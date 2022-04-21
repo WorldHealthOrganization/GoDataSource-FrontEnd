@@ -1,0 +1,176 @@
+@import 'mixins';
+@import 'font';
+
+/* Create, Modify, View */
+.gd-create-view-modify-create,
+.gd-create-view-modify-modify,
+.gd-create-view-modify-view {
+  height: 100%;
+
+  .gd-create-view-modify-loading-data {
+    height: 100%;
+  }
+
+  .gd-create-view-modify-top {
+    padding-bottom: 2.4rem;
+
+    .gd-create-view-modify-top-title-buttons {
+      .gd-create-view-modify-top-title-buttons-title {
+        span {
+          color: var(--gd-primary);
+          font-family: $gd-font-family;
+          font-size: 2.4rem;
+          font-weight: 500;
+          line-height: $gd-line-height;
+        }
+
+        .mat-icon-button {
+          font-size: 2.4rem;
+          height: auto;
+          min-width: 3rem;
+          padding: 0.4rem;
+          width: 3rem;
+        }
+      }
+    }
+  }
+
+  .gd-create-view-modify-bottom {
+    .gd-create-view-modify-bottom-content {
+      .gd-create-view-modify-bottom-section {
+        + .gd-create-view-modify-bottom-section {
+          margin-top: 1.6rem;
+        }
+
+        .gd-create-view-modify-bottom-section-title {
+          color: var(--gd-primary-alt);
+          font-size: 1.8rem;
+          font-weight: 500;
+          margin-bottom: 1.6rem;
+        }
+
+        .gd-create-view-modify-bottom-section-content {
+          > .gd-create-view-modify-bottom-section-content-input {
+            &:not(.gd-create-view-modify-bottom-section-content-input-has-list) {
+              width: calc(25% - 1.6rem);
+
+              &:last-child {
+                margin-right: 1.6rem;
+              }
+            }
+            
+            &.gd-create-view-modify-bottom-section-content-input-has-age-dob {
+              width: calc(50% - 1.6rem);
+            }
+
+            &.gd-create-view-modify-bottom-section-content-input-has-textarea {
+              width: 100%;
+            }
+
+            &.gd-create-view-modify-bottom-section-content-input-has-list {
+              width: calc(100% - 1.6rem);
+
+              .gd-create-view-modify-bottom-section-content-input-list {
+                .gd-create-view-modify-bottom-section-content-input-list-item {
+                  @include border-radius(0.4rem);
+                  margin-bottom: 1.6rem;
+
+                  .gd-create-view-modify-bottom-section-content-input-list-item-delete {
+                    button.mat-icon-button,
+                    a.mat-icon-button {
+                      @include border-radius(0.4rem 0.4rem 0 0);
+                      font-size: 1.6rem;
+                      height: 2.4rem;
+                      min-width: 2.4rem;
+                      padding: 0.4rem;
+                      width: 2.4rem;
+
+                      .mat-icon {
+                        font-size: 1.6rem;
+                      }
+                    }
+                  }
+
+                  .gd-create-view-modify-bottom-section-content-input-list-item-content {
+                    border: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+                    @include border-radius(0.4rem 0 0.4rem 0.4rem);
+                    padding: 1.6rem 1.6rem 0;
+
+                    > .gd-create-view-modify-bottom-section-content-input {
+                      width: 100%;
+                    }
+
+                    .gd-create-view-modify-bottom-section-content-input-list-multiple-rows {
+                      margin-right: -1.6rem;
+
+                      > * {
+                        width: calc(25% - 1.6rem);
+
+                        &:last-child {
+                          margin-right: 1.6rem;
+                        }
+                      }
+
+                      > app-form-textarea-v2 {
+                        width: 100%;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          > .gd-create-view-modify-bottom-section-content-input-replaced {
+            color: var(--gd-secondary);
+            font-style: italic;
+            line-height: 4rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* View */
+.gd-create-view-modify-view {
+  .gd-create-view-modify-bottom {
+    .gd-create-view-modify-bottom-content {
+      .gd-create-view-modify-bottom-section {
+        + .gd-create-view-modify-bottom-section {
+          margin-top: 1.6rem;
+        }
+
+        .gd-create-view-modify-bottom-section-content {
+          > .gd-create-view-modify-bottom-section-content-input {
+            &:not(.gd-create-view-modify-bottom-section-content-input-has-list) {
+              margin-bottom: 1.6rem;
+            }
+
+            &.gd-create-view-modify-bottom-section-content-input-has-list {
+              .gd-create-view-modify-bottom-section-content-input-list {
+                .gd-create-view-modify-bottom-section-content-input-list-item {
+                  .gd-create-view-modify-bottom-section-content-input-list-item-content {
+                    > .gd-create-view-modify-bottom-section-content-input {
+                      > div:not(.gd-create-view-modify-bottom-section-content-input-list-multiple-rows) {
+                        > * {
+                          margin-bottom: 1.6rem;
+                        }
+                      }
+                    }
+
+                    .gd-create-view-modify-bottom-section-content-input-list-multiple-rows {
+                      > * {
+                        margin-bottom: 1.6rem;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,8 +1,8 @@
 @import 'mixins';
 @import 'font';
 
-/* Form input */
-.gd-form-input-v2 {
+/* Form textarea */
+.gd-form-textarea-v2 {
   width: 100%;
 
   .mat-form-field {
@@ -19,7 +19,7 @@
         margin-top: 0;
         padding: 0 1.6rem;
 
-        /* Form input borders */
+        /* Form textarea borders */
         .mat-form-field-outline {
           color: var(--gd-secondary);
           top: 0;
@@ -43,7 +43,7 @@
           }
         }
 
-        /* Form input borders on focus */
+        /* Form textarea borders on focus */
         .mat-form-field-outline-thick {
           color: var(--gd-primary);
 
@@ -66,7 +66,7 @@
           }
         }
 
-        /* Form input prefix */
+        /* Form textarea prefix */
         .mat-form-field-prefix {
           left: -0.4rem;
           top: 0.5rem;
@@ -83,15 +83,17 @@
           }
         }
 
-        /* Form input middle */
+        /* Form textarea middle */
         .mat-form-field-infix {
           border-top: 0 none;
           @include flex(flex);
           padding: 0.8rem 0;
 
-          input {
+          textarea {
             line-height: 2.4rem;
-            margin-top: 0;
+            margin: 0;
+            min-height: 2.4rem;
+            padding: 0;
           }
 
           .mat-input-element {
@@ -107,7 +109,7 @@
           }
         }
 
-        /* Form input suffix */
+        /* Form textarea suffix */
         .mat-form-field-suffix {
           top: 0.3rem;
 
@@ -136,7 +138,7 @@
       }
     }
 
-    /* Form input focused */
+    /* Form textarea focused */
     &:focus,
     &.mat-focused,
     &.mat-form-field-should-float {
@@ -155,7 +157,7 @@
       }
     }
 
-    /* Form input disabled */
+    /* Form textarea disabled */
     &.mat-form-field-disabled {
       .mat-form-field-wrapper {
         .mat-form-field-flex {
@@ -188,7 +190,7 @@
       }
     }
 
-    /* Form input invalid */
+    /* Form textarea invalid */
     &.mat-form-field-invalid {
       .mat-form-field-wrapper {
         .mat-form-field-flex {
@@ -210,8 +212,8 @@
     }
   }
 
-  .gd-form-input-v2-viewonly {
-    .gd-form-input-v2-viewonly-label {
+  .gd-form-textarea-v2-viewonly {
+    .gd-form-textarea-v2-viewonly-label {
       color: var(--gd-secondary);
       white-space: nowrap;
     }

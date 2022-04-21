@@ -43,6 +43,21 @@ a.mat-flat-button {
       background-color: rgba(var(--gd-primary-rgb), 0.25);
       color: var(--gd-background);
     }
+
+    .mat-progress-spinner {
+      &.mat-primary,
+      &.mat-accent {
+        circle {
+          stroke: var(--gd-background);
+        }
+      }
+
+      &.mat-warn {
+        circle {
+          stroke: var(--gd-warning);
+        }
+      }
+    }
   }
 
   /* Secondary button */

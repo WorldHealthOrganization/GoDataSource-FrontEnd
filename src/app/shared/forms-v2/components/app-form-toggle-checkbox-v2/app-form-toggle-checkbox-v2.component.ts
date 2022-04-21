@@ -5,7 +5,7 @@ import {
   Host, Input,
   OnDestroy,
   Optional,
-  SkipSelf
+  SkipSelf, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
@@ -15,6 +15,7 @@ import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 @Component({
   selector: 'app-form-toggle-checkbox-v2',
   templateUrl: './app-form-toggle-checkbox-v2.component.html',
+  styleUrls: ['./app-form-toggle-checkbox-v2.component.scss'],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -22,6 +23,7 @@ import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
       multi: true
     }
   ],
+  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppFormToggleCheckboxV2Component

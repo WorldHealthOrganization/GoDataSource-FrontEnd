@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input } from '@angular/core';
 import { CreateViewModifyV2Action } from './models/action.model';
-import { ICreateViewModifyV2, CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputList, CreateViewModifyV2MenuType } from './models/tab.model';
+import { CreateViewModifyV2ActionType, CreateViewModifyV2MenuType, CreateViewModifyV2TabInputType, ICreateViewModifyV2, ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputList } from './models/tab.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/bottom-dialog-config.model';
@@ -10,6 +10,8 @@ import { Constants } from '../../../core/models/constants';
 import { AddressModel } from '../../../core/models/address.model';
 import { ILocation } from '../../forms-v2/core/app-form-location-base-v2';
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';
+import * as _ from 'lodash';
+import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 
 /**
  * Component
@@ -17,6 +19,7 @@ import { FormHelperService } from '../../../core/services/helper/form-helper.ser
 @Component({
   selector: 'app-create-view-modify-v2',
   templateUrl: './app-create-view-modify-v2.component.html',
+  styleUrls: ['./app-create-view-modify-v2.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppCreateViewModifyV2Component {
@@ -81,7 +84,8 @@ export class AppCreateViewModifyV2Component {
     protected elementRef: ElementRef,
     protected changeDetectorRef: ChangeDetectorRef,
     protected dialogV2Service: DialogV2Service,
-    protected formHelper: FormHelperService
+    protected formHelper: FormHelperService,
+    protected toastV2Service: ToastV2Service
   ) {}
 
   /**
@@ -238,9 +242,98 @@ export class AppCreateViewModifyV2Component {
    * Create item
    */
   create(): void {
-    // determine form data
+    // determine forms
     const forms: NgForm[] = this.tabData.tabs.map((tab) => tab.form).filter((item) => !!item);
+
+    // validate
+    if (!this.formHelper.isFormsSetValid(forms)) {
+      return;
+    }
+
+    // determine form data
     const fieldData = this.formHelper.mergeFields(forms);
-    console.log(fieldData);
+    if (_.isEmpty(fieldData)) {
+      return;
+    }
+
+    // show loading
+    const loadingHandler = this.dialogV2Service.showLoadingDialog();
+
+    // call create
+    this.tabData
+      .createOrUpdate(
+        CreateViewModifyV2ActionType.CREATE,
+        fieldData,
+        (error, data) => {
+          // hide loading
+          loadingHandler.close();
+
+          // handle errors
+          if (error) {
+            // show error
+            this.toastV2Service.error(error);
+
+            // finished
+            return;
+          }
+
+          // redirect after create / update
+          this.tabData.redirectAfterCreateUpdate(data);
+        }
+      );
+  }
+
+  /**
+   * Update item
+   */
+  modify(): void {
+    // determine forms
+    const forms: NgForm[] = this.tabData.tabs.map((tab) => tab.form).filter((item) => !!item);
+
+    // submit to validate forms
+    forms.forEach((form) => {
+      form.ngSubmit.emit();
+    });
+
+    // validate
+    if (!this.formHelper.isFormsSetValid(forms)) {
+      // show message
+      this.toastV2Service.notice('LNG_FORM_ERROR_FORM_INVALID');
+
+      // finished
+      return;
+    }
+
+    // determine form data
+    const fieldData = this.formHelper.mergeDirtyFields(forms);
+    if (_.isEmpty(fieldData)) {
+      return;
+    }
+console.log(fieldData);
+    // // show loading
+    // const loadingHandler = this.dialogV2Service.showLoadingDialog();
+    //
+    // // call create
+    // this.tabData
+    //   .createOrUpdate(
+    //     CreateViewModifyV2ActionType.UPDATE,
+    //     fieldData,
+    //     (error, data) => {
+    //       // hide loading
+    //       loadingHandler.close();
+    //
+    //       // handle errors
+    //       if (error) {
+    //         // show error
+    //         this.toastV2Service.error(error);
+    //
+    //         // finished
+    //         return;
+    //       }
+    //
+    //       // redirect after create / update
+    //       this.tabData.redirectAfterCreateUpdate(data);
+    //     }
+    //   );
   }
 }

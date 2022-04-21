@@ -1,14 +1,21 @@
 import { Component, OnDestroy } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { TranslateService } from '@ngx-translate/core';
-import { CreateViewModifyV2MenuType, CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import {
+  CreateViewModifyV2ActionType,
+  CreateViewModifyV2MenuType,
+  CreateViewModifyV2TabInputType,
+  ICreateViewModifyV2Buttons,
+  ICreateViewModifyV2CreateOrUpdate,
+  ICreateViewModifyV2Tab
+} from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { Constants } from '../../../../core/models/constants';
@@ -25,6 +32,10 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
+import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
+import * as _ from 'lodash';
 
 /**
  * Component
@@ -46,11 +57,13 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Constructor
    */
   constructor(
+    protected router: Router,
     protected activatedRoute: ActivatedRoute,
     protected caseDataService: CaseDataService,
     protected translateService: TranslateService,
-    authDataService: AuthDataService,
-    toastV2Service: ToastV2Service
+    protected systemSettingsDataService: SystemSettingsDataService,
+    protected toastV2Service: ToastV2Service,
+    authDataService: AuthDataService
   ) {
     super(
       activatedRoute,
@@ -199,183 +212,17 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       },
 
       // buttons
-      buttons: {
-        view: {
-          link: {
-            link: () => ['/cases', this.itemData?.id, 'view']
-          }
-        },
-        modify: {
-          link: {
-            link: () => ['/cases', this.itemData?.id, 'modify']
-          },
-          visible: () => CaseModel.canModify(this.authUser)
-        },
-        createCancel: {
-          link: {
-            link: () => ['/cases']
-          }
-        },
-        viewCancel: {
-          link: {
-            link: () => ['/cases']
-          }
-        },
-        modifyCancel: {
-          link: {
-            link: () => ['/cases']
-          }
-        },
-        quickActions: {
-          options: [
-            // Add contact
-            {
-              type: CreateViewModifyV2MenuType.OPTION,
-              label: 'LNG_PAGE_ACTION_ADD_CONTACT',
-              action: {
-                link: () => ['/contacts', 'create'],
-                queryParams: () => {
-                  return {
-                    entityType: EntityType.CASE,
-                    entityId: this.itemData?.id
-                  };
-                }
-              },
-              visible: () => CaseModel.canCreateContact(this.authUser) && ContactModel.canCreate(this.authUser)
-            },
+      buttons: this.initializeButtons(),
 
-            // Divider
-            {
-              type: CreateViewModifyV2MenuType.DIVIDER,
-              visible: () => CaseModel.canCreateContact(this.authUser) && ContactModel.canCreate(this.authUser)
-            },
-
-            // View Questionnaire
-            {
-              type: CreateViewModifyV2MenuType.OPTION,
-              label: 'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE',
-              action: {
-                link: () => ['/cases', this.itemData.id, 'view-questionnaire']
-              }
-            },
-
-            // Divider
-            {
-              type: CreateViewModifyV2MenuType.DIVIDER
-            },
-
-            // Duplicate records marked as not duplicate
-            {
-              type: CreateViewModifyV2MenuType.OPTION,
-              label: 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_RECORDS_NOT_DUPLICATES',
-              action: {
-                link: () => ['/duplicated-records', 'cases', this.itemData.id, 'marked-not-duplicates']
-              },
-              visible: () => CaseModel.canList(this.authUser)
-            },
-
-            // contacts
-            {
-              type: CreateViewModifyV2MenuType.OPTION,
-              label: 'LNG_COMMON_BUTTON_EXPOSURES_FROM',
-              action: {
-                link: () => ['/relationships', EntityType.CASE, this.itemData.id, 'contacts']
-              },
-              visible: () => CaseModel.canListRelationshipContacts(this.authUser)
-            },
-            // exposures
-            {
-              type: CreateViewModifyV2MenuType.OPTION,
-              label: 'LNG_COMMON_BUTTON_EXPOSURES_TO',
-              action: {
-                link: () => ['/relationships', EntityType.CASE, this.itemData.id, 'exposures']
-              },
-              visible: () => CaseModel.canListRelationshipExposures(this.authUser)
-            },
-
-            // lab results
-            {
-              type: CreateViewModifyV2MenuType.OPTION,
-              label: 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS',
-              action: {
-                link: () => ['/lab-results', 'cases', this.itemData.id]
-              },
-              visible: () => LabResultModel.canList(this.authUser) && CaseModel.canListLabResult(this.authUser)
-            },
-
-            // follow-ups
-            {
-              type: CreateViewModifyV2MenuType.OPTION,
-              label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS',
-              action: {
-                link: () => ['/contacts', 'case-related-follow-ups', this.itemData.id]
-              },
-              visible: () => FollowUpModel.canList(this.authUser)
-            },
-
-            // Divider
-            {
-              type: CreateViewModifyV2MenuType.DIVIDER,
-              visible: () => CaseModel.canList(this.authUser) || CaseModel.canListRelationshipContacts(this.authUser) ||
-                CaseModel.canListRelationshipExposures(this.authUser) || (LabResultModel.canList(this.authUser) && CaseModel.canListLabResult(this.authUser)) ||
-                FollowUpModel.canList(this.authUser)
-            },
-
-            // movement map
-            {
-              type: CreateViewModifyV2MenuType.OPTION,
-              label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_MOVEMENT',
-              action: {
-                link: () => ['/cases', this.itemData.id, 'movement']
-              },
-              visible: () => CaseModel.canViewMovementMap(this.authUser)
-            },
-
-            // chronology chart
-            {
-              type: CreateViewModifyV2MenuType.OPTION,
-              label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CHRONOLOGY',
-              action: {
-                link: () => ['/cases', this.itemData.id, 'chronology']
-              },
-              visible: () => CaseModel.canViewChronologyChart(this.authUser)
-            },
-
-            // Divider
-            {
-              type: CreateViewModifyV2MenuType.DIVIDER,
-              visible: () => CaseModel.canViewMovementMap(this.authUser) || CaseModel.canViewChronologyChart(this.authUser)
-            },
-
-            // Contact group
-            {
-              type: CreateViewModifyV2MenuType.GROUP,
-              label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CASE_WAS_CONTACT_TITLE',
-              visible: () => this.itemData.wasContact && (
-                this.itemData.hasQuestionnaireAnswersContact ||
-                FollowUpModel.canList(this.authUser)
-              )
-            },
-            // case => contact questionnaire
-            {
-              type: CreateViewModifyV2MenuType.OPTION,
-              label: 'LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE',
-              action: {
-                link: () => ['/cases', this.itemData.id, 'history']
-              },
-              visible: () => this.itemData.wasContact && this.itemData.hasQuestionnaireAnswersContact
-            },
-            // case => contact follow-ups
-            {
-              type: CreateViewModifyV2MenuType.OPTION,
-              label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CONTACT_FOLLOW_UPS',
-              action: {
-                link: () => ['/contacts', 'case-follow-ups', this.itemData.id]
-              },
-              visible: () => this.itemData.wasContact && FollowUpModel.canList(this.authUser)
-            }
-          ]
-        }
+      // create or update
+      createOrUpdate: this.initializeProcessData(),
+      redirectAfterCreateUpdate: (data: CaseModel) => {
+        // redirect to view
+        this.router.navigate([
+          '/cases',
+          data.id,
+          'view'
+        ]);
       }
     };
   }
@@ -659,6 +506,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               set: (value) => {
                 this.itemData.classification = value;
               }
+            },
+            validators: {
+              required: () => true
             }
           }, {
             type: CreateViewModifyV2TabInputType.DATE,
@@ -673,7 +523,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             },
             maxDate: this._today,
             validators: {
-              required: () => this.selectedOutbreak.isDateOfOnsetRequired,
+              required: () => !!this.selectedOutbreak.isDateOfOnsetRequired,
               dateSameOrBefore: () => [
                 this._today,
                 'dateOfOutcome'
@@ -987,6 +837,317 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }]
         }
       ]
+    };
+  }
+
+  /**
+   * Initialize buttons
+   */
+  private initializeButtons(): ICreateViewModifyV2Buttons {
+    return {
+      view: {
+        link: {
+          link: () => ['/cases', this.itemData?.id, 'view']
+        }
+      },
+      modify: {
+        link: {
+          link: () => ['/cases', this.itemData?.id, 'modify']
+        },
+        visible: () => CaseModel.canModify(this.authUser)
+      },
+      createCancel: {
+        link: {
+          link: () => ['/cases']
+        }
+      },
+      viewCancel: {
+        link: {
+          link: () => ['/cases']
+        }
+      },
+      modifyCancel: {
+        link: {
+          link: () => ['/cases']
+        }
+      },
+      quickActions: {
+        options: [
+          // Add contact
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_PAGE_ACTION_ADD_CONTACT',
+            action: {
+              link: () => ['/contacts', 'create'],
+              queryParams: () => {
+                return {
+                  entityType: EntityType.CASE,
+                  entityId: this.itemData?.id
+                };
+              }
+            },
+            visible: () => CaseModel.canCreateContact(this.authUser) && ContactModel.canCreate(this.authUser)
+          },
+
+          // Divider
+          {
+            type: CreateViewModifyV2MenuType.DIVIDER,
+            visible: () => CaseModel.canCreateContact(this.authUser) && ContactModel.canCreate(this.authUser)
+          },
+
+          // View Questionnaire
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE',
+            action: {
+              link: () => ['/cases', this.itemData.id, 'view-questionnaire']
+            }
+          },
+
+          // Divider
+          {
+            type: CreateViewModifyV2MenuType.DIVIDER
+          },
+
+          // Duplicate records marked as not duplicate
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_RECORDS_NOT_DUPLICATES',
+            action: {
+              link: () => ['/duplicated-records', 'cases', this.itemData.id, 'marked-not-duplicates']
+            },
+            visible: () => CaseModel.canList(this.authUser)
+          },
+
+          // contacts
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_COMMON_BUTTON_EXPOSURES_FROM',
+            action: {
+              link: () => ['/relationships', EntityType.CASE, this.itemData.id, 'contacts']
+            },
+            visible: () => CaseModel.canListRelationshipContacts(this.authUser)
+          },
+          // exposures
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_COMMON_BUTTON_EXPOSURES_TO',
+            action: {
+              link: () => ['/relationships', EntityType.CASE, this.itemData.id, 'exposures']
+            },
+            visible: () => CaseModel.canListRelationshipExposures(this.authUser)
+          },
+
+          // lab results
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS',
+            action: {
+              link: () => ['/lab-results', 'cases', this.itemData.id]
+            },
+            visible: () => LabResultModel.canList(this.authUser) && CaseModel.canListLabResult(this.authUser)
+          },
+
+          // follow-ups
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS',
+            action: {
+              link: () => ['/contacts', 'case-related-follow-ups', this.itemData.id]
+            },
+            visible: () => FollowUpModel.canList(this.authUser)
+          },
+
+          // Divider
+          {
+            type: CreateViewModifyV2MenuType.DIVIDER,
+            visible: () => CaseModel.canList(this.authUser) || CaseModel.canListRelationshipContacts(this.authUser) ||
+              CaseModel.canListRelationshipExposures(this.authUser) || (LabResultModel.canList(this.authUser) && CaseModel.canListLabResult(this.authUser)) ||
+              FollowUpModel.canList(this.authUser)
+          },
+
+          // movement map
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_MOVEMENT',
+            action: {
+              link: () => ['/cases', this.itemData.id, 'movement']
+            },
+            visible: () => CaseModel.canViewMovementMap(this.authUser)
+          },
+
+          // chronology chart
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CHRONOLOGY',
+            action: {
+              link: () => ['/cases', this.itemData.id, 'chronology']
+            },
+            visible: () => CaseModel.canViewChronologyChart(this.authUser)
+          },
+
+          // Divider
+          {
+            type: CreateViewModifyV2MenuType.DIVIDER,
+            visible: () => CaseModel.canViewMovementMap(this.authUser) || CaseModel.canViewChronologyChart(this.authUser)
+          },
+
+          // Contact group
+          {
+            type: CreateViewModifyV2MenuType.GROUP,
+            label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CASE_WAS_CONTACT_TITLE',
+            visible: () => this.itemData.wasContact && (
+              this.itemData.hasQuestionnaireAnswersContact ||
+              FollowUpModel.canList(this.authUser)
+            )
+          },
+          // case => contact questionnaire
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE',
+            action: {
+              link: () => ['/cases', this.itemData.id, 'history']
+            },
+            visible: () => this.itemData.wasContact && this.itemData.hasQuestionnaireAnswersContact
+          },
+          // case => contact follow-ups
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CONTACT_FOLLOW_UPS',
+            action: {
+              link: () => ['/contacts', 'case-follow-ups', this.itemData.id]
+            },
+            visible: () => this.itemData.wasContact && FollowUpModel.canList(this.authUser)
+          }
+        ]
+      }
+    };
+  }
+
+  /**
+   * Initialize process data
+   */
+  private initializeProcessData(): ICreateViewModifyV2CreateOrUpdate {
+    return (
+      type,
+      data,
+      finished
+    ) => {
+      // create / update
+      const runCreateOrUpdate = () => {
+        // create / update
+        (type === CreateViewModifyV2ActionType.CREATE ?
+          this.caseDataService
+            .createCase(
+              this.selectedOutbreak.id,
+              data
+            ) :
+          this.caseDataService
+            .modifyCase(
+              this.selectedOutbreak.id,
+              this.itemData.id,
+              data
+            )
+        ).pipe(
+          // handle error
+          catchError((err) => {
+            // show error
+            finished(err, undefined);
+
+            // finished
+            return throwError(err);
+          }),
+
+          // should be the last pipe
+          takeUntil(this.destroyed$)
+        )
+          .subscribe((item) => {
+            // success creating case
+            this.toastV2Service.success('LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE');
+
+            // manage duplicates
+            // #TODO
+
+            // finished with success
+            finished(undefined, item);
+          });
+      };
+
+      // check if we need to determine duplicates
+      this.systemSettingsDataService
+        .getAPIVersion()
+        .pipe(
+          // handle error
+          catchError((err) => {
+            // show error
+            finished(err, undefined);
+
+            // send down
+            return throwError(err);
+          }),
+
+          // should be the last pipe
+          takeUntil(this.destroyed$)
+        )
+        .subscribe((versionData) => {
+          // no duplicates - proceed to create case ?
+          if (
+            (
+              type === CreateViewModifyV2ActionType.CREATE &&
+              versionData.duplicate.disableCaseDuplicateCheck
+            ) || (
+              type === CreateViewModifyV2ActionType.UPDATE && (
+                versionData.duplicate.disableCaseDuplicateCheck || (
+                  versionData.duplicate.executeCheckOnlyOnDuplicateDataChange &&
+                  !EntityModel.duplicateDataHasChanged(data)
+                )
+              )
+            )
+          ) {
+            // no need to check for duplicates
+            return runCreateOrUpdate();
+          }
+
+          // check for duplicates
+          this.caseDataService
+            .findDuplicates(
+              this.selectedOutbreak.id,
+              this.isCreate ?
+                data : {
+                  ...this.itemData,
+                  ...data
+                }
+            )
+            .pipe(
+              catchError((err) => {
+                // specific error
+                if (_.includes(_.get(err, 'details.codes.id'), 'uniqueness')) {
+                  finished('LNG_PAGE_CREATE_CASE_ERROR_UNIQUE_ID', undefined);
+                } else {
+                  finished(err, undefined);
+                }
+
+                // send down
+                return throwError(err);
+              }),
+
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            )
+            .subscribe((caseDuplicates) => {
+              // no duplicates ?
+              if (caseDuplicates.duplicates.length < 1) {
+                // create case
+                return runCreateOrUpdate();
+              }
+
+              // construct duplicates dialog input list
+              // #TODO
+
+              // display duplicates dialog
+              // #TODO
+            });
+        });
     };
   }
 }

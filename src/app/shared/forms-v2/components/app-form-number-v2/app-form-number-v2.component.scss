@@ -66,6 +66,23 @@
           }
         }
 
+        /* Form input prefix */
+        .mat-form-field-prefix {
+          left: -0.4rem;
+          top: 0.5rem;
+
+          .mat-icon {
+            color: rgba(var(--gd-text-rgb), 0.75);
+            text-align: center;
+          }
+
+          .mat-icon-button {
+            font-size: 1.6rem;
+            height: 2.4rem;
+            width: 2.4rem;
+          }
+        }
+
         /* Input number middle */
         .mat-form-field-infix {
           border-top: 0 none;
@@ -75,6 +92,10 @@
           input {
             line-height: 2.4rem;
             margin-top: 0;
+          }
+
+          .mat-input-element {
+            caret-color: var(--gd-text);
           }
 
           .mat-form-field-label-wrapper {
@@ -89,8 +110,8 @@
 
       .mat-form-field-subscript-wrapper {
         font-size: 1.2rem;
-        margin-top: 0.4rem;
-        padding: 0 1.6rem;
+        margin-top: 0.2rem;
+        padding: 0;
       }
     }
 
@@ -141,7 +162,7 @@
           background: rgba(var(--gd-danger-rgb), 0.15);
 
           .mat-form-field-outline {
-            color: rgba(var(--gd-danger-rgb), 0.5);
+            color: var(--gd-danger);
           }
 
           .mat-form-field-infix {
@@ -153,6 +174,13 @@
           }
         }
       }
+    }
+  }
+
+  .gd-form-number-v2-viewonly {
+    .gd-form-number-v2-viewonly-label {
+      color: var(--gd-secondary);
+      white-space: nowrap;
     }
   }
 }

@@ -186,8 +186,8 @@
 
       .mat-form-field-subscript-wrapper {
         font-size: 1.2rem;
-        margin-top: 0.4rem;
-        padding: 0 1.6rem;
+        margin-top: 0.2rem;
+        padding: 0;
       }
     }
 
@@ -270,7 +270,7 @@
           background: rgba(var(--gd-danger-rgb), 0.15);
 
           .mat-form-field-outline {
-            color: rgba(var(--gd-danger-rgb), 0.5);
+            color: var(--gd-danger);
           }
 
           .mat-form-field-infix {
@@ -296,6 +296,13 @@
           }
         }
       }
+    }
+  }
+
+  .gd-form-select-location-single-v2-viewonly {
+    .gd-form-select-location-single-v2-viewonly-label {
+      color: var(--gd-secondary);
+      white-space: nowrap;
     }
   }
 }

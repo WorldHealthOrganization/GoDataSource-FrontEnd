@@ -76,7 +76,7 @@
         /* Select prefix */
         .mat-form-field-prefix {
           left: -0.4rem;
-          top: 0.3rem;
+          top: 0.5rem;
 
           .mat-icon {
             color: rgba(var(--gd-text-rgb), 0.75);
@@ -114,9 +114,9 @@
                   mat-select-trigger {
                     > img {
                       display: inline-block;
-                      height: 2.4rem;
+                      height: 2rem;
                       margin-right: 0.4rem;
-                      vertical-align: middle;
+                      vertical-align: text-bottom;
                     }
                   }
 
@@ -188,8 +188,8 @@
 
       .mat-form-field-subscript-wrapper {
         font-size: 1.2rem;
-        margin-top: 0.4rem;
-        padding: 0 1.6rem;
+        margin-top: 0.2rem;
+        padding: 0;
       }
     }
 
@@ -272,7 +272,7 @@
           background: rgba(var(--gd-danger-rgb), 0.15);
 
           .mat-form-field-outline {
-            color: rgba(var(--gd-danger-rgb), 0.5);
+            color: var(--gd-danger);
           }
 
           .mat-form-field-infix {
@@ -298,6 +298,13 @@
           }
         }
       }
+    }
+  }
+
+  .gd-form-input-v2-viewonly {
+    .gd-form-input-v2-viewonly-label {
+      color: var(--gd-secondary);
+      white-space: nowrap;
     }
   }
 }
