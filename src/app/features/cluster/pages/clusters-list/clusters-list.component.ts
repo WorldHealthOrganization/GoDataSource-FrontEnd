@@ -39,16 +39,16 @@ export class ClustersListComponent extends ListComponent implements OnDestroy {
   }
 
   /**
-     * Component destroyed
-     */
+   * Component destroyed
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
   }
 
   /**
-* Selected outbreak was changed
-*/
+  * Selected outbreak was changed
+  */
   selectedOutbreakChanged(): void {
     // initialize pagination
     this.initPaginator();
@@ -98,7 +98,6 @@ export class ClustersListComponent extends ListComponent implements OnDestroy {
           type: V2ColumnFormat.COLOR
         }
       },
-
 
       // actions
       {
@@ -197,8 +196,6 @@ export class ClustersListComponent extends ListComponent implements OnDestroy {
                           })
                         )
                         .subscribe(() => {
-
-
                           // success
                           this.toastV2Service.success('LNG_PAGE_LIST_CLUSTERS_ACTION_DELETE_SUCCESS_MESSAGE');
 
@@ -218,7 +215,6 @@ export class ClustersListComponent extends ListComponent implements OnDestroy {
                     ClusterModel.canDelete(this.authUser);
                 }
               },
-
 
               // Divider
               {
@@ -354,8 +350,8 @@ export class ClustersListComponent extends ListComponent implements OnDestroy {
   }
 
   /**
-     * Get total number of items, based on the applied filters
-     */
+   * Get total number of items, based on the applied filters
+   */
   refreshListCount(applyHasMoreLimit?: boolean) {
     if (this.selectedOutbreak) {
       // reset
@@ -370,7 +366,6 @@ export class ClustersListComponent extends ListComponent implements OnDestroy {
       const countQueryBuilder = _.cloneDeep(this.queryBuilder);
       countQueryBuilder.paginator.clear();
       countQueryBuilder.sort.clear();
-
       this.clusterDataService
         .getClustersCount(this.selectedOutbreak.id, countQueryBuilder)
         .pipe(
