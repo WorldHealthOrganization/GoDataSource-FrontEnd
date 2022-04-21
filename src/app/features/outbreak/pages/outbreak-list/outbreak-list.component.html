@@ -3,12 +3,16 @@
   [records$]="outbreaksList$"
   [columns]="tableColumns"
   [breadcrumbs]="breadcrumbs"
+  [quickActions]="quickActions"
+  [groupActions]="groupActions"
   [addAction]="addAction"
+  [groupedData]="groupedData"
   [pageCount]="pageCount"
   [pageSize]="pageSize"
   [pageIndex]="pageIndex"
   [pageSettingsKey]="UserSettings.OUTBREAK_FIELDS"
   [sortColumn]="tableSortBy"
+  [infos]="infos"
   [filtersApplied]="filtersApplied"
   [advancedFilterType]="Constants.APP_PAGE.OUTBREAKS.value"
   [advancedFilters]="advancedFilters"
@@ -18,4 +22,5 @@
   (sortBy)="sortBy($event)"
   (filterBy)="filterBy($event)"
   (resetHeaderFilters)="resetFiltersToSideFilters()"
-  (advancedFilterBy)="applySideFilters($event)">></app-list-table-v2>
+  (advancedFilterBy)="applySideFilters($event)">
+</app-list-table-v2>
