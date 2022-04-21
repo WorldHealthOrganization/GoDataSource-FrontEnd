@@ -696,6 +696,10 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
                               handler.form.invalid ||
                               handler.form.pending;
                           }
+                        }, {
+                          type: IV2SideDialogConfigButtonType.CANCEL,
+                          label: 'LNG_COMMON_BUTTON_CANCEL',
+                          color: 'text'
                         }],
                         initialized: (handler) => {
                           // display loading
