@@ -1042,7 +1042,12 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               this.selectedOutbreak.id,
               data
             ) :
-          null
+          this.caseDataService
+            .modifyCase(
+              this.selectedOutbreak.id,
+              this.itemData.id,
+              data
+            )
         ).pipe(
           // handle error
           catchError((err) => {

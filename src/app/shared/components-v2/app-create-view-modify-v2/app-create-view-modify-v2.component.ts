@@ -282,4 +282,58 @@ export class AppCreateViewModifyV2Component {
         }
       );
   }
+
+  /**
+   * Update item
+   */
+  modify(): void {
+    // determine forms
+    const forms: NgForm[] = this.tabData.tabs.map((tab) => tab.form).filter((item) => !!item);
+
+    // submit to validate forms
+    forms.forEach((form) => {
+      form.ngSubmit.emit();
+    });
+
+    // validate
+    if (!this.formHelper.isFormsSetValid(forms)) {
+      // show message
+      this.toastV2Service.notice('LNG_FORM_ERROR_FORM_INVALID');
+
+      // finished
+      return;
+    }
+
+    // determine form data
+    const fieldData = this.formHelper.mergeDirtyFields(forms);
+    if (_.isEmpty(fieldData)) {
+      return;
+    }
+
+    // show loading
+    const loadingHandler = this.dialogV2Service.showLoadingDialog();
+
+    // call create
+    this.tabData
+      .createOrUpdate(
+        CreateViewModifyV2ActionType.UPDATE,
+        fieldData,
+        (error, data) => {
+          // hide loading
+          loadingHandler.close();
+
+          // handle errors
+          if (error) {
+            // show error
+            this.toastV2Service.error(error);
+
+            // finished
+            return;
+          }
+
+          // redirect after create / update
+          this.tabData.redirectAfterCreateUpdate(data);
+        }
+      );
+  }
 }

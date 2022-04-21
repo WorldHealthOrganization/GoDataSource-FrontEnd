@@ -154,8 +154,16 @@
           <button
             *ngIf="isModify"
             type="button"
-            mat-flat-button color="primary">
-            {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+            mat-flat-button color="primary"
+            (click)="modify()">
+
+            <!-- Pending validators ? -->
+            <!-- #TODO -->
+
+            <!-- Label -->
+            <span>
+              {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+            </span>
           </button>
 
           <!-- Edit -->
