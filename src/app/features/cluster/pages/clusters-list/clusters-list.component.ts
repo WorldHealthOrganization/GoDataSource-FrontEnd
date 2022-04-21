@@ -284,7 +284,19 @@ export class ClustersListComponent extends ListComponent implements OnDestroy {
   /**
    * Initialize table add action
    */
-  protected initializeAddAction(): void {}
+  protected initializeAddAction(): void {
+    this.addAction = {
+      type: V2ActionType.ICON_LABEL,
+      label: 'LNG_COMMON_BUTTON_ADD',
+      icon: 'add_circle_outline',
+      action: {
+        link: (): string[] => ['/clusters', 'create']
+      },
+      visible: (): boolean => {
+        return ClusterModel.canCreate(this.authUser);
+      }
+    };
+  }
 
   /**
    * Initialize table grouped data
