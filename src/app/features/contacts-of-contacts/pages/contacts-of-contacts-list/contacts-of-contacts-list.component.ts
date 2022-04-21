@@ -1128,6 +1128,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
   /**
    * Initialize add action
+   * - can add contact of contacts only through contacts
    */
   protected initializeAddAction(): void {}
 

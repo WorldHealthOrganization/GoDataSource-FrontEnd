@@ -1807,20 +1807,9 @@ export class ContactsListComponent
 
   /**
    * Initialize table add action
+   * - can add contacts only through cases & events
    */
-  protected initializeAddAction(): void {
-    this.addAction = {
-      type: V2ActionType.ICON_LABEL,
-      label: 'LNG_COMMON_BUTTON_ADD',
-      icon: 'add_circle_outline',
-      action: {
-        link: (): string[] => ['/contacts', 'create']
-      },
-      visible: (): boolean => {
-        return ContactModel.canCreate(this.authUser);
-      }
-    };
-  }
+  protected initializeAddAction(): void {}
 
   /**
    * Initialize grouped data

@@ -1,4 +1,4 @@
-<app-list-table-v2 
+<app-list-table-v2
   [pageTitle]="appliedListFilter !== Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS ? 'LNG_PAGE_LIST_EVENTS_TITLE' : 'LNG_PAGE_DASHBOARD_EVENTS_WITHOUT_RELATIONSHIPS'"
   [records$]="eventsList$"
   [columns]="tableColumns"
@@ -6,11 +6,13 @@
   [quickActions]="quickActions"
   [groupActions]="groupActions"
   [addAction]="addAction"
+  [groupedData]="groupedData"
   [pageCount]="pageCount"
   [pageSize]="pageSize"
   [pageIndex]="pageIndex"
   [pageSettingsKey]="appliedListFilter !== Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS ? UserSettings.EVENT_FIELDS : UserSettings.EVENT_WITHOUT_RELATIONSHIPS_FIELDS"
   [sortColumn]="tableSortBy"
+  [infos]="infos"
   [filtersApplied]="filtersApplied"
   [advancedFilterType]="Constants.APP_PAGE.EVENTS.value"
   [advancedFilters]="advancedFilters"
@@ -20,5 +22,5 @@
   (sortBy)="sortBy($event)"
   (filterBy)="filterBy($event)"
   (resetHeaderFilters)="resetFiltersToSideFilters()"
-  (advancedFilterBy)="applySideFilters($event)"
-></app-list-table-v2>
+  (advancedFilterBy)="applySideFilters($event)">
+</app-list-table-v2>

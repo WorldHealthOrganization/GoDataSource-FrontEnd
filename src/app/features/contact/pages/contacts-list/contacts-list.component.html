@@ -12,7 +12,7 @@
   [pageIndex]="pageIndex"
   [pageSettingsKey]="UserSettings.CONTACT_FIELDS"
   [sortColumn]="tableSortBy"
-  [infos]="null"
+  [infos]="infos"
   [filtersApplied]="filtersApplied"
   [advancedFilterType]="Constants.APP_PAGE.CONTACTS.value"
   [advancedFilters]="advancedFilters"
@@ -22,4 +22,5 @@
   (sortBy)="sortBy($event, { age: [ 'years', 'months' ] })"
   (filterBy)="filterBy($event)"
   (resetHeaderFilters)="resetFiltersToSideFilters()"
-  (advancedFilterBy)="applySideFilters($event)"></app-list-table-v2>
+  (advancedFilterBy)="applySideFilters($event)">
+</app-list-table-v2>
