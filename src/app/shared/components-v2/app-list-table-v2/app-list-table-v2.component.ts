@@ -1,5 +1,4 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, Renderer2 } from '@angular/core';
-import { BaseModel } from '../../../core/models/base.model';
 import { Observable, throwError } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { GridReadyEvent, ValueFormatterParams } from '@ag-grid-community/core';
@@ -80,8 +79,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   // records
   recordsSubscription: Subscription;
-  private _records$: Observable<BaseModel[]>;
-  @Input() set records$(records$: Observable<BaseModel[]>) {
+  private _records$: Observable<any[]>;
+  @Input() set records$(records$: Observable<any[]>) {
     // set the new observable
     this._records$ = records$;
 
