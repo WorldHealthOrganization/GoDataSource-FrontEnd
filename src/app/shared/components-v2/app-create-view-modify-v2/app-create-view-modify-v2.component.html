@@ -155,10 +155,16 @@
             *ngIf="isModify"
             type="button"
             mat-flat-button color="primary"
+            [disabled]="hasPendingForm"
             (click)="modify()">
 
-            <!-- Pending validators ? -->
-            <!-- #TODO -->
+            <!-- Pending validators -->
+            <mat-progress-spinner
+              [style.visibility]="hasPendingForm ? 'visible' : 'hidden'"
+              diameter="16"
+              mode="indeterminate"
+              color="primary">
+            </mat-progress-spinner>
 
             <!-- Label -->
             <span>

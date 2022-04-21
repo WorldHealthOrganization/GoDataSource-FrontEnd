@@ -34,6 +34,7 @@ export class GeneralAsyncValidatorDirective {
 
   // previous validated value
   private _previousValue: any;
+  private _previousResponse: any = null;
 
   /**
    * Validate
@@ -50,7 +51,15 @@ export class GeneralAsyncValidatorDirective {
 
     // no need to validate if same as previous value ?
     if (this._previousValue === control.value) {
-      return of(null);
+      return of(this._previousResponse);
+    }
+
+    // no need to validate when not dirty ?
+    if (
+      this.validateOnlyWhenDirty &&
+      !control.dirty
+    ) {
+      return of(this._previousResponse);
     }
 
     // wait for binding
@@ -87,8 +96,8 @@ export class GeneralAsyncValidatorDirective {
                     control.markAsTouched();
                   }
 
-                  // finished
-                  return isValid ?
+                  // set response
+                  this._previousResponse = isValid ?
                     null : {
                       generalAsyncValidatorDirective: {
                         err: this.asyncValidatorErrMsg,
@@ -107,8 +116,8 @@ export class GeneralAsyncValidatorDirective {
                     control.markAsTouched();
                   }
 
-                  // finished
-                  return data.isValid ?
+                  // set response
+                  this._previousResponse = data.isValid ?
                     null : {
                       generalAsyncValidatorDirective: {
                         err: data.errMsg ? data.errMsg : this.asyncValidatorErrMsg,
@@ -116,6 +125,9 @@ export class GeneralAsyncValidatorDirective {
                       }
                     };
                 }
+
+                // finished
+                return this._previousResponse;
               })
             );
         })

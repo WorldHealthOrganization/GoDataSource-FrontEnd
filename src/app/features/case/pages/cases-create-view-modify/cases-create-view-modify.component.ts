@@ -379,7 +379,12 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                 // construct cache key
                 const cacheKey: string = 'CCA_' + this.selectedOutbreak.id +
                   this._caseVisualIDMask.mask +
-                  this.itemData.visualId;
+                  this.itemData.visualId +
+                  (
+                    this.isCreate ?
+                      '' :
+                      this.itemData.id
+                  );
 
                 // get data from cache or execute validator
                 TimerCache.run(
@@ -387,7 +392,10 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                   this.caseDataService.checkCaseVisualIDValidity(
                     this.selectedOutbreak.id,
                     this._caseVisualIDMask.mask,
-                    this.itemData.visualId
+                    this.itemData.visualId,
+                    this.isCreate ?
+                      undefined :
+                      this.itemData.id
                   )
                 ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
                   observer.next(isValid);

@@ -71,6 +71,28 @@ export class AppCreateViewModifyV2Component {
     }
   ];
 
+  // Go through forms and determine if one is pending
+  get hasPendingForm(): boolean {
+    // nothing to check ?
+    if (
+      !this.tabData ||
+      !this.tabData.tabs ||
+      this.tabData.tabs.length < 1
+    ) {
+      return false;
+    }
+
+    // check forms
+    for (let index: number = 0; index < this.tabData.tabs.length; index++) {
+      if (this.tabData.tabs[index].form?.pending) {
+        return true;
+      }
+    }
+
+    // all forms are okay
+    return false;
+  }
+
   // constants
   CreateViewModifyV2TabInputType = CreateViewModifyV2TabInputType;
   Constants = Constants;
