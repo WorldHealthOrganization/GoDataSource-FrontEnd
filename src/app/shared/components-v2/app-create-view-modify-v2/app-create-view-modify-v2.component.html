@@ -275,7 +275,7 @@
                 <app-form-toggle-v2
                   *ngIf="!isView"
                   [(ngModel)]="input.ageChecked"
-                  [name]="parentName ? parentName + '[ageDob]' : 'ageDob'"
+                  [name]="FormHelperService.IGNORE_FIELD_PREFIX + (parentName ? parentName + '[ageDob]' : 'ageDob')"
                   [options]="ageDOBOptions"></app-form-toggle-v2>
 
                 <!-- Age -->
@@ -322,7 +322,7 @@
                     *ngIf="!isView"
                     fxFlex
                     [(ngModel)]="input.ageTypeYears"
-                    [name]="parentName ? parentName + '[ageDobType]' : 'ageDobType'"
+                    [name]="FormHelperService.IGNORE_FIELD_PREFIX + (parentName ? parentName + '[ageDobType]' : 'ageDobType')"
                     placeholder="LNG_AGE_FIELD_LABEL_TYPE"
                     [options]="ageTypeOptions"
                     (ngModelChange)="input.ageTypeYears ? input.value.age.months.set(0) : input.value.age.years.set(0)"></app-form-select-single-v2>
@@ -775,6 +775,7 @@
               <button
                 *ngIf="tabIndex > 0"
                 mat-flat-button color="secondary"
+                type="button"
                 matStepperPrevious>
                 <!-- Label -->
                 <span>
@@ -785,6 +786,7 @@
               <!-- Next -->
               <button
                 mat-flat-button color="primary"
+                type="button"
                 matStepperNext
                 (click)="tab.form ? tab.form.ngSubmit.emit() : undefined">
 
@@ -854,6 +856,7 @@
               <!-- Previous -->
               <button
                 mat-flat-button color="secondary"
+                type="button"
                 matStepperPrevious>
                 <!-- Label -->
                 <span>
@@ -864,7 +867,8 @@
               <!-- Create -->
               <button
                 mat-flat-button color="primary"
-                matStepperNext>
+                type="button"
+                (click)="create()">
                 {{tabData.create.finalStep.buttonLabel | translate}}
               </button>
             </div>
