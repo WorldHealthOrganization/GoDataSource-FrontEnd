@@ -672,7 +672,7 @@
                 <div
                   class="gd-create-view-modify-bottom-section-content-input-list">
                   <div
-                    *ngFor="let item of input.items; let itemIndex = index"
+                    *ngFor="let item of input.items; let itemIndex = index; trackBy: trackByIndex"
                     class="gd-create-view-modify-bottom-section-content-input-list-item">
 
                     <!-- Remove button -->

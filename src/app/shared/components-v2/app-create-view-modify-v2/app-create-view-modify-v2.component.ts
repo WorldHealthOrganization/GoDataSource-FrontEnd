@@ -375,4 +375,11 @@ export class AppCreateViewModifyV2Component {
         });
     });
   }
+
+  /**
+   * Track by
+   */
+  trackByIndex(index: number): number {
+    return index;
+  }
 }
