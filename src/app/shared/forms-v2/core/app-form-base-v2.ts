@@ -142,7 +142,7 @@ export abstract class AppFormBaseV2<T> implements ControlValueAccessor {
       // listen for submit
       this.formSubmittedSubscription = form.ngSubmit.subscribe(() => {
         // touch on submit
-        this.onTouchItem();
+        this.onTouch();
 
         // validate
         this.control?.updateValueAndValidity();

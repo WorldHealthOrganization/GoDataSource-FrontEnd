@@ -127,16 +127,16 @@ export class FormHelperService {
    * Check a set of forms and verify if they are all valid
    */
   isFormsSetValid(forms: NgForm[]) {
-    // valid ?
-    let isValid = true;
-
-    // check each form validity
-    _.forEach(forms, (form: NgForm) => {
-      isValid = isValid && form.valid;
-    });
+    // if one form is invalid..then...
+    forms = forms || [];
+    for (const form of forms) {
+      if (!form.valid) {
+        return false;
+      }
+    }
 
     // finished
-    return isValid;
+    return true;
   }
 
   /**

@@ -32,6 +32,9 @@ export class GeneralAsyncValidatorDirective {
     [key: string]: any
   };
 
+  // previous validated value
+  private _previousValue: any;
+
   /**
    * Validate
    */
@@ -42,6 +45,11 @@ export class GeneralAsyncValidatorDirective {
       !control.value &&
       control.value !== 0
     ) {
+      return of(null);
+    }
+
+    // no need to validate if same as previous value ?
+    if (this._previousValue === control.value) {
       return of(null);
     }
 
@@ -62,6 +70,9 @@ export class GeneralAsyncValidatorDirective {
           ) {
             return of(null);
           }
+
+          // update previous value
+          this._previousValue = control.value;
 
           // execute validator
           return this.asyncValidatorObservable

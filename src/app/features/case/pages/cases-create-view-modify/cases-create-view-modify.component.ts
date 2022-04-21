@@ -107,7 +107,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     };
 
     // set visual id for case
-    this.itemData.visualId = this._caseVisualIDMask.mask;
+    this.itemData.visualId = this.isCreate ?
+      this._caseVisualIDMask.mask :
+      this.itemData.visualId;
   }
 
   /**
