@@ -6,6 +6,7 @@
   <!-- Loading data -->
   <div
     *ngIf="loadingItemData; else dataLoaded"
+    fxLayout="row" fxLayoutAlign="center center"
     class="gd-create-view-modify-loading-data">
 
     <!-- Spinner -->
@@ -35,7 +36,7 @@
 
         <!-- Title & view button -->
         <div
-          fxFlex
+          fxFlex fxLayoutAlign="start center" fxLayoutGap="1.6rem"
           class="gd-create-view-modify-top-title-buttons-title">
 
           <!-- Title -->
@@ -194,7 +195,6 @@
             <!-- Input -->
             <div
               *ngIf="!input.replace || !input.replace.condition(input); else replaceHtml"
-              fxFlex
               class="gd-create-view-modify-bottom-section-content-input"
               [class.gd-create-view-modify-bottom-section-content-input-has-textarea]="input.type === CreateViewModifyV2TabInputType.TEXTAREA"
               [class.gd-create-view-modify-bottom-section-content-input-has-age-dob]="input.type === CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH"
@@ -269,24 +269,27 @@
               <!-- Age - Dob -->
               <div
                 *ngSwitchCase="CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH"
-                fxFlex fxLayout="row" fxLayoutGap="1.6rem">
+                fxLayout="row" fxLayoutGap="1.6rem">
 
                 <!-- Age / Dob option -->
-                <app-form-toggle-v2
-                  *ngIf="!isView"
-                  [(ngModel)]="input.ageChecked"
-                  [name]="FormHelperService.IGNORE_FIELD_PREFIX + (parentName ? parentName + '[ageDob]' : 'ageDob')"
-                  [options]="ageDOBOptions"></app-form-toggle-v2>
+                <div
+                  fxFlex="calc(50% - 0.8rem)">
+                  <app-form-toggle-v2
+                    *ngIf="!isView"
+                    [(ngModel)]="input.ageChecked"
+                    [name]="FormHelperService.IGNORE_FIELD_PREFIX + (parentName ? parentName + '[ageDob]' : 'ageDob')"
+                    [options]="ageDOBOptions"></app-form-toggle-v2>
+                </div>
 
                 <!-- Age -->
                 <div
                   *ngIf="input.ageChecked; else dob"
-                  fxFlex fxLayout="row" fxLayoutGap="1.6rem">
+                  fxFlex="calc(50% - 0.8rem)" fxLayout="row" fxLayoutGap="1.6rem">
 
                   <!-- Years -->
                   <app-form-number-v2
                     *ngIf="input.ageTypeYears; else months"
-                    fxFlex
+                    fxFlex="calc(50% - 0.8rem)"
                     [ngModel]="input.value.age.years.get()"
                     [name]="parentName ? parentName + '[' + input.name.age + '][years]' : (input.name.age + '[years]')"
                     [placeholder]="isView && input.ageChecked ? ('LNG_ENTITY_FIELD_LABEL_AGE' | translate) + ' - ' + ('LNG_AGE_FIELD_LABEL_YEARS' | translate) : 'LNG_AGE_FIELD_LABEL_YEARS'"
@@ -303,7 +306,7 @@
                   <ng-template
                     #months>
                     <app-form-number-v2
-                      fxFlex
+                      fxFlex="calc(50% - 0.8rem)"
                       [ngModel]="input.value.age.months.get()"
                       [name]="parentName ? parentName + '[' + input.name.age + '][months]' : (input.name.age + '[months]')"
                       [placeholder]="isView && input.ageChecked ? ('LNG_ENTITY_FIELD_LABEL_AGE' | translate) + ' - ' + ('LNG_AGE_FIELD_LABEL_MONTHS' | translate) : 'LNG_AGE_FIELD_LABEL_MONTHS'"
@@ -320,7 +323,7 @@
                   <!-- Type -->
                   <app-form-select-single-v2
                     *ngIf="!isView"
-                    fxFlex
+                    fxFlex="calc(50% - 0.8rem)"
                     [(ngModel)]="input.ageTypeYears"
                     [name]="FormHelperService.IGNORE_FIELD_PREFIX + (parentName ? parentName + '[ageDobType]' : 'ageDobType')"
                     placeholder="LNG_AGE_FIELD_LABEL_TYPE"
@@ -333,7 +336,7 @@
                 <ng-template
                   #dob>
                   <app-form-date-v2
-                    fxFlex
+                    fxFlex="calc(50% - 0.8rem)"
                     [ngModel]="input.value.dob.get()"
                     [name]="parentName ? parentName + '[' + input.name.dob + ']' : input.name.dob"
                     placeholder="LNG_ENTITY_FIELD_LABEL_DOB"
@@ -410,11 +413,11 @@
               <!-- Address -->
               <div
                 *ngSwitchCase="CreateViewModifyV2TabInputType.ADDRESS"
-                fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem">
+                fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem"
+                class="gd-create-view-modify-bottom-section-content-input-list-multiple-rows">
 
                 <!-- Type -->
                 <app-form-select-single-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).typeId"
                   [name]="parentName ? parentName + '[typeId]' : (input.name + '[typeId]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_TYPE"
@@ -425,7 +428,6 @@
 
                 <!-- Date -->
                 <app-form-date-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).date"
                   [name]="parentName ? parentName + '[date]' : (input.name + '[date]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_DATE"
@@ -434,7 +436,6 @@
 
                 <!-- Email address -->
                 <app-form-input-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).emailAddress"
                   [name]="parentName ? parentName + '[emailAddress]' : (input.name + '[emailAddress]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS"
@@ -444,7 +445,6 @@
 
                 <!-- Phone number -->
                 <app-form-input-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).phoneNumber"
                   [name]="parentName ? parentName + '[phoneNumber]' : (input.name + '[phoneNumber]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER"
@@ -453,7 +453,6 @@
 
                 <!-- Location -->
                 <app-form-select-location-single-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).locationId"
                   [name]="parentName ? parentName + '[locationId]' : (input.name + '[locationId]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_LOCATION"
@@ -464,7 +463,6 @@
 
                 <!-- City -->
                 <app-form-input-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).city"
                   [name]="parentName ? parentName + '[city]' : (input.name + '[city]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_CITY"
@@ -473,7 +471,6 @@
 
                 <!-- Postal code -->
                 <app-form-input-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).postalCode"
                   [name]="parentName ? parentName + '[postalCode]' : (input.name + '[postalCode]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE"
@@ -482,7 +479,6 @@
 
                 <!-- Address line 1 -->
                 <app-form-input-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).addressLine1"
                   [name]="parentName ? parentName + '[addressLine1]' : (input.name + '[addressLine1]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1"
@@ -491,11 +487,11 @@
 
                 <!-- Lat & Lng -->
                 <div
-                  fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem">
+                  fxLayout="row wrap" fxLayoutGap="1.6rem">
 
                   <!-- Lat -->
                   <app-form-number-v2
-                    fxFlex
+                    fxFlex="calc(50% - 0.8rem)"
                     [(ngModel)]="input.value.get(parentItemIndex).geoLocation.lat"
                     [name]="parentName ? parentName + '[geoLocation][lat]' : (input.name + '[geoLocation][lat]')"
                     placeholder="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT"
@@ -510,7 +506,7 @@
 
                   <!-- Lng -->
                   <app-form-number-v2
-                    fxFlex
+                    fxFlex="calc(50% - 0.8rem)"
                     [(ngModel)]="input.value.get(parentItemIndex).geoLocation.lng"
                     [name]="parentName ? parentName + '[geoLocation][lng]' : (input.name + '[geoLocation][lng]')"
                     placeholder="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG"
@@ -527,7 +523,6 @@
 
                 <!-- Geo location accurate -->
                 <app-form-toggle-checkbox-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).geoLocationAccurate"
                   [name]="parentName ? parentName + '[geoLocationAccurate]' : (input.name + '[geoLocationAccurate]')"
                   placeholder="LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES"
@@ -573,11 +568,11 @@
               <!-- Center date range -->
               <div
                 *ngSwitchCase="CreateViewModifyV2TabInputType.CENTER_DATE_RANGE"
-                fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem">
+                fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem"
+                class="gd-create-view-modify-bottom-section-content-input-list-multiple-rows">
 
                 <!-- Type -->
                 <app-form-select-single-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).typeId"
                   [name]="parentName ? parentName + '[typeId]' : 'typeId'"
                   placeholder="LNG_CASE_FIELD_LABEL_DATE_RANGE_TYPE_ID"
@@ -585,30 +580,35 @@
                   [options]="input.typeOptions"
                   required="true"></app-form-select-single-v2>
 
-                <!-- Date range - start -->
-                <app-form-date-v2
-                  fxFlex
-                  [(ngModel)]="input.value.get(parentItemIndex).startDate"
-                  [name]="parentName ? parentName + '[startDate]' : 'startDate'"
-                  placeholder="LNG_FORM_RANGE_FIELD_LABEL_FROM"
-                  [viewOnly]="isView"
-                  app-date-validator
-                  [dateSameOrBefore]="parentName ? parentName + '[endDate]' : 'endDate'"
-                  [dateSameOrAfter]="input.startDateValidators?.dateSameOrAfter ? input.startDateValidators?.dateSameOrAfter() : undefined"></app-form-date-v2>
+                <!-- From & To -->
+                <div
+                  fxLayout="row wrap" fxLayoutGap="1.6rem">
 
-                <!-- Date range - end -->
-                <app-form-date-v2
-                  fxFlex
-                  [(ngModel)]="input.value.get(parentItemIndex).endDate"
-                  [name]="parentName ? parentName + '[endDate]' : 'endDate'"
-                  placeholder="LNG_FORM_RANGE_FIELD_LABEL_TO"
-                  [viewOnly]="isView"
-                  app-date-validator
-                  [dateSameOrAfter]="parentName ? parentName + '[startDate]' : 'startDate'"></app-form-date-v2>
+                  <!-- Date range - start -->
+                  <app-form-date-v2
+                    fxFlex="calc(50% - 0.8rem)"
+                    [(ngModel)]="input.value.get(parentItemIndex).startDate"
+                    [name]="parentName ? parentName + '[startDate]' : 'startDate'"
+                    placeholder="LNG_FORM_RANGE_FIELD_LABEL_FROM"
+                    [viewOnly]="isView"
+                    app-date-validator
+                    [dateSameOrBefore]="parentName ? parentName + '[endDate]' : 'endDate'"
+                    [dateSameOrAfter]="input.startDateValidators?.dateSameOrAfter ? input.startDateValidators?.dateSameOrAfter() : undefined"></app-form-date-v2>
+
+                  <!-- Date range - end -->
+                  <app-form-date-v2
+                    fxFlex="calc(50% - 0.8rem)"
+                    [(ngModel)]="input.value.get(parentItemIndex).endDate"
+                    [name]="parentName ? parentName + '[endDate]' : 'endDate'"
+                    placeholder="LNG_FORM_RANGE_FIELD_LABEL_TO"
+                    [viewOnly]="isView"
+                    app-date-validator
+                    [dateSameOrAfter]="parentName ? parentName + '[startDate]' : 'startDate'"></app-form-date-v2>
+
+                </div>
 
                 <!-- Center name -->
                 <app-form-select-single-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).centerName"
                   [name]="parentName ? parentName + '[centerName]' : 'centerName'"
                   placeholder="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME"
@@ -617,7 +617,6 @@
 
                 <!-- Location -->
                 <app-form-select-location-single-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).locationId"
                   [name]="parentName ? parentName + '[locationId]' : 'locationId'"
                   placeholder="LNG_CASE_FIELD_LABEL_CENTER_DATES_LOCATION"
@@ -626,7 +625,6 @@
 
                 <!-- Comments -->
                 <app-form-textarea-v2
-                  fxFlex
                   [(ngModel)]="input.value.get(parentItemIndex).comments"
                   [name]="parentName ? parentName + '[comments]' : 'comments'"
                   placeholder="LNG_CASE_FIELD_LABEL_CENTER_DATES_COMMENTS"
@@ -639,14 +637,17 @@
                 *ngSwitchCase="CreateViewModifyV2TabInputType.LIST">
 
                 <!-- List Items -->
-                <div>
+                <div
+                  class="gd-create-view-modify-bottom-section-content-input-list">
                   <div
-                    *ngFor="let item of input.items; let itemIndex = index">
+                    *ngFor="let item of input.items; let itemIndex = index"
+                    class="gd-create-view-modify-bottom-section-content-input-list-item">
 
                     <!-- Remove button -->
                     <div
                       *ngIf="!isView"
-                      fxLayoutAlign="end">
+                      fxLayoutAlign="end"
+                      class="gd-create-view-modify-bottom-section-content-input-list-item-delete">
                       <button
                         type="button"
                         mat-icon-button
@@ -659,7 +660,8 @@
 
                     <!-- Inputs -->
                     <div
-                      fxLayout="row wrap" fxLayoutGap="1.6rem">
+                      fxLayout="row wrap" fxLayoutGap="1.6rem"
+                      class="gd-create-view-modify-bottom-section-content-input-list-item-content">
                       <ng-container
                         *ngTemplateOutlet="inputRender; context: { input: input.definition.input, parentName: input.name + '[' + itemIndex + ']', parentItemIndex: itemIndex }"></ng-container>
                     </div>
@@ -672,7 +674,8 @@
                   *ngIf="!isView">
                   <button
                     type="button"
-                    mat-flat-button color="text"
+                    mat-flat-button
+                    color="text"
                     (click)="addListItem(input)">
 
                     <!-- + Icon -->
@@ -770,7 +773,7 @@
 
             <!-- Right -->
             <div
-              fxFlex fxLayoutAlign="end">
+              fxFlex fxLayoutAlign="end" fxLayoutGap="0.8rem">
               <!-- Previous -->
               <button
                 *ngIf="tabIndex > 0"
@@ -819,7 +822,7 @@
 
           <!-- Content -->
           <div
-            class="gd-create-view-modify-bottom-content">
+            class="gd-create-view-modify-bottom-content-final-step">
 
             <!-- Message -->
             <div
@@ -851,7 +854,7 @@
 
             <!-- Right -->
             <div
-              fxFlex fxLayoutAlign="end">
+              fxFlex fxLayoutAlign="end" fxLayoutGap="0.8rem">
               <!-- Previous -->
               <button
                 mat-flat-button color="secondary"
@@ -898,8 +901,11 @@
             </ng-template>
 
             <!-- Content -->
-            <ng-container
-              *ngTemplateOutlet="sectionsRender; context: { tab }"></ng-container>
+            <div
+            class="gd-create-view-modify-bottom-content">
+              <ng-container
+                *ngTemplateOutlet="sectionsRender; context: { tab }"></ng-container>
+            </div>
           </mat-tab>
         </mat-tab-group>
       </ng-template>

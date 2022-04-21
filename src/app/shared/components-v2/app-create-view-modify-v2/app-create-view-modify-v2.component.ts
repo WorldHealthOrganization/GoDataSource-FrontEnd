@@ -19,6 +19,7 @@ import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 @Component({
   selector: 'app-create-view-modify-v2',
   templateUrl: './app-create-view-modify-v2.component.html',
+  styleUrls: ['./app-create-view-modify-v2.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppCreateViewModifyV2Component {

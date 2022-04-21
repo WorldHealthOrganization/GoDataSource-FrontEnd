@@ -25,6 +25,21 @@
           color: var(--gd-secondary);
         }
       }
+
+      &.gd-create-view-modify-top-title-buttons-buttons-quick-options {
+        .mat-menu-content {
+          > div {
+            background: rgba(var(--gd-secondary-rgb), 0.05);
+            border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+            color: var(--gd-secondary);
+            font-size: 1.2rem;
+            margin: 0;
+            padding: 0.8rem 1.6rem;
+            text-transform: uppercase;
+            white-space: nowrap;
+          }
+        }
+      }
     }
   }
 }

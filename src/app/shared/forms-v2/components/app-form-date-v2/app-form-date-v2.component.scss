@@ -9,7 +9,6 @@
     width: 100%;
     font-family: $gd-font-family;
     font-size: $gd-font-size;
-    line-height: $gd-line-height;
 
     .mat-form-field-wrapper {
       margin: 0;
@@ -66,15 +65,43 @@
           }
         }
 
+        /* Select prefix */
+        .mat-form-field-prefix {
+          left: -0.4rem;
+          top: 0.5rem;
+
+          + .mat-form-field-infix {
+            line-height: 1.125;
+          }
+
+          .mat-icon {
+            color: rgba(var(--gd-text-rgb), 0.75);
+            text-align: center;
+          }
+        }
+
         /* Form input middle */
         .mat-form-field-infix {
           border-top: 0 none;
           @include flex(flex);
+          line-height: $gd-line-height;
           padding: 0.8rem 0;
 
           input {
             line-height: 2.4rem;
             margin-top: 0;
+          }
+
+          .mat-input-element {
+            caret-color: var(--gd-text);
+          }
+
+          .mat-form-field-label-wrapper {
+            .mat-form-field-label {
+              color: var(--gd-secondary);
+              line-height: 2.4rem;
+              margin-top: -0.7rem;
+            }
           }
         }
 
@@ -115,8 +142,8 @@
 
       .mat-form-field-subscript-wrapper {
         font-size: 1.2rem;
-        margin-top: 0.4rem;
-        padding: 0 1.6rem;
+        margin-top: 0.5rem;
+        padding: 0;
       }
     }
 
@@ -179,7 +206,7 @@
           background: rgba(var(--gd-danger-rgb), 0.15);
 
           .mat-form-field-outline {
-            color: rgba(var(--gd-danger-rgb), 0.5);
+            color: var(--gd-danger);
           }
 
           .mat-form-field-infix {
@@ -191,6 +218,13 @@
           }
         }
       }
+    }
+  }
+
+  .gd-form-date-v2-viewonly {
+    .gd-form-date-v2-viewonly-label {
+      color: var(--gd-secondary);
+      white-space: nowrap;
     }
   }
 }

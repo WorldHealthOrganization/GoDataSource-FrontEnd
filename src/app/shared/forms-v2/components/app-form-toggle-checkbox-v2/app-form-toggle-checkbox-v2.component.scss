@@ -1,0 +1,111 @@
+@import 'mixins';
+@import 'font';
+
+/* Form Toggle Checkbox */
+.gd-form-toggle-checkbox-v2 {
+  .mat-button-toggle {
+    background: var(--gd-background);
+    border: 0.1rem solid var(--gd-secondary);
+    @include border-radius(0.4rem);
+    color: var(--gd-text);
+    @include flex(flex);
+    font-family: $gd-font-family;
+    font-size: 1.4rem;
+    line-height: $gd-line-height;
+    @include transition(all 0.24s ease-in-out 0s);
+
+    .mat-button-toggle-button {
+      .mat-button-toggle-label-content {
+        @include flex_align_items(center);
+        @include flex(flex);
+        @include flex-direction(row);
+        line-height: $gd-line-height;
+        min-height: 3.8rem;
+        padding: 0.4rem 1.6rem;
+
+        .mat-icon {
+          color: rgba(var(--gd-text-rgb), 0.75);
+          height: 2rem;
+          margin-right: 0.8rem;
+          @include transition(all 0.24s ease-in-out 0s);
+          width: 2rem;
+
+          &:not(.mat-tooltip-trigger) {
+            font-size: 3rem;
+            height: auto;
+            width: 3rem;
+          }
+        }
+
+        span {
+          line-height: 2.4rem;
+        }
+      }
+    }
+
+    .mat-button-toggle-focus-overlay {
+      background-color: rgba(var(--gd-primary-rgb), 0.15);
+      @include opacity(0);
+      @include transition(all 0.24s ease-in-out 0s);
+    }
+
+    .mat-ripple {
+      display: none;
+    }
+
+    &.mat-button-toggle-disabled {
+      background: rgba(var(--gd-secondary-rgb), 0.15);
+      border-color: rgba(var(--gd-secondary-rgb), 0.5);
+      color: var(--gd-secondary);
+
+      .mat-button-toggle-button {
+        .mat-button-toggle-label-content {
+          .mat-icon {
+            color: var(--gd-secondary);
+          }
+        }
+      }
+    }
+
+    &:not(.mat-button-toggle-disabled) {
+      &:hover {
+        .mat-button-toggle-focus-overlay {
+          @include opacity(1);
+        }
+      }
+    }
+
+    &.mat-button-toggle-checked {
+      background: var(--gd-primary);
+      color: var(--gd-background);
+
+      .mat-button-toggle-button {
+        .mat-button-toggle-label-content {
+          .mat-icon {
+            color: var(--gd-background);
+          }
+        }
+      }
+
+      &.mat-button-toggle-disabled {
+        background: rgba(var(--gd-primary-rgb), 0.15);
+        color: var(--gd-secondary);
+  
+        .mat-button-toggle-button {
+          .mat-button-toggle-label-content {
+            .mat-icon {
+              color: var(--gd-secondary);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .gd-form-toggle-checkbox-v2-viewonly {
+    .gd-form-toggle-checkbox-v2-viewonly-label {
+      color: var(--gd-secondary);
+      white-space: nowrap;
+    }
+  }
+}

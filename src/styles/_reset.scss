@@ -347,3 +347,13 @@ svg:not(:root) {
     padding: 0.4rem 0.8rem;
   }
 }
+
+/* Divider */
+.mat-divider {
+  border-top-color: rgba(var(--gd-secondary-rgb), 0.25);
+}
+
+/* Error */
+.mat-error {
+  color: var(--gd-danger);
+}
