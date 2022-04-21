@@ -409,8 +409,9 @@ export interface ICreateViewModifyV2Buttons {
  */
 export type ICreateViewModifyV2CreateOrUpdate = (
   type: CreateViewModifyV2ActionType,
-  data: any
-) => Observable<any>;
+  data: any,
+  finished: (error?: any) => void
+) => void;
 
 /**
  * Create view modify data

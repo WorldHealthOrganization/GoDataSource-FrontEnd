@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input } from '@angular/core';
 import { CreateViewModifyV2Action } from './models/action.model';
 import { CreateViewModifyV2ActionType, CreateViewModifyV2MenuType, CreateViewModifyV2TabInputType, ICreateViewModifyV2, ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputList } from './models/tab.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
@@ -11,8 +11,6 @@ import { AddressModel } from '../../../core/models/address.model';
 import { ILocation } from '../../forms-v2/core/app-form-location-base-v2';
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';
 import * as _ from 'lodash';
-import { ReplaySubject, throwError } from 'rxjs';
-import { catchError, takeUntil } from 'rxjs/operators';
 import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 
 /**
@@ -23,10 +21,7 @@ import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
   templateUrl: './app-create-view-modify-v2.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppCreateViewModifyV2Component implements OnDestroy {
-  // handler for stopping take until
-  protected destroyed$: ReplaySubject<boolean> = new ReplaySubject<boolean>();
-
+export class AppCreateViewModifyV2Component {
   // page type
   // - determined from route data
   @Input() action: CreateViewModifyV2Action;
@@ -91,16 +86,6 @@ export class AppCreateViewModifyV2Component implements OnDestroy {
     protected formHelper: FormHelperService,
     protected toastV2Service: ToastV2Service
   ) {}
-
-  /**
-   * Stop requests
-   */
-  ngOnDestroy(): void {
-    // unsubscribe other requests
-    this.destroyed$.next(true);
-    this.destroyed$.complete();
-    this.destroyed$ = undefined;
-  }
 
   /**
    * Should update height of table
@@ -273,35 +258,27 @@ export class AppCreateViewModifyV2Component implements OnDestroy {
     // show loading
     const loadingHandler = this.dialogV2Service.showLoadingDialog();
 
-    // handle errors
-    // #TODO
-
-    // hide loading
-    // #TODO
-
     // call create
     this.tabData
       .createOrUpdate(
         CreateViewModifyV2ActionType.CREATE,
-        fieldData
-      )
-      .pipe(
-        catchError((err) => {
-          // show error
-          this.toastV2Service.error(err);
-
+        fieldData,
+        (error) => {
           // hide loading
           loadingHandler.close();
 
-          // send down
-          return throwError(err);
-        }),
+          // handle errors
+          if (error) {
+            // show error
+            this.toastV2Service.error(error);
 
-        // should be the last pipe
-        takeUntil(this.destroyed$)
-      )
-      .subscribe(() => {
-        // done
-      });
+            // finished
+            return;
+          }
+
+          // redirect to view
+          // #TODO
+        }
+      );
   }
 }

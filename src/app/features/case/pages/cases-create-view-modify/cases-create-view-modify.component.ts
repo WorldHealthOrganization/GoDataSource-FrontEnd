@@ -8,7 +8,13 @@ import { Observable } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { TranslateService } from '@ngx-translate/core';
-import { CreateViewModifyV2MenuType, CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import {
+  CreateViewModifyV2MenuType,
+  CreateViewModifyV2TabInputType,
+  ICreateViewModifyV2Buttons,
+  ICreateViewModifyV2CreateOrUpdate,
+  ICreateViewModifyV2Tab
+} from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { Constants } from '../../../../core/models/constants';
@@ -51,8 +57,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     protected caseDataService: CaseDataService,
     protected translateService: TranslateService,
     protected systemSettingsDataService: SystemSettingsDataService,
-    authDataService: AuthDataService,
-    toastV2Service: ToastV2Service
+    protected toastV2Service: ToastV2Service,
+    authDataService: AuthDataService
   ) {
     super(
       activatedRoute,
@@ -1012,9 +1018,80 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     ) => {
       console.log(type, data);
 
-      // check if we need to determine duplicates
-      return this.systemSettingsDataService
-        .getAPIVersion();
+      // // create / update
+      // const runCreateOrUpdate = (): Observable<any> => {
+      //   return of([]);
+      // };
+
+    // .pipe(
+    //     catchError((err) => {
+    //       // show error
+    //       this.toastV2Service.error(err);
+    //
+    //       // hide loading
+    //       loadingHandler.close();
+    //
+    //       // send down
+    //       return throwError(err);
+    //     }),
+    //
+    //     // should be the last pipe
+    //     takeUntil(this.destroyed$)
+    //   )
+    //     .subscribe(() => {
+    //       // done
+    //     });      // check if we need to determine duplicates
+    //   return this.systemSettingsDataService
+    //     .getAPIVersion()
+    //     .pipe(
+    //       // handle response
+    //       switchMap((versionData) => {
+    //         // no duplicates - proceed to create case ?
+    //         if (
+    //           (
+    //             type === CreateViewModifyV2ActionType.CREATE &&
+    //             versionData.duplicate.disableCaseDuplicateCheck
+    //           ) || (
+    //             type === CreateViewModifyV2ActionType.UPDATE && (
+    //               versionData.duplicate.disableCaseDuplicateCheck || (
+    //                 versionData.duplicate.executeCheckOnlyOnDuplicateDataChange &&
+    //                 !EntityModel.duplicateDataHasChanged(data)
+    //               )
+    //             )
+    //           )
+    //         ) {
+    //           // no need to check for duplicates
+    //           return runCreateOrUpdate();
+    //         }
+    //
+    //         // check for duplicates
+    //         return this.caseDataService
+    //           .findDuplicates(
+    //             this.selectedOutbreak.id,
+    //             this.isCreate ?
+    //               data : {
+    //                 ...this.itemData,
+    //                 ...data
+    //               }
+    //           )
+    //           .pipe(
+    //
+    //
+    //             // handle errors
+    //             catchError((err) => {
+    //               // specific error
+    //               if (_.includes(_.get(err, 'details.codes.id'), 'uniqueness')) {
+    //                 this.toastV2Service.error('LNG_PAGE_CREATE_CASE_ERROR_UNIQUE_ID');
+    //               } else {
+    //                 this.toastV2Service.error(err);
+    //               }
+    //
+    //               // finished
+    //               return throwError(err);
+    //             })
+    //           )
+    //       })
+    //     );
     };
   }
 }
