@@ -805,6 +805,72 @@
           </div>
 
         </mat-step>
+
+        <!-- Final step -->
+        <mat-step>
+
+          <!-- Tab Label -->
+          <div
+            *matStepLabel>
+            {{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}
+          </div>
+
+          <!-- Content -->
+          <div
+            class="gd-create-view-modify-bottom-content">
+
+            <!-- Message -->
+            <div>
+              {{tabData.create.finalStep.message()}}
+            </div>
+
+            <!-- General details -->
+            <div
+              [innerHTML]="'LNG_STEPPER_FINAL_STEP_TEXT' | translate:tabData.create.finalStep | safeHtml"></div>
+
+          </div>
+
+          <!-- Bottom -->
+          <div
+            class="gd-create-view-modify-bottom-bottom"
+            fxLayoutAlign="space-between">
+            <!-- Left -->
+            <div
+              fxFlex>
+              <!-- Cancel -->
+              <a
+                *ngIf="!tabData.buttons.createCancel.visible || tabData.buttons.createCancel.visible()"
+                type="button"
+                mat-flat-button color="text"
+                [routerLink]="tabData.buttons.createCancel.link.link()"
+                [queryParams]="tabData.buttons.createCancel.link.queryParams ? tabData.buttons.createCancel.link.queryParams() : undefined">
+                {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
+              </a>
+            </div>
+
+            <!-- Right -->
+            <div
+              fxFlex fxLayoutAlign="end">
+              <!-- Previous -->
+              <button
+                mat-flat-button color="secondary"
+                matStepperPrevious>
+                <!-- Label -->
+                <span>
+                  {{'LNG_STEPPER_BUTTON_BACK' | translate}}
+                </span>
+              </button>
+
+              <!-- Create -->
+              <button
+                mat-flat-button color="primary"
+                matStepperNext>
+                {{tabData.create.finalStep.buttonLabel | translate}}
+              </button>
+            </div>
+          </div>
+
+        </mat-step>
       </mat-horizontal-stepper>
 
       <!-- Render tabs - View / Modify layout -->
