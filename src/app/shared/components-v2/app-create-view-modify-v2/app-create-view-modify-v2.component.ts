@@ -264,7 +264,7 @@ export class AppCreateViewModifyV2Component {
       .createOrUpdate(
         CreateViewModifyV2ActionType.CREATE,
         fieldData,
-        (error) => {
+        (error, data) => {
           // hide loading
           loadingHandler.close();
 
@@ -277,8 +277,8 @@ export class AppCreateViewModifyV2Component {
             return;
           }
 
-          // redirect to view
-          // #TODO
+          // redirect after create / update
+          this.tabData.redirectAfterCreateUpdate(data);
         }
       );
   }

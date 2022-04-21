@@ -410,7 +410,7 @@ export interface ICreateViewModifyV2Buttons {
 export type ICreateViewModifyV2CreateOrUpdate = (
   type: CreateViewModifyV2ActionType,
   data: any,
-  finished: (error?: any) => void
+  finished: (error: any, data: any) => void
 ) => void;
 
 /**
@@ -427,4 +427,5 @@ export interface ICreateViewModifyV2 {
   };
   buttons: ICreateViewModifyV2Buttons;
   createOrUpdate: ICreateViewModifyV2CreateOrUpdate;
+  redirectAfterCreateUpdate: (data: any) => void;
 }

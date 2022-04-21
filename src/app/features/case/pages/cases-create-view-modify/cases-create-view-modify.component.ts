@@ -1,14 +1,15 @@
 import { Component, OnDestroy } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { TranslateService } from '@ngx-translate/core';
 import {
+  CreateViewModifyV2ActionType,
   CreateViewModifyV2MenuType,
   CreateViewModifyV2TabInputType,
   ICreateViewModifyV2Buttons,
@@ -32,6 +33,9 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
+import * as _ from 'lodash';
 
 /**
  * Component
@@ -53,6 +57,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Constructor
    */
   constructor(
+    protected router: Router,
     protected activatedRoute: ActivatedRoute,
     protected caseDataService: CaseDataService,
     protected translateService: TranslateService,
@@ -210,7 +215,15 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       buttons: this.initializeButtons(),
 
       // create or update
-      createOrUpdate: this.initializeProcessData()
+      createOrUpdate: this.initializeProcessData(),
+      redirectAfterCreateUpdate: (data: CaseModel) => {
+        // redirect to view
+        this.router.navigate([
+          '/cases',
+          data.id,
+          'view'
+        ]);
+      }
     };
   }
 
@@ -493,6 +506,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               set: (value) => {
                 this.itemData.classification = value;
               }
+            },
+            validators: {
+              required: () => true
             }
           }, {
             type: CreateViewModifyV2TabInputType.DATE,
@@ -507,7 +523,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             },
             maxDate: this._today,
             validators: {
-              required: () => this.selectedOutbreak.isDateOfOnsetRequired,
+              required: () => !!this.selectedOutbreak.isDateOfOnsetRequired,
               dateSameOrBefore: () => [
                 this._today,
                 'dateOfOutcome'
@@ -1014,84 +1030,119 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   private initializeProcessData(): ICreateViewModifyV2CreateOrUpdate {
     return (
       type,
-      data
+      data,
+      finished
     ) => {
-      console.log(type, data);
+      // create / update
+      const runCreateOrUpdate = () => {
+        // create / update
+        (type === CreateViewModifyV2ActionType.CREATE ?
+          this.caseDataService
+            .createCase(
+              this.selectedOutbreak.id,
+              data
+            ) :
+          null
+        ).pipe(
+          // handle error
+          catchError((err) => {
+            // show error
+            finished(err, undefined);
 
-      // // create / update
-      // const runCreateOrUpdate = (): Observable<any> => {
-      //   return of([]);
-      // };
+            // finished
+            return throwError(err);
+          }),
 
-    // .pipe(
-    //     catchError((err) => {
-    //       // show error
-    //       this.toastV2Service.error(err);
-    //
-    //       // hide loading
-    //       loadingHandler.close();
-    //
-    //       // send down
-    //       return throwError(err);
-    //     }),
-    //
-    //     // should be the last pipe
-    //     takeUntil(this.destroyed$)
-    //   )
-    //     .subscribe(() => {
-    //       // done
-    //     });      // check if we need to determine duplicates
-    //   return this.systemSettingsDataService
-    //     .getAPIVersion()
-    //     .pipe(
-    //       // handle response
-    //       switchMap((versionData) => {
-    //         // no duplicates - proceed to create case ?
-    //         if (
-    //           (
-    //             type === CreateViewModifyV2ActionType.CREATE &&
-    //             versionData.duplicate.disableCaseDuplicateCheck
-    //           ) || (
-    //             type === CreateViewModifyV2ActionType.UPDATE && (
-    //               versionData.duplicate.disableCaseDuplicateCheck || (
-    //                 versionData.duplicate.executeCheckOnlyOnDuplicateDataChange &&
-    //                 !EntityModel.duplicateDataHasChanged(data)
-    //               )
-    //             )
-    //           )
-    //         ) {
-    //           // no need to check for duplicates
-    //           return runCreateOrUpdate();
-    //         }
-    //
-    //         // check for duplicates
-    //         return this.caseDataService
-    //           .findDuplicates(
-    //             this.selectedOutbreak.id,
-    //             this.isCreate ?
-    //               data : {
-    //                 ...this.itemData,
-    //                 ...data
-    //               }
-    //           )
-    //           .pipe(
-    //
-    //
-    //             // handle errors
-    //             catchError((err) => {
-    //               // specific error
-    //               if (_.includes(_.get(err, 'details.codes.id'), 'uniqueness')) {
-    //                 this.toastV2Service.error('LNG_PAGE_CREATE_CASE_ERROR_UNIQUE_ID');
-    //               } else {
-    //                 this.toastV2Service.error(err);
-    //               }
-    //
-    //               // finished
-    //               return throwError(err);
-    //             })
-    //           )
-    //       })
-    //     );
+          // should be the last pipe
+          takeUntil(this.destroyed$)
+        )
+          .subscribe((item) => {
+            // success creating case
+            this.toastV2Service.success('LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE');
+
+            // manage duplicates
+            // #TODO
+
+            // finished with success
+            finished(undefined, item);
+          });
+      };
+
+      // check if we need to determine duplicates
+      this.systemSettingsDataService
+        .getAPIVersion()
+        .pipe(
+          // handle error
+          catchError((err) => {
+            // show error
+            finished(err, undefined);
+
+            // send down
+            return throwError(err);
+          }),
+
+          // should be the last pipe
+          takeUntil(this.destroyed$)
+        )
+        .subscribe((versionData) => {
+          // no duplicates - proceed to create case ?
+          if (
+            (
+              type === CreateViewModifyV2ActionType.CREATE &&
+              versionData.duplicate.disableCaseDuplicateCheck
+            ) || (
+              type === CreateViewModifyV2ActionType.UPDATE && (
+                versionData.duplicate.disableCaseDuplicateCheck || (
+                  versionData.duplicate.executeCheckOnlyOnDuplicateDataChange &&
+                  !EntityModel.duplicateDataHasChanged(data)
+                )
+              )
+            )
+          ) {
+            // no need to check for duplicates
+            return runCreateOrUpdate();
+          }
+
+          // check for duplicates
+          this.caseDataService
+            .findDuplicates(
+              this.selectedOutbreak.id,
+              this.isCreate ?
+                data : {
+                  ...this.itemData,
+                  ...data
+                }
+            )
+            .pipe(
+              catchError((err) => {
+                // specific error
+                if (_.includes(_.get(err, 'details.codes.id'), 'uniqueness')) {
+                  finished('LNG_PAGE_CREATE_CASE_ERROR_UNIQUE_ID', undefined);
+                } else {
+                  finished(err, undefined);
+                }
+
+                // send down
+                return throwError(err);
+              }),
+
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            )
+            .subscribe((caseDuplicates) => {
+              // no duplicates ?
+              if (caseDuplicates.duplicates.length < 1) {
+                // create case
+                return runCreateOrUpdate();
+              }
+
+              // construct duplicates dialog input list
+              // #TODO
+
+              // display duplicates dialog
+              // #TODO
+            });
+        });
     };
   }
 }
