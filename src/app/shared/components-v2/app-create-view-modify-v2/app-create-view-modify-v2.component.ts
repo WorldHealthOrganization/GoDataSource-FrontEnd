@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnDestroy } from '@angular/core';
 import { CreateViewModifyV2Action } from './models/action.model';
-import { ICreateViewModifyV2, CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputList, CreateViewModifyV2MenuType } from './models/tab.model';
+import { CreateViewModifyV2ActionType, CreateViewModifyV2MenuType, CreateViewModifyV2TabInputType, ICreateViewModifyV2, ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputList } from './models/tab.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/bottom-dialog-config.model';
@@ -9,6 +9,11 @@ import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model
 import { Constants } from '../../../core/models/constants';
 import { AddressModel } from '../../../core/models/address.model';
 import { ILocation } from '../../forms-v2/core/app-form-location-base-v2';
+import { FormHelperService } from '../../../core/services/helper/form-helper.service';
+import * as _ from 'lodash';
+import { ReplaySubject, throwError } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 
 /**
  * Component
@@ -19,7 +24,10 @@ import { ILocation } from '../../forms-v2/core/app-form-location-base-v2';
   styleUrls: ['./app-create-view-modify-v2.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppCreateViewModifyV2Component {
+export class AppCreateViewModifyV2Component implements OnDestroy {
+  // handler for stopping take until
+  protected destroyed$: ReplaySubject<boolean> = new ReplaySubject<boolean>();
+
   // page type
   // - determined from route data
   @Input() action: CreateViewModifyV2Action;
@@ -72,6 +80,7 @@ export class AppCreateViewModifyV2Component {
   CreateViewModifyV2TabInputType = CreateViewModifyV2TabInputType;
   Constants = Constants;
   CreateViewModifyV2MenuType = CreateViewModifyV2MenuType;
+  FormHelperService = FormHelperService;
 
   /**
    * Constructor
@@ -79,8 +88,20 @@ export class AppCreateViewModifyV2Component {
   constructor(
     protected elementRef: ElementRef,
     protected changeDetectorRef: ChangeDetectorRef,
-    protected dialogV2Service: DialogV2Service
+    protected dialogV2Service: DialogV2Service,
+    protected formHelper: FormHelperService,
+    protected toastV2Service: ToastV2Service
   ) {}
+
+  /**
+   * Stop requests
+   */
+  ngOnDestroy(): void {
+    // unsubscribe other requests
+    this.destroyed$.next(true);
+    this.destroyed$.complete();
+    this.destroyed$ = undefined;
+  }
 
   /**
    * Should update height of table
@@ -230,5 +251,58 @@ export class AppCreateViewModifyV2Component {
           this.changeDetectorRef.detectChanges();
         });
     }
+  }
+
+  /**
+   * Create item
+   */
+  create(): void {
+    // determine forms
+    const forms: NgForm[] = this.tabData.tabs.map((tab) => tab.form).filter((item) => !!item);
+
+    // validate
+    if (!this.formHelper.isFormsSetValid(forms)) {
+      return;
+    }
+
+    // determine form data
+    const fieldData = this.formHelper.mergeFields(forms);
+    if (_.isEmpty(fieldData)) {
+      return;
+    }
+
+    // show loading
+    const loadingHandler = this.dialogV2Service.showLoadingDialog();
+
+    // handle errors
+    // #TODO
+
+    // hide loading
+    // #TODO
+
+    // call create
+    this.tabData
+      .createOrUpdate(
+        CreateViewModifyV2ActionType.CREATE,
+        fieldData
+      )
+      .pipe(
+        catchError((err) => {
+          // show error
+          this.toastV2Service.error(err);
+
+          // hide loading
+          loadingHandler.close();
+
+          // send down
+          return throwError(err);
+        }),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      )
+      .subscribe(() => {
+        // done
+      });
   }
 }

@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-
 import { AbstractControl, FormControl, NgForm } from '@angular/forms';
 import * as _ from 'lodash';
 import { I18nService } from './i18n.service';
@@ -7,17 +6,20 @@ import { ToastV2Service } from './toast-v2.service';
 
 @Injectable()
 export class FormHelperService {
+  // if field name starts with this then we won't retrieve value from it, just like not being touched
+  static readonly IGNORE_FIELD_PREFIX = '__';
 
+  /**
+   * Constructor
+   */
   constructor(
     private toastV2Service: ToastV2Service,
     private i18nService: I18nService
-  ) {
-  }
+  ) {}
 
   /**
-     * Retrieve control value
-     * @param control
-     */
+   * Retrieve control value
+   */
   getControlValue(control: FormControl): any {
     return (control as any).getFilteredValue ?
       (control as any).getFilteredValue() :
@@ -25,14 +27,20 @@ export class FormHelperService {
   }
 
   /**
-     * Get all fields of a form, with their values
-     * @param {NgForm} form
-     * @returns {any}
-     */
+   * Get all fields of a form, with their values
+   */
   getFields(form: NgForm): any {
+    // fields
     const fields = {};
 
+    // retrieve fields
     _.forEach(form.controls, (control: FormControl, controlName: string) => {
+      // ignore field ?
+      if (controlName.startsWith(FormHelperService.IGNORE_FIELD_PREFIX)) {
+        return;
+      }
+
+      // set data
       _.set(
         fields,
         controlName,
@@ -40,18 +48,25 @@ export class FormHelperService {
       );
     });
 
+    // finished
     return fields;
   }
 
   /**
-     * Extract the "dirty" fields of a Form
-     * @param {NgForm} form
-     * @returns {any}
-     */
+   * Extract the "dirty" fields of a Form
+   */
   getDirtyFields(form: NgForm) {
+    // fields
     const dirtyFields = {};
 
+    // retrieve fields
     _.forEach(form.controls, (control: FormControl, controlName: string) => {
+      // ignore field ?
+      if (controlName.startsWith(FormHelperService.IGNORE_FIELD_PREFIX)) {
+        return;
+      }
+
+      // set data
       if (control.dirty) {
         if ((control as any).getDirtyFields) {
           _.each((control as any).getDirtyFields(), (
@@ -70,63 +85,63 @@ export class FormHelperService {
       }
     });
 
+    // finished
     return dirtyFields;
   }
 
   /**
-     * Extract the "dirty" fields from a set of Forms, merging all of them into a single object
-     * @param {NgForm[]} forms
-     */
+   * Extract the "dirty" fields from a set of Forms, merging all of them into a single object
+   */
   mergeDirtyFields(forms: NgForm[]) {
+    // fields
     let dirtyFields = {};
 
+    // retrieve fields
     _.forEach(forms, (form: NgForm) => {
       // get the dirty fields of each form
       dirtyFields = { ...dirtyFields, ...this.getDirtyFields(form) };
     });
 
+    // finished
     return dirtyFields;
   }
 
   /**
-     * Merge all the fields from a set of Forms into a single object
-     * @param {NgForm[]} forms
-     * @returns {any}
-     */
+   * Merge all the fields from a set of Forms into a single object
+   */
   mergeFields(forms: NgForm[]) {
+    // fields
     let fields = {};
 
+    // retrieve fields
     _.forEach(forms, (form: NgForm) => {
       // get the fields of each form
-      const formFields = this.getFields(form);
-
-      fields = { ...fields, ...formFields };
+      fields = { ...fields, ...this.getFields(form) };
     });
 
+    // finished
     return fields;
   }
 
   /**
-     * Check a set of forms and verify if they are all valid
-     * @param {NgForm[]} forms
-     * @returns {boolean}
-     */
+   * Check a set of forms and verify if they are all valid
+   */
   isFormsSetValid(forms: NgForm[]) {
+    // valid ?
     let isValid = true;
 
+    // check each form validity
     _.forEach(forms, (form: NgForm) => {
       isValid = isValid && form.valid;
     });
 
+    // finished
     return isValid;
   }
 
   /**
-     * Check if a form is modified and valid, otherwise display a meaningful error
-     * @param form
-     * @param checkForChanges
-     * @returns {boolean}
-     */
+   * Check if a form is modified and valid, otherwise display a meaningful error
+   */
   validateForm(
     form: NgForm,
     checkForChanges: boolean = true
@@ -149,7 +164,7 @@ export class FormHelperService {
           // invalid controls
           if (
             ctrl.invalid &&
-                        !_.isEmpty(name)
+            !_.isEmpty(name)
           ) {
             // determine directive
             let directives = (controlsForm as any)._directives;
@@ -157,7 +172,7 @@ export class FormHelperService {
             const directive = _.find(directives, { name: name }) as any;
             if (
               directive &&
-                            directive.valueAccessor
+              directive.valueAccessor
             ) {
               // determine row indexes
               const nameWithIndexes: string = directive.valueAccessor.alternativeName ? directive.valueAccessor.alternativeName : name;
@@ -213,7 +228,7 @@ export class FormHelperService {
                 lastControlRowIndexes = rowIndexes;
               } else if (
                 directive.valueAccessor.groupForm &&
-                                directive.valueAccessor.groupForm.controls
+                directive.valueAccessor.groupForm.controls
               ) {
                 // merge old & new prefixes
                 const newPrefixes: string[] = _.clone(prefixes);
@@ -276,9 +291,8 @@ export class FormHelperService {
   }
 
   /**
-     * Get list of invalid controls
-     * @param form
-     */
+   * Get list of invalid controls
+   */
   getInvalidControls(form: NgForm) {
     // we don't handle if there are two controls with the same name
     const invalidControls: {
