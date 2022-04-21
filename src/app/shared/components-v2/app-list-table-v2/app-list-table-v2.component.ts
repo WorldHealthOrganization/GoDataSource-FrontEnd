@@ -569,65 +569,70 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     });
 
     // determine columns
-    const columnDefs: IExtendedColDef[] = [{
-      pinned: IV2ColumnPinned.LEFT,
-      headerName: '',
-      field: this.keyField,
-      checkboxSelection: true,
-      cellClass: 'gd-cell-no-focus',
-      suppressMovable: true,
-      headerComponent: AppListTableV2SelectionHeaderComponent,
-      width: AppListTableV2Component.STANDARD_SELECT_COLUMN_WIDTH,
-      valueFormatter: () => '',
-      columnDefinitionData: this,
-      columnDefinition: {
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
+    const columnDefs: IExtendedColDef[] = [];
+
+    // attach items selection column only if we have group actions
+    if (this.groupActions?.length > 0) {
+      columnDefs.push({
+        pinned: IV2ColumnPinned.LEFT,
+        headerName: '',
         field: this.keyField,
-        label: '',
-        actions: [{
-          type: V2ActionType.MENU,
-          icon: 'expand_more',
-          menuOptions: [
-            {
-              label: 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL',
-              action: {
-                click: () => {
-                  this._agTable.api.selectAll();
+        checkboxSelection: true,
+        cellClass: 'gd-cell-no-focus',
+        suppressMovable: true,
+        headerComponent: AppListTableV2SelectionHeaderComponent,
+        width: AppListTableV2Component.STANDARD_SELECT_COLUMN_WIDTH,
+        valueFormatter: () => '',
+        columnDefinitionData: this,
+        columnDefinition: {
+          format: {
+            type: V2ColumnFormat.ACTIONS
+          },
+          field: this.keyField,
+          label: '',
+          actions: [{
+            type: V2ActionType.MENU,
+            icon: 'expand_more',
+            menuOptions: [
+              {
+                label: 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL',
+                action: {
+                  click: () => {
+                    this._agTable.api.selectAll();
+                  }
+                },
+                visible: (): boolean => {
+                  return this._agTable.api.getDisplayedRowCount() > 0 &&
+                    this._agTable.api.getSelectedNodes().length < this._agTable.api.getDisplayedRowCount();
                 }
               },
-              visible: (): boolean => {
-                return this._agTable.api.getDisplayedRowCount() > 0 &&
-                  this._agTable.api.getSelectedNodes().length < this._agTable.api.getDisplayedRowCount();
-              }
-            },
-            {
-              label: 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL',
-              action: {
-                click: () => {
-                  this._agTable.api.deselectAll();
+              {
+                label: 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL',
+                action: {
+                  click: () => {
+                    this._agTable.api.deselectAll();
+                  }
+                },
+                visible: (): boolean => {
+                  return this._agTable.api.getDisplayedRowCount() > 0 &&
+                    this._agTable.api.getSelectedNodes().length > 0;
                 }
               },
-              visible: (): boolean => {
-                return this._agTable.api.getDisplayedRowCount() > 0 &&
-                  this._agTable.api.getSelectedNodes().length > 0;
-              }
-            },
-            {
-              // divider
-              visible: (): boolean => {
-                return this._agTable.api.getDisplayedRowCount() > 0 && (
-                  this._agTable.api.getSelectedNodes().length < this._agTable.api.getDisplayedRowCount() ||
-                  this._agTable.api.getSelectedNodes().length > 0
-                );
-              }
-            },
-            ...(this.groupActions ? this.groupActions : [])
-          ]
-        }]
-      }
-    }];
+              {
+                // divider
+                visible: (): boolean => {
+                  return this._agTable.api.getDisplayedRowCount() > 0 && (
+                    this._agTable.api.getSelectedNodes().length < this._agTable.api.getDisplayedRowCount() ||
+                    this._agTable.api.getSelectedNodes().length > 0
+                  );
+                }
+              },
+              ...(this.groupActions ? this.groupActions : [])
+            ]
+          }]
+        }
+      });
+    }
 
     // process columns
     this._columns.forEach((column) => {
