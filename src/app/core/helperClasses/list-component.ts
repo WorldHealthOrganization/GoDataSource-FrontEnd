@@ -92,6 +92,9 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
     direction?: RequestSortDirection
   } = {};
 
+  // info
+  infos: string[];
+
   // retrieve table handler
   @ViewChild(AppListTableV2Component, { static: true }) tableV2Component: AppListTableV2Component;
 

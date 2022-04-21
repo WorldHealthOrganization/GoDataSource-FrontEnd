@@ -121,7 +121,7 @@
 
       <!-- Add -->
       <a
-        *ngIf="addAction"
+        *ngIf="addAction && (!addAction.visible || addAction.visible(null))"
         mat-flat-button
         [routerLink]="addAction.action.link && (!addAction.disable || !addAction.disable(null)) ? addAction.action.link(null) : undefined"
         [queryParams]="addAction.action.linkQueryParams ? addAction.action.linkQueryParams(null) : undefined"
