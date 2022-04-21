@@ -69,6 +69,7 @@ import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/
 })
 export class AppListTableV2Component implements OnInit, OnDestroy {
   // static
+  private static readonly STANDARD_COLUMN_MAX_DEFAULT_WIDTH: number = 400;
   private static readonly STANDARD_SELECT_COLUMN_WIDTH: number = 42;
   private static readonly STANDARD_SHAPE_SIZE: number = 12;
   private static readonly STANDARD_SHAPE_GAP: number = 6;
@@ -995,6 +996,21 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // resize all columns
     this._agTable.columnApi.autoSizeAllColumns();
 
+    // set max width
+    // - but allow user to go beyond that
+    this._agTable.columnApi.getAllColumns().forEach((column) => {
+      // no need to resize ?
+      if (column.getActualWidth() <= AppListTableV2Component.STANDARD_COLUMN_MAX_DEFAULT_WIDTH) {
+        return;
+      }
+
+      // resize
+      this._agTable.columnApi.setColumnWidth(
+        column,
+        AppListTableV2Component.STANDARD_COLUMN_MAX_DEFAULT_WIDTH
+      );
+    });
+
     // some type of columns should have a fixed width
     this.adjustFixedSizeColumns();
 
@@ -1012,10 +1028,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    */
   private adjustFixedSizeColumns(): void {
     // some type of columns should have a fixed width
-    this._agTable.columnApi.getColumnState().forEach((columnState) => {
+    this._agTable.columnApi.getAllColumns().forEach((column) => {
       // retrieve column definition
-      const column = this._agTable.columnApi.getColumn(columnState.colId);
-      const colDef: IExtendedColDef = column?.getColDef() as IExtendedColDef;
+      const colDef: IExtendedColDef = column.getColDef() as IExtendedColDef;
       if (colDef.columnDefinition?.format?.type === V2ColumnFormat.STATUS) {
         // determine maximum number of items
         const statusColumn: IV2ColumnStatus = colDef.columnDefinition as IV2ColumnStatus;
