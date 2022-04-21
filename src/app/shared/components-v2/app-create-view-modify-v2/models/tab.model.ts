@@ -385,6 +385,34 @@ interface ICreateViewModifyV2LinkButton {
 }
 
 /**
+ * Create view modify data - create or update
+ */
+export enum CreateViewModifyV2ActionType {
+  CREATE,
+  UPDATE
+}
+
+/**
+ * Create view modify buttons
+ */
+export interface ICreateViewModifyV2Buttons {
+  view: ICreateViewModifyV2LinkButton,
+  modify: ICreateViewModifyV2LinkButton,
+  createCancel: ICreateViewModifyV2LinkButton,
+  viewCancel: ICreateViewModifyV2LinkButton,
+  modifyCancel: ICreateViewModifyV2LinkButton,
+  quickActions?: ICreateViewModifyV2Menu
+}
+
+/**
+ * Create view modify process data
+ */
+export type ICreateViewModifyV2CreateOrUpdate = (
+  type: CreateViewModifyV2ActionType,
+  data: any
+) => Observable<any>;
+
+/**
  * Create view modify data
  */
 export interface ICreateViewModifyV2 {
@@ -396,12 +424,6 @@ export interface ICreateViewModifyV2 {
       message: () => string
     }
   };
-  buttons: {
-    view: ICreateViewModifyV2LinkButton,
-    modify: ICreateViewModifyV2LinkButton,
-    createCancel: ICreateViewModifyV2LinkButton,
-    viewCancel: ICreateViewModifyV2LinkButton,
-    modifyCancel: ICreateViewModifyV2LinkButton,
-    quickActions?: ICreateViewModifyV2Menu
-  };
+  buttons: ICreateViewModifyV2Buttons;
+  createOrUpdate: ICreateViewModifyV2CreateOrUpdate;
 }
