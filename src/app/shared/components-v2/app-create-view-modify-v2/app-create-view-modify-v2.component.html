@@ -822,9 +822,8 @@
             class="gd-create-view-modify-bottom-content">
 
             <!-- Message -->
-            <div>
-              {{tabData.create.finalStep.message()}}
-            </div>
+            <div
+              [innerHTML]="tabData.create.finalStep.message() | safeHtml"></div>
 
             <!-- General details -->
             <div
