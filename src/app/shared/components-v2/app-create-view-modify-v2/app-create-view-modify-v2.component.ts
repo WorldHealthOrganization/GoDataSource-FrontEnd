@@ -309,31 +309,31 @@ export class AppCreateViewModifyV2Component {
     if (_.isEmpty(fieldData)) {
       return;
     }
-
-    // show loading
-    const loadingHandler = this.dialogV2Service.showLoadingDialog();
-
-    // call create
-    this.tabData
-      .createOrUpdate(
-        CreateViewModifyV2ActionType.UPDATE,
-        fieldData,
-        (error, data) => {
-          // hide loading
-          loadingHandler.close();
-
-          // handle errors
-          if (error) {
-            // show error
-            this.toastV2Service.error(error);
-
-            // finished
-            return;
-          }
-
-          // redirect after create / update
-          this.tabData.redirectAfterCreateUpdate(data);
-        }
-      );
+console.log(fieldData);
+    // // show loading
+    // const loadingHandler = this.dialogV2Service.showLoadingDialog();
+    //
+    // // call create
+    // this.tabData
+    //   .createOrUpdate(
+    //     CreateViewModifyV2ActionType.UPDATE,
+    //     fieldData,
+    //     (error, data) => {
+    //       // hide loading
+    //       loadingHandler.close();
+    //
+    //       // handle errors
+    //       if (error) {
+    //         // show error
+    //         this.toastV2Service.error(error);
+    //
+    //         // finished
+    //         return;
+    //       }
+    //
+    //       // redirect after create / update
+    //       this.tabData.redirectAfterCreateUpdate(data);
+    //     }
+    //   );
   }
 }
