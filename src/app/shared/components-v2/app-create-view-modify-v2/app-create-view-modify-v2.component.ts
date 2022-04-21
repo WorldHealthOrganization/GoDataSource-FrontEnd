@@ -309,7 +309,9 @@ export class AppCreateViewModifyV2Component {
     if (_.isEmpty(fieldData)) {
       return;
     }
-console.log(fieldData);
+
+    // console.log(fieldData);
+
     // // show loading
     // const loadingHandler = this.dialogV2Service.showLoadingDialog();
     //
