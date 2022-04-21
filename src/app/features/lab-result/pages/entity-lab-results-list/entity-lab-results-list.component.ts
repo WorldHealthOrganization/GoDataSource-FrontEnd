@@ -553,6 +553,11 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
   }
 
   /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {}

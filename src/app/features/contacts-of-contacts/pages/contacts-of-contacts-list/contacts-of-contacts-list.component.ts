@@ -812,6 +812,11 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
   }
 
   /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
    * Initialize advanced filters
    */
   protected initializeTableAdvancedFilters(): void {

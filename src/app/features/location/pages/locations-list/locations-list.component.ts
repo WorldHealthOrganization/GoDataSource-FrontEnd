@@ -257,6 +257,11 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
   }
 
   /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {}

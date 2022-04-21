@@ -187,6 +187,11 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
   }
 
   /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {}

@@ -1200,6 +1200,11 @@ export class ContactsListComponent
   }
 
   /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
    * Initialize advanced filters
    */
   protected initializeTableAdvancedFilters(): void {

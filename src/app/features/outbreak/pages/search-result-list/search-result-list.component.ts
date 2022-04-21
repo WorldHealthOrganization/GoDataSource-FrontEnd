@@ -184,6 +184,11 @@ export class SearchResultListComponent extends ListComponent implements OnInit, 
   }
 
   /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {}

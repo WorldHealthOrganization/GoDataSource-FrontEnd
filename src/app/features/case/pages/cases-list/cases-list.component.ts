@@ -125,11 +125,6 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
   ];
 
-  // additional page information
-  infos: string[] = [
-    'LNG_PAGE_LIST_CASES_NOT_A_CASE_INFO_LABEL'
-  ];
-
   // used to filter cases
   notACaseFilter: boolean | '' = false;
 
@@ -1302,6 +1297,16 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
         ]
       }
     );
+  }
+
+  /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {
+    // additional page information
+    this.infos = [
+      'LNG_PAGE_LIST_CASES_NOT_A_CASE_INFO_LABEL'
+    ];
   }
 
   /**

@@ -202,6 +202,11 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
   }
 
   /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {}

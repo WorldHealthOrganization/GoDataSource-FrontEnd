@@ -222,6 +222,11 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
   protected initializeTableColumns(): void {}
 
   /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {}

@@ -152,6 +152,11 @@ export class LanguagesListComponent
   protected initializeTableColumns(): void {}
 
   /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {}

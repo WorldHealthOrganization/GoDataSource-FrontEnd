@@ -247,6 +247,11 @@ export class ClustersListComponent extends ListComponent implements OnDestroy {
   }
 
   /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {

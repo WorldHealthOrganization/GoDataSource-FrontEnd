@@ -178,6 +178,9 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
       // initialize side columns
       this.initializeTableColumns();
 
+      // initialize infos
+      this.initializeTableInfos();
+
       // initialize advanced filters
       this.initializeTableAdvancedFilters();
 
@@ -294,6 +297,11 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
    * Initialize table columns
    */
   protected abstract initializeTableColumns(): void;
+
+  /**
+   * Initialize table infos
+   */
+  protected abstract initializeTableInfos(): void;
 
   /**
    * Initialize table advanced filters

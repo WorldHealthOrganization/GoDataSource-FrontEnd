@@ -98,6 +98,11 @@ export class HelpSearchComponent extends ListComponent implements OnInit, OnDest
   }
 
   /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {}
