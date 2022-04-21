@@ -128,7 +128,7 @@ export abstract class AppFormBaseV2<T> implements ControlValueAccessor {
     if (controlContainer) {
       // ng model group ?
       if (controlContainer instanceof NgModelGroup) {
-        form = controlContainer.formDirective as NgForm
+        form = controlContainer.formDirective as NgForm;
       } else {
         form = controlContainer as NgForm;
       }
