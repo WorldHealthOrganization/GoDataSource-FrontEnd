@@ -26,7 +26,6 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
-import { switchMap } from 'rxjs/operators';
 
 /**
  * Component
@@ -1015,13 +1014,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
       // check if we need to determine duplicates
       return this.systemSettingsDataService
-        .getAPIVersion()
-        .pipe(
-          // handle response
-          switchMap(() => {
-
-          })
-        );
+        .getAPIVersion();
     };
   }
 }
