@@ -20,7 +20,8 @@
         @include flex(flex);
         @include flex-direction(row);
         line-height: $gd-line-height;
-        padding: 0.7rem 1.6rem;
+        min-height: 3.8rem;
+        padding: 0.4rem 1.6rem;
 
         .mat-icon {
           color: rgba(var(--gd-text-rgb), 0.75);
@@ -28,6 +29,12 @@
           margin-right: 0.8rem;
           @include transition(all 0.24s ease-in-out 0s);
           width: 2rem;
+
+          &:not(.mat-tooltip-trigger) {
+            font-size: 3rem;
+            height: auto;
+            width: 3rem;
+          }
         }
 
         span {
