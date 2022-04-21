@@ -1062,8 +1062,12 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           takeUntil(this.destroyed$)
         )
           .subscribe((item) => {
-            // success creating case
-            this.toastV2Service.success('LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE');
+            // success creating / updating case
+            this.toastV2Service.success(
+              type === CreateViewModifyV2ActionType.CREATE ?
+                'LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE' :
+                'LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE'
+            );
 
             // manage duplicates
             // #TODO
