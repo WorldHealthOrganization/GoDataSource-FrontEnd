@@ -33,8 +33,8 @@ export class OutbreakTemplatesListComponent
   outbreakTemplatesList$: Observable<OutbreakTemplateModel[]>;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     private router: Router,
@@ -49,16 +49,16 @@ export class OutbreakTemplatesListComponent
   }
 
   /**
-     * Release resources
-     */
+   * Release resources
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
   }
 
   /**
-     * Component initialized
-     */
+   * Component initialized
+   */
   initialized(): void {
     // initialize pagination
     this.initPaginator();
@@ -68,8 +68,8 @@ export class OutbreakTemplatesListComponent
   }
 
   /**
-     * Initialize Table Columns
-     */
+   * Initialize Table Columns
+   */
   protected initializeTableColumns() {
     // validate clone outbreak template name
     let cloneTemplateName: string;
@@ -651,8 +651,8 @@ export class OutbreakTemplatesListComponent
   }
 
   /**
-     * Get total number of items, based on the applied filters
-     */
+   * Get total number of items, based on the applied filters
+   */
   refreshListCount(applyHasMoreLimit?: boolean) {
     // reset
     this.pageCount = undefined;
