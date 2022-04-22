@@ -11,9 +11,11 @@ import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-
 import { BaseModel } from '../models/base.model';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ToastV2Service } from '../services/helper/toast-v2.service';
+import { ConfirmOnFormChanges } from '../services/guards/page-change-confirmation-guard.service';
 
 @Directive()
-export abstract class CreateViewModifyComponent<T extends BaseModel> {
+export abstract class CreateViewModifyComponent<T extends BaseModel>
+  extends ConfirmOnFormChanges {
   // handler for stopping take until
   protected destroyed$: ReplaySubject<boolean> = new ReplaySubject<boolean>();
 
@@ -63,11 +65,14 @@ export abstract class CreateViewModifyComponent<T extends BaseModel> {
   /**
    * Constructor
    */
-  constructor(
+  protected constructor(
     activatedRoute: ActivatedRoute,
     authDataService: AuthDataService,
     toastV2Service: ToastV2Service
   ) {
+    // initialize parent
+    super();
+
     // disable select outbreak
     TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = true;
 

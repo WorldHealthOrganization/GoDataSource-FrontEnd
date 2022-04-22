@@ -61,51 +61,51 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
+    // // get the authenticated user
     this.authUser = this.authDataService.getAuthenticatedUser();
-    this.helpCategoriesList$ = this.helpDataService.getHelpCategoryList();
-
-    // show loading
-    this.showLoadingDialog(false);
-
-    this.route.params
-      .subscribe((params: { categoryId, itemId }) => {
-        this.categoryId = params.categoryId;
-        this.itemId = params.itemId;
-
-        // retrieve help category
-        this.helpDataService
-          .getHelpCategory(this.categoryId)
-          .subscribe((category) => {
-            this.selectedCategory = category;
-
-            // get item
-            this.helpDataService
-              .getHelpItem(this.categoryId, this.itemId)
-              .subscribe((helpItemData) => {
-                // since this is cached we need to clone it because otherwise we modify the existing object and if we chose to discard changes...
-                // for help items this isn't really necessary, because get id isn't cached as it is for languages but still it is a good idea to clone it
-                this.helpItemData = new HelpItemModel(helpItemData);
-
-                // initialize breadcrumbs
-                this.initializeBreadcrumbs();
-
-                // ngx-wig isn't pristine at start when setting ng-model
-                // so we need to hack it
-                // wait for binding
-                setTimeout(() => {
-                  this.canDeactivateForms.forEach((form: NgForm) => {
-                    if (form.controls['content']) {
-                      form.controls['content'].markAsPristine();
-                    }
-                  });
-                });
-
-                // hide loading
-                this.hideLoadingDialog();
-              });
-          });
-      });
+    // this.helpCategoriesList$ = this.helpDataService.getHelpCategoryList();
+    //
+    // // show loading
+    // this.showLoadingDialog(false);
+    //
+    // this.route.params
+    //   .subscribe((params: { categoryId, itemId }) => {
+    //     this.categoryId = params.categoryId;
+    //     this.itemId = params.itemId;
+    //
+    //     // retrieve help category
+    //     this.helpDataService
+    //       .getHelpCategory(this.categoryId)
+    //       .subscribe((category) => {
+    //         this.selectedCategory = category;
+    //
+    //         // get item
+    //         this.helpDataService
+    //           .getHelpItem(this.categoryId, this.itemId)
+    //           .subscribe((helpItemData) => {
+    //             // since this is cached we need to clone it because otherwise we modify the existing object and if we chose to discard changes...
+    //             // for help items this isn't really necessary, because get id isn't cached as it is for languages but still it is a good idea to clone it
+    //             this.helpItemData = new HelpItemModel(helpItemData);
+    //
+    //             // initialize breadcrumbs
+    //             this.initializeBreadcrumbs();
+    //
+    //             // ngx-wig isn't pristine at start when setting ng-model
+    //             // so we need to hack it
+    //             // wait for binding
+    //             setTimeout(() => {
+    //               this.canDeactivateForms.forEach((form: NgForm) => {
+    //                 if (form.controls['content']) {
+    //                   form.controls['content'].markAsPristine();
+    //                 }
+    //               });
+    //             });
+    //
+    //             // hide loading
+    //             this.hideLoadingDialog();
+    //           });
+    //       });
+    //   });
   }
 
   /**

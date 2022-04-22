@@ -30,6 +30,7 @@ import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { AppBottomDialogV2Component } from '../../../shared/components-v2/app-bottom-dialog-v2/app-bottom-dialog-v2.component';
 import { IV2BottomDialogConfig, IV2BottomDialogConfigButtonType, IV2BottomDialogConfigData, IV2BottomDialogHandler, IV2BottomDialogResponse } from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { ToastV2Service } from './toast-v2.service';
+import { MatBottomSheetRef } from '@angular/material/bottom-sheet/bottom-sheet-ref';
 
 @Injectable()
 export class DialogV2Service {
@@ -734,9 +735,9 @@ export class DialogV2Service {
   }
 
   /**
-   * Show bottom dialog
+   * Generate dialog without showing it
    */
-  showBottomDialog(config: IV2BottomDialogConfig): Observable<IV2BottomDialogResponse> {
+  showBottomDialogBare(config: IV2BottomDialogConfig): MatBottomSheetRef<AppBottomDialogV2Component> {
     return this.matBottomSheet
       .open(
         AppBottomDialogV2Component, {
@@ -747,7 +748,14 @@ export class DialogV2Service {
           disableClose: true,
           closeOnNavigation: false
         }
-      ).afterDismissed();
+      );
+  }
+
+  /**
+   * Show bottom dialog
+   */
+  showBottomDialog(config: IV2BottomDialogConfig): Observable<IV2BottomDialogResponse> {
+    return this.showBottomDialogBare(config).afterDismissed();
   }
 
   /**

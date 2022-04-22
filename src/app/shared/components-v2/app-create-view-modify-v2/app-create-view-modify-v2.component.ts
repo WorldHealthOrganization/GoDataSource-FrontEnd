@@ -277,6 +277,22 @@ export class AppCreateViewModifyV2Component {
   }
 
   /**
+   * Mark forms as pristine
+   */
+  markFormsAsPristine(): void {
+    // mark all forms as pristine
+    (this.tabData?.tabs || []).forEach((tab) => {
+      // nothing to do ?
+      if (!tab.form) {
+        return;
+      }
+
+      // mark as pristine
+      tab.form.control.markAsPristine();
+    });
+  }
+
+  /**
    * Create item
    */
   create(): void {
@@ -314,6 +330,9 @@ export class AppCreateViewModifyV2Component {
             // finished
             return;
           }
+
+          // mark all forms as pristine
+          this.markFormsAsPristine();
 
           // redirect after create / update
           this.tabData.redirectAfterCreateUpdate(data);
@@ -372,6 +391,9 @@ export class AppCreateViewModifyV2Component {
             // finished
             return;
           }
+
+          // mark all forms as pristine
+          this.markFormsAsPristine();
 
           // redirect after create / update
           this.tabData.redirectAfterCreateUpdate(data);
