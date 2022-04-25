@@ -4,5 +4,8 @@
   [breadcrumbs]="breadcrumbs"
   [pageTitle]="pageTitle"
   [pageTitleData]="pageTitleData"
-  [tabData]="tabData">
+  [tabData]="tabData"
+  listTitle="LNG_PAGE_LIST_CASES_TITLE"
+  [expandListRecords$]="expandListRecords$"
+  (expandListRefreshData)="refreshExpandList($event)">
 </app-create-view-modify-v2>

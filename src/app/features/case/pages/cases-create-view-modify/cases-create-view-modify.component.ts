@@ -36,6 +36,7 @@ import { SystemSettingsDataService } from '../../../../core/services/data/system
 import { catchError, takeUntil } from 'rxjs/operators';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import * as _ from 'lodash';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 /**
  * Component
@@ -1169,5 +1170,16 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             });
         });
     };
+  }
+
+  /**
+   * Refresh expand list
+   */
+  refreshExpandList(expandListQueryBuilder: RequestQueryBuilder): void {
+    this.expandListRecords$ = this.caseDataService
+      .getCasesList(
+        this.selectedOutbreak.id,
+        expandListQueryBuilder
+      );
   }
 }

@@ -12,6 +12,7 @@ import { BaseModel } from '../models/base.model';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ToastV2Service } from '../services/helper/toast-v2.service';
 import { ConfirmOnFormChanges } from '../services/guards/page-change-confirmation-guard.service';
+import { RequestQueryBuilder } from './request-query-builder';
 
 @Directive()
 export abstract class CreateViewModifyComponent<T extends BaseModel>
@@ -61,6 +62,9 @@ export abstract class CreateViewModifyComponent<T extends BaseModel>
 
   // tabs
   tabData: ICreateViewModifyV2;
+
+  // expanded list records observable
+  expandListRecords$: Observable<T[]>;
 
   /**
    * Constructor
@@ -179,6 +183,11 @@ export abstract class CreateViewModifyComponent<T extends BaseModel>
    * Initialize tabs
    */
   protected abstract initializeTabs(): void;
+
+  /**
+   * Refresh expand list
+   */
+  protected abstract refreshExpandList(queryBuilder: RequestQueryBuilder): void;
 
   /**
    * Release resources

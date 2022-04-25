@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { CreateViewModifyV2Action } from './models/action.model';
 import { CreateViewModifyV2ActionType, CreateViewModifyV2MenuType, CreateViewModifyV2TabInputType, ICreateViewModifyV2, ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputList } from './models/tab.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
@@ -12,6 +12,11 @@ import { ILocation } from '../../forms-v2/core/app-form-location-base-v2';
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';
 import * as _ from 'lodash';
 import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
+import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
+import { Subscription } from 'rxjs/internal/Subscription';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 
 /**
  * Component
@@ -22,7 +27,7 @@ import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
   styleUrls: ['./app-create-view-modify-v2.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppCreateViewModifyV2Component {
+export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   // page type
   // - determined from route data
   @Input() action: CreateViewModifyV2Action;
@@ -93,6 +98,55 @@ export class AppCreateViewModifyV2Component {
     return false;
   }
 
+  // list of records
+  expandList: boolean = false;
+
+  // search
+  expandListSearchValue: string;
+  expandListSearchSuffixButtons: IAppFormIconButtonV2[] = [
+    {
+      icon: 'search',
+      clickAction: () => {
+        this.expandListSearch();
+      }
+    }
+  ];
+
+  // load data ?
+  expandListInitialized: boolean = false;
+  expandListLoadingData: boolean = false;
+
+  // list title
+  @Input() listTitle: string;
+
+  // records
+  expandListRecordsSubscription: Subscription;
+  private _expandListRecords$: Observable<any[]>;
+  @Input() set expandListRecords$(expandListRecords$: Observable<any[]>) {
+    // set data
+    this._expandListRecords$ = expandListRecords$;
+
+    // must reload data
+    this.expandListInitialized = false;
+
+    // nothing to do ?
+    if (!this.expandList) {
+      return;
+    }
+
+    // retrieve data
+    this.expandListRetrieveData();
+  }
+  get expandListRecords$(): Observable<any[]> {
+    return this._expandListRecords$;
+  }
+
+  // query builder
+  private expandListQueryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
+
+  // refresh data
+  @Output() expandListRefreshData = new EventEmitter<RequestQueryBuilder>();
+
   // constants
   CreateViewModifyV2TabInputType = CreateViewModifyV2TabInputType;
   Constants = Constants;
@@ -109,6 +163,33 @@ export class AppCreateViewModifyV2Component {
     protected formHelper: FormHelperService,
     protected toastV2Service: ToastV2Service
   ) {}
+
+  /**
+   * Initialize resources
+   */
+  ngOnInit(): void {
+    // update table size
+    this.resizeTable();
+  }
+
+  /**
+   * Release resources
+   */
+  ngOnDestroy(): void {
+    // stop retrieving data
+    this.expandListStopGetRecords();
+  }
+
+  /**
+   * Stop retrieving data
+   */
+  private expandListStopGetRecords(): void {
+    // stop retrieving data
+    if (this.expandListRecordsSubscription) {
+      this.expandListRecordsSubscription.unsubscribe();
+      this.expandListRecordsSubscription = undefined;
+    }
+  }
 
   /**
    * Should update height of table
@@ -425,5 +506,84 @@ export class AppCreateViewModifyV2Component {
    */
   trackByIndex(index: number): number {
     return index;
+  }
+
+  /**
+   * Refresh expand list data
+   */
+  private expandListRefresh(): void {
+    this.expandListRefreshData.emit(this.expandListQueryBuilder);
+  }
+
+  /**
+   * List filters
+   */
+  expandListFilter(): void {
+    // Set filters
+    // #TODO
+    this.expandListRefresh();
+  }
+
+  /**
+   * List search
+   */
+  expandListSearch(): void {
+    // Search
+    // #TODO
+    this.expandListRefresh();
+  }
+
+  /**
+   * Expand collapse list
+   */
+  expandCollapseList(): void {
+    // toggle state
+    this.expandList = !this.expandList;
+
+    // nothing to do here anymore ?
+    if (
+      !this.expandList ||
+      this.expandListInitialized
+    ) {
+      return;
+    }
+
+    // retrieve data
+    this.expandListRefresh();
+  }
+
+  /**
+   * Retrieve data
+   */
+  private expandListRetrieveData(): void {
+    // cancel previous one
+    this.expandListStopGetRecords();
+
+    // initialized
+    this.expandListInitialized = true;
+
+    // show loading
+    this.expandListLoadingData = true;
+    this.expandListRecordsSubscription = this.expandListRecords$
+      .pipe(
+        catchError((err) => {
+          // show error
+          this.toastV2Service.error(err);
+
+          // send error down the road
+          return throwError(err);
+        })
+      )
+      .subscribe((data) => {
+        // finished
+        this.expandListRecordsSubscription = undefined;
+        this.expandListLoadingData = false;
+
+        // #TODO
+        console.log(data);
+
+        // re-render ui
+        this.changeDetectorRef.detectChanges();
+      });
   }
 }
