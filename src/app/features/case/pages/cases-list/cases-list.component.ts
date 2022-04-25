@@ -1312,48 +1312,47 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
    * Initialize advanced filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = CaseModel.generateAdvancedFilters(
-      // data
-      this.authUser,
+    this.advancedFilters = CaseModel.generateAdvancedFilters({
+      authUser: this.authUser,
+      caseInvestigationTemplate: () => this.selectedOutbreak.caseInvestigationTemplate,
+      options: {
+        gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        occupation: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        risk: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        classification: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        outcome: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        clusterLoad: (finished) => {
+          this.clusterDataService
+            .getResolveList(
+              this.selectedOutbreak.id
+            )
+            .pipe(
+              // handle error
+              catchError((err) => {
+                // show error
+                this.toastV2Service.error(err);
 
-      // options
-      (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-      (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-      (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-      (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-      (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-      (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-      (finished) => {
-        this.clusterDataService
-          .getResolveList(
-            this.selectedOutbreak.id
-          )
-          .pipe(
-            // handle error
-            catchError((err) => {
-              // show error
-              this.toastV2Service.error(err);
+                // not found
+                finished(null);
 
-              // not found
-              finished(null);
+                // send error down the road
+                return throwError(err);
+              }),
 
-              // send error down the road
-              return throwError(err);
-            }),
-
-            // should be the last pipe
-            takeUntil(this.destroyed$)
-          )
-          .subscribe((data) => {
-            finished(data);
-          });
-      },
-      () => this.selectedOutbreak.caseInvestigationTemplate,
-      (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-      (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-      (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-      (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
-    );
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            )
+            .subscribe((data) => {
+              finished(data);
+            });
+        },
+        pregnancy: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        vaccine: (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        vaccineStatus: (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+      }
+    });
   }
 
   /**
