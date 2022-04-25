@@ -18,6 +18,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 import { V2AdvancedFilter } from '../app-list-table-v2/models/advanced-filter.model';
+import { SavedFilterData } from '../../../core/models/saved-filters.model';
 
 /**
  * Component
@@ -143,11 +144,12 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   }
 
   // query builder
-  private expandListQueryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
+  private _expandListQueryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
 
   // advanced filters
   @Input() expandListAdvancedFilterType: string;
   @Input() expandListAdvancedFilters: V2AdvancedFilter[];
+  @Input() expandListAdvancedFiltersApplied: SavedFilterData;
 
   // refresh data
   @Output() expandListRefreshData = new EventEmitter<RequestQueryBuilder>();
@@ -517,7 +519,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    * Refresh expand list data
    */
   private expandListRefresh(): void {
-    this.expandListRefreshData.emit(this.expandListQueryBuilder);
+    this.expandListRefreshData.emit(this._expandListQueryBuilder);
   }
 
   /**
@@ -534,10 +536,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
       .showAdvancedFiltersDialog(
         this.expandListAdvancedFilterType,
         this.expandListAdvancedFilters,
-
-        // #TODO
-        // this._advancedFiltersApplied
-        undefined
+        this.expandListAdvancedFiltersApplied
       )
       .subscribe((response) => {
         // cancelled ?
@@ -545,17 +544,12 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
           return;
         }
 
-        // #TODO
+        // set data
+        this._expandListQueryBuilder = response.queryBuilder;
+        this.expandListAdvancedFiltersApplied = response.filtersApplied;
 
-        // // set data
-        // this._advancedFiltersQueryBuilder = response.queryBuilder;
-        // this._advancedFiltersApplied = response.filtersApplied;
-        //
-        // // emit the Request Query Builder
-        // this.advancedFilterBy.emit(this.advancedFiltersQueryBuilder);
-
-        // #TODO
-        // this.expandListRefresh();
+        // filter
+        this.expandListRefresh();
       });
   }
 
@@ -563,7 +557,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    * List search
    */
   expandListSearch(): void {
-    // Search
+    // search
     // #TODO
     this.expandListRefresh();
   }
@@ -609,13 +603,13 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
           return throwError(err);
         })
       )
-      .subscribe((_data) => {
+      .subscribe((data) => {
         // finished
         this.expandListRecordsSubscription = undefined;
         this.expandListLoadingData = false;
 
         // #TODO
-        // console.log(data);
+        console.log(data);
 
         // re-render ui
         this.changeDetectorRef.detectChanges();
