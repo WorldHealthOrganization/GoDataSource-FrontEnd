@@ -30,7 +30,7 @@ const createViewModifyFoundation: Route = {
   resolve: {
     outbreak: SelectedOutbreakDataResolver,
     gender: GenderDataResolver,
-    pregnancyStatus: PregnancyStatusDataResolver,
+    pregnancy: PregnancyStatusDataResolver,
     documentType: DocumentTypeDataResolver,
     classification: ClassificationDataResolver,
     occupation: OccupationDataResolver,
@@ -41,7 +41,8 @@ const createViewModifyFoundation: Route = {
     vaccine: VaccineDataResolver,
     vaccineStatus: VaccineStatusDataResolver,
     dateRangeType: PersonDateTypeDataResolver,
-    dateRangeCenter: DateRangeCenterDataResolver
+    dateRangeCenter: DateRangeCenterDataResolver,
+    yesNo: YesNoDataResolver
   }
 };
 
