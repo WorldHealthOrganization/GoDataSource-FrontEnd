@@ -24,6 +24,7 @@ import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { StorageService } from '../../../core/services/helper/storage.service';
 import { ICachedFilter } from '../../../core/helperClasses/models/cache.model';
 import { CreateViewModifyV2ExpandColumn, CreateViewModifyV2ExpandColumnType } from './models/expand-column.model';
+import { ICreateViewModifyV2Refresh } from './models/refresh.model';
 
 /**
  * Component
@@ -227,7 +228,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   }
 
   // refresh data
-  @Output() expandListRefreshData = new EventEmitter<RequestQueryBuilder>();
+  @Output() expandListRefreshData = new EventEmitter<ICreateViewModifyV2Refresh>();
 
   // switch viewed item
   @Output() expandListChangeRecord = new EventEmitter<any>();
@@ -616,7 +617,12 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     }
 
     // retrieve data
-    this.expandListRefreshData.emit(this._expandListQueryBuilder);
+    this.expandListRefreshData.emit(
+      {
+        queryBuilder: this._expandListQueryBuilder,
+        searchBy: this.expandListSearchValue
+      }
+    );
   }
 
   /**
@@ -657,7 +663,6 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    */
   expandListSearch(): void {
     // search
-    // #TODO
     this.expandListRefresh();
   }
 

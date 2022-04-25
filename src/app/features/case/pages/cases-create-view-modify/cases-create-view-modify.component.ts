@@ -36,10 +36,10 @@ import { SystemSettingsDataService } from '../../../../core/services/data/system
 import { catchError, takeUntil } from 'rxjs/operators';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import * as _ from 'lodash';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
+import { RequestFilterGenerator, RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 
 /**
  * Component
@@ -1250,11 +1250,36 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   /**
    * Refresh expand list
    */
-  refreshExpandList(expandListQueryBuilder: RequestQueryBuilder): void {
+  refreshExpandList(data): void {
+    // clone query builder so we can alter it
+    const qb: RequestQueryBuilder = _.cloneDeep(data.queryBuilder);
+
+    // append / remove search
+    if (data.searchBy) {
+      qb.filter.where({
+        or: [
+          {
+            firstName: RequestFilterGenerator.textContains(
+              data.searchBy
+            )
+          }, {
+            lastName: RequestFilterGenerator.textContains(
+              data.searchBy
+            )
+          }, {
+            middleName: RequestFilterGenerator.textContains(
+              data.searchBy
+            )
+          }
+        ]
+      });
+    }
+
+    // retrieve data
     this.expandListRecords$ = this.caseDataService
       .getCasesList(
         this.selectedOutbreak.id,
-        expandListQueryBuilder
+        qb
       );
   }
 }

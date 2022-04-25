@@ -11,10 +11,10 @@ import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ToastV2Service } from '../services/helper/toast-v2.service';
 import { ConfirmOnFormChanges } from '../services/guards/page-change-confirmation-guard.service';
-import { RequestQueryBuilder } from './request-query-builder';
 import { Constants } from '../models/constants';
 import { V2AdvancedFilter } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { CreateViewModifyV2ExpandColumn } from '../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
+import { ICreateViewModifyV2Refresh } from '../../shared/components-v2/app-create-view-modify-v2/models/refresh.model';
 
 @Directive()
 export abstract class CreateViewModifyComponent<T>
@@ -183,7 +183,7 @@ export abstract class CreateViewModifyComponent<T>
   /**
    * Refresh expand list
    */
-  protected abstract refreshExpandList(queryBuilder: RequestQueryBuilder): void;
+  protected abstract refreshExpandList(data: ICreateViewModifyV2Refresh): void;
 
   /**
    * Release resources
