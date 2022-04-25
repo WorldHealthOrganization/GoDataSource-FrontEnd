@@ -96,7 +96,22 @@
             <!-- Data -->
             <ng-template
               #dataLoaded>
-              data
+              <cdk-virtual-scroll-viewport
+                style="height: 200px;"
+                [itemSize]="40">
+                <div
+                  *cdkVirtualFor="let record of expandListRecords; templateCacheSize: 0;"
+                  [ngSwitch]="expandListColumnRenderer?.type"
+                  style="height: 40px;">
+
+                  <!-- Text -->
+                  <div
+                    *ngSwitchCase="CreateViewModifyV2ExpandColumnType.TEXT">
+                    {{ expandListColumnRenderer.get(record) }}
+                  </div>
+
+                </div>
+              </cdk-virtual-scroll-viewport>
             </ng-template>
 
           </div>

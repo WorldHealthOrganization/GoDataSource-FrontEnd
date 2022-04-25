@@ -15,6 +15,7 @@ import { ConfirmOnFormChanges } from '../services/guards/page-change-confirmatio
 import { RequestQueryBuilder } from './request-query-builder';
 import { Constants } from '../models/constants';
 import { V2AdvancedFilter } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { CreateViewModifyV2ExpandColumn } from '../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 
 @Directive()
 export abstract class CreateViewModifyComponent<T extends BaseModel>
@@ -68,6 +69,9 @@ export abstract class CreateViewModifyComponent<T extends BaseModel>
   // expanded list records observable
   expandListRecords$: Observable<T[]>;
 
+  // expand list column renderer;
+  expandListColumnRenderer: CreateViewModifyV2ExpandColumn;
+
   // expand query fields
   expandListQueryFields: string[];
 
@@ -113,6 +117,9 @@ export abstract class CreateViewModifyComponent<T extends BaseModel>
 
       // initialize tabs
       this.initializeTabs();
+
+      // initialize expanded list column renderer
+      this.initializeExpandListColumnRenderer();
 
       // initialize expanded list query fields
       this.initializeExpandListQueryFields();
@@ -200,6 +207,11 @@ export abstract class CreateViewModifyComponent<T extends BaseModel>
    * Initialize tabs
    */
   protected abstract initializeTabs(): void;
+
+  /**
+   * Initialize expand list column renderer fields
+   */
+  protected abstract initializeExpandListColumnRenderer(): void;
 
   /**
    * Initialize expand list query fields

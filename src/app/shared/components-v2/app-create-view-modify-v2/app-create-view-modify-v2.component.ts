@@ -23,6 +23,7 @@ import { ListComponent } from '../../../core/helperClasses/list-component';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { StorageService } from '../../../core/services/helper/storage.service';
 import { ICachedFilter } from '../../../core/helperClasses/models/cache.model';
+import { CreateViewModifyV2ExpandColumn, CreateViewModifyV2ExpandColumnType } from './models/expand-column.model';
 
 /**
  * Component
@@ -122,6 +123,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   expandListInitialized: boolean = false;
   expandListLoadingData: boolean = false;
 
+  // expand list data
+  expandListRecords: any[];
+
   // list title
   @Input() listTitle: string;
 
@@ -146,6 +150,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   get expandListRecords$(): Observable<any[]> {
     return this._expandListRecords$;
   }
+
+  // expand list column renderer
+  @Input() expandListColumnRenderer: CreateViewModifyV2ExpandColumn;
 
   // query builder
   private _expandListQueryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
@@ -221,6 +228,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   Constants = Constants;
   CreateViewModifyV2MenuType = CreateViewModifyV2MenuType;
   FormHelperService = FormHelperService;
+  CreateViewModifyV2ExpandColumnType = CreateViewModifyV2ExpandColumnType;
 
   /**
    * Constructor
@@ -690,8 +698,8 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
         this.expandListRecordsSubscription = undefined;
         this.expandListLoadingData = false;
 
-        // #TODO
-        console.log(data);
+        // set data
+        this.expandListRecords = data;
 
         // re-render ui
         this.changeDetectorRef.detectChanges();

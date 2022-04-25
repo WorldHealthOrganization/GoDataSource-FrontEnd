@@ -39,6 +39,7 @@ import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
+import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 
 /**
  * Component
@@ -1172,6 +1173,16 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               // #TODO
             });
         });
+    };
+  }
+
+  /**
+   * Initialize expand list column renderer fields
+   */
+  protected initializeExpandListColumnRenderer(): void {
+    this.expandListColumnRenderer = {
+      type: CreateViewModifyV2ExpandColumnType.TEXT,
+      get: (item: CaseModel) => item.name
     };
   }
 
