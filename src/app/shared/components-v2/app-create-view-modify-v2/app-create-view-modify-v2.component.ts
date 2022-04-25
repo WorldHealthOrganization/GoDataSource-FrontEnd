@@ -48,7 +48,13 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     return this.action === CreateViewModifyV2Action.MODIFY;
   }
 
-  // loading item data ?
+  // loading data
+  @Input() loadingPage: boolean;
+
+  // current item id
+  @Input() itemID: string;
+
+  // loading item data
   @Input() loadingItemData: boolean;
 
   // breadcrumbs
@@ -222,6 +228,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
   // refresh data
   @Output() expandListRefreshData = new EventEmitter<RequestQueryBuilder>();
+
+  // switch viewed item
+  @Output() expandListChangeRecord = new EventEmitter<any>();
 
   // constants
   CreateViewModifyV2TabInputType = CreateViewModifyV2TabInputType;
@@ -704,5 +713,12 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
         // re-render ui
         this.changeDetectorRef.detectChanges();
       });
+  }
+
+  /**
+   * View record
+   */
+  expandListViewRecord(record: any): void {
+    this.expandListChangeRecord.emit(record);
   }
 }

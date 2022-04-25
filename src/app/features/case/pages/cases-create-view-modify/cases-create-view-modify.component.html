@@ -1,9 +1,11 @@
 <app-create-view-modify-v2
   [action]="action"
+  [loadingPage]="loadingPage"
   [loadingItemData]="loadingItemData"
   [breadcrumbs]="breadcrumbs"
   [pageTitle]="pageTitle"
   [pageTitleData]="pageTitleData"
+  [itemID]="itemData?.id"
   [tabData]="tabData"
   listTitle="LNG_PAGE_LIST_CASES_TITLE"
   [expandListRecords$]="expandListRecords$"
@@ -12,5 +14,6 @@
   [expandListAdvancedFilters]="expandListAdvancedFilters"
   [expandListQueryFields]="expandListQueryFields"
   expandListAdvancedFiltersCacheKey="/cases"
-  (expandListRefreshData)="refreshExpandList($event)">
+  (expandListRefreshData)="refreshExpandList($event)"
+  (expandListChangeRecord)="expandListChangeRecord($event)">
 </app-create-view-modify-v2>

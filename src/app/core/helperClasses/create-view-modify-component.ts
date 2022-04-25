@@ -8,7 +8,6 @@ import { Directive } from '@angular/core';
 import { TopnavComponent } from '../components/topnav/topnav.component';
 import { AuthDataService } from '../services/data/auth.data.service';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
-import { BaseModel } from '../models/base.model';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ToastV2Service } from '../services/helper/toast-v2.service';
 import { ConfirmOnFormChanges } from '../services/guards/page-change-confirmation-guard.service';
@@ -18,7 +17,7 @@ import { V2AdvancedFilter } from '../../shared/components-v2/app-list-table-v2/m
 import { CreateViewModifyV2ExpandColumn } from '../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 
 @Directive()
-export abstract class CreateViewModifyComponent<T extends BaseModel>
+export abstract class CreateViewModifyComponent<T>
   extends ConfirmOnFormChanges {
   // handler for stopping take until
   protected destroyed$: ReplaySubject<boolean> = new ReplaySubject<boolean>();
@@ -40,7 +39,10 @@ export abstract class CreateViewModifyComponent<T extends BaseModel>
 
   // item data
   itemData: T;
-  loadingItemData: boolean = true;
+
+  // loading page / item data
+  loadingPage: boolean = true;
+  loadingItemData: boolean = false;
 
   // check if selected outbreak is the active one
   get selectedOutbreakIsActive(): boolean {
@@ -87,7 +89,7 @@ export abstract class CreateViewModifyComponent<T extends BaseModel>
   protected constructor(
     activatedRoute: ActivatedRoute,
     authDataService: AuthDataService,
-    toastV2Service: ToastV2Service
+    protected toastV2Service: ToastV2Service
   ) {
     // initialize parent
     super();
@@ -104,32 +106,8 @@ export abstract class CreateViewModifyComponent<T extends BaseModel>
     // retrieve selected outbreak - since on create, view & modify select outbreak dropdown should be disabled
     this.selectedOutbreak = activatedRoute.snapshot.data.outbreak;
 
-    // initialize
-    const initialize = () => {
-      // initialized data
-      this.initializedData();
-
-      // initialize page title
-      this.initializePageTitle();
-
-      // initialize breadcrumbs
-      this.initializeBreadcrumbs();
-
-      // initialize tabs
-      this.initializeTabs();
-
-      // initialize expanded list column renderer
-      this.initializeExpandListColumnRenderer();
-
-      // initialize expanded list query fields
-      this.initializeExpandListQueryFields();
-
-      // initialize advanced filters
-      this.initializeExpandListAdvancedFilters();
-    };
-
     // create ?
-    this.loadingItemData = true;
+    this.loadingPage = true;
     if (this.isCreate) {
       // create
       setTimeout(() => {
@@ -137,38 +115,17 @@ export abstract class CreateViewModifyComponent<T extends BaseModel>
         this.itemData = this.createNewItem();
 
         // initialize other things
-        initialize();
+        this.initializeData();
 
         // not loading anymore
+        this.loadingPage = false;
         this.loadingItemData = false;
       });
     } else {
       // view / modify
       // retrieve item data
       setTimeout(() => {
-        this.retrieveItem()
-          .pipe(
-            catchError((err) => {
-              // show error
-              toastV2Service.error(err);
-
-              // send down
-              return throwError(err);
-            }),
-
-            // should be the last pipe
-            takeUntil(this.destroyed$)
-          )
-          .subscribe((data) => {
-            // set data
-            this.itemData = data;
-
-            // initialize
-            initialize();
-
-            // not loading anymore
-            this.loadingItemData = false;
-          });
+        this.getData(this.retrieveItem());
       });
     }
   }
@@ -186,7 +143,7 @@ export abstract class CreateViewModifyComponent<T extends BaseModel>
   /**
    * Initialize page title
    */
-  protected abstract retrieveItem(): Observable<T>;
+  protected abstract retrieveItem(record?: T): Observable<T>;
 
   /**
    * Initialized data
@@ -239,5 +196,72 @@ export abstract class CreateViewModifyComponent<T extends BaseModel>
 
     // enable select outbreak
     TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = false;
+  }
+
+  /**
+   * Initialize data
+   */
+  private initializeData(): void {
+    // initialized data
+    this.initializedData();
+
+    // initialize page title
+    this.initializePageTitle();
+
+    // initialize breadcrumbs
+    this.initializeBreadcrumbs();
+
+    // initialize tabs
+    this.initializeTabs();
+
+    // initialize expanded list column renderer
+    this.initializeExpandListColumnRenderer();
+
+    // initialize expanded list query fields
+    this.initializeExpandListQueryFields();
+
+    // initialize advanced filters
+    this.initializeExpandListAdvancedFilters();
+  }
+
+  /**
+   * Switch to a different record
+   */
+  expandListChangeRecord(record: T): void {
+    // show loading
+    this.loadingItemData = true;
+
+    // retrieve item
+    this.getData(
+      this.retrieveItem(record)
+    );
+  }
+
+  /**
+   * Actual retrieval of data
+   */
+  private getData(observer$: Observable<T>): void {
+    observer$.pipe(
+      catchError((err) => {
+        // show error
+        this.toastV2Service.error(err);
+
+        // send down
+        return throwError(err);
+      }),
+
+      // should be the last pipe
+      takeUntil(this.destroyed$)
+    ).subscribe((data) => {
+      // set data
+      this.itemData = data;
+
+      // initialize
+      this.initializeData();
+
+      // not loading anymore
+      this.loadingPage = false;
+      this.loadingItemData = false;
+    });
   }
 }

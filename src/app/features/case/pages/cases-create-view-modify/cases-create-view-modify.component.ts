@@ -94,11 +94,13 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   /**
    * Retrieve item
    */
-  protected retrieveItem(): Observable<CaseModel> {
+  protected retrieveItem(record?: CaseModel): Observable<CaseModel> {
     return this.caseDataService
       .getCase(
         this.selectedOutbreak.id,
-        this.activatedRoute.snapshot.params.caseId
+        record ?
+          record.id :
+          this.activatedRoute.snapshot.params.caseId
       );
   }
 
@@ -1191,6 +1193,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    */
   protected initializeExpandListQueryFields(): void {
     this.expandListQueryFields = [
+      'id',
       'firstName',
       'lastName',
       'middleName'
