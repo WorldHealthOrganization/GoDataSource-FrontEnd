@@ -5,7 +5,7 @@ import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
 import { CaseCenterDateRangeModel } from './case-center-date-range.model';
-import { IAnswerData } from './question.model';
+import { IAnswerData, QuestionModel } from './question.model';
 import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
 import { Moment, moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
@@ -25,6 +25,9 @@ import {
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
+import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { IResolverV2ResponseModel } from '../services/resolvers/data/models/resolver-response.model';
+import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 
 export class CaseModel
   extends BaseModel
@@ -116,10 +119,242 @@ export class CaseModel
 
   matchedDuplicateRelationships: EntityMatchedRelationshipModel[];
 
+  // case advanced filters
+  static generateAdvancedFilters(
+    // data
+    authUser: UserModel,
+
+    // options
+    genderOptions: ILabelValuePairModel[],
+    occupationOptions: ILabelValuePairModel[],
+    riskOptions: ILabelValuePairModel[],
+    classificationOptions: ILabelValuePairModel[],
+    yesNoOptions: ILabelValuePairModel[],
+    outcomeOptions: ILabelValuePairModel[],
+    clusterOptionsLoad: (finished: (data: IResolverV2ResponseModel<any>) => void) => void,
+    caseInvestigationTemplate: () => QuestionModel[],
+    pregnancyOptions: ILabelValuePairModel[],
+    vaccineOptions: ILabelValuePairModel[],
+    vaccineStatusOptions: ILabelValuePairModel[],
+    userOptions: ILabelValuePairModel[]
+  ): V2AdvancedFilter[] {
+    // initialize
+    const advancedFilters: V2AdvancedFilter[] = [
+      // Case
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'firstName',
+        label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
+        sortable: true
+      }, {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'middleName',
+        label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
+        sortable: true
+      }, {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'lastName',
+        label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
+        sortable: true
+      }, {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'gender',
+        label: 'LNG_CASE_FIELD_LABEL_GENDER',
+        options: genderOptions,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_AGE,
+        field: 'age',
+        label: 'LNG_CASE_FIELD_LABEL_AGE'
+      },
+      {
+        type: V2AdvancedFilterType.ADDRESS,
+        field: 'addresses',
+        label: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
+        isArray: true
+      },
+      {
+        type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
+        field: 'addresses',
+        label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
+        isArray: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dob',
+        label: 'LNG_CASE_FIELD_LABEL_DOB',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'occupation',
+        label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
+        options: occupationOptions
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'riskLevel',
+        label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
+        options: riskOptions
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'riskReason',
+        label: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'visualId',
+        label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'classification',
+        label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+        options: classificationOptions
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateOfInfection',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateOfOnset',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateOfOutcome',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateBecomeCase',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'safeBurial',
+        label: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
+        options: yesNoOptions,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'isDateOfOnsetApproximate',
+        label: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
+        options: yesNoOptions,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateOfReporting',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'isDateOfReportingApproximate',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+        options: yesNoOptions,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'transferRefused',
+        label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
+        options: yesNoOptions,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'outcomeId',
+        label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+        options: outcomeOptions
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'wasContact',
+        label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
+        options: yesNoOptions,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_NUMBER,
+        field: 'numberOfContacts',
+        label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_NUMBER,
+        field: 'numberOfExposures',
+        label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'clusterId',
+        label: 'LNG_CASE_FIELD_LABEL_CLUSTER_NAME',
+        relationshipPath: ['relationships'],
+        relationshipLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER',
+        optionsLoad: clusterOptionsLoad
+      }, {
+        type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
+        field: 'questionnaireAnswers',
+        label: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+        template: caseInvestigationTemplate
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'pregnancyStatus',
+        label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
+        options: pregnancyOptions,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'vaccinesReceived.vaccine',
+        label: 'LNG_CASE_FIELD_LABEL_VACCINE',
+        options: vaccineOptions
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'vaccinesReceived.status',
+        label: 'LNG_CASE_FIELD_LABEL_VACCINE_STATUS',
+        options: vaccineStatusOptions
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'vaccinesReceived.date',
+        label: 'LNG_CASE_FIELD_LABEL_VACCINE_DATE'
+      }
+    ];
+
+    // allowed to filter by responsible user ?
+    if (UserModel.canList(authUser)) {
+      advancedFilters.push({
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'responsibleUserId',
+        label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
+        options: userOptions
+      });
+    }
+
+    // finished
+    return advancedFilters;
+  }
+
   /**
-     * Return case id mask with data replaced
-     * @param caseIdMask
-     */
+   * Return case id mask with data replaced
+   */
   static generateCaseIDMask(caseIdMask: string): string {
     // validate
     if (_.isEmpty(caseIdMask)) {

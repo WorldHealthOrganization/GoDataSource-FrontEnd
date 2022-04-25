@@ -524,9 +524,39 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    * List filters
    */
   expandListFilter(): void {
-    // Set filters
-    // #TODO
-    this.expandListRefresh();
+    // no advanced filter type set ?
+    if (!this.expandListAdvancedFilterType) {
+      throw new Error('Advanced filter type missing...');
+    }
+
+    // show advanced filters dialog
+    this.dialogV2Service
+      .showAdvancedFiltersDialog(
+        this.expandListAdvancedFilterType,
+        this.expandListAdvancedFilters,
+
+        // #TODO
+        // this._advancedFiltersApplied
+        undefined
+      )
+      .subscribe((response) => {
+        // cancelled ?
+        if (!response) {
+          return;
+        }
+
+        // #TODO
+
+        // // set data
+        // this._advancedFiltersQueryBuilder = response.queryBuilder;
+        // this._advancedFiltersApplied = response.filtersApplied;
+        //
+        // // emit the Request Query Builder
+        // this.advancedFilterBy.emit(this.advancedFiltersQueryBuilder);
+
+        // #TODO
+        // this.expandListRefresh();
+      });
   }
 
   /**

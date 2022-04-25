@@ -39,7 +39,6 @@ import { LocationDataService } from '../../../../core/services/data/location.dat
 import { LocationModel } from '../../../../core/models/location.model';
 import { IV2FilterBoolean, IV2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IExtendedColDef } from '../../../../shared/components-v2/app-list-table-v2/models/extended-column.model';
-import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import * as moment from 'moment';
 
@@ -1313,238 +1312,48 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
    * Initialize advanced filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = [
-      // Case
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'firstName',
-        label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
-        sortable: true
-      }, {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'middleName',
-        label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
-        sortable: true
-      }, {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'lastName',
-        label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
-        sortable: true
-      }, {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'gender',
-        label: 'LNG_CASE_FIELD_LABEL_GENDER',
-        options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_AGE,
-        field: 'age',
-        label: 'LNG_CASE_FIELD_LABEL_AGE'
-      },
-      {
-        type: V2AdvancedFilterType.ADDRESS,
-        field: 'addresses',
-        label: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
-        isArray: true
-      },
-      {
-        type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
-        field: 'addresses',
-        label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
-        isArray: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dob',
-        label: 'LNG_CASE_FIELD_LABEL_DOB',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'occupation',
-        label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
-        options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'riskLevel',
-        label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
-        options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'riskReason',
-        label: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'visualId',
-        label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'classification',
-        label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-        options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfInfection',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfOnset',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfOutcome',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateBecomeCase',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'safeBurial',
-        label: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
-        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'isDateOfOnsetApproximate',
-        label: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
-        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfReporting',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'isDateOfReportingApproximate',
-        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'transferRefused',
-        label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
-        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'outcomeId',
-        label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
-        options: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'wasContact',
-        label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
-        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_NUMBER,
-        field: 'numberOfContacts',
-        label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_CONTACTS',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_NUMBER,
-        field: 'numberOfExposures',
-        label: 'LNG_CASE_FIELD_LABEL_NUMBER_OF_EXPOSURES',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'clusterId',
-        label: 'LNG_CASE_FIELD_LABEL_CLUSTER_NAME',
-        relationshipPath: ['relationships'],
-        relationshipLabel: 'LNG_CASE_FIELD_LABEL_CLUSTER',
-        optionsLoad: (finished) => {
-          this.clusterDataService
-            .getResolveList(
-              this.selectedOutbreak.id
-            )
-            .pipe(
-              // handle error
-              catchError((err) => {
-                // show error
-                this.toastV2Service.error(err);
+    this.advancedFilters = CaseModel.generateAdvancedFilters(
+      // data
+      this.authUser,
 
-                // not found
-                finished(null);
+      // options
+      (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+      (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+      (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+      (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+      (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+      (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+      (finished) => {
+        this.clusterDataService
+          .getResolveList(
+            this.selectedOutbreak.id
+          )
+          .pipe(
+            // handle error
+            catchError((err) => {
+              // show error
+              this.toastV2Service.error(err);
 
-                // send error down the road
-                return throwError(err);
-              }),
+              // not found
+              finished(null);
 
-              // should be the last pipe
-              takeUntil(this.destroyed$)
-            )
-            .subscribe((data) => {
-              finished(data);
-            });
-        }
-      }, {
-        type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
-        field: 'questionnaireAnswers',
-        label: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-        template: () => this.selectedOutbreak.caseInvestigationTemplate
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'pregnancyStatus',
-        label: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
-        options: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'vaccinesReceived.vaccine',
-        label: 'LNG_CASE_FIELD_LABEL_VACCINE',
-        options: (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'vaccinesReceived.status',
-        label: 'LNG_CASE_FIELD_LABEL_VACCINE_STATUS',
-        options: (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'vaccinesReceived.date',
-        label: 'LNG_CASE_FIELD_LABEL_VACCINE_DATE'
-      }
-    ];
+              // send error down the road
+              return throwError(err);
+            }),
 
-    // allowed to filter by responsible user ?
-    if (UserModel.canList(this.authUser)) {
-      this.advancedFilters.push({
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'responsibleUserId',
-        label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
-        options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
-      });
-    }
+            // should be the last pipe
+            takeUntil(this.destroyed$)
+          )
+          .subscribe((data) => {
+            finished(data);
+          });
+      },
+      () => this.selectedOutbreak.caseInvestigationTemplate,
+      (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+      (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+      (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+      (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+    );
   }
 
   /**
