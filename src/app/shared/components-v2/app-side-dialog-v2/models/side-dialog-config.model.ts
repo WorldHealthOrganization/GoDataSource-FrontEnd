@@ -3,8 +3,9 @@ import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.mo
 import { NgForm } from '@angular/forms';
 import { Params } from '@angular/router';
 import { V2AdvancedFilter } from '../../app-list-table-v2/models/advanced-filter.model';
-import { RequestFilterOperator } from '../../../../core/helperClasses/request-query-builder';
+import { RequestFilterOperator, RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { IGeneralAsyncValidatorResponse } from '../../../xt-forms/validators/general-async-validator.directive';
+import { SavedFilterData } from '../../../../core/models/saved-filters.model';
 
 /**
  * Side dialog config
@@ -411,4 +412,13 @@ export interface IV2SideDialogResponse {
 
   // optional
   data?: IV2SideDialogData;
+}
+
+/**
+ * Side dialog advanced filters response
+ */
+export interface IV2SideDialogAdvancedFiltersResponse {
+  // required
+  queryBuilder: RequestQueryBuilder;
+  filtersApplied: SavedFilterData;
 }

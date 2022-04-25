@@ -579,13 +579,13 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
           return throwError(err);
         })
       )
-      .subscribe((data) => {
+      .subscribe((_data) => {
         // finished
         this.expandListRecordsSubscription = undefined;
         this.expandListLoadingData = false;
 
         // #TODO
-        console.log(data);
+        // console.log(data);
 
         // re-render ui
         this.changeDetectorRef.detectChanges();
