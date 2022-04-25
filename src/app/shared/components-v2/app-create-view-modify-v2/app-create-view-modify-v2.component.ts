@@ -154,6 +154,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   @Input() expandListAdvancedFilterType: string;
   @Input() expandListAdvancedFilters: V2AdvancedFilter[];
 
+  // query fields
+  @Input() expandListQueryFields: string[];
+
   // filters applied
   private _expandListAdvancedFiltersApplied: SavedFilterData;
 
@@ -580,6 +583,22 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    * Refresh expand list data
    */
   private expandListRefresh(): void {
+    // make sure we add pagination
+    this._expandListQueryBuilder.paginator.setPage({
+      pageSize: Constants.DEFAULT_PAGE_SIZE,
+      pageIndex: 0
+    });
+
+    // query only the fields that we need to
+    if (
+      this.expandListQueryFields &&
+      this.expandListQueryFields.length > 0
+    ) {
+      this._expandListQueryBuilder.clearFields();
+      this._expandListQueryBuilder.fields(...this.expandListQueryFields);
+    }
+
+    // retrieve data
     this.expandListRefreshData.emit(this._expandListQueryBuilder);
   }
 
@@ -606,7 +625,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
         }
 
         // set data
-        this._expandListQueryBuilder = response.queryBuilder;
+        this._expandListQueryBuilder = response.queryBuilder ?
+          response.queryBuilder :
+          new RequestQueryBuilder();
         this._expandListAdvancedFiltersApplied = response.filtersApplied;
 
         // filter

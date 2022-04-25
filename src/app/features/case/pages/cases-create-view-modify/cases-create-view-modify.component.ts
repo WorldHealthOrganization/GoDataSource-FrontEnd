@@ -1176,6 +1176,17 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   }
 
   /**
+   * Initialize expand list query fields
+   */
+  protected initializeExpandListQueryFields(): void {
+    this.expandListQueryFields = [
+      'firstName',
+      'lastName',
+      'middleName'
+    ];
+  }
+
+  /**
    * Initialize expand list advanced filters
    */
   protected initializeExpandListAdvancedFilters(): void {

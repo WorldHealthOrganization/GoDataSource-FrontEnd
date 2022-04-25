@@ -68,6 +68,9 @@ export abstract class CreateViewModifyComponent<T extends BaseModel>
   // expanded list records observable
   expandListRecords$: Observable<T[]>;
 
+  // expand query fields
+  expandListQueryFields: string[];
+
   // advanced filters
   expandListAdvancedFilters: V2AdvancedFilter[];
 
@@ -110,6 +113,9 @@ export abstract class CreateViewModifyComponent<T extends BaseModel>
 
       // initialize tabs
       this.initializeTabs();
+
+      // initialize expanded list query fields
+      this.initializeExpandListQueryFields();
 
       // initialize advanced filters
       this.initializeExpandListAdvancedFilters();
@@ -194,6 +200,11 @@ export abstract class CreateViewModifyComponent<T extends BaseModel>
    * Initialize tabs
    */
   protected abstract initializeTabs(): void;
+
+  /**
+   * Initialize expand list query fields
+   */
+  protected abstract initializeExpandListQueryFields(): void;
 
   /**
    * Initialize expand list advanced filters
