@@ -96,25 +96,36 @@
             <!-- Data -->
             <ng-template
               #dataLoaded>
-              <cdk-virtual-scroll-viewport
-                style="height: 200px;"
-                [itemSize]="40">
-                <div
-                  *cdkVirtualFor="let record of expandListRecords; templateCacheSize: 0;"
-                  [ngSwitch]="expandListColumnRenderer?.type"
-                  style="height: 40px;"
-                  class="gd-create-view-modify-list-data-record"
-                  [class.gd-create-view-modify-list-data-record-active]="record.id === itemID"
-                  (click)="record.id === itemID ? undefined : expandListViewRecord(record)">
 
-                  <!-- Text -->
+              <!-- No data -->
+              <div
+                *ngIf="expandListRecords.length < 1; else hasData">
+                no data image..same as for list table when no rows are returned
+              </div>
+
+              <!-- Has Data -->
+              <ng-template
+                #hasData>
+                <cdk-virtual-scroll-viewport
+                  style="height: 200px;"
+                  [itemSize]="40">
                   <div
-                    *ngSwitchCase="CreateViewModifyV2ExpandColumnType.TEXT">
-                    {{ expandListColumnRenderer.get(record) }}
-                  </div>
+                    *cdkVirtualFor="let record of expandListRecords; templateCacheSize: 0;"
+                    [ngSwitch]="expandListColumnRenderer?.type"
+                    style="height: 40px;"
+                    class="gd-create-view-modify-list-data-record"
+                    [class.gd-create-view-modify-list-data-record-active]="record.id === itemID"
+                    (click)="record.id === itemID ? undefined : expandListViewRecord(record)">
 
-                </div>
-              </cdk-virtual-scroll-viewport>
+                    <!-- Text -->
+                    <div
+                      *ngSwitchCase="CreateViewModifyV2ExpandColumnType.TEXT">
+                      {{ expandListColumnRenderer.get(record) }}
+                    </div>
+
+                  </div>
+                </cdk-virtual-scroll-viewport>
+              </ng-template>
             </ng-template>
 
           </div>
