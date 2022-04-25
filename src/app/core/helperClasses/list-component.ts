@@ -144,6 +144,34 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   /**
    * Retrieve cached filters
    */
+  static getCachedFiltersPageKey(
+    filterKey: string,
+    applySuffix: string
+  ): string {
+    // get path
+    const pathParamsIndex: number = filterKey.indexOf('?');
+    if (pathParamsIndex > -1) {
+      filterKey = filterKey.substr(0, pathParamsIndex);
+    }
+
+    // if apply list filter then we need to make sure we add it to our key so we don't break other pages by adding filters that we shouldn't
+    if (applySuffix) {
+      filterKey += `_${applySuffix}`;
+    }
+
+    // remove ids from link so we don't have filters for each item because this would mean that we will fill storage really fast
+    filterKey = filterKey.replace(
+      /[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}/ig,
+      ''
+    );
+
+    // finished
+    return filterKey;
+  }
+
+  /**
+   * Retrieve cached filters
+   */
   static getCachedFiltersFromStorage(
     authUser: UserModel,
     storageService: StorageService
@@ -781,26 +809,10 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
    * Retrieve filter key for current page
    */
   private getCachedFilterPageKey(): string {
-    // get path
-    let filterKey: string = this.listHelperService.location.path();
-    const pathParamsIndex: number = filterKey.indexOf('?');
-    if (pathParamsIndex > -1) {
-      filterKey = filterKey.substr(0, pathParamsIndex);
-    }
-
-    // if apply list filter then we need to make sure we add it to our key so we don't break other pages by adding filters that we shouldn't
-    if (this.appliedListFilter) {
-      filterKey += `_${this.appliedListFilter}`;
-    }
-
-    // remove ids from link so we don't have filters for each item because this would mean that we will fill storage really fast
-    filterKey = filterKey.replace(
-      /[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}/ig,
-      ''
+    return ListComponent.getCachedFiltersPageKey(
+      this.listHelperService.location.path(),
+      this.appliedListFilter
     );
-
-    // finished
-    return filterKey;
   }
 
   /**

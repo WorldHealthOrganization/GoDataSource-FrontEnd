@@ -19,6 +19,10 @@ import { catchError } from 'rxjs/operators';
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 import { V2AdvancedFilter } from '../app-list-table-v2/models/advanced-filter.model';
 import { SavedFilterData } from '../../../core/models/saved-filters.model';
+import { ListComponent } from '../../../core/helperClasses/list-component';
+import { AuthDataService } from '../../../core/services/data/auth.data.service';
+import { StorageService } from '../../../core/services/helper/storage.service';
+import { ICachedFilter } from '../../../core/helperClasses/models/cache.model';
 
 /**
  * Component
@@ -149,7 +153,62 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   // advanced filters
   @Input() expandListAdvancedFilterType: string;
   @Input() expandListAdvancedFilters: V2AdvancedFilter[];
-  @Input() expandListAdvancedFiltersApplied: SavedFilterData;
+
+  // filters applied
+  private _expandListAdvancedFiltersApplied: SavedFilterData;
+
+  // advanced filters cache key
+  private _expandListAdvancedFiltersCacheKey: string;
+  @Input() set expandListAdvancedFiltersCacheKey(pageKey: string) {
+    // set data
+    this._expandListAdvancedFiltersCacheKey = pageKey;
+
+    // nothing to do ?
+    if (!this._expandListAdvancedFiltersCacheKey) {
+      // reset data
+      this._expandListAdvancedFiltersApplied = undefined;
+      this._expandListQueryBuilder = new RequestQueryBuilder();
+
+      // finished
+      return;
+    }
+
+    // load cached filters for our page
+    const realCacheKey: string = ListComponent.getCachedFiltersPageKey(
+      this._expandListAdvancedFiltersCacheKey,
+      undefined
+    );
+
+    // retrieve storage filters
+    const currentUserCache: ICachedFilter = ListComponent.getCachedFiltersFromStorage(
+      this.authDataService.getAuthenticatedUser(),
+      this.storageService
+    );
+
+    // check if we have cached for our page
+    if (
+      currentUserCache &&
+      currentUserCache[realCacheKey]
+    ) {
+      // set query builder
+      if (currentUserCache[realCacheKey].queryBuilder) {
+        // reset
+        this._expandListQueryBuilder = new RequestQueryBuilder();
+
+        // deserialize
+        this._expandListQueryBuilder.deserialize(currentUserCache[realCacheKey].queryBuilder);
+      }
+
+      // set query builder
+      if (currentUserCache[realCacheKey].sideFilters) {
+        // set data
+        this._expandListAdvancedFiltersApplied = new SavedFilterData(currentUserCache[realCacheKey].sideFilters);
+      }
+    }
+  }
+  get expandListAdvancedFiltersCacheKey(): string {
+    return this._expandListAdvancedFiltersCacheKey;
+  }
 
   // refresh data
   @Output() expandListRefreshData = new EventEmitter<RequestQueryBuilder>();
@@ -168,7 +227,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     protected changeDetectorRef: ChangeDetectorRef,
     protected dialogV2Service: DialogV2Service,
     protected formHelper: FormHelperService,
-    protected toastV2Service: ToastV2Service
+    protected toastV2Service: ToastV2Service,
+    protected authDataService: AuthDataService,
+    protected storageService: StorageService
   ) {}
 
   /**
@@ -536,7 +597,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
       .showAdvancedFiltersDialog(
         this.expandListAdvancedFilterType,
         this.expandListAdvancedFilters,
-        this.expandListAdvancedFiltersApplied
+        this._expandListAdvancedFiltersApplied
       )
       .subscribe((response) => {
         // cancelled ?
@@ -546,7 +607,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
         // set data
         this._expandListQueryBuilder = response.queryBuilder;
-        this.expandListAdvancedFiltersApplied = response.filtersApplied;
+        this._expandListAdvancedFiltersApplied = response.filtersApplied;
 
         // filter
         this.expandListRefresh();
