@@ -6,7 +6,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { DebounceTimeCaller } from './debounce-time-caller';
 import { ListHelperService } from '../services/helper/list-helper.service';
 import { SubscriptionLike } from 'rxjs/internal/types';
-import { StorageKey } from '../services/helper/storage.service';
+import { StorageKey, StorageService } from '../services/helper/storage.service';
 import { UserModel, UserSettings } from '../models/user.model';
 import * as LzString from 'lz-string';
 import { IV2Column } from '../../shared/components-v2/app-list-table-v2/models/column.model';
@@ -140,6 +140,32 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
     // refresh list
     this.refreshListCount();
   }));
+
+  /**
+   * Retrieve cached filters
+   */
+  static getCachedFiltersFromStorage(
+    authUser: UserModel,
+    storageService: StorageService
+  ): ICachedFilter {
+    // retrieve filters if there are any initialized
+    const cachedFilters: string = storageService.get(StorageKey.FILTERS);
+    let filters: {
+      [userId: string]: any
+    } = {};
+    if (cachedFilters) {
+      filters = JSON.parse(LzString.decompress(cachedFilters));
+    }
+
+    // we need to have data for this user, otherwise remove what we have
+    let currentUserCache: ICachedFilter = filters[authUser.id];
+    if (!currentUserCache) {
+      currentUserCache = {};
+    }
+
+    // finished
+    return currentUserCache;
+  }
 
   /**
    * Constructor
@@ -712,23 +738,11 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
    * Retrieve cached filters
    */
   private getCachedFilters(forLoadingFilters: boolean): ICachedFilter {
-    // user information
-    const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
-
-    // retrieve filters if there are any initialized
-    const cachedFilters: string = this.listHelperService.storageService.get(StorageKey.FILTERS);
-    let filters: {
-      [userId: string]: any
-    } = {};
-    if (cachedFilters) {
-      filters = JSON.parse(LzString.decompress(cachedFilters));
-    }
-
     // we need to have data for this user, otherwise remove what we have
-    let currentUserCache: ICachedFilter = filters[authUser.id];
-    if (!currentUserCache) {
-      currentUserCache = {};
-    }
+    const currentUserCache: ICachedFilter = ListComponent.getCachedFiltersFromStorage(
+      this.listHelperService.authDataService.getAuthenticatedUser(),
+      this.listHelperService.storageService
+    );
 
     // check if we have something in url, which has priority against storage
     if (
