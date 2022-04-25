@@ -13,6 +13,8 @@ import { catchError, takeUntil } from 'rxjs/operators';
 import { ToastV2Service } from '../services/helper/toast-v2.service';
 import { ConfirmOnFormChanges } from '../services/guards/page-change-confirmation-guard.service';
 import { RequestQueryBuilder } from './request-query-builder';
+import { Constants } from '../models/constants';
+import { V2AdvancedFilter } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 
 @Directive()
 export abstract class CreateViewModifyComponent<T extends BaseModel>
@@ -66,6 +68,12 @@ export abstract class CreateViewModifyComponent<T extends BaseModel>
   // expanded list records observable
   expandListRecords$: Observable<T[]>;
 
+  // advanced filters
+  expandListAdvancedFilters: V2AdvancedFilter[];
+
+  // constants
+  Constants = Constants;
+
   /**
    * Constructor
    */
@@ -102,6 +110,9 @@ export abstract class CreateViewModifyComponent<T extends BaseModel>
 
       // initialize tabs
       this.initializeTabs();
+
+      // initialize advanced filters
+      this.initializeExpandListAdvancedFilters();
     };
 
     // create ?
@@ -183,6 +194,11 @@ export abstract class CreateViewModifyComponent<T extends BaseModel>
    * Initialize tabs
    */
   protected abstract initializeTabs(): void;
+
+  /**
+   * Initialize expand list advanced filters
+   */
+  protected abstract initializeExpandListAdvancedFilters(): void;
 
   /**
    * Refresh expand list

@@ -17,6 +17,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
+import { V2AdvancedFilter } from '../app-list-table-v2/models/advanced-filter.model';
 
 /**
  * Component
@@ -143,6 +144,10 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
   // query builder
   private expandListQueryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
+
+  // advanced filters
+  @Input() expandListAdvancedFilterType: string;
+  @Input() expandListAdvancedFilters: V2AdvancedFilter[];
 
   // refresh data
   @Output() expandListRefreshData = new EventEmitter<RequestQueryBuilder>();

@@ -1173,6 +1173,14 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   }
 
   /**
+   * Initialize expand list advanced filters
+   */
+  protected initializeExpandListAdvancedFilters(): void {
+    // #TODO
+    // this.expandListAdvancedFilters
+  }
+
+  /**
    * Refresh expand list
    */
   refreshExpandList(expandListQueryBuilder: RequestQueryBuilder): void {
