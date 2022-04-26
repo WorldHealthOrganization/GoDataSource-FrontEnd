@@ -221,7 +221,8 @@
                   [class.gd-create-view-modify-top-title-buttons-buttons-quick-expanded]="quickMenuTrigger.menuOpen"
                   type="button"
                   mat-flat-button color="secondary"
-                  [matMenuTriggerFor]="quickMenu">
+                  [matMenuTriggerFor]="quickMenu"
+                  (menuClosed)="changeDetectorRef.detectChanges()">
 
                   <!-- Label -->
                   <span>
@@ -299,7 +300,7 @@
 
                 <!-- Pending validators -->
                 <mat-progress-spinner
-                  [style.visibility]="hasPendingForm ? 'visible' : 'hidden'"
+                  *ngIf="hasPendingForm"
                   diameter="16"
                   mode="indeterminate"
                   color="primary">

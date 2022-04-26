@@ -245,7 +245,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    */
   constructor(
     protected elementRef: ElementRef,
-    protected changeDetectorRef: ChangeDetectorRef,
+    public changeDetectorRef: ChangeDetectorRef,
     protected dialogV2Service: DialogV2Service,
     protected formHelper: FormHelperService,
     protected toastV2Service: ToastV2Service,
