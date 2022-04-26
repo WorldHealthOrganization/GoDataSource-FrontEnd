@@ -85,4 +85,29 @@ export class AppFormNumberV2Component
   ngOnDestroy(): void {
     super.onDestroy();
   }
+
+  /**
+   * Set value
+   * @param value
+   */
+  writeValue(value: number): void {
+    // make sure precision is max 6 digits
+    if (value) {
+      // count number of decimals
+      const stringValue: string = value.toString();
+      const decimalIndex: number = stringValue.indexOf('.');
+      if (
+        decimalIndex > -1 &&
+        stringValue.length - 1 > decimalIndex
+      ) {
+        const decimals: string = stringValue.substring(decimalIndex + 1);
+        if (decimals.length > 5) {
+          value = Math.round(value * 1000000) / 1000000;
+        }
+      }
+    }
+
+    // write value
+    super.writeValue(value);
+  }
 }
