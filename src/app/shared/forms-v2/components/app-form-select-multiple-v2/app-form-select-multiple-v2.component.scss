@@ -21,6 +21,7 @@
 
 /* Select */
 .gd-form-select-multiple-v2 {
+  @include flex(flex);
   width: 100%;
 
   .mat-form-field {
@@ -232,12 +233,6 @@
             width: 2.4rem;
           }
         }
-      }
-
-      .mat-form-field-subscript-wrapper {
-        font-size: 1.2rem;
-        margin-top: 0.2rem;
-        padding: 0;
       }
     }
 
