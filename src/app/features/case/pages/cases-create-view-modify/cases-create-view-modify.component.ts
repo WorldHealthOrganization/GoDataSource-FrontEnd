@@ -39,7 +39,7 @@ import * as _ from 'lodash';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
-import { RequestFilterGenerator, RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 
 /**
  * Component
@@ -1251,12 +1251,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Refresh expand list
    */
   refreshExpandList(data): void {
-    // clone query builder so we can alter it
-    const qb: RequestQueryBuilder = _.cloneDeep(data.queryBuilder);
-
     // append / remove search
     if (data.searchBy) {
-      qb.filter.where({
+      data.queryBuilder.filter.where({
         or: [
           {
             firstName: RequestFilterGenerator.textContains(
@@ -1270,6 +1267,10 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             middleName: RequestFilterGenerator.textContains(
               data.searchBy
             )
+          }, {
+            visualId: RequestFilterGenerator.textContains(
+              data.searchBy
+            )
           }
         ]
       });
@@ -1279,7 +1280,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     this.expandListRecords$ = this.caseDataService
       .getCasesList(
         this.selectedOutbreak.id,
-        qb
+        data.queryBuilder
       );
   }
 }

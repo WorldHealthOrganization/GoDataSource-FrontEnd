@@ -619,7 +619,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     // retrieve data
     this.expandListRefreshData.emit(
       {
-        queryBuilder: this._expandListQueryBuilder,
+        queryBuilder: _.cloneDeep(this._expandListQueryBuilder),
         searchBy: this.expandListSearchValue
       }
     );
