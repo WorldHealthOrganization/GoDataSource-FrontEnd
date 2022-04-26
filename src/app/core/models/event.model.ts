@@ -8,6 +8,8 @@ import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
 import { IPermissionBasic, IPermissionExportable, IPermissionImportable, IPermissionRelatedContact, IPermissionRelatedContactBulk, IPermissionRelatedRelationship, IPermissionRestorable } from './permission.interface';
+import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 
 export class EventModel
   extends BaseModel
@@ -40,6 +42,75 @@ export class EventModel
 
   responsibleUserId: string;
   responsibleUser: UserModel;
+
+  /**
+   * Advanced filters
+   */
+  static generateAdvancedFilters(data: {
+    options: {
+      user: ILabelValuePairModel[]
+    }
+  }): V2AdvancedFilter[] {
+    // initialize
+    const advancedFilters: V2AdvancedFilter[] = [
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'name',
+        label: 'LNG_EVENT_FIELD_LABEL_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'date',
+        label: 'LNG_EVENT_FIELD_LABEL_DATE',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'description',
+        label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.ADDRESS,
+        field: 'address',
+        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
+        isArray: false
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateOfReporting',
+        label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING'
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'isDateOfReportingApproximate',
+        label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_NUMBER,
+        field: 'numberOfContacts',
+        label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_NUMBER,
+        field: 'numberOfExposures',
+        label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'responsibleUserId',
+        label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+        options: data.options.user
+      }
+    ];
+
+    // finished
+    return advancedFilters;
+  }
 
   /**
      * Static Permissions - IPermissionBasic
@@ -97,8 +168,8 @@ export class EventModel
   static canBulkDeleteRelationshipContacts(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_BULK_DELETE_RELATIONSHIP_CONTACTS) : false); }
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(data = null) {
     super(data);
 
