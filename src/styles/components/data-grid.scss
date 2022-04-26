@@ -280,6 +280,27 @@
           &.ag-column-hover {
             background-color: transparent;
           }
+
+          .gd-list-table-icon-material {
+            display: block;
+            height: 2.4rem;
+
+            .material-icons {
+              font-size: 2.4rem;
+            }
+          }
+
+          .gd-list-table-color {
+            @include flex_align_items(center);
+            @include flex(flex);
+            @include flex_direction(row);
+
+            span {
+              height: 2rem;
+              margin-right: 0.8rem;
+              width: 2rem;
+            }
+          }
         }
       }
 
@@ -405,7 +426,7 @@
       color: var(--gd-secondary);
       font-size: 1.2rem;
       margin-left: 0.8rem;
-      min-width: 11rem;
+      min-width: 13.1rem;
       text-transform: uppercase;
     }
   
