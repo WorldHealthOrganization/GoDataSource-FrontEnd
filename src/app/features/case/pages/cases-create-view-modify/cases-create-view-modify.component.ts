@@ -257,7 +257,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               value: {
                 get: () => this.itemData.firstName,
                 set: (value) => {
+                  // set data
                   this.itemData.firstName = value;
+
+                  // check for duplicates
+                  this.checkForPersonExistence();
                 }
               },
               validators: {
@@ -271,7 +275,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               value: {
                 get: () => this.itemData.middleName,
                 set: (value) => {
+                  // set data
                   this.itemData.middleName = value;
+
+                  // check for duplicates
+                  this.checkForPersonExistence();
                 }
               }
             }, {
@@ -282,7 +290,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               value: {
                 get: () => this.itemData.lastName,
                 set: (value) => {
+                  // set data
                   this.itemData.lastName = value;
+
+                  // check for duplicates
+                  this.checkForPersonExistence();
                 }
               }
             }, {
@@ -1282,5 +1294,12 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         this.selectedOutbreak.id,
         data.queryBuilder
       );
+  }
+
+  /**
+   * Check if a contact exists with the same name
+   */
+  private checkForPersonExistence(): void {
+    // #TODO
   }
 }
