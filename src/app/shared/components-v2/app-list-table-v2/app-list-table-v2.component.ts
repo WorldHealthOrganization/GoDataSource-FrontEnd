@@ -896,7 +896,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
           // create color display
           return value ?
-            `<span class="gd-list-table-color"><div style="background-color: ${value}; display: inline-block; width: 2.4rem; height: 2.4rem;"></div> ${value}</span>` :
+            `<div class="gd-list-table-color"><span style="background-color: ${value};"></span> ${value}</div>` :
             this.translateService.instant(colorColumn.noColorLabel);
         };
       }

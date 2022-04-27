@@ -354,6 +354,19 @@ svg:not(:root) {
 }
 
 /* Error */
+.mat-form-field {
+  .mat-form-field-wrapper {
+    .mat-form-field-subscript-wrapper {
+      font-size: 1.2rem;
+      line-height: 1;
+      margin-top: 0;
+      padding: 0;
+      position: static;
+      top: 0;
+    }
+  }
+}
+
 .mat-error {
   color: var(--gd-danger);
 }

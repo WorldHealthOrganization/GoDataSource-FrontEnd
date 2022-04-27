@@ -22,58 +22,57 @@
 
     <!-- Sidenav -->
     <mat-sidenav-container
-      hasBackdrop="false">
+      hasBackdrop="false"
+      [class.gd-create-view-modify-list-expanded]="expandList">
 
       <!-- Left Side - List of records -->
       <mat-sidenav
         *ngIf="isView"
         class="gd-create-view-modify-list"
-        [class.gd-create-view-modify-list-expanded]="expandList"
         opened="true"
         mode="side"
-        disableClose="true"
-        style="width: 200px;">
+        disableClose="true">
 
         <!-- Top -->
         <div
-          fxLayout="row"
           class="gd-create-view-modify-list-top">
 
-          <!-- Title -->
           <div
-            fxFlex
-            class="gd-create-view-modify-list-top-title">
-            {{listTitle | translate}}
+            fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="1.6rem"
+            class="gd-create-view-modify-list-top-inner">
+
+            <!-- Title -->
+            <div
+              fxFlex
+              class="gd-create-view-modify-list-top-title">
+              {{listTitle | translate}}
+            </div>
+
+            <!-- Buttons -->
+            <div
+              *ngIf="expandList"
+              fxGrow="0"
+              class="gd-create-view-modify-list-top-buttons">
+
+              <!-- Sort and filter -->
+              <button
+                type="button"
+                mat-icon-button
+                color="secondary"
+                [matTooltip]="'LNG_SIDE_FILTERS_TITLE' | translate"
+                (click)="expandListFilter()">
+                <mat-icon>filter_alt</mat-icon>
+              </button>
+
+            </div>
+
           </div>
-
-          <!-- Buttons -->
-          <div
-            *ngIf="expandList"
-            fxGrow="0"
-            class="gd-create-view-modify-list-top-buttons">
-
-            <!-- Sort and filter -->
-            <button
-              type="button"
-              mat-icon-button
-              color="secondary"
-              [matTooltip]="'LNG_SIDE_FILTERS_TITLE' | translate"
-              (click)="expandListFilter()">
-              <mat-icon>filter_alt</mat-icon>
-            </button>
-
-          </div>
-
-        </div>
-
-        <!-- Content -->
-        <div
-          *ngIf="expandList"
-          class="gd-create-view-modify-list-content">
 
           <!-- Search -->
           <div
+            *ngIf="expandList"
             class="gd-create-view-modify-list-search">
+
             <app-form-input-v2
               placeholder="LNG_COMMON_LABEL_SEARCH"
               [(ngModel)]="expandListSearchValue"
@@ -82,54 +81,64 @@
               autocomplete="off"
               (keyup.enter)="expandListSearch()">
             </app-form-input-v2>
+            
           </div>
 
-          <!-- Table of records -->
-          <div
-            class="gd-create-view-modify-list-data">
+        </div>
 
-            <!-- Loading data ? -->
-            <mat-progress-spinner
-              *ngIf="expandListLoadingData; else dataLoaded"
-              diameter="48"
-              mode="indeterminate"></mat-progress-spinner>
+        <!-- Content - Table of records -->
+        <div
+          *ngIf="expandList"
+          class="gd-create-view-modify-list-data">
 
-            <!-- Data -->
-            <ng-template
-              #dataLoaded>
+          <!-- Loading data ? -->
+          <mat-progress-spinner
+            *ngIf="expandListLoadingData; else dataLoaded"
+            diameter="48"
+            mode="indeterminate"></mat-progress-spinner>
 
-              <!-- No data -->
+          <!-- Data -->
+          <ng-template
+            #dataLoaded>
+
+            <!-- No data -->
+            <div
+              *ngIf="expandListRecords.length < 1; else hasData"
+              fxLayout="column" fxLayoutAlign="center center"
+              class="gd-create-view-modify-list-data-no-records">
+
+              <!-- Image -->
               <div
-                *ngIf="expandListRecords.length < 1; else hasData">
-                no data image..same as for list table when no rows are returned
-              </div>
+                class="gd-create-view-modify-list-data-no-records-image"></div>
 
-              <!-- Has Data -->
-              <ng-template
-                #hasData>
-                <cdk-virtual-scroll-viewport
-                  style="height: 200px;"
-                  [itemSize]="40">
+              <!-- Message -->
+              <div
+                class="gd-create-view-modify-list-data-no-records-text">{{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}</div>
+            </div>
+
+            <!-- Has Data -->
+            <ng-template
+              #hasData>
+              <cdk-virtual-scroll-viewport
+                [itemSize]="40">
+                <div
+                  *cdkVirtualFor="let record of expandListRecords; templateCacheSize: 0;"
+                  [ngSwitch]="expandListColumnRenderer?.type"
+                  style="height: 4rem;"
+                  class="gd-create-view-modify-list-data-record"
+                  [class.gd-create-view-modify-list-data-record-active]="record.id === itemID"
+                  (click)="record.id === itemID ? undefined : expandListViewRecord(record)">
+
+                  <!-- Text -->
                   <div
-                    *cdkVirtualFor="let record of expandListRecords; templateCacheSize: 0;"
-                    [ngSwitch]="expandListColumnRenderer?.type"
-                    style="height: 40px;"
-                    class="gd-create-view-modify-list-data-record"
-                    [class.gd-create-view-modify-list-data-record-active]="record.id === itemID"
-                    (click)="record.id === itemID ? undefined : expandListViewRecord(record)">
-
-                    <!-- Text -->
-                    <div
-                      *ngSwitchCase="CreateViewModifyV2ExpandColumnType.TEXT">
-                      {{ expandListColumnRenderer.get(record) }}
-                    </div>
-
+                    *ngSwitchCase="CreateViewModifyV2ExpandColumnType.TEXT">
+                    {{ expandListColumnRenderer.get(record) }}
                   </div>
-                </cdk-virtual-scroll-viewport>
-              </ng-template>
-            </ng-template>
 
-          </div>
+                </div>
+              </cdk-virtual-scroll-viewport>
+            </ng-template>
+          </ng-template>
 
         </div>
 
@@ -222,7 +231,8 @@
                   [class.gd-create-view-modify-top-title-buttons-buttons-quick-expanded]="quickMenuTrigger.menuOpen"
                   type="button"
                   mat-flat-button color="secondary"
-                  [matMenuTriggerFor]="quickMenu">
+                  [matMenuTriggerFor]="quickMenu"
+                  (menuClosed)="changeDetectorRef.detectChanges()">
 
                   <!-- Label -->
                   <span>
@@ -288,8 +298,6 @@
 
               </ng-container>
 
-
-
               <!-- Save -->
               <button
                 *ngIf="isModify"
@@ -300,7 +308,7 @@
 
                 <!-- Pending validators -->
                 <mat-progress-spinner
-                  [style.visibility]="hasPendingForm ? 'visible' : 'hidden'"
+                  *ngIf="hasPendingForm"
                   diameter="16"
                   mode="indeterminate"
                   color="primary">
