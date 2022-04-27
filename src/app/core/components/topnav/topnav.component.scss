@@ -8,6 +8,7 @@
   /* Header left */
   .gd-top-left {
     padding-left: 4rem;
+    @include transition(all 0.24s ease-in-out 0s);
 
     @include breakpoint('lt-lg') {
       @include flex_align_items(center);
@@ -133,6 +134,14 @@
         padding: 0.6rem;
         width: 3.6rem;
       }
+    }
+  }
+}
+
+.gd-body-content-right-expanded {
+  .gd-top {
+    .gd-top-left {
+      padding-left: 0;
     }
   }
 }
