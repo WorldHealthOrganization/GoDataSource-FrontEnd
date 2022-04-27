@@ -1381,14 +1381,14 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                     !CaseModel.canView(this.authUser)
                   )
                 ) {
-                  return item.name;
+                  return `${item.name} (${this.translateService.instant(item.type)})`;
                 }
 
                 // create url
                 const url: string = `${item.type === EntityType.CONTACT ? '/contacts' : '/cases'}/${item.id}/view`;
 
                 // finished
-                return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.name}</span></a>`;
+                return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.name} (${this.translateService.instant(item.type)})</span></a>`;
               })
               .join(', '),
             undefined,
