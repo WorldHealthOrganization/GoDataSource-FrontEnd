@@ -226,7 +226,9 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
           type: V2ColumnFormat.BOOLEAN
         },
         filter: {
-          type: V2FilterType.BOOLEAN
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
         }
       },
       {
@@ -237,7 +239,9 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
           type: V2ColumnFormat.BOOLEAN
         },
         filter: {
-          type: V2FilterType.BOOLEAN
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
         }
       },
       {
@@ -249,7 +253,9 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
           type: V2ColumnFormat.BOOLEAN
         },
         filter: {
-          type: V2FilterType.BOOLEAN
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
         }
       },
       {
@@ -261,7 +267,9 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
           type: V2ColumnFormat.BOOLEAN
         },
         filter: {
-          type: V2FilterType.BOOLEAN
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
         }
       },
       {
@@ -273,7 +281,9 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
           type: V2ColumnFormat.BOOLEAN
         },
         filter: {
-          type: V2FilterType.BOOLEAN
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
         }
       },
       {

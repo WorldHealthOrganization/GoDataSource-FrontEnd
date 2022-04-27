@@ -129,7 +129,9 @@ export class OutbreakTemplatesListComponent
           type: V2ColumnFormat.BOOLEAN
         },
         filter: {
-          type: V2FilterType.BOOLEAN
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
         }
       },
       {
@@ -140,7 +142,9 @@ export class OutbreakTemplatesListComponent
           type: V2ColumnFormat.BOOLEAN
         },
         filter: {
-          type: V2FilterType.BOOLEAN
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
         }
       },
       {
@@ -151,7 +155,9 @@ export class OutbreakTemplatesListComponent
           type: V2ColumnFormat.BOOLEAN
         },
         filter: {
-          type: V2FilterType.BOOLEAN
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
         }
       },
 
