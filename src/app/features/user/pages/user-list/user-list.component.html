@@ -14,6 +14,7 @@
   [sortColumn]="tableSortBy"
   [infos]="infos"
   [filtersApplied]="filtersApplied"
+  [advancedFilterType]="Constants.APP_PAGE.USERS.value"
   [advancedFilters]="advancedFilters"
   (refreshData)="needsRefreshList(true)"
   (refreshDataCount)="refreshListCount(false)"
@@ -23,8 +24,6 @@
   (resetHeaderFilters)="resetFiltersToSideFilters()"
   (advancedFilterBy)="applySideFilters($event)">
 </app-list-table-v2>
-<!-- FIXME: .USERS missing -->
-<!-- [advancedFilterType]="Constants.APP_PAGE.USERS.value" -->
 
 
 <!-- <mat-card class="page-section page-content">
