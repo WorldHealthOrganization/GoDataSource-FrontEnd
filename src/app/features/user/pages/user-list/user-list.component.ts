@@ -243,7 +243,8 @@ export class UserListComponent extends ListComponent implements OnDestroy {
                         message: {
                           get: () => 'LNG_DIALOG_CONFIRM_DELETE_USER',
                           data: () => ({
-                            name: item.name
+                            firstName: item.firstName,
+                            lastName: item.lastName
                           })
                         }
                       }
