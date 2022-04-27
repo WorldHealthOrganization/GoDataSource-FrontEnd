@@ -25,7 +25,13 @@ import {
   IPermissionRelatedContactOfContactBulk,
   IPermissionRelatedContactOfContact
 } from './permission.interface';
-import { IAnswerData } from './question.model';
+import { IAnswerData, QuestionModel } from './question.model';
+import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
+import { TeamModel } from './team.model';
+import { FollowUpModel } from './follow-up.model';
+import { RequestQueryBuilder } from '../helperClasses/request-query-builder';
+import { CaseModel } from './case.model';
 
 export interface IFollowUpHistory {
   startDate: string;
@@ -107,9 +113,296 @@ export class ContactModel
   matchedDuplicateRelationships: EntityMatchedRelationshipModel[];
 
   /**
-     * Return contact id mask with data replaced
-     * @param contactIdMask
-     */
+   * Advanced filters
+   */
+  static generateAdvancedFilters(data: {
+    authUser: UserModel,
+    contactInvestigationTemplate: () => QuestionModel[],
+    contactFollowUpTemplate: () => QuestionModel[],
+    caseInvestigationTemplate: () => QuestionModel[],
+    options: {
+      occupation: ILabelValuePairModel[],
+      followUpStatus: ILabelValuePairModel[],
+      pregnancyStatus: ILabelValuePairModel[],
+      vaccine: ILabelValuePairModel[],
+      vaccineStatus: ILabelValuePairModel[],
+      yesNo: ILabelValuePairModel[],
+      team: ILabelValuePairModel[],
+      user: ILabelValuePairModel[],
+      dailyFollowUpStatus: ILabelValuePairModel[],
+      gender: ILabelValuePairModel[]
+    }
+  }): V2AdvancedFilter[] {
+    // initialize
+    const advancedFilters: V2AdvancedFilter[] = [
+      // Contact
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'firstName',
+        label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'middleName',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'lastName',
+        label: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'occupation',
+        label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
+        options: data.options.occupation,
+        sortable: true
+      },
+      {
+        field: 'gender',
+        label: 'LNG_CONTACT_FIELD_LABEL_GENDER',
+        type: V2AdvancedFilterType.MULTISELECT,
+        options: data.options.gender
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_AGE,
+        field: 'age',
+        label: 'LNG_CONTACT_FIELD_LABEL_AGE',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateOfReporting',
+        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dob',
+        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'visualId',
+        label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.ADDRESS,
+        field: 'addresses',
+        label: 'LNG_CONTACT_FIELD_LABEL_ADDRESSES',
+        isArray: true
+      },
+      {
+        type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
+        field: 'addresses',
+        label: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER',
+        isArray: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'followUp.status',
+        label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
+        options: data.options.followUpStatus,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'followUp.endDate',
+        label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_END_DATE',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateOfLastContact',
+        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
+        field: 'questionnaireAnswers',
+        label: 'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+        template: data.contactInvestigationTemplate
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'pregnancyStatus',
+        label: 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
+        options: data.options.pregnancyStatus,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'vaccinesReceived.vaccine',
+        label: 'LNG_CONTACT_FIELD_LABEL_VACCINE',
+        options: data.options.vaccine
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'vaccinesReceived.status',
+        label: 'LNG_CONTACT_FIELD_LABEL_VACCINE_STATUS',
+        options: data.options.vaccineStatus
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'vaccinesReceived.date',
+        label: 'LNG_CONTACT_FIELD_LABEL_VACCINE_DATE'
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'wasCase',
+        label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_NUMBER,
+        field: 'numberOfContacts',
+        label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_NUMBER,
+        field: 'numberOfExposures',
+        label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+        sortable: true
+      }
+    ];
+
+    // allowed to filter by follow-up team ?
+    if (TeamModel.canList(data.authUser)) {
+      advancedFilters.push({
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'followUpTeamId',
+        label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
+        options: data.options.team
+      });
+    }
+
+    // allowed to filter by follow-up user ?
+    if (UserModel.canList(data.authUser)) {
+      advancedFilters.push({
+        field: 'responsibleUserId',
+        label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+        type: V2AdvancedFilterType.MULTISELECT,
+        options: data.options.user
+      });
+    }
+
+    // Relation - Follow-up
+    if (FollowUpModel.canList(data.authUser)) {
+      advancedFilters.push(
+        {
+          field: 'date',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
+          type: V2AdvancedFilterType.RANGE_DATE,
+          relationshipPath: ['followUps'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        },
+        {
+          field: 'index',
+          label: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP',
+          type: V2AdvancedFilterType.RANGE_NUMBER,
+          relationshipPath: ['followUps'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        },
+        {
+          field: 'targeted',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
+          type: V2AdvancedFilterType.SELECT,
+          options: data.options.yesNo,
+          relationshipPath: ['followUps'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        },
+        {
+          field: 'statusId',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
+          type: V2AdvancedFilterType.MULTISELECT,
+          options: data.options.dailyFollowUpStatus,
+          relationshipPath: ['followUps'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        },
+        {
+          field: 'questionnaireAnswers',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+          type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
+          template: data.contactFollowUpTemplate,
+          relationshipPath: ['followUps'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_FOLLOW_UPS'
+        }
+      );
+    }
+
+    // case condition
+    const caseCondition = new RequestQueryBuilder();
+    caseCondition.filter.byEquality(
+      'type',
+      EntityType.CASE
+    );
+
+    // Relation - Cases
+    if (CaseModel.canList(data.authUser)) {
+      advancedFilters.push(
+        {
+          field: 'firstName',
+          label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
+          type: V2AdvancedFilterType.TEXT,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel:
+            'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          field: 'lastName',
+          label: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
+          type: V2AdvancedFilterType.TEXT,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel:
+            'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          field: 'gender',
+          label: 'LNG_CASE_FIELD_LABEL_GENDER',
+          type: V2AdvancedFilterType.MULTISELECT,
+          options: data.options.gender,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel:
+            'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          field: 'age',
+          label: 'LNG_CASE_FIELD_LABEL_AGE',
+          type: V2AdvancedFilterType.RANGE_AGE,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel:
+            'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        },
+        {
+          field: 'questionnaireAnswers',
+          label: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+          type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
+          template: data.caseInvestigationTemplate,
+          relationshipPath: ['relationships', 'people'],
+          relationshipLabel: 'LNG_CONTACT_FIELD_RELATIONSHIP_LABEL_RELATIONSHIP_CASES',
+          extraConditions: caseCondition
+        }
+      );
+    }
+
+    // finished
+    return advancedFilters;
+  }
+
+  /**
+   * Return contact id mask with data replaced
+   */
   static generateContactIDMask(contactIdMask: string): string {
     // validate
     if (_.isEmpty(contactIdMask)) {

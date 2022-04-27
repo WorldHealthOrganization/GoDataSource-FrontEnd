@@ -8,7 +8,7 @@ import { DialogV2Service } from '../../services/helper/dialog-v2.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { V2SideDialogConfigAction } from '../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { IV2LoadingDialogHandler } from '../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
-import { ChildActivationStart, NavigationEnd, RouteConfigLoadStart, Router } from '@angular/router';
+import { ChildActivationStart, NavigationEnd, Router } from '@angular/router';
 import { DashboardModel } from '../../models/dashboard.model';
 import { ConfirmOnFormChanges, PageChangeConfirmationGuard } from '../../services/guards/page-change-confirmation-guard.service';
 import { determineRenderMode, RenderMode } from '../../enums/render-mode.enum';
@@ -134,11 +134,8 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
       }
 
       // display loading spinner
-      // - NavigationStart can't be used because create / modify confirm dirty dialog won't work anymore, it will be blocked by the loading dialog
-      if (
-        event instanceof RouteConfigLoadStart ||
-        event instanceof ChildActivationStart
-      ) {
+      // - NavigationStart & RouteConfigLoadStart can't be used because create / modify confirm dirty dialog won't work anymore, it will be blocked by the loading dialog
+      if (event instanceof ChildActivationStart) {
         this.showLoading();
       } else if (event instanceof NavigationEnd) {
         this.hideLoading();

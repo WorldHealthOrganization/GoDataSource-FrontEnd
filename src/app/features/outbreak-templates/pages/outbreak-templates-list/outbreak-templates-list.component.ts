@@ -19,7 +19,6 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2SideDialogConfigInputType, IV2SideDialogConfigButtonType, IV2SideDialogConfigInputText } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Component({
@@ -513,55 +512,13 @@ export class OutbreakTemplatesListComponent
    */
   protected initializeTableAdvancedFilters(): void {
     // Outbreak template
-    this.advancedFilters = [
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'name',
-        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_NAME',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'description',
-        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DESCRIPTION',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'disease',
-        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DISEASE',
-        options: (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'generateFollowUpsTeamAssignmentAlgorithm',
-        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM',
-        options: (this.activatedRoute.snapshot.data.followUpGenerationTeamAssignmentAlgorithm as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'generateFollowUpsOverwriteExisting',
-        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING',
-        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'generateFollowUpsKeepTeamAssignment',
-        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT',
-        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'generateFollowUpsDateOfLastContact',
-        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT',
-        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        sortable: true
+    this.advancedFilters = OutbreakTemplateModel.generateAdvancedFilters({
+      options: {
+        disease: (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        followUpGenerationTeamAssignmentAlgorithm: (this.activatedRoute.snapshot.data.followUpGenerationTeamAssignmentAlgorithm as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
       }
-    ];
+    });
   }
 
   /**

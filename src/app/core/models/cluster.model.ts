@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import { IPermissionBasic, IPermissionCluster } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
+import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 
 export class ClusterModel
 implements
@@ -15,8 +16,32 @@ implements
   icon: string;
 
   /**
-     * Static Permissions - IPermissionBasic
-     */
+   * Advanced filters
+   */
+  static generateAdvancedFilters(): V2AdvancedFilter[] {
+    // initialize
+    const advancedFilters: V2AdvancedFilter[] = [
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'name',
+        label: 'LNG_CLUSTER_FIELD_LABEL_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'description',
+        label: 'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION',
+        sortable: true
+      }
+    ];
+
+    // finished
+    return advancedFilters;
+  }
+
+  /**
+   * Static Permissions - IPermissionBasic
+   */
   static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CLUSTER_VIEW) : false; }
   static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CLUSTER_LIST) : false; }
   static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.CLUSTER_CREATE) : false; }

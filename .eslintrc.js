@@ -147,31 +147,7 @@ module.exports = {
         ],
         "no-bitwise": "error",
         "no-caller": "error",
-        "no-console": [
-          "error",
-          {
-            "allow": [
-              "warn",
-              "dir",
-              "timeLog",
-              "assert",
-              "clear",
-              "count",
-              "countReset",
-              "group",
-              "groupEnd",
-              "table",
-              "dirxml",
-              "error",
-              "groupCollapsed",
-              "Console",
-              "profile",
-              "profileEnd",
-              "timeStamp",
-              "context"
-            ]
-          }
-        ],
+        "no-console": "error",
         "no-debugger": "error",
         "no-duplicate-imports": "off",
         "no-empty": "off",

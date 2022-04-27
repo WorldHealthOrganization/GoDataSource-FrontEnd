@@ -30,7 +30,6 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
@@ -820,93 +819,13 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
    * Initialize advanced filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = [
-      // Contact of contact
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'firstName',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'middleName',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'lastName',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'occupation',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION',
-        options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_AGE,
-        field: 'age',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfReporting',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dob',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'visualId',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.ADDRESS,
-        field: 'addresses',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_LOCATION',
-        isArray: true
-      },
-      {
-        type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
-        field: 'addresses',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PHONE_NUMBER',
-        isArray: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfLastContact',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_NUMBER,
-        field: 'numberOfExposures',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
-        sortable: true
+    this.advancedFilters = ContactOfContactModel.generateAdvancedFilters({
+      authUser: this.authUser,
+      options: {
+        occupation: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
       }
-    ];
-
-    // allowed to filter by responsible user ?
-    if (UserModel.canList(this.authUser)) {
-      this.advancedFilters.push({
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'responsibleUserId',
-        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-        options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
-      });
-    }
-
+    });
   }
 
   /**

@@ -414,6 +414,7 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
    * Note: To be overridden on pages that implement pagination
    */
   public refreshListCount(_applyHasMoreLimit?: boolean) {
+    // eslint-disable-next-line no-console
     console.error('Component must implement \'refreshListCount\' method');
   }
 

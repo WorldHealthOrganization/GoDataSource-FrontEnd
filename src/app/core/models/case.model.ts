@@ -119,7 +119,9 @@ export class CaseModel
 
   matchedDuplicateRelationships: EntityMatchedRelationshipModel[];
 
-  // case advanced filters
+  /**
+   * Advanced filters
+   */
   static generateAdvancedFilters(data: {
     authUser: UserModel,
     caseInvestigationTemplate: () => QuestionModel[],

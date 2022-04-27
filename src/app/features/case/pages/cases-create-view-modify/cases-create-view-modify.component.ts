@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -39,7 +39,13 @@ import * as _ from 'lodash';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
-import { RequestFilterGenerator, RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
+import { Subscription } from 'rxjs/internal/Subscription';
+import { forkJoin } from 'rxjs/internal/observable/forkJoin';
+import { ContactDataService } from '../../../../core/services/data/contact.data.service';
+import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
+import { AppMessages } from '../../../../core/enums/app-messages.enum';
+import { Location } from '@angular/common';
 
 /**
  * Component
@@ -57,6 +63,20 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   // today
   private _today: Moment = moment();
 
+  // check for duplicate
+  private _duplicateCheckingTimeout: any;
+  private _duplicateCheckingSubscription: Subscription;
+  private _personDuplicates: (ContactModel | CaseModel)[] = [];
+  private _previousChecked: {
+    firstName: string,
+    lastName: string,
+    middleName: string
+  } = {
+      firstName: '',
+      lastName: '',
+      middleName: ''
+    };
+
   /**
    * Constructor
    */
@@ -68,12 +88,17 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     protected systemSettingsDataService: SystemSettingsDataService,
     protected toastV2Service: ToastV2Service,
     protected clusterDataService: ClusterDataService,
-    authDataService: AuthDataService
+    protected contactDataService: ContactDataService,
+    protected location: Location,
+    authDataService: AuthDataService,
+    renderer2: Renderer2
   ) {
     super(
       activatedRoute,
       authDataService,
-      toastV2Service
+      toastV2Service,
+      renderer2,
+      router
     );
   }
 
@@ -81,7 +106,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Release resources
    */
   ngOnDestroy(): void {
+    // parent
     super.onDestroy();
+
+    // remove global notifications
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
   }
 
   /**
@@ -257,7 +286,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               value: {
                 get: () => this.itemData.firstName,
                 set: (value) => {
+                  // set data
                   this.itemData.firstName = value;
+
+                  // check for duplicates
+                  this.checkForPersonExistence();
                 }
               },
               validators: {
@@ -271,7 +304,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               value: {
                 get: () => this.itemData.middleName,
                 set: (value) => {
+                  // set data
                   this.itemData.middleName = value;
+
+                  // check for duplicates
+                  this.checkForPersonExistence();
                 }
               }
             }, {
@@ -282,7 +319,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               value: {
                 get: () => this.itemData.lastName,
                 set: (value) => {
+                  // set data
                   this.itemData.lastName = value;
+
+                  // check for duplicates
+                  this.checkForPersonExistence();
                 }
               }
             }, {
@@ -1251,12 +1292,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Refresh expand list
    */
   refreshExpandList(data): void {
-    // clone query builder so we can alter it
-    const qb: RequestQueryBuilder = _.cloneDeep(data.queryBuilder);
-
     // append / remove search
     if (data.searchBy) {
-      qb.filter.where({
+      data.queryBuilder.filter.where({
         or: [
           {
             firstName: RequestFilterGenerator.textContains(
@@ -1270,6 +1308,10 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             middleName: RequestFilterGenerator.textContains(
               data.searchBy
             )
+          }, {
+            visualId: RequestFilterGenerator.textContains(
+              data.searchBy
+            )
           }
         ]
       });
@@ -1279,7 +1321,182 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     this.expandListRecords$ = this.caseDataService
       .getCasesList(
         this.selectedOutbreak.id,
-        qb
+        data.queryBuilder
       );
+  }
+
+  /**
+   * Check if a contact exists with the same name
+   */
+  private checkForPersonExistence(): void {
+    // cancel previous timout that will trigger request
+    if (this._duplicateCheckingTimeout) {
+      // clear timeout
+      clearTimeout(this._duplicateCheckingTimeout);
+      this._duplicateCheckingTimeout = undefined;
+    }
+
+    // cancel previous request
+    if (this._duplicateCheckingSubscription) {
+      // stop
+      this._duplicateCheckingSubscription.unsubscribe();
+      this._duplicateCheckingSubscription = undefined;
+    }
+
+    // check for duplicate
+    this._duplicateCheckingTimeout = setTimeout(
+      () => {
+        // timeout executed
+        this._duplicateCheckingTimeout = undefined;
+
+        // update alert
+        const updateAlert = () => {
+          // must update message ?
+          // - hide alert
+          this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
+
+          // nothing to show ?
+          if (
+            !this._personDuplicates ||
+            this._personDuplicates.length < 1
+          ) {
+            // finished
+            return;
+          }
+
+          // update message & show alert if not visible already
+          // - with links for cases / contacts view page if we have enough rights
+          this.toastV2Service.notice(
+            this.translateService.instant('LNG_CASE_FIELD_LABEL_DUPLICATE_CONTACTS') +
+            ' ' +
+            this._personDuplicates
+              .map((item) => {
+                // check rights
+                if (
+                  (
+                    item.type === EntityType.CONTACT &&
+                    !ContactModel.canView(this.authUser)
+                  ) || (
+                    item.type === EntityType.CASE &&
+                    !CaseModel.canView(this.authUser)
+                  )
+                ) {
+                  return item.name;
+                }
+
+                // create url
+                const url: string = `${item.type === EntityType.CONTACT ? '/contacts' : '/cases'}/${item.id}/view`;
+
+                // finished
+                return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.name}</span></a>`;
+              })
+              .join(', '),
+            undefined,
+            AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT
+          );
+        };
+
+        // nothing to show ?
+        if (
+          !this.selectedOutbreak?.id ||
+          (
+            this.itemData.firstName &&
+            !this.itemData.lastName &&
+            !this.itemData.middleName
+          ) || (
+            this.itemData.lastName &&
+            !this.itemData.firstName &&
+            !this.itemData.middleName
+          ) || (
+            this.itemData.middleName &&
+            !this.itemData.firstName &&
+            !this.itemData.lastName
+          )
+        ) {
+          // reset
+          this._personDuplicates = undefined;
+          this._previousChecked.firstName = this.itemData.firstName;
+          this._previousChecked.lastName = this.itemData.lastName;
+          this._previousChecked.middleName = this.itemData.middleName;
+
+          // update alert
+          updateAlert();
+
+          // finished
+          return;
+        }
+
+        // same as before ?
+        if (
+          this._previousChecked.firstName === this.itemData.firstName &&
+          this._previousChecked.lastName === this.itemData.lastName &&
+          this._previousChecked.middleName === this.itemData.middleName
+        ) {
+          // nothing to do
+          return;
+        }
+
+        // update previous values
+        this._previousChecked.firstName = this.itemData.firstName;
+        this._previousChecked.lastName = this.itemData.lastName;
+        this._previousChecked.middleName = this.itemData.middleName;
+
+        // check for duplicates
+        this._duplicateCheckingSubscription = forkJoin([
+          this.contactDataService
+            .findDuplicates(
+              this.selectedOutbreak.id,
+              this._previousChecked
+            ),
+          this.caseDataService
+            .findDuplicates(
+              this.selectedOutbreak.id,
+              this.isModify ?
+                {
+                  id: this.itemData.id,
+                  ...this._previousChecked
+                } :
+                this._previousChecked
+            )
+        ]).pipe(
+          // handle error
+          catchError((err) => {
+            // show error
+            this.toastV2Service.error(err);
+
+            // finished
+            return throwError(err);
+          }),
+
+          // should be the last pipe
+          takeUntil(this.destroyed$)
+        ).subscribe((
+          [foundContacts, foundCases]: [
+            EntityDuplicatesModel,
+            EntityDuplicatesModel
+          ]
+        ) => {
+          // request executed
+          this._duplicateCheckingSubscription = undefined;
+
+          // update what we found
+          this._personDuplicates = [];
+          if (foundContacts?.duplicates?.length > 0) {
+            this._personDuplicates.push(
+              ...foundContacts.duplicates.map((item) => item.model as ContactModel)
+            );
+          }
+          if (foundCases?.duplicates?.length > 0) {
+            this._personDuplicates.push(
+              ...foundCases.duplicates.map((item) => item.model as CaseModel)
+            );
+          }
+
+          // update alert
+          updateAlert();
+        });
+      },
+      400
+    );
   }
 }

@@ -260,6 +260,14 @@ export class Constants {
     CLUSTERS: {
       label: 'LNG_APP_PAGE_CLUSTERS',
       value: 'LNG_APP_PAGE_CLUSTERS'
+    },
+    USERS: {
+      label: 'LNG_APP_PAGE_USERS',
+      value: 'LNG_APP_PAGE_USERS'
+    },
+    ENTITY_NOT_DUPLICATES: {
+      label: 'LNG_APP_PAGE_ENTITY_NOT_DUPLICATES',
+      value: 'LNG_APP_PAGE_ENTITY_NOT_DUPLICATES'
     }
   };
 

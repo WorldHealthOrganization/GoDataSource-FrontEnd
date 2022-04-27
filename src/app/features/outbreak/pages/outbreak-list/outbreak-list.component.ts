@@ -24,7 +24,6 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputText, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 
@@ -908,89 +907,15 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
    */
   protected initializeTableAdvancedFilters(): void {
     // Outbreak
-    this.advancedFilters = [
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'name',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_NAME',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'disease',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_DISEASE',
-        options: (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'countries.id',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES',
-        options: (this.activatedRoute.snapshot.data.country as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'reportingGeographicalLevelId',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_LOCATION_GEOGRAPHICAL_LEVEL',
-        options: (this.activatedRoute.snapshot.data.geographicalLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'startDate',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_START_DATE',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'endDate',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_END_DATE',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'generateFollowUpsTeamAssignmentAlgorithm',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM',
-        options: (this.activatedRoute.snapshot.data.followUpGenerationTeamAssignmentAlgorithm as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'generateFollowUpsOverwriteExisting',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING',
-        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'generateFollowUpsKeepTeamAssignment',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT',
-        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'isContactLabResultsActive',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_LAB_RESULTS_ACTIVE',
-        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'isDateOfOnsetRequired',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED',
-        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.SELECT,
-        field: 'generateFollowUpsDateOfLastContact',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT',
-        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        sortable: true
+    this.advancedFilters = OutbreakModel.generateAdvancedFilters({
+      options: {
+        disease: (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        country: (this.activatedRoute.snapshot.data.country as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        geographicalLevel: (this.activatedRoute.snapshot.data.geographicalLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        followUpGenerationTeamAssignmentAlgorithm: (this.activatedRoute.snapshot.data.followUpGenerationTeamAssignmentAlgorithm as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
       }
-    ];
+    });
   }
 
   /**

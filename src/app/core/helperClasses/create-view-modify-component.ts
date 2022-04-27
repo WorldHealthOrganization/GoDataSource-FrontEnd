@@ -3,8 +3,8 @@ import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/mode
 import { OutbreakModel } from '../models/outbreak.model';
 import { UserModel } from '../models/user.model';
 import { ICreateViewModifyV2 } from '../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
-import { ActivatedRoute } from '@angular/router';
-import { Directive } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Directive, Renderer2 } from '@angular/core';
 import { TopnavComponent } from '../components/topnav/topnav.component';
 import { AuthDataService } from '../services/data/auth.data.service';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
@@ -80,6 +80,9 @@ export abstract class CreateViewModifyComponent<T>
   // advanced filters
   expandListAdvancedFilters: V2AdvancedFilter[];
 
+  // click listener
+  private _clickListener: () => void;
+
   // constants
   Constants = Constants;
 
@@ -89,7 +92,9 @@ export abstract class CreateViewModifyComponent<T>
   protected constructor(
     activatedRoute: ActivatedRoute,
     authDataService: AuthDataService,
-    protected toastV2Service: ToastV2Service
+    protected toastV2Service: ToastV2Service,
+    protected renderer2: Renderer2,
+    protected router: Router
   ) {
     // initialize parent
     super();
@@ -196,6 +201,12 @@ export abstract class CreateViewModifyComponent<T>
 
     // enable select outbreak
     TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = false;
+
+    // remove click listener
+    if (this._clickListener) {
+      this._clickListener();
+      this._clickListener = undefined;
+    }
   }
 
   /**
@@ -222,6 +233,29 @@ export abstract class CreateViewModifyComponent<T>
 
     // initialize advanced filters
     this.initializeExpandListAdvancedFilters();
+
+    // listen for href clicks
+    this._clickListener = this.renderer2.listen(
+      document,
+      'click',
+      (event) => {
+        // not a link that we need to handle ?
+        if (
+          !event.target?.parentElement?.classList?.contains ||
+          !event.target.parentElement.classList.contains('gd-alert-link')
+        ) {
+          return;
+        }
+
+        // stop propagation
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+
+        // redirect
+        this.router.navigate([event.target.parentElement.getAttribute('href')]);
+      }
+    );
   }
 
   /**
