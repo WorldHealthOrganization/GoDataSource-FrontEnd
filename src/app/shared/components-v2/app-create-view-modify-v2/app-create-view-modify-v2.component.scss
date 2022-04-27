@@ -5,7 +5,226 @@
 .gd-create-view-modify-create,
 .gd-create-view-modify-modify,
 .gd-create-view-modify-view {
+  /* Variables */
+  --gd-side-list-width-expanded: 22rem;
+  --gd-side-list-width-collapsed: 5.6rem;
+
   height: 100%;
+
+  > .mat-drawer-container {
+    background-color: transparent;
+    color: var(--gd-text);
+    height: calc(100% + 5.2rem);
+    margin: -1.2rem -4rem -4rem;
+
+    .gd-create-view-modify-list {
+      border-right: 0 none;
+      @include box-shadow(0.2rem 0 0.2rem rgba(var(--gd-text-rgb), 0.1));
+      color: var(--gd-text);
+      overflow: visible;
+      @include transition(all 0.24s ease-in-out 0s);
+      width: var(--gd-side-list-width-collapsed);
+
+      .mat-drawer-inner-container {
+        @include flex(flex);
+        @include flex_direction(column);
+        height: 100%;
+
+        .gd-create-view-modify-list-top {
+          .gd-create-view-modify-list-top-inner {
+            padding: 1.6rem 1.4rem;
+
+            .gd-create-view-modify-list-top-title {
+              color: var(--gd-primary-alt);
+              font-size: 1.8rem;
+              font-weight: 500;
+              text-orientation: upright;
+              writing-mode: vertical-lr;
+            }
+
+            .gd-create-view-modify-list-top-buttons {
+              button.mat-icon-button {
+                height: 2.4rem;
+                min-width: 2.4rem;
+                padding: 0;
+                width: 2.4rem;
+
+                .mat-icon {
+                  font-size: 1.6rem;
+                  height: 1.6rem;
+                  line-height: 1;
+                  text-align: center;
+                }
+              }
+            }
+          }
+
+          .gd-create-view-modify-list-search {
+            .gd-form-input-v2 {
+              .mat-form-field {
+                .mat-form-field-wrapper {
+                  background: rgba(var(--gd-secondary-rgb), 0.1);
+                  @include border-radius(0);
+                  padding-bottom: 0;
+        
+                  .mat-form-field-flex {
+                    .mat-form-field-outline {
+                      color: transparent;
+        
+                      .mat-form-field-outline-start,
+                      .mat-form-field-outline-gap,
+                      .mat-form-field-outline-end {
+                        border-width: 0;
+                      }
+                    }
+        
+                    .mat-form-field-outline-thick {
+                      color: transparent;
+        
+                      .mat-form-field-outline-start,
+                      .mat-form-field-outline-gap,
+                      .mat-form-field-outline-end {
+                        border-width: 0;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        .gd-create-view-modify-list-data {
+          height: 100%;
+
+          .cdk-virtual-scroll-viewport {
+            height: 100%;
+            overflow-y: overlay;
+            overflow-x: hidden;
+          }
+
+          .gd-create-view-modify-list-data-record {
+            cursor: pointer;
+            max-width: var(--gd-side-list-width-expanded);
+            padding: 0.8rem 1.6rem;
+            width: 100%;
+
+            + .gd-create-view-modify-list-data-record {
+              border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.15);
+            }
+
+            &:hover {
+              background-color: rgba(var(--gd-secondary-rgb), 0.05);
+            }
+
+            &.gd-create-view-modify-list-data-record-active {
+              background-color: rgba(var(--gd-primary-alt-rgb), 0.1);
+            }
+
+            > div {
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
+          }
+
+          .gd-create-view-modify-list-data-no-records {
+            left: 50%;
+            position: absolute;
+            top: 50%;
+            @include translate(-50%, -50%);
+
+            .gd-create-view-modify-list-data-no-records-image {
+              background-image: url(../../../../assets/images/nothing-found.svg);
+              background-size: contain;
+              background-position: center;
+              background-repeat: no-repeat;
+              height: 15rem;
+              width: 15rem;
+            }
+      
+            .gd-create-view-modify-list-data-no-records-text {
+              color: var(--gd-secondary);
+              display: block;
+              font-size: 1.4rem;
+              padding: 1.6rem 0.8rem;
+              text-align: center;
+            }
+          }
+        }
+      }
+
+      ~ .mat-drawer-content {
+        margin: 0 0 0 var(--gd-side-list-width-collapsed) !important;
+        @include transition(all 0.24s ease-in-out 0s);
+        width: calc(100% - var(--gd-side-list-width-collapsed));
+      }
+    }
+
+    .mat-drawer-content {
+      padding: 1.2rem 4rem 4rem;
+    }
+
+    &.gd-create-view-modify-list-expanded {
+      .gd-create-view-modify-list {
+        width: var(--gd-side-list-width-expanded);
+
+        .mat-drawer-inner-container {
+          .gd-create-view-modify-list-top {
+            .gd-create-view-modify-list-top-inner {
+              padding: 4.5rem 1.6rem 0.8rem;
+  
+              .gd-create-view-modify-list-top-title {
+                text-orientation: initial;
+                writing-mode: lr;
+              }
+            }
+          }
+        }
+
+        ~ .mat-drawer-content {
+          margin-left: var(--gd-side-list-width-expanded) !important;
+          width: calc(100% - var(--gd-side-list-width-expanded));
+        }
+      }
+    }
+
+    /* Expand / collapse button */
+    .gd-create-view-modify-list-expand-collapse-button {
+      background: var(--gd-background);
+      border: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.5);
+      @include border-radius(50%);
+      color: rgba(var(--gd-secondary-rgb), 0.5);
+      font-size: 2rem;
+      height: 2rem;
+      left: calc(100% - 1rem);
+      line-height: 1;
+      min-width: 0;
+      padding: 0;
+      position: absolute;
+      top: 1.6rem;
+      width: 2rem;
+      z-index: 1000;
+
+      .material-icons {
+        font-size: 2rem;
+        @include flex(flex);
+        @include flex_align_items(center);
+        @include flex_justify(center);
+        height: 1.8rem;
+        vertical-align: baseline;
+        width: 1.8rem;
+      }
+    }
+
+    /* Progress Spinner */
+    .mat-progress-spinner {
+      left: 50%;
+      position: absolute;
+      top: 50%;
+      @include translate(-50%, -50%);
+    }
+  }
 
   .gd-create-view-modify-loading-data {
     height: 100%;
@@ -30,6 +249,10 @@
           min-width: 3rem;
           padding: 0.4rem;
           width: 3rem;
+
+          .mat-icon {
+            color: var(--gd-text);
+          }
         }
       }
 
