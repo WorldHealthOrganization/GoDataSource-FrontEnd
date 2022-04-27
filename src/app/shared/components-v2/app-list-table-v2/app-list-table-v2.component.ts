@@ -9,7 +9,21 @@ import { moment } from '../../../core/helperClasses/x-moment';
 import { Constants } from '../../../core/models/constants';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { IV2Column, IV2ColumnAction, IV2ColumnBasic, IV2ColumnBasicFormat, IV2ColumnButton, IV2ColumnColor, IV2ColumnIconMaterial, IV2ColumnPinned, IV2ColumnStatus, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from './models/column.model';
+import {
+  IV2Column,
+  IV2ColumnAction,
+  IV2ColumnBasic,
+  IV2ColumnBasicFormat,
+  IV2ColumnButton,
+  IV2ColumnColor,
+  IV2ColumnIconMaterial,
+  IV2ColumnLinkList,
+  IV2ColumnPinned,
+  IV2ColumnStatus,
+  IV2ColumnStatusFormType,
+  V2ColumnFormat,
+  V2ColumnStatusForm
+} from './models/column.model';
 import { AppListTableV2ActionsComponent } from './components/actions/app-list-table-v2-actions.component';
 import { IExtendedColDef } from './models/extended-column.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
@@ -788,6 +802,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           case V2ColumnFormat.STATUS:
           case V2ColumnFormat.BUTTON:
           case V2ColumnFormat.ACTIONS:
+          case V2ColumnFormat.LINK_LIST:
 
             // nothing to do here
             return null;
@@ -934,6 +949,23 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         buttonColumn.format.type === V2ColumnFormat.BUTTON
       ) {
         return AppListTableV2ButtonComponent;
+      }
+
+      // link list
+      const linkListColumn: IV2ColumnLinkList = column as IV2ColumnLinkList;
+      if (
+        linkListColumn.format &&
+        linkListColumn.format.type === V2ColumnFormat.LINK_LIST
+      ) {
+        return (params: ValueFormatterParams) => {
+          // create links
+          return (linkListColumn.links(params.data) || [])
+            .map((item) => item.href ?
+              `<a class="gd-list-table-link" href="${this.location.prepareExternalUrl(item.href)}"><span is-link="${item.href}">${item.label}</span><a/>` :
+              item.label
+            )
+            .join(' / ');
+        };
       }
 
       // status

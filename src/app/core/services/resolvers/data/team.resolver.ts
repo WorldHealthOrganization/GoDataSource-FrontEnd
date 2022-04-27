@@ -36,7 +36,8 @@ export class TeamDataResolver implements IMapResolverV2<TeamModel> {
     const qb = new RequestQueryBuilder();
     qb.fields(
       'id',
-      'name'
+      'name',
+      'userIds'
     );
 
     // sort them

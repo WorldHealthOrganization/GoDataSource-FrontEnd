@@ -58,7 +58,8 @@ export enum V2ColumnFormat {
   ACTIONS,
   STATUS,
   COLOR,
-  ICON_MATERIAL
+  ICON_MATERIAL,
+  LINK_LIST
 }
 
 /**
@@ -245,6 +246,34 @@ export interface IV2ColumnStatus {
 }
 
 /**
+ * Link list column
+ */
+export interface IV2ColumnLinkList {
+  // required
+  format: Omit<IV2ColumnBasicFormatType, 'type'> & {
+    type: V2ColumnFormat.LINK_LIST
+  };
+  field: string;
+  label: string;
+  links: (data: any) => {
+    label: string,
+    href: string
+  }[];
+
+  // optional
+  notVisible?: boolean;
+  exclude?: (IV2Column) => boolean;
+  pinned?: IV2ColumnPinned | boolean;
+  notResizable?: boolean;
+  cssCellClass?: string;
+  filter?: V2Filter;
+
+  // never
+  sortable?: never;
+}
+
+/**
  * Column
  */
-export type IV2Column = IV2ColumnBasic | IV2ColumnButton | IV2ColumnAge | IV2ColumnDate | IV2ColumnDatetime | IV2ColumnBoolean | IV2ColumnColor | IV2ColumnIconMaterial | IV2ColumnAction | IV2ColumnStatus;
+export type IV2Column = IV2ColumnBasic | IV2ColumnButton | IV2ColumnAge | IV2ColumnDate | IV2ColumnDatetime | IV2ColumnBoolean | IV2ColumnColor | IV2ColumnIconMaterial
+| IV2ColumnAction | IV2ColumnStatus | IV2ColumnLinkList;

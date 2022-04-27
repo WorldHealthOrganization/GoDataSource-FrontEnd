@@ -1375,9 +1375,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
   /**
    * Re(load) the Contacts list
    */
-  refreshList(
-    triggeredByPageChange: boolean
-  ) {
+  refreshList(triggeredByPageChange: boolean) {
     // retrieve created user & modified user information
     this.queryBuilder.include('createdByUser', true);
     this.queryBuilder.include('updatedByUser', true);
@@ -1457,7 +1455,6 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         })
       )
       .pipe(
-
         // should be the last pipe
         takeUntil(this.destroyed$)
       );

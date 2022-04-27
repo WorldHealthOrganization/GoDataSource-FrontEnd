@@ -519,6 +519,17 @@ export abstract class ListQueryComponent {
 
         // finished
         break;
+
+      // phone number
+      case V2FilterType.PHONE_NUMBER:
+        // filter
+        this.filterByPhoneNumber(
+          column.columnDefinition.field,
+          column.columnDefinition.filter.value
+        );
+
+        // finished
+        break;
     }
   }
 }

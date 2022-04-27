@@ -2083,9 +2083,7 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
   /**
    * Re(load) the Cases list, based on the applied filter, sort criterias
    */
-  refreshList(
-    triggeredByPageChange: boolean
-  ) {
+  refreshList(triggeredByPageChange: boolean) {
     // classification conditions - not really necessary since refreshListCount is always called before this one
     this.addClassificationConditions();
 

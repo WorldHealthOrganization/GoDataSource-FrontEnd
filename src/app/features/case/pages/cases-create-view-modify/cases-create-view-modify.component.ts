@@ -455,7 +455,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               name: 'responsibleUserId',
               placeholder: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
               description: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
               value: {
                 get: () => this.itemData.responsibleUserId,
                 set: (value) => {

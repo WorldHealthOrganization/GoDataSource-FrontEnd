@@ -330,11 +330,6 @@ export class ClustersListComponent extends ListComponent implements OnDestroy {
     this.clustersList$ = this.clusterDataService
       .getClusterList(this.selectedOutbreak.id, this.queryBuilder)
       .pipe(
-        catchError((err) => {
-          this.toastV2Service.error(err);
-          return throwError(err);
-        }),
-
         // should be the last pipe
         takeUntil(this.destroyed$)
       );

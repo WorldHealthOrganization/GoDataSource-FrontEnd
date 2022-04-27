@@ -18,7 +18,8 @@ export enum V2FilterType {
   ADDRESS_ACCURATE_GEO_LOCATION,
   BOOLEAN,
   NUMBER_RANGE,
-  DELETED
+  DELETED,
+  PHONE_NUMBER
 }
 
 /**
@@ -200,8 +201,20 @@ export interface IV2FilterDeleted extends Omit<IV2FilterBasic, 'value' | 'defaul
 }
 
 /**
+ * Phone number
+ */
+export interface IV2FilterPhoneNumber extends Omit<IV2FilterBasic, 'value' | 'defaultValue'> {
+  // required
+  type: V2FilterType.PHONE_NUMBER;
+
+  // optional
+  value?: string;
+  defaultValue?: string;
+}
+
+/**
  * Filter
  */
 export type V2Filter = IV2FilterText | IV2FilterMultipleSelect | IV2FilterDate | IV2FilterAge | IV2FilterAddressPhoneNumber
 | IV2FilterAddressMultipleLocation | IV2FilterAddressField | IV2FilterAddressAccurateGeoLocation | IV2FilterBoolean | IV2FilterNumber
-| IV2FilterDeleted;
+| IV2FilterDeleted | IV2FilterPhoneNumber;

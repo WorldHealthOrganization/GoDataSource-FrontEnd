@@ -16,7 +16,6 @@ import { EventModel } from '../../../../core/models/event.model';
 import { ExportFieldsGroupModelNameEnum } from '../../../../core/models/export-fields-group.model';
 import { LocationModel } from '../../../../core/models/location.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { EventDataService } from '../../../../core/services/data/event.data.service';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
@@ -800,7 +799,7 @@ export class EventsListComponent
   protected initializeTableAdvancedFilters(): void {
     this.advancedFilters = EventModel.generateAdvancedFilters({
       options: {
-        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
       }
     });
   }
@@ -1324,7 +1323,6 @@ export class EventsListComponent
         })
       )
       .pipe(
-
         // should be the last pipe
         takeUntil(this.destroyed$)
       );

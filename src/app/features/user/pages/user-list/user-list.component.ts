@@ -8,17 +8,17 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { TeamModel } from '../../../../core/models/team.model';
-import { PhoneNumberType, UserModel, UserSettings } from '../../../../core/models/user.model';
+import { PhoneNumberType, UserModel, UserRoleModel, UserSettings } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
-import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { IV2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { IExtendedColDef } from '../../../../shared/components-v2/app-list-table-v2/models/extended-column.model';
 
 @Component({
   selector: 'app-user-list',
@@ -31,23 +31,52 @@ export class UserListComponent extends ListComponent implements OnDestroy {
   // constants
   UserSettings = UserSettings;
 
+  // list of existing teams mapped by user
+  userTeamMap: {
+    [userId: string]: TeamModel[]
+  };
+
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     private userDataService: UserDataService,
     private toastV2Service: ToastV2Service,
     private activatedRoute: ActivatedRoute,
-    private dialogV2Service: DialogV2Service,
-    private i18nService: I18nService
+    private dialogV2Service: DialogV2Service
   ) {
+    // parent
     super(listHelperService);
+
+    // map teams by user
+    this.userTeamMap = {};
+    ((this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).list || []).forEach((team) => {
+      // no need to continue ?
+      // no really necessary since we do the above filter
+      if (
+        !team.userIds ||
+        team.userIds.length < 1
+      ) {
+        return;
+      }
+
+      // go through users
+      team.userIds.forEach((userId) => {
+        // init array ?
+        if (!this.userTeamMap[userId]) {
+          this.userTeamMap[userId] = [];
+        }
+
+        // push team
+        this.userTeamMap[userId].push(team);
+      });
+    });
   }
 
   /**
-     * Release resources
-     */
+   * Release resources
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
@@ -65,8 +94,8 @@ export class UserListComponent extends ListComponent implements OnDestroy {
   }
 
   /**
-     * Initialize Side Table Columns
-     */
+   * Initialize Side Table Columns
+   */
   protected initializeTableColumns() {
     // default table columns
     this.tableColumns = [
@@ -110,25 +139,38 @@ export class UserListComponent extends ListComponent implements OnDestroy {
         }
       },
       {
-        // TODO: Filter not defined
-        field: 'telephoneNumbers',
+        field: `telephoneNumbers.${PhoneNumberType.PRIMARY_PHONE_NUMBER}`,
         label: 'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS',
         format: {
           type: (item: UserModel) => {
-            return item.telephoneNumbers &&
-              item.telephoneNumbers[PhoneNumberType.PRIMARY_PHONE_NUMBER] ?
-              this.i18nService.instant(item.telephoneNumbers[PhoneNumberType.PRIMARY_PHONE_NUMBER]) :
+            return item.telephoneNumbers && item.telephoneNumbers[PhoneNumberType.PRIMARY_PHONE_NUMBER] ?
+              item.telephoneNumbers[PhoneNumberType.PRIMARY_PHONE_NUMBER] :
               '';
           }
+        },
+        filter: {
+          type: V2FilterType.PHONE_NUMBER
         }
       },
       {
-        // TODO: Roles need expandables row feature
-        field: 'roles',
+        field: 'roleIds',
         label: 'LNG_USER_FIELD_LABEL_ROLES',
+        format: {
+          type: V2ColumnFormat.LINK_LIST
+        },
+        links: (item: UserModel) => item.roles?.length > 0 ?
+          item.roles.map((role) => {
+            return {
+              label: role.name,
+              href: UserRoleModel.canView(this.authUser) ?
+                `/user-roles/${role.id}/view` :
+                null
+            };
+          }) :
+          [],
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.userRole as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: (this.activatedRoute.snapshot.data.userRole as IResolverV2ResponseModel<UserRoleModel>).options,
           includeNoValue: true
         }
       },
@@ -145,32 +187,92 @@ export class UserListComponent extends ListComponent implements OnDestroy {
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options,
           includeNoValue: true
         }
       },
       {
-        // TODO: Available outbreaks needs expandable row feature
-        field: 'availableOutbreaks',
+        field: 'outbreakIds',
         label: 'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS',
+        format: {
+          type: V2ColumnFormat.LINK_LIST
+        },
+        links: (item: UserModel) => item.outbreakIds?.length > 0 ?
+          item.outbreakIds
+            .filter((outbreakId) => !!(this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[outbreakId])
+            .map((outbreakId) => {
+              return {
+                label: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[outbreakId].name,
+                href: OutbreakModel.canView(this.authUser) ?
+                  `/outbreaks/${outbreakId}/view` :
+                  null
+              };
+            }) :
+          [],
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-          includeNoValue: true
+          options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options
         }
       }
     ];
 
     // can see teams ?
     if (TeamModel.canList(this.authUser)) {
-      // TODO: Teams outbreaks needs expandable row feature
       this.tableColumns.push({
         field: 'teams',
         label: 'LNG_USER_FIELD_LABEL_TEAMS',
+        format: {
+          type: V2ColumnFormat.LINK_LIST
+        },
+        links: (item: UserModel) => this.userTeamMap[item.id]?.length > 0 ?
+          this.userTeamMap[item.id].map((team) => {
+            return {
+              label: team.name,
+              href: TeamModel.canView(this.authUser) ?
+                `/teams/${team.id}/view` :
+                null
+            };
+          }) :
+          [],
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-          includeNoValue: true
+          options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
+          search: (column: IExtendedColDef) => {
+            // retrieve teams
+            const teamIds: string[] = (column.columnDefinition.filter as IV2FilterMultipleSelect).value;
+
+            // determine user ids
+            const userIdsMap: {
+              [userId: string]: true
+            } = {};
+            (teamIds || []).forEach((teamId) => {
+              // noting to do ?
+              if ((this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[teamId]?.userIds?.length < 1) {
+                return;
+              }
+
+              // retrieve users
+              (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[teamId].userIds.forEach((userId) => {
+                userIdsMap[userId] = true;
+              });
+            });
+
+            // nothing to retrieve ?
+            const userIds: string[] = Object.keys(userIdsMap);
+            if (
+              teamIds?.length > 0 &&
+              userIds.length < 1
+            ) {
+              userIds.push('-1');
+            }
+
+            // filter
+            this.filterBySelectField(
+              'id',
+              userIds,
+              null
+            );
+          }
         }
       });
     }
@@ -311,9 +413,9 @@ export class UserListComponent extends ListComponent implements OnDestroy {
       authUser: this.authUser,
       options: {
         institution: (this.activatedRoute.snapshot.data.institution as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        userRole: (this.activatedRoute.snapshot.data.userRole as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        outbreak: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        userRole: (this.activatedRoute.snapshot.data.userRole as IResolverV2ResponseModel<UserRoleModel>).options,
+        outbreak: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options,
+        team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options
       }
     });
   }
@@ -401,6 +503,7 @@ export class UserListComponent extends ListComponent implements OnDestroy {
       'email',
       'institutionName',
       'telephoneNumbers',
+      'roleIds',
       'roles',
       'activeOutbreakId',
       'outbreakIds'
@@ -415,19 +518,14 @@ export class UserListComponent extends ListComponent implements OnDestroy {
     this.usersList$ = this.userDataService
       .getUsersList(this.queryBuilder)
       .pipe(
-        catchError((err) => {
-          this.toastV2Service.error(err);
-          return throwError(err);
-        }),
-
         // should be the last pipe
         takeUntil(this.destroyed$)
       );
   }
 
   /**
-     * Get total number of items, based on the applied filters
-     */
+   * Get total number of items, based on the applied filters
+   */
   refreshListCount(applyHasMoreLimit?: boolean) {
     // reset
     this.pageCount = undefined;
@@ -464,73 +562,5 @@ export class UserListComponent extends ListComponent implements OnDestroy {
       .subscribe((response) => {
         this.pageCount = response;
       });
-  }
-
-  // TODO: To be deleted, left for inspiration
-  /**
-     * Retrieve teams
-     */
-  retrieveTeams(): void {
-    // // retrieve teams
-    // const qb = new RequestQueryBuilder();
-    // qb.fields(
-    //   'id',
-    //   'name',
-    //   'userIds'
-    // );
-    // this.teamsList$ = this.teamDataService
-    //   .getTeamsList(qb)
-    //   .pipe(
-    //     tap((teams) => {
-    //       // go through each team and determine users
-    //       this.userTeamMap = {};
-    //       teams.forEach((team) => {
-    //         // no need to continue ?
-    //         // no really necessary since we do the above filter
-    //         if (
-    //           !team.userIds ||
-    //           team.userIds.length < 1
-    //         ) {
-    //           return;
-    //         }
-
-    //         // go through users
-    //         team.userIds.forEach((userId) => {
-    //           // init array ?
-    //           if (!this.userTeamMap[userId]) {
-    //             this.userTeamMap[userId] = [];
-    //           }
-
-    //           // push team
-    //           this.userTeamMap[userId].push(team);
-    //         });
-    //       });
-    //     })
-    //   );
-  }
-
-  // TODO: To be deleted, left for inspiration
-  /**
-     * Filter by team
-     */
-  filterTeamField(_teams: TeamModel[]): void {
-    // // determine list of users that we need to retrieve
-    // const usersToRetrieve: {
-    //   [idUser: string]: true
-    // } = {};
-    // if (teams) {
-    //   teams.forEach((team) => {
-    //     (team.userIds || []).forEach((userId) => {
-    //       usersToRetrieve[userId] = true;
-    //     });
-    //   });
-    // }
-
-    // // filter
-    // this.filterBySelectField(
-    //   'id',
-    //   Object.keys(usersToRetrieve),
-    //   null
-    // );
   }
 }
