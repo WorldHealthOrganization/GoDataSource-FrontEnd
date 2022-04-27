@@ -100,6 +100,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       renderer2,
       router
     );
+
+    // check if record has duplicate (all 3 pages types)
+    this.checkForPersonExistence();
   }
 
   /**
