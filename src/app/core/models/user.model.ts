@@ -3,6 +3,9 @@ import { IPermissionChildModel, PERMISSION, PermissionModel } from './permission
 import { SecurityQuestionModel } from './securityQuestion.model';
 import { UserSettingsDashboardModel } from './user-settings-dashboard.model';
 import { IPermissionBasic, IPermissionCloneable, IPermissionUser } from './permission.interface';
+import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
+import { TeamModel } from './team.model';
 
 export enum UserSettings {
   AUDIT_LOG_FIELDS = 'auditLogFields',
@@ -251,6 +254,85 @@ implements
   };
 
   availablePermissions: PermissionModel[];
+
+  /**
+   * Advanced filters
+   */
+  static generateAdvancedFilters(data: {
+    authUser: UserModel,
+    options: {
+      institution: ILabelValuePairModel[],
+      userRole: ILabelValuePairModel[],
+      outbreak: ILabelValuePairModel[],
+      team: ILabelValuePairModel[],
+    }
+  }): V2AdvancedFilter[] {
+    // initialize
+    const advancedFilters: V2AdvancedFilter[] = [
+      // User
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'firstName',
+        label: 'LNG_USER_FIELD_LABEL_FIRST_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'lastName',
+        label: 'LNG_USER_FIELD_LABEL_LAST_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'email',
+        label: 'LNG_USER_FIELD_LABEL_EMAIL',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'institutionName',
+        label: 'LNG_USER_FIELD_LABEL_INSTITUTION_NAME',
+        options: data.options.institution
+      },
+      {
+        // TODO: Needs correct telephoneNumbers advanced filter type
+        type: V2AdvancedFilterType.TEXT,
+        field: 'telephoneNumbers',
+        label: 'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'roles',
+        label: 'LNG_USER_FIELD_LABEL_ROLES',
+        options: data.options.userRole
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'activeOutbreakId',
+        label: 'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK',
+        options: data.options.outbreak
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'outbreakIds',
+        label: 'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS',
+        options: data.options.outbreak
+      }
+    ];
+
+    // can see teams ?
+    if (TeamModel.canList(data.authUser)) {
+      advancedFilters.push({
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'teams',
+        label: 'LNG_USER_FIELD_LABEL_TEAMS',
+        options: data.options.team
+      });
+    }
+
+    // finished
+    return advancedFilters;
+  }
 
   /**
      * Static Permissions - IPermissionBasic

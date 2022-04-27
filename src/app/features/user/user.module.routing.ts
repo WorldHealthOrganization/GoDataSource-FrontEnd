@@ -5,6 +5,11 @@ import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
+import { TeamDataResolver } from '../../core/services/resolvers/data/team.resolver';
+import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
+import { InstitutionDataResolver } from '../../core/services/resolvers/data/institution.resolver';
+import { UserRoleDataResolver } from '../../core/services/resolvers/data/user-role.resolver';
+import { OutbreakDataResolver } from '../../core/services/resolvers/data/outbreak.resolver';
 
 const routes: Routes = [
   // Users list
@@ -16,6 +21,13 @@ const routes: Routes = [
       permissions: [
         PERMISSION.USER_LIST
       ]
+    },
+    resolve: {
+      team: TeamDataResolver,
+      yesNoAll: YesNoAllDataResolver,
+      institution: InstitutionDataResolver,
+      userRole: UserRoleDataResolver,
+      outbreak: OutbreakDataResolver
     }
   },
   // Create User
