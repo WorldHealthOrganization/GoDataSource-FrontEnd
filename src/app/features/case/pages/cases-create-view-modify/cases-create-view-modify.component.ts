@@ -255,7 +255,10 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         this.initializeTabsEpidemiology(),
 
         // table tabs - specific to cases, contacts, contact of contacts and events
-        this.initializeTabsContacts()
+        this.initializeTabsContacts(),
+        this.initializeTabsExposures(),
+        this.initializeTabsLabResults(),
+        this.initializeTabsViewFollowUps()
       ],
 
       // create details
@@ -949,6 +952,36 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       label: 'LNG_COMMON_BUTTON_EXPOSURES_FROM'
+    };
+  }
+
+  /**
+   * Initialize tabs - Exposures
+   */
+  private initializeTabsExposures(): ICreateViewModifyV2TabTable {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      label: 'LNG_COMMON_BUTTON_EXPOSURES_TO'
+    };
+  }
+
+  /**
+   * Initialize tabs - Lab results
+   */
+  private initializeTabsLabResults(): ICreateViewModifyV2TabTable {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      label: 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS'
+    };
+  }
+
+  /**
+   * Initialize tabs - Follow-ups
+   */
+  private initializeTabsViewFollowUps(): ICreateViewModifyV2TabTable {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS'
     };
   }
 
