@@ -8,7 +8,6 @@ import { XtFormsModule } from './xt-forms/xt-forms.module';
 import { AngularMaterialModule } from './angular-material/angular-material.module';
 import { FileUploadModule } from 'ng2-file-upload';
 import { NgxWigModule } from 'ngx-wig';
-import { HotTableModule } from '@handsontable/angular';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { ScrollingModule as ExperimentalScrollingModule } from '@angular/cdk-experimental/scrolling';
@@ -37,7 +36,6 @@ import { ToastrModule } from 'ngx-toastr';
     MglTimelineModule,
     NgxWigModule,
     NgxMatSelectSearchModule,
-    HotTableModule.forRoot(),
     ScrollingModule,
     ExperimentalScrollingModule,
     ToastrModule.forRoot({
