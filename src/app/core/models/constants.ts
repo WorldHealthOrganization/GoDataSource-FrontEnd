@@ -268,6 +268,10 @@ export class Constants {
     ENTITY_NOT_DUPLICATES: {
       label: 'LNG_APP_PAGE_ENTITY_NOT_DUPLICATES',
       value: 'LNG_APP_PAGE_ENTITY_NOT_DUPLICATES'
+    },
+    ROLES: {
+      label: 'LNG_APP_PAGE_ROLES',
+      value: 'LNG_APP_PAGE_ROLES'
     }
   };
 
