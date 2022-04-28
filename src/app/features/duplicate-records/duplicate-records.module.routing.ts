@@ -1,9 +1,21 @@
 import { ModuleWithProviders } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import * as fromPages from './pages';
-import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
-import { AuthGuard } from '../../core/services/guards/auth-guard.service';
+import { Route, RouterModule, Routes } from '@angular/router';
 import { PERMISSION } from '../../core/models/permission.model';
+import { AuthGuard } from '../../core/services/guards/auth-guard.service';
+import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
+import { GenderDataResolver } from '../../core/services/resolvers/data/gender.resolver';
+import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
+import * as fromPages from './pages';
+
+// Not Duplicates List - Cases / Contacts / Contacts of Contacts
+const noDuplicatesListFoundation: Route = {
+  component: fromPages.MarkedNotDuplicatesListComponent,
+  canActivate: [AuthGuard],
+  resolve: {
+    yesNoAll: YesNoAllDataResolver,
+    gender: GenderDataResolver
+  }
+};
 
 const routes: Routes = [
   // Duplicate records list
@@ -79,8 +91,7 @@ const routes: Routes = [
   // Not Duplicates List - Cases
   {
     path: 'cases/:caseId/marked-not-duplicates',
-    component: fromPages.MarkedNotDuplicatesListComponent,
-    canActivate: [AuthGuard],
+    ...noDuplicatesListFoundation,
     data: {
       permissions: [
         PERMISSION.CASE_LIST
@@ -90,8 +101,7 @@ const routes: Routes = [
   // Not Duplicates List - Contacts
   {
     path: 'contacts/:contactId/marked-not-duplicates',
-    component: fromPages.MarkedNotDuplicatesListComponent,
-    canActivate: [AuthGuard],
+    ...noDuplicatesListFoundation,
     data: {
       permissions: [
         PERMISSION.CONTACT_LIST
@@ -101,8 +111,7 @@ const routes: Routes = [
   // Not Duplicates List - Contacts of Contacts
   {
     path: 'contacts-of-contacts/:contactOfContactId/marked-not-duplicates',
-    component: fromPages.MarkedNotDuplicatesListComponent,
-    canActivate: [AuthGuard],
+    ...noDuplicatesListFoundation,
     data: {
       permissions: [
         PERMISSION.CONTACT_OF_CONTACT_LIST

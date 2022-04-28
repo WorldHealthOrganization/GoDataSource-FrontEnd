@@ -1,31 +1,34 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
-import { UserSettings } from '../../../../core/models/user.model';
-import { CaseModel } from '../../../../core/models/case.model';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswer, DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
-import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { Constants } from '../../../../core/models/constants';
-import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { catchError, share } from 'rxjs/operators';
-import { IBasicCount } from '../../../../core/models/basic-count.interface';
-import { ContactModel } from '../../../../core/models/contact.model';
-import { EntityDataService } from '../../../../core/services/data/entity.data.service';
-import { EntityType } from '../../../../core/models/entity-type';
-import { throwError } from 'rxjs/internal/observable/throwError';
+import { TranslateService } from '@ngx-translate/core';
 import * as _ from 'lodash';
+import { Observable } from 'rxjs';
+import { throwError } from 'rxjs/internal/observable/throwError';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { AddressModel } from '../../../../core/models/address.model';
+import { CaseModel } from '../../../../core/models/case.model';
+import { Constants } from '../../../../core/models/constants';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { ContactModel } from '../../../../core/models/contact.model';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
-import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { EntityType } from '../../../../core/models/entity-type';
+import { EventModel } from '../../../../core/models/event.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { UserSettings } from '../../../../core/models/user.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
-import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
+import { EntityDataService } from '../../../../core/services/data/entity.data.service';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { EventModel } from '../../../../core/models/event.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 
 @Component({
   selector: 'app-cases-list',
@@ -33,89 +36,16 @@ import { EventModel } from '../../../../core/models/event.model';
 })
 export class MarkedNotDuplicatesListComponent
   extends ListComponent
-  implements OnInit, OnDestroy {
-  // breadcrumbs
-  // breadcrumbs: BreadcrumbItemModel[] = [];
-
+  implements OnDestroy {
   // list of not duplicates
   recordId: string;
   recordType: EntityType;
   recordData: CaseModel | ContactModel | ContactOfContactModel;
   notDuplicatesList$: Observable<(EventModel | CaseModel | ContactModel | ContactOfContactModel)[]>;
-  notDuplicatesListCount$: Observable<IBasicCount>;
-
-  // obs
-  genderList$: Observable<any[]>;
 
   // provide constants to template
   Constants = Constants;
   UserSettings = UserSettings;
-
-  // subscribers
-  outbreakSubscriber: Subscription;
-
-  // actions
-  recordActions: HoverRowAction[] = [
-    // View Entity
-    new HoverRowAction({
-      icon: 'visibility',
-      iconTooltip: 'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_VIEW_ENTITY',
-      linkGenerator: (item: CaseModel | ContactModel | ContactOfContactModel): string[] => {
-        return [
-          `/${EntityModel.getLinkForEntityType(item.type)}`,
-          item.id,
-          'view'
-        ];
-      },
-      visible: (item: CaseModel | ContactModel | ContactOfContactModel): boolean => {
-        return !item.deleted &&
-                    item.canView(this.authUser);
-      }
-    }),
-
-    // Modify Entity
-    new HoverRowAction({
-      icon: 'settings',
-      iconTooltip: 'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_MODIFY_ENTITY',
-      linkGenerator: (item: CaseModel | ContactModel | ContactOfContactModel): string[] => {
-        return [
-          `/${EntityModel.getLinkForEntityType(item.type)}`,
-          item.id,
-          'modify'
-        ];
-      },
-      visible: (item: CaseModel | ContactModel | ContactOfContactModel): boolean => {
-        return !item.deleted &&
-                    this.authUser &&
-                    this.selectedOutbreak &&
-                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                    item.canModify(this.authUser);
-      }
-    }),
-
-    // Other actions
-    new HoverRowAction({
-      type: HoverRowActionType.MENU,
-      icon: 'moreVertical',
-      menuOptions: [
-        // Delete Case
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_REMOVE_FROM_LIST_ENTITY',
-          click: (item: CaseModel | ContactModel | ContactOfContactModel) => {
-            this.removeFromList(item);
-          },
-          visible: (item: CaseModel | ContactModel | ContactOfContactModel): boolean => {
-            return !item.deleted &&
-                            this.authUser &&
-                            this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            item.canModify(this.authUser);
-          },
-          class: 'mat-menu-item-delete'
-        })
-      ]
-    })
-  ];
 
   /**
      * Constructor
@@ -123,24 +53,16 @@ export class MarkedNotDuplicatesListComponent
   constructor(
     protected listHelperService: ListHelperService,
     private toastV2Service: ToastV2Service,
-    private outbreakDataService: OutbreakDataService,
-    private referenceDataDataService: ReferenceDataDataService,
     private route: ActivatedRoute,
     private entityDataService: EntityDataService,
-    private dialogService: DialogService,
     private caseDataService: CaseDataService,
     private contactDataService: ContactDataService,
-    private contactOfContactDataService: ContactsOfContactsDataService
+    private contactOfContactDataService: ContactsOfContactsDataService,
+    private activatedRoute: ActivatedRoute,
+    private translateService: TranslateService,
+    private dialogV2Service: DialogV2Service
   ) {
     super(listHelperService);
-  }
-
-  /**
-     * Component initialized
-     */
-  ngOnInit() {
-    // reference data
-    this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
 
     // retrieve case / contact id
     this.route.params
@@ -164,25 +86,6 @@ export class MarkedNotDuplicatesListComponent
         // retrieve case / contact data
         this.getCaseContactData();
       });
-
-    // subscribe to the Selected Outbreak Subject stream
-    this.outbreakSubscriber = this.outbreakDataService
-      .getSelectedOutbreakSubject()
-      .subscribe((selectedOutbreak: OutbreakModel) => {
-        this.selectedOutbreak = selectedOutbreak;
-
-        // retrieve case / contact data
-        this.getCaseContactData();
-
-        // initialize pagination
-        this.initPaginator();
-
-        // ...and re-load the list when the Selected Outbreak is changed
-        this.needsRefreshList(true);
-      });
-
-    // initialize Side Table Columns
-    this.initializeTableColumns();
   }
 
   /**
@@ -191,94 +94,21 @@ export class MarkedNotDuplicatesListComponent
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
-
-    // outbreak subscriber
-    if (this.outbreakSubscriber) {
-      this.outbreakSubscriber.unsubscribe();
-      this.outbreakSubscriber = null;
-    }
   }
 
   /**
-     * Initialize breadcrumbs
-     */
-  // initializeBreadcrumbs() {
-  //   // reset
-  //   this.breadcrumbs = [];
-  //
-  //   // add list / view / modify record breadcrumbs
-  //   if (this.recordType === EntityType.CASE) {
-  //     // list
-  //     if (CaseModel.canList(this.authUser)) {
-  //       this.breadcrumbs.push(new BreadcrumbItemModel(
-  //         'LNG_PAGE_LIST_CASES_TITLE',
-  //         '/cases'
-  //       ));
-  //     }
-  //
-  //     // view / modify
-  //     if (this.recordData) {
-  //       this.breadcrumbs.push(
-  //         new BreadcrumbItemModel(
-  //           CaseModel.canModify(this.authUser) ? 'LNG_PAGE_MODIFY_CASE_TITLE' : 'LNG_PAGE_VIEW_CASE_TITLE',
-  //           `/cases/${this.recordId}/${CaseModel.canModify(this.authUser) ? 'modify' : 'view'}`,
-  //           false,
-  //           {},
-  //           this.recordData
-  //         )
-  //       );
-  //     }
-  //   } else if (this.recordType === EntityType.CONTACT) {
-  //     // list
-  //     if (ContactModel.canList(this.authUser)) {
-  //       this.breadcrumbs.push(new BreadcrumbItemModel(
-  //         'LNG_PAGE_LIST_CONTACTS_TITLE',
-  //         '/contacts'
-  //       ));
-  //     }
-  //
-  //     // view / modify
-  //     if (this.recordData) {
-  //       this.breadcrumbs.push(
-  //         new BreadcrumbItemModel(
-  //           ContactModel.canModify(this.authUser) ? 'LNG_PAGE_MODIFY_CONTACT_TITLE' : 'LNG_PAGE_VIEW_CONTACT_TITLE',
-  //           `/contacts/${this.recordId}/${ContactModel.canModify(this.authUser) ? 'modify' : 'view'}`,
-  //           false,
-  //           {},
-  //           this.recordData
-  //         )
-  //       );
-  //     }
-  //   } else if (this.recordType === EntityType.CONTACT_OF_CONTACT) {
-  //     // list
-  //     if (ContactOfContactModel.canList(this.authUser)) {
-  //       this.breadcrumbs.push(new BreadcrumbItemModel(
-  //         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
-  //         '/contacts-of-contacts'
-  //       ));
-  //     }
-  //
-  //     // view / modify
-  //     if (this.recordData) {
-  //       this.breadcrumbs.push(
-  //         new BreadcrumbItemModel(
-  //           ContactOfContactModel.canModify(this.authUser) ? 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TITLE' : 'LNG_PAGE_VIEW_CONTACT_OF_CONTACT_TITLE',
-  //           `/contacts-of-contacts/${this.recordId}/${ContactOfContactModel.canModify(this.authUser) ? 'modify' : 'view'}`,
-  //           false,
-  //           {},
-  //           this.recordData
-  //         )
-  //       );
-  //     }
-  //   }
-  //
-  //   // add main breadcrumb
-  //   this.breadcrumbs.push(new BreadcrumbItemModel(
-  //     'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_TITLE',
-  //     '.',
-  //     true
-  //   ));
-  // }
+    * Selected outbreak was changed
+    */
+  selectedOutbreakChanged(): void {
+    // initialize pagination
+    this.initPaginator();
+
+    // retrieve case / contact data
+    this.getCaseContactData();
+
+    // ...and re-load the list when the Selected Outbreak is changed
+    this.needsRefreshList(true);
+  }
 
   /**
      * Retrieve case / contact data
@@ -340,34 +170,218 @@ export class MarkedNotDuplicatesListComponent
   /**
      * Initialize Side Table Columns
      */
-  initializeTableColumns() {
+  protected initializeTableColumns() {
+    // address model used to search by phone number, address line, postal code, city....
+    const filterAddressModel: AddressModel = new AddressModel({
+      geoLocationAccurate: ''
+    });
+
     // default table columns
-    // this.tableColumns = [
-    //   new VisibleColumnModel({
-    //     field: 'lastName',
-    //     label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'firstName',
-    //     label: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'visualId',
-    //     label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'age',
-    //     label: 'LNG_ENTITY_FIELD_LABEL_AGE'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'gender',
-    //     label: 'LNG_ENTITY_FIELD_LABEL_GENDER'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'phoneNumber',
-    //     label: 'LNG_ENTITY_FIELD_LABEL_PHONE_NUMBER'
-    //   })
-    // ];
+    this.tableColumns = [
+      {
+        field: 'lastName',
+        label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'firstName',
+        label: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'visualId',
+        label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID',
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'age',
+        label: 'LNG_ENTITY_FIELD_LABEL_AGE',
+        format: {
+          type: V2ColumnFormat.AGE
+        },
+        sortable: true,
+        filter: {
+          type: V2FilterType.AGE_RANGE,
+          min: 0,
+          max: Constants.DEFAULT_AGE_MAX_YEARS
+        }
+      },
+      {
+        field: 'gender',
+        label: 'LNG_ENTITY_FIELD_LABEL_GENDER',
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        }
+      },
+      {
+        field: 'phoneNumber',
+        label: 'LNG_ENTITY_FIELD_LABEL_PHONE_NUMBER',
+        format: {
+          type: 'mainAddress.phoneNumber'
+        },
+        sortable: true,
+        filter: {
+          type: V2FilterType.ADDRESS_PHONE_NUMBER,
+          address: filterAddressModel,
+          field: 'addresses',
+          fieldIsArray: true
+        }
+      },
+
+      // actions
+      {
+        field: 'actions',
+        label: 'LNG_COMMON_LABEL_ACTIONS',
+        pinned: IV2ColumnPinned.RIGHT,
+        notResizable: true,
+        cssCellClass: 'gd-cell-no-focus',
+        format: {
+          type: V2ColumnFormat.ACTIONS
+        },
+        actions: [
+          // View
+          {
+            type: V2ActionType.ICON,
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_VIEW_ENTITY',
+            action: {
+              link: (item: CaseModel | ContactModel | ContactOfContactModel): string[] => {
+                return [
+                  `/${ EntityModel.getLinkForEntityType(item.type) }`,
+                  item.id,
+                  'view'
+                ];
+              }
+            },
+            visible: (item: CaseModel | ContactModel | ContactOfContactModel): boolean => {
+              return !item.deleted &&
+                item.canView(this.authUser);
+            }
+          },
+
+          // Modify
+          {
+            type: V2ActionType.ICON,
+            icon: 'edit',
+            iconTooltip: 'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_MODIFY_ENTITY',
+            action: {
+              link: (item: CaseModel | ContactModel | ContactOfContactModel): string[] => {
+                return [
+                  `/${ EntityModel.getLinkForEntityType(item.type) }`,
+                  item.id,
+                  'modify'
+                ];
+              }
+            },
+            visible: (item: CaseModel | ContactModel | ContactOfContactModel): boolean => {
+              return !item.deleted &&
+                this.authUser &&
+                this.selectedOutbreak &&
+                this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                item.canModify(this.authUser);
+            }
+          },
+
+          // Other actions
+          {
+            type: V2ActionType.MENU,
+            icon: 'more_horiz',
+            menuOptions: [
+              // Delete
+              {
+                label: 'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_REMOVE_FROM_LIST_ENTITY',
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+                action: {
+                  click: (item: CaseModel | ContactModel | ContactOfContactModel) => {
+                    this.dialogV2Service.showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_DELETE',
+                          data: () => ({
+                            name: item.name
+                          })
+                        },
+                        message: {
+                          get: () => 'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_REMOVE_FROM_LIST_ENTITY_CONFIRMATION',
+                          data: () => ({
+                            name: item.name
+                          })
+                        }
+                      }
+                    }).subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // delete
+                      this.entityDataService
+                        .markPersonAsOrNotADuplicate(
+                          this.selectedOutbreak.id,
+                          this.recordType,
+                          this.recordId,
+                          [],
+                          [item.id]
+                        )
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            this.toastV2Service.error(err);
+
+                            // hide loading
+                            loading.close();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          // success
+                          this.toastV2Service.success('LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_REMOVE_FROM_LIST_ENTITY_CONFIRMATION');
+
+                          // hide loading
+                          loading.close();
+
+                          // reload data
+                          this.needsRefreshList(true);
+                        });
+                    });
+                  }
+                },
+                visible: (item: CaseModel | ContactModel | ContactOfContactModel): boolean => {
+                  return !item.deleted &&
+                    this.authUser &&
+                    this.selectedOutbreak &&
+                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    item.canModify(this.authUser);
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ];
   }
 
   /**
@@ -378,7 +392,47 @@ export class MarkedNotDuplicatesListComponent
   /**
    * Initialize Table Advanced Filters
    */
-  protected initializeTableAdvancedFilters(): void {}
+  protected initializeTableAdvancedFilters(): void {
+    // initialize
+    this.advancedFilters = [
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'firstName',
+        label: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'lastName',
+        label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'visualId',
+        label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_AGE,
+        field: 'age',
+        label: 'LNG_ENTITY_FIELD_LABEL_AGE'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'gender',
+        label: 'LNG_ENTITY_FIELD_LABEL_GENDER',
+        options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
+        field: 'addresses',
+        label: 'LNG_ENTITY_FIELD_LABEL_PHONE_NUMBER',
+        isArray: true
+      }
+    ];
+  }
 
   /**
    * Initialize table quick actions
@@ -403,21 +457,103 @@ export class MarkedNotDuplicatesListComponent
   /**
    * Initialize breadcrumbs
    */
-  initializeBreadcrumbs(): void {
+  protected initializeBreadcrumbs(): void {
+    // initialise breadcrumbs array
+    this.breadcrumbs = [];
+
+    // add list / view / modify record breadcrumbs
+    if (this.recordType === EntityType.CASE) {
+      // list
+      if (CaseModel.canList(this.authUser)) {
+        this.breadcrumbs.push({
+          label: 'LNG_PAGE_LIST_CASES_TITLE',
+          action: { link: ['/cases'] }
+        });
+      }
+
+      // view / modify
+      if (this.recordData) {
+        this.breadcrumbs.push({
+          label: this.translateService.instant(
+            'LNG_PAGE_VIEW_CASE_TITLE',
+            { name: [this.recordData.firstName, this.recordData.middleName, this.recordData.lastName].filter(Boolean).join(' ') }
+          ),
+          action: {
+            link: [`/cases/${ this.recordId }/view`]
+          }
+        });
+      }
+    } else if (this.recordType === EntityType.CONTACT) {
+      // list
+      if (ContactModel.canList(this.authUser)) {
+        this.breadcrumbs.push({
+          label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
+          action: { link: ['/contacts'] }
+        });
+      }
+
+      // view / modify
+      if (this.recordData) {
+        this.breadcrumbs.push({
+          label: this.translateService.instant(
+            'LNG_PAGE_VIEW_CONTACT_TITLE',
+            { name: [this.recordData.firstName, this.recordData.middleName, this.recordData.lastName].filter(Boolean).join(' ') }
+          ),
+          action: { link: [`/contacts/${ this.recordId }/view`] }
+        });
+      }
+    } else if (this.recordType === EntityType.CONTACT_OF_CONTACT) {
+      // list
+      if (ContactOfContactModel.canList(this.authUser)) {
+        this.breadcrumbs.push({
+          label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
+          action: { link: ['/contacts-of-contacts'] }
+        });
+      }
+
+      // view / modify
+      if (this.recordData) {
+        this.breadcrumbs.push({
+          label: this.translateService.instant(
+            'LNG_PAGE_VIEW_CONTACT_OF_CONTACT_TITLE',
+            { name: [this.recordData.firstName, this.recordData.middleName, this.recordData.lastName].filter(Boolean).join(' ') }
+          ),
+          action: { link: [`/contacts-of-contacts/${ this.recordId }/view`] }
+        });
+      }
+    }
+
+    // add main breadcrumb
+    this.breadcrumbs.push({
+      label:  'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_TITLE',
+      action: null
+    });
   }
 
   /**
    * Fields retrieved from api to reduce payload size
    */
   protected refreshListFields(): string[] {
-    return [];
+    return [
+      'id',
+      'lastName',
+      'firstName',
+      'visualId',
+      'age',
+      'gender',
+      'addresses',
+      'phoneNumber',
+      'type',
+      'relationship',
+      'labResults'
+    ];
   }
 
   /**
-   * Re(load) the Cases list, based on the applied filter, sort criterias
+   * Re(load) the list, based on the applied filter, sort criterias
    */
   refreshList() {
-    // retrieve the list of Cases
+    // retrieve the list of Entities
     this.notDuplicatesList$ = this.entityDataService
       .getEntitiesMarkedAsNotDuplicates(
         this.selectedOutbreak.id,
@@ -426,73 +562,53 @@ export class MarkedNotDuplicatesListComponent
         this.queryBuilder
       )
       .pipe(
-        catchError((err) => {
-          this.toastV2Service.error(err);
-          return throwError(err);
-        })
+        // should be the last pipe
+        takeUntil(this.destroyed$)
       );
   }
 
   /**
      * Get total number of items, based on the applied filters
      */
-  refreshListCount() {
-    if (this.selectedOutbreak) {
-      // remove paginator from query builder
-      const countQueryBuilder = _.cloneDeep(this.queryBuilder);
-      countQueryBuilder.paginator.clear();
-      countQueryBuilder.sort.clear();
-      this.notDuplicatesListCount$ = this.entityDataService
-        .getEntitiesMarkedAsNotDuplicatesCount(
-          this.selectedOutbreak.id,
-          this.recordType,
-          this.recordId,
-          countQueryBuilder
-        )
-        .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            return throwError(err);
-          }),
-          share()
-        );
-    }
-  }
+  refreshListCount(applyHasMoreLimit?: boolean) {
+    // reset
+    this.pageCount = undefined;
 
-  /**
-     * Remove from list of not duplicate items
-     */
-  removeFromList(item: CaseModel | ContactModel | ContactOfContactModel) {
-    if (this.selectedOutbreak) {
-      this.dialogService
-        .showConfirm('LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_REMOVE_FROM_LIST_ENTITY_CONFIRMATION')
-        .subscribe((answer: DialogAnswer) => {
-          if (answer.button === DialogAnswerButton.Yes) {
-            const loadingDialog = this.dialogService.showLoadingDialog();
-            this.entityDataService
-              .markPersonAsOrNotADuplicate(
-                this.selectedOutbreak.id,
-                this.recordType,
-                this.recordId,
-                [],
-                [item.id]
-              )
-              .pipe(
-                catchError((err) => {
-                  this.toastV2Service.error(err);
-                  loadingDialog.close();
-                  return throwError(err);
-                })
-              )
-              .subscribe(() => {
-                // refresh list of items
-                this.needsRefreshList(true);
-
-                // close loading dialog
-                loadingDialog.close();
-              });
-          }
-        });
+    // set apply value
+    if (applyHasMoreLimit !== undefined) {
+      this.applyHasMoreLimit = applyHasMoreLimit;
     }
+
+    // remove paginator from query builder
+    const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+    countQueryBuilder.paginator.clear();
+    countQueryBuilder.sort.clear();
+
+    // apply has more limit
+    if (this.applyHasMoreLimit) {
+      countQueryBuilder.flag(
+        'applyHasMoreLimit',
+        true
+      );
+    }
+
+    this.entityDataService
+      .getEntitiesMarkedAsNotDuplicatesCount(
+        this.selectedOutbreak.id,
+        this.recordType,
+        this.recordId,
+        countQueryBuilder
+      )
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        }),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      ).subscribe((response) => {
+        this.pageCount = response;
+      });
   }
 }
