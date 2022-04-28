@@ -1098,9 +1098,20 @@
 
                   <!-- Content -->
                   <div
-                  class="gd-create-view-modify-bottom-content">
+                    class="gd-create-view-modify-bottom-content">
+
+                    <!-- Inputs tab -->
                     <ng-container
-                      *ngTemplateOutlet="sectionsRender; context: { tab }"></ng-container>
+                      *ngIf="tab.type === CreateViewModifyV2TabInputType.TAB; else tableTab">
+                      <ng-container
+                        *ngTemplateOutlet="sectionsRender; context: { tab }"></ng-container>
+                    </ng-container>
+
+                    <!-- Table tab -->
+                    <ng-template
+                      #tableTab>
+                      table...
+                    </ng-template>
                   </div>
                 </mat-tab>
               </ng-container>
