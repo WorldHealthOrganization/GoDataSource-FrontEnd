@@ -29,6 +29,7 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 
 @Component({
   selector: 'app-cases-list',
@@ -37,6 +38,7 @@ import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2
 export class MarkedNotDuplicatesListComponent
   extends ListComponent
   implements OnDestroy {
+
   // list of not duplicates
   recordId: string;
   recordType: EntityType;
@@ -48,8 +50,8 @@ export class MarkedNotDuplicatesListComponent
   UserSettings = UserSettings;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     private toastV2Service: ToastV2Service,
@@ -62,64 +64,57 @@ export class MarkedNotDuplicatesListComponent
     private translateService: TranslateService,
     private dialogV2Service: DialogV2Service
   ) {
+    // parent
     super(listHelperService);
 
-    // retrieve case / contact id
-    this.route.params
-      .subscribe((params: {
-        contactId?: string,
-        caseId?: string,
-        contactOfContactId?: string
-      }) => {
-        // params set
-        if (params.caseId) {
-          this.recordId = params.caseId;
-          this.recordType = EntityType.CASE;
-        } else if (params.contactId) {
-          this.recordId = params.contactId;
-          this.recordType = EntityType.CONTACT;
-        } else if (params.contactOfContactId) {
-          this.recordId = params.contactOfContactId;
-          this.recordType = EntityType.CONTACT_OF_CONTACT;
-        }
+    // disable select outbreak
+    TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = true;
 
-        // retrieve case / contact data
-        this.getCaseContactData();
-      });
+    // retrieve  id
+    const paramMap = this.route.snapshot.paramMap;
+    if (paramMap.get('caseId')) {
+      this.recordId = paramMap.get('caseId');
+      this.recordType = EntityType.CASE;
+    } else if (paramMap.get('contactId')) {
+      this.recordId = paramMap.get('contactId');
+      this.recordType = EntityType.CONTACT;
+    } else if (paramMap.get('contactOfContactId')) {
+      this.recordId = paramMap.get('contactOfContactId');
+      this.recordType = EntityType.CONTACT_OF_CONTACT;
+    }
   }
 
   /**
-     * Component destroyed
-     */
+   * Component destroyed
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
+
+    // enable select outbreak
+    TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = false;
   }
 
   /**
-    * Selected outbreak was changed
-    */
+  * Selected outbreak was changed
+  */
   selectedOutbreakChanged(): void {
     // initialize pagination
     this.initPaginator();
 
-    // retrieve case / contact data
-    this.getCaseContactData();
-
     // ...and re-load the list when the Selected Outbreak is changed
     this.needsRefreshList(true);
+
+    // retrieve case / contact data
+    this.getCaseContactData();
   }
 
   /**
-     * Retrieve case / contact data
-     */
+   * Retrieve case / contact data
+   */
   getCaseContactData() {
     // do we have contact type and outbreak data ?
-    if (
-      !this.recordType ||
-            !this.selectedOutbreak ||
-            !this.selectedOutbreak.id
-    ) {
+    if (!this.recordType) {
       return;
     }
 
@@ -168,8 +163,8 @@ export class MarkedNotDuplicatesListComponent
   }
 
   /**
-     * Initialize Side Table Columns
-     */
+   * Initialize Side Table Columns
+   */
   protected initializeTableColumns() {
     // address model used to search by phone number, address line, postal code, city....
     const filterAddressModel: AddressModel = new AddressModel({
@@ -272,6 +267,7 @@ export class MarkedNotDuplicatesListComponent
             },
             visible: (item: CaseModel | ContactModel | ContactOfContactModel): boolean => {
               return !item.deleted &&
+                this.selectedOutbreakIsActive &&
                 item.canView(this.authUser);
             }
           },
@@ -292,9 +288,7 @@ export class MarkedNotDuplicatesListComponent
             },
             visible: (item: CaseModel | ContactModel | ContactOfContactModel): boolean => {
               return !item.deleted &&
-                this.authUser &&
-                this.selectedOutbreak &&
-                this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                this.selectedOutbreakIsActive &&
                 item.canModify(this.authUser);
             }
           },
@@ -371,9 +365,7 @@ export class MarkedNotDuplicatesListComponent
                 },
                 visible: (item: CaseModel | ContactModel | ContactOfContactModel): boolean => {
                   return !item.deleted &&
-                    this.authUser &&
-                    this.selectedOutbreak &&
-                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                    this.selectedOutbreakIsActive &&
                     item.canModify(this.authUser);
                 }
               }
@@ -426,9 +418,9 @@ export class MarkedNotDuplicatesListComponent
         sortable: true
       },
       {
-        type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
+        type: V2AdvancedFilterType.ADDRESS,
         field: 'addresses',
-        label: 'LNG_ENTITY_FIELD_LABEL_PHONE_NUMBER',
+        label: 'LNG_ENTITY_FIELD_LABEL_ADDRESS',
         isArray: true
       }
     ];
@@ -476,7 +468,7 @@ export class MarkedNotDuplicatesListComponent
         this.breadcrumbs.push({
           label: this.translateService.instant(
             'LNG_PAGE_VIEW_CASE_TITLE',
-            { name: [this.recordData.firstName, this.recordData.middleName, this.recordData.lastName].filter(Boolean).join(' ') }
+            { name: this.recordData.name }
           ),
           action: {
             link: [`/cases/${ this.recordId }/view`]
@@ -497,7 +489,7 @@ export class MarkedNotDuplicatesListComponent
         this.breadcrumbs.push({
           label: this.translateService.instant(
             'LNG_PAGE_VIEW_CONTACT_TITLE',
-            { name: [this.recordData.firstName, this.recordData.middleName, this.recordData.lastName].filter(Boolean).join(' ') }
+            { name: this.recordData.name }
           ),
           action: { link: [`/contacts/${ this.recordId }/view`] }
         });
@@ -516,7 +508,7 @@ export class MarkedNotDuplicatesListComponent
         this.breadcrumbs.push({
           label: this.translateService.instant(
             'LNG_PAGE_VIEW_CONTACT_OF_CONTACT_TITLE',
-            { name: [this.recordData.firstName, this.recordData.middleName, this.recordData.lastName].filter(Boolean).join(' ') }
+            { name: this.recordData.name }
           ),
           action: { link: [`/contacts-of-contacts/${ this.recordId }/view`] }
         });
@@ -592,6 +584,7 @@ export class MarkedNotDuplicatesListComponent
       );
     }
 
+    // count
     this.entityDataService
       .getEntitiesMarkedAsNotDuplicatesCount(
         this.selectedOutbreak.id,
