@@ -50,6 +50,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     return this.action === CreateViewModifyV2Action.MODIFY;
   }
 
+  // selected outbreak is active ?
+  @Input() selectedOutbreakIsActive: boolean;
+
   // loading data
   @Input() loadingPage: boolean;
 

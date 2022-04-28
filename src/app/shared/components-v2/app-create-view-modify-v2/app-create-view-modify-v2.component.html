@@ -322,7 +322,7 @@
 
               <!-- Edit -->
               <a
-                *ngIf="isView && (!tabData.buttons.modify.visible || tabData.buttons.modify.visible())"
+                *ngIf="isView && selectedOutbreakIsActive && (!tabData.buttons.modify.visible || tabData.buttons.modify.visible())"
                 type="button"
                 mat-flat-button color="primary"
                 [routerLink]="tabData.buttons.modify.link.link()"
