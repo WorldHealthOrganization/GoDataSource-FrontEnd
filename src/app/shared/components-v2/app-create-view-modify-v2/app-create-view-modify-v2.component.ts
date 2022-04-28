@@ -246,7 +246,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    */
   constructor(
     protected elementRef: ElementRef,
-    public changeDetectorRef: ChangeDetectorRef,
+    protected changeDetectorRef: ChangeDetectorRef,
     protected dialogV2Service: DialogV2Service,
     protected formHelper: FormHelperService,
     protected toastV2Service: ToastV2Service,
@@ -481,34 +481,11 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
       return;
     }
 
-    // show loading
-    const loadingHandler = this.dialogV2Service.showLoadingDialog();
-
     // call create
-    this.tabData
-      .createOrUpdate(
-        CreateViewModifyV2ActionType.CREATE,
-        fieldData,
-        (error, data) => {
-          // hide loading
-          loadingHandler.close();
-
-          // handle errors
-          if (error) {
-            // show error
-            this.toastV2Service.error(error);
-
-            // finished
-            return;
-          }
-
-          // mark all forms as pristine
-          this.markFormsAsPristine();
-
-          // redirect after create / update
-          this.tabData.redirectAfterCreateUpdate(data);
-        }
-      );
+    this.runCreateOrUpdate(
+      CreateViewModifyV2ActionType.CREATE,
+      fieldData
+    );
   }
 
   /**
@@ -542,17 +519,34 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
       return;
     }
 
+    // call update
+    this.runCreateOrUpdate(
+      CreateViewModifyV2ActionType.UPDATE,
+      fieldData
+    );
+  }
+
+  /**
+   * Execute create / update
+   */
+  private runCreateOrUpdate(
+    type: CreateViewModifyV2ActionType,
+    fieldData: any
+  ): void {
     // show loading
-    const loadingHandler = this.dialogV2Service.showLoadingDialog();
+    let loadingHandler = this.dialogV2Service.showLoadingDialog();
 
     // call create
     this.tabData
       .createOrUpdate(
-        CreateViewModifyV2ActionType.UPDATE,
+        type,
         fieldData,
         (error, data) => {
           // hide loading
-          loadingHandler.close();
+          if (loadingHandler) {
+            loadingHandler.close();
+            loadingHandler = undefined;
+          }
 
           // handle errors
           if (error) {
@@ -568,6 +562,30 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
           // redirect after create / update
           this.tabData.redirectAfterCreateUpdate(data);
+        },
+        {
+          show: () => {
+            // already visible ?
+            if (loadingHandler) {
+              return;
+            }
+
+            // show loading
+            loadingHandler = this.dialogV2Service.showLoadingDialog();
+          },
+          hide: () => {
+            // hide loading
+            if (loadingHandler) {
+              loadingHandler.close();
+              loadingHandler = undefined;
+            }
+          }
+        },
+        {
+          markFormsAsPristine: () => {
+            // mark all forms as pristine
+            this.markFormsAsPristine();
+          }
         }
       );
   }
@@ -726,5 +744,12 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    */
   expandListViewRecord(record: any): void {
     this.expandListChangeRecord.emit(record);
+  }
+
+  /**
+   * Detect changes
+   */
+  detectChanges(): void {
+    this.changeDetectorRef.detectChanges();
   }
 }

@@ -46,6 +46,9 @@ import { ContactDataService } from '../../../../core/services/data/contact.data.
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { Location } from '@angular/common';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputLinkWithAction, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 
 /**
  * Component
@@ -90,6 +93,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     protected clusterDataService: ClusterDataService,
     protected contactDataService: ContactDataService,
     protected location: Location,
+    protected dialogV2Service: DialogV2Service,
+    protected entityDataService: EntityDataService,
     authDataService: AuthDataService,
     renderer2: Renderer2
   ) {
@@ -1107,10 +1112,15 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     return (
       type,
       data,
-      finished
+      finished,
+      loading,
+      forms
     ) => {
+      // items marked as not duplicates
+      let itemsMarkedAsNotDuplicates: string[];
+
       // create / update
-      const runCreateOrUpdate = () => {
+      const runCreateOrUpdate = (overwriteFinished: (item: CaseModel) => void) => {
         // create / update
         (type === CreateViewModifyV2ActionType.CREATE ?
           this.caseDataService
@@ -1136,8 +1146,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
           // should be the last pipe
           takeUntil(this.destroyed$)
-        )
-          .subscribe((item) => {
+        ).subscribe((item: CaseModel) => {
+          // finished
+          const finishedProcessingData = () => {
             // success creating / updating case
             this.toastV2Service.success(
               type === CreateViewModifyV2ActionType.CREATE ?
@@ -1145,12 +1156,55 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                 'LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE'
             );
 
-            // manage duplicates
-            // #TODO
-
             // finished with success
-            finished(undefined, item);
-          });
+            if (!overwriteFinished) {
+              finished(undefined, item);
+            } else {
+              // mark pristine
+              forms.markFormsAsPristine();
+
+              // hide loading
+              loading.hide();
+
+              // call overwrite
+              overwriteFinished(item);
+            }
+          };
+
+          // there are no records marked as NOT duplicates ?
+          if (
+            !itemsMarkedAsNotDuplicates ||
+            itemsMarkedAsNotDuplicates.length < 1
+          ) {
+            finishedProcessingData();
+          } else {
+            // mark records as not duplicates
+            this.entityDataService
+              .markPersonAsOrNotADuplicate(
+                this.selectedOutbreak.id,
+                EntityType.CASE,
+                item.id,
+                itemsMarkedAsNotDuplicates
+              )
+              .pipe(
+                // handle error
+                catchError((err) => {
+                  // show error
+                  finished(err, undefined);
+
+                  // send error further
+                  return throwError(err);
+                }),
+
+                // should be the last pipe
+                takeUntil(this.destroyed$)
+              )
+              .subscribe(() => {
+                // finished
+                finishedProcessingData();
+              });
+          }
+        });
       };
 
       // check if we need to determine duplicates
@@ -1185,7 +1239,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             )
           ) {
             // no need to check for duplicates
-            return runCreateOrUpdate();
+            return runCreateOrUpdate(undefined);
           }
 
           // check for duplicates
@@ -1214,18 +1268,145 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               // should be the last pipe
               takeUntil(this.destroyed$)
             )
-            .subscribe((caseDuplicates) => {
+            .subscribe((response) => {
               // no duplicates ?
-              if (caseDuplicates.duplicates.length < 1) {
+              if (response.duplicates.length < 1) {
                 // create case
-                return runCreateOrUpdate();
+                return runCreateOrUpdate(undefined);
               }
 
-              // construct duplicates dialog input list
-              // #TODO
+              // hide loading since this will be handled further by the side dialog
+              loading.hide();
 
-              // display duplicates dialog
-              // #TODO
+              // hide notification
+              // - hide alert
+              this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
+
+              // construct list of actions
+              const itemsToManage: IV2SideDialogConfigInputLinkWithAction[] = response.duplicates.map((item, index) => {
+                return {
+                  type: V2SideDialogConfigInputType.LINK_WITH_ACTION,
+                  name: `actionsLink[${item.model.id}]`,
+                  placeholder: (index + 1) + '. ' + EntityModel.getNameWithDOBAge(
+                    item.model as CaseModel,
+                    this.translateService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+                    this.translateService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+                  ),
+                  link: () => ['/cases', item.model.id, 'view'],
+                  actions: {
+                    type: V2SideDialogConfigInputType.TOGGLE,
+                    name: `actionsAction[${item.model.id}]`,
+                    value: Constants.DUPLICATE_ACTION.NO_ACTION,
+                    data: item.model.id,
+                    options: [
+                      {
+                        label: Constants.DUPLICATE_ACTION.NO_ACTION,
+                        value: Constants.DUPLICATE_ACTION.NO_ACTION
+                      },
+                      {
+                        label: Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE,
+                        value: Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE
+                      },
+                      {
+                        label: Constants.DUPLICATE_ACTION.MERGE,
+                        value: Constants.DUPLICATE_ACTION.MERGE
+                      }
+                    ]
+                  }
+                };
+              });
+
+              // construct & display duplicates dialog
+              this.dialogV2Service
+                .showSideDialog({
+                  title: {
+                    get: () => 'LNG_COMMON_LABEL_HAS_DUPLICATES_TITLE'
+                  },
+                  hideInputFilter: true,
+                  dontCloseOnBackdrop: true,
+                  inputs: [
+                    // Title
+                    {
+                      type: V2SideDialogConfigInputType.DIVIDER,
+                      placeholder: this.isCreate ?
+                        'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_CONFIRM_MSG' :
+                        'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_CONFIRM_MSG',
+                      placeholderMultipleLines: true
+                    },
+
+                    // Actions
+                    ...itemsToManage
+                  ],
+                  bottomButtons: [{
+                    type: IV2SideDialogConfigButtonType.OTHER,
+                    label: 'LNG_COMMON_BUTTON_SAVE',
+                    color: 'primary'
+                  }, {
+                    type: IV2SideDialogConfigButtonType.CANCEL,
+                    label: 'LNG_COMMON_BUTTON_CANCEL',
+                    color: 'text'
+                  }]
+                })
+                .subscribe((dialogResponse) => {
+                  // cancelled ?
+                  if (dialogResponse.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+                    // show back duplicates alert
+                    this.showDuplicatesAlert();
+
+                    // finished
+                    return;
+                  }
+
+                  // determine number of items to merge / mark as not duplicates
+                  const itemsToMerge: string[] = [];
+                  itemsMarkedAsNotDuplicates = [];
+
+                  // go through items to manage
+                  dialogResponse.data.inputs.forEach((item) => {
+                    // not important ?
+                    if (item.type !== V2SideDialogConfigInputType.LINK_WITH_ACTION) {
+                      return;
+                    }
+
+                    // take action
+                    switch (item.actions.value) {
+                      case Constants.DUPLICATE_ACTION.NOT_A_DUPLICATE:
+                        itemsMarkedAsNotDuplicates.push(item.actions.data);
+                        break;
+                      case Constants.DUPLICATE_ACTION.MERGE:
+                        itemsToMerge.push(item.actions.data);
+                        break;
+                    }
+                  });
+
+                  // hide dialog
+                  dialogResponse.handler.hide();
+
+                  // show back loading
+                  loading.show();
+
+                  // save data first, followed by redirecting to merge
+                  if (itemsToMerge.length > 0) {
+                    runCreateOrUpdate((item) => {
+                      // construct list of ids
+                      const mergeIds: string[] = [
+                        item.id,
+                        ...itemsToMerge
+                      ];
+
+                      // redirect to merge
+                      this.router.navigate(
+                        ['/duplicated-records', EntityModel.getLinkForEntityType(EntityType.CASE), 'merge'], {
+                          queryParams: {
+                            ids: JSON.stringify(mergeIds)
+                          }
+                        }
+                      );
+                    });
+                  } else {
+                    runCreateOrUpdate(undefined);
+                  }
+                });
             });
         });
     };
@@ -1338,6 +1519,51 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   }
 
   /**
+   * Show duplicates alert
+   */
+  private showDuplicatesAlert(): void {
+    // nothing to show ?
+    if (
+      !this._personDuplicates ||
+      this._personDuplicates.length < 1
+    ) {
+      // finished
+      return;
+    }
+
+    // update message & show alert if not visible already
+    // - with links for cases / contacts view page if we have enough rights
+    this.toastV2Service.notice(
+      this.translateService.instant('LNG_CASE_FIELD_LABEL_DUPLICATE_CONTACTS') +
+      ' ' +
+      this._personDuplicates
+        .map((item) => {
+          // check rights
+          if (
+            (
+              item.type === EntityType.CONTACT &&
+              !ContactModel.canView(this.authUser)
+            ) || (
+              item.type === EntityType.CASE &&
+              !CaseModel.canView(this.authUser)
+            )
+          ) {
+            return `${item.name} (${this.translateService.instant(item.type)})`;
+          }
+
+          // create url
+          const url: string = `${item.type === EntityType.CONTACT ? '/contacts' : '/cases'}/${item.id}/view`;
+
+          // finished
+          return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.name} (${this.translateService.instant(item.type)})</span></a>`;
+        })
+        .join(', '),
+      undefined,
+      AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT
+    );
+  }
+
+  /**
    * Check if a contact exists with the same name
    */
   private checkForPersonExistence(): void {
@@ -1367,45 +1593,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           // - hide alert
           this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
 
-          // nothing to show ?
-          if (
-            !this._personDuplicates ||
-            this._personDuplicates.length < 1
-          ) {
-            // finished
-            return;
-          }
-
-          // update message & show alert if not visible already
-          // - with links for cases / contacts view page if we have enough rights
-          this.toastV2Service.notice(
-            this.translateService.instant('LNG_CASE_FIELD_LABEL_DUPLICATE_CONTACTS') +
-            ' ' +
-            this._personDuplicates
-              .map((item) => {
-                // check rights
-                if (
-                  (
-                    item.type === EntityType.CONTACT &&
-                    !ContactModel.canView(this.authUser)
-                  ) || (
-                    item.type === EntityType.CASE &&
-                    !CaseModel.canView(this.authUser)
-                  )
-                ) {
-                  return `${item.name} (${this.translateService.instant(item.type)})`;
-                }
-
-                // create url
-                const url: string = `${item.type === EntityType.CONTACT ? '/contacts' : '/cases'}/${item.id}/view`;
-
-                // finished
-                return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.name} (${this.translateService.instant(item.type)})</span></a>`;
-              })
-              .join(', '),
-            undefined,
-            AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT
-          );
+          // show duplicates alert
+          this.showDuplicatesAlert();
         };
 
         // nothing to show ?

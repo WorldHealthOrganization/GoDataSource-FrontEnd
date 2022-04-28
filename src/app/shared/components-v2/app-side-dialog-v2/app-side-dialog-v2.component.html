@@ -82,7 +82,8 @@
             <div
               *ngSwitchCase="V2SideDialogConfigInputType.DIVIDER"
               class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-divider {{input.cssClasses}}"
-              [class.gd-app-side-dialog-v2-content-middle-item-input-divider-has-title]="!!input.placeholder">{{input.placeholder | translate}}</div>
+              [class.gd-app-side-dialog-v2-content-middle-item-input-divider-has-title]="!!input.placeholder"
+              [class.gd-app-side-dialog-v2-content-middle-item-input-divider-has-title-multiple-lines]="!!input.placeholderMultipleLines">{{input.placeholder | translate}}</div>
 
             <!-- Checkbox -->
             <app-form-checkbox-v2
@@ -145,6 +146,16 @@
               [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
               (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-select-multiple-v2>
 
+            <!-- Toggle -->
+            <app-form-toggle-v2
+              *ngSwitchCase="V2SideDialogConfigInputType.TOGGLE"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
+              [(ngModel)]="input.value"
+              [name]="input.name"
+              [options]="input.options"
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
+              (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-toggle-v2>
+
             <!-- Key-Value -->
             <div
               *ngSwitchCase="V2SideDialogConfigInputType.KEY_VALUE"
@@ -181,6 +192,30 @@
               (click)="hide(true)">
               {{input.placeholder | translate}}
             </a>
+
+            <!-- Link with action -->
+            <div
+              *ngSwitchCase="V2SideDialogConfigInputType.LINK_WITH_ACTION">
+
+              <!-- Link -->
+              <a
+                mat-flat-button
+                color="text"
+                class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-link {{input.cssClasses}}"
+                [routerLink]="input.link(dialogHandler.data, dialogHandler, input)"
+                [queryParams]="input.linkQueryParams ? input.linkQueryParams(dialogHandler.data, dialogHandler, input) : undefined"
+                [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)">
+                {{input.placeholder | translate}}
+              </a>
+
+              <!-- Action -->
+              <div>
+                <ng-template
+                  [ngTemplateOutlet]="commonPart"
+                  [ngTemplateOutletContext]="{ input: input.actions }"></ng-template>
+              </div>
+
+            </div>
 
             <!-- Accordion -->
             <div

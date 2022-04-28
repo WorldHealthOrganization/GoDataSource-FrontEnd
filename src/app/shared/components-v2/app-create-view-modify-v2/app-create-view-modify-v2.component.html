@@ -81,7 +81,7 @@
               autocomplete="off"
               (keyup.enter)="expandListSearch()">
             </app-form-input-v2>
-            
+
           </div>
 
         </div>
@@ -232,7 +232,7 @@
                   type="button"
                   mat-flat-button color="secondary"
                   [matMenuTriggerFor]="quickMenu"
-                  (menuClosed)="changeDetectorRef.detectChanges()">
+                  (menuClosed)="detectChanges()">
 
                   <!-- Label -->
                   <span>

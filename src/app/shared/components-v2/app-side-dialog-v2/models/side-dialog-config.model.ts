@@ -25,7 +25,9 @@ export enum V2SideDialogConfigInputType {
   NUMBER,
   DROPDOWN_SINGLE,
   DROPDOWN_MULTI,
+  TOGGLE,
   LINK,
+  LINK_WITH_ACTION,
   ACCORDION,
   ACCORDION_PANEL,
   KEY_VALUE,
@@ -78,6 +80,11 @@ export interface IV2SideDialogConfigInputDivider extends IV2SideDialogConfigInpu
 
   // optional
   placeholder?: string;
+  placeholderMultipleLines?: boolean;
+
+  // never
+  value?: never;
+  disabled?: never;
 }
 
 /**
@@ -159,6 +166,19 @@ export interface IV2SideDialogConfigInputMultiDropdown extends IV2SideDialogConf
 }
 
 /**
+ * Side dialog input - toggle
+ */
+export interface IV2SideDialogConfigInputToggle extends IV2SideDialogConfigInput {
+  // required
+  type: V2SideDialogConfigInputType.TOGGLE;
+  options: ILabelValuePairModel[];
+  value: string;
+
+  // never
+  placeholder?: never;
+}
+
+/**
  * Side dialog input - number
  */
 export interface IV2SideDialogConfigInputNumber extends IV2SideDialogConfigInput {
@@ -183,6 +203,21 @@ export interface IV2SideDialogConfigInputLink extends IV2SideDialogConfigInputBa
 
   // optional
   linkQueryParams?: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: IV2SideDialogConfigInputLink) => Params;
+}
+
+/**
+ * Side dialog input - link with action
+ */
+export interface IV2SideDialogConfigInputLinkWithAction extends IV2SideDialogConfigInputBase {
+  // required
+  type: V2SideDialogConfigInputType.LINK_WITH_ACTION;
+  name: string;
+  placeholder: string;
+  link: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: IV2SideDialogConfigInputLinkWithAction) => string[];
+  actions: IV2SideDialogConfigInputToggle;
+
+  // optional
+  linkQueryParams?: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: IV2SideDialogConfigInputLinkWithAction) => Params;
 }
 
 /**
@@ -261,9 +296,10 @@ export interface IV2SideDialogConfigInputFilterList extends IV2SideDialogConfigI
  * Side dialog inputs
  */
 export type V2SideDialogConfigInputFromInput = IV2SideDialogConfigInputCheckbox | IV2SideDialogConfigInputText | IV2SideDialogConfigInputSingleDropdown
-| IV2SideDialogConfigInputMultiDropdown | IV2SideDialogConfigInputNumber;
+| IV2SideDialogConfigInputMultiDropdown | IV2SideDialogConfigInputToggle | IV2SideDialogConfigInputNumber;
 export type V2SideDialogConfigInput = IV2SideDialogConfigInputDivider | IV2SideDialogConfigInputKeyValue | IV2SideDialogConfigInputHTML
-| V2SideDialogConfigInputFromInput | IV2SideDialogConfigInputLink | IV2SideDialogConfigInputAccordion | IV2SideDialogConfigInputFilterList;
+| V2SideDialogConfigInputFromInput | IV2SideDialogConfigInputLink | IV2SideDialogConfigInputLinkWithAction | IV2SideDialogConfigInputAccordion
+| IV2SideDialogConfigInputFilterList;
 
 /**
  * Side dialog inputs map

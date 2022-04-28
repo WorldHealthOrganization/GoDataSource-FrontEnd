@@ -410,7 +410,14 @@ export interface ICreateViewModifyV2Buttons {
 export type ICreateViewModifyV2CreateOrUpdate = (
   type: CreateViewModifyV2ActionType,
   data: any,
-  finished: (error: any, data: any) => void
+  finished: (error: any, data: any) => void,
+  loading: {
+    show: () => void
+    hide: () => void
+  },
+  forms: {
+    markFormsAsPristine: () => void
+  }
 ) => void;
 
 /**
