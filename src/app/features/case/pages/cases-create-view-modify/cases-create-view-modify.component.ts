@@ -100,9 +100,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       renderer2,
       router
     );
-
-    // check if record has duplicate (all 3 pages types)
-    this.checkForPersonExistence();
   }
 
   /**
@@ -149,6 +146,18 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     this.itemData.visualId = this.isCreate ?
       this._caseVisualIDMask.mask :
       this.itemData.visualId;
+
+    // check if record has duplicate (all 3 pages types)
+    if (
+      this.isView ||
+      this.isModify
+    ) {
+      // remove global notifications
+      this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
+
+      // check
+      this.checkForPersonExistence();
+    }
   }
 
   /**
