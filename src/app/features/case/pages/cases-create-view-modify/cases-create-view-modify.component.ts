@@ -1599,6 +1599,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       this._duplicateCheckingSubscription = undefined;
     }
 
+    // don't check if not active outbreak
+    if (!this.selectedOutbreakIsActive) {
+      return;
+    }
+
     // check for duplicate
     this._duplicateCheckingTimeout = setTimeout(
       () => {
@@ -1670,7 +1675,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           this.caseDataService
             .findDuplicates(
               this.selectedOutbreak.id,
-              this.isModify ?
+              this.isView || this.isModify ?
                 {
                   id: this.itemData.id,
                   ...this._previousChecked
