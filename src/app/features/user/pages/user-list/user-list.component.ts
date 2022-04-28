@@ -83,9 +83,9 @@ export class UserListComponent extends ListComponent implements OnDestroy {
   }
 
   /**
-  * Selected outbreak was changed
+  * Component initialized
   */
-  selectedOutbreakChanged(): void {
+  initialized(): void {
     // initialize pagination
     this.initPaginator();
 
