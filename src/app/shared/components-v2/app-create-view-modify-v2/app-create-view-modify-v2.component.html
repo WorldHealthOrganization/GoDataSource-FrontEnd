@@ -126,14 +126,18 @@
                   [ngSwitch]="expandListColumnRenderer?.type"
                   style="height: 4rem;"
                   class="gd-create-view-modify-list-data-record"
-                  [class.gd-create-view-modify-list-data-record-active]="record.id === itemID"
-                  (click)="record.id === itemID ? undefined : expandListViewRecord(record)">
+                  [class.gd-create-view-modify-list-data-record-active]="record.id === itemID">
 
                   <!-- Text -->
-                  <div
-                    *ngSwitchCase="CreateViewModifyV2ExpandColumnType.TEXT">
-                    {{ expandListColumnRenderer.get(record) }}
-                  </div>
+                  <a
+                    *ngSwitchCase="CreateViewModifyV2ExpandColumnType.TEXT"
+                    [routerLink]="expandListColumnRenderer.link ? expandListColumnRenderer.link(record) : undefined"
+                    [queryParams]="expandListColumnRenderer.linkQueryParams ? expandListColumnRenderer.linkQueryParams(record) : undefined">
+                    <span
+                      (click)="$event.preventDefault(); $event.stopPropagation(); $event.stopImmediatePropagation(); (record.id === itemID ? undefined : expandListViewRecord(record))">
+                      {{ expandListColumnRenderer.get(record) }}
+                    </span>
+                  </a>
 
                 </div>
               </cdk-virtual-scroll-viewport>

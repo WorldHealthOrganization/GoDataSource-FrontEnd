@@ -1,3 +1,5 @@
+import { Params } from '@angular/router';
+
 /**
  * Column type
  */
@@ -9,8 +11,13 @@ export enum CreateViewModifyV2ExpandColumnType {
  * Text Column
  */
 interface ICreateViewModifyV2ExpandColumnText {
+  // required
   type: CreateViewModifyV2ExpandColumnType.TEXT;
-  get: (item: any) => string
+  get: (item: any) => string;
+
+  // optional
+  link?: (item: any) => string[];
+  linkQueryParams?: (item: any) => Params;
 }
 
 /**

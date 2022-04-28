@@ -1436,7 +1436,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: CaseModel) => item.name
+      get: (item: CaseModel) => item.name,
+      link: (item: CaseModel) => ['/cases', item.id, 'view']
     };
   }
 
