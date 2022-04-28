@@ -927,80 +927,83 @@
           <mat-horizontal-stepper
             *ngIf="isCreate; else viewModify"
             linear>
-            <mat-step
-              *ngFor="let tab of tabData.tabs; let tabIndex = index"
-              [stepControl]="tab.form">
+            <ng-container
+              *ngFor="let tab of tabData.tabs; let tabIndex = index">
+              <mat-step
+                *ngIf="tab.type === CreateViewModifyV2TabInputType.TAB"
+                [stepControl]="tab.form">
 
-              <!-- Tab Label -->
-              <div
-                *matStepLabel>
-                {{tab.label | translate}}
-              </div>
-
-              <!-- Content -->
-              <div
-                class="gd-create-view-modify-bottom-content">
-                <ng-container
-                  *ngTemplateOutlet="sectionsRender; context: { tab }"></ng-container>
-              </div>
-
-              <!-- Bottom -->
-              <div
-                class="gd-create-view-modify-bottom-bottom"
-                fxLayoutAlign="space-between">
-                <!-- Left -->
+                <!-- Tab Label -->
                 <div
-                  fxFlex>
-                  <!-- Cancel -->
-                  <a
-                    *ngIf="!tabData.buttons.createCancel.visible || tabData.buttons.createCancel.visible()"
-                    type="button"
-                    mat-flat-button color="text"
-                    [routerLink]="tabData.buttons.createCancel.link.link()"
-                    [queryParams]="tabData.buttons.createCancel.link.queryParams ? tabData.buttons.createCancel.link.queryParams() : undefined">
-                    {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
-                  </a>
+                  *matStepLabel>
+                  {{tab.label | translate}}
                 </div>
 
-                <!-- Right -->
+                <!-- Content -->
                 <div
-                  fxFlex fxLayoutAlign="end" fxLayoutGap="0.8rem">
-                  <!-- Previous -->
-                  <button
-                    *ngIf="tabIndex > 0"
-                    mat-flat-button color="secondary"
-                    type="button"
-                    matStepperPrevious>
-                    <!-- Label -->
-                    <span>
-                      {{'LNG_STEPPER_BUTTON_BACK' | translate}}
-                    </span>
-                  </button>
-
-                  <!-- Next -->
-                  <button
-                    mat-flat-button color="primary"
-                    type="button"
-                    matStepperNext
-                    (click)="tab.form ? tab.form.ngSubmit.emit() : undefined">
-
-                    <!-- Pending validators -->
-                    <mat-progress-spinner
-                      *ngIf="tab.form?.pending"
-                      diameter="16"
-                      mode="indeterminate"
-                      color="primary">
-                    </mat-progress-spinner>
-
-                    <!-- Label -->
-                    <span>
-                      {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
-                    </span>
-                  </button>
+                  class="gd-create-view-modify-bottom-content">
+                  <ng-container
+                    *ngTemplateOutlet="sectionsRender; context: { tab }"></ng-container>
                 </div>
-              </div>
 
-            </mat-step>
+                <!-- Bottom -->
+                <div
+                  class="gd-create-view-modify-bottom-bottom"
+                  fxLayoutAlign="space-between">
+                  <!-- Left -->
+                  <div
+                    fxFlex>
+                    <!-- Cancel -->
+                    <a
+                      *ngIf="!tabData.buttons.createCancel.visible || tabData.buttons.createCancel.visible()"
+                      type="button"
+                      mat-flat-button color="text"
+                      [routerLink]="tabData.buttons.createCancel.link.link()"
+                      [queryParams]="tabData.buttons.createCancel.link.queryParams ? tabData.buttons.createCancel.link.queryParams() : undefined">
+                      {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
+                    </a>
+                  </div>
+
+                  <!-- Right -->
+                  <div
+                    fxFlex fxLayoutAlign="end" fxLayoutGap="0.8rem">
+                    <!-- Previous -->
+                    <button
+                      *ngIf="tabIndex > 0"
+                      mat-flat-button color="secondary"
+                      type="button"
+                      matStepperPrevious>
+                      <!-- Label -->
+                      <span>
+                        {{'LNG_STEPPER_BUTTON_BACK' | translate}}
+                      </span>
+                    </button>
+
+                    <!-- Next -->
+                    <button
+                      mat-flat-button color="primary"
+                      type="button"
+                      matStepperNext
+                      (click)="tab.form ? tab.form.ngSubmit.emit() : undefined">
+
+                      <!-- Pending validators -->
+                      <mat-progress-spinner
+                        *ngIf="tab.form?.pending"
+                        diameter="16"
+                        mode="indeterminate"
+                        color="primary">
+                      </mat-progress-spinner>
+
+                      <!-- Label -->
+                      <span>
+                        {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+
+              </mat-step>
+            </ng-container>
 
             <!-- Final step -->
             <mat-step>
@@ -1074,30 +1077,33 @@
           <ng-template
             #viewModify>
             <mat-tab-group>
-              <mat-tab
+              <ng-container
                 *ngFor="let tab of tabData.tabs">
+                <mat-tab
+                  *ngIf="isView || tab.type === CreateViewModifyV2TabInputType.TAB">
 
-                <!-- Label & valid -->
-                <ng-template
-                  mat-tab-label>
+                  <!-- Label & valid -->
+                  <ng-template
+                    mat-tab-label>
 
-                  <!-- Label -->
-                  <span>{{tab.label | translate}}</span>
+                    <!-- Label -->
+                    <span>{{tab.label | translate}}</span>
 
-                  <!-- Invalid -->
-                  <mat-icon
-                    *ngIf="isModify && tab.form?.invalid"
-                    color="warn"
-                    [matTooltip]="'LNG_COMMON_LABEL_INVALID_TAB' | translate">warning</mat-icon>
-                </ng-template>
+                    <!-- Invalid -->
+                    <mat-icon
+                      *ngIf="isModify && tab.form?.invalid"
+                      color="warn"
+                      [matTooltip]="'LNG_COMMON_LABEL_INVALID_TAB' | translate">warning</mat-icon>
+                  </ng-template>
 
-                <!-- Content -->
-                <div
-                class="gd-create-view-modify-bottom-content">
-                  <ng-container
-                    *ngTemplateOutlet="sectionsRender; context: { tab }"></ng-container>
-                </div>
-              </mat-tab>
+                  <!-- Content -->
+                  <div
+                  class="gd-create-view-modify-bottom-content">
+                    <ng-container
+                      *ngTemplateOutlet="sectionsRender; context: { tab }"></ng-container>
+                  </div>
+                </mat-tab>
+              </ng-container>
             </mat-tab-group>
           </ng-template>
 
