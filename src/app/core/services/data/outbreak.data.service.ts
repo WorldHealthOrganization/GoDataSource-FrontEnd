@@ -361,6 +361,10 @@ export class OutbreakDataService {
           if (authUser.activeOutbreakId !== selectedOutbreak.id) {
             this.getOutbreak(authUser.activeOutbreakId)
               .subscribe((outbreak) => {
+                // hide to update message
+                this.toastV2Service.hide(AppMessages.APP_MESSAGE_UNRESPONSIVE_SELECTED_OUTBREAK_NOT_ACTIVE);
+
+                // show
                 this.toastV2Service.notice(
                   'LNG_GENERIC_WARNING_SELECTED_OUTBREAK_NOT_ACTIVE',
                   {
