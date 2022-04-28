@@ -985,13 +985,13 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                 };
               }
             },
-            visible: () => CaseModel.canCreateContact(this.authUser) && ContactModel.canCreate(this.authUser)
+            visible: () => this.selectedOutbreakIsActive && CaseModel.canCreateContact(this.authUser) && ContactModel.canCreate(this.authUser)
           },
 
           // Divider
           {
             type: CreateViewModifyV2MenuType.DIVIDER,
-            visible: () => CaseModel.canCreateContact(this.authUser) && ContactModel.canCreate(this.authUser)
+            visible: () => this.selectedOutbreakIsActive &&  CaseModel.canCreateContact(this.authUser) && ContactModel.canCreate(this.authUser)
           },
 
           // View Questionnaire
