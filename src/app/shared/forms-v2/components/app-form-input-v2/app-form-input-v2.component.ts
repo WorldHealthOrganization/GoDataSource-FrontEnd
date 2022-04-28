@@ -97,7 +97,7 @@ export class AppFormInputV2Component
 
     // execute click action
     if (iconB.clickAction) {
-      iconB.clickAction();
+      iconB.clickAction(this);
     }
   }
 }

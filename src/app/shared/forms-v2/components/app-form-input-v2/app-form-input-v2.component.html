@@ -44,6 +44,7 @@
       type="button"
       mat-icon-button
       matSuffix
+      [matTooltip]="iconB.tooltip | translate"
       (click)="iconButtonClick($event, iconB)"><mat-icon>{{iconB.icon}}</mat-icon></button>
 
     <!-- Errors -->

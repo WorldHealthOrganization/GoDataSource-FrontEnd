@@ -8,6 +8,7 @@ import { DocumentModel } from '../../../../core/models/document.model';
 import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
 import { Params } from '@angular/router';
+import { IAppFormIconButtonV2 } from '../../../forms-v2/core/app-form-icon-button-v2';
 
 /**
  * Input type
@@ -158,6 +159,9 @@ interface ICreateViewModifyV2TabInputVisualID extends Omit<ICreateViewModifyV2Ta
   type: CreateViewModifyV2TabInputType.VISUAL_ID;
   value: ICreateViewModifyV2TabInputValue<string>;
   validator: Observable<boolean | IGeneralAsyncValidatorResponse>;
+
+  // optional
+  suffixIconButtons?: IAppFormIconButtonV2[];
 }
 
 /**

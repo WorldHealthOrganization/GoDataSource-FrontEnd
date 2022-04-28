@@ -518,6 +518,7 @@
                     [tooltip]="input.description"
                     [viewOnly]="isView"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    [suffixIconButtons]="input.suffixIconButtons"
                     autocomplete="off"
                     app-general-async-validator
                     [asyncValidatorObservable]="!isView ? input.validator : undefined"

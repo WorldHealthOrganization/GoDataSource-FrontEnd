@@ -440,6 +440,24 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                   this.itemData.visualId = value;
                 }
               },
+              suffixIconButtons: [
+                {
+                  icon: 'refresh',
+                  tooltip: 'LNG_PAGE_ACTION_REFRESH_VISUAL_ID_DESCRIPTION',
+                  clickAction: (input) => {
+                    // nothing to do ?
+                    if (!this._caseVisualIDMask) {
+                      return;
+                    }
+
+                    // generate
+                    this.itemData.visualId = CaseModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask);
+
+                    // mark as dirty
+                    input.control?.markAsDirty();
+                  }
+                }
+              ],
               validator: new Observable((observer) => {
                 // construct cache key
                 const cacheKey: string = 'CCA_' + this.selectedOutbreak.id +
