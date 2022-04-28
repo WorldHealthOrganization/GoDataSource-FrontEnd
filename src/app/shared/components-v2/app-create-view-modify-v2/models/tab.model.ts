@@ -33,6 +33,7 @@ export enum CreateViewModifyV2TabInputType {
 
   // layout
   TAB,
+  TAB_TABLE,
   SECTION
 }
 
@@ -286,11 +287,23 @@ interface ICreateViewModifyV2Section {
 export interface ICreateViewModifyV2Tab {
   // required
   type: CreateViewModifyV2TabInputType.TAB;
-  sections: ICreateViewModifyV2Section[];
   label: string;
+  sections: ICreateViewModifyV2Section[];
 
   // optional
   form?: NgForm;
+}
+
+/**
+ * Tab table
+ */
+export interface ICreateViewModifyV2TabTable {
+  // required
+  type: CreateViewModifyV2TabInputType.TAB_TABLE;
+  label: string;
+
+  // optional
+  visible?: () => boolean
 }
 
 /**
@@ -429,7 +442,7 @@ export type ICreateViewModifyV2CreateOrUpdate = (
  */
 export interface ICreateViewModifyV2 {
   // required
-  tabs: ICreateViewModifyV2Tab[];
+  tabs: (ICreateViewModifyV2Tab | ICreateViewModifyV2TabTable)[];
   create: {
     finalStep: {
       buttonLabel: string,

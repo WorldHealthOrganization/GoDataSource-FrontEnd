@@ -14,7 +14,7 @@ import {
   CreateViewModifyV2TabInputType,
   ICreateViewModifyV2Buttons,
   ICreateViewModifyV2CreateOrUpdate,
-  ICreateViewModifyV2Tab
+  ICreateViewModifyV2Tab, ICreateViewModifyV2TabTable
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -252,7 +252,10 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         this.initializeTabsPersonal(),
 
         // Epidemiology
-        this.initializeTabsEpidemiology()
+        this.initializeTabsEpidemiology(),
+
+        // table tabs - specific to cases, contacts, contact of contacts and events
+        this.initializeTabsContacts()
       ],
 
       // create details
@@ -940,6 +943,16 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   }
 
   /**
+   * Initialize tabs - Contacts
+   */
+  private initializeTabsContacts(): ICreateViewModifyV2TabTable {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      label: 'LNG_COMMON_BUTTON_EXPOSURES_FROM'
+    };
+  }
+
+  /**
    * Initialize buttons
    */
   private initializeButtons(): ICreateViewModifyV2Buttons {
@@ -991,7 +1004,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           // Divider
           {
             type: CreateViewModifyV2MenuType.DIVIDER,
-            visible: () => this.selectedOutbreakIsActive &&  CaseModel.canCreateContact(this.authUser) && ContactModel.canCreate(this.authUser)
+            visible: () => this.selectedOutbreakIsActive && CaseModel.canCreateContact(this.authUser) && ContactModel.canCreate(this.authUser)
           },
 
           // View Questionnaire
