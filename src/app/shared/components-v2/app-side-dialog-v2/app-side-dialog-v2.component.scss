@@ -79,8 +79,6 @@
               }
 
               .mat-form-field-wrapper {
-                padding-bottom: 0;
-          
                 .mat-form-field-flex {
                   .mat-form-field-outline,
                   .mat-form-field-outline-thick {
@@ -93,6 +91,11 @@
                       @include border-radius(0);
                     }
                   }
+                }
+
+                .mat-form-field-subscript-wrapper {
+                  min-height: 0;
+                  padding: 0;
                 }
               }
 
@@ -147,6 +150,11 @@
 
               &:before {
                 display: none;
+              }
+
+              &.gd-app-side-dialog-v2-content-middle-item-input-divider-has-title-multiple-lines {
+                height: auto;
+                white-space: normal;
               }
             }
           }
