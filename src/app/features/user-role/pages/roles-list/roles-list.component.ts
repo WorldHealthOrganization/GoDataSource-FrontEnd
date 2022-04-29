@@ -26,8 +26,8 @@ export class RolesListComponent extends ListComponent implements OnDestroy {
   rolesList$: Observable<UserRoleModel[]>;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     private userRoleDataService: UserRoleDataService,
@@ -37,8 +37,6 @@ export class RolesListComponent extends ListComponent implements OnDestroy {
     private i18nService: I18nService
   ) {
     super(listHelperService);
-
-    // TODO: Should we deactivate Outbreaks drop-down?
   }
 
   /**
@@ -48,7 +46,6 @@ export class RolesListComponent extends ListComponent implements OnDestroy {
     // release parent resources
     super.onDestroy();
   }
-
 
   /**
    * Component initialized
@@ -62,8 +59,8 @@ export class RolesListComponent extends ListComponent implements OnDestroy {
   }
 
   /**
-     * Initialize Side Table Columns
-     */
+   * Initialize Side Table Columns
+   */
   protected initializeTableColumns() {
     // default table columns
     this.tableColumns = [
@@ -86,7 +83,7 @@ export class RolesListComponent extends ListComponent implements OnDestroy {
         }
       },
       {
-        field: 'users',
+        field: 'users._id',
         label: 'LNG_USER_ROLE_FIELD_LABEL_USERS',
         format: {
           type: V2ColumnFormat.LINK_LIST
@@ -103,8 +100,7 @@ export class RolesListComponent extends ListComponent implements OnDestroy {
           [],
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
-          includeNoValue: true
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
         }
       },
       {
@@ -373,19 +369,14 @@ export class RolesListComponent extends ListComponent implements OnDestroy {
     this.rolesList$ = this.userRoleDataService
       .getRolesList(this.queryBuilder)
       .pipe(
-        catchError((err) => {
-          this.toastV2Service.error(err);
-          return throwError(err);
-        }),
-
         // should be the last pipe
         takeUntil(this.destroyed$)
       );
   }
 
   /**
-     * Get total number of items, based on the applied filters
-     */
+   * Get total number of items, based on the applied filters
+   */
   refreshListCount(applyHasMoreLimit?: boolean) {
     // reset
     this.pageCount = undefined;
@@ -408,6 +399,7 @@ export class RolesListComponent extends ListComponent implements OnDestroy {
       );
     }
 
+    // count
     this.userRoleDataService
       .getRolesCount(countQueryBuilder)
       .pipe(

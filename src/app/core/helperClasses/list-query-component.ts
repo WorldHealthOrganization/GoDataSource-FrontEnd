@@ -389,6 +389,7 @@ export abstract class ListQueryComponent {
       // multiple select
       case V2FilterType.MULTIPLE_SELECT:
         // replace previous conditions
+        this.queryBuilder.filter.remove(column.columnDefinition.field);
         this.queryBuilder.filter.removePathCondition(column.columnDefinition.field);
         this.queryBuilder.filter.removePathCondition(`or.${column.columnDefinition.field}`);
 
