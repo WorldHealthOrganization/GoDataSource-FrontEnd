@@ -80,8 +80,6 @@
           .gd-form-select-location-multiple-v2 {
             .mat-form-field {
               .mat-form-field-wrapper {
-                padding-bottom: 0;
-
                 .mat-form-field-flex {
                   background: var(--gd-background);
                   @include border-radius(0.4rem);
@@ -101,6 +99,11 @@
                   .mat-form-field-infix {
                     width: 10rem;
                   }
+                }
+
+                .mat-form-field-subscript-wrapper {
+                  min-height: 0;
+                  padding: 0;
                 }
               }
 

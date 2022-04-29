@@ -32,49 +32,14 @@
           line-height: 4rem;
           padding: 0 1.6rem;
 
-          /* Radio button */
-          .mat-radio-button {
-            font-family: $gd-font-family;
-        
-            /* Radio button label */
-            .mat-radio-label {
-              .mat-radio-container {
-                .mat-radio-outer-circle {
-                  border-color: var(--gd-secondary);
-                }
-        
-                .mat-ripple {
-                  display: none;
-                }
-              }
-        
-              .mat-radio-label-content {
-                line-height: 2rem;
-              }
-            }
-        
-            /* Radio button types */
-            &.mat-primary,
-            &.mat-accent,
-            &.mat-warn {
-              .mat-radio-label {
-                .mat-radio-container {
-                  .mat-radio-inner-circle {
-                    background-color: var(--gd-primary);
-                  }
-                }
-              }
-        
-              &.mat-radio-checked {
-                .mat-radio-label {
-                  .mat-radio-container {
-                    .mat-radio-outer-circle {
-                      border-color: var(--gd-primary);
-                    }
-                  }
-                }
-              }
-            }
+          /* Icon */
+          .mat-icon {
+            color: var(--gd-secondary);
+            font-size: 2.4rem;
+            height: 2.4rem;
+            margin-right: 0.8rem;
+            @include transition(all 0.24s ease-in-out 0s);
+            width: 2.4rem;
           }
         }
       }
@@ -91,28 +56,8 @@
 
         .mat-button-toggle-button {
           .mat-button-toggle-label-content {
-            .mat-radio-button {
-              &.mat-primary,
-              &.mat-accent,
-              &.mat-warn {
-                .mat-radio-label {
-                  .mat-radio-container {
-                    .mat-radio-inner-circle {
-                      background-color: var(--gd-background);
-                    }
-                  }
-                }
-          
-                &.mat-radio-checked {
-                  .mat-radio-label {
-                    .mat-radio-container {
-                      .mat-radio-outer-circle {
-                        border-color: var(--gd-background);
-                      }
-                    }
-                  }
-                }
-              }
+            .mat-icon {
+              color: var(--gd-background);
             }
           }
         }

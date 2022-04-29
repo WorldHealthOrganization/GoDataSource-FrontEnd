@@ -13,7 +13,7 @@
 
     .mat-form-field-wrapper {
       margin: 0;
-      padding-bottom: 1.6rem;
+      padding-bottom: 0;
 
       .mat-form-field-flex {
         margin-top: 0;
@@ -138,6 +138,21 @@
               }
             }
           }
+        }
+      }
+
+      /* Form input error */
+      .mat-form-field-subscript-wrapper {
+        font-size: 1.2rem;
+        line-height: 1;
+        margin-top: 0;
+        min-height: 1.6rem;
+        padding: 0.2rem 0;
+        position: static;
+        top: 0;
+
+        .mat-error {
+          color: var(--gd-danger);
         }
       }
     }

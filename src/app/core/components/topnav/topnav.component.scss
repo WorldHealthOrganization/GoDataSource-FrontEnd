@@ -52,7 +52,6 @@
         .mat-form-field-wrapper {
           background: rgba(var(--gd-secondary-rgb), 0.15);
           @include border-radius(0.4rem);
-          padding-bottom: 0;
 
           .mat-form-field-flex {
             .mat-form-field-outline {
@@ -74,6 +73,11 @@
                 border-width: 0;
               }
             }
+          }
+
+          .mat-form-field-subscript-wrapper {
+            min-height: 0;
+            padding: 0;
           }
         }
       }
@@ -108,7 +112,10 @@
         }
 
         .mat-form-field-wrapper {
-          padding-bottom: 0;
+          .mat-form-field-subscript-wrapper {
+            min-height: 0;
+            padding: 0;
+          }
         }
       }
     }

@@ -228,25 +228,6 @@
               <ng-container
                 *ngIf="tabData.buttons.quickActions">
 
-                <!-- Menu -->
-                <button
-                  #quickMenuTrigger="matMenuTrigger"
-                  class="gd-create-view-modify-top-title-buttons-buttons-quick"
-                  [class.gd-create-view-modify-top-title-buttons-buttons-quick-expanded]="quickMenuTrigger.menuOpen"
-                  type="button"
-                  mat-flat-button color="secondary"
-                  [matMenuTriggerFor]="quickMenu"
-                  (menuClosed)="detectChanges()">
-
-                  <!-- Label -->
-                  <span>
-                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}}
-                  </span>
-
-                  <!-- Icon -->
-                  <mat-icon>expand_more</mat-icon>
-                </button>
-
                 <!-- Floating menu -->
                 <mat-menu
                   #quickMenu="matMenu"
@@ -299,6 +280,25 @@
                     </ng-container>
                   </ng-container>
                 </mat-menu>
+
+                <!-- Menu -->
+                <button
+                  #quickMenuTrigger="matMenuTrigger"
+                  class="gd-create-view-modify-top-title-buttons-buttons-quick"
+                  [class.gd-create-view-modify-top-title-buttons-buttons-quick-expanded]="quickMenuTrigger.menuOpen"
+                  type="button"
+                  mat-flat-button color="secondary"
+                  [matMenuTriggerFor]="quickMenu"
+                  (menuClosed)="detectChanges()">
+
+                  <!-- Label -->
+                  <span>
+                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}}
+                  </span>
+
+                  <!-- Icon -->
+                  <mat-icon>expand_more</mat-icon>
+                </button>
 
               </ng-container>
 
