@@ -8,7 +8,7 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { TeamModel } from '../../../../core/models/team.model';
-import { PhoneNumberType, UserModel, UserRoleModel, UserSettings } from '../../../../core/models/user.model';
+import { PhoneNumberType, UserModel, UserRoleModel } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
@@ -17,8 +17,8 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
-import { IV2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IExtendedColDef } from '../../../../shared/components-v2/app-list-table-v2/models/extended-column.model';
+import { IV2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 
 @Component({
   selector: 'app-user-list',
@@ -27,9 +27,6 @@ import { IExtendedColDef } from '../../../../shared/components-v2/app-list-table
 export class UserListComponent extends ListComponent implements OnDestroy {
   // list of existing users
   usersList$: Observable<UserModel[]>;
-
-  // constants
-  UserSettings = UserSettings;
 
   // list of existing teams mapped by user
   userTeamMap: {

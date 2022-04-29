@@ -5,6 +5,8 @@ import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
+import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 
 const routes: Routes = [
   // Roles list
@@ -16,6 +18,12 @@ const routes: Routes = [
       permissions: [
         PERMISSION.USER_ROLE_LIST
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      user: UserDataResolver
+      // TODO: Needs permission resolver
+      // permission: PermissionDataResolver
     }
   },
   // Create new Role
