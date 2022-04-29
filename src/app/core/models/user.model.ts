@@ -175,7 +175,7 @@ implements
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
-        field: 'users',
+        field: 'users._id',
         label: 'LNG_USER_ROLE_FIELD_LABEL_USERS',
         options: data.options.user
       }
