@@ -122,8 +122,7 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.country as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-          includeNoValue: true
+          options: (this.activatedRoute.snapshot.data.country as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
         }
       },
       {

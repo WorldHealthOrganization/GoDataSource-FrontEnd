@@ -352,7 +352,7 @@ export class MarkedNotDuplicatesListComponent
                         )
                         .subscribe(() => {
                           // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_REMOVE_FROM_LIST_ENTITY_CONFIRMATION');
+                          this.toastV2Service.success('LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_DELETE_SUCCESS_MESSAGE');
 
                           // hide loading
                           loading.close();

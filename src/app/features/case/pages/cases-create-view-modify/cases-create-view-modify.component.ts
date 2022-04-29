@@ -1411,6 +1411,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                   },
                   hideInputFilter: true,
                   dontCloseOnBackdrop: true,
+                  width: '55rem',
                   inputs: [
                     // Title
                     {

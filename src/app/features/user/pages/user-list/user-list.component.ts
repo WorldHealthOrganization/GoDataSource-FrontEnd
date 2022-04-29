@@ -167,8 +167,7 @@ export class UserListComponent extends ListComponent implements OnDestroy {
           [],
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.userRole as IResolverV2ResponseModel<UserRoleModel>).options,
-          includeNoValue: true
+          options: (this.activatedRoute.snapshot.data.userRole as IResolverV2ResponseModel<UserRoleModel>).options
         }
       },
       {
@@ -181,6 +180,13 @@ export class UserListComponent extends ListComponent implements OnDestroy {
               (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[user.activeOutbreakId].name :
               '';
           }
+        },
+        link: (user: UserModel) => {
+          return user.activeOutbreakId &&
+            OutbreakModel.canView(this.authUser) &&
+            (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[user.activeOutbreakId] ?
+            `/outbreaks/${user.activeOutbreakId}/view` :
+            undefined;
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
