@@ -1,12 +1,19 @@
 import { Injectable } from '@angular/core';
 import { Observable, Subject, Subscriber, throwError } from 'rxjs';
 import {
-  IV2SideDialog, IV2SideDialogAdvancedFiltersResponse,
+  IV2SideDialog,
+  IV2SideDialogAdvancedFiltersResponse,
   IV2SideDialogConfig,
   IV2SideDialogConfigButtonType,
-  IV2SideDialogConfigInputCheckbox, IV2SideDialogConfigInputFilterList, IV2SideDialogConfigInputFilterListFilter, IV2SideDialogConfigInputFilterListSort,
+  IV2SideDialogConfigInputCheckbox,
+  IV2SideDialogConfigInputFilterList,
+  IV2SideDialogConfigInputFilterListFilter,
+  IV2SideDialogConfigInputFilterListSort,
+  IV2SideDialogConfigInputKeyValue,
   IV2SideDialogConfigInputMultiDropdown,
-  IV2SideDialogConfigInputSingleDropdown, IV2SideDialogConfigInputText, IV2SideDialogHandler,
+  IV2SideDialogConfigInputSingleDropdown,
+  IV2SideDialogConfigInputText,
+  IV2SideDialogHandler,
   IV2SideDialogResponse,
   V2SideDialogConfigAction,
   V2SideDialogConfigInput,
@@ -38,7 +45,8 @@ import {
   IV2AdvancedFilterAddressPhoneNumber,
   IV2AdvancedFilterQuestionnaireAnswers,
   V2AdvancedFilter,
-  V2AdvancedFilterComparatorType, V2AdvancedFilterQuestionWhichAnswer,
+  V2AdvancedFilterComparatorType,
+  V2AdvancedFilterQuestionWhichAnswer,
   V2AdvancedFilterType
 } from '../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { UserModel } from '../../models/user.model';
@@ -48,6 +56,8 @@ import { AnswerModel, QuestionModel } from '../../models/question.model';
 import { AddressModel } from '../../models/address.model';
 import { IV2DateRange } from '../../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
 import { AuthDataService } from '../data/auth.data.service';
+import { BaseModel } from '../../models/base.model';
+import { IResolverV2ResponseModel } from '../resolvers/data/models/resolver-response.model';
 
 @Injectable()
 export class DialogV2Service {
@@ -2111,5 +2121,85 @@ export class DialogV2Service {
         }
       });
     });
+  }
+
+  /**
+   * Show record details dialog
+   */
+  showRecordDetailsDialog(
+    title: string,
+    record: BaseModel,
+    users: IResolverV2ResponseModel<UserModel>
+  ): void {
+    // construct list of details
+    const detailsInputs: IV2SideDialogConfigInputKeyValue[] = [];
+
+    // created by
+    let createdByName: string = '—';
+    if (
+      record.createdBy &&
+      users.map[record.createdBy]
+    ) {
+      createdByName = users.map[record.createdBy].name;
+    }
+    detailsInputs.push({
+      type: V2SideDialogConfigInputType.KEY_VALUE,
+      name: 'createdBy',
+      placeholder: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY',
+      value: createdByName
+    });
+
+    // created at
+    let createdAt: string = '—';
+    if (record.createdAt) {
+      createdAt = moment(record.createdAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT);
+    }
+    detailsInputs.push({
+      type: V2SideDialogConfigInputType.KEY_VALUE,
+      name: 'createdAt',
+      placeholder: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT',
+      value: createdAt
+    });
+
+    // updated by
+    let updatedByName: string = '—';
+    if (
+      record.updatedBy &&
+      users.map[record.updatedBy]
+    ) {
+      updatedByName = users.map[record.updatedBy].name;
+    }
+    detailsInputs.push({
+      type: V2SideDialogConfigInputType.KEY_VALUE,
+      name: 'updatedBy',
+      placeholder: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY',
+      value: updatedByName
+    });
+
+    // updated at
+    let updatedAt: string = '—';
+    if (record.updatedAt) {
+      updatedAt = moment(record.updatedAt).format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT);
+    }
+    detailsInputs.push({
+      type: V2SideDialogConfigInputType.KEY_VALUE,
+      name: 'updatedAt',
+      placeholder: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT',
+      value: updatedAt
+    });
+
+    // display dialog
+    this.showSideDialog({
+      title: {
+        get: () => title
+      },
+      width: '35rem',
+      inputs: detailsInputs,
+      bottomButtons: [{
+        type: IV2SideDialogConfigButtonType.CANCEL,
+        label: 'LNG_COMMON_BUTTON_CANCEL',
+        color: 'text'
+      }]
+    }).subscribe();
   }
 }

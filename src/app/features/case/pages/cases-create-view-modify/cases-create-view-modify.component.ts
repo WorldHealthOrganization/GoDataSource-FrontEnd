@@ -1018,6 +1018,29 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       },
       quickActions: {
         options: [
+          // Record details
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_PAGE_MODIFY_CASE_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
+            action: {
+              click: () => {
+                // show record details dialog
+                this.dialogV2Service.showRecordDetailsDialog(
+                  'LNG_PAGE_MODIFY_CASE_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
+                  this.itemData,
+                  this.activatedRoute.snapshot.data.user
+                );
+              }
+            },
+            visible: () => !this.isCreate
+          },
+
+          // Divider
+          {
+            type: CreateViewModifyV2MenuType.DIVIDER,
+            visible: () => !this.isCreate
+          },
+
           // Add contact
           {
             type: CreateViewModifyV2MenuType.OPTION,
