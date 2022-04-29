@@ -150,6 +150,50 @@ implements
   users: UserModel[];
 
   /**
+   * Advanced filters
+   */
+  static generateAdvancedFilters(data: {
+    options: {
+      user: ILabelValuePairModel[]
+      // TODO: Needs permission resolver
+      // permission: ILabelValuePairModel[],
+    }
+  }): V2AdvancedFilter[] {
+    // initialize
+    const advancedFilters: V2AdvancedFilter[] = [
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'name',
+        label: 'LNG_USER_ROLE_FIELD_LABEL_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'description',
+        label: 'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'users',
+        label: 'LNG_USER_ROLE_FIELD_LABEL_USERS',
+        options: data.options.user
+      }
+      // TODO: Needs permission resolver
+      // {
+      //   type: V2AdvancedFilterType.MULTISELECT,
+      //   field: 'permissions',
+      //   label: 'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS',
+      //   options: data.options.permission
+      // }
+    ];
+
+    // finished
+    return advancedFilters;
+  }
+
+
+  /**
      * Static Permissions - IPermissionBasic
      */
   static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_ROLE_VIEW) : false; }

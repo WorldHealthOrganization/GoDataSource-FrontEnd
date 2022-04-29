@@ -14,7 +14,6 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 
@@ -285,33 +284,13 @@ export class RolesListComponent extends ListComponent implements OnDestroy {
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = [
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'name',
-        label: 'LNG_USER_ROLE_FIELD_LABEL_NAME',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'description',
-        label: 'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'users',
-        label: 'LNG_USER_ROLE_FIELD_LABEL_USERS',
-        options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+    this.advancedFilters = UserRoleModel.generateAdvancedFilters({
+      options: {
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+        // TODO: Needs permission resolver
+        // permission: (this.activatedRoute.snapshot.data.permission as IResolverV2ResponseModel<PermissionModel>).options
       }
-      // TODO: Needs permission resolver
-      // {
-      //   type: V2AdvancedFilterType.MULTISELECT,
-      //   field: 'permissions',
-      //   label: 'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS',
-      //   options: (this.activatedRoute.snapshot.data.permissions as IResolverV2ResponseModel<UserModel>).options
-      // }
-    ];
+    });
   }
 
   /**
