@@ -20,6 +20,7 @@ export enum V2AdvancedFilterType {
   LOCATION_SINGLE = 'location_single',
   LOCATION_MULTIPLE = 'location_multiple',
   ADDRESS_PHONE_NUMBER = 'address_phone_number',
+  PHONE_NUMBER = 'phone_number',
   QUESTIONNAIRE_ANSWERS = 'questionnaire_answers',
   FILE = 'file'
 }
@@ -203,8 +204,14 @@ export const V2AdvancedFilterComparatorOptions: {
     value: V2AdvancedFilterComparatorType.LOCATION
   }],
 
-  // phone number
+  // address phone number
   [V2AdvancedFilterType.ADDRESS_PHONE_NUMBER]: [{
+    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_CONTAINS',
+    value: V2AdvancedFilterComparatorType.CONTAINS
+  }],
+
+  // phone number
+  [V2AdvancedFilterType.PHONE_NUMBER]: [{
     label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_CONTAINS',
     value: V2AdvancedFilterComparatorType.CONTAINS
   }],
@@ -323,6 +330,14 @@ export interface IV2AdvancedFilterAddressPhoneNumber extends IV2AdvancedFilterBa
 }
 
 /**
+ * Advanced filter - Phone number
+ */
+export interface IV2AdvancedFilterPhoneNumber extends IV2AdvancedFilterBase {
+  // required
+  type: V2AdvancedFilterType.PHONE_NUMBER;
+}
+
+/**
  * Advanced filter - location single
  */
 export interface IV2AdvancedFilterSingleLocation extends IV2AdvancedFilterBase {
@@ -380,5 +395,5 @@ export interface IV2AdvancedFilterQuestionnaireAnswers extends IV2AdvancedFilter
 // advanced filter
 export type V2AdvancedFilter = IV2AdvancedFilterText | IV2AdvancedFilterNumber | IV2AdvancedFilterSingleSelect | IV2AdvancedFilterSingleSelectLoader
 | IV2AdvancedFilterMultipleSelect | IV2AdvancedFilterMultipleSelectLoader | IV2AdvancedFilterAgeRange | IV2AdvancedFilterAddress
-| IV2AdvancedFilterAddressPhoneNumber | IV2AdvancedFilterDateRange | IV2AdvancedFilterDate | IV2AdvancedFilterNumberRange
+| IV2AdvancedFilterAddressPhoneNumber | IV2AdvancedFilterPhoneNumber | IV2AdvancedFilterDateRange | IV2AdvancedFilterDate | IV2AdvancedFilterNumberRange
 | IV2AdvancedFilterQuestionnaireAnswers | IV2AdvancedFilterSingleLocation | IV2AdvancedFilterMultipleLocation;

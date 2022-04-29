@@ -1261,7 +1261,7 @@ export class DialogV2Service {
             // finished
             break;
 
-          // filter by phone number
+          // filter by address phone number
           case V2AdvancedFilterType.ADDRESS_PHONE_NUMBER:
             // construct address phone number search qb
             searchQb = AddressModel.buildPhoneSearchFilter(
@@ -1274,6 +1274,19 @@ export class DialogV2Service {
             if (searchQb) {
               qb.merge(searchQb);
             }
+
+            // finished
+            break;
+
+          // filter by phone number
+          case V2AdvancedFilterType.PHONE_NUMBER:
+            // construct phone number search qb
+            qb.filter.byPhoneNumber(
+              filterDefinition.field,
+              appliedFilter.value,
+              true,
+              'regex'
+            );
 
             // finished
             break;

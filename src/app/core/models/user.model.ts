@@ -295,9 +295,8 @@ implements
         options: data.options.institution
       },
       {
-        // TODO: Needs correct telephoneNumbers advanced filter type
-        type: V2AdvancedFilterType.TEXT,
-        field: 'telephoneNumbers',
+        type: V2AdvancedFilterType.PHONE_NUMBER,
+        field: `telephoneNumbers.${PhoneNumberType.PRIMARY_PHONE_NUMBER}`,
         label: 'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS'
       },
       {

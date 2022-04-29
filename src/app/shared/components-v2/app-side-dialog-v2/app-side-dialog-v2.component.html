@@ -364,6 +364,7 @@
                             <app-form-input-v2
                               *ngIf="(
                                 input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.TEXT ||
+                                input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.PHONE_NUMBER ||
                                 input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.ADDRESS_PHONE_NUMBER || (
                                     input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.ADDRESS &&
                                     filter.comparator.value === V2AdvancedFilterComparatorType.CONTAINS
