@@ -12,7 +12,6 @@ import { ILocation } from '../../forms-v2/core/app-form-location-base-v2';
 import { FormHelperService } from '../../../core/services/helper/form-helper.service';
 import * as _ from 'lodash';
 import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
-import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -124,14 +123,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
   // search
   expandListSearchValue: string;
-  expandListSearchSuffixButtons: IAppFormIconButtonV2[] = [
-    {
-      icon: 'search',
-      clickAction: () => {
-        this.expandListSearch();
-      }
-    }
-  ];
+  expandListSearchValueTimeout: any;
 
   // load data ?
   expandListInitialized: boolean = false;
@@ -274,6 +266,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     // stop retrieving data
     this.expandListStopGetRecords();
+
+    // stop refresh list from search typing
+    this.expandListStopSearchApply();
   }
 
   /**
@@ -690,11 +685,26 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Stop refresh list from search typing
+   */
+  private expandListStopSearchApply(): void {
+    if (this.expandListSearchValueTimeout) {
+      clearTimeout(this.expandListSearchValueTimeout);
+      this.expandListSearchValueTimeout = undefined;
+    }
+  }
+
+  /**
    * List search
    */
   expandListSearch(): void {
+    // remove previous request
+    this.expandListStopSearchApply();
+
     // search
-    this.expandListRefresh();
+    this.expandListSearchValueTimeout = setTimeout(() => {
+      this.expandListRefresh();
+    }, 500);
   }
 
   /**

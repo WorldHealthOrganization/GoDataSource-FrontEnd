@@ -76,10 +76,9 @@
             <app-form-input-v2
               placeholder="LNG_COMMON_LABEL_SEARCH"
               [(ngModel)]="expandListSearchValue"
-              [suffixIconButtons]="expandListSearchSuffixButtons"
               [neverFloatLabel]="true"
               autocomplete="off"
-              (keyup.enter)="expandListSearch()">
+              (ngModelChange)="expandListSearch()">
             </app-form-input-v2>
 
           </div>
