@@ -171,6 +171,23 @@ export class AppFormSelectGroupsV2Component
   @Output() groupOptionCheckStateChanged = new EventEmitter<IGroupOptionEventData>();
 
   /**
+   * Process options to be applied on filters
+   */
+  static processValuesForFilter(
+    values: string[],
+    defaultValues: any[],
+    groupOptionValueKey: string
+  ): string[] {
+    return (values || []).filter((optionId) => {
+      return defaultValues &&
+        groupOptionValueKey &&
+        !defaultValues.find((value) => {
+          return value[groupOptionValueKey] === optionId;
+        });
+    });
+  }
+
+  /**
    * Constructor
    */
   constructor(
@@ -634,13 +651,11 @@ export class AppFormSelectGroupsV2Component
         // emit event after binding is done
         setTimeout(() => {
           this.optionChanged.emit(
-            (this.value || []).filter((optionId) => {
-              return this.defaultValues &&
-                this.groupOptionValueKey &&
-                !this.defaultValues.find((value) => {
-                  return value[this.groupOptionValueKey] === optionId;
-                });
-            })
+            AppFormSelectGroupsV2Component.processValuesForFilter(
+              this.value,
+              this.defaultValues,
+              this.groupOptionValueKey
+            )
           );
         });
       }

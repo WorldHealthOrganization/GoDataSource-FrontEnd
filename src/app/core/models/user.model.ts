@@ -154,9 +154,8 @@ implements
    */
   static generateAdvancedFilters(data: {
     options: {
-      user: ILabelValuePairModel[]
-      // TODO: Needs permission resolver
-      // permission: ILabelValuePairModel[],
+      user: ILabelValuePairModel[],
+      permission: PermissionModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -178,14 +177,28 @@ implements
         field: 'users._id',
         label: 'LNG_USER_ROLE_FIELD_LABEL_USERS',
         options: data.options.user
+      },
+      {
+        type: V2AdvancedFilterType.SELECT_GROUPS,
+        field: 'permissionIds',
+        label: 'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS',
+        groups: data.options.permission,
+        groupLabelKey: 'groupLabel',
+        groupTooltipKey: 'groupDescription',
+        groupValueKey: 'groupAllId',
+        groupOptionsKey: 'permissions',
+        groupOptionLabelKey: 'label',
+        groupOptionValueKey: 'id',
+        groupOptionTooltipKey: 'description',
+        groupAllLabel: 'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_ALL',
+        groupAllTooltip: 'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_ALL_DESCRIPTION',
+        groupNoneLabel: 'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_NONE',
+        groupNoneTooltip: 'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_NONE_DESCRIPTION',
+        groupPartialLabel: 'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL',
+        groupPartialTooltip: 'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL_DESCRIPTION',
+        groupOptionHiddenKey: 'hidden',
+        defaultValues: PermissionModel.HIDDEN_PERMISSIONS
       }
-      // TODO: Needs permission resolver
-      // {
-      //   type: V2AdvancedFilterType.MULTISELECT,
-      //   field: 'permissions',
-      //   label: 'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS',
-      //   options: data.options.permission
-      // }
     ];
 
     // finished

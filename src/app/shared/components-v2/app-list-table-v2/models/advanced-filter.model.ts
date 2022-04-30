@@ -3,6 +3,9 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { QuestionModel } from '../../../../core/models/question.model';
 import { Constants } from '../../../../core/models/constants';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { DomSanitizer } from '@angular/platform-browser';
+import { TranslateService } from '@ngx-translate/core';
+import { ISelectGroupMap, ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from '../../../forms-v2/components/app-form-select-groups-v2/models/select-group.model';
 
 /**
  * Advanced filter type
@@ -22,7 +25,8 @@ export enum V2AdvancedFilterType {
   ADDRESS_PHONE_NUMBER = 'address_phone_number',
   PHONE_NUMBER = 'phone_number',
   QUESTIONNAIRE_ANSWERS = 'questionnaire_answers',
-  FILE = 'file'
+  FILE = 'file',
+  SELECT_GROUPS = 'select-groups'
 }
 
 /**
@@ -229,6 +233,12 @@ export const V2AdvancedFilterComparatorOptions: {
   }, {
     label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_DOESNT_HAVE_VALUE',
     value: V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE
+  }],
+
+  // select groups
+  [V2AdvancedFilterType.SELECT_GROUPS]: [{
+    label: 'LNG_SIDE_FILTERS_COMPARATOR_LABEL_SELECT_HAS_AT_LEAST_ONE',
+    value: V2AdvancedFilterComparatorType.NONE
   }]
 };
 
@@ -392,8 +402,43 @@ export interface IV2AdvancedFilterQuestionnaireAnswers extends IV2AdvancedFilter
   };
 }
 
+/**
+ * Advanced filter - Select groups
+ */
+interface IV2AdvancedFilterGroupsSelect extends IV2AdvancedFilterBase {
+  // required
+  type: V2AdvancedFilterType.SELECT_GROUPS;
+  groups: any[];
+  groupLabelKey: string;
+  groupValueKey: string;
+  groupOptionsKey: string;
+  groupOptionLabelKey: string;
+  groupOptionValueKey: string;
+  groupNoneLabel: string;
+  groupPartialLabel: string;
+  groupAllLabel: string;
+
+  // optional
+  value?: string[];
+  defaultValue?: string[];
+  groupTooltipKey?: string;
+  groupOptionTooltipKey?: string;
+  groupNoneTooltip?: string;
+  groupPartialTooltip?: string;
+  groupAllTooltip?: string;
+  groupOptionHiddenKey?: string;
+  groupOptionFormatMethod?: (
+    sanitized: DomSanitizer,
+    i18nService: TranslateService,
+    groupsMap: ISelectGroupMap<any>,
+    optionsMap: ISelectGroupOptionMap<any>,
+    option: any
+  ) => ISelectGroupOptionFormatResponse;
+  defaultValues?: any[];
+}
+
 // advanced filter
 export type V2AdvancedFilter = IV2AdvancedFilterText | IV2AdvancedFilterNumber | IV2AdvancedFilterSingleSelect | IV2AdvancedFilterSingleSelectLoader
 | IV2AdvancedFilterMultipleSelect | IV2AdvancedFilterMultipleSelectLoader | IV2AdvancedFilterAgeRange | IV2AdvancedFilterAddress
 | IV2AdvancedFilterAddressPhoneNumber | IV2AdvancedFilterPhoneNumber | IV2AdvancedFilterDateRange | IV2AdvancedFilterDate | IV2AdvancedFilterNumberRange
-| IV2AdvancedFilterQuestionnaireAnswers | IV2AdvancedFilterSingleLocation | IV2AdvancedFilterMultipleLocation;
+| IV2AdvancedFilterQuestionnaireAnswers | IV2AdvancedFilterSingleLocation | IV2AdvancedFilterMultipleLocation | IV2AdvancedFilterGroupsSelect;

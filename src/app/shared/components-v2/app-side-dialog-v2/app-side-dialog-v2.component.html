@@ -486,6 +486,33 @@
                               required="true">
                             </app-form-number-v2>
 
+                            <!-- Groups select -->
+                            <app-form-select-groups-v2
+                              *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.SELECT_GROUPS
+                                && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                              [name]="filter.name"
+                              placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+                              required="true"
+                              [groups]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groups"
+                              [groupLabelKey]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupLabelKey"
+                              [groupValueKey]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupValueKey"
+                              [groupOptionsKey]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupOptionsKey"
+                              [groupOptionLabelKey]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupOptionLabelKey"
+                              [groupOptionValueKey]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupOptionValueKey"
+                              [groupNoneLabel]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupNoneLabel"
+                              [groupPartialLabel]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupPartialLabel"
+                              [groupAllLabel]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupAllLabel"
+                              [groupTooltipKey]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupTooltipKey"
+                              [groupOptionTooltipKey]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupOptionTooltipKey"
+                              [groupNoneTooltip]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupNoneTooltip"
+                              [groupPartialTooltip]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupPartialTooltip"
+                              [groupAllTooltip]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupAllTooltip"
+                              [groupOptionHiddenKey]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupOptionHiddenKey"
+                              [groupOptionFormatMethod]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupOptionFormatMethod"
+                              [defaultValues]="input.optionsAsLabelValueMap[filter.filterBy.value].data.defaultValues"
+                              [(ngModel)]="filter.value">
+                            </app-form-select-groups-v2>
+
                             <!-- Questionnaire answers -->
                             <ng-container
                               *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS">

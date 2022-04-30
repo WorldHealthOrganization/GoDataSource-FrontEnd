@@ -58,6 +58,7 @@ import { IV2DateRange } from '../../../shared/forms-v2/components/app-form-date-
 import { AuthDataService } from '../data/auth.data.service';
 import { BaseModel } from '../../models/base.model';
 import { IResolverV2ResponseModel } from '../resolvers/data/models/resolver-response.model';
+import { AppFormSelectGroupsV2Component } from '../../../shared/forms-v2/components/app-form-select-groups-v2/app-form-select-groups-v2.component';
 
 @Injectable()
 export class DialogV2Service {
@@ -1417,6 +1418,23 @@ export class DialogV2Service {
                   null
                 );
             }
+
+            // finished
+            break;
+
+          case V2AdvancedFilterType.SELECT_GROUPS:
+            // filter
+            // FilterComparator.NONE
+            qb.filter.bySelect(
+              filterDefinition.field,
+              AppFormSelectGroupsV2Component.processValuesForFilter(
+                appliedFilter.value,
+                filterDefinition.defaultValues,
+                filterDefinition.groupOptionValueKey
+              ),
+              false,
+              null
+            );
 
             // finished
             break;

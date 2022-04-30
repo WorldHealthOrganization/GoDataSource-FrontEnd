@@ -296,9 +296,8 @@ export class RolesListComponent extends ListComponent implements OnDestroy {
   protected initializeTableAdvancedFilters(): void {
     this.advancedFilters = UserRoleModel.generateAdvancedFilters({
       options: {
-        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
-        // TODO: Needs permission resolver
-        // permission: (this.activatedRoute.snapshot.data.permission as IResolverV2ResponseModel<PermissionModel>).options
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        permission: this.activatedRoute.snapshot.data.permission
       }
     });
   }
