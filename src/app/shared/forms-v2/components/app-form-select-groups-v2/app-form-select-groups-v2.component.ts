@@ -402,6 +402,9 @@ export class AppFormSelectGroupsV2Component
       // add option label
       this.selectTriggerText = labels.join(', ');
     }
+
+    // re-render ui
+    this.changeDetectorRef.detectChanges();
   }
 
   /**
