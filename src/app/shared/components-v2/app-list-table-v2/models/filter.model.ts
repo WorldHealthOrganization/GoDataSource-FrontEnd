@@ -268,16 +268,17 @@ export interface IV2FilterSelectGroups
   groupNoneLabel: string;
   groupPartialLabel: string;
   groupAllLabel: string;
+  groupTooltipKey: string;
+  groupOptionTooltipKey: string;
+  groupNoneTooltip: string;
+  groupPartialTooltip: string;
+  groupAllTooltip: string;
+  groupOptionHiddenKey: string;
+  defaultValues: any[];
 
   // optional
   value?: string[];
   defaultValue?: string[];
-  groupTooltipKey?: string;
-  groupOptionTooltipKey?: string;
-  groupNoneTooltip?: string;
-  groupPartialTooltip?: string;
-  groupAllTooltip?: string;
-  groupOptionHiddenKey?: string;
   groupOptionFormatMethod?: (
     sanitized: DomSanitizer,
     i18nService: TranslateService,
@@ -285,7 +286,6 @@ export interface IV2FilterSelectGroups
     optionsMap: ISelectGroupOptionMap<any>,
     option: any
   ) => ISelectGroupOptionFormatResponse;
-  defaultValues?: any[];
 }
 
 /**

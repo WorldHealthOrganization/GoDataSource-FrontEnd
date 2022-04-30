@@ -417,16 +417,17 @@ interface IV2AdvancedFilterGroupsSelect extends IV2AdvancedFilterBase {
   groupNoneLabel: string;
   groupPartialLabel: string;
   groupAllLabel: string;
+  groupTooltipKey: string;
+  groupOptionTooltipKey: string;
+  groupNoneTooltip: string;
+  groupPartialTooltip: string;
+  groupAllTooltip: string;
+  groupOptionHiddenKey: string;
+  defaultValues: any[];
 
   // optional
   value?: string[];
   defaultValue?: string[];
-  groupTooltipKey?: string;
-  groupOptionTooltipKey?: string;
-  groupNoneTooltip?: string;
-  groupPartialTooltip?: string;
-  groupAllTooltip?: string;
-  groupOptionHiddenKey?: string;
   groupOptionFormatMethod?: (
     sanitized: DomSanitizer,
     i18nService: TranslateService,
@@ -434,7 +435,6 @@ interface IV2AdvancedFilterGroupsSelect extends IV2AdvancedFilterBase {
     optionsMap: ISelectGroupOptionMap<any>,
     option: any
   ) => ISelectGroupOptionFormatResponse;
-  defaultValues?: any[];
 }
 
 // advanced filter
