@@ -1,0 +1,128 @@
+<div
+  class="gd-form-select-groups-v2">
+
+  <!-- Input data -->
+  <mat-form-field
+    appearance="outline">
+
+    <!-- Place holder -->
+    <mat-label
+      *ngIf="!neverFloatLabel">
+      {{ placeholder | translate }}
+    </mat-label>
+
+    <!-- Select -->
+    <mat-select
+      panelClass="gd-form-select-groups-v2-panel"
+      [(ngModel)]="value"
+      [required]="required"
+      [placeholder]="neverFloatLabel ? (placeholder | translate) : undefined"
+      [disabled]="disabled"
+      [errorStateMatcher]="errMatcher"
+      multiple="true"
+      (closed)="onTouchItem()"
+      (valueChange)="valueChanged($event)"
+      (openedChange)="openedChange($event)">
+
+      <!-- Render display selected -->
+      <mat-select-trigger>
+        <div
+          fxLayout="row">
+          <!-- selected values -->
+          <div
+            fxFlex
+            class="gd-form-select-groups-v2-group-selected">
+            {{ selectTriggerText }}
+          </div>
+
+          <!-- Clear button -->
+          <div
+            fxFlex fxGrow="0">
+            <span
+              class="gd-form-select-groups-v2-group-selected-clear"
+              (click)="clearSelected($event)">x</span>
+          </div>
+        </div>
+      </mat-select-trigger>
+
+      <!-- Needed to actually select partial records when nothing selectable is visible -->
+      <mat-option
+        *ngFor="let defaultValue of defaultValues"
+        [value]="defaultValue[groupOptionValueKey]"
+        disabled="true"
+        [matTooltip]="defaultValue[groupOptionTooltipKey] | translate">
+        {{ defaultValue[groupOptionLabelKey] | translate }}
+      </mat-option>
+
+      <!-- Render select panel -->
+      <mat-optgroup
+        *ngFor="let group of groups"
+        (click)="clickedGroup($event, group, 'gd-form-select-groups-v2-line')">
+
+        <!-- Group label -->
+        <div
+          class="gd-form-select-groups-v2-line"
+          [matTooltip]="group[groupTooltipKey] | translate">
+          <mat-icon>{{ expandedGroups[group[groupValueKey]] ? 'expand_more' : 'chevron_right' }}</mat-icon>
+          <span
+            class="gd-form-select-groups-v2-line-label">
+            {{ group[groupLabelKey] | translate }}
+          </span>
+        </div>
+
+        <!-- Collapsed - Child options -->
+        <ng-container
+          *ngIf="!expandedGroups[group[groupValueKey]]">
+          <mat-option
+            class="gd-form-select-groups-v2-option"
+            [disabled]="!othersAreChecked(group[groupValueKey], groupKeys.partial[group[groupValueKey]])"
+            [value]="groupKeys.none[group[groupValueKey]]"
+            [matTooltip]="groupNoneTooltip | translate"
+            (onSelectionChange)="uncheckOthers($event)">
+            {{ groupNoneLabel | translate }}
+          </mat-option>
+          <mat-option
+            class="gd-form-select-groups-v2-option gd-form-select-groups-v2-option-partial"
+            disabled="true"
+            [value]="groupKeys.partial[group[groupValueKey]]"
+            [matTooltip]="groupPartialTooltip | translate"
+            (onSelectionChange)="uncheckOthers($event)"
+            (click)="clickedGroup($event, group, 'gd-form-select-groups-v2-option-partial')">
+            {{ groupPartialLabel | translate:{ partialLabels: partialOptions[groupKeys.partial[group[groupValueKey]]] } }}
+          </mat-option>
+          <mat-option
+            class="gd-form-select-groups-v2-option"
+            [disabled]="!othersAreChecked(groupKeys.none[group[groupValueKey]], groupKeys.partial[group[groupValueKey]])"
+            [value]="group[groupValueKey]"
+            [matTooltip]="groupAllTooltip | translate"
+            (onSelectionChange)="uncheckOthers($event)">
+            {{ groupAllLabel | translate }}
+          </mat-option>
+        </ng-container>
+
+        <!-- Expanded - Child options -->
+        <ng-container
+          *ngIf="expandedGroups[group[groupValueKey]]">
+          <mat-option
+            *ngFor="let option of group[groupOptionsKey]"
+            [value]="option[groupOptionValueKey]"
+            [matTooltip]="tooltipTranslations[option[groupOptionTooltipKey]]"
+            (onSelectionChange)="checkedChildOption($event)">
+            <div
+              fxLayout="row"
+              [innerHTML]="labelTranslations[option[groupOptionLabelKey]]">
+            </div>
+          </mat-option>
+        </ng-container>
+      </mat-optgroup>
+
+    </mat-select>
+
+    <!-- Errors -->
+    <mat-error
+      *ngIf="control?.invalid && control?.touched">
+      {{ getErrorMessages() }}
+    </mat-error>
+
+  </mat-form-field>
+</div>
