@@ -33,7 +33,10 @@ export class AppListTableV2ColumnHeaderComponent implements IHeaderAngularComp {
     sortByColumn: IExtendedColDef,
     sortByDirection: RequestSortDirection | null,
     showHeaderFilters: boolean,
-    columnFilterBy: (column: IExtendedColDef) => void,
+    columnFilterBy: (
+      column: IExtendedColDef,
+      valueOverwrite?: any
+    ) => void,
     columns: IV2Column[]
   };
 

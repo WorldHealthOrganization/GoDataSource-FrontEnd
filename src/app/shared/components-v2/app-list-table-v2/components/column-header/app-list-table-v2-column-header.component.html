@@ -170,6 +170,33 @@
       autocomplete="off"
       (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-input-v2>
 
+    <!-- Select groups -->
+    <app-form-select-groups-v2
+      *ngSwitchCase="V2FilterType.SELECT_GROUPS"
+      class="gd-list-table-column-filter-input"
+      [name]="'filterBy' + extendedColDef.field"
+      placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+      neverFloatLabel="true"
+      [groups]="extendedColDef.columnDefinition.filter.groups"
+      [groupLabelKey]="extendedColDef.columnDefinition.filter.groupLabelKey"
+      [groupValueKey]="extendedColDef.columnDefinition.filter.groupValueKey"
+      [groupOptionsKey]="extendedColDef.columnDefinition.filter.groupOptionsKey"
+      [groupOptionLabelKey]="extendedColDef.columnDefinition.filter.groupOptionLabelKey"
+      [groupOptionValueKey]="extendedColDef.columnDefinition.filter.groupOptionValueKey"
+      [groupNoneLabel]="extendedColDef.columnDefinition.filter.groupNoneLabel"
+      [groupPartialLabel]="extendedColDef.columnDefinition.filter.groupPartialLabel"
+      [groupAllLabel]="extendedColDef.columnDefinition.filter.groupAllLabel"
+      [groupTooltipKey]="extendedColDef.columnDefinition.filter.groupTooltipKey"
+      [groupOptionTooltipKey]="extendedColDef.columnDefinition.filter.groupOptionTooltipKey"
+      [groupNoneTooltip]="extendedColDef.columnDefinition.filter.groupNoneTooltip"
+      [groupPartialTooltip]="extendedColDef.columnDefinition.filter.groupPartialTooltip"
+      [groupAllTooltip]="extendedColDef.columnDefinition.filter.groupAllTooltip"
+      [groupOptionHiddenKey]="extendedColDef.columnDefinition.filter.groupOptionHiddenKey"
+      [groupOptionFormatMethod]="extendedColDef.columnDefinition.filter.groupOptionFormatMethod"
+      [defaultValues]="extendedColDef.columnDefinition.filter.defaultValues"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.value"
+      (optionChanged)="component.columnFilterBy(extendedColDef, $event)"></app-form-select-groups-v2>
+
   </div>
 
 </div>

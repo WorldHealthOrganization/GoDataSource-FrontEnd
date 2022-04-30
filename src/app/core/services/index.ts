@@ -80,6 +80,7 @@ import { DateRangeCenterDataResolver } from './resolvers/data/date-range-center.
 import { OutbreakDataResolver } from './resolvers/data/outbreak.resolver';
 import { UserRoleDataResolver } from './resolvers/data/user-role.resolver';
 import { InstitutionDataResolver } from './resolvers/data/institution.resolver';
+import { PermissionDataResolver } from './resolvers/data/permission.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -100,6 +101,7 @@ export const services: any[] = [
   OccupationDataResolver,
   OutbreakDataResolver,
   OutcomeDataResolver,
+  PermissionDataResolver,
   PersonDateTypeDataResolver,
   PregnancyStatusDataResolver,
   RiskDataResolver,

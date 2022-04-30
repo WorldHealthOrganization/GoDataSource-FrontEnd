@@ -16,6 +16,7 @@ import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { PermissionModel } from '../../../../core/models/permission.model';
 
 @Component({
   selector: 'app-roles-list',
@@ -104,7 +105,7 @@ export class RolesListComponent extends ListComponent implements OnDestroy {
         }
       },
       {
-        field: 'permissions',
+        field: 'permissionIds',
         label: 'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS',
         format: {
           type: V2ColumnFormat.LINK_LIST
@@ -116,13 +117,26 @@ export class RolesListComponent extends ListComponent implements OnDestroy {
               href: null
             };
           }) :
-          []
-        // TODO: Needs permission resolver
-        // filter: {
-        //   type: V2FilterType.MULTIPLE_SELECT,
-        //   options: (this.activatedRoute.snapshot.data.permission as IResolverV2ResponseModel<UserModel>).options,
-        //   includeNoValue: true
-        // }
+          [],
+        filter: {
+          type: V2FilterType.SELECT_GROUPS,
+          groups: this.activatedRoute.snapshot.data.permission,
+          groupLabelKey: 'groupLabel',
+          groupTooltipKey: 'groupDescription',
+          groupValueKey: 'groupAllId',
+          groupOptionsKey: 'permissions',
+          groupOptionLabelKey: 'label',
+          groupOptionValueKey: 'id',
+          groupOptionTooltipKey: 'description',
+          groupAllLabel: 'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_ALL',
+          groupAllTooltip: 'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_ALL_DESCRIPTION',
+          groupNoneLabel: 'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_NONE',
+          groupNoneTooltip: 'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_NONE_DESCRIPTION',
+          groupPartialLabel: 'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL',
+          groupPartialTooltip: 'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL_DESCRIPTION',
+          groupOptionHiddenKey: 'hidden',
+          defaultValues: PermissionModel.HIDDEN_PERMISSIONS
+        }
       },
 
       // actions

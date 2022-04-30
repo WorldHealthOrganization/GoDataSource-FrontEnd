@@ -3,6 +3,9 @@ import { IExtendedColDef } from './extended-column.model';
 import { IV2DateRange } from '../../../forms-v2/components/app-form-date-range-v2/models/date.model';
 import { IV2NumberRange } from '../../../forms-v2/components/app-form-number-range-v2/models/number.model';
 import { AddressModel } from '../../../../core/models/address.model';
+import { DomSanitizer } from '@angular/platform-browser';
+import { TranslateService } from '@ngx-translate/core';
+import { ISelectGroupMap, ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from '../../../forms-v2/components/app-form-select-groups-v2/models/select-group.model';
 
 /**
  * Filter Type
@@ -19,7 +22,8 @@ export enum V2FilterType {
   BOOLEAN,
   NUMBER_RANGE,
   DELETED,
-  PHONE_NUMBER
+  PHONE_NUMBER,
+  SELECT_GROUPS
 }
 
 /**
@@ -48,6 +52,23 @@ interface IV2FilterBasic {
   defaultValue?: never;
   addressField?: never;
   includeNoValue?: never;
+  groups?: never;
+  groupLabelKey?: never;
+  groupValueKey?: never;
+  groupOptionsKey?: never;
+  groupOptionLabelKey?: never;
+  groupOptionValueKey?: never;
+  groupNoneLabel?: never;
+  groupPartialLabel?: never;
+  groupAllLabel?: never;
+  groupTooltipKey?: never;
+  groupOptionTooltipKey?: never;
+  groupNoneTooltip?: never;
+  groupPartialTooltip?: never;
+  groupAllTooltip?: never;
+  groupOptionHiddenKey?: never;
+  groupOptionFormatMethod?: never;
+  defaultValues?: never;
 }
 
 /**
@@ -213,8 +234,63 @@ export interface IV2FilterPhoneNumber extends Omit<IV2FilterBasic, 'value' | 'de
 }
 
 /**
+ * Select groups
+ */
+export interface IV2FilterSelectGroups
+  extends Omit<IV2FilterBasic,
+  'value' |
+  'defaultValue' |
+  'groups' |
+  'groupLabelKey' |
+  'groupValueKey' |
+  'groupOptionsKey' |
+  'groupOptionLabelKey' |
+  'groupOptionValueKey' |
+  'groupNoneLabel' |
+  'groupPartialLabel' |
+  'groupAllLabel' |
+  'groupTooltipKey' |
+  'groupOptionTooltipKey' |
+  'groupNoneTooltip' |
+  'groupPartialTooltip' |
+  'groupAllTooltip' |
+  'groupOptionHiddenKey' |
+  'groupOptionFormatMethod' |
+  'defaultValues' > {
+  // required
+  type: V2FilterType.SELECT_GROUPS;
+  groups: any[];
+  groupLabelKey: string;
+  groupValueKey: string;
+  groupOptionsKey: string;
+  groupOptionLabelKey: string;
+  groupOptionValueKey: string;
+  groupNoneLabel: string;
+  groupPartialLabel: string;
+  groupAllLabel: string;
+
+  // optional
+  value?: string[];
+  defaultValue?: string[];
+  groupTooltipKey?: string;
+  groupOptionTooltipKey?: string;
+  groupNoneTooltip?: string;
+  groupPartialTooltip?: string;
+  groupAllTooltip?: string;
+  groupOptionHiddenKey?: string;
+  groupOptionFormatMethod?: (
+    sanitized: DomSanitizer,
+    i18nService: TranslateService,
+    groupsMap: ISelectGroupMap<any>,
+    optionsMap: ISelectGroupOptionMap<any>,
+    option: any
+  ) => ISelectGroupOptionFormatResponse;
+  defaultValues?: any[];
+}
+
+/**
  * Filter
  */
 export type V2Filter = IV2FilterText | IV2FilterMultipleSelect | IV2FilterDate | IV2FilterAge | IV2FilterAddressPhoneNumber
 | IV2FilterAddressMultipleLocation | IV2FilterAddressField | IV2FilterAddressAccurateGeoLocation | IV2FilterBoolean | IV2FilterNumber
-| IV2FilterDeleted | IV2FilterPhoneNumber;
+| IV2FilterDeleted | IV2FilterPhoneNumber | IV2FilterSelectGroups;

@@ -221,7 +221,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   }>();
 
   // filter by
-  @Output() filterBy = new EventEmitter<IExtendedColDef>();
+  @Output() filterBy = new EventEmitter<{
+    column: IExtendedColDef,
+    valueOverwrite?: any
+  }>();
   @Output() advancedFilterBy = new EventEmitter<RequestQueryBuilder>();
 
   // reset header filters
@@ -1545,9 +1548,15 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   /**
    * Filter by
    */
-  columnFilterBy(column: IExtendedColDef): void {
+  columnFilterBy(
+    column: IExtendedColDef,
+    valueOverwrite?: any
+  ): void {
     // filter
-    this.filterBy.emit(column);
+    this.filterBy.emit({
+      column,
+      valueOverwrite
+    });
   }
 
   /**

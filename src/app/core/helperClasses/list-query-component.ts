@@ -353,7 +353,13 @@ export abstract class ListQueryComponent {
   /**
    * Filter by
    */
-  filterBy(column: IExtendedColDef): void {
+  filterBy(data: {
+    column: IExtendedColDef,
+    valueOverwrite?: any
+  }): void {
+    // format
+    const column: IExtendedColDef = data.column;
+
     // custom filter ?
     if (column.columnDefinition.filter.search) {
       // call
@@ -527,6 +533,18 @@ export abstract class ListQueryComponent {
         this.filterByPhoneNumber(
           column.columnDefinition.field,
           column.columnDefinition.filter.value
+        );
+
+        // finished
+        break;
+
+      // select group
+      case V2FilterType.SELECT_GROUPS:
+        // filter
+        this.filterBySelectField(
+          column.columnDefinition.field,
+          data.valueOverwrite,
+          null
         );
 
         // finished

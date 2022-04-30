@@ -7,6 +7,7 @@ import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
+import { PermissionDataResolver } from '../../core/services/resolvers/data/permission.resolver';
 
 const routes: Routes = [
   // Roles list
@@ -21,9 +22,8 @@ const routes: Routes = [
     },
     resolve: {
       yesNoAll: YesNoAllDataResolver,
-      user: UserDataResolver
-      // TODO: Needs permission resolver
-      // permission: PermissionDataResolver
+      user: UserDataResolver,
+      permission: PermissionDataResolver
     }
   },
   // Create new Role
