@@ -2,9 +2,9 @@ import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import * as _ from 'lodash';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { throwError } from 'rxjs/internal/observable/throwError';
-import { catchError, takeUntil } from 'rxjs/operators';
+import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { AddressModel } from '../../../../core/models/address.model';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -30,6 +30,9 @@ import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { LocationModel } from '../../../../core/models/location.model';
+import { LocationDataService } from '../../../../core/services/data/location.data.service';
 
 @Component({
   selector: 'app-cases-list',
@@ -62,7 +65,8 @@ export class MarkedNotDuplicatesListComponent
     private contactOfContactDataService: ContactsOfContactsDataService,
     private activatedRoute: ActivatedRoute,
     private translateService: TranslateService,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private locationDataService: LocationDataService
   ) {
     // parent
     super(listHelperService);
@@ -237,6 +241,34 @@ export class MarkedNotDuplicatesListComponent
           address: filterAddressModel,
           field: 'addresses',
           fieldIsArray: true
+        }
+      },
+      {
+        field: 'location',
+        label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
+        format: {
+          type: 'mainAddress.location.name'
+        },
+        link: (data) => {
+          return data.mainAddress?.location?.name ?
+            `/locations/${data.mainAddress.location.id}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'addresses.addressLine1',
+        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS',
+        notVisible: true,
+        format: {
+          type: 'mainAddress.addressLine1'
+        }
+      },
+      {
+        field: 'addresses.city',
+        label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+        notVisible: true,
+        format: {
+          type: 'mainAddress.city'
         }
       },
 
@@ -416,12 +448,6 @@ export class MarkedNotDuplicatesListComponent
         label: 'LNG_ENTITY_FIELD_LABEL_GENDER',
         options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.ADDRESS,
-        field: 'addresses',
-        label: 'LNG_ENTITY_FIELD_LABEL_ADDRESS',
-        isArray: true
       }
     ];
   }
@@ -533,6 +559,7 @@ export class MarkedNotDuplicatesListComponent
       'visualId',
       'age',
       'gender',
+      'address',
       'addresses',
       'phoneNumber',
       'type',
@@ -554,6 +581,74 @@ export class MarkedNotDuplicatesListComponent
         this.queryBuilder
       )
       .pipe(
+        switchMap((data) => {
+          // determine locations that we need to retrieve
+          const locationsIdsMap: {
+            [locationId: string]: true
+          } = {};
+          data.forEach((item) => {
+            const addresses: AddressModel[] = item instanceof EventModel ?
+              [item.address] :
+              item.addresses;
+            (addresses || []).forEach((address) => {
+              // nothing to add ?
+              if (!address?.locationId) {
+                return;
+              }
+
+              // add location to list
+              locationsIdsMap[address.locationId] = true;
+            });
+          });
+
+          // determine ids
+          const locationIds: string[] = Object.keys(locationsIdsMap);
+
+          // nothing to retrieve ?
+          if (locationIds.length < 1) {
+            return of(data);
+          }
+
+          // construct location query builder
+          const qb = new RequestQueryBuilder();
+          qb.filter.bySelect(
+            'id',
+            locationIds,
+            false,
+            null
+          );
+
+          // retrieve locations
+          return this.locationDataService
+            .getLocationsList(qb)
+            .pipe(
+              map((locations) => {
+                // map locations
+                const locationsMap: {
+                  [locationId: string]: LocationModel
+                } = {};
+                locations.forEach((location) => {
+                  locationsMap[location.id] = location;
+                });
+
+                // set locations
+                data.forEach((item) => {
+                  const addresses: AddressModel[] = item instanceof EventModel ?
+                    [item.address] :
+                    item.addresses;
+                  (addresses || []).forEach((address) => {
+                    address.location = address.locationId && locationsMap[address.locationId] ?
+                      locationsMap[address.locationId] :
+                      address.location;
+                  });
+                });
+
+                // finished
+                return data;
+              })
+            );
+        }),
+
         // should be the last pipe
         takeUntil(this.destroyed$)
       );
