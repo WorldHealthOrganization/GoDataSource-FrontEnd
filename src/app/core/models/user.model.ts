@@ -358,7 +358,7 @@ implements
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,
-        field: 'roles',
+        field: 'roleIds',
         label: 'LNG_USER_FIELD_LABEL_ROLES',
         options: data.options.userRole
       },
