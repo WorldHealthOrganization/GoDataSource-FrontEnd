@@ -16,6 +16,8 @@ import { OutbreakModel } from './outbreak.model';
 import { IPermissionBasic, IPermissionBasicBulk, IPermissionExportable, IPermissionRelationship } from './permission.interface';
 import { ContactOfContactModel } from './contact-of-contact.model';
 import { DocumentModel } from './document.model';
+import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 
 export class RelationshipModel
   extends BaseModel
@@ -38,6 +40,99 @@ export class RelationshipModel
   comment: string;
   people: EntityModel[];
   dateOfFirstContact: string;
+
+  /**
+   * Advanced filters
+   */
+  static generateAdvancedFilters(data: {
+    options: {
+      certaintyLevel: ILabelValuePairModel[],
+      exposureType: ILabelValuePairModel[],
+      exposureFrequency: ILabelValuePairModel[],
+      exposureDuration: ILabelValuePairModel[],
+      contextOfTransmission: ILabelValuePairModel[],
+      cluster: ILabelValuePairModel[]
+    }
+  }): V2AdvancedFilter[] {
+    // initialize
+    const advancedFilters: V2AdvancedFilter[] = [
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'lastName',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_LAST_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'firstName',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_FIRST_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'visualId',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_VISUAL_ID',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'contactDate',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
+        childQueryBuilderKey: 'relationship'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'certaintyLevelId',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
+        options: data.options.certaintyLevel,
+        childQueryBuilderKey: 'relationship'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'exposureTypeId',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
+        options: data.options.exposureType,
+        childQueryBuilderKey: 'relationship'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'exposureFrequencyId',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
+        options: data.options.exposureFrequency,
+        childQueryBuilderKey: 'relationship'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'exposureDurationId',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
+        options: data.options.exposureDuration,
+        childQueryBuilderKey: 'relationship'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'socialRelationshipTypeId',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
+        options: data.options.contextOfTransmission,
+        childQueryBuilderKey: 'relationship'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'socialRelationshipDetail',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL',
+        childQueryBuilderKey: 'relationship'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'clusterId',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+        options: data.options.cluster,
+        childQueryBuilderKey: 'relationship'
+      }
+    ];
+
+    // finished
+    return advancedFilters;
+  }
 
   /**
      * Static Permissions - IPermissionBasic
