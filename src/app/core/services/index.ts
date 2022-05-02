@@ -81,17 +81,31 @@ import { OutbreakDataResolver } from './resolvers/data/outbreak.resolver';
 import { UserRoleDataResolver } from './resolvers/data/user-role.resolver';
 import { InstitutionDataResolver } from './resolvers/data/institution.resolver';
 import { PermissionDataResolver } from './resolvers/data/permission.resolver';
+import { CertaintyLevelDataResolver } from './resolvers/data/certainty-level.resolver';
+import { ExposureTypeDataResolver } from './resolvers/data/exposure-type.resolver';
+import { ExposureFrequencyDataResolver } from './resolvers/data/exposure-frequency.resolver';
+import { ExposureDurationDataResolver } from './resolvers/data/exposure-duration.resolver';
+import { ContextOfTransmissionDataResolver } from './resolvers/data/context-of-transmission.resolver';
+import { ClusterDataResolver } from './resolvers/data/cluster.resolver';
+import { PersonTypeDataResolver } from './resolvers/data/person-type.resolver';
+import { RelationshipPersonDataResolver } from './resolvers/data/relationship-person.resolver';
 
 // export the list of services
 export const services: any[] = [
   // resolver services
   AddressTypeDataResolver,
+  CertaintyLevelDataResolver,
   ClassificationDataResolver,
+  ClusterDataResolver,
+  ContextOfTransmissionDataResolver,
   CountryDataResolver,
   DailyFollowUpStatusDataResolver,
   DateRangeCenterDataResolver,
   DiseaseDataResolver,
   DocumentTypeDataResolver,
+  ExposureDurationDataResolver,
+  ExposureFrequencyDataResolver,
+  ExposureTypeDataResolver,
   FinalFollowUpStatusDataResolver,
   FollowUpGenerationTeamAssignmentAlgorithmDataResolver,
   GenderDataResolver,
@@ -103,7 +117,9 @@ export const services: any[] = [
   OutcomeDataResolver,
   PermissionDataResolver,
   PersonDateTypeDataResolver,
+  PersonTypeDataResolver,
   PregnancyStatusDataResolver,
+  RelationshipPersonDataResolver,
   RiskDataResolver,
   SelectedOutbreakDataResolver,
   TeamDataResolver,

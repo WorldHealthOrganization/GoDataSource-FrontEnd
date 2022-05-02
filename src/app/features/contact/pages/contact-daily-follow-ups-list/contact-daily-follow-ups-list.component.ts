@@ -1043,58 +1043,58 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
      * Initialize header filters
      */
   initializeHeaderFilters() {
-    // from workload page ?
-    if (this.workloadData) {
-      // date
-      this.dateFilterDefaultValue = this.workloadData.date.clone().startOf('day');
-      this.dateFilterValue = this.dateFilterDefaultValue;
-
-      // team
-      this.selectedTeamIdFilterValue = this.workloadData.team ?
-        this.workloadData.team :
-        null;
-
-      // user
-      this.selectedResponsibleUserIdFilterValue = this.workloadData.user ?
-        this.workloadData.user :
-        null;
-
-      // make sure we filter by team first time
-      if (this.workloadData.team !== undefined) {
-        this.filterByTeam(new LabelValuePair(
-          '',
-          this.selectedTeamIdFilterValue
-        ));
-      }
-
-      // make sure we filter by responsible user first time
-      if (this.workloadData.user !== undefined) {
-        this.filterBySelectField(
-          'responsibleUserId',
-          this.selectedResponsibleUserIdFilterValue,
-          null
-        );
-      }
-
-      // filter by status ?
-      if (this.workloadData.status) {
-        this.selectedStatusFilterValue = this.workloadData.status;
-
-        // filter by status
-        this.filterBySelectField(
-          'statusId',
-          this.selectedStatusFilterValue,
-          null
-        );
-      }
-    } else {
-      this.dateFilterDefaultValue = moment().startOf('day');
-      this.dateFilterValue = this.dateFilterDefaultValue;
-      this.selectedTeamIdFilterValue = this.teamIdFilterValue;
-    }
-
-    // filter
-    this.filterByFollowUpDate(this.dateFilterDefaultValue);
+    // // from workload page ?
+    // if (this.workloadData) {
+    //   // date
+    //   this.dateFilterDefaultValue = this.workloadData.date.clone().startOf('day');
+    //   this.dateFilterValue = this.dateFilterDefaultValue;
+    //
+    //   // team
+    //   this.selectedTeamIdFilterValue = this.workloadData.team ?
+    //     this.workloadData.team :
+    //     null;
+    //
+    //   // user
+    //   this.selectedResponsibleUserIdFilterValue = this.workloadData.user ?
+    //     this.workloadData.user :
+    //     null;
+    //
+    //   // make sure we filter by team first time
+    //   if (this.workloadData.team !== undefined) {
+    //     this.filterByTeam(new LabelValuePair(
+    //       '',
+    //       this.selectedTeamIdFilterValue
+    //     ));
+    //   }
+    //
+    //   // make sure we filter by responsible user first time
+    //   if (this.workloadData.user !== undefined) {
+    //     this.filterBySelectField(
+    //       'responsibleUserId',
+    //       this.selectedResponsibleUserIdFilterValue,
+    //       null
+    //     );
+    //   }
+    //
+    //   // filter by status ?
+    //   if (this.workloadData.status) {
+    //     this.selectedStatusFilterValue = this.workloadData.status;
+    //
+    //     // filter by status
+    //     this.filterBySelectField(
+    //       'statusId',
+    //       this.selectedStatusFilterValue,
+    //       null
+    //     );
+    //   }
+    // } else {
+    //   this.dateFilterDefaultValue = moment().startOf('day');
+    //   this.dateFilterValue = this.dateFilterDefaultValue;
+    //   this.selectedTeamIdFilterValue = this.teamIdFilterValue;
+    // }
+    //
+    // // filter
+    // this.filterByFollowUpDate(this.dateFilterDefaultValue);
   }
 
   /**
@@ -1314,86 +1314,86 @@ export class ContactDailyFollowUpsListComponent extends FollowUpsListComponent i
      * Filter by follow-up date
      * @param value
      */
-  filterByFollowUpDate(value: Moment) {
-    // remember filter
-    this.dateFilterValue = value;
-
-    // cleanup
-    this.queryBuilder.filter.removePathCondition('date');
-    this.queryBuilder.filter.removePathCondition('or.date');
-    this.queryBuilder.filter.removePathCondition('or.statusId');
-
-    // do we need to remove filter ?
-    if (!value) {
-      // send filter further
-      this.filterByDateField('date', value);
-
-      // reset values
-      this.displayMissedFollowUps = false;
-    } else {
-      // do we need to retrieve missed follow-ups too ?
-      if (
-        this.displayMissedFollowUps &&
-                this.displayMissedFollowUpsNoDays > 0
-      ) {
-        this.queryBuilder.filter.where({
-          or: [{
-            date: {
-              between: [
-                moment(value).startOf('day'),
-                moment(value).endOf('day')
-              ]
-            }
-          }, {
-            statusId: {
-              inq: [
-                'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_PERFORMED',
-                'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_MISSED',
-                'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_ATTEMPTED'
-              ]
-            },
-            date: {
-              between: [
-                moment(value).add(-this.displayMissedFollowUpsNoDays, 'days').startOf('day'),
-                moment(value).endOf('day')
-              ]
-            }
-          }]
-        });
-
-        // refresh
-        this.needsRefreshList();
-      } else {
-        // retrieve follow-ups from specific day
-        this.filterByDateField('date', value);
-      }
-    }
-
-    // refresh dialog fields
-    setTimeout(() => {
-      this.genericDataService
-        .getRangeFollowUpGroupByOptions(true)
-        .subscribe((options) => {
-          // print follow-up
-          this.printFollowUpsDialogExtraAPIData = {
-            date: {
-              startDate: moment(value).startOf('day'),
-              endDate: moment(value).endOf('day')
-            }
-          };
-
-          // print follow-up
-          this.printFollowUpsDialogFields = [
-            new DialogField({
-              name: 'groupBy',
-              placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON',
-              inputOptions: options,
-              value: Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE.value,
-              required: true
-            })
-          ];
-        });
-    });
+  filterByFollowUpDate(_value: Moment) {
+    // // remember filter
+    // this.dateFilterValue = value;
+    //
+    // // cleanup
+    // this.queryBuilder.filter.removePathCondition('date');
+    // this.queryBuilder.filter.removePathCondition('or.date');
+    // this.queryBuilder.filter.removePathCondition('or.statusId');
+    //
+    // // do we need to remove filter ?
+    // if (!value) {
+    //   // send filter further
+    //   this.filterByDateField('date', value);
+    //
+    //   // reset values
+    //   this.displayMissedFollowUps = false;
+    // } else {
+    //   // do we need to retrieve missed follow-ups too ?
+    //   if (
+    //     this.displayMissedFollowUps &&
+    //             this.displayMissedFollowUpsNoDays > 0
+    //   ) {
+    //     this.queryBuilder.filter.where({
+    //       or: [{
+    //         date: {
+    //           between: [
+    //             moment(value).startOf('day'),
+    //             moment(value).endOf('day')
+    //           ]
+    //         }
+    //       }, {
+    //         statusId: {
+    //           inq: [
+    //             'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_PERFORMED',
+    //             'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_MISSED',
+    //             'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_ATTEMPTED'
+    //           ]
+    //         },
+    //         date: {
+    //           between: [
+    //             moment(value).add(-this.displayMissedFollowUpsNoDays, 'days').startOf('day'),
+    //             moment(value).endOf('day')
+    //           ]
+    //         }
+    //       }]
+    //     });
+    //
+    //     // refresh
+    //     this.needsRefreshList();
+    //   } else {
+    //     // retrieve follow-ups from specific day
+    //     this.filterByDateField('date', value);
+    //   }
+    // }
+    //
+    // // refresh dialog fields
+    // setTimeout(() => {
+    //   this.genericDataService
+    //     .getRangeFollowUpGroupByOptions(true)
+    //     .subscribe((options) => {
+    //       // print follow-up
+    //       this.printFollowUpsDialogExtraAPIData = {
+    //         date: {
+    //           startDate: moment(value).startOf('day'),
+    //           endDate: moment(value).endOf('day')
+    //         }
+    //       };
+    //
+    //       // print follow-up
+    //       this.printFollowUpsDialogFields = [
+    //         new DialogField({
+    //           name: 'groupBy',
+    //           placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON',
+    //           inputOptions: options,
+    //           value: Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE.value,
+    //           required: true
+    //         })
+    //       ];
+    //     });
+    // });
   }
 
   /**

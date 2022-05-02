@@ -134,8 +134,8 @@ export abstract class RelationshipsListComponent extends ListComponent implement
   relationshipType: RelationshipType;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     protected router: Router,
@@ -147,23 +147,23 @@ export abstract class RelationshipsListComponent extends ListComponent implement
   }
 
   /**
-     * Called when the following data is loaded:
-     *      this.relationshipType
-     *      this.entityType
-     *      this.entityId
-     *      this.selectedOutbreak
-     */
+   * Called when the following data is loaded:
+   *      this.relationshipType
+   *      this.entityType
+   *      this.entityId
+   *      this.selectedOutbreak
+   */
   abstract onDataInitialized();
 
   /**
-     * Called when person data is loaded (in addition to the initial data):
-     *      this.entity
-     */
+   * Called when person data is loaded (in addition to the initial data):
+   *      this.entity
+   */
   abstract onPersonLoaded();
 
   /**
-     * Component initialized
-     */
+   * Component initialized
+   */
   ngOnInit() {
     // get relationship type
     this.route.data.subscribe((routeData) => {
@@ -192,8 +192,8 @@ export abstract class RelationshipsListComponent extends ListComponent implement
   }
 
   /**
-     * Release resources
-     */
+   * Release resources
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
@@ -205,9 +205,9 @@ export abstract class RelationshipsListComponent extends ListComponent implement
   private checkInitData() {
     if (
       this.relationshipType &&
-            this.entityType &&
-            this.entityId &&
-            this.selectedOutbreak
+      this.entityType &&
+      this.entityId &&
+      this.selectedOutbreak
     ) {
       // all data is loaded; let component do its job
       this.onDataInitialized();
@@ -218,8 +218,8 @@ export abstract class RelationshipsListComponent extends ListComponent implement
   }
 
   /**
-     * Load person data
-     */
+   * Load person data
+   */
   private loadPerson() {
     // get person data
     this.entityDataService
@@ -243,8 +243,8 @@ export abstract class RelationshipsListComponent extends ListComponent implement
   }
 
   /**
-     * Relationships list page title, based on relationship type (Exposures or Contacts?)
-     */
+   * Relationships list page title, based on relationship type (Exposures or Contacts?)
+   */
   get relationshipsListPageTitle(): string {
     return this.relationshipType === RelationshipType.EXPOSURE ?
       'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE' :
@@ -252,57 +252,57 @@ export abstract class RelationshipsListComponent extends ListComponent implement
   }
 
   /**
-     * Route path for specific relationships type (exposures or contacts)
-     */
+   * Route path for specific relationships type (exposures or contacts)
+   */
   get relationshipTypeRoutePath(): string {
     return this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures';
   }
 
   /**
-     * Check if we're allowed to view event / case / contact relationships'
-     */
+   * Check if we're allowed to view event / case / contact relationships'
+   */
   get entityCanView(): boolean {
     return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].view(this.authUser);
   }
 
   /**
-     * Check if we're allowed to create event / case / contact relationships'
-     */
+   * Check if we're allowed to create event / case / contact relationships'
+   */
   get entityCanCreate(): boolean {
     return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].create(this.authUser);
   }
 
   /**
-     * Check if we're allowed to modify event / case / contact relationships'
-     */
+   * Check if we're allowed to modify event / case / contact relationships'
+   */
   get entityCanModify(): boolean {
     return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].modify(this.authUser);
   }
 
   /**
-     * Check if we're allowed to delete event / case / contact relationships'
-     */
+   * Check if we're allowed to delete event / case / contact relationships'
+   */
   get entityCanDelete(): boolean {
     return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].delete(this.authUser);
   }
 
   /**
-     * Check if we're allowed to share event / case / contact relationships'
-     */
+   * Check if we're allowed to share event / case / contact relationships'
+   */
   get entityCanShare(): boolean {
     return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].share(this.authUser);
   }
 
   /**
-     * Check if we're allowed to change person source of a relationship
-     */
+   * Check if we're allowed to change person source of a relationship
+   */
   get entityCanChangeSource(): boolean {
     return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].changeSource(this.authUser);
   }
 
   /**
-     * Check if we're allowed to bulk delete relationships
-     */
+   * Check if we're allowed to bulk delete relationships
+   */
   get entityCanBulkDelete(): boolean {
     return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].bulkDelete(this.authUser);
   }

@@ -272,6 +272,10 @@ export class Constants {
     ROLES: {
       label: 'LNG_APP_PAGE_ROLES',
       value: 'LNG_APP_PAGE_ROLES'
+    },
+    RELATIONSHIPS: {
+      label: 'LNG_APP_PAGE_RELATIONSHIPS',
+      value: 'LNG_APP_PAGE_RELATIONSHIPS'
     }
   };
 

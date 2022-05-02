@@ -1,8 +1,4 @@
-import { RequestFilter, RequestFilterOperator, RequestQueryBuilder } from './request-query-builder';
-import { IV2NumberRange } from '../../shared/forms-v2/components/app-form-number-range-v2/models/number.model';
-import { moment, Moment } from './x-moment';
-import * as _ from 'lodash';
-import { IV2DateRange } from '../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
+import { RequestQueryBuilder } from './request-query-builder';
 import { AddressModel } from '../models/address.model';
 import { IExtendedColDef } from '../../shared/components-v2/app-list-table-v2/models/extended-column.model';
 import { V2FilterTextType, V2FilterType } from '../../shared/components-v2/app-list-table-v2/models/filter.model';
@@ -32,323 +28,86 @@ export abstract class ListQueryComponent {
     ) => void
   ) {}
 
-  /**
-   * Filter the list by a text field
-   */
-  protected filterByTextField(
-    property: string | string[],
-    value: string,
-    operator?: RequestFilterOperator,
-    useLike?: boolean
-  ) {
-    // default values
-    if (operator === undefined) {
-      operator = RequestFilterOperator.OR;
-    }
-
-    // filter
-    if (_.isArray(property)) {
-      this.queryBuilder.filter.byTextMultipleProperties(
-        property as string[],
-        value,
-        true,
-        operator
-      );
-    } else {
-      this.queryBuilder.filter.byText(
-        property as string,
-        value,
-        true,
-        useLike
-      );
-    }
-
-    // refresh list
-    this.refreshCall();
-  }
-
-  /**
-   * Filter by phone number
-   */
-  protected filterByPhoneNumber(
-    property: string,
-    value: string,
-    regexMethod: string = 'regex'
-  ) {
-    this.queryBuilder.filter.byPhoneNumber(
-      property as string,
-      value,
-      true,
-      regexMethod
-    );
-
-    // refresh list
-    this.refreshCall();
-  }
-
-  /**
-   * Filter the list by equality
-   */
-  protected filterByEquality(
-    property: string | string[],
-    value: any
-  ) {
-    this.queryBuilder.filter.byEquality(
-      property as string,
-      value
-    );
-
-    // refresh list
-    this.refreshCall();
-  }
-
-  /**
-   * Filter the list by a text field
-   */
-  protected filterByTextContainingField(
-    property: string,
-    value: string,
-    useLike?: boolean
-  ) {
-    this.queryBuilder.filter.byContainingText(
-      property as string,
-      value,
-      true,
-      useLike
-    );
-
-    // refresh list
-    this.refreshCall();
-  }
-
-  /**
-   * Filter the list by a text field
-   */
-  protected filterByBooleanField(
-    property: string,
-    value: boolean | null | undefined
-  ) {
-    this.queryBuilder.filter.byBoolean(property, value);
-
-    // refresh list
-    this.refreshCall();
-  }
-
-  /**
-   * Filter all records that don't have value on a specific field
-   */
-  protected filterByNotHavingValue(
-    property: string
-  ): void {
-    // filter
-    this.queryBuilder.filter.byNotHavingValue(property);
-
-    // refresh list
-    this.refreshCall();
-  }
-
-  /**
-   * Filter the list by a range field ('from' / 'to')
-   */
-  protected filterByRangeField(property: string, value: IV2NumberRange) {
-    this.queryBuilder.filter.byRange(property, value);
-
-    // refresh list
-    this.refreshCall();
-  }
-
-  /**
-   * Filter the list by an age range field ('from' / 'to')
-   */
-  protected filterByAgeRangeField(
-    property: string,
-    value: IV2NumberRange
-  ) {
-    // filter by age range
-    this.queryBuilder.filter.byAgeRange(property, value);
-
-    // refresh list
-    this.refreshCall();
-  }
-
-  /**
-   * Filter the list by a date field ( startOf day => endOf day )
-   */
-  protected filterByDateField(
-    property: string,
-    value: Moment
-  ) {
-    // filter by date
-    if (_.isEmpty(value)) {
-      this.queryBuilder.filter.byDateRange(property, value);
-    } else {
-      this.queryBuilder.filter.byDateRange(
-        property, {
-          startDate: moment(value).startOf('day'),
-          endDate: moment(value).endOf('day')
-        }
-      );
-    }
-
-    // refresh list
-    this.refreshCall();
-  }
-
-  /**
-   * Filter the list by a date range field ('startDate' / 'endDate')
-   */
-  protected filterByDateRangeField(
-    property: string,
-    value: IV2DateRange
-  ) {
-    // filter by date range
-    this.queryBuilder.filter.byDateRange(property, value);
-
-    // refresh list
-    this.refreshCall();
-  }
-
-  /**
-   * Filter the list by a Select / Multi-Select field
-   */
-  protected filterBySelectField(
-    property: string,
-    values: any | any[],
-    valueKey: string = 'value',
-    replace: boolean = true
-  ) {
-    // no value ?
-    if (values === false) {
-      this.queryBuilder.filter.byBoolean(
-        property,
-        false,
-        true
-      );
-    } else {
-      this.queryBuilder.filter.bySelect(property, values, replace, valueKey);
-    }
-
-    // refresh list
-    this.refreshCall();
-  }
-
-  /**
-   * Filter by boolean with exists condition
-   */
-  protected filterByBooleanUsingExistField(
-    property: string,
-    value: any
-  ) {
-    // filter by boolean using exist
-    this.queryBuilder.filter.byBooleanUsingExist(property, value);
-
-    // refresh list
-    this.refreshCall();
-  }
-
-  /**
-   * Filter by current address
-   */
-  protected filterByAddress(
-    property: string,
-    isArray: boolean,
-    addressModel: AddressModel,
-    addressParentLocationIds: string[],
-    useLike: boolean = false
-  ) {
-    // remove the previous conditions
-    this.queryBuilder.filter.removePathCondition('address');
-    this.queryBuilder.filter.removePathCondition('addresses');
-    this.queryBuilder.filter.removePathCondition('and.address');
-    this.queryBuilder.filter.removePathCondition('and.addresses');
-
-    // create a query builder
-    const searchQb: RequestQueryBuilder = AddressModel.buildAddressFilter(
-      property,
-      isArray,
-      addressModel,
-      addressParentLocationIds,
-      useLike
-    );
-
-    // add condition if we were able to create it
-    if (
-      searchQb &&
-      !searchQb.isEmpty()
-    ) {
-      this.queryBuilder.merge(searchQb);
-    }
-
-    // refresh list
-    this.refreshCall();
-  }
-
-  /**
-   * Filter by deleted field
-   */
-  protected filterByDeletedField(
-    value: boolean | ''
-  ) {
-    // filter
-    if (value === false) {
-      this.queryBuilder.excludeDeleted();
-      this.queryBuilder.filter.remove('deleted');
-    } else {
-      this.queryBuilder.includeDeleted();
-      if (value === true) {
-        this.queryBuilder.filter.where({
-          'deleted': {
-            'eq': true
-          }
-        }, true);
-      } else {
-        this.queryBuilder.filter.remove('deleted');
-      }
-    }
-
-    // refresh list
-    this.refreshCall();
-  }
-
-  /**
-   * Filter by relation
-   */
-  protected filterByRelation(
-    relation: string | string[]
-  ): RequestFilter {
-    // make sure we always have an array of relations
-    const relations: string[] = (_.isArray(relation) ?
-      relation :
-      [relation]
-    ) as string[];
-
-    // go through all the relations until we get the desired query builder
-    let relationQB: RequestQueryBuilder = this.queryBuilder;
-    _.each(relations, (rel: string) => {
-      relationQB = relationQB.include(rel).queryBuilder;
-    });
-
-    // refresh list
-    // this one isn't executed instantly, so there should be enough time to setup the relation filter
-    this.refreshCall();
-
-    // retrieve filter
-    return relationQB.filter;
-  }
-
-  /**
-   * Filter by child query builder
-   */
-  protected filterByChildQueryBuilder(
-    qbFilterKey: string
-  ): RequestFilter {
-    const childQueryBuilder = this.queryBuilder.addChildQueryBuilder(qbFilterKey);
-
-    // refresh list
-    this.refreshCall();
-
-    return childQueryBuilder.filter;
-  }
+  // /**
+  //  * Filter the list by a text field
+  //  */
+  // protected filterByTextContainingField(
+  //   property: string,
+  //   value: string,
+  //   useLike?: boolean
+  // ) {
+  //   this.queryBuilder.filter.byContainingText(
+  //     property as string,
+  //     value,
+  //     true,
+  //     useLike
+  //   );
+  //
+  //   // refresh list
+  //   this.refreshCall();
+  // }
+  //
+  // /**
+  //  * Filter the list by a text field
+  //  */
+  // protected filterByBooleanField(
+  //   property: string,
+  //   value: boolean | null | undefined
+  // ) {
+  //   this.queryBuilder.filter.byBoolean(property, value);
+  //
+  //   // refresh list
+  //   this.refreshCall();
+  // }
+  //
+  // /**
+  //  * Filter the list by a date field ( startOf day => endOf day )
+  //  */
+  // protected filterByDateField(
+  //   property: string,
+  //   value: Moment
+  // ) {
+  //   // filter by date
+  //   if (_.isEmpty(value)) {
+  //     this.queryBuilder.filter.byDateRange(property, value);
+  //   } else {
+  //     this.queryBuilder.filter.byDateRange(
+  //       property, {
+  //         startDate: moment(value).startOf('day'),
+  //         endDate: moment(value).endOf('day')
+  //       }
+  //     );
+  //   }
+  //
+  //   // refresh list
+  //   this.refreshCall();
+  // }
+  //
+  // /**
+  //  * Filter by relation
+  //  */
+  // protected filterByRelation(
+  //   relation: string | string[]
+  // ): RequestFilter {
+  //   // make sure we always have an array of relations
+  //   const relations: string[] = (_.isArray(relation) ?
+  //     relation :
+  //     [relation]
+  //   ) as string[];
+  //
+  //   // go through all the relations until we get the desired query builder
+  //   let relationQB: RequestQueryBuilder = this.queryBuilder;
+  //   _.each(relations, (rel: string) => {
+  //     relationQB = relationQB.include(rel).queryBuilder;
+  //   });
+  //
+  //   // refresh list
+  //   // this one isn't executed instantly, so there should be enough time to setup the relation filter
+  //   this.refreshCall();
+  //
+  //   // retrieve filter
+  //   return relationQB.filter;
+  // }
 
   /**
    * Filter by
@@ -359,6 +118,14 @@ export abstract class ListQueryComponent {
   }): void {
     // format
     const column: IExtendedColDef = data.column;
+
+    // default query builder o which we apply the conditions
+    let query: RequestQueryBuilder = this.queryBuilder;
+
+    // apply to child query builder ?
+    if (column.columnDefinition.filter.childQueryBuilder) {
+      query = query.addChildQueryBuilder(column.columnDefinition.filter.childQueryBuilder);
+    }
 
     // custom filter ?
     if (column.columnDefinition.filter.search) {
@@ -380,7 +147,7 @@ export abstract class ListQueryComponent {
           case V2FilterTextType.STARTS_WITH:
 
             // filter
-            this.filterByTextField(
+            query.filter.byText(
               column.columnDefinition.field,
               column.columnDefinition.filter.value
             );
@@ -395,9 +162,9 @@ export abstract class ListQueryComponent {
       // multiple select
       case V2FilterType.MULTIPLE_SELECT:
         // replace previous conditions
-        this.queryBuilder.filter.remove(column.columnDefinition.field);
-        this.queryBuilder.filter.removePathCondition(column.columnDefinition.field);
-        this.queryBuilder.filter.removePathCondition(`or.${column.columnDefinition.field}`);
+        query.filter.remove(column.columnDefinition.field);
+        query.filter.removePathCondition(column.columnDefinition.field);
+        query.filter.removePathCondition(`or.${column.columnDefinition.field}`);
 
         // do we need to retrieve empty
         const hasNoValueIncluded: boolean = column.columnDefinition.filter.value ?
@@ -410,7 +177,7 @@ export abstract class ListQueryComponent {
           column.columnDefinition.filter.value.length === 1
         ) {
           // only has no value
-          this.queryBuilder.filter.where({
+          query.filter.where({
             or: [
               {
                 [column.columnDefinition.field]: {
@@ -427,7 +194,7 @@ export abstract class ListQueryComponent {
           hasNoValueIncluded
         ) {
           // has no value and others...
-          this.queryBuilder.filter.where({
+          query.filter.where({
             or: [
               {
                 [column.columnDefinition.field]: {
@@ -447,13 +214,10 @@ export abstract class ListQueryComponent {
           column.columnDefinition.filter.value.length > 0
         ) {
           // only other values
-          this.queryBuilder.filter.where({
+          query.filter.where({
             [column.columnDefinition.field]: { inq: column.columnDefinition.filter.value.filter((value) => value !== AppFormSelectMultipleV2Component.HAS_NO_VALUE) }
           }, true);
         }
-
-        // refresh list
-        this.refreshCall();
 
         // finished
         break;
@@ -461,7 +225,7 @@ export abstract class ListQueryComponent {
       // date range
       case V2FilterType.DATE_RANGE:
         // filter
-        this.filterByDateRangeField(
+        query.filter.byDateRange(
           column.columnDefinition.field,
           column.columnDefinition.filter.value
         );
@@ -472,7 +236,7 @@ export abstract class ListQueryComponent {
       // age range - years
       case V2FilterType.AGE_RANGE:
         // filter
-        this.filterByAgeRangeField(
+        query.filter.byAgeRange(
           column.columnDefinition.field,
           column.columnDefinition.filter.value
         );
@@ -485,8 +249,14 @@ export abstract class ListQueryComponent {
       case V2FilterType.ADDRESS_MULTIPLE_LOCATION:
       case V2FilterType.ADDRESS_FIELD:
       case V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION:
-        // filter
-        this.filterByAddress(
+        // remove the previous conditions
+        query.filter.removePathCondition('address');
+        query.filter.removePathCondition('addresses');
+        query.filter.removePathCondition('and.address');
+        query.filter.removePathCondition('and.addresses');
+
+        // create a query builder
+        const searchQb: RequestQueryBuilder = AddressModel.buildAddressFilter(
           column.columnDefinition.filter.field,
           column.columnDefinition.filter.fieldIsArray,
           column.columnDefinition.filter.address,
@@ -494,15 +264,23 @@ export abstract class ListQueryComponent {
           (column.columnDefinition.filter as any).useLike
         );
 
+        // add condition if we were able to create it
+        if (
+          searchQb &&
+          !searchQb.isEmpty()
+        ) {
+          query.merge(searchQb);
+        }
+
         // finished
         break;
 
       // boolean
       case V2FilterType.BOOLEAN:
         // filter
-        this.filterByBooleanUsingExistField(
+        query.filter.byBooleanUsingExist(
           column.columnDefinition.field,
-          column.columnDefinition.filter.value
+          column.columnDefinition.filter.value as any
         );
 
         // finished
@@ -511,7 +289,7 @@ export abstract class ListQueryComponent {
       // number range
       case V2FilterType.NUMBER_RANGE:
         // filter
-        this.filterByRangeField(
+        query.filter.byRange(
           column.columnDefinition.field,
           column.columnDefinition.filter.value
         );
@@ -522,7 +300,21 @@ export abstract class ListQueryComponent {
       // deleted
       case V2FilterType.DELETED:
         // filter
-        this.filterByDeletedField(column.columnDefinition.filter.value);
+        if (column.columnDefinition.filter.value === false) {
+          query.excludeDeleted();
+          query.filter.remove('deleted');
+        } else {
+          query.includeDeleted();
+          if (column.columnDefinition.filter.value === true) {
+            query.filter.where({
+              deleted: {
+                eq: true
+              }
+            }, true);
+          } else {
+            query.filter.remove('deleted');
+          }
+        }
 
         // finished
         break;
@@ -530,7 +322,7 @@ export abstract class ListQueryComponent {
       // phone number
       case V2FilterType.PHONE_NUMBER:
         // filter
-        this.filterByPhoneNumber(
+        query.filter.byPhoneNumber(
           column.columnDefinition.field,
           column.columnDefinition.filter.value
         );
@@ -541,14 +333,18 @@ export abstract class ListQueryComponent {
       // select group
       case V2FilterType.SELECT_GROUPS:
         // filter
-        this.filterBySelectField(
+        query.filter.bySelect(
           column.columnDefinition.field,
           data.valueOverwrite,
+          true,
           null
         );
 
         // finished
         break;
     }
+
+    // refresh list
+    this.refreshCall();
   }
 }

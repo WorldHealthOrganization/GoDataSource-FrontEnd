@@ -330,12 +330,16 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
 
             // add new filter
             if (values) {
-              this.filterBySelectField(
+              // filter
+              this.queryBuilder.filter.bySelect(
                 'classification',
                 values,
-                null,
-                false
+                false,
+                null
               );
+
+              // refresh list
+              this.needsRefreshList();
             }
           }
         }
@@ -1707,20 +1711,23 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
 
         // filter by group data
         if (!item) {
-          this.filterByEquality(
+          this.queryBuilder.filter.byEquality(
             'classification',
             null
           );
         } else if (item.label === 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_UNCLASSIFIED') {
           // clear
-          this.filterByNotHavingValue('classification');
+          this.queryBuilder.filter.byNotHavingValue('classification');
         } else {
           // search
-          this.filterByEquality(
+          this.queryBuilder.filter.byEquality(
             'classification',
             item.label
           );
         }
+
+        // refresh
+        this.needsRefreshList();
       },
       data: {
         loading: false,

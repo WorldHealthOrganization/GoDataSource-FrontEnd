@@ -1620,16 +1620,25 @@ export class ContactsListComponent
 
         // filter by group data
         if (!item) {
-          this.filterByEquality('riskLevel', null);
+          this.queryBuilder.filter.byEquality(
+            'riskLevel',
+            null
+          );
         } else if (
           item.label === 'LNG_REFERENCE_DATA_CATEGORY_RISK_LEVEL_UNCLASSIFIED'
         ) {
           // clear
-          this.filterByNotHavingValue('riskLevel');
+          this.queryBuilder.filter.byNotHavingValue('riskLevel');
         } else {
           // search
-          this.filterByEquality('riskLevel', item.label);
+          this.queryBuilder.filter.byEquality(
+            'riskLevel',
+            item.label
+          );
         }
+
+        // refresh
+        this.needsRefreshList();
       },
       data: {
         loading: false,

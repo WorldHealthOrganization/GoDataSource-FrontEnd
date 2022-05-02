@@ -504,25 +504,25 @@ export abstract class FollowUpsListComponent extends ListComponent implements On
   /**
      * Filter by team
      */
-  filterByTeam(data: LabelValuePair) {
-    // nothing to retrieve ?
-    if (!data) {
-      // no team
-      this.queryBuilder.filter.where({
-        teamId: {
-          eq: null
-        }
-      });
-
-      // refresh list
-      this.needsRefreshList();
-    } else {
-      // retrieve everything?
-      if (data.value === this.teamIdFilterValue) {
-        this.filterBySelectField('teamId', []);
-      } else {
-        this.filterBySelectField('teamId', data);
-      }
-    }
+  filterByTeam(_data: LabelValuePair) {
+    // // nothing to retrieve ?
+    // if (!data) {
+    //   // no team
+    //   this.queryBuilder.filter.where({
+    //     teamId: {
+    //       eq: null
+    //     }
+    //   });
+    //
+    //   // refresh list
+    //   this.needsRefreshList();
+    // } else {
+    //   // retrieve everything?
+    //   if (data.value === this.teamIdFilterValue) {
+    //     this.filterBySelectField('teamId', []);
+    //   } else {
+    //     this.filterBySelectField('teamId', data);
+    //   }
+    // }
   }
 }

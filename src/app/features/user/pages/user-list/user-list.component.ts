@@ -270,11 +270,15 @@ export class UserListComponent extends ListComponent implements OnDestroy {
             }
 
             // filter
-            this.filterBySelectField(
+            this.queryBuilder.filter.bySelect(
               'id',
               userIds,
+              true,
               null
             );
+
+            // refresh list
+            this.needsRefreshList();
           }
         }
       });

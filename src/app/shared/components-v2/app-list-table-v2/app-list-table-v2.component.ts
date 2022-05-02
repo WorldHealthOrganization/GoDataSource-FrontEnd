@@ -1434,7 +1434,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    */
   selectionChanged(): void {
     // update selected
-    this._selected = this._agTable.api.getSelectedNodes().map((item) => item.data[this.keyField]);
+    this._selected = this._agTable.api.getSelectedNodes().map(
+      (item) => _.get(item.data, this.keyField)
+    );
   }
 
   /**

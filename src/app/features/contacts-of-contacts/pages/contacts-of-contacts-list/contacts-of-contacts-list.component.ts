@@ -1075,20 +1075,23 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
         // filter by group data
         if (!item) {
-          this.filterByEquality(
+          this.queryBuilder.filter.byEquality(
             'riskLevel',
             null
           );
         } else if (item.label === 'LNG_REFERENCE_DATA_CATEGORY_RISK_LEVEL_UNCLASSIFIED') {
           // clear
-          this.filterByNotHavingValue('riskLevel');
+          this.queryBuilder.filter.byNotHavingValue('riskLevel');
         } else {
           // search
-          this.filterByEquality(
+          this.queryBuilder.filter.byEquality(
             'riskLevel',
             item.label
           );
         }
+
+        // refresh
+        this.needsRefreshList();
       },
       data: {
         loading: false,
