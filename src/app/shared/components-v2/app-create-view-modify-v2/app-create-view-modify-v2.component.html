@@ -829,34 +829,48 @@
                     <!-- List Items -->
                     <div
                       class="gd-create-view-modify-bottom-section-content-input-list">
-                      <div
-                        *ngFor="let item of input.items; let itemIndex = index; trackBy: trackByIndex"
-                        class="gd-create-view-modify-bottom-section-content-input-list-item">
 
-                        <!-- Remove button -->
+                      <!-- Display items -->
+                      <ng-container
+                        *ngIf="!isView || input.items?.length > 0; else emptyList">
                         <div
-                          *ngIf="!isView"
-                          fxLayoutAlign="end"
-                          class="gd-create-view-modify-bottom-section-content-input-list-item-delete">
-                          <button
-                            type="button"
-                            mat-icon-button
-                            color="warn"
-                            [matTooltip]="input.definition.remove.label | translate"
-                            (click)="removeListItem(input, itemIndex, form);">
-                            <mat-icon>delete</mat-icon>
-                          </button>
-                        </div>
+                          *ngFor="let item of input.items; let itemIndex = index; trackBy: trackByIndex"
+                          class="gd-create-view-modify-bottom-section-content-input-list-item">
 
-                        <!-- Inputs -->
+                          <!-- Remove button -->
+                          <div
+                            *ngIf="!isView"
+                            fxLayoutAlign="end"
+                            class="gd-create-view-modify-bottom-section-content-input-list-item-delete">
+                            <button
+                              type="button"
+                              mat-icon-button
+                              color="warn"
+                              [matTooltip]="input.definition.remove.label | translate"
+                              (click)="removeListItem(input, itemIndex, form);">
+                              <mat-icon>delete</mat-icon>
+                            </button>
+                          </div>
+
+                          <!-- Inputs -->
+                          <div
+                            fxLayout="row wrap" fxLayoutGap="1.6rem"
+                            class="gd-create-view-modify-bottom-section-content-input-list-item-content">
+                            <ng-container
+                              *ngTemplateOutlet="inputRender; context: { input: input.definition.input, parentName: input.name, parentItemIndex: itemIndex }"></ng-container>
+                          </div>
+
+                        </div>
+                      </ng-container>
+
+                      <!-- Empty list -->
+                      <ng-template
+                        #emptyList>
                         <div
-                          fxLayout="row wrap" fxLayoutGap="1.6rem"
-                          class="gd-create-view-modify-bottom-section-content-input-list-item-content">
-                          <ng-container
-                            *ngTemplateOutlet="inputRender; context: { input: input.definition.input, parentName: input.name, parentItemIndex: itemIndex }"></ng-container>
+                          class="gd-create-view-modify-bottom-section-content-input-list-empty">
+                          {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
                         </div>
-
-                      </div>
+                      </ng-template>
                     </div>
 
                     <!-- Add -->
