@@ -953,7 +953,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    */
   private initializeTabsContacts(): ICreateViewModifyV2TabTable {
     // create tab
-    return {
+    const newTab: ICreateViewModifyV2TabTable = {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       label: 'LNG_COMMON_BUTTON_EXPOSURES_FROM',
       pageSettingsKey: UserSettings.RELATIONSHIP_FIELDS,
@@ -978,8 +978,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           },
           refreshList: () => {
             // reload data
-            // #TODO
-            // this.needsRefreshList(true);
+            newTab.refresh(newTab);
           }
         }),
       advancedFilters: this.entityHelperService.generateAdvancedFilters({
@@ -1052,6 +1051,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           });
       }
     };
+
+    // finished
+    return newTab;
   }
 
   // /**
