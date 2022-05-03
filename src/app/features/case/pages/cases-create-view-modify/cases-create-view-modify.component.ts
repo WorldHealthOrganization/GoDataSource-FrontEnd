@@ -14,7 +14,8 @@ import {
   CreateViewModifyV2TabInputType,
   ICreateViewModifyV2Buttons,
   ICreateViewModifyV2CreateOrUpdate,
-  ICreateViewModifyV2Tab, ICreateViewModifyV2TabTable
+  ICreateViewModifyV2Tab,
+  ICreateViewModifyV2TabTable
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -22,7 +23,7 @@ import { Constants } from '../../../../core/models/constants';
 import { AgeModel } from '../../../../core/models/age.model';
 import { TimerCache } from '../../../../core/helperClasses/timer-cache';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
-import { UserModel } from '../../../../core/models/user.model';
+import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { DocumentModel } from '../../../../core/models/document.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
@@ -37,9 +38,8 @@ import { catchError, takeUntil } from 'rxjs/operators';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import * as _ from 'lodash';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
-import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
+import { RequestFilterGenerator, RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
@@ -49,6 +49,8 @@ import { Location } from '@angular/common';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputLinkWithAction, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
+import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
+import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 
 /**
  * Component
@@ -90,11 +92,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     protected translateService: TranslateService,
     protected systemSettingsDataService: SystemSettingsDataService,
     protected toastV2Service: ToastV2Service,
-    protected clusterDataService: ClusterDataService,
     protected contactDataService: ContactDataService,
     protected location: Location,
     protected dialogV2Service: DialogV2Service,
     protected entityDataService: EntityDataService,
+    protected entityHelperService: EntityHelperService,
     authDataService: AuthDataService,
     renderer2: Renderer2
   ) {
@@ -950,8 +952,46 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    */
   private initializeTabsContacts(): ICreateViewModifyV2TabTable {
     return {
+      // #TODO
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
-      label: 'LNG_COMMON_BUTTON_EXPOSURES_FROM'
+      label: 'LNG_COMMON_BUTTON_EXPOSURES_FROM',
+      pageSettingsKey: UserSettings.RELATIONSHIP_FIELDS,
+      visible: () => CaseModel.canListRelationshipContacts(this.authUser),
+      records$: this.entityHelperService
+        .retrieveRecords(
+          RelationshipType.CONTACT,
+          this.selectedOutbreak,
+          this.itemData,
+          // #TODO
+          new RequestQueryBuilder()
+        )
+        .pipe(
+          // should be the last pipe
+          takeUntil(this.destroyed$)
+        ),
+      tableColumns: this.entityHelperService
+        .retrieveTableColumns({
+          selectedOutbreakIsActive: this.selectedOutbreakIsActive,
+          selectedOutbreak: this.selectedOutbreak,
+          entity: this.itemData,
+          relationshipType: RelationshipType.CONTACT,
+          authUser: this.authUser,
+          personType: this.activatedRoute.snapshot.data.personType,
+          cluster: this.activatedRoute.snapshot.data.cluster,
+          options: {
+            certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            exposureFrequency: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            exposureDuration: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            contextOfTransmission: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+          },
+          refreshList: () => {
+            // reload data
+            // #TODO
+            // this.needsRefreshList(true);
+          }
+        })
     };
   }
 
@@ -960,8 +1000,13 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    */
   private initializeTabsExposures(): ICreateViewModifyV2TabTable {
     return {
+      // #TODO
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
-      label: 'LNG_COMMON_BUTTON_EXPOSURES_TO'
+      label: 'LNG_COMMON_BUTTON_EXPOSURES_TO',
+      pageSettingsKey: undefined,
+      visible: () => CaseModel.canListRelationshipExposures(this.authUser),
+      records$: undefined,
+      tableColumns: undefined
     };
   }
 
@@ -970,8 +1015,13 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    */
   private initializeTabsLabResults(): ICreateViewModifyV2TabTable {
     return {
+      // #TODO
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
-      label: 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS'
+      label: 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS',
+      pageSettingsKey: undefined,
+      visible: () => LabResultModel.canList(this.authUser) && CaseModel.canListLabResult(this.authUser),
+      records$: undefined,
+      tableColumns: undefined
     };
   }
 
@@ -981,7 +1031,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   private initializeTabsViewFollowUps(): ICreateViewModifyV2TabTable {
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
-      label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS'
+      label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS',
+      pageSettingsKey: undefined,
+      visible: () => FollowUpModel.canList(this.authUser),
+      records$: undefined,
+      tableColumns: undefined
     };
   }
 
@@ -1538,29 +1592,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         outcome: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         clusterLoad: (finished) => {
-          this.clusterDataService
-            .getResolveList(
-              this.selectedOutbreak.id
-            )
-            .pipe(
-              // handle error
-              catchError((err) => {
-                // show error
-                this.toastV2Service.error(err);
-
-                // not found
-                finished(null);
-
-                // send error down the road
-                return throwError(err);
-              }),
-
-              // should be the last pipe
-              takeUntil(this.destroyed$)
-            )
-            .subscribe((data) => {
-              finished(data);
-            });
+          finished(this.activatedRoute.snapshot.data.cluster);
         },
         pregnancy: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         vaccine: (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,

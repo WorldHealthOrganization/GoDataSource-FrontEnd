@@ -9,6 +9,8 @@ import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
 import { Params } from '@angular/router';
 import { IAppFormIconButtonV2 } from '../../../forms-v2/core/app-form-icon-button-v2';
+import { IV2Column } from '../../app-list-table-v2/models/column.model';
+import { UserSettings } from '../../../../core/models/user.model';
 
 /**
  * Input type
@@ -292,6 +294,11 @@ export interface ICreateViewModifyV2Tab {
 
   // optional
   form?: NgForm;
+
+
+  records$?: never;
+  tableColumns?: never;
+  pageSettingsKey?: never;
 }
 
 /**
@@ -301,6 +308,9 @@ export interface ICreateViewModifyV2TabTable {
   // required
   type: CreateViewModifyV2TabInputType.TAB_TABLE;
   label: string;
+  records$: Observable<any[]>;
+  tableColumns: IV2Column[];
+  pageSettingsKey: UserSettings;
 
   // optional
   visible?: () => boolean

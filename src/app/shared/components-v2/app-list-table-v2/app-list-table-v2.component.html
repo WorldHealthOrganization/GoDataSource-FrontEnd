@@ -4,11 +4,13 @@
 
   <!-- Breadcrumbs -->
   <app-breadcrumb-v2
+    *ngIf="breadcrumbs"
     [breadcrumbs]="breadcrumbs"
     (detectChanges)="resizeTable()"></app-breadcrumb-v2>
 
   <!-- Title & buttons -->
   <div
+    *ngIf="pageTitle"
     fxLayout="row"
     class="gd-list-top-tile-buttons">
 

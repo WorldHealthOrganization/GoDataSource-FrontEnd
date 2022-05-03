@@ -18,6 +18,17 @@ import { Constants } from '../../models/constants';
 import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
 import { I18nService } from './i18n.service';
 import { ToastV2Service } from './toast-v2.service';
+import { IV2Column, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { RelationshipType } from '../../enums/relationship-type.enum';
+import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
+import { V2FilterTextType, V2FilterType } from '../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { IResolverV2ResponseModel } from '../resolvers/data/models/resolver-response.model';
+import { ReferenceDataEntryModel } from '../../models/reference-data.model';
+import { ClusterModel } from '../../models/cluster.model';
+import { UserModel } from '../../models/user.model';
+import { V2ActionType } from '../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2BottomDialogConfigButtonType } from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { TranslateService } from '@ngx-translate/core';
 
 /**
  * From ?
@@ -29,6 +40,113 @@ enum SentFromColumn {
 
 @Injectable()
 export class EntityHelperService {
+  // entities map
+  readonly entityMap: {
+    [entityType: string]: {
+      label: string,
+      link: string,
+      can: {
+        [type: string]: {
+          view: (UserModel) => boolean,
+          create: (UserModel) => boolean,
+          modify: (UserModel) => boolean,
+          delete: (UserModel) => boolean,
+          share: (UserModel) => boolean,
+          changeSource: (UserModel) => boolean,
+          bulkDelete: (UserModel) => boolean
+        }
+      }
+    }
+  } = {
+      [EntityType.CASE]: {
+        label: 'LNG_PAGE_LIST_CASES_TITLE',
+        link: '/cases',
+        can: {
+          contacts: {
+            view: CaseModel.canViewRelationshipContacts,
+            create: CaseModel.canCreateRelationshipContacts,
+            modify: CaseModel.canModifyRelationshipContacts,
+            delete: CaseModel.canDeleteRelationshipContacts,
+            share: CaseModel.canShareRelationship,
+            changeSource: CaseModel.canChangeSource,
+            bulkDelete: CaseModel.canBulkDeleteRelationshipContacts
+          },
+          exposures: {
+            view: CaseModel.canViewRelationshipExposures,
+            create: CaseModel.canCreateRelationshipExposures,
+            modify: CaseModel.canModifyRelationshipExposures,
+            delete: CaseModel.canDeleteRelationshipExposures,
+            share: CaseModel.canShareRelationship,
+            changeSource: () => false,
+            bulkDelete: CaseModel.canBulkDeleteRelationshipExposures
+          }
+        }
+      },
+      [EntityType.CONTACT]: {
+        label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
+        link: '/contacts',
+        can: {
+          contacts: {
+            view: ContactModel.canViewRelationshipContacts,
+            create: ContactModel.canCreateRelationshipContacts,
+            modify: ContactModel.canModifyRelationshipContacts,
+            delete: ContactModel.canDeleteRelationshipContacts,
+            share: ContactModel.canShareRelationship,
+            changeSource: ContactModel.canChangeSource,
+            bulkDelete: ContactModel.canBulkDeleteRelationshipContacts
+          },
+          exposures: {
+            view: ContactModel.canViewRelationshipExposures,
+            create: ContactModel.canCreateRelationshipExposures,
+            modify: ContactModel.canModifyRelationshipExposures,
+            delete: ContactModel.canDeleteRelationshipExposures,
+            share: ContactModel.canShareRelationship,
+            changeSource: ContactModel.canChangeSource,
+            bulkDelete: ContactModel.canBulkDeleteRelationshipExposures
+          }
+        }
+      },
+      [EntityType.CONTACT_OF_CONTACT]: {
+        label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
+        link: '/contacts-of-contacts',
+        can: {
+          exposures: {
+            view: ContactOfContactModel.canViewRelationshipExposures,
+            create: ContactOfContactModel.canCreateRelationshipExposures,
+            modify: ContactOfContactModel.canModifyRelationshipExposures,
+            delete: ContactOfContactModel.canDeleteRelationshipExposures,
+            share: ContactOfContactModel.canShareRelationship,
+            changeSource: ContactOfContactModel.canChangeSource,
+            bulkDelete: ContactOfContactModel.canBulkDeleteRelationshipExposures
+          }
+        }
+      },
+      [EntityType.EVENT]: {
+        label: 'LNG_PAGE_LIST_EVENTS_TITLE',
+        link: '/events',
+        can: {
+          contacts: {
+            view: EventModel.canViewRelationshipContacts,
+            create: EventModel.canCreateRelationshipContacts,
+            modify: EventModel.canModifyRelationshipContacts,
+            delete: EventModel.canDeleteRelationshipContacts,
+            share: EventModel.canShareRelationship,
+            changeSource: EventModel.canChangeSource,
+            bulkDelete: EventModel.canBulkDeleteRelationshipContacts
+          },
+          exposures: {
+            view: EventModel.canViewRelationshipExposures,
+            create: EventModel.canCreateRelationshipExposures,
+            modify: EventModel.canModifyRelationshipExposures,
+            delete: EventModel.canDeleteRelationshipExposures,
+            share: EventModel.canShareRelationship,
+            changeSource: () => false,
+            bulkDelete: EventModel.canBulkDeleteRelationshipExposures
+          }
+        }
+      }
+    };
+
   /**
    * Constructor
    */
@@ -36,7 +154,8 @@ export class EntityHelperService {
     private dialogV2Service: DialogV2Service,
     private relationshipDataService: RelationshipDataService,
     private i18nService: I18nService,
-    private toastV2Service: ToastV2Service
+    private toastV2Service: ToastV2Service,
+    private translateService: TranslateService
   ) {}
 
   /**
@@ -419,5 +538,456 @@ export class EntityHelperService {
       ),
       entity
     );
+  }
+
+  /**
+   * Retrieve table columns
+   */
+  retrieveTableColumns(definitions: {
+    selectedOutbreakIsActive: boolean,
+    selectedOutbreak: OutbreakModel,
+    entity: CaseModel | ContactModel | EventModel,
+    relationshipType: RelationshipType,
+    authUser: UserModel,
+    personType: IResolverV2ResponseModel<ReferenceDataEntryModel>,
+    cluster: IResolverV2ResponseModel<ClusterModel>,
+    options: {
+      certaintyLevel: ILabelValuePairModel[],
+      exposureType: ILabelValuePairModel[],
+      exposureFrequency: ILabelValuePairModel[],
+      exposureDuration: ILabelValuePairModel[],
+      contextOfTransmission: ILabelValuePairModel[],
+      user: ILabelValuePairModel[]
+    },
+    refreshList: () => void
+  }): IV2Column[] {
+    // default table columns
+    const tableColumns: IV2Column[] = [
+      {
+        field: 'lastName',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_LAST_NAME',
+        format: {
+          type: 'model.lastName'
+        },
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'firstName',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_FIRST_NAME',
+        format: {
+          type: 'model.firstName'
+        },
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'visualId',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_PERSON_VISUAL_ID',
+        format: {
+          type: 'model.visualId'
+        },
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'statuses',
+        label: 'LNG_COMMON_LABEL_STATUSES',
+        format: {
+          type: V2ColumnFormat.STATUS
+        },
+        notResizable: true,
+        pinned: true,
+        legends: [
+          // person type
+          {
+            title: 'LNG_ENTITY_FIELD_LABEL_TYPE',
+            items: definitions.personType.list.map((item) => {
+              return {
+                form: {
+                  type: IV2ColumnStatusFormType.CIRCLE,
+                  color: item.getColorCode()
+                },
+                label: item.id
+              };
+            })
+          }
+        ],
+        forms: (_column, data): V2ColumnStatusForm[] => {
+          // construct list of forms that we need to display
+          const forms: V2ColumnStatusForm[] = [];
+
+          // person type
+          if (
+            data.type &&
+            definitions.personType.map[data.type]
+          ) {
+            forms.push({
+              type: IV2ColumnStatusFormType.CIRCLE,
+              color: definitions.personType.map[data.type].getColorCode(),
+              tooltip: this.translateService.instant(data.type)
+            });
+          }
+
+          // finished
+          return forms;
+        }
+      },
+      {
+        field: 'contactDate',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
+        format: {
+          type: V2ColumnFormat.DATE,
+          value: (item) => item.relationship?.contactDate
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE,
+          childQueryBuilder: 'relationship'
+        }
+      },
+      {
+        field: 'certaintyLevelId',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
+        format: {
+          type: (item) => item.relationship?.certaintyLevelId ?
+            this.translateService.instant(item.relationship?.certaintyLevelId) :
+            item.relationship?.certaintyLevelId
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          childQueryBuilder: 'relationship',
+          options: definitions.options.certaintyLevel,
+          includeNoValue: true
+        }
+      },
+      {
+        field: 'exposureTypeId',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
+        format: {
+          type: (item) => item.relationship?.exposureTypeId ?
+            this.translateService.instant(item.relationship?.exposureTypeId) :
+            item.relationship?.exposureTypeId
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          childQueryBuilder: 'relationship',
+          options: definitions.options.exposureType,
+          includeNoValue: true
+        }
+      },
+      {
+        field: 'exposureFrequencyId',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
+        format: {
+          type: (item) => item.relationship?.exposureFrequencyId ?
+            this.translateService.instant(item.relationship?.exposureFrequencyId) :
+            item.relationship?.exposureFrequencyId
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          childQueryBuilder: 'relationship',
+          options: definitions.options.exposureFrequency,
+          includeNoValue: true
+        }
+      },
+      {
+        field: 'exposureDurationId',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
+        format: {
+          type: (item) => item.relationship?.exposureDurationId ?
+            this.translateService.instant(item.relationship?.exposureDurationId) :
+            item.relationship?.exposureDurationId
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          childQueryBuilder: 'relationship',
+          options: definitions.options.exposureDuration,
+          includeNoValue: true
+        }
+      },
+      {
+        field: 'socialRelationshipTypeId',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
+        format: {
+          type: (item) => item.relationship?.socialRelationshipTypeId ?
+            this.translateService.instant(item.relationship?.socialRelationshipTypeId) :
+            item.relationship?.socialRelationshipTypeId
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          childQueryBuilder: 'relationship',
+          options: definitions.options.contextOfTransmission,
+          includeNoValue: true
+        }
+      },
+      {
+        field: 'socialRelationshipDetail',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL',
+        format: {
+          type: 'relationship.socialRelationshipDetail'
+        },
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH,
+          childQueryBuilder: 'relationship'
+        }
+      }
+    ];
+
+    // by cluster
+    if (ClusterModel.canList(definitions.authUser)) {
+      tableColumns.push({
+        field: 'clusterId',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+        format: {
+          type: (item) => item.relationship?.clusterId && definitions.cluster.map[item.relationship?.clusterId] ?
+            definitions.cluster.map[item.relationship?.clusterId].name :
+            item.relationship?.clusterId
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          childQueryBuilder: 'relationship',
+          options: definitions.cluster.options,
+          includeNoValue: true
+        }
+      });
+    }
+
+    // general
+    tableColumns.push(
+      {
+        field: 'createdBy',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_BY',
+        format: {
+          type: 'relationship.createdByUser.name'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: definitions.options.user,
+          includeNoValue: true,
+          childQueryBuilder: 'relationship'
+        },
+        exclude: (): boolean => {
+          return !UserModel.canView(definitions.authUser);
+        },
+        link: (data) => {
+          return data.relationship?.createdBy ?
+            `/users/${data.relationship.createdBy}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'createdAt',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_CREATED_AT',
+        format: {
+          type: V2ColumnFormat.DATE,
+          value: (item) => item.relationship?.createdAt
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE,
+          childQueryBuilder: 'relationship'
+        }
+      },
+      {
+        field: 'updatedBy',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_BY',
+        format: {
+          type: 'relationship.updatedByUser.name'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: definitions.options.user,
+          includeNoValue: true,
+          childQueryBuilder: 'relationship'
+        },
+        exclude: (): boolean => {
+          return !UserModel.canView(definitions.authUser);
+        },
+        link: (data) => {
+          return data.relationship?.updatedBy ?
+            `/users/${data.relationship.updatedBy}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'updatedAt',
+        label: 'LNG_RELATIONSHIP_FIELD_LABEL_UPDATED_AT',
+        format: {
+          type: V2ColumnFormat.DATE,
+          value: (item) => item.relationship?.updatedAt
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE,
+          childQueryBuilder: 'relationship'
+        }
+      },
+
+      // actions
+      {
+        field: 'actions',
+        label: 'LNG_COMMON_LABEL_ACTIONS',
+        pinned: IV2ColumnPinned.RIGHT,
+        notResizable: true,
+        cssCellClass: 'gd-cell-no-focus',
+        format: {
+          type: V2ColumnFormat.ACTIONS
+        },
+        actions: [
+          // View
+          {
+            type: V2ActionType.ICON,
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_VIEW_RELATIONSHIP',
+            action: {
+              link: (item: EntityModel): string[] => {
+                return ['/relationships', definitions.entity.type, definitions.entity.id, definitions.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures', item.relationship.id, 'view'];
+              }
+            },
+            visible: (item: EntityModel): boolean => {
+              return !item.relationship.deleted &&
+                RelationshipModel.canView(definitions.authUser) &&
+                this.entityMap[definitions.entity.type].can[definitions.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].view(definitions.authUser);
+            }
+          },
+
+          // Modify
+          {
+            type: V2ActionType.ICON,
+            icon: 'edit',
+            iconTooltip: 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_MODIFY_RELATIONSHIP',
+            action: {
+              link: (item: EntityModel): string[] => {
+                return ['/relationships', definitions.entity.type, definitions.entity.id, definitions.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures', item.relationship.id, 'modify'];
+              }
+            },
+            visible: (item: EntityModel): boolean => {
+              return !item.relationship.deleted &&
+                definitions.selectedOutbreakIsActive &&
+                RelationshipModel.canModify(definitions.authUser) &&
+                this.entityMap[definitions.entity.type].can[definitions.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].modify(definitions.authUser);
+            }
+          },
+
+          // Other actions
+          {
+            type: V2ActionType.MENU,
+            icon: 'more_horiz',
+            menuOptions: [
+              // Delete
+              {
+                label: 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP',
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+                action: {
+                  click: (item: EntityModel): void => {
+                    // confirm
+                    this.dialogV2Service.showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_DELETE',
+                          data: () => ({
+                            name: item.model.name
+                          })
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP',
+                          data: () => ({
+                            name: item.model.name
+                          })
+                        }
+                      }
+                    }).subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // delete
+                      this.relationshipDataService
+                        .deleteRelationship(
+                          definitions.selectedOutbreak.id,
+                          definitions.entity.type,
+                          definitions.entity.id,
+                          item.relationship.id
+                        )
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            this.toastV2Service.error(err);
+
+                            // hide loading
+                            loading.close();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          // success
+                          this.toastV2Service.success('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
+
+                          // hide loading
+                          loading.close();
+
+                          // reload data
+                          definitions.refreshList();
+                        });
+                    });
+                  }
+                },
+                visible: (item: CaseModel): boolean => {
+                  return !item.deleted &&
+                    definitions.selectedOutbreakIsActive &&
+                    CaseModel.canDelete(definitions.authUser);
+                }
+              }
+            ]
+          }
+        ]
+      }
+    );
+
+    // finished
+    return tableColumns;
+  }
+
+  /**
+   * Retrieve data
+   */
+  retrieveRecords(
+    relationshipType: RelationshipType,
+    selectedOutbreak: OutbreakModel,
+    entity: CaseModel | ContactModel | EventModel,
+    queryBuilder: RequestQueryBuilder
+  ): Observable<EntityModel[]> {
+    return relationshipType === RelationshipType.EXPOSURE ?
+      this.relationshipDataService
+        .getEntityExposures(
+          selectedOutbreak.id,
+          entity.type,
+          entity.id,
+          queryBuilder
+        ) :
+      this.relationshipDataService.getEntityContacts(
+        selectedOutbreak.id,
+        entity.type,
+        entity.id,
+        queryBuilder
+      );
   }
 }
