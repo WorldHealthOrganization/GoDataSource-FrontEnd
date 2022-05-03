@@ -289,7 +289,7 @@ export const applyFilterBy = (
   query: RequestQueryBuilder,
   column: IExtendedColDef,
   valueOverwrite?: any
-) => {
+): void => {
   // apply to child query builder ?
   if (column.columnDefinition.filter.childQueryBuilder) {
     query = query.addChildQueryBuilder(column.columnDefinition.filter.childQueryBuilder);
@@ -511,4 +511,57 @@ export const applyFilterBy = (
       // finished
       break;
   }
+};
+
+/**
+ * Reset filters to default values
+ */
+export const applyResetOnAllFilters = (
+  columns: IV2Column[]
+): void => {
+  // clear header filters
+  (columns || []).forEach((column) => {
+    // doesn't have filter, then there is no point in continuing ?
+    if (!column.filter) {
+      return;
+    }
+
+    // reset value
+    switch (column.filter.type) {
+      case V2FilterType.ADDRESS_PHONE_NUMBER:
+        column.filter.address.phoneNumber = column.filter.defaultValue;
+
+        // finished
+        break;
+
+      case V2FilterType.ADDRESS_MULTIPLE_LOCATION:
+        column.filter.address.filterLocationIds = column.filter.defaultValue;
+
+        // finished
+        break;
+
+      case V2FilterType.ADDRESS_FIELD:
+        column.filter.address[column.filter.addressField] = column.filter.defaultValue;
+
+        // finished
+        break;
+
+      case V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION:
+        column.filter.address.geoLocationAccurate = column.filter.defaultValue as any;
+
+        // finished
+        break;
+
+      default:
+        column.filter.value =  column.filter.defaultValue;
+    }
+
+    // custom filter ?
+    if (column.filter.search) {
+      // call
+      column.filter.search({
+        columnDefinition: column
+      });
+    }
+  });
 };

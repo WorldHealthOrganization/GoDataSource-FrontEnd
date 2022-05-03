@@ -26,7 +26,8 @@ import { CreateViewModifyV2ExpandColumn, CreateViewModifyV2ExpandColumnType } fr
 import { ICreateViewModifyV2Refresh } from './models/refresh.model';
 import { determineRenderMode, RenderMode } from '../../../core/enums/render-mode.enum';
 import { IExtendedColDef } from '../app-list-table-v2/models/extended-column.model';
-import { applyFilterBy } from '../app-list-table-v2/models/column.model';
+import { applyFilterBy, applyResetOnAllFilters } from '../app-list-table-v2/models/column.model';
+import { AppListTableV2Component } from '../app-list-table-v2/app-list-table-v2.component';
 
 /**
  * Component
@@ -863,6 +864,36 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     this.refreshTabList(
       tab,
       false
+    );
+  }
+
+  /**
+   * Tab filter by - advanced
+   */
+  tabListFilterByAdvanced(
+    listTable: AppListTableV2Component,
+    tab: ICreateViewModifyV2TabTable,
+    queryBuilder?: RequestQueryBuilder
+  ): void {
+    // clear query builder of conditions and sorting criterias
+    tab.queryBuilder.clear();
+
+    // clear table filters
+    applyResetOnAllFilters(tab.tableColumns);
+    listTable.updateColumnDefinitions();
+
+    // // reset table sort columns
+    // this.clearHeaderSort();
+    //
+    // merge query builder with side filters
+    if (queryBuilder) {
+      tab.queryBuilder.merge(queryBuilder);
+    }
+
+    // refresh
+    this.refreshTabList(
+      tab,
+      true
     );
   }
 

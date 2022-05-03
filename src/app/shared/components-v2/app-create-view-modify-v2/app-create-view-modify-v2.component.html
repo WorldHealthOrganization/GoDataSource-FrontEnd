@@ -1142,6 +1142,7 @@
 
                       <app-list-table-v2
                         *ngIf="visitedTabs[tab.label]"
+                        #listTable
                         [records$]="tab.records$"
                         [columns]="tab.tableColumns"
                         [pageCount]="tab.pageCount"
@@ -1159,7 +1160,7 @@
                         (sortBy)="undefined"
                         (filterBy)="tabListFilterBy(tab, $event)"
                         (resetHeaderFilters)="undefined"
-                        (advancedFilterBy)="undefined">
+                        (advancedFilterBy)="tabListFilterByAdvanced(listTable, tab, $event)">
                       </app-list-table-v2>
 
                     </ng-template>
