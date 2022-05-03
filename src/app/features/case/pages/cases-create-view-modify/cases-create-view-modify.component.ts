@@ -1034,11 +1034,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             countQueryBuilder
           )
           .pipe(
-            catchError((err) => {
-              this.toastV2Service.error(err);
-              return throwError(err);
-            }),
-
             // should be the last pipe
             takeUntil(this.destroyed$)
           ).subscribe((response) => {

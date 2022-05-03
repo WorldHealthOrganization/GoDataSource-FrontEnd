@@ -1001,7 +1001,7 @@ export class EntityHelperService {
     entity: CaseModel | ContactModel | EventModel,
     countQueryBuilder: RequestQueryBuilder
   ): Observable<IBasicCount> {
-    return relationshipType === RelationshipType.EXPOSURE ?
+    return (relationshipType === RelationshipType.EXPOSURE ?
       this.relationshipDataService
         .getEntityExposuresCount(
           selectedOutbreak.id,
@@ -1015,6 +1015,12 @@ export class EntityHelperService {
           entity.type,
           entity.id,
           countQueryBuilder
-        );
+        )
+    ).pipe(
+      catchError((err) => {
+        this.toastV2Service.error(err);
+        return throwError(err);
+      })
+    );
   }
 }

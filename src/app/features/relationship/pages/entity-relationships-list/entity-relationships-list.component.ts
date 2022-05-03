@@ -427,11 +427,6 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
         countQueryBuilder
       )
       .pipe(
-        catchError((err) => {
-          this.toastV2Service.error(err);
-          return throwError(err);
-        }),
-
         // should be the last pipe
         takeUntil(this.destroyed$)
       ).subscribe((response) => {
