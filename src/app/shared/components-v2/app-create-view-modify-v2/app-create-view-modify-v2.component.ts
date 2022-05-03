@@ -882,9 +882,13 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     applyResetOnAllFilters(tab.tableColumns);
     listTable.updateColumnDefinitions();
 
-    // // reset table sort columns
-    // this.clearHeaderSort();
-    //
+    // reset table sort columns
+    listTable.columnSortBy(
+      null,
+      null,
+      null
+    );
+
     // merge query builder with side filters
     if (queryBuilder) {
       tab.queryBuilder.merge(queryBuilder);
