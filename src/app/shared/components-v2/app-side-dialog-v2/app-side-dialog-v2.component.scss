@@ -474,6 +474,66 @@
                         }
                       }
                     }
+
+                    .gd-form-select-groups-v2 {
+                      .mat-form-field {
+                        .mat-form-field-wrapper {
+                          .mat-form-field-flex {
+                            .mat-form-field-infix {
+                              .mat-select-multiple {
+                                .mat-select-trigger {
+                                  .mat-select-value {
+                                    width: calc(100% - 2.4rem);
+
+                                    .mat-select-value-text {
+                                      @include flex(flex);
+
+                                      > mat-select-trigger {
+                                        overflow: hidden;
+                                        text-overflow: ellipsis;
+                                        white-space: nowrap;
+
+                                        > div {
+                                          overflow: hidden;
+                                          text-overflow: ellipsis;
+                                          white-space: nowrap;
+                                        }
+                                      }
+
+                                      .gd-form-select-groups-v2-group-selected {
+                                        display: inline-block !important;
+                                        height: 2.4rem;
+                                        max-height: 2.4rem;
+                                        overflow: hidden;
+                                        padding-right: 0;
+                                        text-overflow: ellipsis;
+                                        white-space: nowrap;
+                                      }
+                                    }
+                                  }
+
+                                  .mat-select-arrow-wrapper {
+                                    right: 0.8rem;
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+
+                        &.mat-form-field-invalid {
+                          .mat-form-field-wrapper {
+                            .mat-form-field-flex {
+                              .mat-form-field-infix {
+                                .mat-select.mat-select-multiple {
+                                  height: 2.4rem;
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
                   }
                 }
               }

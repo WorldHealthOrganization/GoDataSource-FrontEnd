@@ -231,7 +231,79 @@
             top: 0.3rem;
             width: 1rem;
           }
+
+          /* Checkbox checked and disabled */
+          &.mat-pseudo-checkbox-disabled {
+            background-color: rgba(var(--gd-primary-rgb), 0.3);
+            color: var(--gd-background);
+          }
         }
+
+        /* Checkbox not checked and disabled */
+        &:not(.mat-pseudo-checkbox-checked) {
+          &.mat-pseudo-checkbox-disabled {
+            color: rgba(var(--gd-secondary-rgb), 0.3);
+          }
+        }
+
+        &.mat-pseudo-checkbox-disabled {
+          color: rgba(var(--gd-secondary-rgb), 0.3);
+
+          + .mat-option-text {
+            color: var(--gd-secondary);
+          }
+        }
+      }
+    }
+
+    &.gd-form-select-groups-v2-panel {
+      .mat-optgroup {
+        border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+        color: var(--gd-text);
+        display: block;
+        @include transition(background-color 0.24s ease-in-out 0s);
+
+        &:hover {
+          background-color: rgba(var(--gd-secondary-rgb), 0.05);
+        }
+
+        .mat-optgroup-label {
+          color: var(--gd-text);
+          cursor: pointer;
+          font-family: $gd-font-family;
+          font-size: $gd-font-size;
+          font-weight: normal;
+          height: auto;
+          line-height: $gd-line-height;
+          padding: 0.8rem 1.6rem;
+
+          .gd-form-select-groups-v2-line {
+            @include flex(flex);
+            @include flex_align_items(center);
+
+            .mat-icon {
+              height: 2rem;
+              margin-right: 0.8rem;
+              width: 2rem;
+            }
+
+            .gd-form-select-groups-v2-line-label {
+              color: var(--gd-text);
+              font-family: $gd-font-family;
+              font-size: $gd-font-size;
+              font-weight: normal;
+              letter-spacing: 0.2rem;
+              line-height: $gd-line-height;
+              text-transform: uppercase;
+            }
+          }
+
+          ~ .mat-option {
+            padding-left: 4.4rem;
+          }
+        }
+
+        .mat-option {}
       }
     }
   }

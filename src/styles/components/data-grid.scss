@@ -77,7 +77,8 @@
           .gd-form-select-multiple-v2,
           .gd-form-date-v2,
           .gd-form-select-location-single-v2,
-          .gd-form-select-location-multiple-v2 {
+          .gd-form-select-location-multiple-v2,
+          .gd-form-select-groups-v2 {
             .mat-form-field {
               .mat-form-field-wrapper {
                 .mat-form-field-flex {
@@ -198,6 +199,63 @@
                             }
 
                             .gd-form-select-multiple-v2-panel-inner {
+                              display: inline-block !important;
+                              height: 2.4rem;
+                              max-height: 2.4rem;
+                              overflow: hidden;
+                              padding-right: 0;
+                              text-overflow: ellipsis;
+                              white-space: nowrap;
+                            }
+                          }
+                        }
+
+                        .mat-select-arrow-wrapper {
+                          right: 0.8rem;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          .gd-form-select-groups-v2 {
+            .mat-form-field {
+              .mat-form-field-wrapper {
+                .mat-form-field-flex {
+                  .mat-form-field-infix {
+                    width: 20rem;
+
+                    .mat-select.mat-select-multiple {
+                      height: 2.4rem;
+
+                      .mat-select-trigger {
+                        .mat-select-value {
+                          overflow: hidden;
+                          text-overflow: ellipsis;
+                          white-space: nowrap;
+                          width: calc(100% - 2.4rem);
+
+                          .mat-select-value-text {
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+
+                            > mat-select-trigger {
+                              overflow: hidden;
+                              text-overflow: ellipsis;
+                              white-space: nowrap;
+
+                              > div {
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                white-space: nowrap;
+                              }
+                            }
+
+                            .gd-form-select-groups-v2-group-selected {
                               display: inline-block !important;
                               height: 2.4rem;
                               max-height: 2.4rem;
