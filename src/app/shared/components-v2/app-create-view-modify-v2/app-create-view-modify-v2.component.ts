@@ -28,6 +28,7 @@ import { determineRenderMode, RenderMode } from '../../../core/enums/render-mode
 import { IExtendedColDef } from '../app-list-table-v2/models/extended-column.model';
 import { applyFilterBy, applyResetOnAllFilters } from '../app-list-table-v2/models/column.model';
 import { AppListTableV2Component } from '../app-list-table-v2/app-list-table-v2.component';
+import { PageEvent } from '@angular/material/paginator';
 
 /**
  * Component
@@ -844,6 +845,26 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Tab page change
+   */
+  tabListPageChange(
+    tab: ICreateViewModifyV2TabTable,
+    page: PageEvent
+  ): void {
+    // update API pagination params
+    tab.queryBuilder.paginator.setPage(page);
+
+    // update page index
+    tab.pageIndex = tab.queryBuilder.paginator.skip / tab.queryBuilder.paginator.limit;
+
+    // refresh list
+    this.refreshTabList(
+      tab,
+      true
+    );
+  }
+
+  /**
    * Tab filter by
    */
   tabListFilterBy(
@@ -888,9 +909,14 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
       null
     );
 
-    // reset paginator
-    // #TODO
-    // this.resetPaginator();
+    // initialize query paginator
+    tab.queryBuilder.paginator.setPage({
+      pageSize: tab.queryBuilder.paginator.limit,
+      pageIndex: 0
+    }, true);
+
+    // update page index
+    tab.pageIndex = 0;
 
     // retrieve Side filters
     let queryBuilder;

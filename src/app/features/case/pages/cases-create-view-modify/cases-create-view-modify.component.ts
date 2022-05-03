@@ -993,6 +993,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         }
       }),
       queryBuilder: new RequestQueryBuilder(),
+      pageIndex: 0,
       refresh: (tab) => {
         // refresh data
         tab.records$ = this.entityHelperService
