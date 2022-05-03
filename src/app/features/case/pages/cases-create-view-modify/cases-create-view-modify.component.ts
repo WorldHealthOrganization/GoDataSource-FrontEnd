@@ -954,7 +954,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   private initializeTabsContacts(): ICreateViewModifyV2TabTable {
     // create tab
     return {
-      // #TODO
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       label: 'LNG_COMMON_BUTTON_EXPOSURES_FROM',
       pageSettingsKey: UserSettings.RELATIONSHIP_FIELDS,

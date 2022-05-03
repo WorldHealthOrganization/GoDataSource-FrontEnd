@@ -868,6 +868,49 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   *
+   */
+  tabListResetHeaderFilters(
+    listTable: AppListTableV2Component,
+    tab: ICreateViewModifyV2TabTable
+  ): void {
+    // clear query builder of conditions and sorting criteria
+    tab.queryBuilder.clear();
+
+    // clear table filters
+    applyResetOnAllFilters(tab.tableColumns);
+    listTable.updateColumnDefinitions();
+
+    // reset table sort columns
+    listTable.columnSortBy(
+      null,
+      null,
+      null
+    );
+
+    // reset paginator
+    // #TODO
+    // this.resetPaginator();
+
+    // retrieve Side filters
+    let queryBuilder;
+    if ((queryBuilder = listTable.advancedFiltersQueryBuilder)) {
+      tab.queryBuilder.merge(queryBuilder);
+    }
+
+    // if no side query builder then clear side filters too
+    if (!queryBuilder) {
+      listTable.generateFiltersFromFilterData(undefined);
+    }
+
+    // refresh
+    this.refreshTabList(
+      tab,
+      true
+    );
+  }
+
+  /**
    * Tab filter by - advanced
    */
   tabListFilterByAdvanced(
@@ -875,7 +918,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     tab: ICreateViewModifyV2TabTable,
     queryBuilder?: RequestQueryBuilder
   ): void {
-    // clear query builder of conditions and sorting criterias
+    // clear query builder of conditions and sorting criteria
     tab.queryBuilder.clear();
 
     // clear table filters
