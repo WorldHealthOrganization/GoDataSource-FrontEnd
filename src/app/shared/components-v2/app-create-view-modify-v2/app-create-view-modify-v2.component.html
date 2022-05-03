@@ -1139,7 +1139,6 @@
                     <!-- Table tab -->
                     <ng-template
                       #tableTab>
-
                       <app-list-table-v2
                         *ngIf="visitedTabs[tab.label]"
                         #listTable
@@ -1149,8 +1148,6 @@
                         [pageSize]="tab.queryBuilder.paginator.limit"
                         [pageIndex]="tab.pageIndex"
                         [pageSettingsKey]="tab.pageSettingsKey"
-
-                        [sortColumn]="undefined"
                         [filtersApplied]="!tab.queryBuilder.isEmptyOnlyFilters()"
                         [advancedFilterType]="tab.advancedFilterType"
                         [advancedFilters]="tab.advancedFilters"
@@ -1162,7 +1159,6 @@
                         (resetHeaderFilters)="tabListResetHeaderFilters(listTable, tab)"
                         (advancedFilterBy)="tabListFilterByAdvanced(listTable, tab, $event)">
                       </app-list-table-v2>
-
                     </ng-template>
                   </div>
                 </mat-tab>

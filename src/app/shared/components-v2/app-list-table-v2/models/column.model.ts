@@ -1,9 +1,10 @@
 import { V2Action } from './action.model';
 import { V2Filter, IV2FilterDate, V2FilterType, V2FilterTextType } from './filter.model';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { IExtendedColDef } from './extended-column.model';
 import { AppFormSelectMultipleV2Component } from '../../../forms-v2/components/app-form-select-multiple-v2/app-form-select-multiple-v2.component';
 import { AddressModel } from '../../../../core/models/address.model';
+import * as _ from 'lodash';
 
 /**
  * Column pinned
@@ -564,4 +565,51 @@ export const applyResetOnAllFilters = (
       });
     }
   });
+};
+
+/**
+ * Sort by
+ */
+export const applySortBy = (
+  tableSortBy: {
+    field?: string,
+    direction?: RequestSortDirection
+  },
+  applyToQueryBuilder: RequestQueryBuilder,
+  advancedQueryBuilder: RequestQueryBuilder,
+  objectDetailsSort: {
+    [property: string]: string[]
+  }
+): void => {
+  // remove previous sort columns, we can sort only by one column at a time
+  applyToQueryBuilder.sort.clear();
+
+  // retrieve Side filters
+  if (advancedQueryBuilder) {
+    applyToQueryBuilder.sort.merge(advancedQueryBuilder.sort);
+  }
+
+  // sort
+  if (
+    tableSortBy.field &&
+    tableSortBy.direction
+  ) {
+    // add sorting criteria
+    if (
+      objectDetailsSort &&
+      objectDetailsSort[tableSortBy.field]
+    ) {
+      _.each(objectDetailsSort[tableSortBy.field], (childProperty: string) => {
+        applyToQueryBuilder.sort.by(
+          `${tableSortBy.field}.${childProperty}`,
+          tableSortBy.direction
+        );
+      });
+    } else {
+      applyToQueryBuilder.sort.by(
+        tableSortBy.field,
+        tableSortBy.direction
+      );
+    }
+  }
 };

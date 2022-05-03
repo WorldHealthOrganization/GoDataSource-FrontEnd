@@ -9,7 +9,7 @@ import { SubscriptionLike } from 'rxjs/internal/types';
 import { StorageKey, StorageService } from '../services/helper/storage.service';
 import { UserModel, UserSettings } from '../models/user.model';
 import * as LzString from 'lz-string';
-import { applyResetOnAllFilters, IV2Column } from '../../shared/components-v2/app-list-table-v2/models/column.model';
+import { applyResetOnAllFilters, applySortBy, IV2Column } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { IV2ActionIconLabel, IV2ActionMenuLabel, V2ActionMenuItem } from '../../shared/components-v2/app-list-table-v2/models/action.model';
 import { OutbreakModel } from '../models/outbreak.model';
@@ -499,41 +499,13 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
     this.tableSortBy.field = data?.field;
     this.tableSortBy.direction = data?.direction;
 
-    // remove previous sort columns, we can sort only by one column at a time
-    this.queryBuilder.sort.clear();
-
-    // retrieve Side filters
-    let queryBuilder;
-    if (
-      this.tableV2Component &&
-      (queryBuilder = this.tableV2Component.advancedFiltersQueryBuilder)
-    ) {
-      this.queryBuilder.sort.merge(queryBuilder.sort);
-    }
-
-    // sort
-    if (
-      this.tableSortBy.field &&
-      this.tableSortBy.direction
-    ) {
-      // add sorting criteria
-      if (
-        objectDetailsSort &&
-        objectDetailsSort[this.tableSortBy.field]
-      ) {
-        _.each(objectDetailsSort[this.tableSortBy.field], (childProperty: string) => {
-          this.queryBuilder.sort.by(
-            `${this.tableSortBy.field}.${childProperty}`,
-            this.tableSortBy.direction
-          );
-        });
-      } else {
-        this.queryBuilder.sort.by(
-          this.tableSortBy.field,
-          this.tableSortBy.direction
-        );
-      }
-    }
+    // apply sort
+    applySortBy(
+      this.tableSortBy,
+      this.queryBuilder,
+      this.tableV2Component?.advancedFiltersQueryBuilder,
+      objectDetailsSort
+    );
 
     // refresh list
     this.needsRefreshList(
