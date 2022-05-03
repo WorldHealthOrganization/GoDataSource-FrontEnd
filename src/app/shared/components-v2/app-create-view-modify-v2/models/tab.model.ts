@@ -294,11 +294,6 @@ export interface ICreateViewModifyV2Tab {
 
   // optional
   form?: NgForm;
-
-
-  records$?: never;
-  tableColumns?: never;
-  pageSettingsKey?: never;
 }
 
 /**
