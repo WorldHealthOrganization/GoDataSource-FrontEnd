@@ -107,6 +107,7 @@
           border-top: 0 none;
           @include flex(flex);
           padding: 0.8rem 0;
+          width: 10rem;
 
           .mat-select {
             font-family: $gd-font-family;

@@ -114,6 +114,10 @@
 
           .mat-tab-body-content {
             padding: 1.6rem;
+
+            @include breakpoint('xs') {
+              padding-right: 0;
+            }
           }
 
           &.gd-create-view-modify-tab-list {

@@ -89,6 +89,7 @@
           border-top: 0 none;
           @include flex(flex);
           padding: 0.8rem 0;
+          width: 10rem;
 
           textarea {
             line-height: 2.4rem;

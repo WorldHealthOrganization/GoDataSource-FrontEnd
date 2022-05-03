@@ -183,7 +183,7 @@
 
           <!-- Title & buttons -->
           <div
-            fxLayout="row"
+            fxLayout="row" fxLayout.lt-md="column"
             class="gd-create-view-modify-top-title-buttons">
 
             <!-- Title & view button -->
@@ -434,13 +434,13 @@
                   <!-- Age - Dob -->
                   <div
                     *ngSwitchCase="CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH"
-                    fxLayout="row" fxLayoutGap="1.6rem">
+                    fxLayout="row" fxLayout.xs="column" fxLayoutGap="1.6rem">
 
                     <!-- Age / Dob option -->
                     <div
-                      fxFlex="calc(50% - 0.8rem)">
+                      *ngIf="!isView"
+                      fxFlex="calc(50% - 0.8rem)" fxFlex.xs="calc(100% - 0.8rem)">
                       <app-form-toggle-v2
-                        *ngIf="!isView"
                         [(ngModel)]="input.ageChecked"
                         [name]="FormHelperService.IGNORE_FIELD_PREFIX + (parentName ? parentName + '[ageDob]' : 'ageDob')"
                         [options]="ageDOBOptions"></app-form-toggle-v2>
@@ -449,7 +449,7 @@
                     <!-- Age -->
                     <div
                       *ngIf="input.ageChecked; else dob"
-                      fxFlex="calc(50% - 0.8rem)" fxLayout="row" fxLayoutGap="1.6rem">
+                      fxFlex="calc(50% - 0.8rem)" fxFlex.xs="calc(100% - 0.8rem)" fxLayout="row" fxLayoutGap="1.6rem">
 
                       <!-- Years -->
                       <app-form-number-v2
@@ -471,7 +471,7 @@
                       <ng-template
                         #months>
                         <app-form-number-v2
-                          fxFlex="calc(50% - 0.8rem)"
+                          fxFlex="calc(50% - 0.8rem)" fxFlex.xs="calc(100% - 0.8rem)"
                           [ngModel]="input.value.age.months.get()"
                           [name]="parentName ? parentName + '[' + input.name.age + '][months]' : (input.name.age + '[months]')"
                           [placeholder]="isView && input.ageChecked ? ('LNG_ENTITY_FIELD_LABEL_AGE' | translate) + ' - ' + ('LNG_AGE_FIELD_LABEL_MONTHS' | translate) : 'LNG_AGE_FIELD_LABEL_MONTHS'"
@@ -501,7 +501,7 @@
                     <ng-template
                       #dob>
                       <app-form-date-v2
-                        fxFlex="calc(50% - 0.8rem)"
+                        fxFlex="calc(50% - 0.8rem)" fxFlex.xs="calc(100% - 0.8rem)"
                         [ngModel]="input.value.dob.get()"
                         [name]="parentName ? parentName + '[' + input.name.dob + ']' : input.name.dob"
                         placeholder="LNG_ENTITY_FIELD_LABEL_DOB"
@@ -551,7 +551,7 @@
                   <!-- Document -->
                   <div
                     *ngSwitchCase="CreateViewModifyV2TabInputType.DOCUMENT"
-                    fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem"
+                    fxFlex fxLayout="row wrap" fxLayout.lt-md="column" fxLayoutGap="1.6rem" fxLayoutGap.lt-md="0"
                     [ngModelGroup]="parentName !== undefined ? parentName + '[' + parentItemIndex + ']' : input.name">
 
                     <!-- Type -->
@@ -665,12 +665,12 @@
 
                     <!-- Lat & Lng -->
                     <div
-                      fxLayout="row wrap" fxLayoutGap="1.6rem"
+                      fxLayout="row wrap" fxLayout.xs="column" fxLayoutGap="1.6rem" fxLayoutGap.xs="0"
                       ngModelGroup="geoLocation">
 
                       <!-- Lat -->
                       <app-form-number-v2
-                        fxFlex="calc(50% - 0.8rem)"
+                        fxFlex="calc(50% - 0.8rem)" fxFlex.xs="100%"
                         [(ngModel)]="input.value.get(parentItemIndex).geoLocation.lat"
                         name="lat"
                         placeholder="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT"
@@ -686,7 +686,7 @@
 
                       <!-- Lng -->
                       <app-form-number-v2
-                        fxFlex="calc(50% - 0.8rem)"
+                        fxFlex="calc(50% - 0.8rem)" fxFlex.xs="100%"
                         [(ngModel)]="input.value.get(parentItemIndex).geoLocation.lng"
                         name="lng"
                         placeholder="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG"
@@ -715,7 +715,7 @@
                   <!-- Vaccine -->
                   <div
                     *ngSwitchCase="CreateViewModifyV2TabInputType.VACCINE"
-                    fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem"
+                    fxFlex fxLayout="row wrap" fxLayout.lt-md="column" fxLayoutGap="1.6rem" fxLayoutGap.lt-md="0"
                     [ngModelGroup]="parentName !== undefined ? parentName + '[' + parentItemIndex + ']' : input.name">
 
                     <!-- Vaccine -->
@@ -766,11 +766,11 @@
 
                     <!-- From & To -->
                     <div
-                      fxLayout="row wrap" fxLayoutGap="1.6rem">
+                      fxLayout="row wrap" fxLayout.xs="column" fxLayoutGap="1.6rem" fxLayoutGap.xs="0">
 
                       <!-- Date range - start -->
                       <app-form-date-v2
-                        fxFlex="calc(50% - 0.8rem)"
+                        fxFlex="calc(50% - 0.8rem)" fxFlex.xs="100%"
                         [(ngModel)]="input.value.get(parentItemIndex).startDate"
                         name="startDate"
                         placeholder="LNG_FORM_RANGE_FIELD_LABEL_FROM"
@@ -781,7 +781,7 @@
 
                       <!-- Date range - end -->
                       <app-form-date-v2
-                        fxFlex="calc(50% - 0.8rem)"
+                        fxFlex="calc(50% - 0.8rem)" fxFlex.xs="100%"
                         [(ngModel)]="input.value.get(parentItemIndex).endDate"
                         name="endDate"
                         placeholder="LNG_FORM_RANGE_FIELD_LABEL_TO"

@@ -17,6 +17,11 @@
     height: calc(100% + 5.2rem);
     margin: -1.2rem -4rem -4rem;
 
+    @include breakpoint('lt-md') {
+      height: calc(100% + 3.2rem);
+      margin: -1.2rem -2rem -2rem;
+    }
+
     .gd-create-view-modify-list {
       border-right: 0 none;
       @include box-shadow(0.2rem 0 0.2rem rgba(var(--gd-text-rgb), 0.1));
@@ -174,7 +179,12 @@
     }
 
     .mat-drawer-content {
+      overflow: hidden;
       padding: 1.2rem 4rem 4rem;
+
+      @include breakpoint('lt-md') {
+        padding: 1.2rem 2rem 2rem;
+      }
     }
 
     &.gd-create-view-modify-list-expanded {
@@ -245,6 +255,10 @@
   .gd-create-view-modify-top {
     padding-bottom: 2.4rem;
 
+    @include breakpoint('xs') {
+      padding-bottom: 1.6rem;
+    }
+
     .gd-create-view-modify-top-title-buttons {
       .gd-create-view-modify-top-title-buttons-title {
         span {
@@ -269,6 +283,10 @@
       }
 
       .gd-create-view-modify-top-title-buttons-buttons {
+        @include breakpoint('xs') {
+          margin-top: 1.6rem;
+        }
+
         .gd-create-view-modify-top-title-buttons-buttons-quick {
           .mat-icon {
             @include transition(all 0.24s ease-in-out 0s);
@@ -303,6 +321,22 @@
             &:not(.gd-create-view-modify-bottom-section-content-input-has-list) {
               width: calc(25% - 1.6rem);
 
+              @include breakpoint('lg') {
+                width: calc(50% - 1.6rem);
+              }
+
+              @include breakpoint('md') {
+                width: calc(50% - 1.6rem);
+              }
+
+              @include breakpoint('sm') {
+                width: calc(50% - 1.6rem);
+              }
+
+              @include breakpoint('xs') {
+                width: calc(100% - 1.6rem);
+              }
+
               &:last-child {
                 margin-right: 1.6rem;
               }
@@ -310,6 +344,10 @@
             
             &.gd-create-view-modify-bottom-section-content-input-has-age-dob {
               width: calc(50% - 1.6rem);
+
+              @include breakpoint('lt-md') {
+                width: calc(100% - 1.6rem);
+              }
             }
 
             &.gd-create-view-modify-bottom-section-content-input-has-textarea {
@@ -354,6 +392,22 @@
 
                       > * {
                         width: calc(25% - 1.6rem);
+
+                        @include breakpoint('lg') {
+                          width: calc(50% - 1.6rem);
+                        }
+
+                        @include breakpoint('md') {
+                          width: calc(50% - 1.6rem);
+                        }
+          
+                        @include breakpoint('sm') {
+                          width: calc(50% - 1.6rem);
+                        }
+          
+                        @include breakpoint('xs') {
+                          width: calc(100% - 1.6rem);
+                        }
 
                         &:last-child {
                           margin-right: 1.6rem;
