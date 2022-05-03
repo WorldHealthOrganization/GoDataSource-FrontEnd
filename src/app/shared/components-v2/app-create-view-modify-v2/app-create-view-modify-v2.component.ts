@@ -889,7 +889,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   }
 
   /**
-   *
+   * Reset Header filters
    */
   tabListResetHeaderFilters(
     listTable: AppListTableV2Component,
@@ -957,6 +957,15 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
       null,
       null
     );
+
+    // initialize query paginator
+    tab.queryBuilder.paginator.setPage({
+      pageSize: tab.queryBuilder.paginator.limit,
+      pageIndex: 0
+    }, true);
+
+    // update page index
+    tab.pageIndex = 0;
 
     // merge query builder with side filters
     if (queryBuilder) {
