@@ -22,6 +22,13 @@ import { DocumentTypeDataResolver } from '../../core/services/resolvers/data/doc
 import { AddressTypeDataResolver } from '../../core/services/resolvers/data/address-type.resolver';
 import { PersonDateTypeDataResolver } from '../../core/services/resolvers/data/person-date-type.resolver';
 import { DateRangeCenterDataResolver } from '../../core/services/resolvers/data/date-range-center.resolver';
+import { PersonTypeDataResolver } from '../../core/services/resolvers/data/person-type.resolver';
+import { ClusterDataResolver } from '../../core/services/resolvers/data/cluster.resolver';
+import { CertaintyLevelDataResolver } from '../../core/services/resolvers/data/certainty-level.resolver';
+import { ExposureTypeDataResolver } from '../../core/services/resolvers/data/exposure-type.resolver';
+import { ExposureFrequencyDataResolver } from '../../core/services/resolvers/data/exposure-frequency.resolver';
+import { ExposureDurationDataResolver } from '../../core/services/resolvers/data/exposure-duration.resolver';
+import { ContextOfTransmissionDataResolver } from '../../core/services/resolvers/data/context-of-transmission.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -42,7 +49,15 @@ const createViewModifyFoundation: Route = {
     vaccineStatus: VaccineStatusDataResolver,
     dateRangeType: PersonDateTypeDataResolver,
     dateRangeCenter: DateRangeCenterDataResolver,
-    yesNo: YesNoDataResolver
+    yesNo: YesNoDataResolver,
+    personType: PersonTypeDataResolver,
+    cluster: ClusterDataResolver,
+    certaintyLevel: CertaintyLevelDataResolver,
+    exposureType: ExposureTypeDataResolver,
+    exposureFrequency: ExposureFrequencyDataResolver,
+    exposureDuration: ExposureDurationDataResolver,
+    contextOfTransmission: ContextOfTransmissionDataResolver,
+    yesNoAll: YesNoAllDataResolver
   }
 };
 

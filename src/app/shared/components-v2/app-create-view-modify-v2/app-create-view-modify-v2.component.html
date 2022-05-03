@@ -1093,7 +1093,8 @@
               <ng-container
                 *ngFor="let tab of tabData.tabs">
                 <mat-tab
-                  *ngIf="isView || tab.type === CreateViewModifyV2TabInputType.TAB">
+                  *ngIf="(isView && (!tab.visible || tab.visible())) || tab.type === CreateViewModifyV2TabInputType.TAB"
+                  [bodyClass]="tab.type === CreateViewModifyV2TabInputType.TAB_TABLE ? 'gd-create-view-modify-tab-list' : undefined">
 
                   <!-- Label & valid -->
                   <ng-template
@@ -1123,7 +1124,28 @@
                     <!-- Table tab -->
                     <ng-template
                       #tableTab>
-                      table...
+
+                      <app-list-table-v2
+                        [records$]="tab.records$"
+                        [columns]="tab.tableColumns"
+
+                        [pageCount]="{count: 50}"
+                        [pageSize]="50"
+                        [pageIndex]="0"
+                        [pageSettingsKey]="tab.pageSettingsKey"
+                        [sortColumn]="undefined"
+                        [filtersApplied]="undefined"
+                        [advancedFilterType]="undefined"
+                        [advancedFilters]="undefined"
+                        (refreshData)="undefined"
+                        (refreshDataCount)="undefined"
+                        (pageChange)="undefined"
+                        (sortBy)="undefined"
+                        (filterBy)="undefined"
+                        (resetHeaderFilters)="undefined"
+                        (advancedFilterBy)="undefined">
+                      </app-list-table-v2>
+
                     </ng-template>
                   </div>
                 </mat-tab>
