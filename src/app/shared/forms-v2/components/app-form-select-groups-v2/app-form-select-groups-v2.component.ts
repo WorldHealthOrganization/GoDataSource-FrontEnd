@@ -5,7 +5,7 @@ import {
   Host, Input,
   OnDestroy,
   Optional, Output,
-  SkipSelf
+  SkipSelf, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
@@ -20,6 +20,7 @@ import { MatOptionSelectionChange } from '@angular/material/core';
 @Component({
   selector: 'app-form-select-groups-v2',
   templateUrl: './app-form-select-groups-v2.component.html',
+  styleUrls: ['./app-form-select-groups-v2.component.scss'],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
     useExisting: forwardRef(() => AppFormSelectGroupsV2Component),
@@ -30,6 +31,7 @@ import { MatOptionSelectionChange } from '@angular/material/core';
       overlayPanelClass: 'gd-cdk-overlay-pane-dropdown-groups'
     }
   }],
+  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppFormSelectGroupsV2Component
