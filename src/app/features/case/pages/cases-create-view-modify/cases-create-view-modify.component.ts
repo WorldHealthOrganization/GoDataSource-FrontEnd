@@ -258,8 +258,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         this.initializeTabsEpidemiology(),
 
         // table tabs - specific to cases, contacts, contact of contacts and events
-        this.initializeTabsContacts()
-        // this.initializeTabsExposures(),
+        this.initializeTabsContacts(),
+        this.initializeTabsExposures()
         // this.initializeTabsLabResults(),
         // this.initializeTabsViewFollowUps()
       ],
@@ -1056,22 +1056,114 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     return newTab;
   }
 
-  // /**
-  //  * Initialize tabs - Exposures
-  //  */
-  // private initializeTabsExposures(): ICreateViewModifyV2TabTable {
-  //   return {
-  //     // #TODO
-  //     type: CreateViewModifyV2TabInputType.TAB_TABLE,
-  //     label: 'LNG_COMMON_BUTTON_EXPOSURES_TO',
-  //     pageSettingsKey: undefined,
-  //     advancedFilterType: undefined,
-  //     visible: () => CaseModel.canListRelationshipExposures(this.authUser),
-  //     records$: undefined,
-  //     tableColumns: undefined
-  //   };
-  // }
-  //
+  /**
+   * Initialize tabs - Exposures
+   */
+  private initializeTabsExposures(): ICreateViewModifyV2TabTable {
+    // create tab
+    const newTab: ICreateViewModifyV2TabTable = {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      label: 'LNG_COMMON_BUTTON_EXPOSURES_TO',
+      pageSettingsKey: UserSettings.RELATIONSHIP_FIELDS,
+      advancedFilterType: Constants.APP_PAGE.RELATIONSHIPS.value,
+      visible: () => CaseModel.canListRelationshipExposures(this.authUser),
+      tableColumns: this.entityHelperService
+        .retrieveTableColumns({
+          selectedOutbreakIsActive: this.selectedOutbreakIsActive,
+          selectedOutbreak: this.selectedOutbreak,
+          entity: this.itemData,
+          relationshipType: RelationshipType.EXPOSURE,
+          authUser: this.authUser,
+          personType: this.activatedRoute.snapshot.data.personType,
+          cluster: this.activatedRoute.snapshot.data.cluster,
+          options: {
+            certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            exposureFrequency: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            exposureDuration: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            contextOfTransmission: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+          },
+          refreshList: () => {
+            // reload data
+            newTab.refresh(newTab);
+          }
+        }),
+      advancedFilters: this.entityHelperService.generateAdvancedFilters({
+        options: {
+          certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          exposureFrequency: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          exposureDuration: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          contextOfTransmission: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          cluster: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ClusterModel>).options
+        }
+      }),
+      queryBuilder: new RequestQueryBuilder(),
+      pageIndex: 0,
+      refresh: (tab) => {
+        // refresh data
+        tab.records$ = this.entityHelperService
+          .retrieveRecords(
+            RelationshipType.EXPOSURE,
+            this.selectedOutbreak,
+            this.itemData,
+            tab.queryBuilder
+          )
+          .pipe(
+            // should be the last pipe
+            takeUntil(this.destroyed$)
+          );
+
+        // count
+        tab.refreshCount(tab);
+      },
+      refreshCount: (
+        tab,
+        applyHasMoreLimit?: boolean
+      ) => {
+        // reset
+        tab.pageCount = undefined;
+
+        // set apply value
+        if (applyHasMoreLimit !== undefined) {
+          tab.applyHasMoreLimit = applyHasMoreLimit;
+        }
+
+        // remove paginator from query builder
+        const countQueryBuilder = _.cloneDeep(tab.queryBuilder);
+        countQueryBuilder.paginator.clear();
+        countQueryBuilder.sort.clear();
+
+        // apply has more limit
+        if (tab.applyHasMoreLimit) {
+          countQueryBuilder.flag(
+            'applyHasMoreLimit',
+            true
+          );
+        }
+
+        // count
+        this.entityHelperService
+          .retrieveRecordsCount(
+            RelationshipType.EXPOSURE,
+            this.selectedOutbreak,
+            this.itemData,
+            countQueryBuilder
+          )
+          .pipe(
+            // should be the last pipe
+            takeUntil(this.destroyed$)
+          ).subscribe((response) => {
+            tab.pageCount = response;
+          });
+      }
+    };
+
+    // finished
+    return newTab;
+  }
+
   // /**
   //  * Initialize tabs - Lab results
   //  */
@@ -1093,6 +1185,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   //  */
   // private initializeTabsViewFollowUps(): ICreateViewModifyV2TabTable {
   //   return {
+  //     // #TODO
   //     type: CreateViewModifyV2TabInputType.TAB_TABLE,
   //     label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS',
   //     pageSettingsKey: undefined,
