@@ -1090,7 +1090,8 @@
           <!-- Render tabs - View / Modify layout -->
           <ng-template
             #viewModify>
-            <mat-tab-group>
+            <mat-tab-group
+              (selectedIndexChange)="visitedTabs[tabData.tabs[$event].label] = true">
               <ng-container
                 *ngFor="let tab of tabData.tabs">
                 <mat-tab
@@ -1127,6 +1128,7 @@
                       #tableTab>
 
                       <app-list-table-v2
+                        *ngIf="visitedTabs[tab.label]"
                         [records$]="tab.records$"
                         [columns]="tab.tableColumns"
 
@@ -1136,7 +1138,7 @@
                         [pageSettingsKey]="tab.pageSettingsKey"
                         [sortColumn]="undefined"
                         [filtersApplied]="undefined"
-                        [advancedFilterType]="undefined"
+                        [advancedFilterType]="tab.advancedFilterType"
                         [advancedFilters]="undefined"
                         (refreshData)="undefined"
                         (refreshDataCount)="undefined"

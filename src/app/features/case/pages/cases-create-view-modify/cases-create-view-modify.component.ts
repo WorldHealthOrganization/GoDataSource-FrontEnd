@@ -956,6 +956,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       label: 'LNG_COMMON_BUTTON_EXPOSURES_FROM',
       pageSettingsKey: UserSettings.RELATIONSHIP_FIELDS,
+      advancedFilterType: Constants.APP_PAGE.RELATIONSHIPS.value,
       visible: () => CaseModel.canListRelationshipContacts(this.authUser),
       records$: this.entityHelperService
         .retrieveRecords(
@@ -1004,6 +1005,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       label: 'LNG_COMMON_BUTTON_EXPOSURES_TO',
       pageSettingsKey: undefined,
+      advancedFilterType: undefined,
       visible: () => CaseModel.canListRelationshipExposures(this.authUser),
       records$: undefined,
       tableColumns: undefined
@@ -1019,6 +1021,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       label: 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS',
       pageSettingsKey: undefined,
+      advancedFilterType: undefined,
       visible: () => LabResultModel.canList(this.authUser) && CaseModel.canListLabResult(this.authUser),
       records$: undefined,
       tableColumns: undefined
@@ -1033,6 +1036,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS',
       pageSettingsKey: undefined,
+      advancedFilterType: undefined,
       visible: () => FollowUpModel.canList(this.authUser),
       records$: undefined,
       tableColumns: undefined

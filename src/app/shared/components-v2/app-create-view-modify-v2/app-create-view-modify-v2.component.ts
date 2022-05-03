@@ -226,6 +226,11 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     return this._expandListAdvancedFiltersCacheKey;
   }
 
+  // visited tabs
+  visitedTabs: {
+    [tabLabel: string]: true
+  } = {};
+
   // refresh data
   @Output() expandListRefreshData = new EventEmitter<ICreateViewModifyV2Refresh>();
 
@@ -765,6 +770,10 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    * View record
    */
   expandListViewRecord(record: any): void {
+    // reset visited tabs
+    this.visitedTabs = {};
+
+    // change
     this.expandListChangeRecord.emit(record);
   }
 

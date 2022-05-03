@@ -311,6 +311,7 @@ export interface ICreateViewModifyV2TabTable {
   records$: Observable<any[]>;
   tableColumns: IV2Column[];
   pageSettingsKey: UserSettings;
+  advancedFilterType: string;
 
   // optional
   visible?: () => boolean

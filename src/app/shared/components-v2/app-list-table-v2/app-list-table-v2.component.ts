@@ -372,13 +372,17 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       }
     );
 
-    // update table size
-    this.resizeTable();
-
     // update filter visibility
     const authUser: UserModel = this.authDataService.getAuthenticatedUser();
     const filterVisibility: boolean | undefined = authUser.getSettings(this._pageSettingsKeyHeaderFilter);
     this._showHeaderFilters = filterVisibility === undefined || filterVisibility;
+
+    // update table size
+    // - hack to rectify some things not being rendered
+    this.resizeTable();
+    setTimeout(() => {
+      this.resizeTable();
+    });
   }
 
   /**
