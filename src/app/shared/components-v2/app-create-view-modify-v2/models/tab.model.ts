@@ -11,6 +11,7 @@ import { Params } from '@angular/router';
 import { IAppFormIconButtonV2 } from '../../../forms-v2/core/app-form-icon-button-v2';
 import { IV2Column } from '../../app-list-table-v2/models/column.model';
 import { UserSettings } from '../../../../core/models/user.model';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
 
 /**
  * Input type
@@ -310,6 +311,9 @@ export interface ICreateViewModifyV2TabTable {
 
   // optional
   visible?: () => boolean
+
+  // used by ui
+  pageCount?: IBasicCount;
 }
 
 /**

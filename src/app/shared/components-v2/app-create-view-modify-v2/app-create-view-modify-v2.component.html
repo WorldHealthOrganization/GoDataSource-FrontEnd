@@ -1131,8 +1131,8 @@
                         *ngIf="visitedTabs[tab.label]"
                         [records$]="tab.records$"
                         [columns]="tab.tableColumns"
+                        [pageCount]="tab.pageCount"
 
-                        [pageCount]="{count: 50}"
                         [pageSize]="50"
                         [pageIndex]="0"
                         [pageSettingsKey]="tab.pageSettingsKey"
