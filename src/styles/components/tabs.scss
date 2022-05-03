@@ -97,18 +97,38 @@
       }
 
       .mat-tab-body-wrapper {
-        background-color: var(--gd-background);
-        @include border-radius(0.4rem);
-        @include box-shadow(0 0.2rem 0.1rem -0.1rem rgb(0, 0, 0, 0.2),
-                            0 0.1rem 0.1rem 0 rgb(0, 0, 0, 0.14),
-                            0 0.1rem 0.3rem 0 rgb(0, 0, 0, 0.12));
-        display: block;
-        max-height: calc(100% - 6.2px);
-        overflow-y: auto;
+        height: 100%;
+        overflow: auto;
 
         .mat-tab-body {
+          &.mat-tab-body-active {
+            background-color: var(--gd-background);
+            @include border-radius(0.4rem);
+            @include box-shadow(0 0.2rem 0.1rem -0.1rem rgb(0, 0, 0, 0.2),
+                                0 0.1rem 0.1rem 0 rgb(0, 0, 0, 0.14),
+                                0 0.1rem 0.3rem 0 rgb(0, 0, 0, 0.12));
+            display: block;
+            max-height: calc(100% - 6.2px);
+            overflow-y: auto;
+          }
+
           .mat-tab-body-content {
             padding: 1.6rem;
+          }
+
+          &.gd-create-view-modify-tab-list {
+            .mat-tab-body-content {
+              height: 100%;
+              padding: 0;
+
+              .gd-create-view-modify-bottom-content {
+                height: 100%;
+
+                .mat-card {
+                  @include box-shadow(none);
+                }
+              }
+            }
           }
         }
       }
