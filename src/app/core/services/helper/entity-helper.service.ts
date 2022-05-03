@@ -29,6 +29,7 @@ import { UserModel } from '../../models/user.model';
 import { V2ActionType } from '../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2BottomDialogConfigButtonType } from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { TranslateService } from '@ngx-translate/core';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 /**
  * From ?
@@ -989,5 +990,31 @@ export class EntityHelperService {
         entity.id,
         queryBuilder
       );
+  }
+
+  /**
+   * Retrieve data count
+   */
+  retrieveRecordsCount(
+    relationshipType: RelationshipType,
+    selectedOutbreak: OutbreakModel,
+    entity: CaseModel | ContactModel | EventModel,
+    countQueryBuilder: RequestQueryBuilder
+  ): Observable<IBasicCount> {
+    return relationshipType === RelationshipType.EXPOSURE ?
+      this.relationshipDataService
+        .getEntityExposuresCount(
+          selectedOutbreak.id,
+          entity.type,
+          entity.id,
+          countQueryBuilder
+        ) :
+      this.relationshipDataService
+        .getEntityContactsCount(
+          selectedOutbreak.id,
+          entity.type,
+          entity.id,
+          countQueryBuilder
+        );
   }
 }

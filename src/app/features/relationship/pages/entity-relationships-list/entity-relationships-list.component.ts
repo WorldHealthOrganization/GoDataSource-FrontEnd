@@ -419,32 +419,23 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
     }
 
     // count
-    (
-      this.relationshipType === RelationshipType.EXPOSURE ?
-        this.relationshipDataService
-          .getEntityExposuresCount(
-            this.selectedOutbreak.id,
-            this._entity.type,
-            this._entity.id,
-            countQueryBuilder
-          ) :
-        this.relationshipDataService
-          .getEntityContactsCount(
-            this.selectedOutbreak.id,
-            this._entity.type,
-            this._entity.id,
-            countQueryBuilder
-          )
-    ).pipe(
-      catchError((err) => {
-        this.toastV2Service.error(err);
-        return throwError(err);
-      }),
+    this.entityHelperService
+      .retrieveRecordsCount(
+        this.relationshipType,
+        this.selectedOutbreak,
+        this._entity,
+        countQueryBuilder
+      )
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        }),
 
-      // should be the last pipe
-      takeUntil(this.destroyed$)
-    ).subscribe((response) => {
-      this.pageCount = response;
-    });
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      ).subscribe((response) => {
+        this.pageCount = response;
+      });
   }
 }

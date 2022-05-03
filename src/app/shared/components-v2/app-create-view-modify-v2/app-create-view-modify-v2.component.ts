@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { CreateViewModifyV2Action } from './models/action.model';
-import { CreateViewModifyV2ActionType, CreateViewModifyV2MenuType, CreateViewModifyV2TabInputType, ICreateViewModifyV2, ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputList } from './models/tab.model';
+import { CreateViewModifyV2ActionType, CreateViewModifyV2MenuType, CreateViewModifyV2TabInputType, ICreateViewModifyV2, ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputList, ICreateViewModifyV2TabTable } from './models/tab.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/bottom-dialog-config.model';
@@ -782,5 +782,49 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    */
   detectChanges(): void {
     this.changeDetectorRef.detectChanges();
+  }
+
+  /**
+   * Refresh tab list
+   */
+  refreshTabList(
+    tab: ICreateViewModifyV2TabTable,
+    instant: boolean
+  ): void {
+    // cancel previous request
+    if (tab.previousRefreshRequest) {
+      clearTimeout(tab.previousRefreshRequest);
+      tab.previousRefreshRequest = undefined;
+    }
+
+    // refresh
+    if (instant) {
+      tab.refresh(tab);
+    } else {
+      tab.previousRefreshRequest = setTimeout(() => {
+        tab.refresh(tab);
+      }, Constants.DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS);
+    }
+  }
+
+  /**
+   * Visit tab
+   */
+  visitTab(tab: ICreateViewModifyV2Tab | ICreateViewModifyV2TabTable): void {
+    // already visited ?
+    if (this.visitedTabs[tab.label]) {
+      return;
+    }
+
+    // set visited
+    this.visitedTabs[tab.label] = true;
+
+    // trigger first refresh if of type table
+    if (tab.type === CreateViewModifyV2TabInputType.TAB_TABLE) {
+      this.refreshTabList(
+        tab,
+        true
+      );
+    }
   }
 }

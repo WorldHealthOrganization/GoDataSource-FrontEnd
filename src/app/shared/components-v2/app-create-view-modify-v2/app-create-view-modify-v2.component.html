@@ -1091,7 +1091,7 @@
           <ng-template
             #viewModify>
             <mat-tab-group
-              (selectedIndexChange)="visitedTabs[tabData.tabs[$event].label] = true">
+              (selectedIndexChange)="visitTab(tabData.tabs[$event])">
               <ng-container
                 *ngFor="let tab of tabData.tabs">
                 <mat-tab
@@ -1140,8 +1140,8 @@
                         [filtersApplied]="undefined"
                         [advancedFilterType]="tab.advancedFilterType"
                         [advancedFilters]="undefined"
-                        (refreshData)="undefined"
-                        (refreshDataCount)="undefined"
+                        (refreshData)="refreshTabList(tab, true)"
+                        (refreshDataCount)="tab.refreshCount(tab, false)"
                         (pageChange)="undefined"
                         (sortBy)="undefined"
                         (filterBy)="undefined"
