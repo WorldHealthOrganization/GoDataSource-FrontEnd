@@ -135,6 +135,7 @@
                 padding: 0.8rem 1.6rem;
                 text-overflow: ellipsis;
                 white-space: nowrap;
+                width: 100%;
               }
             }
           }
@@ -363,6 +364,21 @@
                         width: 100%;
                       }
                     }
+                  }
+                }
+
+                .gd-create-view-modify-bottom-section-content-input-list-empty {
+                  color: var(--gd-secondary);
+                  @include flex(flex);
+                  @include flex_align_items(center);
+                  font-style: italic;
+                  margin: 0 0 1.6rem;
+                  padding-bottom: 0;
+
+                  .mat-icon {
+                    color: rgba(var(--gd-secondary-rgb), 0.5);
+                    font-size: 2.4rem;
+                    margin-right: 0.4rem;
                   }
                 }
               }

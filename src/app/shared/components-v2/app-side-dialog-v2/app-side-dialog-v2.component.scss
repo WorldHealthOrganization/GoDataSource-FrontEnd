@@ -176,6 +176,27 @@
             }
           }
 
+          /* Slide-in panel links with actions */
+          .gd-app-side-dialog-v2-content-middle-item-input-link-with-action {
+            padding: 0.8rem 0;
+            position: relative;
+
+            &:before {
+              background: rgba(var(--gd-secondary-rgb), 0.25);
+              bottom: -0.8rem;
+              content: '';
+              display: block;
+              height: 0.1rem;
+              left: -1.6rem;
+              position: absolute;
+              width: calc(100% + 3.2rem);
+            }
+
+            .gd-app-side-dialog-v2-content-middle-item-input-link {
+              margin-bottom: 0.8rem;
+            }
+          }
+
           /* Slide-in panel accordions */
           .gd-app-side-dialog-v2-content-middle-item-input-accordion-title {
             color: var(--gd-secondary);

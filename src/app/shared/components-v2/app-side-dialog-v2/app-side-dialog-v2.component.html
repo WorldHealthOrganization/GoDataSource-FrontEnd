@@ -195,13 +195,14 @@
 
             <!-- Link with action -->
             <div
-              *ngSwitchCase="V2SideDialogConfigInputType.LINK_WITH_ACTION">
+              *ngSwitchCase="V2SideDialogConfigInputType.LINK_WITH_ACTION"
+              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-link-with-action {{input.cssClasses}}">
 
               <!-- Link -->
               <a
                 mat-flat-button
                 color="text"
-                class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-link {{input.cssClasses}}"
+                class="gd-app-side-dialog-v2-content-middle-item-input-link {{input.cssClasses}}"
                 [routerLink]="input.link(dialogHandler.data, dialogHandler, input)"
                 [queryParams]="input.linkQueryParams ? input.linkQueryParams(dialogHandler.data, dialogHandler, input) : undefined"
                 [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)">
