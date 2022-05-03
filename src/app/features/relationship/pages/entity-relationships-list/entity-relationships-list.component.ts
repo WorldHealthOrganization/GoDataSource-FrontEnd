@@ -132,7 +132,7 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = RelationshipModel.generateAdvancedFilters({
+    this.advancedFilters = this.entityHelperService.generateAdvancedFilters({
       options: {
         certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,

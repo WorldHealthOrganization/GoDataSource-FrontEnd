@@ -22,15 +22,17 @@
 
     <!-- Sidenav -->
     <mat-sidenav-container
-      hasBackdrop="false"
-      [class.gd-create-view-modify-list-expanded]="expandList">
+      [class.gd-create-view-modify-list-expanded]="expandList"
+      [hasBackdrop]="renderMode !== RenderMode.FULL && expandList"
+      (backdropClick)="expandList = false">
 
       <!-- Left Side - List of records -->
       <mat-sidenav
         *ngIf="isView"
         class="gd-create-view-modify-list"
+        [class.gd-create-view-modify-list-hovering]="renderMode !== RenderMode.FULL"
         opened="true"
-        mode="side"
+        [mode]="renderMode === RenderMode.FULL ? 'side' : 'over'"
         disableClose="true">
 
         <!-- Top -->
@@ -147,12 +149,23 @@
 
         <!-- Expand / Collapse button -->
         <button
+          *ngIf="renderMode === RenderMode.FULL; else hoverViewListButton"
           type="button"
           mat-icon-button
           (click)="expandCollapseList()"
           class="gd-create-view-modify-list-expand-collapse-button">
           <span class="material-icons">{{expandList ? 'chevron_left' : 'chevron_right'}}</span>
         </button>
+        <ng-template
+          #hoverViewListButton>
+          <button
+            type="button"
+            mat-flat-button
+            (click)="expandCollapseList()"
+            class="gd-create-view-modify-list-expand-collapse-button">
+            <span>{{listTitle | translate}}</span>
+          </button>
+        </ng-template>
 
       </mat-sidenav>
 
@@ -1139,12 +1152,12 @@
                         [sortColumn]="undefined"
                         [filtersApplied]="undefined"
                         [advancedFilterType]="tab.advancedFilterType"
-                        [advancedFilters]="undefined"
+                        [advancedFilters]="tab.advancedFilters"
                         (refreshData)="refreshTabList(tab, true)"
                         (refreshDataCount)="tab.refreshCount(tab, false)"
                         (pageChange)="undefined"
                         (sortBy)="undefined"
-                        (filterBy)="undefined"
+                        (filterBy)="tabListFilterBy(tab, $event)"
                         (resetHeaderFilters)="undefined"
                         (advancedFilterBy)="undefined">
                       </app-list-table-v2>

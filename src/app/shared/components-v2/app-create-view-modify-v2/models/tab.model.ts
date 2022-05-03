@@ -13,6 +13,7 @@ import { IV2Column } from '../../app-list-table-v2/models/column.model';
 import { UserSettings } from '../../../../core/models/user.model';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { V2AdvancedFilter } from '../../app-list-table-v2/models/advanced-filter.model';
 
 /**
  * Input type
@@ -308,6 +309,7 @@ export interface ICreateViewModifyV2TabTable {
   tableColumns: IV2Column[];
   pageSettingsKey: UserSettings;
   advancedFilterType: string;
+  advancedFilters: V2AdvancedFilter[];
   refresh: (tab: ICreateViewModifyV2TabTable) => void;
   refreshCount: (
     tab: ICreateViewModifyV2TabTable,

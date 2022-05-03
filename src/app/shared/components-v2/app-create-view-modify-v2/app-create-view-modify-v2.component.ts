@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { CreateViewModifyV2Action } from './models/action.model';
 import { CreateViewModifyV2ActionType, CreateViewModifyV2MenuType, CreateViewModifyV2TabInputType, ICreateViewModifyV2, ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputList, ICreateViewModifyV2TabTable } from './models/tab.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
@@ -24,6 +24,9 @@ import { StorageService } from '../../../core/services/helper/storage.service';
 import { ICachedFilter } from '../../../core/helperClasses/models/cache.model';
 import { CreateViewModifyV2ExpandColumn, CreateViewModifyV2ExpandColumnType } from './models/expand-column.model';
 import { ICreateViewModifyV2Refresh } from './models/refresh.model';
+import { determineRenderMode, RenderMode } from '../../../core/enums/render-mode.enum';
+import { IExtendedColDef } from '../app-list-table-v2/models/extended-column.model';
+import { applyFilterBy } from '../app-list-table-v2/models/column.model';
 
 /**
  * Component
@@ -231,6 +234,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     [tabLabel: string]: true
   } = {};
 
+  // render mode
+  renderMode: RenderMode = RenderMode.FULL;
+
   // refresh data
   @Output() expandListRefreshData = new EventEmitter<ICreateViewModifyV2Refresh>();
 
@@ -243,6 +249,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   CreateViewModifyV2MenuType = CreateViewModifyV2MenuType;
   FormHelperService = FormHelperService;
   CreateViewModifyV2ExpandColumnType = CreateViewModifyV2ExpandColumnType;
+  RenderMode = RenderMode;
 
   /**
    * Constructor
@@ -255,7 +262,10 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     protected toastV2Service: ToastV2Service,
     protected authDataService: AuthDataService,
     protected storageService: StorageService
-  ) {}
+  ) {
+    // update render mode
+    this.updateRenderMode();
+  }
 
   /**
    * Initialize resources
@@ -802,7 +812,11 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
       tab.refresh(tab);
     } else {
       tab.previousRefreshRequest = setTimeout(() => {
+        // refresh
         tab.refresh(tab);
+
+        // update ui
+        this.detectChanges();
       }, Constants.DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS);
     }
   }
@@ -826,5 +840,38 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
         true
       );
     }
+  }
+
+  /**
+   * Tab filter by
+   */
+  tabListFilterBy(
+    tab: ICreateViewModifyV2TabTable,
+    data: {
+      column: IExtendedColDef,
+      valueOverwrite?: any
+    }
+  ): void {
+    // filter
+    applyFilterBy(
+      tab.queryBuilder,
+      data.column,
+      data.valueOverwrite
+    );
+
+    // refresh
+    this.refreshTabList(
+      tab,
+      false
+    );
+  }
+
+  /**
+   * Update website render mode
+   */
+  @HostListener('window:resize')
+  private updateRenderMode(): void {
+    // determine render mode
+    this.renderMode = determineRenderMode();
   }
 }

@@ -51,6 +51,7 @@ import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputLinkWithAction, 
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
+import { ClusterModel } from '../../../../core/models/cluster.model';
 
 /**
  * Component
@@ -982,6 +983,16 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             // this.needsRefreshList(true);
           }
         }),
+      advancedFilters: this.entityHelperService.generateAdvancedFilters({
+        options: {
+          certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          exposureFrequency: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          exposureDuration: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          contextOfTransmission: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          cluster: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ClusterModel>).options
+        }
+      }),
       queryBuilder: new RequestQueryBuilder(),
       refresh: (tab) => {
         // refresh data
