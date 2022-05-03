@@ -11,6 +11,9 @@ import { Params } from '@angular/router';
 import { IAppFormIconButtonV2 } from '../../../forms-v2/core/app-form-icon-button-v2';
 import { IV2Column } from '../../app-list-table-v2/models/column.model';
 import { UserSettings } from '../../../../core/models/user.model';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { V2AdvancedFilter } from '../../app-list-table-v2/models/advanced-filter.model';
 
 /**
  * Input type
@@ -294,11 +297,6 @@ export interface ICreateViewModifyV2Tab {
 
   // optional
   form?: NgForm;
-
-
-  records$?: never;
-  tableColumns?: never;
-  pageSettingsKey?: never;
 }
 
 /**
@@ -308,13 +306,25 @@ export interface ICreateViewModifyV2TabTable {
   // required
   type: CreateViewModifyV2TabInputType.TAB_TABLE;
   label: string;
-  records$: Observable<any[]>;
   tableColumns: IV2Column[];
   pageSettingsKey: UserSettings;
   advancedFilterType: string;
+  advancedFilters: V2AdvancedFilter[];
+  refresh: (tab: ICreateViewModifyV2TabTable) => void;
+  refreshCount: (
+    tab: ICreateViewModifyV2TabTable,
+    applyHasMoreLimit?: boolean
+  ) => void;
 
   // optional
   visible?: () => boolean
+
+  // used by ui
+  records$?: Observable<any[]>;
+  queryBuilder?: RequestQueryBuilder;
+  applyHasMoreLimit?: boolean;
+  pageCount?: IBasicCount;
+  previousRefreshRequest?: any;
 }
 
 /**

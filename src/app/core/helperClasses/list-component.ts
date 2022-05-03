@@ -9,7 +9,7 @@ import { SubscriptionLike } from 'rxjs/internal/types';
 import { StorageKey, StorageService } from '../services/helper/storage.service';
 import { UserModel, UserSettings } from '../models/user.model';
 import * as LzString from 'lz-string';
-import { IV2Column } from '../../shared/components-v2/app-list-table-v2/models/column.model';
+import { applyResetOnAllFilters, IV2Column } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { IV2ActionIconLabel, IV2ActionMenuLabel, V2ActionMenuItem } from '../../shared/components-v2/app-list-table-v2/models/action.model';
 import { OutbreakModel } from '../models/outbreak.model';
@@ -611,50 +611,7 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
    */
   clearHeaderFilters() {
     // clear header filters
-    (this.tableColumns || []).forEach((column) => {
-      // doesn't have filter, then there is no point in continuing ?
-      if (!column.filter) {
-        return;
-      }
-
-      // reset value
-      switch (column.filter.type) {
-        case V2FilterType.ADDRESS_PHONE_NUMBER:
-          column.filter.address.phoneNumber = column.filter.defaultValue;
-
-          // finished
-          break;
-
-        case V2FilterType.ADDRESS_MULTIPLE_LOCATION:
-          column.filter.address.filterLocationIds = column.filter.defaultValue;
-
-          // finished
-          break;
-
-        case V2FilterType.ADDRESS_FIELD:
-          column.filter.address[column.filter.addressField] = column.filter.defaultValue;
-
-          // finished
-          break;
-
-        case V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION:
-          column.filter.address.geoLocationAccurate = column.filter.defaultValue as any;
-
-          // finished
-          break;
-
-        default:
-          column.filter.value =  column.filter.defaultValue;
-      }
-
-      // custom filter ?
-      if (column.filter.search) {
-        // call
-        column.filter.search({
-          columnDefinition: column
-        });
-      }
-    });
+    applyResetOnAllFilters(this.tableColumns);
 
     // not rendered yet ?
     if (!this.tableV2Component) {

@@ -51,6 +51,7 @@ import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputLinkWithAction, 
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
+import { ClusterModel } from '../../../../core/models/cluster.model';
 
 /**
  * Component
@@ -257,10 +258,10 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         this.initializeTabsEpidemiology(),
 
         // table tabs - specific to cases, contacts, contact of contacts and events
-        this.initializeTabsContacts(),
-        this.initializeTabsExposures(),
-        this.initializeTabsLabResults(),
-        this.initializeTabsViewFollowUps()
+        this.initializeTabsContacts()
+        // this.initializeTabsExposures(),
+        // this.initializeTabsLabResults(),
+        // this.initializeTabsViewFollowUps()
       ],
 
       // create details
@@ -951,6 +952,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Initialize tabs - Contacts
    */
   private initializeTabsContacts(): ICreateViewModifyV2TabTable {
+    // create tab
     return {
       // #TODO
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
@@ -958,18 +960,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       pageSettingsKey: UserSettings.RELATIONSHIP_FIELDS,
       advancedFilterType: Constants.APP_PAGE.RELATIONSHIPS.value,
       visible: () => CaseModel.canListRelationshipContacts(this.authUser),
-      records$: this.entityHelperService
-        .retrieveRecords(
-          RelationshipType.CONTACT,
-          this.selectedOutbreak,
-          this.itemData,
-          // #TODO
-          new RequestQueryBuilder()
-        )
-        .pipe(
-          // should be the last pipe
-          takeUntil(this.destroyed$)
-        ),
       tableColumns: this.entityHelperService
         .retrieveTableColumns({
           selectedOutbreakIsActive: this.selectedOutbreakIsActive,
@@ -992,56 +982,124 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             // #TODO
             // this.needsRefreshList(true);
           }
-        })
+        }),
+      advancedFilters: this.entityHelperService.generateAdvancedFilters({
+        options: {
+          certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          exposureFrequency: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          exposureDuration: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          contextOfTransmission: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          cluster: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ClusterModel>).options
+        }
+      }),
+      queryBuilder: new RequestQueryBuilder(),
+      refresh: (tab) => {
+        // refresh data
+        tab.records$ = this.entityHelperService
+          .retrieveRecords(
+            RelationshipType.CONTACT,
+            this.selectedOutbreak,
+            this.itemData,
+            tab.queryBuilder
+          )
+          .pipe(
+            // should be the last pipe
+            takeUntil(this.destroyed$)
+          );
+
+        // count
+        tab.refreshCount(tab);
+      },
+      refreshCount: (
+        tab,
+        applyHasMoreLimit?: boolean
+      ) => {
+        // reset
+        tab.pageCount = undefined;
+
+        // set apply value
+        if (applyHasMoreLimit !== undefined) {
+          tab.applyHasMoreLimit = applyHasMoreLimit;
+        }
+
+        // remove paginator from query builder
+        const countQueryBuilder = _.cloneDeep(tab.queryBuilder);
+        countQueryBuilder.paginator.clear();
+        countQueryBuilder.sort.clear();
+
+        // apply has more limit
+        if (tab.applyHasMoreLimit) {
+          countQueryBuilder.flag(
+            'applyHasMoreLimit',
+            true
+          );
+        }
+
+        // count
+        this.entityHelperService
+          .retrieveRecordsCount(
+            RelationshipType.CONTACT,
+            this.selectedOutbreak,
+            this.itemData,
+            countQueryBuilder
+          )
+          .pipe(
+            // should be the last pipe
+            takeUntil(this.destroyed$)
+          ).subscribe((response) => {
+            tab.pageCount = response;
+          });
+      }
     };
   }
 
-  /**
-   * Initialize tabs - Exposures
-   */
-  private initializeTabsExposures(): ICreateViewModifyV2TabTable {
-    return {
-      // #TODO
-      type: CreateViewModifyV2TabInputType.TAB_TABLE,
-      label: 'LNG_COMMON_BUTTON_EXPOSURES_TO',
-      pageSettingsKey: undefined,
-      advancedFilterType: undefined,
-      visible: () => CaseModel.canListRelationshipExposures(this.authUser),
-      records$: undefined,
-      tableColumns: undefined
-    };
-  }
-
-  /**
-   * Initialize tabs - Lab results
-   */
-  private initializeTabsLabResults(): ICreateViewModifyV2TabTable {
-    return {
-      // #TODO
-      type: CreateViewModifyV2TabInputType.TAB_TABLE,
-      label: 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS',
-      pageSettingsKey: undefined,
-      advancedFilterType: undefined,
-      visible: () => LabResultModel.canList(this.authUser) && CaseModel.canListLabResult(this.authUser),
-      records$: undefined,
-      tableColumns: undefined
-    };
-  }
-
-  /**
-   * Initialize tabs - Follow-ups
-   */
-  private initializeTabsViewFollowUps(): ICreateViewModifyV2TabTable {
-    return {
-      type: CreateViewModifyV2TabInputType.TAB_TABLE,
-      label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS',
-      pageSettingsKey: undefined,
-      advancedFilterType: undefined,
-      visible: () => FollowUpModel.canList(this.authUser),
-      records$: undefined,
-      tableColumns: undefined
-    };
-  }
+  // /**
+  //  * Initialize tabs - Exposures
+  //  */
+  // private initializeTabsExposures(): ICreateViewModifyV2TabTable {
+  //   return {
+  //     // #TODO
+  //     type: CreateViewModifyV2TabInputType.TAB_TABLE,
+  //     label: 'LNG_COMMON_BUTTON_EXPOSURES_TO',
+  //     pageSettingsKey: undefined,
+  //     advancedFilterType: undefined,
+  //     visible: () => CaseModel.canListRelationshipExposures(this.authUser),
+  //     records$: undefined,
+  //     tableColumns: undefined
+  //   };
+  // }
+  //
+  // /**
+  //  * Initialize tabs - Lab results
+  //  */
+  // private initializeTabsLabResults(): ICreateViewModifyV2TabTable {
+  //   return {
+  //     // #TODO
+  //     type: CreateViewModifyV2TabInputType.TAB_TABLE,
+  //     label: 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS',
+  //     pageSettingsKey: undefined,
+  //     advancedFilterType: undefined,
+  //     visible: () => LabResultModel.canList(this.authUser) && CaseModel.canListLabResult(this.authUser),
+  //     records$: undefined,
+  //     tableColumns: undefined
+  //   };
+  // }
+  //
+  // /**
+  //  * Initialize tabs - Follow-ups
+  //  */
+  // private initializeTabsViewFollowUps(): ICreateViewModifyV2TabTable {
+  //   return {
+  //     type: CreateViewModifyV2TabInputType.TAB_TABLE,
+  //     label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS',
+  //     pageSettingsKey: undefined,
+  //     advancedFilterType: undefined,
+  //     visible: () => FollowUpModel.canList(this.authUser),
+  //     records$: undefined,
+  //     tableColumns: undefined
+  //   };
+  // }
 
   /**
    * Initialize buttons

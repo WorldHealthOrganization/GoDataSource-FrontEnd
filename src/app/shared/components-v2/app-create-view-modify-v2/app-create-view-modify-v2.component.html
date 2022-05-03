@@ -22,15 +22,17 @@
 
     <!-- Sidenav -->
     <mat-sidenav-container
-      hasBackdrop="false"
-      [class.gd-create-view-modify-list-expanded]="expandList">
+      [class.gd-create-view-modify-list-expanded]="expandList"
+      [hasBackdrop]="renderMode !== RenderMode.FULL && expandList"
+      (backdropClick)="expandList = false">
 
       <!-- Left Side - List of records -->
       <mat-sidenav
         *ngIf="isView"
         class="gd-create-view-modify-list"
+        [class.gd-create-view-modify-list-hovering]="renderMode !== RenderMode.FULL"
         opened="true"
-        mode="side"
+        [mode]="renderMode === RenderMode.FULL ? 'side' : 'over'"
         disableClose="true">
 
         <!-- Top -->
@@ -147,12 +149,23 @@
 
         <!-- Expand / Collapse button -->
         <button
+          *ngIf="renderMode === RenderMode.FULL; else hoverViewListButton"
           type="button"
           mat-icon-button
           (click)="expandCollapseList()"
           class="gd-create-view-modify-list-expand-collapse-button">
           <span class="material-icons">{{expandList ? 'chevron_left' : 'chevron_right'}}</span>
         </button>
+        <ng-template
+          #hoverViewListButton>
+          <button
+            type="button"
+            mat-flat-button
+            (click)="expandCollapseList()"
+            class="gd-create-view-modify-list-expand-collapse-button">
+            <span>{{listTitle | translate}}</span>
+          </button>
+        </ng-template>
 
       </mat-sidenav>
 
@@ -1091,7 +1104,7 @@
           <ng-template
             #viewModify>
             <mat-tab-group
-              (selectedIndexChange)="visitedTabs[tabData.tabs[$event].label] = true">
+              (selectedIndexChange)="visitTab(tabData.tabs[$event])">
               <ng-container
                 *ngFor="let tab of tabData.tabs">
                 <mat-tab
@@ -1129,24 +1142,25 @@
 
                       <app-list-table-v2
                         *ngIf="visitedTabs[tab.label]"
+                        #listTable
                         [records$]="tab.records$"
                         [columns]="tab.tableColumns"
+                        [pageCount]="tab.pageCount"
 
-                        [pageCount]="{count: 50}"
                         [pageSize]="50"
                         [pageIndex]="0"
                         [pageSettingsKey]="tab.pageSettingsKey"
                         [sortColumn]="undefined"
-                        [filtersApplied]="undefined"
+                        [filtersApplied]="!tab.queryBuilder.isEmptyOnlyFilters()"
                         [advancedFilterType]="tab.advancedFilterType"
-                        [advancedFilters]="undefined"
-                        (refreshData)="undefined"
-                        (refreshDataCount)="undefined"
+                        [advancedFilters]="tab.advancedFilters"
+                        (refreshData)="refreshTabList(tab, true)"
+                        (refreshDataCount)="tab.refreshCount(tab, false)"
                         (pageChange)="undefined"
                         (sortBy)="undefined"
-                        (filterBy)="undefined"
+                        (filterBy)="tabListFilterBy(tab, $event)"
                         (resetHeaderFilters)="undefined"
-                        (advancedFilterBy)="undefined">
+                        (advancedFilterBy)="tabListFilterByAdvanced(listTable, tab, $event)">
                       </app-list-table-v2>
 
                     </ng-template>

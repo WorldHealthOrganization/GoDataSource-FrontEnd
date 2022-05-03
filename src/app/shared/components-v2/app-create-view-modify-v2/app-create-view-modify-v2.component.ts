@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { CreateViewModifyV2Action } from './models/action.model';
-import { CreateViewModifyV2ActionType, CreateViewModifyV2MenuType, CreateViewModifyV2TabInputType, ICreateViewModifyV2, ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputList } from './models/tab.model';
+import { CreateViewModifyV2ActionType, CreateViewModifyV2MenuType, CreateViewModifyV2TabInputType, ICreateViewModifyV2, ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputList, ICreateViewModifyV2TabTable } from './models/tab.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/bottom-dialog-config.model';
@@ -24,6 +24,10 @@ import { StorageService } from '../../../core/services/helper/storage.service';
 import { ICachedFilter } from '../../../core/helperClasses/models/cache.model';
 import { CreateViewModifyV2ExpandColumn, CreateViewModifyV2ExpandColumnType } from './models/expand-column.model';
 import { ICreateViewModifyV2Refresh } from './models/refresh.model';
+import { determineRenderMode, RenderMode } from '../../../core/enums/render-mode.enum';
+import { IExtendedColDef } from '../app-list-table-v2/models/extended-column.model';
+import { applyFilterBy, applyResetOnAllFilters } from '../app-list-table-v2/models/column.model';
+import { AppListTableV2Component } from '../app-list-table-v2/app-list-table-v2.component';
 
 /**
  * Component
@@ -231,6 +235,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     [tabLabel: string]: true
   } = {};
 
+  // render mode
+  renderMode: RenderMode = RenderMode.FULL;
+
   // refresh data
   @Output() expandListRefreshData = new EventEmitter<ICreateViewModifyV2Refresh>();
 
@@ -243,6 +250,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   CreateViewModifyV2MenuType = CreateViewModifyV2MenuType;
   FormHelperService = FormHelperService;
   CreateViewModifyV2ExpandColumnType = CreateViewModifyV2ExpandColumnType;
+  RenderMode = RenderMode;
 
   /**
    * Constructor
@@ -255,7 +263,10 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     protected toastV2Service: ToastV2Service,
     protected authDataService: AuthDataService,
     protected storageService: StorageService
-  ) {}
+  ) {
+    // update render mode
+    this.updateRenderMode();
+  }
 
   /**
    * Initialize resources
@@ -782,5 +793,120 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    */
   detectChanges(): void {
     this.changeDetectorRef.detectChanges();
+  }
+
+  /**
+   * Refresh tab list
+   */
+  refreshTabList(
+    tab: ICreateViewModifyV2TabTable,
+    instant: boolean
+  ): void {
+    // cancel previous request
+    if (tab.previousRefreshRequest) {
+      clearTimeout(tab.previousRefreshRequest);
+      tab.previousRefreshRequest = undefined;
+    }
+
+    // refresh
+    if (instant) {
+      tab.refresh(tab);
+    } else {
+      tab.previousRefreshRequest = setTimeout(() => {
+        // refresh
+        tab.refresh(tab);
+
+        // update ui
+        this.detectChanges();
+      }, Constants.DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS);
+    }
+  }
+
+  /**
+   * Visit tab
+   */
+  visitTab(tab: ICreateViewModifyV2Tab | ICreateViewModifyV2TabTable): void {
+    // already visited ?
+    if (this.visitedTabs[tab.label]) {
+      return;
+    }
+
+    // set visited
+    this.visitedTabs[tab.label] = true;
+
+    // trigger first refresh if of type table
+    if (tab.type === CreateViewModifyV2TabInputType.TAB_TABLE) {
+      this.refreshTabList(
+        tab,
+        true
+      );
+    }
+  }
+
+  /**
+   * Tab filter by
+   */
+  tabListFilterBy(
+    tab: ICreateViewModifyV2TabTable,
+    data: {
+      column: IExtendedColDef,
+      valueOverwrite?: any
+    }
+  ): void {
+    // filter
+    applyFilterBy(
+      tab.queryBuilder,
+      data.column,
+      data.valueOverwrite
+    );
+
+    // refresh
+    this.refreshTabList(
+      tab,
+      false
+    );
+  }
+
+  /**
+   * Tab filter by - advanced
+   */
+  tabListFilterByAdvanced(
+    listTable: AppListTableV2Component,
+    tab: ICreateViewModifyV2TabTable,
+    queryBuilder?: RequestQueryBuilder
+  ): void {
+    // clear query builder of conditions and sorting criterias
+    tab.queryBuilder.clear();
+
+    // clear table filters
+    applyResetOnAllFilters(tab.tableColumns);
+    listTable.updateColumnDefinitions();
+
+    // reset table sort columns
+    listTable.columnSortBy(
+      null,
+      null,
+      null
+    );
+
+    // merge query builder with side filters
+    if (queryBuilder) {
+      tab.queryBuilder.merge(queryBuilder);
+    }
+
+    // refresh
+    this.refreshTabList(
+      tab,
+      true
+    );
+  }
+
+  /**
+   * Update website render mode
+   */
+  @HostListener('window:resize')
+  private updateRenderMode(): void {
+    // determine render mode
+    this.renderMode = determineRenderMode();
   }
 }

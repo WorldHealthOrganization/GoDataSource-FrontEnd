@@ -132,7 +132,7 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = RelationshipModel.generateAdvancedFilters({
+    this.advancedFilters = this.entityHelperService.generateAdvancedFilters({
       options: {
         certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -419,32 +419,18 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
     }
 
     // count
-    (
-      this.relationshipType === RelationshipType.EXPOSURE ?
-        this.relationshipDataService
-          .getEntityExposuresCount(
-            this.selectedOutbreak.id,
-            this._entity.type,
-            this._entity.id,
-            countQueryBuilder
-          ) :
-        this.relationshipDataService
-          .getEntityContactsCount(
-            this.selectedOutbreak.id,
-            this._entity.type,
-            this._entity.id,
-            countQueryBuilder
-          )
-    ).pipe(
-      catchError((err) => {
-        this.toastV2Service.error(err);
-        return throwError(err);
-      }),
-
-      // should be the last pipe
-      takeUntil(this.destroyed$)
-    ).subscribe((response) => {
-      this.pageCount = response;
-    });
+    this.entityHelperService
+      .retrieveRecordsCount(
+        this.relationshipType,
+        this.selectedOutbreak,
+        this._entity,
+        countQueryBuilder
+      )
+      .pipe(
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      ).subscribe((response) => {
+        this.pageCount = response;
+      });
   }
 }

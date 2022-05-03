@@ -1,5 +1,9 @@
 import { V2Action } from './action.model';
-import { V2Filter, IV2FilterDate } from './filter.model';
+import { V2Filter, IV2FilterDate, V2FilterType, V2FilterTextType } from './filter.model';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { IExtendedColDef } from './extended-column.model';
+import { AppFormSelectMultipleV2Component } from '../../../forms-v2/components/app-form-select-multiple-v2/app-form-select-multiple-v2.component';
+import { AddressModel } from '../../../../core/models/address.model';
 
 /**
  * Column pinned
@@ -277,3 +281,287 @@ export interface IV2ColumnLinkList {
  */
 export type IV2Column = IV2ColumnBasic | IV2ColumnButton | IV2ColumnAge | IV2ColumnDate | IV2ColumnDatetime | IV2ColumnBoolean | IV2ColumnColor | IV2ColumnIconMaterial
 | IV2ColumnAction | IV2ColumnStatus | IV2ColumnLinkList;
+
+/**
+ * Filter handler
+ */
+export const applyFilterBy = (
+  query: RequestQueryBuilder,
+  column: IExtendedColDef,
+  valueOverwrite?: any
+): void => {
+  // apply to child query builder ?
+  if (column.columnDefinition.filter.childQueryBuilder) {
+    query = query.addChildQueryBuilder(column.columnDefinition.filter.childQueryBuilder);
+  }
+
+  // custom filter ?
+  if (column.columnDefinition.filter.search) {
+    // call
+    column.columnDefinition.filter.search(column);
+
+    // finished
+    return;
+  }
+
+  // filter accordingly
+  switch (column.columnDefinition.filter.type) {
+
+    // text
+    case V2FilterType.TEXT:
+
+      // text filter type
+      switch (column.columnDefinition.filter.textType) {
+        case V2FilterTextType.STARTS_WITH:
+
+          // filter
+          query.filter.byText(
+            column.columnDefinition.field,
+            column.columnDefinition.filter.value
+          );
+
+          // finished
+          break;
+      }
+
+      // finished
+      break;
+
+    // multiple select
+    case V2FilterType.MULTIPLE_SELECT:
+      // replace previous conditions
+      query.filter.remove(column.columnDefinition.field);
+      query.filter.removePathCondition(column.columnDefinition.field);
+      query.filter.removePathCondition(`or.${column.columnDefinition.field}`);
+
+      // do we need to retrieve empty
+      const hasNoValueIncluded: boolean = column.columnDefinition.filter.value ?
+        column.columnDefinition.filter.value.indexOf(AppFormSelectMultipleV2Component.HAS_NO_VALUE) > -1 :
+        false;
+
+      // has no value ?
+      if (
+        hasNoValueIncluded &&
+        column.columnDefinition.filter.value.length === 1
+      ) {
+        // only has no value
+        query.filter.where({
+          or: [
+            {
+              [column.columnDefinition.field]: {
+                eq: null
+              }
+            }, {
+              [column.columnDefinition.field]: {
+                exists: false
+              }
+            }
+          ]
+        }, true);
+      } else if (
+        hasNoValueIncluded
+      ) {
+        // has no value and others...
+        query.filter.where({
+          or: [
+            {
+              [column.columnDefinition.field]: {
+                eq: null
+              }
+            }, {
+              [column.columnDefinition.field]: {
+                exists: false
+              }
+            }, {
+              [column.columnDefinition.field]: { inq: column.columnDefinition.filter.value.filter((value) => value !== AppFormSelectMultipleV2Component.HAS_NO_VALUE) }
+            }
+          ]
+        }, true);
+      } else if (
+        column.columnDefinition.filter.value &&
+        column.columnDefinition.filter.value.length > 0
+      ) {
+        // only other values
+        query.filter.where({
+          [column.columnDefinition.field]: { inq: column.columnDefinition.filter.value.filter((value) => value !== AppFormSelectMultipleV2Component.HAS_NO_VALUE) }
+        }, true);
+      }
+
+      // finished
+      break;
+
+    // date range
+    case V2FilterType.DATE_RANGE:
+      // filter
+      query.filter.byDateRange(
+        column.columnDefinition.field,
+        column.columnDefinition.filter.value
+      );
+
+      // finished
+      break;
+
+    // age range - years
+    case V2FilterType.AGE_RANGE:
+      // filter
+      query.filter.byAgeRange(
+        column.columnDefinition.field,
+        column.columnDefinition.filter.value
+      );
+
+      // finished
+      break;
+
+    // address
+    case V2FilterType.ADDRESS_PHONE_NUMBER:
+    case V2FilterType.ADDRESS_MULTIPLE_LOCATION:
+    case V2FilterType.ADDRESS_FIELD:
+    case V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION:
+      // remove the previous conditions
+      query.filter.removePathCondition('address');
+      query.filter.removePathCondition('addresses');
+      query.filter.removePathCondition('and.address');
+      query.filter.removePathCondition('and.addresses');
+
+      // create a query builder
+      const searchQb: RequestQueryBuilder = AddressModel.buildAddressFilter(
+        column.columnDefinition.filter.field,
+        column.columnDefinition.filter.fieldIsArray,
+        column.columnDefinition.filter.address,
+        column.columnDefinition.filter.address.filterLocationIds,
+        (column.columnDefinition.filter as any).useLike
+      );
+
+      // add condition if we were able to create it
+      if (
+        searchQb &&
+        !searchQb.isEmpty()
+      ) {
+        query.merge(searchQb);
+      }
+
+      // finished
+      break;
+
+    // boolean
+    case V2FilterType.BOOLEAN:
+      // filter
+      query.filter.byBooleanUsingExist(
+        column.columnDefinition.field,
+        column.columnDefinition.filter.value as any
+      );
+
+      // finished
+      break;
+
+    // number range
+    case V2FilterType.NUMBER_RANGE:
+      // filter
+      query.filter.byRange(
+        column.columnDefinition.field,
+        column.columnDefinition.filter.value
+      );
+
+      // finished
+      break;
+
+    // deleted
+    case V2FilterType.DELETED:
+      // filter
+      if (column.columnDefinition.filter.value === false) {
+        query.excludeDeleted();
+        query.filter.remove('deleted');
+      } else {
+        query.includeDeleted();
+        if (column.columnDefinition.filter.value === true) {
+          query.filter.where({
+            deleted: {
+              eq: true
+            }
+          }, true);
+        } else {
+          query.filter.remove('deleted');
+        }
+      }
+
+      // finished
+      break;
+
+    // phone number
+    case V2FilterType.PHONE_NUMBER:
+      // filter
+      query.filter.byPhoneNumber(
+        column.columnDefinition.field,
+        column.columnDefinition.filter.value
+      );
+
+      // finished
+      break;
+
+    // select group
+    case V2FilterType.SELECT_GROUPS:
+      // filter
+      query.filter.bySelect(
+        column.columnDefinition.field,
+        valueOverwrite,
+        true,
+        null
+      );
+
+      // finished
+      break;
+  }
+};
+
+/**
+ * Reset filters to default values
+ */
+export const applyResetOnAllFilters = (
+  columns: IV2Column[]
+): void => {
+  // clear header filters
+  (columns || []).forEach((column) => {
+    // doesn't have filter, then there is no point in continuing ?
+    if (!column.filter) {
+      return;
+    }
+
+    // reset value
+    switch (column.filter.type) {
+      case V2FilterType.ADDRESS_PHONE_NUMBER:
+        column.filter.address.phoneNumber = column.filter.defaultValue;
+
+        // finished
+        break;
+
+      case V2FilterType.ADDRESS_MULTIPLE_LOCATION:
+        column.filter.address.filterLocationIds = column.filter.defaultValue;
+
+        // finished
+        break;
+
+      case V2FilterType.ADDRESS_FIELD:
+        column.filter.address[column.filter.addressField] = column.filter.defaultValue;
+
+        // finished
+        break;
+
+      case V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION:
+        column.filter.address.geoLocationAccurate = column.filter.defaultValue as any;
+
+        // finished
+        break;
+
+      default:
+        column.filter.value =  column.filter.defaultValue;
+    }
+
+    // custom filter ?
+    if (column.filter.search) {
+      // call
+      column.filter.search({
+        columnDefinition: column
+      });
+    }
+  });
+};
