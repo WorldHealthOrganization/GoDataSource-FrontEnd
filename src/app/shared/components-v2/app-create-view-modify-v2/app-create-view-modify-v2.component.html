@@ -1150,7 +1150,7 @@
                         [pageIndex]="0"
                         [pageSettingsKey]="tab.pageSettingsKey"
                         [sortColumn]="undefined"
-                        [filtersApplied]="undefined"
+                        [filtersApplied]="!tab.queryBuilder.isEmptyOnlyFilters()"
                         [advancedFilterType]="tab.advancedFilterType"
                         [advancedFilters]="tab.advancedFilters"
                         (refreshData)="refreshTabList(tab, true)"
