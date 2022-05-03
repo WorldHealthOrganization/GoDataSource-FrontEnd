@@ -1154,7 +1154,7 @@
                         (refreshData)="refreshTabList(tab, true)"
                         (refreshDataCount)="tab.refreshCount(tab, false)"
                         (pageChange)="tabListPageChange(tab, $event)"
-                        (sortBy)="undefined"
+                        (sortBy)="tabListSortBy(listTable, tab, $event)"
                         (filterBy)="tabListFilterBy(tab, $event)"
                         (resetHeaderFilters)="tabListResetHeaderFilters(listTable, tab)"
                         (advancedFilterBy)="tabListFilterByAdvanced(listTable, tab, $event)">

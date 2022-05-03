@@ -15,7 +15,7 @@ import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
+import { RequestQueryBuilder, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
 import { V2AdvancedFilter } from '../app-list-table-v2/models/advanced-filter.model';
 import { SavedFilterData } from '../../../core/models/saved-filters.model';
 import { ListComponent } from '../../../core/helperClasses/list-component';
@@ -26,7 +26,7 @@ import { CreateViewModifyV2ExpandColumn, CreateViewModifyV2ExpandColumnType } fr
 import { ICreateViewModifyV2Refresh } from './models/refresh.model';
 import { determineRenderMode, RenderMode } from '../../../core/enums/render-mode.enum';
 import { IExtendedColDef } from '../app-list-table-v2/models/extended-column.model';
-import { applyFilterBy, applyResetOnAllFilters } from '../app-list-table-v2/models/column.model';
+import { applyFilterBy, applyResetOnAllFilters, applySortBy } from '../app-list-table-v2/models/column.model';
 import { AppListTableV2Component } from '../app-list-table-v2/app-list-table-v2.component';
 import { PageEvent } from '@angular/material/paginator';
 
@@ -861,6 +861,32 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     this.refreshTabList(
       tab,
       true
+    );
+  }
+
+  /**
+   * Tab sort by
+   */
+  tabListSortBy(
+    listTable: AppListTableV2Component,
+    tab: ICreateViewModifyV2TabTable,
+    data: {
+      field: string,
+      direction: RequestSortDirection
+    }
+  ): void {
+    // apply sort
+    applySortBy(
+      data,
+      tab.queryBuilder,
+      listTable.advancedFiltersQueryBuilder,
+      undefined
+    );
+
+    // refresh list
+    this.refreshTabList(
+      tab,
+      false
     );
   }
 
