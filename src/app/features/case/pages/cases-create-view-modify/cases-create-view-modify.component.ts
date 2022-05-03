@@ -257,7 +257,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         this.initializeTabsEpidemiology(),
 
         // table tabs - specific to cases, contacts, contact of contacts and events
-        this.initializeTabsContacts(),
+        this.initializeTabsContacts()
         // this.initializeTabsExposures(),
         // this.initializeTabsLabResults(),
         // this.initializeTabsViewFollowUps()
