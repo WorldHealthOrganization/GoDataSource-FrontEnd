@@ -30,7 +30,6 @@
       <mat-sidenav
         *ngIf="isView"
         class="gd-create-view-modify-list"
-        [class.gd-create-view-modify-list-hovering]="renderMode !== RenderMode.FULL"
         opened="true"
         [mode]="renderMode === RenderMode.FULL ? 'side' : 'over'"
         disableClose="true">

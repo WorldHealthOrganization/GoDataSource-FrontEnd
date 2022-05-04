@@ -220,6 +220,13 @@
           }
         }
 
+        .gd-create-view-modify-list-expand-collapse-button {
+          @include breakpoint('lt-lg') {
+            background-color: var(--gd-warning);
+            color: var(--gd-text);
+          }
+        }
+
         ~ .mat-drawer-content {
           @include breakpoint('gt-lg') {
             margin-left: var(--gd-side-list-width-expanded) !important;
