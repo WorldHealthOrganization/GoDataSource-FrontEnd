@@ -1,22 +1,22 @@
 import { ModuleWithProviders } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import * as fromPages from './pages';
-import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
-import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
-import { AuthGuard } from '../../core/services/guards/auth-guard.service';
-import { PERMISSION } from '../../core/models/permission.model';
+import { RouterModule, Routes } from '@angular/router';
 import { RelationshipType } from '../../core/enums/relationship-type.enum';
+import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
+import { PERMISSION } from '../../core/models/permission.model';
 import { PermissionExpression } from '../../core/models/user.model';
-import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
+import { AuthGuard } from '../../core/services/guards/auth-guard.service';
+import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 import { CertaintyLevelDataResolver } from '../../core/services/resolvers/data/certainty-level.resolver';
-import { ExposureTypeDataResolver } from '../../core/services/resolvers/data/exposure-type.resolver';
-import { ExposureFrequencyDataResolver } from '../../core/services/resolvers/data/exposure-frequency.resolver';
-import { ExposureDurationDataResolver } from '../../core/services/resolvers/data/exposure-duration.resolver';
-import { ContextOfTransmissionDataResolver } from '../../core/services/resolvers/data/context-of-transmission.resolver';
 import { ClusterDataResolver } from '../../core/services/resolvers/data/cluster.resolver';
+import { ContextOfTransmissionDataResolver } from '../../core/services/resolvers/data/context-of-transmission.resolver';
+import { ExposureDurationDataResolver } from '../../core/services/resolvers/data/exposure-duration.resolver';
+import { ExposureFrequencyDataResolver } from '../../core/services/resolvers/data/exposure-frequency.resolver';
+import { ExposureTypeDataResolver } from '../../core/services/resolvers/data/exposure-type.resolver';
 import { PersonTypeDataResolver } from '../../core/services/resolvers/data/person-type.resolver';
-import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { RelationshipPersonDataResolver } from '../../core/services/resolvers/data/relationship-person.resolver';
+import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
+import * as fromPages from './pages';
 
 const relationshipTypeChildrenRoutes = [
   // Relationships list
@@ -175,6 +175,9 @@ const routes: Routes = [
       permissions: [
         PERMISSION.CASE_LIST_ONSET_BEFORE_PRIMARY_CASE_REPORT
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver
     }
   },
   // Report about the long periods in the dates of onset between cases in the chain of transmission i.e. indicate where an intermediate contact may have been missed
