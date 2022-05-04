@@ -500,7 +500,9 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
             menuOptions: [
               // Delete Outbreak
               {
-                label: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_OUTBREAK',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_OUTBREAK'
+                },
                 cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: OutbreakModel): void => {
@@ -584,7 +586,9 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
 
               // View Outbreak inconsistencies
               {
-                label: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_INCONSISTENCIES',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_INCONSISTENCIES'
+                },
                 action: {
                   link: (item: OutbreakModel): string[] => {
                     return ['/outbreaks', item.id, 'inconsistencies'];
@@ -598,7 +602,9 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
 
               // View Outbreak case form
               {
-                label: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE'
+                },
                 action: {
                   link: (item: OutbreakModel): string[] => {
                     return ['/outbreaks', item.id, 'case-questionnaire'];
@@ -612,7 +618,9 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
 
               // View Outbreak contact form
               {
-                label: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE'
+                },
                 action: {
                   link: (item: OutbreakModel): string[] => {
                     return ['/outbreaks', item.id, 'contact-questionnaire'];
@@ -626,7 +634,9 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
 
               // View Outbreak contact follow-up form
               {
-                label: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE'
+                },
                 action: {
                   link: (item: OutbreakModel): string[] => {
                     return ['/outbreaks', item.id, 'contact-follow-up-questionnaire'];
@@ -640,7 +650,9 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
 
               // View Outbreak case lab result form
               {
-                label: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE'
+                },
                 action: {
                   link: (item: OutbreakModel): string[] => {
                     return ['/outbreaks', item.id, 'case-lab-results-questionnaire'];
@@ -668,7 +680,9 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
 
               // Clone Outbreak
               {
-                label: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_OUTBREAK',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_OUTBREAK'
+                },
                 action: {
                   click: (item: OutbreakModel): void => {
                     // determine what we need to clone
@@ -841,7 +855,9 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
 
               // Restore deleted Outbreak
               {
-                label: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_RESTORE_OUTBREAK',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_OUTBREAKS_ACTION_RESTORE_OUTBREAK'
+                },
                 cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: OutbreakModel) => {

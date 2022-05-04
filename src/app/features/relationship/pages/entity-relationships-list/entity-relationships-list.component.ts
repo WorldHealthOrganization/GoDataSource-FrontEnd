@@ -156,9 +156,11 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
     this.groupActions = [
       // Share
       {
-        label: this.relationshipType === RelationshipType.EXPOSURE ?
-          'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_SHARE_SELECTED_EXPOSURES' :
-          'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_SHARE_SELECTED_CONTACTS',
+        label: {
+          get: () => this.relationshipType === RelationshipType.EXPOSURE ?
+            'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_SHARE_SELECTED_EXPOSURES' :
+            'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_SHARE_SELECTED_CONTACTS'
+        },
         action: {
           click: (selected: string[]) => {
             // determine list of model ids
@@ -190,7 +192,9 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
 
       // Change source
       {
-        label: 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_CHANGE_SOURCE',
+        label: {
+          get: () => 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_CHANGE_SOURCE'
+        },
         action: {
           click: (selected: string[]) => {
             // pass the selected target persons for not including them in available peoples
@@ -224,7 +228,9 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
 
       // Bulk delete
       {
-        label: 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS',
+        label: {
+          get: () => 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_DELETE_SELECTED_RELATIONSHIPS'
+        },
         action: {
           click: (selected: string[]) => {
             // create query

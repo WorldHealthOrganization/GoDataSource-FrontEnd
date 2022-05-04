@@ -332,7 +332,9 @@ export class MarkedNotDuplicatesListComponent
             menuOptions: [
               // Delete
               {
-                label: 'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_REMOVE_FROM_LIST_ENTITY',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_REMOVE_FROM_LIST_ENTITY'
+                },
                 cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: CaseModel | ContactModel | ContactOfContactModel) => {

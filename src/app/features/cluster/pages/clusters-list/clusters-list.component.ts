@@ -149,7 +149,9 @@ export class ClustersListComponent extends ListComponent implements OnDestroy {
             menuOptions: [
               // Delete Cluster
               {
-                label: 'LNG_PAGE_LIST_CLUSTERS_ACTION_DELETE_CLUSTER',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CLUSTERS_ACTION_DELETE_CLUSTER'
+                },
                 cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: OutbreakModel): void => {
@@ -228,7 +230,9 @@ export class ClustersListComponent extends ListComponent implements OnDestroy {
 
               // View People
               {
-                label: 'LNG_PAGE_LIST_CLUSTERS_ACTION_VIEW_PEOPLE',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CLUSTERS_ACTION_VIEW_PEOPLE'
+                },
                 action: {
                   link: (item: OutbreakModel): string[] => {
                     return ['/clusters', item.id, 'people'];

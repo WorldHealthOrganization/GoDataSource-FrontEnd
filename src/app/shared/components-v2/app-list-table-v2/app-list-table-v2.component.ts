@@ -608,7 +608,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
             icon: 'expand_more',
             menuOptions: [
               {
-                label: 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL',
+                label: {
+                  get: () => 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL'
+                },
                 action: {
                   click: () => {
                     this._agTable.api.selectAll();
@@ -620,7 +622,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
                 }
               },
               {
-                label: 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL',
+                label: {
+                  get: () => 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL'
+                },
                 action: {
                   click: () => {
                     this._agTable.api.deselectAll();

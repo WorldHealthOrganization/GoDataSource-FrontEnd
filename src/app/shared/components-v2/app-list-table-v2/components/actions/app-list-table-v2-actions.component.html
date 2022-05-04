@@ -57,7 +57,7 @@
                 [queryParams]="menuOption.action.linkQueryParams ? menuOption.action.linkQueryParams(data) : undefined"
                 [disabled]="menuOption.disable && menuOption.disable(data)"
                 (click)="menuOption.action.click && (!menuOption.disable || !menuOption.disable(data)) ? menuOption.action.click(data) : undefined">
-                {{menuOption.label | translate}}
+                {{menuOption.label.get(data) | translate:(menuOption.label.data ? menuOption.label.data(data) : undefined)}}
               </a>
 
               <!-- Divider -->

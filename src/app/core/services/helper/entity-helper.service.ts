@@ -889,7 +889,9 @@ export class EntityHelperService {
             menuOptions: [
               // Delete
               {
-                label: 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP'
+                },
                 cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: EntityModel): void => {

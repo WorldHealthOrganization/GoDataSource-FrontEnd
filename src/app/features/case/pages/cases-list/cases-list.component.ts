@@ -798,7 +798,9 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
             menuOptions: [
               // Delete Case
               {
-                label: 'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE'
+                },
                 cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: CaseModel): void => {
@@ -910,7 +912,9 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
 
               // Convert Case To Contact
               {
-                label: 'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT'
+                },
                 cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: CaseModel): void => {
@@ -989,7 +993,9 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
 
               // Add Contact to Case
               {
-                label: 'LNG_PAGE_ACTION_ADD_CONTACT',
+                label: {
+                  get: () => 'LNG_PAGE_ACTION_ADD_CONTACT'
+                },
                 action: {
                   link: (): string[] => {
                     return ['/contacts', 'create'];
@@ -1011,7 +1017,9 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
 
               // Bulk add contacts to case
               {
-                label: 'LNG_PAGE_ACTION_BULK_ADD_CONTACTS',
+                label: {
+                  get: () => 'LNG_PAGE_ACTION_BULK_ADD_CONTACTS'
+                },
                 action: {
                   link: (): string[] => {
                     return ['/contacts', 'create-bulk'];
@@ -1051,7 +1059,9 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
 
               // See case contacts..
               {
-                label: 'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM',
+                label: {
+                  get: () => 'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM'
+                },
                 action: {
                   link: (item: CaseModel): string[] => {
                     return ['/relationships', EntityType.CASE, item.id, 'contacts'];
@@ -1066,7 +1076,9 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
 
               // See case exposures
               {
-                label: 'LNG_PAGE_ACTION_SEE_EXPOSURES_TO',
+                label: {
+                  get: () => 'LNG_PAGE_ACTION_SEE_EXPOSURES_TO'
+                },
                 action: {
                   link: (item: CaseModel): string[] => {
                     return ['/relationships', EntityType.CASE, item.id, 'exposures'];
@@ -1094,7 +1106,9 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
 
               // See records detected by the system as duplicates but they were marked as not duplicates
               {
-                label: 'LNG_PAGE_LIST_CASES_ACTION_SEE_RECORDS_NOT_DUPLICATES',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CASES_ACTION_SEE_RECORDS_NOT_DUPLICATES'
+                },
                 action: {
                   link: (item: CaseModel): string[] => {
                     return ['/duplicated-records/cases', item.id, 'marked-not-duplicates'];
@@ -1107,7 +1121,9 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
 
               // See case lab results
               {
-                label: 'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS'
+                },
                 action: {
                   link: (item: CaseModel): string[] => {
                     return ['/lab-results', 'cases', item.id];
@@ -1122,7 +1138,9 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
 
               // See contacts follow-us belonging to this case
               {
-                label: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS'
+                },
                 action: {
                   link: (item: CaseModel): string[] => {
                     return ['/contacts', 'case-related-follow-ups', item.id];
@@ -1136,7 +1154,9 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
 
               // See questionnaire
               {
-                label: 'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE',
+                label: {
+                  get: () => 'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE'
+                },
                 action: {
                   link: (item: CaseModel): string[] => {
                     return ['/cases', item.id, 'view-questionnaire'];
@@ -1161,7 +1181,9 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
 
               // View Case movement map
               {
-                label: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_MOVEMENT',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CASES_ACTION_VIEW_MOVEMENT'
+                },
                 action: {
                   link: (item: CaseModel): string[] => {
                     return ['/cases', item.id, 'movement'];
@@ -1175,7 +1197,9 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
 
               // View case chronology timeline
               {
-                label: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY'
+                },
                 action: {
                   link: (item: CaseModel): string[] => {
                     return ['/cases', item.id, 'chronology'];
@@ -1199,7 +1223,9 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
 
               // Download case investigation form
               {
-                label: 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_CASE_INVESTIGATION_FORM',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_CASE_INVESTIGATION_FORM'
+                },
                 action: {
                   click: (item: CaseModel) => {
                     // export
@@ -1232,7 +1258,9 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
 
               // Restore a deleted case
               {
-                label: 'LNG_PAGE_LIST_CASES_ACTION_RESTORE_CASE',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CASES_ACTION_RESTORE_CASE'
+                },
                 cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: CaseModel) => {
@@ -1378,7 +1406,9 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
       menuOptions: [
         // No relationships
         {
-          label: 'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON',
+          label: {
+            get: () => 'LNG_PAGE_LIST_CASES_ACTION_NO_RELATIONSHIPS_BUTTON'
+          },
           action: this.redirectService.linkAndQueryParams(
             ['/cases'],
             {
@@ -1401,7 +1431,9 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
 
         // Onset report
         {
-          label: 'LNG_PAGE_LIST_CASES_ONSET_REPORT_BUTTON',
+          label: {
+            get: () => 'LNG_PAGE_LIST_CASES_ONSET_REPORT_BUTTON'
+          },
           action: {
             link: () => ['/relationships/date-onset']
           },
@@ -1412,7 +1444,9 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
 
         // Cases long period report
         {
-          label: 'LNG_PAGE_LIST_CASES_LONG_PERIOD_REPORT_BUTTON',
+          label: {
+            get: () => 'LNG_PAGE_LIST_CASES_LONG_PERIOD_REPORT_BUTTON'
+          },
           action: {
             link: () => ['/relationships/long-period']
           },
@@ -1431,7 +1465,9 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
 
         // Export cases
         {
-          label: 'LNG_PAGE_LIST_CASES_EXPORT_BUTTON',
+          label: {
+            get: () => 'LNG_PAGE_LIST_CASES_EXPORT_BUTTON'
+          },
           action: {
             click: () => {
               this.exportCases(this.queryBuilder);
@@ -1444,7 +1480,9 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
 
         // Import cases
         {
-          label: 'LNG_PAGE_LIST_CASES_IMPORT_BUTTON',
+          label: {
+            get: () => 'LNG_PAGE_LIST_CASES_IMPORT_BUTTON'
+          },
           action: {
             link: () => ['/import-export-data', 'case-data', 'import']
           },
@@ -1464,7 +1502,9 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
 
         // Empty case investigation form
         {
-          label: 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS',
+          label: {
+            get: () => 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_EMPTY_CASE_INVESTIGATION_FORMS'
+          },
           action: {
             click: () => {
               this.dialogV2Service.showExportData({
@@ -1505,7 +1545,9 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
 
         // Export relationships
         {
-          label: 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_CASES_RELATIONSHIPS',
+          label: {
+            get: () => 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_CASES_RELATIONSHIPS'
+          },
           action: {
             click: () => {
               // construct filter by case query builder
@@ -1544,7 +1586,9 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
 
         // Import relationships
         {
-          label: 'LNG_PAGE_LIST_CASES_ACTION_IMPORT_CASES_RELATIONSHIPS',
+          label: {
+            get: () => 'LNG_PAGE_LIST_CASES_ACTION_IMPORT_CASES_RELATIONSHIPS'
+          },
           action: {
             link: () => ['/import-export-data', 'relationships', 'import'],
             linkQueryParams: (): Params => {
@@ -1568,7 +1612,9 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
   protected initializeGroupActions(): void {
     this.groupActions = [
       {
-        label: 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES',
+        label: {
+          get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES'
+        },
         action: {
           click: (selected: string[]) => {
             // construct query builder
@@ -1591,7 +1637,9 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
           return selected.length < 1;
         }
       }, {
-        label: 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER',
+        label: {
+          get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER'
+        },
         action: {
           click: (selected: string[]) => {
             // remove id from list
@@ -1634,7 +1682,9 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
           return selected.length < 1;
         }
       }, {
-        label: 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_RELATIONSHIPS',
+        label: {
+          get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_RELATIONSHIPS'
+        },
         action: {
           click: (selected: string[]) => {
             // construct query builder

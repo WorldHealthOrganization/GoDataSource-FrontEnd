@@ -188,7 +188,9 @@ export class RolesListComponent extends ListComponent implements OnDestroy {
             menuOptions: [
               // Delete Role
               {
-                label: 'LNG_PAGE_LIST_USER_ROLES_ACTION_DELETE_ROLE',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_USER_ROLES_ACTION_DELETE_ROLE'
+                },
                 cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: UserRoleModel): void => {
@@ -263,7 +265,9 @@ export class RolesListComponent extends ListComponent implements OnDestroy {
 
               // Clone Role
               {
-                label: 'LNG_PAGE_LIST_USER_ROLES_ACTION_CLONE_ROLE',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_USER_ROLES_ACTION_CLONE_ROLE'
+                },
                 action: {
                   link: (): string[] => {
                     return ['/user-roles/create'];

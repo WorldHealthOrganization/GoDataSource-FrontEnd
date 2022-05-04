@@ -72,7 +72,15 @@ export interface IV2ActionIconLabel {
  */
 interface IV2ActionMenuOption {
   // menu option
-  label: string;
+  label: {
+    // required
+    get: (data: any) => string,
+
+    // optional
+    data?: (data: any) => {
+      [key: string]: string
+    }
+  };
   action: IV2ActionClick | IV2ActionLink;
 
   // optional

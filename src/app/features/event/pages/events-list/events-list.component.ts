@@ -525,7 +525,9 @@ export class EventsListComponent
             menuOptions: [
               // Delete Event
               {
-                label: 'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_EVENT',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_EVENT'
+                },
                 cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: EventModel): void => {
@@ -604,7 +606,9 @@ export class EventsListComponent
 
               // Add Contact to Event
               {
-                label: 'LNG_PAGE_ACTION_ADD_CONTACT',
+                label: {
+                  get: () => 'LNG_PAGE_ACTION_ADD_CONTACT'
+                },
                 action: {
                   link: (): string[] => {
                     return ['/contacts', 'create'];
@@ -628,7 +632,9 @@ export class EventsListComponent
 
               // Bulk add contacts to event
               {
-                label: 'LNG_PAGE_ACTION_BULK_ADD_CONTACTS',
+                label: {
+                  get: () => 'LNG_PAGE_ACTION_BULK_ADD_CONTACTS'
+                },
                 action: {
                   link: (): string[] => {
                     return ['/contacts', 'create-bulk'];
@@ -667,7 +673,9 @@ export class EventsListComponent
 
               // See event contacts
               {
-                label: 'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM',
+                label: {
+                  get: () => 'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM'
+                },
                 action: {
                   link: (item: EventModel): string[] => {
                     return [
@@ -689,7 +697,9 @@ export class EventsListComponent
 
               // See event exposures
               {
-                label: 'LNG_PAGE_ACTION_SEE_EXPOSURES_TO',
+                label: {
+                  get: () => 'LNG_PAGE_ACTION_SEE_EXPOSURES_TO'
+                },
                 action: {
                   link: (item: EventModel): string[] => {
                     return [
@@ -711,7 +721,9 @@ export class EventsListComponent
 
               // Restore a deleted event
               {
-                label: 'LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_EVENT',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_EVENT'
+                },
                 cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: EventModel) => {
@@ -822,7 +834,9 @@ export class EventsListComponent
       menuOptions: [
         // No relationships
         {
-          label: 'LNG_PAGE_LIST_EVENTS_ACTION_NO_RELATIONSHIPS_BUTTON',
+          label: {
+            get: () => 'LNG_PAGE_LIST_EVENTS_ACTION_NO_RELATIONSHIPS_BUTTON'
+          },
           action: this.redirectService.linkAndQueryParams(['/events'], {
             applyListFilter:
               Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS
@@ -849,7 +863,9 @@ export class EventsListComponent
 
         // Export events
         {
-          label: 'LNG_PAGE_LIST_EVENTS_EXPORT_BUTTON',
+          label: {
+            get: () => 'LNG_PAGE_LIST_EVENTS_EXPORT_BUTTON'
+          },
           action: {
             click: () => {
               this.exportEvents(this.queryBuilder);
@@ -862,7 +878,9 @@ export class EventsListComponent
 
         // Import events
         {
-          label: 'LNG_PAGE_LIST_EVENTS_IMPORT_BUTTON',
+          label: {
+            get: () => 'LNG_PAGE_LIST_EVENTS_IMPORT_BUTTON'
+          },
           action: {
             link: () => ['/import-export-data', 'event-data', 'import']
           },
@@ -886,7 +904,9 @@ export class EventsListComponent
 
         // Export relationships
         {
-          label: 'LNG_PAGE_LIST_EVENTS_ACTION_EXPORT_EVENTS_RELATIONSHIPS',
+          label: {
+            get: () => 'LNG_PAGE_LIST_EVENTS_ACTION_EXPORT_EVENTS_RELATIONSHIPS'
+          },
           action: {
             click: () => {
               // construct filter by event query builder
@@ -919,7 +939,9 @@ export class EventsListComponent
 
         // Import relationships
         {
-          label: 'LNG_PAGE_LIST_EVENTS_ACTION_IMPORT_EVENTS_RELATIONSHIPS',
+          label: {
+            get: () => 'LNG_PAGE_LIST_EVENTS_ACTION_IMPORT_EVENTS_RELATIONSHIPS'
+          },
           action: {
             link: () => ['/import-export-data', 'relationships', 'import'],
             linkQueryParams: (): Params => {
@@ -945,7 +967,9 @@ export class EventsListComponent
   protected initializeGroupActions(): void {
     this.groupActions = [
       {
-        label: 'LNG_PAGE_LIST_EVENTS_GROUP_ACTION_EXPORT_SELECTED_EVENTS',
+        label: {
+          get: () => 'LNG_PAGE_LIST_EVENTS_GROUP_ACTION_EXPORT_SELECTED_EVENTS'
+        },
         action: {
           click: (selected: string[]) => {
             // construct query builder
@@ -964,7 +988,9 @@ export class EventsListComponent
         }
       },
       {
-        label: 'LNG_PAGE_LIST_EVENTS_GROUP_ACTION_EXPORT_SELECTED_EVENTS_RELATIONSHIPS',
+        label: {
+          get: () => 'LNG_PAGE_LIST_EVENTS_GROUP_ACTION_EXPORT_SELECTED_EVENTS_RELATIONSHIPS'
+        },
         action: {
           click: (selected: string[]) => {
             // construct query builder

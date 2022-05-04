@@ -336,7 +336,9 @@ export class UserListComponent extends ListComponent implements OnDestroy {
             menuOptions: [
               // Delete User
               {
-                label: 'LNG_PAGE_LIST_USERS_ACTION_DELETE_USER',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_USERS_ACTION_DELETE_USER'
+                },
                 cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: UserModel): void => {
@@ -440,7 +442,9 @@ export class UserListComponent extends ListComponent implements OnDestroy {
       menuOptions: [
         // Onset report
         {
-          label: 'LNG_PAGE_LIST_USERS_ACTION_VIEW_USERS_WORKLOAD',
+          label: {
+            get: () => 'LNG_PAGE_LIST_USERS_ACTION_VIEW_USERS_WORKLOAD'
+          },
           action: {
             link: () => ['/users', 'workload']
           },

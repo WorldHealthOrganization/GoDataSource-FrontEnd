@@ -781,7 +781,9 @@ export class ContactsListComponent
             menuOptions: [
               // Delete Contact
               {
-                label: 'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_CONTACT',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_CONTACT'
+                },
                 cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: ContactModel): void => {
@@ -856,7 +858,9 @@ export class ContactsListComponent
 
               // Convert Contact to Contact
               {
-                label: 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE'
+                },
                 cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: ContactModel): void => {
@@ -934,7 +938,9 @@ export class ContactsListComponent
 
               // Add Contact of Contact
               {
-                label: 'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_CONTACT_OF_CONTACT',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_CONTACT_OF_CONTACT'
+                },
                 action: {
                   link: (): string[] => {
                     return ['/contacts-of-contacts', 'create'];
@@ -956,7 +962,9 @@ export class ContactsListComponent
 
               // Bulk add Contacts of Contacts
               {
-                label: 'LNG_PAGE_LIST_CONTACTS_ACTION_BULK_ADD_CONTACTS',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_BULK_ADD_CONTACTS'
+                },
                 action: {
                   link: (): string[] => {
                     return ['/contacts-of-contacts', 'create-bulk'];
@@ -996,7 +1004,9 @@ export class ContactsListComponent
 
               // Add Follow-up to Contact
               {
-                label: 'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_FOLLOW_UP',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_FOLLOW_UP'
+                },
                 action: {
                   link: (item: ContactModel): string[] => {
                     return ['/contacts', item.id, 'follow-ups', 'create'];
@@ -1021,7 +1031,9 @@ export class ContactsListComponent
 
               // See contact exposures
               {
-                label: 'LNG_PAGE_ACTION_SEE_EXPOSURES_TO',
+                label: {
+                  get: () => 'LNG_PAGE_ACTION_SEE_EXPOSURES_TO'
+                },
                 action: {
                   link: (item: ContactModel): string[] => {
                     return [
@@ -1040,7 +1052,9 @@ export class ContactsListComponent
 
               // See contact contacts of contacts
               {
-                label: 'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM',
+                label: {
+                  get: () => 'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM'
+                },
                 action: {
                   link: (item: ContactModel): string[] => {
                     return ['/relationships', EntityType.CONTACT, item.id, 'contacts'];
@@ -1064,8 +1078,9 @@ export class ContactsListComponent
 
               // See records detected by the system as duplicates but they were marked as not duplicates
               {
-                label:
-                  'LNG_PAGE_LIST_CONTACTS_ACTION_SEE_RECORDS_NOT_DUPLICATES',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_SEE_RECORDS_NOT_DUPLICATES'
+                },
                 action: {
                   link: (item: ContactModel): string[] => {
                     return ['/duplicated-records/contacts', item.id, 'marked-not-duplicates'];
@@ -1078,7 +1093,9 @@ export class ContactsListComponent
 
               // See contact lab results
               {
-                label: 'LNG_PAGE_LIST_CONTACTS_ACTION_SEE_LAB_RESULTS',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_SEE_LAB_RESULTS'
+                },
                 action: {
                   link: (item: ContactModel): string[] => {
                     return ['/lab-results', 'contacts', item.id];
@@ -1094,7 +1111,9 @@ export class ContactsListComponent
 
               // See contact follow-us
               {
-                label: 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_FOLLOW_UPS',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_FOLLOW_UPS'
+                },
                 action: {
                   link: (item: ContactModel): string[] => {
                     return ['/contacts', 'contact-related-follow-ups', item.id];
@@ -1107,7 +1126,9 @@ export class ContactsListComponent
 
               // See questionnaire
               {
-                label: 'LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE',
+                label: {
+                  get: () => 'LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE'
+                },
                 action: {
                   link: (item: ContactModel): string[] => {
                     return ['/contacts', item.id, 'view-questionnaire'];
@@ -1127,7 +1148,9 @@ export class ContactsListComponent
 
               // View Contact movement map
               {
-                label: 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_MOVEMENT',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_MOVEMENT'
+                },
                 action: {
                   link: (item: ContactModel): string[] => {
                     return ['/contacts', item.id, 'movement'];
@@ -1141,7 +1164,9 @@ export class ContactsListComponent
 
               // View Contact chronology timeline
               {
-                label: 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CHRONOLOGY',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CHRONOLOGY'
+                },
                 action: {
                   link: (item: ContactModel): string[] => {
                     return ['/contacts', item.id, 'chronology'];
@@ -1155,7 +1180,9 @@ export class ContactsListComponent
 
               // Restore a deleted contact
               {
-                label: 'LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_CONTACT',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_CONTACT'
+                },
                 cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: ContactModel) => {
@@ -1274,8 +1301,9 @@ export class ContactsListComponent
       menuOptions: [
         // Change contact final follow up status
         {
-          label:
-            'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS',
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_CHANGE_CONTACT_FINAL_FOLLOW_UP_STATUS'
+          },
           action: {
             click: () => {
               this.changeContactFinalFollowUpStatus();
@@ -1295,7 +1323,9 @@ export class ContactsListComponent
 
         // Export contacts
         {
-          label: 'LNG_PAGE_LIST_CONTACTS_EXPORT_BUTTON',
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_EXPORT_BUTTON'
+          },
           action: {
             click: () => {
               this.exportContacts(this.queryBuilder);
@@ -1307,7 +1337,9 @@ export class ContactsListComponent
         },
         // Import contacts
         {
-          label: 'LNG_PAGE_LIST_CONTACTS_IMPORT_BUTTON',
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_IMPORT_BUTTON'
+          },
           action: {
             link: () => ['/import-export-data', 'contact-data', 'import']
           },
@@ -1328,7 +1360,9 @@ export class ContactsListComponent
 
         // Export relationships
         {
-          label: 'LNG_PAGE_LIST_CONTACTS_ACTION_EXPORT_CONTACTS_RELATIONSHIPS',
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_EXPORT_CONTACTS_RELATIONSHIPS'
+          },
           action: {
             click: () => {
               // construct filter by contact query builder
@@ -1361,7 +1395,9 @@ export class ContactsListComponent
 
         // Import relationships
         {
-          label: 'LNG_PAGE_LIST_CONTACTS_ACTION_IMPORT_CONTACTS_RELATIONSHIPS',
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_IMPORT_CONTACTS_RELATIONSHIPS'
+          },
           action: {
             link: () => ['/import-export-data', 'relationships', 'import'],
             linkQueryParams: (): Params => {
@@ -1387,7 +1423,9 @@ export class ContactsListComponent
 
         // Export follow up list
         {
-          label: 'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_BUTTON',
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_BUTTON'
+          },
           action: {
             click: () => {
               this.dialogV2Service.showExportData({
@@ -1451,7 +1489,9 @@ export class ContactsListComponent
 
         // Export daily follow up form
         {
-          label: 'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_BUTTON',
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_BUTTON'
+          },
           action: {
             click: () => {
               this.dialogV2Service.showExportData({
@@ -1486,7 +1526,9 @@ export class ContactsListComponent
   protected initializeGroupActions(): void {
     this.groupActions = [
       {
-        label: 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS',
+        label: {
+          get: () => 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS'
+        },
         action: {
           click: (selected: string[]) => {
             // construct query builder
@@ -1505,7 +1547,9 @@ export class ContactsListComponent
         }
       },
       {
-        label: 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_DOSSIER',
+        label: {
+          get: () => 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_DOSSIER'
+        },
         action: {
           click: (selected: string[]) => {
             // remove id from list
@@ -1548,8 +1592,9 @@ export class ContactsListComponent
         }
       },
       {
-        label:
-          'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_RELATIONSHIPS',
+        label: {
+          get: () => 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_RELATIONSHIPS'
+        },
         action: {
           click: (selected: string[]) => {
             // construct query builder
@@ -1577,7 +1622,9 @@ export class ContactsListComponent
         }
       },
       {
-        label: 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_MODIFY_CONTACTS',
+        label: {
+          get: () => 'LNG_PAGE_LIST_CONTACTS_GROUP_ACTION_MODIFY_CONTACTS'
+        },
         action: {
           link: (): string[] => {
             return ['/contacts', 'modify-bulk'];

@@ -233,7 +233,9 @@ export class OutbreakTemplatesListComponent
             menuOptions: [
               // Delete Outbreak template
               {
-                label: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_DELETE_OUTBREAK_TEMPLATE',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_DELETE_OUTBREAK_TEMPLATE'
+                },
                 cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: OutbreakTemplateModel): void => {
@@ -314,7 +316,9 @@ export class OutbreakTemplatesListComponent
 
               // View Outbreak template case form
               {
-                label: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE'
+                },
                 action: {
                   link: (item: OutbreakTemplateModel): string[] => {
                     return ['/outbreak-templates', item.id, 'case-questionnaire'];
@@ -327,7 +331,9 @@ export class OutbreakTemplatesListComponent
 
               // View Outbreak template contact form
               {
-                label: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE'
+                },
                 action: {
                   link: (item: OutbreakTemplateModel): string[] => {
                     return ['/outbreak-templates', item.id, 'contact-questionnaire'];
@@ -340,7 +346,9 @@ export class OutbreakTemplatesListComponent
 
               // View Outbreak template contact follow-up form
               {
-                label: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE'
+                },
                 action: {
                   link: (item: OutbreakTemplateModel): string[] => {
                     return ['/outbreak-templates', item.id, 'contact-follow-up-questionnaire'];
@@ -353,7 +361,9 @@ export class OutbreakTemplatesListComponent
 
               // View Outbreak template case lab result form
               {
-                label: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE'
+                },
                 action: {
                   link: (item: OutbreakTemplateModel): string[] => {
                     return ['/outbreak-templates', item.id, 'case-lab-results-questionnaire'];
@@ -374,7 +384,9 @@ export class OutbreakTemplatesListComponent
 
               // Clone Template Outbreak
               {
-                label: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTIONS_CLONE_OUTBREAK_TEMPLATE',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTIONS_CLONE_OUTBREAK_TEMPLATE'
+                },
                 action: {
                   click: (item: OutbreakTemplateModel): void => {
                     // determine what we need to clone

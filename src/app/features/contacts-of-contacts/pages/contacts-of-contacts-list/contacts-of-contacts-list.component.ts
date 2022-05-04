@@ -593,7 +593,9 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
             menuOptions: [
               // Delete Contact of contact
               {
-                label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_CONTACT_OF_CONTACT',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_DELETE_CONTACT_OF_CONTACT'
+                },
                 cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: ContactOfContactModel): void => {
@@ -671,7 +673,9 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
               // See Contact of contact exposures
               {
-                label: 'LNG_PAGE_ACTION_SEE_EXPOSURES_TO',
+                label: {
+                  get: () => 'LNG_PAGE_ACTION_SEE_EXPOSURES_TO'
+                },
                 action: {
                   link: (item: ContactOfContactModel): string[] => {
                     return ['/relationships', EntityType.CONTACT_OF_CONTACT, item.id, 'exposures'];
@@ -699,7 +703,9 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
               // See records detected by the system as duplicates but they were marked as not duplicates
               {
-                label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_SEE_RECORDS_NOT_DUPLICATES',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_SEE_RECORDS_NOT_DUPLICATES'
+                },
                 action: {
                   link: (item: ContactOfContactModel): string[] => {
                     return ['/duplicated-records/contacts-of-contacts', item.id, 'marked-not-duplicates'];
@@ -712,7 +718,9 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
               // View Contact of contact movement map
               {
-                label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_MOVEMENT',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_MOVEMENT'
+                },
                 action: {
                   link: (item: ContactOfContactModel): string[] => {
                     return ['/contacts-of-contacts', item.id, 'movement'];
@@ -726,7 +734,9 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
               // View Contact of contact chronology timeline
               {
-                label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_CHRONOLOGY',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_VIEW_CHRONOLOGY'
+                },
                 action: {
                   link: (item: ContactOfContactModel): string[] => {
                     return ['/contacts-of-contacts', item.id, 'chronology'];
@@ -740,7 +750,9 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
               // Restore a deleted Contact of contact
               {
-                label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_RESTORE_CONTACT_OF_CONTACTS',
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_RESTORE_CONTACT_OF_CONTACTS'
+                },
                 cssClasses: () => 'gd-list-table-actions-action-menu-warning',
                 action: {
                   click: (item: ContactOfContactModel) => {
@@ -841,7 +853,9 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
       menuOptions: [
         // Export contacts of contact
         {
-          label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_BUTTON',
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_BUTTON'
+          },
           action: {
             click: () => {
               this.exportContactsOfContacts(this.queryBuilder);
@@ -854,7 +868,9 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
         // Import contacts of contact
         {
-          label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_IMPORT_BUTTON',
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_IMPORT_BUTTON'
+          },
           action: {
             link: () => ['/import-export-data', 'contact-of-contact-data', 'import']
           },
@@ -874,7 +890,9 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
         // Export relationships
         {
-          label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_EXPORT_CONTACTS_OF_CONTACTS_RELATIONSHIPS',
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_EXPORT_CONTACTS_OF_CONTACTS_RELATIONSHIPS'
+          },
           action: {
             click: () => {
               // construct filter by Contact of contact query builder
@@ -913,7 +931,9 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
 
         // Import relationships
         {
-          label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_IMPORT_CONTACTS_OF_CONTACTS_RELATIONSHIPS',
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_ACTION_IMPORT_CONTACTS_OF_CONTACTS_RELATIONSHIPS'
+          },
           action: {
             link: () => ['/import-export-data', 'relationships', 'import'],
             linkQueryParams: (): Params => {
@@ -937,7 +957,9 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
   protected initializeGroupActions(): void {
     this.groupActions = [
       {
-        label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS',
+        label: {
+          get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS'
+        },
         action: {
           click: (selected: string[]) => {
             // construct query builder
@@ -956,7 +978,9 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         }
       },
       {
-        label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER',
+        label: {
+          get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER'
+        },
         action: {
           click: (selected: string[]) => {
             // remove id from list
@@ -1001,7 +1025,9 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         }
       },
       {
-        label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_RELATIONSHIPS',
+        label: {
+          get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_RELATIONSHIPS'
+        },
         action: {
           click: (selected: string[]) => {
             // construct query builder
@@ -1029,7 +1055,9 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         }
       },
       {
-        label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_MODIFY_CONTACTS_OF_CONTACTS',
+        label: {
+          get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_MODIFY_CONTACTS_OF_CONTACTS'
+        },
         action: {
           link: (): string[] => {
             return ['/contacts-of-contacts', 'modify-bulk'];
