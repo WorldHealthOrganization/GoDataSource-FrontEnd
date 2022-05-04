@@ -278,6 +278,7 @@
 
       <!-- Reset filters -->
       <button
+        *ngIf="hasTableHeaderFilters"
         type="button"
         mat-icon-button
         [matTooltip]="'LNG_COMMON_BUTTON_RESET_FILTERS' | translate"
@@ -287,6 +288,7 @@
 
       <!-- Advanced filters -->
       <button
+        *ngIf="advancedFilters?.length > 0"
         type="button"
         mat-flat-button
         color="primary"
@@ -306,6 +308,7 @@
 
       <!-- Show / Hide header filters -->
       <button
+        *ngIf="hasTableHeaderFilters"
         [class.gd-list-table-header-right-header-filters-active]="showHeaderFilters"
         type="button"
         mat-icon-button

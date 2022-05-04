@@ -89,6 +89,14 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // set data
     this._columns = columns;
 
+    // determine if we have at least one header filter
+    this.hasTableHeaderFilters = false;
+    (this._columns || []).forEach((column) => {
+      if (column.filter) {
+        this.hasTableHeaderFilters = true;
+      }
+    });
+
     // update columns definitions
     this.updateColumnDefinitions();
   }
@@ -96,9 +104,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     return this._columns;
   }
 
-  /**
-   * Ag table api handlers
-   */
+  // has at least one table header filter ?
+  hasTableHeaderFilters: boolean = false;
+
+  // ag table api handlers
   private _agTable: {
     api: GridApi,
     columnApi: ColumnApi
@@ -167,7 +176,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     this.saveHeaderFilterVisibility();
   }
   get showHeaderFilters(): boolean {
-    return this._showHeaderFilters;
+    return this.hasTableHeaderFilters && this._showHeaderFilters;
   }
 
   // grouped data
