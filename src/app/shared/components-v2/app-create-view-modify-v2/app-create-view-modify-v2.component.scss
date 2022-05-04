@@ -17,13 +17,25 @@
     height: calc(100% + 5.2rem);
     margin: -1.2rem -4rem -4rem;
 
+    @include breakpoint('lt-md') {
+      height: calc(100% + 3.2rem);
+      margin: -1.2rem -2rem -2rem;
+    }
+
     .gd-create-view-modify-list {
       border-right: 0 none;
       @include box-shadow(0.2rem 0 0.2rem rgba(var(--gd-text-rgb), 0.1));
       color: var(--gd-text);
       overflow: visible;
       @include transition(all 0.24s ease-in-out 0s);
-      width: var(--gd-side-list-width-collapsed);
+
+      @include breakpoint('gt-lg') {
+        width: var(--gd-side-list-width-collapsed);
+      }
+
+      @include breakpoint('lt-lg') {
+        width: 0;
+      }
 
       .mat-drawer-inner-container {
         @include flex(flex);
@@ -38,8 +50,11 @@
               color: var(--gd-primary-alt);
               font-size: 1.8rem;
               font-weight: 500;
-              text-orientation: upright;
-              writing-mode: vertical-lr;
+
+              @include breakpoint('gt-lg') {
+                text-orientation: upright;
+                writing-mode: vertical-lr;
+              }
             }
 
             .gd-create-view-modify-list-top-buttons {
@@ -167,14 +182,21 @@
       }
 
       ~ .mat-drawer-content {
-        margin: 0 0 0 var(--gd-side-list-width-collapsed) !important;
-        @include transition(all 0.24s ease-in-out 0s);
-        width: calc(100% - var(--gd-side-list-width-collapsed));
+        @include breakpoint('gt-lg') {
+          margin: 0 0 0 var(--gd-side-list-width-collapsed) !important;
+          @include transition(all 0.24s ease-in-out 0s);
+          width: calc(100% - var(--gd-side-list-width-collapsed));
+        }
       }
     }
 
     .mat-drawer-content {
+      overflow: hidden;
       padding: 1.2rem 4rem 4rem;
+
+      @include breakpoint('lt-md') {
+        padding: 1.2rem 2rem 2rem;
+      }
     }
 
     &.gd-create-view-modify-list-expanded {
@@ -184,39 +206,71 @@
         .mat-drawer-inner-container {
           .gd-create-view-modify-list-top {
             .gd-create-view-modify-list-top-inner {
-              padding: 4.5rem 1.6rem 0.8rem;
+              @include breakpoint('gt-lg') {
+                padding: 4.5rem 1.6rem 0.8rem;
+              }
   
               .gd-create-view-modify-list-top-title {
-                text-orientation: initial;
-                writing-mode: lr;
+                @include breakpoint('gt-lg') {
+                  text-orientation: initial;
+                  writing-mode: lr;
+                }
               }
             }
           }
         }
 
+        .gd-create-view-modify-list-expand-collapse-button {
+          @include breakpoint('lt-lg') {
+            background-color: var(--gd-warning);
+            color: var(--gd-text);
+          }
+        }
+
         ~ .mat-drawer-content {
-          margin-left: var(--gd-side-list-width-expanded) !important;
-          width: calc(100% - var(--gd-side-list-width-expanded));
+          @include breakpoint('gt-lg') {
+            margin-left: var(--gd-side-list-width-expanded) !important;
+            width: calc(100% - var(--gd-side-list-width-expanded));
+          }
         }
       }
     }
 
     /* Expand / collapse button */
     .gd-create-view-modify-list-expand-collapse-button {
-      background: var(--gd-background);
-      border: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.5);
-      @include border-radius(50%);
-      color: rgba(var(--gd-secondary-rgb), 0.5);
-      font-size: 2rem;
-      height: 2rem;
-      left: calc(100% - 1rem);
-      line-height: 1;
-      min-width: 0;
-      padding: 0;
       position: absolute;
-      top: 1.6rem;
-      width: 2rem;
       z-index: 1000;
+
+      @include breakpoint('gt-lg') {
+        background: var(--gd-background);
+        border: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.5);
+        @include border-radius(50%);
+        color: rgba(var(--gd-secondary-rgb), 0.5);
+        font-size: 2rem;
+        height: 2rem;
+        left: calc(100% - 1rem);
+        line-height: 1;
+        min-width: 0;
+        padding: 0;
+        top: 1.6rem;
+        width: 2rem;
+      }
+
+      @include breakpoint('lt-lg') {
+        @include border-radius(0 0.4rem 0.4rem 0);
+        padding: 1.6rem 0.8rem;
+        right: -3.6rem;
+        top: 0;
+      }
+
+      .mat-button-wrapper {
+        span {
+          @include breakpoint('lt-lg') {
+            text-orientation: upright;
+            writing-mode: vertical-lr;
+          }
+        }
+      }
 
       .material-icons {
         font-size: 2rem;
@@ -245,6 +299,10 @@
   .gd-create-view-modify-top {
     padding-bottom: 2.4rem;
 
+    @include breakpoint('xs') {
+      padding-bottom: 1.6rem;
+    }
+
     .gd-create-view-modify-top-title-buttons {
       .gd-create-view-modify-top-title-buttons-title {
         span {
@@ -269,6 +327,10 @@
       }
 
       .gd-create-view-modify-top-title-buttons-buttons {
+        @include breakpoint('xs') {
+          margin-top: 1.6rem;
+        }
+
         .gd-create-view-modify-top-title-buttons-buttons-quick {
           .mat-icon {
             @include transition(all 0.24s ease-in-out 0s);
@@ -303,6 +365,22 @@
             &:not(.gd-create-view-modify-bottom-section-content-input-has-list) {
               width: calc(25% - 1.6rem);
 
+              @include breakpoint('lg') {
+                width: calc(50% - 1.6rem);
+              }
+
+              @include breakpoint('md') {
+                width: calc(50% - 1.6rem);
+              }
+
+              @include breakpoint('sm') {
+                width: calc(50% - 1.6rem);
+              }
+
+              @include breakpoint('xs') {
+                width: calc(100% - 1.6rem);
+              }
+
               &:last-child {
                 margin-right: 1.6rem;
               }
@@ -310,6 +388,10 @@
             
             &.gd-create-view-modify-bottom-section-content-input-has-age-dob {
               width: calc(50% - 1.6rem);
+
+              @include breakpoint('lt-md') {
+                width: calc(100% - 1.6rem);
+              }
             }
 
             &.gd-create-view-modify-bottom-section-content-input-has-textarea {
@@ -355,6 +437,22 @@
                       > * {
                         width: calc(25% - 1.6rem);
 
+                        @include breakpoint('lg') {
+                          width: calc(50% - 1.6rem);
+                        }
+
+                        @include breakpoint('md') {
+                          width: calc(50% - 1.6rem);
+                        }
+          
+                        @include breakpoint('sm') {
+                          width: calc(50% - 1.6rem);
+                        }
+          
+                        @include breakpoint('xs') {
+                          width: calc(100% - 1.6rem);
+                        }
+
                         &:last-child {
                           margin-right: 1.6rem;
                         }
@@ -398,6 +496,16 @@
 
 /* View */
 .gd-create-view-modify-view {
+  .gd-create-view-modify-top {
+    @include breakpoint('lg') {
+      padding-left: 2rem;
+    }
+
+    @include breakpoint('lt-md') {
+      padding-left: 3.2rem;
+    }
+  }
+
   .gd-create-view-modify-bottom {
     .gd-create-view-modify-bottom-content {
       .gd-create-view-modify-bottom-section {
@@ -409,6 +517,20 @@
           > .gd-create-view-modify-bottom-section-content-input {
             &:not(.gd-create-view-modify-bottom-section-content-input-has-list) {
               margin-bottom: 1.6rem;
+
+              .gd-form-toggle-checkbox-v2 {
+                margin-bottom: 0;
+              }
+            }
+
+            &.gd-create-view-modify-bottom-section-content-input-has-age-dob {
+              @include breakpoint('lt-md') {
+                width: calc(50% - 1.6rem);
+              }
+
+              @include breakpoint('xs') {
+                width: calc(100% - 1.6rem);
+              }
             }
 
             &.gd-create-view-modify-bottom-section-content-input-has-list {
@@ -427,9 +549,32 @@
                       > * {
                         margin-bottom: 1.6rem;
                       }
+
+                      .gd-create-view-modify-bottom-section-content-input-coordinates {
+                        > *:first-child {
+                          @media only screen and (max-width: 599px) {
+                            margin-bottom: 1.6rem !important;
+                          }
+                        }
+                      }
                     }
                   }
                 }
+              }
+            }
+          }
+        }
+      }
+
+      .gd-list-table {
+        .gd-list-table-header {
+          .gd-list-table-header-left {
+            .gd-list-table-header-left-loading {
+              .mat-progress-spinner {
+                left: 0;
+                position: static;
+                top: 0;
+                @include translate(0, 0);
               }
             }
           }

@@ -5,6 +5,31 @@
   .mat-tab-header {
     border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.5);
 
+    .mat-tab-header-pagination {
+      background: rgba(var(--gd-primary-rgb), 0.25);
+      @include box-shadow(none);
+
+      .mat-tab-header-pagination-chevron {
+        border-color: var(--gd-primary);
+      }
+
+      &.mat-tab-header-pagination-before {
+        margin-left: -2rem;
+      }
+
+      &.mat-tab-header-pagination-after {
+        margin-right: -2rem;
+      }
+
+      &.mat-tab-header-pagination-disabled {
+        background: rgba(var(--gd-secondary-rgb), 0.25);
+
+        .mat-tab-header-pagination-chevron {
+          border-color: rgba(var(--gd-secondary-rgb), 0.5);
+        }
+      }
+    }
+
     .mat-tab-label-container {
       .mat-tab-list {
         .mat-tab-labels {
@@ -114,6 +139,10 @@
 
           .mat-tab-body-content {
             padding: 1.6rem;
+
+            @include breakpoint('xs') {
+              padding-right: 0;
+            }
           }
 
           &.gd-create-view-modify-tab-list {
@@ -130,6 +159,26 @@
               }
             }
           }
+        }
+      }
+    }
+  }
+}
+
+.gd-create-view-modify-view {
+  .gd-create-view-modify-bottom {
+    .mat-tab-group {
+      .mat-tab-header {
+        @include breakpoint('lg') {
+          padding-left: 6rem;
+        }
+
+        @include breakpoint('lt-md') {
+          padding-left: 7.2rem;
+        }
+
+        @include breakpoint('xs') {
+          padding-left: 4rem;
         }
       }
     }

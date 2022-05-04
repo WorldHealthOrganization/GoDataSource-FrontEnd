@@ -87,6 +87,7 @@
           @include flex(flex);
           line-height: $gd-line-height;
           padding: 0.8rem 0;
+          width: 10rem;
 
           input {
             line-height: 2.4rem;

@@ -17,6 +17,10 @@
       height: 5.6rem;
       padding: 1.6rem;
 
+      @include breakpoint('xs') {
+        padding: 1.6rem 0.8rem;
+      }
+
       &:hover:not([aria-disabled]),
       &:hover[aria-disabled=false] {
         background-color: transparent;
@@ -46,6 +50,14 @@
             }
           }
         }
+
+        &.mat-step-icon-selected {
+          + .mat-step-label {
+            @include breakpoint('xs') {
+              display: block;
+            }
+          }
+        }
       }
 
       .mat-step-label {
@@ -54,6 +66,10 @@
         font-weight: normal;
         line-height: $gd-line-height;
         min-width: 2.4rem;
+
+        @include breakpoint('xs') {
+          display: none;
+        }
 
         &.mat-step-label-active {
           color: var(--gd-text);

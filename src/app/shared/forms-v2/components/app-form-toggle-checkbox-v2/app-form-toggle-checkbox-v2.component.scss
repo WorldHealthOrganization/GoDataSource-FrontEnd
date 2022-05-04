@@ -3,6 +3,8 @@
 
 /* Form Toggle Checkbox */
 .gd-form-toggle-checkbox-v2 {
+  margin-bottom: 1.6rem;
+
   .mat-button-toggle {
     background: var(--gd-background);
     border: 0.1rem solid var(--gd-secondary);
@@ -39,6 +41,8 @@
 
         span {
           line-height: 2.4rem;
+          text-align: left;
+          white-space: normal;
         }
       }
     }
