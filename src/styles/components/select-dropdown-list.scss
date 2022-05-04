@@ -234,7 +234,7 @@
 
           /* Checkbox checked and disabled */
           &.mat-pseudo-checkbox-disabled {
-            background-color: rgba(var(--gd-primary-rgb), 0.3);
+            background-color: var(--gd-primary);
             color: var(--gd-background);
           }
         }
@@ -242,15 +242,15 @@
         /* Checkbox not checked and disabled */
         &:not(.mat-pseudo-checkbox-checked) {
           &.mat-pseudo-checkbox-disabled {
-            color: rgba(var(--gd-secondary-rgb), 0.3);
+            color: rgba(var(--gd-secondary-rgb), 0.5);
           }
         }
 
         &.mat-pseudo-checkbox-disabled {
-          color: rgba(var(--gd-secondary-rgb), 0.3);
+          color: rgba(var(--gd-secondary-rgb), 0.5);
 
           + .mat-option-text {
-            color: var(--gd-secondary);
+            color: var(--gd-text);
           }
         }
       }
@@ -292,7 +292,7 @@
               font-family: $gd-font-family;
               font-size: $gd-font-size;
               font-weight: normal;
-              letter-spacing: 0.2rem;
+              letter-spacing: 0.1rem;
               line-height: $gd-line-height;
               text-transform: uppercase;
             }
