@@ -402,7 +402,8 @@ export class TopnavComponent implements OnInit, OnDestroy {
           value: this.selectedOutbreak?.id,
           validators: {
             required: () => true
-          }
+          },
+          disabled: () => this.selectedOutbreakDisabled
         }],
         bottomButtons: [{
           type: IV2SideDialogConfigButtonType.OTHER,
