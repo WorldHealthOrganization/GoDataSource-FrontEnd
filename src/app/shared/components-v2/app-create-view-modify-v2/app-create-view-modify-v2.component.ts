@@ -15,7 +15,7 @@ import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
+import { RequestQueryBuilder, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
 import { V2AdvancedFilter } from '../app-list-table-v2/models/advanced-filter.model';
 import { SavedFilterData } from '../../../core/models/saved-filters.model';
 import { ListComponent } from '../../../core/helperClasses/list-component';
@@ -26,8 +26,9 @@ import { CreateViewModifyV2ExpandColumn, CreateViewModifyV2ExpandColumnType } fr
 import { ICreateViewModifyV2Refresh } from './models/refresh.model';
 import { determineRenderMode, RenderMode } from '../../../core/enums/render-mode.enum';
 import { IExtendedColDef } from '../app-list-table-v2/models/extended-column.model';
-import { applyFilterBy, applyResetOnAllFilters } from '../app-list-table-v2/models/column.model';
+import { applyFilterBy, applyResetOnAllFilters, applySortBy } from '../app-list-table-v2/models/column.model';
 import { AppListTableV2Component } from '../app-list-table-v2/app-list-table-v2.component';
+import { PageEvent } from '@angular/material/paginator';
 
 /**
  * Component
@@ -844,6 +845,52 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Tab page change
+   */
+  tabListPageChange(
+    tab: ICreateViewModifyV2TabTable,
+    page: PageEvent
+  ): void {
+    // update API pagination params
+    tab.queryBuilder.paginator.setPage(page);
+
+    // update page index
+    tab.pageIndex = tab.queryBuilder.paginator.skip / tab.queryBuilder.paginator.limit;
+
+    // refresh list
+    this.refreshTabList(
+      tab,
+      true
+    );
+  }
+
+  /**
+   * Tab sort by
+   */
+  tabListSortBy(
+    listTable: AppListTableV2Component,
+    tab: ICreateViewModifyV2TabTable,
+    data: {
+      field: string,
+      direction: RequestSortDirection
+    }
+  ): void {
+    // apply sort
+    applySortBy(
+      data,
+      tab.queryBuilder,
+      listTable.advancedFiltersQueryBuilder,
+      undefined
+    );
+
+    // refresh list
+    this.refreshTabList(
+      tab,
+      false
+    );
+  }
+
+  /**
    * Tab filter by
    */
   tabListFilterBy(
@@ -868,14 +915,13 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   }
 
   /**
-   * Tab filter by - advanced
+   * Reset Header filters
    */
-  tabListFilterByAdvanced(
+  tabListResetHeaderFilters(
     listTable: AppListTableV2Component,
-    tab: ICreateViewModifyV2TabTable,
-    queryBuilder?: RequestQueryBuilder
+    tab: ICreateViewModifyV2TabTable
   ): void {
-    // clear query builder of conditions and sorting criterias
+    // clear query builder of conditions and sorting criteria
     tab.queryBuilder.clear();
 
     // clear table filters
@@ -888,6 +934,64 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
       null,
       null
     );
+
+    // initialize query paginator
+    tab.queryBuilder.paginator.setPage({
+      pageSize: tab.queryBuilder.paginator.limit,
+      pageIndex: 0
+    }, true);
+
+    // update page index
+    tab.pageIndex = 0;
+
+    // retrieve Side filters
+    let queryBuilder;
+    if ((queryBuilder = listTable.advancedFiltersQueryBuilder)) {
+      tab.queryBuilder.merge(queryBuilder);
+    }
+
+    // if no side query builder then clear side filters too
+    if (!queryBuilder) {
+      listTable.generateFiltersFromFilterData(undefined);
+    }
+
+    // refresh
+    this.refreshTabList(
+      tab,
+      true
+    );
+  }
+
+  /**
+   * Tab filter by - advanced
+   */
+  tabListFilterByAdvanced(
+    listTable: AppListTableV2Component,
+    tab: ICreateViewModifyV2TabTable,
+    queryBuilder?: RequestQueryBuilder
+  ): void {
+    // clear query builder of conditions and sorting criteria
+    tab.queryBuilder.clear();
+
+    // clear table filters
+    applyResetOnAllFilters(tab.tableColumns);
+    listTable.updateColumnDefinitions();
+
+    // reset table sort columns
+    listTable.columnSortBy(
+      null,
+      null,
+      null
+    );
+
+    // initialize query paginator
+    tab.queryBuilder.paginator.setPage({
+      pageSize: tab.queryBuilder.paginator.limit,
+      pageIndex: 0
+    }, true);
+
+    // update page index
+    tab.pageIndex = 0;
 
     // merge query builder with side filters
     if (queryBuilder) {

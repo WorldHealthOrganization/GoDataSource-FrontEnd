@@ -315,6 +315,7 @@ export interface ICreateViewModifyV2TabTable {
     tab: ICreateViewModifyV2TabTable,
     applyHasMoreLimit?: boolean
   ) => void;
+  pageIndex: number;
 
   // optional
   visible?: () => boolean

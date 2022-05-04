@@ -1139,30 +1139,26 @@
                     <!-- Table tab -->
                     <ng-template
                       #tableTab>
-
                       <app-list-table-v2
                         *ngIf="visitedTabs[tab.label]"
                         #listTable
                         [records$]="tab.records$"
                         [columns]="tab.tableColumns"
                         [pageCount]="tab.pageCount"
-
-                        [pageSize]="50"
-                        [pageIndex]="0"
+                        [pageSize]="tab.queryBuilder.paginator.limit"
+                        [pageIndex]="tab.pageIndex"
                         [pageSettingsKey]="tab.pageSettingsKey"
-                        [sortColumn]="undefined"
                         [filtersApplied]="!tab.queryBuilder.isEmptyOnlyFilters()"
                         [advancedFilterType]="tab.advancedFilterType"
                         [advancedFilters]="tab.advancedFilters"
                         (refreshData)="refreshTabList(tab, true)"
                         (refreshDataCount)="tab.refreshCount(tab, false)"
-                        (pageChange)="undefined"
-                        (sortBy)="undefined"
+                        (pageChange)="tabListPageChange(tab, $event)"
+                        (sortBy)="tabListSortBy(listTable, tab, $event)"
                         (filterBy)="tabListFilterBy(tab, $event)"
-                        (resetHeaderFilters)="undefined"
+                        (resetHeaderFilters)="tabListResetHeaderFilters(listTable, tab)"
                         (advancedFilterBy)="tabListFilterByAdvanced(listTable, tab, $event)">
                       </app-list-table-v2>
-
                     </ng-template>
                   </div>
                 </mat-tab>
