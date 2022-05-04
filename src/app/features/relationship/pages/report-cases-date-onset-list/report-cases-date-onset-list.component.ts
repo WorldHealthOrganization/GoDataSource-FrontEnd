@@ -24,13 +24,12 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
   casesWithOnsetList$: Observable<ReportCasesWithOnsetModel[]>;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     private relationshipDataService: RelationshipDataService,
     private translateService: TranslateService
-
   ) {
     super(
       listHelperService,
@@ -39,8 +38,8 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
   }
 
   /**
-     * Component destroyed
-     */
+   * Component destroyed
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
@@ -64,13 +63,11 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
     this.tableColumns = [
       {
         field: 'primaryCase.firstName',
-        label: `${this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_PRIMARY')} ${this.translateService.instant('LNG_CASE_FIELD_LABEL_FIRST_NAME')}`,
-        pinned: IV2ColumnPinned.LEFT
+        label: `${this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_PRIMARY')} ${this.translateService.instant('LNG_CASE_FIELD_LABEL_FIRST_NAME')}`
       },
       {
         field: 'primaryCase.lastName',
-        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_PRIMARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_LAST_NAME') }`,
-        pinned: IV2ColumnPinned.LEFT
+        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_PRIMARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_LAST_NAME') }`
       },
       {
         field: 'primaryCase.dateOfOnset',
@@ -85,13 +82,11 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
       },
       {
         field: 'secondaryCase.firstName',
-        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_SECONDARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_FIRST_NAME') }`,
-        pinned: IV2ColumnPinned.LEFT
+        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_SECONDARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_FIRST_NAME') }`
       },
       {
         field: 'secondaryCase.lastName',
-        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_SECONDARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_LAST_NAME') }`,
-        pinned: IV2ColumnPinned.LEFT
+        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_SECONDARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_LAST_NAME') }`
       },
       {
         field: 'secondaryCase.dateOfOnset',
@@ -180,7 +175,7 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
                 },
                 action: {
                   link: (item: ReportCasesWithOnsetModel) => {
-                    // #TODO TBD - if this is correct !? (Old comment)
+                    // #TODO TBD - if this is correct !? (old comment)
                     const relationTypePath: string = _.find(item.relationship.persons, { id: item.primaryCase.id }).source ? 'contacts' : 'exposures';
                     return ['/relationships', EntityType.CASE, item.primaryCase.id, relationTypePath, item.relationship.id, 'view'];
                   }
@@ -219,9 +214,7 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
                   }
                 },
                 visible: () => {
-                  return this.authUser &&
-                    this.selectedOutbreak &&
-                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                  return this.selectedOutbreakIsActive &&
                     CaseModel.canModify(this.authUser);
                 }
               },
@@ -247,9 +240,7 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
                   }
                 },
                 visible: () => {
-                  return this.authUser &&
-                    this.selectedOutbreak &&
-                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                  return this.selectedOutbreakIsActive &&
                     CaseModel.canModify(this.authUser);
                 }
               },
@@ -261,15 +252,13 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
                 },
                 action: {
                   link: (item: ReportCasesWithOnsetModel) => {
-                    // #TODO TBD - if this is correct !? (Old comment)
+                    // #TODO TBD - if this is correct !? (old comment)
                     const relationTypePath: string = _.find(item.relationship.persons, { id: item.primaryCase.id }).source ? 'contacts' : 'exposures';
                     return ['/relationships', EntityType.CASE, item.primaryCase.id, relationTypePath, item.relationship.id, 'modify'];
                   }
                 },
                 visible: () => {
-                  return this.authUser &&
-                    this.selectedOutbreak &&
-                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                  return this.selectedOutbreakIsActive &&
                     RelationshipModel.canModify(this.authUser);
                 }
               }
@@ -348,10 +337,7 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
    * Fields retrieved from api to reduce payload size
    */
   protected refreshListFields(): string[] {
-    return [
-      'primaryCase',
-      'secondaryCase'
-    ];
+    return [];
   }
 
   /**
@@ -362,6 +348,7 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
     this.casesWithOnsetList$ = this.relationshipDataService
       .getCasesWithDateOnsetBeforePrimaryCase(this.selectedOutbreak.id)
       .pipe(
+        // update page count
         tap((casesWithOnset: ReportCasesWithOnsetModel[]) => {
           this.pageCount = {
             count: casesWithOnset.length,
@@ -374,5 +361,8 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
       );
   }
 
+  /**
+   * Get total number of items, based on the applied filters
+   */
   refreshListCount(): void {}
 }

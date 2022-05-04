@@ -1,5 +1,5 @@
 <app-list-table-v2
-  [pageTitle]="'LNG_PAGE_LIST_CASES_DATE_ONSET_TITLE'"
+  pageTitle="LNG_PAGE_LIST_CASES_DATE_ONSET_TITLE"
   [records$]="casesWithOnsetList$"
   [columns]="tableColumns"
   [breadcrumbs]="breadcrumbs"
@@ -16,7 +16,7 @@
   [filtersApplied]="filtersApplied"
   [advancedFilterType]="undefined"
   [advancedFilters]="advancedFilters"
-  [paginatorDisabled]="true"
+  paginatorDisabled="true"
   (refreshData)="needsRefreshList(true)"
   (refreshDataCount)="refreshListCount()"
   (pageChange)="changePage($event)"
