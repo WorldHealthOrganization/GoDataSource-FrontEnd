@@ -104,6 +104,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     return this._columns;
   }
 
+  // paginator disabled ?
+  @Input() paginatorDisabled: boolean = false;
+
   // has at least one table header filter ?
   hasTableHeaderFilters: boolean = false;
 

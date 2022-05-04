@@ -390,6 +390,7 @@
       fxGrow="0"
       class="gd-list-table-bottom-right">
       <app-mat-paginator-extended
+        *ngIf="!paginatorDisabled"
         [pageIndex]="pageIndex"
         [countData]="pageCount"
         [pageSize]="pageSize"
