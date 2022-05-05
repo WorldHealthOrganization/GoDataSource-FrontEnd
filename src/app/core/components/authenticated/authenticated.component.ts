@@ -25,6 +25,13 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
   // #TODO - must check the entire code not only what is commented since some of the code that isn't commented is old
   // #TODO - must check the entire code not only what is commented since some of the code that isn't commented is old
 
+  // #TODO - old html code - must remove once not needed anymore
+  // <div *ngIf="contextSearchHelpItems"
+  // class="context-help-trigger"
+  // (click)="displayHelpDialog()">
+  // <span class="xt-icon">help</span>
+  //   </div>
+
   // disable page loading
   static DISABLE_PAGE_LOADING: boolean = false;
 
