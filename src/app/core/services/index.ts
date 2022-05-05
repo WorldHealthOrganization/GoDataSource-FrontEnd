@@ -98,6 +98,7 @@ import { LabSequenceResultDataResolver } from './resolvers/data/lab-sequence-res
 import { VersionDataResolver } from './resolvers/data/version.resolver';
 import { LanguageUserResolver } from './resolvers/language-user.resolver';
 import { LanguageDataResolver } from './resolvers/data/language.resolver';
+import { PersonDataResolver } from './resolvers/data/person.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -133,6 +134,7 @@ export const services: any[] = [
   OutbreakDataResolver,
   OutcomeDataResolver,
   PermissionDataResolver,
+  PersonDataResolver,
   PersonDateTypeDataResolver,
   PersonTypeDataResolver,
   PregnancyStatusDataResolver,
