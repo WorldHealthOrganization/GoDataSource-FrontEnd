@@ -89,6 +89,13 @@ import { ContextOfTransmissionDataResolver } from './resolvers/data/context-of-t
 import { ClusterDataResolver } from './resolvers/data/cluster.resolver';
 import { PersonTypeDataResolver } from './resolvers/data/person-type.resolver';
 import { RelationshipPersonDataResolver } from './resolvers/data/relationship-person.resolver';
+import { LabNameDataResolver } from './resolvers/data/lab-name.resolver';
+import { LabSampleTypeDataResolver } from './resolvers/data/lab-sample-type.resolver';
+import { LabTestTypeDataResolver } from './resolvers/data/lab-test-type.resolver';
+import { LabTestResultDataResolver } from './resolvers/data/lab-test-result.resolver';
+import { LabProgressDataResolver } from './resolvers/data/lab-progress.resolver';
+import { LabSequenceLaboratoryDataResolver } from './resolvers/data/lab-sequence-laboratory.resolver';
+import { LabSequenceResultDataResolver } from './resolvers/data/lab-sequence-result.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -110,6 +117,13 @@ export const services: any[] = [
   FollowUpGenerationTeamAssignmentAlgorithmDataResolver,
   GenderDataResolver,
   InstitutionDataResolver,
+  LabNameDataResolver,
+  LabProgressDataResolver,
+  LabSampleTypeDataResolver,
+  LabSequenceLaboratoryDataResolver,
+  LabSequenceResultDataResolver,
+  LabTestResultDataResolver,
+  LabTestTypeDataResolver,
   LanguageResolver,
   LocationGeographicalLevelDataResolver,
   OccupationDataResolver,
