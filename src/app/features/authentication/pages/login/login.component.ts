@@ -8,10 +8,13 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { catchError } from 'rxjs/operators';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { AuthModel, IAuthTwoFactor } from '../../../../core/models/auth.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { UserModel } from '../../../../core/models/user.model';
+import { SafeHtml } from '@angular/platform-browser';
+import { CaptchaDataFor, CaptchaDataService } from '../../../../core/services/data/captcha.data.service';
+import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 
 @Component({
   selector: 'app-login',
@@ -30,15 +33,13 @@ export class LoginComponent {
   // used by template
   user = new LoginModel();
 
-  // // captcha data
-  // captchaData$: Observable<SafeHtml>;
-  //
+  // captcha data
+  displayCaptcha = false;
+  captchaData$: Observable<SafeHtml>;
 
-  // displayCaptcha = false;
-  //
-  // // display enter code ?
-  // twoFA: boolean = false;
-  //
+  // display enter code ?
+  twoFA: boolean = false;
+
   /**
    * Constructor
    */
@@ -48,33 +49,33 @@ export class LoginComponent {
     private toastV2Service: ToastV2Service,
     private i18nService: I18nService,
     private router: Router,
+    private captchaDataService: CaptchaDataService,
     activatedRoute: ActivatedRoute
-    // #TODO
-    // private captchaDataService: CaptchaDataService
   ) {
+    // enable back dirty changes
+    ConfirmOnFormChanges.enableAllDirtyConfirm();
+
+    // check if user is authenticated
+    if (this.authDataService.isAuthenticated()) {
+      // user is already authenticated; redirect to landing page
+      this.router.navigate(['']);
+
+      // finished
+      return;
+    }
+
     // update render mode
     this.updateRenderMode();
 
     // retrieve data
     this.versionData = activatedRoute.snapshot.data.version;
-    // #TODO
-    //     // // display captcha ?
-    //     // this.displayCaptcha = versionData.captcha.login;
-    //     // if (this.displayCaptcha) {
-    //     //   // generate captcha
-    //     //   this.refreshCaptcha();
-    //     // }
 
-    // #TODO
-    // // enable back dirty changes
-    // ConfirmOnFormChanges.enableAllDirtyConfirm();
-    //
-    // // check if user is authenticated
-    // if (this.authDataService.isAuthenticated()) {
-    //   // user is already authenticated; redirect to landing page
-    //   this.router.navigate(['']);
-    //   return;
-    // }
+    // display captcha ?
+    this.displayCaptcha = this.versionData.captcha.login;
+    if (this.displayCaptcha) {
+      // generate captcha
+      this.refreshCaptcha();
+    }
   }
 
   /**
@@ -93,9 +94,8 @@ export class LoginComponent {
     const dirtyFields: any = form.value;
     this.authDataService
       .login(
-        dirtyFields
-        // #TODO
-        // this.twoFA
+        dirtyFields,
+        this.twoFA
       )
       .pipe(
         catchError((err) => {
@@ -103,11 +103,10 @@ export class LoginComponent {
           loadingDialog.close();
 
           // reset captcha no matter what...
-          // #TODO
-          // if (this.displayCaptcha) {
-          //   this.user.captcha = '';
-          //   this.refreshCaptcha();
-          // }
+          if (this.displayCaptcha) {
+            this.user.captcha = '';
+            this.refreshCaptcha();
+          }
 
           // show error
           this.toastV2Service.error(err);
@@ -126,8 +125,7 @@ export class LoginComponent {
           );
 
           // must enter code before we can login
-          // #TODO
-          // this.twoFA = true;
+          this.twoFA = true;
 
           // hide loading
           loadingDialog.close();
@@ -140,8 +138,8 @@ export class LoginComponent {
         this.toastV2Service.clearHistory();
 
         // successfully authenticated;
-        // use authenticated user's preferred language
-        // invalidate language
+        // - use authenticated user's preferred language
+        // - invalidate language
         const authModel: AuthModel = auth as AuthModel;
         this.i18nService.clearStorage();
         this.i18nService
@@ -183,20 +181,20 @@ export class LoginComponent {
       });
   }
 
-  // /**
-  //  * Refresh captcha
-  //  */
-  // refreshCaptcha() {
-  //   this.captchaData$ = this.captchaDataService
-  //     .generateSVG(CaptchaDataFor.LOGIN)
-  //     .pipe(
-  //       catchError((err) => {
-  //         // show error
-  //         this.toastV2Service.error(err);
-  //         return throwError(err);
-  //       })
-  //     );
-  // }
+  /**
+   * Refresh captcha
+   */
+  refreshCaptcha() {
+    this.captchaData$ = this.captchaDataService
+      .generateSVG(CaptchaDataFor.LOGIN)
+      .pipe(
+        catchError((err) => {
+          // show error
+          this.toastV2Service.error(err);
+          return throwError(err);
+        })
+      );
+  }
 
   /**
    * Update website render mode

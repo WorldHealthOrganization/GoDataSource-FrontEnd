@@ -53,32 +53,91 @@
           #form="ngForm"
           (submit)="login(form)">
 
-          <!-- Email -->
-          <app-form-input-v2
-            [(ngModel)]="user.email"
-            name="email"
-            placeholder="LNG_COMMON_FIELD_LABEL_EMAIL_ADDRESS"
-            required="true"
-            app-email-validator>
-          </app-form-input-v2>
+          <!-- First step -->
+          <ng-container
+            *ngIf="!twoFA; else twoFACode">
 
-          <!-- Password -->
-          <app-form-password-v2
-            [(ngModel)]="user.password"
-            name="password"
-            placeholder="LNG_COMMON_FIELD_LABEL_PASSWORD"
-            required="true">
-          </app-form-password-v2>
+            <!-- Email -->
+            <app-form-input-v2
+              [(ngModel)]="user.email"
+              name="email"
+              placeholder="LNG_COMMON_FIELD_LABEL_EMAIL_ADDRESS"
+              required="true"
+              app-email-validator>
+            </app-form-input-v2>
 
-          <!-- Forgot password -->
-          <div>
-            <button
+            <!-- Password -->
+            <app-form-password-v2
+              [(ngModel)]="user.password"
+              name="password"
+              placeholder="LNG_COMMON_FIELD_LABEL_PASSWORD"
+              required="true">
+            </app-form-password-v2>
+
+            <!-- Forgot password -->
+            <div>
+              <button
                 mat-flat-button
                 type="button"
                 color="text"
                 routerLink="/auth/forgot-password">
                 {{ 'LNG_PAGE_LOGIN_FORGOT_PASSWORD_LABEL' | translate }}
-            </button>
+              </button>
+            </div>
+
+          </ng-container>
+
+          <!-- 2FA code -->
+          <ng-template
+            #twoFACode>
+
+            <!-- 2FA Code -->
+            <app-form-input-v2
+              [(ngModel)]="user.code"
+              name="code"
+              placeholder="LNG_COMMON_FIELD_LABEL_CODE"
+              required="true"
+              autocomplete="off">
+            </app-form-input-v2>
+
+          </ng-template>
+
+          <!-- Captcha -->
+          <div
+            *ngIf="displayCaptcha">
+
+            <!-- Captcha SVG -->
+            <div
+              *ngIf="captchaData$ | async as captchaData; else loadingCaptcha">
+                <!-- SVG -->
+                <div [innerHTML]="captchaData"></div>
+
+                <!-- Captcha SVG refresh -->
+                <button
+                  type="button"
+                  mat-icon-button
+                  (click)="refreshCaptcha()">
+                  <mat-icon>refresh</mat-icon>
+                </button>
+            </div>
+
+            <!-- Captcha loading -->
+            <ng-template
+                #loadingCaptcha>
+                <mat-progress-spinner
+                  mode="indeterminate"
+                  diameter="24">
+                </mat-progress-spinner>
+            </ng-template>
+
+            <!-- Captcha value -->
+            <app-form-input-v2
+              [(ngModel)]="user.captcha"
+              name="captcha"
+              placeholder="LNG_COMMON_FIELD_LABEL_CAPTCHA"
+              required="true"
+              autocomplete="off">
+            </app-form-input-v2>
           </div>
 
           <!-- Login -->
@@ -103,114 +162,3 @@
 
   </div>
 </div>
-
-<!--<app-not-auth-template>-->
-<!--    <mat-spinner-->
-<!--        *ngIf="loading"-->
-<!--        class="login-spinner">-->
-<!--    </mat-spinner>-->
-
-<!--    <form-->
-<!--        *ngIf="!loading"-->
-<!--        #form="ngForm"-->
-<!--        (submit)="login(form)"-->
-<!--        class="login-form">-->
-<!--        <div fxLayout="row" fxLayoutAlign="center" class="not-auth-content-limited">-->
-<!--            <div fxLayout="column" fxFlex>-->
-<!--                &lt;!&ndash; Password input &ndash;&gt;-->
-<!--                <div-->
-<!--                    *ngIf="!twoFA; else twoFACode"-->
-<!--                    class="login-row-specific-height"-->
-<!--                    fxLayout="row">-->
-<!--                    <app-form-input-->
-<!--                        [tabIndex]="2"-->
-<!--                        class="password-input"-->
-<!--                        type="password"-->
-<!--                        name="password"-->
-<!--                        [(ngModel)]="user.password"-->
-<!--                        [placeholder]="'LNG_COMMON_FIELD_LABEL_PASSWORD' | translate"-->
-<!--                        required="true">-->
-<!--                    </app-form-input>-->
-
-<!--                    <button-->
-<!--                        mat-raised-button-->
-<!--                        type="button"-->
-<!--                        class="reset-pass-button"-->
-<!--                        routerLink="/auth/forgot-password">-->
-<!--                        {{ 'LNG_PAGE_LOGIN_FORGOT_PASSWORD_LABEL' | translate }}-->
-<!--                    </button>-->
-<!--                </div>-->
-
-<!--                &lt;!&ndash; Two Factor code &ndash;&gt;-->
-<!--                <ng-template-->
-<!--                    #twoFACode>-->
-<!--                    <div-->
-<!--                        class="login-row-specific-height"-->
-<!--                        fxLayout="row">-->
-<!--                        <app-form-input-->
-<!--                            [tabIndex]="2"-->
-<!--                            name="code"-->
-<!--                            [(ngModel)]="user.code"-->
-<!--                            [placeholder]="'LNG_COMMON_FIELD_LABEL_CODE' | translate"-->
-<!--                            required="true">-->
-<!--                        </app-form-input>-->
-<!--                    </div>-->
-<!--                </ng-template>-->
-
-<!--                &lt;!&ndash; Captcha input &ndash;&gt;-->
-<!--                <div-->
-<!--                    *ngIf="displayCaptcha"-->
-<!--                    class="login-captcha-row"-->
-<!--                    fxLayout="row">-->
-<!--                    &lt;!&ndash; Captcha SVG &ndash;&gt;-->
-<!--                    <div-->
-<!--                        class="login-captcha-row-svg">-->
-<!--                        <div-->
-<!--                            fxLayout="row" fxLayoutAlign="start center"-->
-<!--                            *ngIf="captchaData$ | async as captchaData; else loadingCaptcha">-->
-<!--                            &lt;!&ndash; SVG &ndash;&gt;-->
-<!--                            <div [innerHTML]="captchaData"></div>-->
-
-<!--                            &lt;!&ndash; Captcha SVG refresh &ndash;&gt;-->
-<!--                            <button-->
-<!--                                fxGrow="0"-->
-<!--                                type="button"-->
-<!--                                mat-icon-button-->
-<!--                                (click)="refreshCaptcha()">-->
-<!--                                <span class="xt-icon">refresh</span>-->
-<!--                            </button>-->
-<!--                        </div>-->
-
-<!--                        &lt;!&ndash; Loading data &ndash;&gt;-->
-<!--                        <ng-template-->
-<!--                            #loadingCaptcha>-->
-<!--                            <div-->
-<!--                                class="login-captcha-row-svg-loading">-->
-<!--                                <mat-spinner></mat-spinner>-->
-<!--                            </div>-->
-<!--                        </ng-template>-->
-<!--                    </div>-->
-
-<!--                    &lt;!&ndash; Captcha SVG input &ndash;&gt;-->
-<!--                    <app-form-input-->
-<!--                        [tabIndex]="3"-->
-<!--                        name="captcha"-->
-<!--                        [(ngModel)]="user.captcha"-->
-<!--                        [placeholder]="'LNG_COMMON_FIELD_LABEL_CAPTCHA' | translate"-->
-<!--                        required="true"-->
-<!--                        autocomplete="off">-->
-<!--                    </app-form-input>-->
-<!--                </div>-->
-
-<!--                &lt;!&ndash; Login button &ndash;&gt;-->
-<!--                <div fxLayout="column" class="app-theme">-->
-<!--                    <button-->
-<!--                        tabindex="4"-->
-<!--                        mat-raised-button color="accent">-->
-<!--                        {{ 'LNG_PAGE_LOGIN_ACTION_LOGIN_BUTTON' | translate }}-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </form>-->
-<!--</app-not-auth-template>-->
