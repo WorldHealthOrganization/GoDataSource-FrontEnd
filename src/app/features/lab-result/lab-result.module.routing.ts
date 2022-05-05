@@ -1,12 +1,40 @@
 import { ModuleWithProviders } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import * as fromPages from './pages';
-import { AuthGuard } from '../../core/services/guards/auth-guard.service';
-import { PERMISSION } from '../../core/models/permission.model';
+import { RouterModule, Routes } from '@angular/router';
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
-import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
-import { PermissionExpression } from '../../core/models/user.model';
 import { EntityType } from '../../core/models/entity-type';
+import { PERMISSION } from '../../core/models/permission.model';
+import { PermissionExpression } from '../../core/models/user.model';
+import { AuthGuard } from '../../core/services/guards/auth-guard.service';
+import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
+import { LabNameDataResolver } from '../../core/services/resolvers/data/lab-name.resolver';
+import { LabProgressDataResolver } from '../../core/services/resolvers/data/lab-progress.resolver';
+import { LabSampleTypeDataResolver } from '../../core/services/resolvers/data/lab-sample-type.resolver';
+import { LabSequenceLaboratoryDataResolver } from '../../core/services/resolvers/data/lab-sequence-laboratory.resolver';
+import { LabSequenceResultDataResolver } from '../../core/services/resolvers/data/lab-sequence-result.resolver';
+import { LabTestResultDataResolver } from '../../core/services/resolvers/data/lab-test-result.resolver';
+import { LabTestTypeDataResolver } from '../../core/services/resolvers/data/lab-test-type.resolver';
+import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
+import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
+import * as fromPages from './pages';
+
+// common base - cases lab results / contacts lab results
+const entityLabResultsFoundation = {
+  component: fromPages.EntityLabResultsListComponent,
+  canActivate: [AuthGuard],
+  resolve: {
+    yesNoAll: YesNoAllDataResolver,
+    labName: LabNameDataResolver,
+    labSampleType: LabSampleTypeDataResolver,
+    labTestType: LabTestTypeDataResolver,
+    labTestResult: LabTestResultDataResolver,
+    labResultProgress: LabProgressDataResolver,
+    labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
+    labSequenceResult: LabSequenceResultDataResolver,
+    user: UserDataResolver,
+    yesNo: YesNoDataResolver
+  }
+};
 
 const routes: Routes = [
   // Outbreak Lab Results
@@ -44,8 +72,7 @@ const routes: Routes = [
   // Case Lab results
   {
     path: 'cases/:caseId',
-    component: fromPages.EntityLabResultsListComponent,
-    canActivate: [AuthGuard],
+    ...entityLabResultsFoundation,
     data: {
       permissions: [
         PERMISSION.CASE_LIST_LAB_RESULT
@@ -101,8 +128,7 @@ const routes: Routes = [
   // Contact Lab results
   {
     path: 'contacts/:contactId',
-    component: fromPages.EntityLabResultsListComponent,
-    canActivate: [AuthGuard],
+    ...entityLabResultsFoundation,
     data: {
       permissions: [
         PERMISSION.CONTACT_LIST_LAB_RESULT
