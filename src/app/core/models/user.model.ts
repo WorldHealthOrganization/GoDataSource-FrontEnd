@@ -43,7 +43,8 @@ export enum UserSettings {
   HELP_ITEMS_LIST = 'helpItemsList',
   BACKUP_FIELDS = 'backupFields',
   CLUSTER_FIELDS = 'clusterFields',
-  ONSET_FIELDS = 'onsetFields'
+  ONSET_FIELDS = 'onsetFields',
+  LONG_ONSET_FIELDS = 'longOnsetFields'
 }
 
 export enum PhoneNumberType {
