@@ -2,7 +2,6 @@ import { Component, HostListener } from '@angular/core';
 import { determineRenderMode, RenderMode } from '../../../../core/enums/render-mode.enum';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 import { ActivatedRoute, Router } from '@angular/router';
-import { LoginModel } from '../../../../core/models/login.model';
 import { NgForm } from '@angular/forms';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -15,6 +14,8 @@ import { UserModel } from '../../../../core/models/user.model';
 import { SafeHtml } from '@angular/platform-browser';
 import { CaptchaDataFor, CaptchaDataService } from '../../../../core/services/data/captcha.data.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
+import * as _ from 'lodash';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
 
 @Component({
   selector: 'app-login',
@@ -27,18 +28,20 @@ export class LoginComponent {
   // version information
   versionData: SystemSettingsVersionModel;
 
-  // constants
-  RenderMode = RenderMode;
-
-  // used by template
-  user = new LoginModel();
-
   // captcha data
   displayCaptcha = false;
   captchaData$: Observable<SafeHtml>;
+  captcha: string;
 
   // display enter code ?
   twoFA: boolean = false;
+
+  // page type
+  pageType: CaptchaDataFor;
+
+  // constants
+  RenderMode = RenderMode;
+  CaptchaDataFor = CaptchaDataFor;
 
   /**
    * Constructor
@@ -50,6 +53,7 @@ export class LoginComponent {
     private i18nService: I18nService,
     private router: Router,
     private captchaDataService: CaptchaDataService,
+    private userDataService: UserDataService,
     activatedRoute: ActivatedRoute
   ) {
     // enable back dirty changes
@@ -64,6 +68,9 @@ export class LoginComponent {
       return;
     }
 
+    // retrieve page type
+    this.pageType = activatedRoute.snapshot.data.page;
+
     // update render mode
     this.updateRenderMode();
 
@@ -71,7 +78,9 @@ export class LoginComponent {
     this.versionData = activatedRoute.snapshot.data.version;
 
     // display captcha ?
-    this.displayCaptcha = this.versionData.captcha.login;
+    this.displayCaptcha = this.pageType === CaptchaDataFor.LOGIN ?
+      this.versionData.captcha.login :
+      this.versionData.captcha.forgotPassword;
     if (this.displayCaptcha) {
       // generate captcha
       this.refreshCaptcha();
@@ -81,7 +90,7 @@ export class LoginComponent {
   /**
    * Login
    */
-  login(form: NgForm) {
+  login(form: NgForm): void {
     // can't proceed ?
     if (!form.valid) {
       return;
@@ -104,7 +113,7 @@ export class LoginComponent {
 
           // reset captcha no matter what...
           if (this.displayCaptcha) {
-            this.user.captcha = '';
+            this.captcha = '';
             this.refreshCaptcha();
           }
 
@@ -182,11 +191,57 @@ export class LoginComponent {
   }
 
   /**
+   * Forgot password
+   */
+  forgotPassword(form: NgForm): void {
+    // can't proceed ?
+    if (!form.valid) {
+      return;
+    }
+
+    // show loading
+    const loadingDialog = this.dialogV2Service.showLoadingDialog();
+
+    // send the "password reset" e-mail
+    const dirtyFields: any = form.value;
+    this.userDataService
+      .forgotPassword(dirtyFields)
+      .pipe(
+        catchError((err) => {
+          // reset captcha no matter what...
+          if (this.displayCaptcha) {
+            this.captcha = '';
+            this.refreshCaptcha();
+          }
+
+          // hide dialog
+          loadingDialog.close();
+
+          // show error
+          this.toastV2Service.error(err);
+          return throwError(err);
+        })
+      )
+      .subscribe(() => {
+        this.toastV2Service.success(
+          'LNG_PAGE_FORGOT_PASSWORD_ACTION_SEND_EMAIL_SUCCESS_MESSAGE',
+          { email: dirtyFields.email }
+        );
+
+        // hide loading
+        loadingDialog.close();
+
+        // redirect to login page
+        this.router.navigate(['/auth/login']);
+      });
+  }
+
+  /**
    * Refresh captcha
    */
-  refreshCaptcha() {
+  refreshCaptcha(): void {
     this.captchaData$ = this.captchaDataService
-      .generateSVG(CaptchaDataFor.LOGIN)
+      .generateSVG(this.pageType)
       .pipe(
         catchError((err) => {
           // show error

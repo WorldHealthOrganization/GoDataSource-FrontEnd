@@ -43,64 +43,88 @@
       <!-- Right - middle - title -->
       <div
         class="gd-login-right-middle-title">
-        {{ 'LNG_PAGE_LOGIN_WELCOME_MESSAGE' | translate }}
+        {{ (pageType === CaptchaDataFor.LOGIN ? 'LNG_PAGE_LOGIN_WELCOME_MESSAGE' : 'LNG_PAGE_FORGOT_PASSWORD_TITLE') | translate }}
+      </div>
+
+      <!-- Details -->
+      <div
+        *ngIf="pageType === CaptchaDataFor.FORGOT_PASSWORD"
+        class="gd-login-right-middle-details">
+        {{ 'LNG_PAGE_FORGOT_PASSWORD_DESCRIPTION' | translate }}
       </div>
 
       <!-- Right - middle - form -->
       <div
         class="gd-login-right-middle-title">
+
+        <!-- Login / Forgot password form -->
         <form
           #form="ngForm"
-          (submit)="login(form)">
+          (submit)="pageType === CaptchaDataFor.LOGIN ? login(form) : forgotPassword(form)">
 
-          <!-- First step -->
+          <!-- Login -->
           <ng-container
-            *ngIf="!twoFA; else twoFACode">
+            *ngIf="pageType === CaptchaDataFor.LOGIN">
 
-            <!-- Email -->
-            <app-form-input-v2
-              [(ngModel)]="user.email"
-              name="email"
-              placeholder="LNG_COMMON_FIELD_LABEL_EMAIL_ADDRESS"
-              required="true"
-              app-email-validator>
-            </app-form-input-v2>
+            <!-- First step -->
+            <ng-container
+              *ngIf="!twoFA; else twoFACode">
 
-            <!-- Password -->
-            <app-form-password-v2
-              [(ngModel)]="user.password"
-              name="password"
-              placeholder="LNG_COMMON_FIELD_LABEL_PASSWORD"
-              required="true">
-            </app-form-password-v2>
+              <!-- Email -->
+              <app-form-input-v2
+                ngModel
+                name="email"
+                placeholder="LNG_COMMON_FIELD_LABEL_EMAIL_ADDRESS"
+                required="true"
+                app-email-validator>
+              </app-form-input-v2>
 
-            <!-- Forgot password -->
-            <div>
-              <button
-                mat-flat-button
-                type="button"
-                color="text"
-                routerLink="/auth/forgot-password">
-                {{ 'LNG_PAGE_LOGIN_FORGOT_PASSWORD_LABEL' | translate }}
-              </button>
-            </div>
+              <!-- Password -->
+              <app-form-password-v2
+                ngModel
+                name="password"
+                placeholder="LNG_COMMON_FIELD_LABEL_PASSWORD"
+                required="true">
+              </app-form-password-v2>
 
+              <!-- Forgot password -->
+              <div>
+                <button
+                  mat-flat-button
+                  type="button"
+                  color="text"
+                  routerLink="/auth/forgot-password">
+                  {{ 'LNG_PAGE_LOGIN_FORGOT_PASSWORD_LABEL' | translate }}
+                </button>
+              </div>
+
+            </ng-container>
+
+            <!-- 2FA code -->
+            <ng-template
+              #twoFACode>
+
+              <!-- 2FA Code -->
+              <app-form-input-v2
+                ngModel
+                name="code"
+                placeholder="LNG_COMMON_FIELD_LABEL_CODE"
+                required="true"
+                autocomplete="off">
+              </app-form-input-v2>
+
+            </ng-template>
           </ng-container>
 
-          <!-- 2FA code -->
-          <ng-template
-            #twoFACode>
-
-            <!-- 2FA Code -->
-            <app-form-input-v2
-              [(ngModel)]="user.code"
-              name="code"
-              placeholder="LNG_COMMON_FIELD_LABEL_CODE"
-              required="true"
-              autocomplete="off">
-            </app-form-input-v2>
-
-          </ng-template>
+          <!-- Email -->
+          <app-form-input-v2
+            *ngIf="pageType === CaptchaDataFor.FORGOT_PASSWORD"
+            ngModel
+            name="email"
+            placeholder="LNG_COMMON_FIELD_LABEL_EMAIL_ADDRESS"
+            required="true"
+            app-email-validator>
+          </app-form-input-v2>
 
           <!-- Captcha -->
           <div
@@ -132,7 +156,7 @@
 
             <!-- Captcha value -->
             <app-form-input-v2
-              [(ngModel)]="user.captcha"
+              [(ngModel)]="captcha"
               name="captcha"
               placeholder="LNG_COMMON_FIELD_LABEL_CAPTCHA"
               required="true"
@@ -145,11 +169,36 @@
             <button
               mat-flat-button
               color="primary">
-              {{ 'LNG_PAGE_LOGIN_ACTION_LOGIN_BUTTON' | translate }}
+              {{ (pageType === CaptchaDataFor.LOGIN ? 'LNG_PAGE_LOGIN_ACTION_LOGIN_BUTTON' : 'LNG_PAGE_FORGOT_PASSWORD_BUTTON') | translate }}
             </button>
           </div>
 
+          <!-- Other forgot password buttons -->
+          <ng-container
+            *ngIf="pageType === CaptchaDataFor.FORGOT_PASSWORD">
+
+            <!-- Reset password with security questions -->
+            <button
+              mat-flat-button
+              type="button"
+              color="text"
+              routerLink="/auth/reset-password-questions">
+              {{ 'LNG_PAGE_FORGOT_PASSWORD_SECURITY_QUESTIONS_BUTTON' | translate }}
+            </button>
+
+            <!-- Reset password with security questions -->
+            <button
+              mat-flat-button
+              type="button"
+              color="text"
+              routerLink="/auth/login">
+              {{ 'LNG_COMMON_BUTTON_BACK_TO_LOGIN' | translate }}
+            </button>
+
+          </ng-container>
+
         </form>
+
       </div>
 
     </div>
