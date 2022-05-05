@@ -1,12 +1,17 @@
 import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
 import * as fromPages from './pages';
+import { VersionDataResolver } from '../../core/services/resolvers/data/version.resolver';
+import { LanguageDataResolver } from '../../core/services/resolvers/data/language.resolver';
 
 const routes: Routes = [
   {
     path: 'login',
-    component: fromPages.LoginComponent
+    component: fromPages.LoginComponent,
+    resolve: {
+      version: VersionDataResolver,
+      languages: LanguageDataResolver
+    }
   },
   {
     path: 'logout',

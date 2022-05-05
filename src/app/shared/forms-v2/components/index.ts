@@ -13,6 +13,7 @@ import { AppFormToggleV2Component } from './app-form-toggle-v2/app-form-toggle-v
 import { AppFormToggleCheckboxV2Component } from './app-form-toggle-checkbox-v2/app-form-toggle-checkbox-v2.component';
 import { AppFormTextareaV2Component } from './app-form-textarea-v2/app-form-textarea-v2.component';
 import { AppFormSelectGroupsV2Component } from './app-form-select-groups-v2/app-form-select-groups-v2.component';
+import { AppFormPasswordV2Component } from './app-form-password-v2/app-form-password-v2.component';
 
 export const components: any[] = [
   AppFormCheckboxV2Component,
@@ -21,6 +22,7 @@ export const components: any[] = [
   AppFormInputV2Component,
   AppFormNumberRangeV2Component,
   AppFormNumberV2Component,
+  AppFormPasswordV2Component,
   AppFormRadioButtonGroupV2Component,
   AppFormSelectGroupsV2Component,
   AppFormSelectLocationMultipleV2Component,

@@ -37,7 +37,6 @@ import { DomService } from './helper/dom.service';
 import { AuthGuard } from './guards/auth-guard.service';
 import { PasswordChangeGuard } from './guards/password-change-guard.service';
 import { PageChangeConfirmationGuard } from './guards/page-change-confirmation-guard.service';
-import { LanguageResolver } from './resolvers/language.resolver';
 import { AuditLogDataService } from './data/audit-log.data.service';
 import { HelpDataService } from './data/help.data.service';
 import { GlobalEntitySearchDataService } from './data/global-entity-search.data.service';
@@ -96,6 +95,9 @@ import { LabTestResultDataResolver } from './resolvers/data/lab-test-result.reso
 import { LabProgressDataResolver } from './resolvers/data/lab-progress.resolver';
 import { LabSequenceLaboratoryDataResolver } from './resolvers/data/lab-sequence-laboratory.resolver';
 import { LabSequenceResultDataResolver } from './resolvers/data/lab-sequence-result.resolver';
+import { VersionDataResolver } from './resolvers/data/version.resolver';
+import { LanguageUserResolver } from './resolvers/language-user.resolver';
+import { LanguageDataResolver } from './resolvers/data/language.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -124,7 +126,8 @@ export const services: any[] = [
   LabSequenceResultDataResolver,
   LabTestResultDataResolver,
   LabTestTypeDataResolver,
-  LanguageResolver,
+  LanguageDataResolver,
+  LanguageUserResolver,
   LocationGeographicalLevelDataResolver,
   OccupationDataResolver,
   OutbreakDataResolver,
@@ -143,6 +146,7 @@ export const services: any[] = [
   YesNoDataResolver,
   VaccineDataResolver,
   VaccineStatusDataResolver,
+  VersionDataResolver,
 
   // data services
   AuthDataService,

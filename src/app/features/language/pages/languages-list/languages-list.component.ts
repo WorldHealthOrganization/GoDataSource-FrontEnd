@@ -5,7 +5,6 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { LanguageDataService } from '../../../../core/services/data/language.data.service';
 import { LanguageModel } from '../../../../core/models/language.model';
 import { DialogAnswer, DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
-import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { catchError, share } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
@@ -121,8 +120,7 @@ export class LanguagesListComponent
     private router: Router,
     private languageDataService: LanguageDataService,
     private toastV2Service: ToastV2Service,
-    private dialogService: DialogService,
-    private cacheService: CacheService
+    private dialogService: DialogService
   ) {
     super(listHelperService);
   }
@@ -261,9 +259,6 @@ export class LanguagesListComponent
               // this.closeLoadingDialog();
 
               this.toastV2Service.success('LNG_PAGE_LIST_LANGUAGES_ACTION_DELETE_SUCCESS_MESSAGE');
-
-              // clear cache
-              this.cacheService.remove(CacheKey.LANGUAGES);
 
               // reload data
               this.needsRefreshList(true);

@@ -88,28 +88,25 @@ export class I18nService {
   }
 
   /**
-     * Determine when was last time we updated language tokens for current language
-     * @param language
-     */
-  private determineCurrentLanguageSinceDate(language: LanguageModel) {
+   * Determine when was last time we updated language tokens for current language
+   */
+  private determineCurrentLanguageSinceDate(languageId: string) {
     // determine since when we need to update tokens
     const loadedLanguages = this.translateService.getLangs() || [];
     const oldDates = this.storageService.get(StorageKey.LANGUAGE_UPDATE_LAST);
-    return loadedLanguages.includes(language.id) && oldDates && oldDates[language.id] ? moment(oldDates[language.id]) : null;
+    return loadedLanguages.includes(languageId) && oldDates && oldDates[languageId] ? moment(oldDates[languageId]) : null;
   }
 
   /**
-     * Change the UI language and keep it in local storage
-     * @param {LanguageModel} language
-     * @returns {Observable<LanguageTokenDetails | AuthModel>}
-     */
-  changeLanguage(language: LanguageModel): Observable<LanguageTokenDetails | AuthModel> {
+   * Change the UI language and keep it in local storage
+   */
+  changeLanguage(languageId: string): Observable<LanguageTokenDetails | AuthModel> {
     // save the selected language to local storage
-    this.storageService.set(StorageKey.SELECTED_LANGUAGE_ID, language.id);
+    this.storageService.set(StorageKey.SELECTED_LANGUAGE_ID, languageId);
 
     // get the tokens for the selected language
     return this.languageDataService
-      .getLanguageTokens(language, this.determineCurrentLanguageSinceDate(language))
+      .getLanguageTokens(languageId, this.determineCurrentLanguageSinceDate(languageId))
       .pipe(
         mergeMap((tokenData: LanguageTokenDetails) => {
           // update translation tokens
@@ -213,7 +210,7 @@ export class I18nService {
 
           // get the tokens for the selected language
           return this.languageDataService
-            .getLanguageTokens(language, this.determineCurrentLanguageSinceDate(language))
+            .getLanguageTokens(language.id, this.determineCurrentLanguageSinceDate(language.id))
             .pipe(
               catchError((err) => {
                 this.languageLoadedEvent.error(err);
