@@ -71,20 +71,24 @@
           </app-form-password-v2>
 
           <!-- Forgot password -->
-          <button
-              mat-flat-button
-              type="button"
-              color="text"
-              routerLink="/auth/forgot-password">
-              {{ 'LNG_PAGE_LOGIN_FORGOT_PASSWORD_LABEL' | translate }}
-          </button>
+          <div>
+            <button
+                mat-flat-button
+                type="button"
+                color="text"
+                routerLink="/auth/forgot-password">
+                {{ 'LNG_PAGE_LOGIN_FORGOT_PASSWORD_LABEL' | translate }}
+            </button>
+          </div>
 
           <!-- Login -->
-          <button
-            mat-flat-button
-            color="accent">
-            {{ 'LNG_PAGE_LOGIN_ACTION_LOGIN_BUTTON' | translate }}
-          </button>
+          <div>
+            <button
+              mat-flat-button
+              color="accent">
+              {{ 'LNG_PAGE_LOGIN_ACTION_LOGIN_BUTTON' | translate }}
+            </button>
+          </div>
 
         </form>
       </div>
