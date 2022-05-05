@@ -16,11 +16,9 @@ import {
 } from '../../../../core/models/export-fields-group.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ReferenceDataCategory, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
-import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
@@ -102,10 +100,8 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
      */
   constructor(
     protected listHelperService: ListHelperService,
-    private route: ActivatedRoute,
     private outbreakDataService: OutbreakDataService,
     private caseDataService: CaseDataService,
-    private contactDataService: ContactDataService,
     private labResultDataService: LabResultDataService,
     private toastV2Service: ToastV2Service,
     private dialogService: DialogService,
@@ -116,72 +112,16 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
     private dialogV2Service: DialogV2Service
   ) {
     super(listHelperService);
+
+    this.personType = this.activatedRoute.snapshot.data.personType;
+    this.entityData = this.activatedRoute.snapshot.data.entityData;
   }
 
   /**
      * Component initialized
      */
   ngOnInit() {
-    // TODO: This logic should be mutated?
-    // retrieve page information
-    this.route.data.subscribe((data: { personType: EntityType }) => {
-      // set page person type
-      this.personType = data.personType;
-
-      // retrieve entity information
-      this.route.params.subscribe((params: { caseId?: string, contactId?: string }) => {
-        // get selected outbreak
-        this.outbreakDataService
-          .getSelectedOutbreak()
-          .subscribe((selectedOutbreak: OutbreakModel) => {
-            // selected outbreak
-            this.selectedOutbreak = selectedOutbreak;
-
-            // export lab results url
-            this.exportLabResultsUrl = null;
-            if (
-              this.selectedOutbreak &&
-              this.selectedOutbreak.id
-            ) {
-              this.exportLabResultsUrl = `/outbreaks/${this.selectedOutbreak.id}/${EntityModel.getLinkForEntityType(this.personType)}/${this.personType === EntityType.CONTACT ? params.contactId : params.caseId}/lab-results/export`;
-              this.exportLabResultsFileName = `${this.i18nService.instant(this.personType === EntityType.CONTACT ? 'LNG_PAGE_LIST_CONTACTS_TITLE' : 'LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD')}`;
-            }
-
-            // determine entity endpoint that we need to call
-            const entitySubscriber: Observable<CaseModel | ContactModel> = this.personType === EntityType.CONTACT ?
-              this.contactDataService.getContact(this.selectedOutbreak.id, params.contactId) :
-              this.caseDataService.getCase(this.selectedOutbreak.id, params.caseId);
-
-            // get entity ( case / contact ) data
-            entitySubscriber
-              .subscribe((entityData: CaseModel | ContactModel) => {
-                this.entityData = entityData;
-
-                // update initial classification
-                if (this.personType === EntityType.CASE) {
-                  this.initialCaseClassification = (entityData as CaseModel).classification;
-                }
-
-                // initialize breadcrumbs
-                this.initializeBreadcrumbs();
-
-                // initialize pagination
-                this.initPaginator();
-                // ...and load the list of items
-                this.needsRefreshList(true);
-              });
-          });
-
-      });
-
-      // initialize breadcrumbs
-      this.initializeBreadcrumbs();
-    });
-
     this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
-
-    // initialize Side Table Columns
-    this.initializeTableColumns();
   }
 
   /**
@@ -262,7 +202,8 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
       visible: (): boolean => {
         return LabResultModel.canExport(this.authUser) && (
           (this.personType === EntityType.CASE && CaseModel.canExportLabResult(this.authUser)) ||
-          (this.personType === EntityType.CONTACT && ContactModel.canExportLabResult(this.authUser))
+          (this.personType === EntityType.CONTACT && ContactModel.canExportLabResult(this.authUser)) ||
+          (this.personType === EntityType.CASE && CaseModel.canModify(this.authUser))
         );
       },
       menuOptions: [
@@ -630,7 +571,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
                 get: () => 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_EXPORT_TITLE'
               },
               export: {
-                url: this.exportLabResultsUrl,
+                url: `/outbreaks/${ this.selectedOutbreak.id }/${ EntityModel.getLinkForEntityType(this.personType) }/${ this.personType === EntityType.CONTACT ? this.activatedRoute.snapshot.params.contactId : this.activatedRoute.snapshot.params.caseId }/lab-results/export`,
                 async: true,
                 method: ExportDataMethod.POST,
                 fileName: `${ this.i18nService.instant(this.personType === EntityType.CONTACT ? 'LNG_PAGE_LIST_CONTACTS_TITLE' : 'LNG_PAGE_LIST_CASES_TITLE') } - ${ moment().format('YYYY-MM-DD') }`,

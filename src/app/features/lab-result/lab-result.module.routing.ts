@@ -13,6 +13,7 @@ import { LabSequenceLaboratoryDataResolver } from '../../core/services/resolvers
 import { LabSequenceResultDataResolver } from '../../core/services/resolvers/data/lab-sequence-result.resolver';
 import { LabTestResultDataResolver } from '../../core/services/resolvers/data/lab-test-result.resolver';
 import { LabTestTypeDataResolver } from '../../core/services/resolvers/data/lab-test-type.resolver';
+import { PersonDataResolver } from '../../core/services/resolvers/data/person.resolver';
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
@@ -32,7 +33,8 @@ const entityLabResultsFoundation = {
     labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
     labSequenceResult: LabSequenceResultDataResolver,
     user: UserDataResolver,
-    yesNo: YesNoDataResolver
+    yesNo: YesNoDataResolver,
+    entityData: PersonDataResolver
   }
 };
 
