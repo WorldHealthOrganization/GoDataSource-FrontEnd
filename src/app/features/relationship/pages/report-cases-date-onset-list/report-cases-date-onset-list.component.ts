@@ -132,9 +132,7 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
                   },
                   linkQueryParams: (): Params => {
                     return {
-                      queryParams: {
-                        onset: true
-                      }
+                      onset: true
                     };
                   }
                 },
@@ -149,7 +147,7 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
                   get: () => 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW',
                   data: (item: ReportCasesWithOnsetModel) => {
                     return {
-                      name: item.primaryCase.name
+                      name: item.secondaryCase.name
                     };
                   }
                 },
@@ -225,7 +223,7 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
                   get: () => 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY',
                   data: (item: ReportCasesWithOnsetModel) => {
                     return {
-                      name: item.primaryCase.name
+                      name: item.secondaryCase.name
                     };
                   }
                 },
