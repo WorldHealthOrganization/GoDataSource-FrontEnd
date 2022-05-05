@@ -1156,7 +1156,10 @@ export class DialogV2Service {
 
               case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
                 // filter
-                qb.filter.byNotHavingValue(filterDefinition.field);
+                qb.filter.byNotHavingValue(
+                  filterDefinition.field,
+                  !!filterDefinition.havingNotHavingApplyMongo
+                );
 
                 // finished
                 break;
@@ -1313,7 +1316,10 @@ export class DialogV2Service {
 
               case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
                 // filter
-                qb.filter.byNotHavingValue(filterDefinition.field);
+                qb.filter.byNotHavingValue(
+                  filterDefinition.field,
+                  !!filterDefinition.havingNotHavingApplyMongo
+                );
 
                 // finished
                 break;
@@ -1353,7 +1359,10 @@ export class DialogV2Service {
 
               case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
                 // filter
-                qb.filter.byNotHavingValue(filterDefinition.field);
+                qb.filter.byNotHavingValue(
+                  filterDefinition.field,
+                  !!filterDefinition.havingNotHavingApplyMongo
+                );
 
                 // finished
                 break;
@@ -1404,7 +1413,10 @@ export class DialogV2Service {
 
               case V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE:
                 // filter
-                qb.filter.byNotHavingValue(filterDefinition.field);
+                qb.filter.byNotHavingValue(
+                  filterDefinition.field,
+                  !!filterDefinition.havingNotHavingApplyMongo
+                );
 
                 // finished
                 break;

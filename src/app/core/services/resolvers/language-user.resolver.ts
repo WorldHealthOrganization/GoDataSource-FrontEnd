@@ -9,7 +9,7 @@ import { throwError } from 'rxjs/internal/observable/throwError';
 import { AuthDataService } from '../data/auth.data.service';
 
 @Injectable()
-export class LanguageResolver
+export class LanguageUserResolver
 implements Resolve<any> {
 
   /**

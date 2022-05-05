@@ -1,12 +1,21 @@
 import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-
 import * as fromPages from './pages';
+import { VersionDataResolver } from '../../core/services/resolvers/data/version.resolver';
+import { LanguageDataResolver } from '../../core/services/resolvers/data/language.resolver';
+import { CaptchaDataFor } from '../../core/services/data/captcha.data.service';
 
 const routes: Routes = [
   {
     path: 'login',
-    component: fromPages.LoginComponent
+    component: fromPages.LoginComponent,
+    resolve: {
+      version: VersionDataResolver,
+      languages: LanguageDataResolver
+    },
+    data: {
+      page: CaptchaDataFor.LOGIN
+    }
   },
   {
     path: 'logout',
@@ -14,7 +23,14 @@ const routes: Routes = [
   },
   {
     path: 'forgot-password',
-    component: fromPages.ForgotPasswordComponent
+    component: fromPages.LoginComponent,
+    resolve: {
+      version: VersionDataResolver,
+      languages: LanguageDataResolver
+    },
+    data: {
+      page: CaptchaDataFor.FORGOT_PASSWORD
+    }
   },
   {
     path: 'reset-password',

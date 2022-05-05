@@ -6,7 +6,6 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { LanguageModel } from '../../../../core/models/language.model';
 import { LanguageDataService } from '../../../../core/services/data/language.data.service';
-import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -39,7 +38,6 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
     private languageDataService: LanguageDataService,
     private formHelper: FormHelperService,
     private toastV2Service: ToastV2Service,
-    private cacheService: CacheService,
     private authDataService: AuthDataService,
     protected dialogService: DialogService
   ) {
@@ -130,9 +128,6 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
           return throwError(err);
         }),
         switchMap((modifiedLanguage) => {
-          // remove help items from cache
-          this.cacheService.remove(CacheKey.LANGUAGES);
-
           // update language tokens
           return this.languageDataService.getLanguagesList()
             .pipe(

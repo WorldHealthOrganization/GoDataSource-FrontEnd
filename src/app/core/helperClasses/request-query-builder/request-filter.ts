@@ -710,15 +710,18 @@ export class RequestFilter {
   }
 
   /**
-     * Filter all records that don't have value on a specific field
-     * @param property
-     */
+   * Filter all records that don't have value on a specific field
+   */
   byNotHavingValue(
-    property: string
+    property: string,
+    forMongo: boolean = false
   ): RequestFilter {
     // filter no values
     this.where(
-      RequestFilterGenerator.doesntHaveValue(property),
+      RequestFilterGenerator.doesntHaveValue(
+        property,
+        forMongo
+      ),
       false,
       false
     );

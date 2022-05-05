@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ImportDataExtension } from '../../components/import-data/model';
@@ -30,7 +29,6 @@ export class ImportLanguageTokensComponent implements OnInit {
      * Constructor
      */
   constructor(
-    private cacheService: CacheService,
     private router: Router,
     protected route: ActivatedRoute,
     private authDataService: AuthDataService,
@@ -83,9 +81,6 @@ export class ImportLanguageTokensComponent implements OnInit {
      * Finished import
      */
   finished() {
-    // remove cached languages
-    this.cacheService.remove(CacheKey.LANGUAGES);
-
     // redirect
     if (LanguageModel.canList(this.authUser)) {
       this.router.navigate(['/languages']);

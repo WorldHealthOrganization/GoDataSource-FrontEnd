@@ -6,7 +6,6 @@ import { NgForm } from '@angular/forms';
 import * as _ from 'lodash';
 import { LanguageModel } from '../../../../core/models/language.model';
 import { LanguageDataService } from '../../../../core/services/data/language.data.service';
-import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
@@ -39,7 +38,6 @@ export class CreateLanguageComponent
     private languageDataService: LanguageDataService,
     private toastV2Service: ToastV2Service,
     private formHelper: FormHelperService,
-    private cacheService: CacheService,
     private dialogService: DialogService,
     private authDataService: AuthDataService,
     private redirectService: RedirectService
@@ -97,9 +95,6 @@ export class CreateLanguageComponent
         )
         .subscribe((newLanguage: LanguageModel) => {
           this.toastV2Service.success('LNG_PAGE_CREATE_LANGUAGE_ACTION_CREATE_LANGUAGE_SUCCESS_MESSAGE');
-
-          // clear cache
-          this.cacheService.remove(CacheKey.LANGUAGES);
 
           // hide dialog
           loadingDialog.close();

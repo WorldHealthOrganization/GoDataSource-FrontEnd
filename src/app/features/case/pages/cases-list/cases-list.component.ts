@@ -836,6 +836,18 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
                         // determine if case has exposed contacts
                         this.caseDataService
                           .getExposedContactsForCase(this.selectedOutbreak.id, item.id)
+                          .pipe(
+                            catchError((err) => {
+                              // show error
+                              this.toastV2Service.error(err);
+
+                              // hide loading
+                              handler.loading.hide();
+
+                              // send error down the road
+                              return throwError(err);
+                            })
+                          )
                           .subscribe((exposedContacts: { count: number }) => {
                             // set message data
                             message.data = {

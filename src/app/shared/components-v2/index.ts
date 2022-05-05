@@ -10,6 +10,7 @@ import { AppListTableV2ColumnHeaderComponent } from './app-list-table-v2/compone
 import { AppListTableV2LoadingComponent } from './app-list-table-v2/components/loading/app-list-table-v2-loading.component';
 import { AppListTableV2NoDataComponent } from './app-list-table-v2/components/no-data/app-list-table-v2-no-data.component';
 import { AppCreateViewModifyV2Component } from './app-create-view-modify-v2/app-create-view-modify-v2.component';
+import { AppSelectLanguageV2Component } from './app-select-language-v2/app-select-language-v2.component';
 
 export const components: any[] = [
   AppBottomDialogV2Component,
@@ -23,5 +24,6 @@ export const components: any[] = [
   AppListTableV2NoDataComponent,
   AppListTableV2SelectionHeaderComponent,
   AppLoadingDialogV2Component,
+  AppSelectLanguageV2Component,
   AppSideDialogV2Component
 ];

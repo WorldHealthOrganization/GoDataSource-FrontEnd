@@ -109,13 +109,15 @@ export class OutbreakModel
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'startDate',
         label: 'LNG_OUTBREAK_FIELD_LABEL_START_DATE',
-        sortable: true
+        sortable: true,
+        havingNotHavingApplyMongo: true
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'endDate',
         label: 'LNG_OUTBREAK_FIELD_LABEL_END_DATE',
-        sortable: true
+        sortable: true,
+        havingNotHavingApplyMongo: true
       },
       {
         type: V2AdvancedFilterType.MULTISELECT,

@@ -3,12 +3,12 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './core/services/guards/auth-guard.service';
 import { PERMISSION } from './core/models/permission.model';
 import { AuthenticatedComponent } from './core/components/authenticated/authenticated.component';
-import { LanguageResolver } from './core/services/resolvers/language.resolver';
 import { ModulePath } from './core/enums/module-path.enum';
 import { PasswordChangeGuard } from './core/services/guards/password-change-guard.service';
 import { RedirectComponent } from './core/components/redirect/redirect.component';
 import { PermissionExpression } from './core/models/user.model';
 import { DashboardModel } from './core/models/dashboard.model';
+import { LanguageUserResolver } from './core/services/resolvers/language-user.resolver';
 
 const routes: Routes = [
   // Authentication Module routes
@@ -16,7 +16,7 @@ const routes: Routes = [
     path: ModulePath.AuthenticationModule,
     loadChildren: () => import('./features/authentication/authentication.module').then(m => m.AuthenticationModule),
     resolve: {
-      language: LanguageResolver
+      language: LanguageUserResolver
     }
   },
 
@@ -25,7 +25,7 @@ const routes: Routes = [
     path: '',
     component: AuthenticatedComponent,
     resolve: {
-      language: LanguageResolver
+      language: LanguageUserResolver
     },
     children: [
       // Account Module routes
