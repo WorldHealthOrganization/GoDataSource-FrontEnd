@@ -189,6 +189,9 @@ const routes: Routes = [
       permissions: [
         PERMISSION.CASE_LIST_LONG_PERIOD_BETWEEN_DATES_REPORT
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver
     }
   }
 ];
