@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
 import { Observable, throwError } from 'rxjs';
@@ -15,12 +15,11 @@ import {
   ExportFieldsGroupModelNameEnum
 } from '../../../../core/models/export-fields-group.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
-import { ReferenceDataCategory, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { EntityLabResultService } from '../../../../core/services/helper/entity-lab-result-helper.service';
@@ -31,7 +30,6 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2SideDialogConfigButtonType, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { FilterModel } from '../../../../shared/components/side-filters/model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
@@ -40,27 +38,18 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
   templateUrl: './entity-lab-results-list.component.html',
   styleUrls: ['./entity-lab-results-list.component.less']
 })
-export class EntityLabResultsListComponent extends ListComponent implements OnInit, OnDestroy {
+export class EntityLabResultsListComponent extends ListComponent implements OnDestroy {
   // entity
   personType: EntityType;
   entityData: CaseModel | ContactModel;
 
-  initialCaseClassification: string;
-
   // list of existing case lab results
   labResultsList$: Observable<LabResultModel[]>;
-
-  caseClassificationsList$: Observable<any[]>;
 
   // constants
   EntityType = EntityType;
 
-  // available side filters
-  availableSideFilters: FilterModel[];
-
-  // export outbreak lab results
-  exportLabResultsUrl: string;
-  exportLabResultsFileName: string;
+  // lab results anonymize fields
   anonymizeFields: ILabelValuePairModel[] = [
     { label: 'LNG_LAB_RESULT_FIELD_LABEL_ID', value: 'id' },
     { label: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON_ID', value: 'personId' },
@@ -89,7 +78,6 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
   ];
 
-
   /**
      * Constructor
      */
@@ -98,7 +86,6 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
     private outbreakDataService: OutbreakDataService,
     private labResultDataService: LabResultDataService,
     private toastV2Service: ToastV2Service,
-    private referenceDataDataService: ReferenceDataDataService,
     private i18nService: I18nService,
     private entityLabResultService: EntityLabResultService,
     private activatedRoute: ActivatedRoute,
@@ -109,13 +96,6 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
 
     this.personType = this.activatedRoute.snapshot.data.personType;
     this.entityData = this.activatedRoute.snapshot.data.entityData;
-  }
-
-  /**
-     * Component initialized
-     */
-  ngOnInit() {
-    this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
   }
 
   /**
@@ -331,7 +311,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
       );
     }
 
-    //   // person breadcrumbs
+    // person breadcrumbs
     if (this.entityData) {
       // entity view
       if (
