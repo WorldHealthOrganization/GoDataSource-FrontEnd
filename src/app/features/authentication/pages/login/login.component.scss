@@ -1,0 +1,161 @@
+@import 'mixins';
+
+.gd-login {
+  height: 100vh;
+  overflow: hidden;
+
+  .gd-login-left {
+    background: var(--gd-primary-alt);
+    clip-path: polygon(0 0, 100% 0, 75% 100%, 0% 100%);
+    overflow: hidden;
+    width: 35%;
+
+    .gd-login-left-top {
+      color: rgba(var(--gd-background-rgb), 0.1);
+      font-size: 10.3vw;
+      font-weight: 900;
+      left: -2rem;
+      line-height: 10rem;
+      max-width: 100%;
+      position: relative;
+
+      @include breakpoint('lg') {
+        font-size: 10.5vw;
+        line-height: 7rem;
+      }
+
+      &:after {
+        background: -moz-linear-gradient(
+                      top,
+                      transparent 0%,
+                      rgba(var(--gd-primary-alt-rgb), 0.85) 50%,
+                      var(--gd-primary-alt) 100%
+                    );
+        background: -webkit-linear-gradient(
+                      top,
+                      transparent 0%,
+                      rgba(var(--gd-primary-alt-rgb), 0.85) 50%,
+                      var(--gd-primary-alt) 100%
+                    );
+        background: linear-gradient(
+                      to bottom,
+                      transparent 0%,
+                      rgba(var(--gd-primary-alt-rgb), 0.85) 50%,
+                      var(--gd-primary-alt) 100%
+                    );
+        filter: progid:DXImageTransform.Microsoft.gradient(
+                  startColorstr='#00004e6f', endColorstr='#004e6f',GradientType=0
+                );
+        bottom: -3rem;
+        content: '';
+        display: block;
+        height: 13rem;
+        left: -2rem;
+        position: absolute;
+        width: calc(100% + 4rem);
+
+        @include breakpoint('lg') {
+          height: 9rem;
+        }
+      }
+    }
+
+    .gd-login-left-bottom {
+      @include opacity(0.5);
+      padding: 1.6rem;
+
+      img {
+        display: block;
+        height: 6rem;
+        width: auto;
+      }
+    }
+  }
+
+  .gd-login-right {
+    overflow-y: overlay;
+    padding: 2.4rem 2.4rem 1.6rem;
+
+    @include breakpoint('gt-md') {
+      width: 65%;
+    }
+
+    @include breakpoint('lt-md') {
+      width: 100%;
+    }
+
+    .gd-login-right-top {
+      .gd-form-select-single-v2 {
+        min-width: 20rem;
+      }
+    }
+
+    .gd-login-right-middle {
+      margin: 5rem auto;
+      max-width: 35rem;
+      width: 100%;
+
+      .gd-login-right-middle-logo {
+        img {
+          display: block;
+          height: auto;
+          max-width: 35rem;
+          width: 100%;
+        }
+      }
+
+      .gd-login-right-middle-title {
+        font-size: 2.4rem;
+        font-weight: 700;
+        margin: 6.4rem 0 3.2rem;
+        text-align: center;
+      }
+
+      .gd-login-right-middle-details {
+        color: var(--gd-secondary);
+        padding-bottom: 0.8rem;
+      }
+
+      .gd-login-right-middle-form {
+        .gd-form-password-v2 {
+          margin-top: 0.8rem;
+        }
+
+        .gd-login-right-middle-form-forgot-button {
+          text-align: right;
+        }
+
+        .gd-login-right-middle-form-login-button {
+          margin-top: 2.4rem;
+
+          .mat-flat-button {
+            width: 100%;
+
+            .mat-button-wrapper {
+              @include flex_justify(center);
+              gap: 0;
+              text-transform: uppercase;
+            }
+          }
+        }
+
+        .gd-login-right-middle-form-reset-buttons {
+          margin-top: 0.8rem;
+
+          > .mat-flat-button {
+            + .mat-flat-button {
+              @include breakpoint('xxs') {
+                margin-top: 0.8rem;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .gd-login-right-bottom {
+      color: var(--gd-secondary);
+      font-size: 1.2rem;
+    }
+  }
+}

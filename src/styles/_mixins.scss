@@ -211,6 +211,13 @@
 }
 
 @mixin breakpoint($point) {
+  /* Small Phone */
+  @if $point=='xxs' {
+    @media only screen and (max-width: 599px) {
+      @content;
+    }
+  }
+
   /* Phone */
   @if $point=='xs' {
     @media only screen and (max-width: 767px) {

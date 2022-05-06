@@ -198,7 +198,7 @@ h6 {
 h1 {
   color: var(--gd-primary);
   font-size: 3rem;
-  font-weight: bold;
+  font-weight: 700;
 
   > span {
     color: var(--gd-primary-alt);
@@ -208,7 +208,7 @@ h1 {
 h2 {
   color: var(--gd-primary);
   font-size: 2.4rem;
-  font-weight: bold;
+  font-weight: 700;
 
   > span {
     color: var(--gd-primary-alt);
@@ -218,7 +218,7 @@ h2 {
 h3 {
   color: var(--gd-primary-alt);
   font-size: 1.8rem;
-  font-weight: bold;
+  font-weight: 700;
 
   > span {
     color: var(--gd-primary-alt);
@@ -227,17 +227,17 @@ h3 {
 
 h4 {
   font-size: 1.6rem;
-  font-weight: normal;
+  font-weight: 400;
 }
 
 h5 {
   font-size: 1.5rem;
-  font-weight: normal;
+  font-weight: 400;
 }
 
 h6 {
   font-size: 1.4rem;
-  font-weight: normal;
+  font-weight: 400;
 }
 
 /* Lists */

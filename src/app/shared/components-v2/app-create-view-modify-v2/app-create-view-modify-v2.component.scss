@@ -552,7 +552,7 @@
 
                       .gd-create-view-modify-bottom-section-content-input-coordinates {
                         > *:first-child {
-                          @media only screen and (max-width: 599px) {
+                          @include breakpoint('xxs') {
                             margin-bottom: 1.6rem !important;
                           }
                         }

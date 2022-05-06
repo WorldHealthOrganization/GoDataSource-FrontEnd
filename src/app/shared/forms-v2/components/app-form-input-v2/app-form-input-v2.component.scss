@@ -105,6 +105,10 @@
               color: var(--gd-secondary);
               line-height: 2.4rem;
               margin-top: -0.7rem;
+
+              .mat-placeholder-required {
+                color: var(--gd-danger);
+              }
             }
           }
         }

@@ -217,6 +217,10 @@
               &.mat-form-field-empty {
                 margin-top: -0.6rem;
               }
+
+              .mat-placeholder-required {
+                color: var(--gd-danger);
+              }
             }
           }
         }
