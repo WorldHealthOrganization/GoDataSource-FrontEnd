@@ -15,7 +15,6 @@ import {
   ExportFieldsGroupModelNameEnum
 } from '../../../../core/models/export-fields-group.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ReferenceDataCategory, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
@@ -23,16 +22,16 @@ import { LabResultDataService } from '../../../../core/services/data/lab-result.
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { EntityLabResultService } from '../../../../core/services/helper/entity-lab-result.service.ts.service';
+import { ExportDataExtension } from '../../../../core/services/helper/dialog.service';
+import { EntityLabResultService } from '../../../../core/services/helper/entity-lab-result-helper.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
-import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
+import { IV2SideDialogConfigButtonType, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { FilterModel } from '../../../../shared/components/side-filters/model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
@@ -45,10 +44,6 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
   // entity
   personType: EntityType;
   entityData: CaseModel | ContactModel;
-  // TODO: Left for inspiration
-  get entityDataAsCaseModel(): CaseModel {
-    return this.entityData as CaseModel;
-  }
 
   initialCaseClassification: string;
 
@@ -101,15 +96,14 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
   constructor(
     protected listHelperService: ListHelperService,
     private outbreakDataService: OutbreakDataService,
-    private caseDataService: CaseDataService,
     private labResultDataService: LabResultDataService,
     private toastV2Service: ToastV2Service,
-    private dialogService: DialogService,
     private referenceDataDataService: ReferenceDataDataService,
     private i18nService: I18nService,
     private entityLabResultService: EntityLabResultService,
     private activatedRoute: ActivatedRoute,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private caseDataService: CaseDataService
   ) {
     super(listHelperService);
 
@@ -179,6 +173,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
    */
   protected initializeTableAdvancedFilters(): void {
     this.advancedFilters = this.entityLabResultService.generateAdvancedFilters({
+      caseInvestigationTemplate: () => this.selectedOutbreak.caseInvestigationTemplate,
       options: {
         labName: (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         labSampleType: (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -207,6 +202,27 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
         );
       },
       menuOptions: [
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_CHANGE_CASE_CLASSIFICATION'
+          },
+          action: {
+            click: () => {
+              this.changeCaseClassification();
+            }
+          },
+          visible: (): boolean => {
+            return this.personType === EntityType.CASE && CaseModel.canModify(this.authUser);
+          }
+        },
+
+        // Divider
+        {
+          visible: (): boolean => {
+            return this.personType === EntityType.CASE && CaseModel.canModify(this.authUser);
+          }
+        },
+
         // Export lab result data
         {
           label: {
@@ -270,43 +286,6 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
           return selected.length < 1;
         }
       }
-    ];
-  }
-
-  // TODO: Should be deleted after inner TODO is resolved
-  /**
-     * Initialize Side Filters
-     */
-  initializeSideFilters() {
-    // if there is no outbreak, we can't fully initialize side filters
-    if (
-      !this.selectedOutbreak ||
-            !this.selectedOutbreak.id
-    ) {
-      return;
-    }
-
-    // init side filters
-    this.availableSideFilters = [
-      // TODO: Should those be added?
-      new FilterModel({
-        fieldName: 'dateTesting',
-        fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
-        type: FilterType.RANGE_DATE,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'notes',
-        fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES',
-        type: FilterType.TEXT,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'questionnaireAnswers',
-        fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-        type: FilterType.QUESTIONNAIRE_ANSWERS,
-        questionnaireTemplate: this.selectedOutbreak.labResultsTemplate
-      })
     ];
   }
 
@@ -493,43 +472,85 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
     }
   }
 
-  // TODO: Left for inspiration
   /**
      * Change case classification
      * @param {LabelValuePair} classificationOption
      */
-  changeCaseClassification(classificationOption: LabelValuePair) {
-    if (_.isEmpty(this.entityData)) {
-      return;
-    }
-
-    // show confirm dialog
-    this.dialogService
-      .showConfirm('LNG_DIALOG_CONFIRM_CHANGE_CASE_EPI_CLASSIFICATION', {
-        caseName: this.i18nService.instant(this.entityData.name),
-        classification: this.i18nService.instant(classificationOption.value)
-      })
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          this.caseDataService
-            .modifyCase(this.selectedOutbreak.id, this.entityData.id, { classification: classificationOption.value })
-            .pipe(
-              catchError((err) => {
-                this.toastV2Service.error(err);
-                return throwError(err);
-              })
-            )
-            .subscribe((caseData: CaseModel) => {
-              // update the initial case classification
-              this.initialCaseClassification = caseData.classification;
-              this.toastV2Service.success('LNG_PAGE_LIST_LAB_RESULTS_ACTION_CHANGE_CASE_EPI_CLASSIFICATION_SUCCESS_MESSAGE');
-            });
-        } else {
-          if (answer.button === DialogAnswerButton.Cancel) {
-            // update the ngModel for select
-            (this.entityData as CaseModel).classification = this.initialCaseClassification;
+  private changeCaseClassification() {
+    this.dialogV2Service
+      .showSideDialog({
+        // title
+        title: {
+          get: () => 'LNG_DIALOG_CONFIRM_CHANGE_CASE_EPI_CLASSIFICATION',
+          data: () => {
+            return {
+              caseName: this.i18nService.instant(this.entityData.name),
+              classification: '...'
+            };
           }
+        },
+
+        // inputs
+        inputs: [
+          {
+            type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+            placeholder: 'LNG_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION',
+            options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: undefined,
+            name: 'classification',
+            validators: {
+              required: () => true
+            }
+          }
+        ],
+
+        // buttons
+        bottomButtons: [
+          {
+            label: 'LNG_COMMON_BUTTON_UPDATE',
+            type: IV2SideDialogConfigButtonType.OTHER,
+            color: 'primary',
+            key: 'save',
+            disabled: (_data, handler): boolean => {
+              return !handler.form || handler.form.invalid;
+            }
+          }
+        ],
+
+        initialized: (handler) => {
+          // update title
+          handler.form.form.valueChanges.subscribe((response) => {
+            if (response.classification) {
+              handler.update.changeTitle('LNG_DIALOG_CONFIRM_CHANGE_CASE_EPI_CLASSIFICATION', { caseName: this.i18nService.instant(this.entityData.name), classification: this.i18nService.instant(response.classification) });
+            }
+          });
         }
+      }).subscribe((response) => {
+        // cancelled ?
+        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+          return;
+        }
+
+        // change case classification
+        this.caseDataService
+          .modifyCase(this.selectedOutbreak.id, this.entityData.id, { classification: (response.handler.data.inputs[0] as any).value })
+          .pipe(
+            catchError((err) => {
+              this.toastV2Service.error(err);
+              return throwError(err);
+            })
+          )
+          .subscribe(() => {
+            // success message
+            this.toastV2Service.success(
+              'LNG_PAGE_LIST_LAB_RESULTS_ACTION_CHANGE_CASE_EPI_CLASSIFICATION_SUCCESS_MESSAGE');
+
+            // close popup
+            response.handler.hide();
+
+            // refresh list
+            this.needsRefreshList(true);
+          });
       });
   }
 

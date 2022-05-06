@@ -6,6 +6,7 @@ import { PERMISSION } from '../../core/models/permission.model';
 import { PermissionExpression } from '../../core/models/user.model';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
+import { ClassificationDataResolver } from '../../core/services/resolvers/data/classification.resolver';
 import { LabNameDataResolver } from '../../core/services/resolvers/data/lab-name.resolver';
 import { LabProgressDataResolver } from '../../core/services/resolvers/data/lab-progress.resolver';
 import { LabSampleTypeDataResolver } from '../../core/services/resolvers/data/lab-sample-type.resolver';
@@ -34,7 +35,8 @@ const entityLabResultsFoundation = {
     labSequenceResult: LabSequenceResultDataResolver,
     user: UserDataResolver,
     yesNo: YesNoDataResolver,
-    entityData: PersonDataResolver
+    entityData: PersonDataResolver,
+    classification: ClassificationDataResolver
   }
 };
 

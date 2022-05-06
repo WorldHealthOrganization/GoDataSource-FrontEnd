@@ -14,6 +14,7 @@ import { EntityModel } from '../../models/entity-and-relationship.model';
 import { EntityType } from '../../models/entity-type';
 import { LabResultModel } from '../../models/lab-result.model';
 import { OutbreakModel } from '../../models/outbreak.model';
+import { QuestionModel } from '../../models/question.model';
 import { UserModel } from '../../models/user.model';
 import { LabResultDataService } from '../data/lab-result.data.service';
 import { DialogV2Service } from './dialog-v2.service';
@@ -565,6 +566,7 @@ export class EntityLabResultService {
    * Advanced filters
    */
   generateAdvancedFilters(data: {
+    caseInvestigationTemplate: () => QuestionModel[],
     options: {
       labName: ILabelValuePairModel[],
       labSampleType: ILabelValuePairModel[],
@@ -687,6 +689,24 @@ export class EntityLabResultService {
         label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED',
         sortable: true,
         options: data.options.yesNo
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateTesting',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'notes',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
+        field: 'questionnaireAnswers',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+        template: data.caseInvestigationTemplate
       }
     ];
 
