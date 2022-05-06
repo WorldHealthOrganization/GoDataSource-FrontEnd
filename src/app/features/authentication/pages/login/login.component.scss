@@ -19,6 +19,12 @@
       max-width: 100%;
       position: relative;
 
+      @include breakpoint('gt-xxl') {
+        font-size: 10.5vw;
+        left: -5rem;
+        line-height: 19rem;
+      }
+
       @include breakpoint('lg') {
         font-size: 10.5vw;
         line-height: 7rem;
@@ -53,6 +59,12 @@
         left: -2rem;
         position: absolute;
         width: calc(100% + 4rem);
+
+        @include breakpoint('gt-xxl') {
+          bottom: -50%;
+          height: 100%;
+          left: 0;
+        }
 
         @include breakpoint('lg') {
           height: 9rem;
