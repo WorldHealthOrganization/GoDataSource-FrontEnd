@@ -24,29 +24,3 @@
   (resetHeaderFilters)="resetFiltersToSideFilters()"
   (advancedFilterBy)="applySideFilters($event)">
 </app-list-table-v2>
-
-<!-- <mat-card class="page-section page-content">
-    <div class="top-section-wrapper">
-        <div fxFlex fxLayout="column">
-            <div
-                *ngIf="personType === EntityType.CASE && CaseModel.canModify(authUser)"
-                fxFlex fxLayout="row" fxLayoutGap="20px" fxLayoutAlign="start center">
-                <div class="info-label">
-                    {{ 'LNG_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION_INFO' | translate }}
-                </div>
-
-                <div>
-                    <app-form-select
-                        name="classificationFilter"
-                        [ngModel]="entityDataAsCaseModel?.classification"
-                        [options]="caseClassificationsList$ | async"
-                        (optionChanged)="changeCaseClassification($event)"
-                        required="true"
-                        [placeholder]="'LNG_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION' | translate"
-                        [tooltip]="'LNG_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION_DESCRIPTION' | translate">
-                    </app-form-select>
-                </div>
-            </div>
-        </div>
-    </div>
-</mat-card> -->
