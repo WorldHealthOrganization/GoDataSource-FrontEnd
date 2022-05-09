@@ -534,6 +534,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     const rightPinnedColumnsMap: {
       [field: string]: true
     } = {};
+    const visibleColumnsMap: {
+      [field: string]: IV2Column
+    } = {};
 
     // load column settings
     const authUser: UserModel = this.authDataService.getAuthenticatedUser();
@@ -557,17 +560,21 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // mark visible columns if we have any
     if (visibleColumns.length > 0) {
       // map visible columns
-      const visibleColumnsMap: {
-        [field: string]: true
-      } = {};
       visibleColumns.forEach((field) => {
-        visibleColumnsMap[field] = true;
+        visibleColumnsMap[field] = null;
       });
 
       // make columns visible
       this._columns.forEach((column) => {
-        column.notVisible = !visibleColumnsMap[column.field] &&
+        // set not visible
+        const isVisible: boolean = visibleColumnsMap[column.field] !== undefined;
+        column.notVisible = !isVisible &&
           column.format?.type !== V2ColumnFormat.ACTIONS;
+
+        // update map if found
+        if (isVisible) {
+          visibleColumnsMap[column.field] = column;
+        }
       });
     }
 
@@ -651,8 +658,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       });
     }
 
-    // process columns
-    this._columns.forEach((column) => {
+    // render columns
+    const renderColumn = (column: IV2Column) => {
       // no need to take in account ?
       if (
         (
@@ -738,7 +745,32 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           });
         });
       }
-    });
+    };
+
+    // keep order of columns
+    if (
+      visibleColumns &&
+      visibleColumns.length > 0
+    ) {
+      // render column in order of visibility
+      // - order changed by user
+      visibleColumns.forEach((field) => {
+        // not found in definitions ?
+        if (!visibleColumnsMap[field]) {
+          // don't render it
+          // - it might've been removed from definitions
+          return;
+        }
+
+        // render column
+        renderColumn(visibleColumnsMap[field]);
+      });
+    } else {
+      // process columns in default order
+      this._columns.forEach((column) => {
+        renderColumn(column);
+      });
+    }
 
     // update column defs
     this._agTable.api.setColumnDefs(columnDefs);
