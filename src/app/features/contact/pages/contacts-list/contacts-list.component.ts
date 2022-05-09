@@ -343,6 +343,18 @@ export class ContactsListComponent
         }
       },
       {
+        field: 'dob',
+        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
         field: 'gender',
         label: 'LNG_CONTACT_FIELD_LABEL_GENDER',
         sortable: true,
@@ -1814,6 +1826,7 @@ export class ContactsListComponent
       'visualId',
       'addresses',
       'age',
+      'dob',
       'gender',
       'riskLevel',
       'dateOfLastContact',
