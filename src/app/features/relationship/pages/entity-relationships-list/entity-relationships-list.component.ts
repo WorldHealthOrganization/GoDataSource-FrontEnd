@@ -101,8 +101,8 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
    */
   protected initializeTableColumns(): void {
     this.tableColumns = this.entityHelperService.retrieveTableColumns({
-      selectedOutbreakIsActive: this.selectedOutbreakIsActive,
-      selectedOutbreak: this.selectedOutbreak,
+      selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
+      selectedOutbreak: () => this.selectedOutbreak,
       entity: this._entity,
       relationshipType: this.relationshipType,
       authUser: this.authUser,

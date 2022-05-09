@@ -546,8 +546,8 @@ export class EntityHelperService {
    * Retrieve table columns
    */
   retrieveTableColumns(definitions: {
-    selectedOutbreakIsActive: boolean,
-    selectedOutbreak: OutbreakModel,
+    selectedOutbreakIsActive: () => boolean,
+    selectedOutbreak: () => OutbreakModel,
     entity: CaseModel | ContactModel | EventModel,
     relationshipType: RelationshipType,
     authUser: UserModel,
@@ -876,7 +876,7 @@ export class EntityHelperService {
             },
             visible: (item: EntityModel): boolean => {
               return !item.relationship.deleted &&
-                definitions.selectedOutbreakIsActive &&
+                definitions.selectedOutbreakIsActive() &&
                 RelationshipModel.canModify(definitions.authUser) &&
                 this.entityMap[definitions.entity.type].can[definitions.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].modify(definitions.authUser);
             }
@@ -924,7 +924,7 @@ export class EntityHelperService {
                       // delete
                       this.relationshipDataService
                         .deleteRelationship(
-                          definitions.selectedOutbreak.id,
+                          definitions.selectedOutbreak().id,
                           definitions.entity.type,
                           definitions.entity.id,
                           item.relationship.id
@@ -956,7 +956,7 @@ export class EntityHelperService {
                 },
                 visible: (item: CaseModel): boolean => {
                   return !item.deleted &&
-                    definitions.selectedOutbreakIsActive &&
+                    definitions.selectedOutbreakIsActive() &&
                     CaseModel.canDelete(definitions.authUser);
                 }
               }

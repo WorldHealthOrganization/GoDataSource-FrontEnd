@@ -40,8 +40,8 @@ export class EntityLabResultService {
   retrieveTableColumns(definitions: {
     authUser: UserModel,
     personType: EntityType,
-    selectedOutbreak: OutbreakModel,
-    selectedOutbreakIsActive: boolean,
+    selectedOutbreak: () => OutbreakModel,
+    selectedOutbreakIsActive: () => boolean,
     options: {
       labName: ILabelValuePairModel[],
       labSampleType: ILabelValuePairModel[],
@@ -352,7 +352,7 @@ export class EntityLabResultService {
             },
             visible: (item: LabResultModel): boolean => {
               return !item.deleted &&
-                definitions.selectedOutbreakIsActive &&
+                definitions.selectedOutbreakIsActive() &&
                 LabResultModel.canModify(definitions.authUser) && (
                 (
                   definitions.personType === EntityType.CASE &&
@@ -403,7 +403,7 @@ export class EntityLabResultService {
 
                       // delete lab result
                       this.labResultDataService
-                        .deleteLabResult(definitions.selectedOutbreak.id, item.id)
+                        .deleteLabResult(definitions.selectedOutbreak().id, item.id)
                         .pipe(
                           catchError((err) => {
                             // show error
@@ -431,7 +431,7 @@ export class EntityLabResultService {
                 },
                 visible: (item: LabResultModel): boolean => {
                   return !item.deleted &&
-                    definitions.selectedOutbreakIsActive &&
+                    definitions.selectedOutbreakIsActive() &&
                     LabResultModel.canDelete(definitions.authUser) && (
                     (
                       definitions.personType === EntityType.CASE &&
@@ -449,7 +449,7 @@ export class EntityLabResultService {
                 visible: (item: LabResultModel): boolean => {
                   // visible only if at least one of the first two items is visible
                   return !item.deleted &&
-                    definitions.selectedOutbreakIsActive &&
+                    definitions.selectedOutbreakIsActive() &&
                     LabResultModel.canDelete(definitions.authUser) && (
                     (
                       definitions.personType === EntityType.CASE &&
@@ -512,7 +512,7 @@ export class EntityLabResultService {
                       // restore lab result
                       this.labResultDataService
                         .restoreLabResult(
-                          definitions.selectedOutbreak.id,
+                          definitions.selectedOutbreak().id,
                           EntityModel.getLinkForEntityType(item.personType),
                           item.personId,
                           item.id
@@ -544,7 +544,7 @@ export class EntityLabResultService {
                 },
                 visible: (item: LabResultModel): boolean => {
                   return item.deleted &&
-                    definitions.selectedOutbreakIsActive &&
+                    definitions.selectedOutbreakIsActive() &&
                     LabResultModel.canRestore(definitions.authUser) && (
                     (
                       definitions.personType === EntityType.CASE &&

@@ -123,8 +123,8 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
     this.tableColumns = this.entityLabResultService.retrieveTableColumns({
       authUser: this.authUser,
       personType: this.personType,
-      selectedOutbreak: this.selectedOutbreak,
-      selectedOutbreakIsActive: this.selectedOutbreakIsActive,
+      selectedOutbreak: () => this.selectedOutbreak,
+      selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
       options: {
         labName: (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         labSampleType: (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,

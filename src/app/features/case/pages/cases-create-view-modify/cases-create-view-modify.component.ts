@@ -963,8 +963,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       visible: () => CaseModel.canListRelationshipContacts(this.authUser),
       tableColumns: this.entityHelperService
         .retrieveTableColumns({
-          selectedOutbreakIsActive: this.selectedOutbreakIsActive,
-          selectedOutbreak: this.selectedOutbreak,
+          selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
+          selectedOutbreak: () => this.selectedOutbreak,
           entity: this.itemData,
           relationshipType: RelationshipType.CONTACT,
           authUser: this.authUser,
@@ -1071,8 +1071,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       visible: () => CaseModel.canListRelationshipExposures(this.authUser),
       tableColumns: this.entityHelperService
         .retrieveTableColumns({
-          selectedOutbreakIsActive: this.selectedOutbreakIsActive,
-          selectedOutbreak: this.selectedOutbreak,
+          selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
+          selectedOutbreak: () => this.selectedOutbreak,
           entity: this.itemData,
           relationshipType: RelationshipType.EXPOSURE,
           authUser: this.authUser,
@@ -1181,8 +1181,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       tableColumns: this.entityLabResultService.retrieveTableColumns({
         authUser: this.authUser,
         personType: this.itemData.type,
-        selectedOutbreak: this.selectedOutbreak,
-        selectedOutbreakIsActive: this.selectedOutbreakIsActive,
+        selectedOutbreak: () => this.selectedOutbreak,
+        selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
         options: {
           labName: (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           labSampleType: (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
