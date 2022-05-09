@@ -29,7 +29,7 @@ import { ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../..
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2SideDialogConfigButtonType, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
@@ -79,8 +79,8 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
   ];
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     private outbreakDataService: OutbreakDataService,
@@ -94,21 +94,22 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
   ) {
     super(listHelperService);
 
+    // retrieve data
     this.personType = this.activatedRoute.snapshot.data.personType;
     this.entityData = this.activatedRoute.snapshot.data.entityData;
   }
 
   /**
-     * Release resources
-     */
+   * Release resources
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
   }
 
   /**
-  * Selected outbreak was changed
-  */
+   * Selected outbreak was changed
+   */
   selectedOutbreakChanged(): void {
     // initialize pagination
     this.initPaginator();
@@ -118,8 +119,8 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
   }
 
   /**
-     * Initialize Side Table Columns
-     */
+   * Initialize Side Table Columns
+   */
   protected initializeTableColumns() {
     this.tableColumns = this.entityLabResultService.retrieveTableColumns({
       authUser: this.authUser,
@@ -356,6 +357,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
   protected refreshListFields(): string[] {
     return [
       'id',
+      'personId',
       'sampleIdentifier',
       'dateSampleTaken',
       'dateSampleDelivered',
@@ -453,21 +455,14 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
   }
 
   /**
-     * Change case classification
-     * @param {LabelValuePair} classificationOption
-     */
+   * Change case classification
+   */
   private changeCaseClassification() {
     this.dialogV2Service
       .showSideDialog({
         // title
         title: {
-          get: () => 'LNG_DIALOG_CONFIRM_CHANGE_CASE_EPI_CLASSIFICATION',
-          data: () => {
-            return {
-              caseName: this.i18nService.instant(this.entityData.name),
-              classification: '...'
-            };
-          }
+          get: () => 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_CHANGE_CASE_CLASSIFICATION'
         },
 
         // inputs
@@ -476,7 +471,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
             type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
             placeholder: 'LNG_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION',
             options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            value: undefined,
+            value: (this.entityData as CaseModel).classification,
             name: 'classification',
             validators: {
               required: () => true
@@ -494,17 +489,12 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
             disabled: (_data, handler): boolean => {
               return !handler.form || handler.form.invalid;
             }
+          }, {
+            type: IV2SideDialogConfigButtonType.CANCEL,
+            label: 'LNG_COMMON_BUTTON_CANCEL',
+            color: 'text'
           }
-        ],
-
-        initialized: (handler) => {
-          // update title
-          handler.form.form.valueChanges.subscribe((response) => {
-            if (response.classification) {
-              handler.update.changeTitle('LNG_DIALOG_CONFIRM_CHANGE_CASE_EPI_CLASSIFICATION', { caseName: this.i18nService.instant(this.entityData.name), classification: this.i18nService.instant(response.classification) });
-            }
-          });
-        }
+        ]
       }).subscribe((response) => {
         // cancelled ?
         if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
@@ -513,7 +503,13 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
 
         // change case classification
         this.caseDataService
-          .modifyCase(this.selectedOutbreak.id, this.entityData.id, { classification: (response.handler.data.inputs[0] as any).value })
+          .modifyCase(
+            this.selectedOutbreak.id,
+            this.entityData.id,
+            {
+              classification: (response.handler.data.map.classification as IV2SideDialogConfigInputSingleDropdown).value
+            }
+          )
           .pipe(
             catchError((err) => {
               this.toastV2Service.error(err);
@@ -521,9 +517,11 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
             })
           )
           .subscribe(() => {
+            // update our record too
+            (this.entityData as CaseModel).classification = (response.handler.data.map.classification as IV2SideDialogConfigInputSingleDropdown).value;
+
             // success message
-            this.toastV2Service.success(
-              'LNG_PAGE_LIST_LAB_RESULTS_ACTION_CHANGE_CASE_EPI_CLASSIFICATION_SUCCESS_MESSAGE');
+            this.toastV2Service.success('LNG_PAGE_LIST_LAB_RESULTS_ACTION_CHANGE_CASE_EPI_CLASSIFICATION_SUCCESS_MESSAGE');
 
             // close popup
             response.handler.hide();
@@ -534,6 +532,9 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
       });
   }
 
+  /**
+   * Export lab results
+   */
   private exportLabResultsData(qb: RequestQueryBuilder) {
     this.dialogV2Service.showExportDataAfterLoadingData({
       title: {

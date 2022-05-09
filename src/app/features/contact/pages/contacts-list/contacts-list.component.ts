@@ -2035,9 +2035,12 @@ export class ContactsListComponent
             disabled: (_data, handler): boolean => {
               return !handler.form || handler.form.invalid;
             }
+          }, {
+            type: IV2SideDialogConfigButtonType.CANCEL,
+            label: 'LNG_COMMON_BUTTON_CANCEL',
+            color: 'text'
           }
         ],
-
         initialized: (handler) => {
           // display loading
           handler.loading.show();

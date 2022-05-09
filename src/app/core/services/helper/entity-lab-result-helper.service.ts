@@ -24,7 +24,9 @@ import { ToastV2Service } from './toast-v2.service';
   providedIn: 'root'
 })
 export class EntityLabResultService {
-
+  /**
+   * Constructor
+   */
   constructor(
     private dialogV2Service: DialogV2Service,
     private labResultDataService: LabResultDataService,
@@ -32,8 +34,8 @@ export class EntityLabResultService {
   ) {}
 
   /**
- * Retrieve table columns
- */
+   * Retrieve table columns
+   */
   retrieveTableColumns(definitions: {
     authUser: UserModel,
     personType: EntityType,
@@ -710,6 +712,7 @@ export class EntityLabResultService {
       }
     ];
 
+    // finished
     return advancedFilters;
   }
 
@@ -723,6 +726,11 @@ export class EntityLabResultService {
     queryBuilder: RequestQueryBuilder
   ): Observable<LabResultModel[]> {
     return this.labResultDataService
-      .getEntityLabResults(outbreakId, entityPath, entityId, queryBuilder);
+      .getEntityLabResults(
+        outbreakId,
+        entityPath,
+        entityId,
+        queryBuilder
+      );
   }
 }

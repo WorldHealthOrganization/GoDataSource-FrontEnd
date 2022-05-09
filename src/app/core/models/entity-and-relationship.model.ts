@@ -187,8 +187,8 @@ export class EntityModel {
   matchesFilter: boolean = false;
 
   /**
-     * Link accordingly to type
-     */
+   * Link accordingly to type
+   */
   static getLinkForEntityType(entityType: EntityType): string {
     switch (entityType) {
       case EntityType.CASE:
@@ -206,10 +206,8 @@ export class EntityModel {
   }
 
   /**
-     * Unique values
-     * @param records
-     * @param path
-     */
+   * Unique values
+   */
   private static uniqueValueOptions(
     records: EntityModel[],
     path: string,

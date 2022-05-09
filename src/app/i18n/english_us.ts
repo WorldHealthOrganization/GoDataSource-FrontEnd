@@ -49,7 +49,7 @@ export const EnglishUsLang = {
     'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CLONE_SUCCESS_MESSAGE': 'Outbreak template successfully cloned',
     'LNG_STEPPER_FINAL_STEP_TEXT': 'If you want to change something you can go back to any step and change it.</br> If all data is correct, click \'<span class="gd-message-button-label">{{buttonLabel}}</span>\' to complete the process.',
     'LNG_STEPPER_FINAL_STEP_TEXT_CASE': 'Data entry for \'<span class="gd-message-name">{{name}}</span>\' has been successfully completed!',
-    'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_CHANGE_CASE_CLASSIFICATION': 'Change current classification of the case'
+    'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_CHANGE_CASE_CLASSIFICATION': 'Change case classification'
 
 
 
@@ -68,5 +68,6 @@ export const EnglishUsLang = {
     // dobButtonLabel="LNG_CASE_FIELD_LABEL_DATE_OF_BIRTH_BUTTON"
     // dobPlaceholder="LNG_CASE_FIELD_LABEL_DOB"
     // LNG_HOSPITALISATION_ISOLATION_DATE_RANGE_WARNING_CASE_DATEOFONSET_AFTER_START_DATE
+    // LNG_DIALOG_CONFIRM_CHANGE_CASE_EPI_CLASSIFICATION
   }
 };
