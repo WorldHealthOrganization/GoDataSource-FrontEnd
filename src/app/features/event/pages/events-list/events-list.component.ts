@@ -94,7 +94,6 @@ export class EventsListComponent
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
   ];
 
-
   /**
    * Constructor
    */
@@ -122,8 +121,8 @@ export class EventsListComponent
   }
 
   /**
- * Selected outbreak was changed
- */
+   * Selected outbreak was changed
+   */
   selectedOutbreakChanged(): void {
     // initialize pagination
     this.initPaginator();
@@ -141,6 +140,7 @@ export class EventsListComponent
       geoLocationAccurate: ''
     });
 
+    // set columns
     this.tableColumns = [
       {
         field: 'name',
