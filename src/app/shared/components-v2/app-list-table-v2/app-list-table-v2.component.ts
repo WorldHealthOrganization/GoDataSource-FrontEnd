@@ -765,6 +765,16 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         // render column
         renderColumn(visibleColumnsMap[field]);
       });
+
+      // make sure we render the actions columns
+      this._columns.forEach((column) => {
+        if (
+          column.format?.type === V2ColumnFormat.ACTIONS &&
+          !visibleColumnsMap[column.field]
+        ) {
+          renderColumn(column);
+        }
+      });
     } else {
       // process columns in default order
       this._columns.forEach((column) => {
