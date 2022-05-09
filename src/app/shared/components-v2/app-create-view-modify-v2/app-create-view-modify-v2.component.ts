@@ -134,6 +134,11 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     {
       icon: 'clear',
       clickAction: () => {
+        // nothing to do ?
+        if (!this.expandListSearchValue) {
+          return;
+        }
+
         // reset
         this.expandListSearchValue = '';
 
