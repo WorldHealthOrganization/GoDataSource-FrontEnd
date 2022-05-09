@@ -19,6 +19,7 @@ import { UserModel } from '../../models/user.model';
 import { LabResultDataService } from '../data/lab-result.data.service';
 import { DialogV2Service } from './dialog-v2.service';
 import { ToastV2Service } from './toast-v2.service';
+import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -731,6 +732,30 @@ export class EntityLabResultService {
         entityPath,
         entityId,
         queryBuilder
+      );
+  }
+
+  /**
+   * Retrieve data count
+   */
+  retrieveRecordsCount(
+    outbreakId: string,
+    personType: EntityType,
+    entityId: string,
+    queryBuilder: RequestQueryBuilder
+  ): Observable<IBasicCount> {
+    return this.labResultDataService
+      .getEntityLabResultsCount(
+        outbreakId,
+        EntityModel.getLinkForEntityType(personType),
+        entityId,
+        queryBuilder
+      )
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        })
       );
   }
 }

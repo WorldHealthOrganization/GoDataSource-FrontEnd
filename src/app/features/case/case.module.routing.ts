@@ -29,6 +29,13 @@ import { ExposureTypeDataResolver } from '../../core/services/resolvers/data/exp
 import { ExposureFrequencyDataResolver } from '../../core/services/resolvers/data/exposure-frequency.resolver';
 import { ExposureDurationDataResolver } from '../../core/services/resolvers/data/exposure-duration.resolver';
 import { ContextOfTransmissionDataResolver } from '../../core/services/resolvers/data/context-of-transmission.resolver';
+import { LabNameDataResolver } from '../../core/services/resolvers/data/lab-name.resolver';
+import { LabSampleTypeDataResolver } from '../../core/services/resolvers/data/lab-sample-type.resolver';
+import { LabTestTypeDataResolver } from '../../core/services/resolvers/data/lab-test-type.resolver';
+import { LabTestResultDataResolver } from '../../core/services/resolvers/data/lab-test-result.resolver';
+import { LabProgressDataResolver } from '../../core/services/resolvers/data/lab-progress.resolver';
+import { LabSequenceLaboratoryDataResolver } from '../../core/services/resolvers/data/lab-sequence-laboratory.resolver';
+import { LabSequenceResultDataResolver } from '../../core/services/resolvers/data/lab-sequence-result.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -57,7 +64,14 @@ const createViewModifyFoundation: Route = {
     exposureFrequency: ExposureFrequencyDataResolver,
     exposureDuration: ExposureDurationDataResolver,
     contextOfTransmission: ContextOfTransmissionDataResolver,
-    yesNoAll: YesNoAllDataResolver
+    yesNoAll: YesNoAllDataResolver,
+    labName: LabNameDataResolver,
+    labSampleType: LabSampleTypeDataResolver,
+    labTestType: LabTestTypeDataResolver,
+    labTestResult: LabTestResultDataResolver,
+    labResultProgress: LabProgressDataResolver,
+    labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
+    labSequenceResult: LabSequenceResultDataResolver
   }
 };
 

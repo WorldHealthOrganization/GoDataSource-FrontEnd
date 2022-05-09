@@ -18,7 +18,6 @@ import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
-import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ExportDataExtension } from '../../../../core/services/helper/dialog.service';
@@ -84,7 +83,6 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
   constructor(
     protected listHelperService: ListHelperService,
     private outbreakDataService: OutbreakDataService,
-    private labResultDataService: LabResultDataService,
     private toastV2Service: ToastV2Service,
     private i18nService: I18nService,
     private entityLabResultService: EntityLabResultService,
@@ -385,8 +383,8 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
   refreshList(triggeredByPageChange: boolean) {
     if (
       this.selectedOutbreak &&
-            this.personType &&
-            this.entityData
+      this.personType &&
+      this.entityData
     ) {
       // retrieve created user & modified user information
       this.queryBuilder.include('createdByUser', true);
@@ -398,7 +396,13 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
       }
 
       // retrieve the list of lab results
-      this.labResultsList$ = this.entityLabResultService.retrieveRecords(this.selectedOutbreak.id, EntityModel.getLinkForEntityType(this.personType), this.entityData.id, this.queryBuilder)
+      this.labResultsList$ = this.entityLabResultService
+        .retrieveRecords(
+          this.selectedOutbreak.id,
+          EntityModel.getLinkForEntityType(this.personType),
+          this.entityData.id,
+          this.queryBuilder
+        )
         .pipe(
           // should be the last pipe
           takeUntil(this.destroyed$)
@@ -407,13 +411,13 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
   }
 
   /**
-     * Get total number of items, based on the applied filters
-     */
+   * Get total number of items, based on the applied filters
+   */
   refreshListCount(applyHasMoreLimit?: boolean) {
     if (
       this.selectedOutbreak &&
-            this.personType &&
-            this.entityData
+      this.personType &&
+      this.entityData
     ) {
       // reset
       this.pageCount = undefined;
@@ -437,14 +441,14 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
       }
 
       // count
-      this.labResultDataService
-        .getEntityLabResultsCount(this.selectedOutbreak.id, EntityModel.getLinkForEntityType(this.personType), this.entityData.id, countQueryBuilder)
+      this.entityLabResultService
+        .retrieveRecordsCount(
+          this.selectedOutbreak.id,
+          this.personType,
+          this.entityData.id,
+          countQueryBuilder
+        )
         .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            return throwError(err);
-          }),
-
           // should be the last pipe
           takeUntil(this.destroyed$)
         )
