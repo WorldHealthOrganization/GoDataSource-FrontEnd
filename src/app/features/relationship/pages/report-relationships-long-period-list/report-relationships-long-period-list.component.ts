@@ -22,8 +22,8 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
   relationshipList$: Observable<ReportDifferenceOnsetRelationshipModel[]>;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     private relationshipDataService: RelationshipDataService
@@ -35,8 +35,8 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
   }
 
   /**
-     * Component destroyed
-     */
+   * Component destroyed
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
@@ -340,11 +340,7 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
    * Fields retrieved from api to reduce payload size
    */
   protected refreshListFields(): string[] {
-    return [
-      'people',
-      'persons',
-      'differenceBetweenDatesOfOnset'
-    ];
+    return [];
   }
 
   /**
