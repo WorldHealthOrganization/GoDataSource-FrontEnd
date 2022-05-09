@@ -5,7 +5,7 @@ import {
   Host,
   OnDestroy,
   Optional,
-  SkipSelf
+  SkipSelf, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
@@ -15,11 +15,13 @@ import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 @Component({
   selector: 'app-form-password-v2',
   templateUrl: './app-form-password-v2.component.html',
+  styleUrls: ['./app-form-password-v2.component.scss'],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
     useExisting: forwardRef(() => AppFormPasswordV2Component),
     multi: true
   }],
+  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppFormPasswordV2Component
@@ -30,15 +32,15 @@ export class AppFormPasswordV2Component
 
   // right - show / hide password
   showHideButton: IAppFormIconButtonV2 = {
-    icon: 'visibility',
+    icon: 'visibility_off',
     clickAction: () => {
       // toggle
       if (this.type === 'password') {
         this.type = 'text';
-        this.showHideButton.icon = 'visibility_off';
+        this.showHideButton.icon = 'visibility';
       } else {
         this.type = 'password';
-        this.showHideButton.icon = 'visibility';
+        this.showHideButton.icon = 'visibility_off';
       }
     }
   };

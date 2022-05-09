@@ -212,7 +212,13 @@
 
 @mixin breakpoint($point) {
   /* Phone */
-  @if $point=='xs' {
+  @if $point=='xxs' {
+    @media only screen and (max-width: 599px) {
+      @content;
+    }
+  }
+
+  @else if $point=='xs' {
     @media only screen and (max-width: 767px) {
       @content;
     }
@@ -295,6 +301,13 @@
 
   @else if $point=='gt-xl' {
     @media only screen and (min-width: 1900px) {
+      @content;
+    }
+  }
+
+  /* 2K and Ultrawide */
+  @else if $point=='gt-xxl' {
+    @media only screen and (min-width: 2000px) {
       @content;
     }
   }

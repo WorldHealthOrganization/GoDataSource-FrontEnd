@@ -1,10 +1,12 @@
 <div
-  class="gd-login">
+  class="gd-login"
+  fxLayout="row" fxLayoutAlign="start stretch">
 
   <!-- Left side -->
   <div
     *ngIf="renderMode !== RenderMode.SMALL"
-    class="gd-login-left">
+    class="gd-login-left"
+    fxLayout="column" fxLayoutAlign="space-between start">
 
     <!-- Left - top -->
     <div
@@ -22,11 +24,13 @@
 
   <!-- Right side -->
   <div
-    class="gd-login-right">
+    class="gd-login-right"
+    fxLayout="column" fxLayoutAlign="space-between center">
 
     <!-- Right - top -->
     <div
-      class="gd-login-right-top">
+      class="gd-login-right-top"
+      fxFlexAlign="end">
       <app-select-language-v2></app-select-language-v2>
     </div>
 
@@ -55,7 +59,7 @@
 
       <!-- Right - middle - form -->
       <div
-        class="gd-login-right-middle-title">
+        class="gd-login-right-middle-form">
 
         <!-- Login / Forgot password form -->
         <form
@@ -88,7 +92,8 @@
               </app-form-password-v2>
 
               <!-- Forgot password -->
-              <div>
+              <div
+                class="gd-login-right-middle-form-forgot-button">
                 <button
                   mat-flat-button
                   type="button"
@@ -165,7 +170,8 @@
           </div>
 
           <!-- Login -->
-          <div>
+          <div
+            class="gd-login-right-middle-form-login-button">
             <button
               mat-flat-button
               color="primary">
@@ -174,8 +180,10 @@
           </div>
 
           <!-- Other forgot password buttons -->
-          <ng-container
-            *ngIf="pageType === CaptchaDataFor.FORGOT_PASSWORD">
+          <div
+            *ngIf="pageType === CaptchaDataFor.FORGOT_PASSWORD"
+            class="gd-login-right-middle-form-reset-buttons"
+            fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-between center">
 
             <!-- Reset password with security questions -->
             <button
@@ -195,7 +203,7 @@
               {{ 'LNG_COMMON_BUTTON_BACK_TO_LOGIN' | translate }}
             </button>
 
-          </ng-container>
+          </div>
 
         </form>
 

@@ -115,6 +115,14 @@
 
         .gd-create-view-modify-list-data {
           height: 100%;
+          position: relative;
+
+          .mat-progress-spinner {
+            left: 50%;
+            position: absolute;
+            top: 50%;
+            @include translate(-50%, -50%);
+          }
 
           .cdk-virtual-scroll-viewport {
             height: 100%;
@@ -196,6 +204,15 @@
 
       @include breakpoint('lt-md') {
         padding: 1.2rem 2rem 2rem;
+      }
+
+      .gd-create-view-modify-content-loader {
+        .mat-progress-spinner {
+          left: 50%;
+          position: absolute;
+          top: 50%;
+          @include translate(-50%, -50%);
+        }
       }
     }
 
@@ -282,18 +299,18 @@
         width: 1.8rem;
       }
     }
+  }
 
-    /* Progress Spinner */
+  .gd-create-view-modify-loading-data {
+    height: 100%;
+    position: relative;
+
     .mat-progress-spinner {
       left: 50%;
       position: absolute;
       top: 50%;
       @include translate(-50%, -50%);
     }
-  }
-
-  .gd-create-view-modify-loading-data {
-    height: 100%;
   }
 
   .gd-create-view-modify-top {
@@ -552,7 +569,7 @@
 
                       .gd-create-view-modify-bottom-section-content-input-coordinates {
                         > *:first-child {
-                          @media only screen and (max-width: 599px) {
+                          @include breakpoint('xxs') {
                             margin-bottom: 1.6rem !important;
                           }
                         }
