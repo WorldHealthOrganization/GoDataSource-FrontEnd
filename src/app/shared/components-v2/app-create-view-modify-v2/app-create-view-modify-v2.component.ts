@@ -29,6 +29,7 @@ import { IExtendedColDef } from '../app-list-table-v2/models/extended-column.mod
 import { applyFilterBy, applyResetOnAllFilters, applySortBy } from '../app-list-table-v2/models/column.model';
 import { AppListTableV2Component } from '../app-list-table-v2/app-list-table-v2.component';
 import { PageEvent } from '@angular/material/paginator';
+import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
 
 /**
  * Component
@@ -129,6 +130,21 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   // search
   expandListSearchValue: string;
   expandListSearchValueTimeout: any;
+  expandListSearchSuffixButtons: IAppFormIconButtonV2[] = [
+    {
+      icon: 'clear',
+      clickAction: () => {
+        // reset
+        this.expandListSearchValue = '';
+
+        // remove previous request
+        this.expandListStopSearchApply();
+
+        // sort
+        this.expandListRefresh();
+      }
+    }
+  ];
 
   // load data ?
   expandListInitialized: boolean = false;
