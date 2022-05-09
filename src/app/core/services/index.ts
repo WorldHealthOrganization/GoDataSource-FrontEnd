@@ -99,6 +99,7 @@ import { VersionDataResolver } from './resolvers/data/version.resolver';
 import { LanguageUserResolver } from './resolvers/language-user.resolver';
 import { LanguageDataResolver } from './resolvers/data/language.resolver';
 import { PersonDataResolver } from './resolvers/data/person.resolver';
+import { NotAuthRedirectGuard } from './guards/not-auth-redirect-guard.service';
 
 // export the list of services
 export const services: any[] = [
@@ -193,6 +194,7 @@ export const services: any[] = [
 
   // guard services
   AuthGuard,
+  NotAuthRedirectGuard,
   PasswordChangeGuard,
   PageChangeConfirmationGuard,
 

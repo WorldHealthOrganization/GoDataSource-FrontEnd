@@ -9,6 +9,7 @@ import { RedirectComponent } from './core/components/redirect/redirect.component
 import { PermissionExpression } from './core/models/user.model';
 import { DashboardModel } from './core/models/dashboard.model';
 import { LanguageUserResolver } from './core/services/resolvers/language-user.resolver';
+import { NotAuthRedirectGuard } from './core/services/guards/not-auth-redirect-guard.service';
 
 const routes: Routes = [
   // Authentication Module routes
@@ -24,6 +25,9 @@ const routes: Routes = [
   {
     path: '',
     component: AuthenticatedComponent,
+    canActivate: [
+      NotAuthRedirectGuard
+    ],
     resolve: {
       language: LanguageUserResolver
     },

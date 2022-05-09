@@ -162,7 +162,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
 
     // check if user is authenticated
     if (!this.authUser) {
-      // // user is NOT authenticated; redirect to Login page
+      // user is NOT authenticated; redirect to Login page
       this.prepareForRedirect();
       this.router.navigate(['/auth/login']);
       return;

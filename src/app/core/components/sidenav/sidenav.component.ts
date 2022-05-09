@@ -540,6 +540,11 @@ export class SidenavComponent implements OnInit, OnDestroy {
    * Component initialized
    */
   ngOnInit() {
+    // nothing to do ?
+    if (!this.authUser) {
+      return;
+    }
+
     // retrieve list of outbreaks
     if (OutbreakModel.canView(this.authUser)) {
       this.outbreakDataService
