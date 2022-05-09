@@ -1,39 +1,36 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { CaseModel } from '../../../../core/models/case.model';
-import { CaseDataService } from '../../../../core/services/data/case.data.service';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { ActivatedRoute, Router } from '@angular/router';
-import { LabResultModel } from '../../../../core/models/lab-result.model';
-import { Observable, throwError } from 'rxjs';
-import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
-import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
-import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
-import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { Component, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { catchError, share } from 'rxjs/operators';
-import { Constants } from '../../../../core/models/constants';
-import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
-import { UserDataService } from '../../../../core/services/data/user.data.service';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { Observable, throwError } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { moment } from '../../../../core/helperClasses/x-moment';
+import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { EntityType } from '../../../../core/models/entity-type';
-import { ContactDataService } from '../../../../core/services/data/contact.data.service';
-import { moment } from '../../../../core/helperClasses/x-moment';
-import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import {
-  IExportFieldsGroupRequired,
   ExportFieldsGroupModelNameEnum
 } from '../../../../core/models/export-fields-group.model';
+import { LabResultModel } from '../../../../core/models/lab-result.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { CaseDataService } from '../../../../core/services/data/case.data.service';
+import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { ExportDataExtension } from '../../../../core/services/helper/dialog.service';
+import { EntityLabResultService } from '../../../../core/services/helper/entity-lab-result-helper.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2SideDialogConfigButtonType, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
   selector: 'app-entity-lab-results-list',
@@ -41,229 +38,44 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   templateUrl: './entity-lab-results-list.component.html',
   styleUrls: ['./entity-lab-results-list.component.less']
 })
-export class EntityLabResultsListComponent extends ListComponent implements OnInit, OnDestroy {
-  // // breadcrumbs
-  // breadcrumbs: BreadcrumbItemModel[] = [];
-
+export class EntityLabResultsListComponent extends ListComponent implements OnDestroy {
   // entity
   personType: EntityType;
   entityData: CaseModel | ContactModel;
-  get entityDataAsCaseModel(): CaseModel {
-    return this.entityData as CaseModel;
-  }
-
-  initialCaseClassification: string;
-
-  // user list
-  userList$: Observable<UserModel[]>;
-
-  // list of export fields groups
-  fieldsGroupList: LabelValuePair[];
-  fieldsGroupListRequired: IExportFieldsGroupRequired;
 
   // list of existing case lab results
   labResultsList$: Observable<LabResultModel[]>;
-  labResultsListCount$: Observable<IBasicCount>;
-
-  labTestResultsList$: Observable<any[]>;
-  testTypesList$: Observable<any[]>;
-  sampleTypesList$: Observable<any[]>;
-  labNamesList$: Observable<any[]>;
-  yesNoOptionsList$: Observable<any[]>;
-  caseClassificationsList$: Observable<any[]>;
-  progressOptionsList$: Observable<any[]>;
-  sequenceLabOptionsList$: Observable<any[]>;
-  sequenceResultOptionsList$: Observable<any[]>;
 
   // constants
-  ReferenceDataCategory = ReferenceDataCategory;
-  CaseModel = CaseModel;
-  ContactModel = ContactModel;
   EntityType = EntityType;
-  EntityModel = EntityModel;
-  LabResultModel = LabResultModel;
 
-  // available side filters
-  availableSideFilters: FilterModel[];
-  // values for side filter
-  savedFiltersType;
-
-  // side filter
-  tableColumnsUserSettingsKey: UserSettings;
-
-  // export outbreak lab results
-  exportLabResultsUrl: string;
-  exportLabResultsFileName: string;
-  allowedExportTypes: ExportDataExtension[] = [
-    ExportDataExtension.CSV,
-    ExportDataExtension.XLS,
-    ExportDataExtension.XLSX,
-    ExportDataExtension.JSON,
-    ExportDataExtension.ODS,
-    ExportDataExtension.PDF
-  ];
-  anonymizeFields: LabelValuePair[] = [
-    new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_ID', 'id'),
-    new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_PERSON_ID', 'personId'),
-    new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN', 'dateSampleTaken'),
-    new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED', 'dateSampleDelivered'),
-    new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING', 'dateTesting'),
-    new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT', 'dateOfResult'),
-    new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME', 'labName'),
-    new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID', 'sampleIdentifier'),
-    new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE', 'sampleType'),
-    new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE', 'testType'),
-    new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR', 'testedFor'),
-    new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_RESULT', 'result'),
-    new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT', 'quantitativeResult'),
-    new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_NOTES', 'notes'),
-    new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_STATUS', 'status'),
-    new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE', 'sequence'),
-    new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers'),
-    new LabelValuePair('LNG_LAB_RESULT_FIELD_LABEL_PERSON', 'person'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', 'createdAt'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', 'createdBy'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', 'updatedAt'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', 'updatedBy'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_DELETED', 'deleted'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', 'deletedAt'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', 'createdOn')
-  ];
-
-  // actions
-  recordActions: HoverRowAction[] = [
-    // View Lab Results
-    new HoverRowAction({
-      icon: 'visibility',
-      iconTooltip: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_VIEW_LAB_RESULT',
-      linkGenerator: (item: LabResultModel): string[] => {
-        return ['/lab-results', EntityModel.getLinkForEntityType(this.personType), item.personId, item.id, 'view'];
-      },
-      visible: (item: LabResultModel): boolean => {
-        return !item.deleted &&
-                    LabResultModel.canView(this.authUser) && (
-          (
-            this.personType === EntityType.CASE &&
-                            CaseModel.canViewLabResult(this.authUser)
-          ) || (
-            this.personType === EntityType.CONTACT &&
-                            ContactModel.canViewLabResult(this.authUser)
-          )
-        );
-      }
-    }),
-
-    // Modify Case Lab Results
-    new HoverRowAction({
-      icon: 'settings',
-      iconTooltip: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_MODIFY_LAB_RESULT',
-      linkGenerator: (item: LabResultModel): string[] => {
-        return ['/lab-results', EntityModel.getLinkForEntityType(this.personType), item.personId, item.id, 'modify'];
-      },
-      visible: (item: LabResultModel): boolean => {
-        return !item.deleted &&
-                    this.authUser &&
-                    this.selectedOutbreak &&
-                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                    LabResultModel.canModify(this.authUser) && (
-          (
-            this.personType === EntityType.CASE &&
-                            CaseModel.canModifyLabResult(this.authUser)
-          ) || (
-            this.personType === EntityType.CONTACT &&
-                            ContactModel.canModifyLabResult(this.authUser)
-          )
-        );
-      }
-    }),
-
-    // Other actions
-    new HoverRowAction({
-      type: HoverRowActionType.MENU,
-      icon: 'moreVertical',
-      menuOptions: [
-        // Delete Lab Results
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_DELETE_LAB_RESULT',
-          click: (item: LabResultModel) => {
-            this.deleteLabResult(item);
-          },
-          visible: (item: LabResultModel): boolean => {
-            return !item.deleted &&
-                            this.authUser &&
-                            this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            LabResultModel.canDelete(this.authUser) && (
-              (
-                this.personType === EntityType.CASE &&
-                                    CaseModel.canDeleteLabResult(this.authUser)
-              ) || (
-                this.personType === EntityType.CONTACT &&
-                                    ContactModel.canDeleteLabResult(this.authUser)
-              )
-            );
-          },
-          class: 'mat-menu-item-delete'
-        }),
-
-        // Divider
-        new HoverRowAction({
-          type: HoverRowActionType.DIVIDER,
-          visible: (item: LabResultModel): boolean => {
-            // visible only if at least one of the first two items is visible
-            return !item.deleted &&
-                            this.authUser &&
-                            this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            LabResultModel.canDelete(this.authUser) && (
-              (
-                this.personType === EntityType.CASE &&
-                                    CaseModel.canDeleteLabResult(this.authUser)
-              ) || (
-                this.personType === EntityType.CONTACT &&
-                                    ContactModel.canDeleteLabResult(this.authUser)
-              )
-            );
-          }
-        }),
-
-        // See questionnaire
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE',
-          click: (item: LabResultModel) => {
-            this.router.navigate(['/lab-results', item.id, 'view-questionnaire']);
-          },
-          visible: (item: LabResultModel): boolean => {
-            return !item.deleted &&
-                            LabResultModel.canView(this.authUser);
-          }
-        }),
-
-        // Restore a deleted Lab Results
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT',
-          click: (item: LabResultModel) => {
-            this.restoreLabResult(item);
-          },
-          visible: (item: LabResultModel): boolean => {
-            return item.deleted &&
-                            this.authUser &&
-                            this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            LabResultModel.canRestore(this.authUser) && (
-              (
-                this.personType === EntityType.CASE &&
-                                    CaseModel.canRestoreLabResult(this.authUser)
-              ) || (
-                this.personType === EntityType.CONTACT &&
-                                    ContactModel.canRestoreLabResult(this.authUser)
-              )
-            );
-          },
-          class: 'mat-menu-item-restore'
-        })
-      ]
-    })
+  // lab results anonymize fields
+  anonymizeFields: ILabelValuePairModel[] = [
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_ID', value: 'id' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON_ID', value: 'personId' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN', value: 'dateSampleTaken' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED', value: 'dateSampleDelivered' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING', value: 'dateTesting' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT', value: 'dateOfResult' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME', value: 'labName' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID', value: 'sampleIdentifier' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE', value: 'sampleType' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE', value: 'testType' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR', value: 'testedFor' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT', value: 'result' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT', value: 'quantitativeResult' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES', value: 'notes' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS', value: 'status' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE', value: 'sequence' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value: 'questionnaireAnswers' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON', value: 'person' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
   ];
 
   /**
@@ -271,118 +83,19 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
      */
   constructor(
     protected listHelperService: ListHelperService,
-    private router: Router,
-    private route: ActivatedRoute,
     private outbreakDataService: OutbreakDataService,
-    private caseDataService: CaseDataService,
-    private contactDataService: ContactDataService,
     private labResultDataService: LabResultDataService,
     private toastV2Service: ToastV2Service,
-    private dialogService: DialogService,
-    private referenceDataDataService: ReferenceDataDataService,
-    private genericDataService: GenericDataService,
-    private userDataService: UserDataService,
-    private i18nService: I18nService
+    private i18nService: I18nService,
+    private entityLabResultService: EntityLabResultService,
+    private activatedRoute: ActivatedRoute,
+    private dialogV2Service: DialogV2Service,
+    private caseDataService: CaseDataService
   ) {
     super(listHelperService);
-  }
 
-  /**
-     * Component initialized
-     */
-  ngOnInit() {
-    // progress options
-    this.progressOptionsList$ = this.genericDataService.getProgressOptionsList();
-    this.sequenceLabOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_SEQUENCE_LABORATORY);
-    this.sequenceResultOptionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_SEQUENCE_RESULT);
-
-    // retrieve users
-    this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
-
-    // retrieve page information
-    this.route.data.subscribe((data: { personType: EntityType }) => {
-      // set page person type
-      this.personType = data.personType;
-
-      // determine saved filter key from person type ( case / contact lab results )
-      this.savedFiltersType = this.personType === EntityType.CONTACT ?
-        Constants.APP_PAGE.CONTACT_LAB_RESULTS.value :
-        Constants.APP_PAGE.CASE_LAB_RESULTS.value;
-
-      // determine side filter key
-      this.tableColumnsUserSettingsKey = this.personType === EntityType.CONTACT ?
-        UserSettings.CONTACT_LAB_FIELDS :
-        UserSettings.CASE_LAB_FIELDS;
-
-      // retrieve entity information
-      this.route.params.subscribe((params: { caseId?: string, contactId?: string }) => {
-        // get selected outbreak
-        this.outbreakDataService
-          .getSelectedOutbreak()
-          .subscribe((selectedOutbreak: OutbreakModel) => {
-            // selected outbreak
-            this.selectedOutbreak = selectedOutbreak;
-
-            // export lab results url
-            this.exportLabResultsUrl = null;
-            if (
-              this.selectedOutbreak &&
-                            this.selectedOutbreak.id
-            ) {
-              this.exportLabResultsUrl = `/outbreaks/${this.selectedOutbreak.id}/${EntityModel.getLinkForEntityType(this.personType)}/${this.personType === EntityType.CONTACT ? params.contactId : params.caseId}/lab-results/export`;
-              this.exportLabResultsFileName = `${this.i18nService.instant(this.personType === EntityType.CONTACT ? 'LNG_PAGE_LIST_CONTACTS_TITLE' : 'LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD')}`;
-            }
-
-            // initialize side filters
-            this.initializeSideFilters();
-
-            // determine entity endpoint that we need to call
-            const entitySubscriber: Observable<CaseModel | ContactModel> = this.personType === EntityType.CONTACT ?
-              this.contactDataService.getContact(this.selectedOutbreak.id, params.contactId) :
-              this.caseDataService.getCase(this.selectedOutbreak.id, params.caseId);
-
-            // get entity ( case / contact ) data
-            entitySubscriber
-              .subscribe((entityData: CaseModel | ContactModel) => {
-                this.entityData = entityData;
-
-                // update initial classification
-                if (this.personType === EntityType.CASE) {
-                  this.initialCaseClassification = (entityData as CaseModel).classification;
-                }
-
-                // initialize breadcrumbs
-                this.initializeBreadcrumbs();
-
-                // initialize pagination
-                this.initPaginator();
-                // ...and load the list of items
-                this.needsRefreshList(true);
-              });
-          });
-
-        // retrieve the list of export fields groups for model
-        this.outbreakDataService.getExportFieldsGroups(ExportFieldsGroupModelNameEnum.LAB_RESULT)
-          .subscribe((fieldsGroupList) => {
-            this.fieldsGroupList = fieldsGroupList.toLabelValuePair(this.i18nService);
-            this.fieldsGroupListRequired = fieldsGroupList.toRequiredList();
-          });
-      });
-
-      // initialize breadcrumbs
-      this.initializeBreadcrumbs();
-    });
-
-    // get the option list for side filters
-    this.labTestResultsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_TEST_RESULT).pipe(share());
-    this.testTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_LAB_TEST).pipe(share());
-    this.sampleTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.TYPE_OF_SAMPLE).pipe(share());
-    this.labNamesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LAB_NAME).pipe(share());
-    this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
-    this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION);
-
-    // initialize Side Table Columns
-    this.initializeTableColumns();
+    this.personType = this.activatedRoute.snapshot.data.personType;
+    this.entityData = this.activatedRoute.snapshot.data.entityData;
   }
 
   /**
@@ -394,162 +107,40 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
   }
 
   /**
-     * Initialize breadcrumbs
-     */
-  // private initializeBreadcrumbs() {
-  //   // reset
-  //   this.breadcrumbs = [];
-  //
-  //   // entity list
-  //   if (
-  //     this.personType === EntityType.CONTACT &&
-  //           ContactModel.canList(this.authUser)
-  //   ) {
-  //     this.breadcrumbs.push(
-  //       new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-  //     );
-  //   } else if (
-  //     this.personType === EntityType.CASE &&
-  //           CaseModel.canList(this.authUser)
-  //   ) {
-  //     this.breadcrumbs.push(
-  //       new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
-  //     );
-  //   }
-  //
-  //   // person breadcrumbs
-  //   if (this.entityData) {
-  //     // entity view
-  //     if (
-  //       this.personType === EntityType.CONTACT &&
-  //               ContactModel.canView(this.authUser)
-  //     ) {
-  //       this.breadcrumbs.push(
-  //         new BreadcrumbItemModel(this.entityData.name, `/contacts/${this.entityData.id}/view`)
-  //       );
-  //     } else if (
-  //       this.personType === EntityType.CASE &&
-  //               CaseModel.canView(this.authUser)
-  //     ) {
-  //       this.breadcrumbs.push(
-  //         new BreadcrumbItemModel(this.entityData.name, `/cases/${this.entityData.id}/view`)
-  //       );
-  //     }
-  //   }
-  //
-  //   // current page
-  //   this.breadcrumbs.push(
-  //     new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE', '.', true)
-  //   );
-  // }
+  * Selected outbreak was changed
+  */
+  selectedOutbreakChanged(): void {
+    // initialize pagination
+    this.initPaginator();
+
+    // ...and re-load the list when the Selected Outbreak is changed
+    this.needsRefreshList(true);
+  }
 
   /**
      * Initialize Side Table Columns
      */
-  initializeTableColumns() {
-    // default table columns
-    // this.tableColumns = [
-    //   new VisibleColumnModel({
-    //     field: 'checkbox',
-    //     required: true,
-    //     excludeFromSave: true
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'sampleIdentifier',
-    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'dateSampleTaken',
-    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'dateSampleDelivered',
-    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'dateOfResult',
-    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'labName',
-    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'sampleType',
-    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'testType',
-    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'result',
-    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'status',
-    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'testedFor',
-    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'sequence.hasSequence',
-    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'sequence.dateSampleSent',
-    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'sequence.labId',
-    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'sequence.dateResult',
-    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'sequence.resultId',
-    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'sequence.noSequenceReason',
-    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'deleted',
-    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_DELETED',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'createdBy',
-    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_BY',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'createdAt',
-    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_AT',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'updatedBy',
-    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_BY',
-    //     visible: false
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'updatedAt',
-    //     label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_AT',
-    //     visible: false
-    //   })
-    // ];
+  protected initializeTableColumns() {
+    this.tableColumns = this.entityLabResultService.retrieveTableColumns({
+      authUser: this.authUser,
+      personType: this.personType,
+      selectedOutbreak: this.selectedOutbreak,
+      selectedOutbreakIsActive: this.selectedOutbreakIsActive,
+      options: {
+        labName: (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        labSampleType: (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        labTestType: (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        labTestResult: (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        labResultProgress: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        labSequenceLaboratory: (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        labSequenceResult: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+      },
+      refreshList: () => {
+        // reload data
+        this.needsRefreshList(true);
+      }
+    });
   }
 
   /**
@@ -560,12 +151,79 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
   /**
    * Initialize Table Advanced Filters
    */
-  protected initializeTableAdvancedFilters(): void {}
+  protected initializeTableAdvancedFilters(): void {
+    this.advancedFilters = this.entityLabResultService.generateAdvancedFilters({
+      caseInvestigationTemplate: () => this.selectedOutbreak.caseInvestigationTemplate,
+      options: {
+        labName: (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        labSampleType: (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        labTestType: (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        labTestResult: (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        labResultProgress: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        labSequenceLaboratory: (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        labSequenceResult: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
+      }
+    });
+  }
 
   /**
    * Initialize table quick actions
    */
-  protected initializeQuickActions(): void {}
+  protected initializeQuickActions(): void {
+    this.quickActions = {
+      type: V2ActionType.MENU,
+      label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
+      visible: (): boolean => {
+        return LabResultModel.canExport(this.authUser) && (
+          (this.personType === EntityType.CASE && CaseModel.canExportLabResult(this.authUser)) ||
+          (this.personType === EntityType.CONTACT && ContactModel.canExportLabResult(this.authUser)) ||
+          (this.personType === EntityType.CASE && CaseModel.canModify(this.authUser))
+        );
+      },
+      menuOptions: [
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_CHANGE_CASE_CLASSIFICATION'
+          },
+          action: {
+            click: () => {
+              this.changeCaseClassification();
+            }
+          },
+          visible: (): boolean => {
+            return this.personType === EntityType.CASE && CaseModel.canModify(this.authUser);
+          }
+        },
+
+        // Divider
+        {
+          visible: (): boolean => {
+            return this.personType === EntityType.CASE && CaseModel.canModify(this.authUser);
+          }
+        },
+
+        // Export lab result data
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_EXPORT_TITLE'
+          },
+          action: {
+            click: () => {
+              // export lab results data
+              this.exportLabResultsData(this.queryBuilder);
+            }
+          },
+          visible: (): boolean => {
+            return LabResultModel.canExport(this.authUser) && (
+              (this.personType === EntityType.CASE && CaseModel.canExportLabResult(this.authUser)) ||
+              (this.personType === EntityType.CONTACT && ContactModel.canExportLabResult(this.authUser))
+            );
+          }
+        }
+      ]
+    };
+  }
 
   /**
    * Initialize table group actions
@@ -580,123 +238,149 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
   /**
    * Initialize table grouped data
    */
-  protected initializeGroupedData(): void {}
+  protected initializeGroupedData(): void {
+    this.groupActions = [
+      // Export selected lab results
+      {
+        label: {
+          get: () => 'LNG_PAGE_LIST_LAB_RESULTS_GROUP_ACTION_EXPORT_SELECTED_LAB_RESULTS'
+        },
+        action: {
+          click: (selected: string[]) => {
+            // create query
+            const qb = new RequestQueryBuilder();
+            qb.filter.bySelect(
+              'id',
+              selected,
+              true,
+              null
+            );
 
-  /**
-     * Initialize Side Filters
-     */
-  initializeSideFilters() {
-    // if there is no outbreak, we can't fully initialize side filters
-    if (
-      !this.selectedOutbreak ||
-            !this.selectedOutbreak.id
-    ) {
-      return;
-    }
-
-    // init side filters
-    this.availableSideFilters = [
-      new FilterModel({
-        fieldName: 'sampleIdentifier',
-        fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
-        type: FilterType.TEXT,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'dateSampleTaken',
-        fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN',
-        type: FilterType.RANGE_DATE,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'dateSampleDelivered',
-        fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED',
-        type: FilterType.RANGE_DATE,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'dateOfResult',
-        fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT',
-        type: FilterType.RANGE_DATE,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'labName',
-        fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
-        type: FilterType.SELECT,
-        options$: this.labNamesList$,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'sampleType',
-        fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE',
-        type: FilterType.SELECT,
-        options$: this.sampleTypesList$,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'testType',
-        fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE',
-        type: FilterType.SELECT,
-        options$: this.testTypesList$,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'result',
-        fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
-        type: FilterType.SELECT,
-        options$: this.labTestResultsList$
-      }),
-      new FilterModel({
-        fieldName: 'dateTesting',
-        fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING',
-        type: FilterType.RANGE_DATE,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'testedFor',
-        fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR',
-        type: FilterType.TEXT,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'notes',
-        fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES',
-        type: FilterType.TEXT,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'status',
-        fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS',
-        type: FilterType.TEXT,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'questionnaireAnswers',
-        fieldLabel: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-        type: FilterType.QUESTIONNAIRE_ANSWERS,
-        questionnaireTemplate: this.selectedOutbreak.labResultsTemplate
-      })
+            this.exportLabResultsData(qb);
+          }
+        },
+        visible: (): boolean => {
+          return LabResultModel.canExport(this.authUser);
+        },
+        disable: (selected: string[]): boolean => {
+          return selected.length < 1;
+        }
+      }
     ];
   }
 
   /**
    * Initialize breadcrumbs
    */
-  initializeBreadcrumbs(): void {
+  protected initializeBreadcrumbs(): void {
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/version']
+        }
+      }
+    ];
+
+    // entity list
+    if (
+      this.personType === EntityType.CONTACT &&
+            ContactModel.canList(this.authUser)
+    ) {
+      this.breadcrumbs.push(
+        {
+          label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
+          action: {
+            link: ['/contacts']
+          }
+        }
+      );
+    } else if (
+      this.personType === EntityType.CASE &&
+            CaseModel.canList(this.authUser)
+    ) {
+      this.breadcrumbs.push(
+        {
+          label: 'LNG_PAGE_LIST_CASES_TITLE',
+          action: {
+            link: ['/cases']
+          }
+        }
+      );
+    }
+
+    // person breadcrumbs
+    if (this.entityData) {
+      // entity view
+      if (
+        this.personType === EntityType.CONTACT &&
+                ContactModel.canView(this.authUser)
+      ) {
+        this.breadcrumbs.push(
+          {
+            label: this.entityData.name,
+            action: {
+              link: [`/contacts/${ this.entityData.id }/view`]
+            }
+          }
+        );
+      } else if (
+        this.personType === EntityType.CASE &&
+                CaseModel.canView(this.authUser)
+      ) {
+        this.breadcrumbs.push(
+          {
+            label: this.entityData.name,
+            action: {
+              link: [`/cases/${ this.entityData.id }/view`]
+            }
+          }
+        );
+      }
+    }
+
+    // current page
+    this.breadcrumbs.push(
+      {
+        label: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE',
+        action: null
+      }
+    );
   }
 
   /**
    * Fields retrieved from api to reduce payload size
    */
   protected refreshListFields(): string[] {
-    return [];
+    return [
+      'id',
+      'sampleIdentifier',
+      'dateSampleTaken',
+      'dateSampleDelivered',
+      'dateOfResult',
+      'labName',
+      'sampleType',
+      'testType',
+      'result',
+      'status',
+      'testedFor',
+      'sequence',
+      'deleted',
+      'createdBy',
+      'createdAt',
+      'createdByUser',
+      'updatedBy',
+      'updatedAt',
+      'updatedByUser'
+    ];
   }
 
   /**
    * Re(load) the Case lab results list, based on the applied filter, sort criterias
    */
-  refreshList() {
+  refreshList(triggeredByPageChange: boolean) {
     if (
       this.selectedOutbreak &&
             this.personType &&
@@ -706,14 +390,16 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
       this.queryBuilder.include('createdByUser', true);
       this.queryBuilder.include('updatedByUser', true);
 
+      // refresh badges list with applied filter
+      if (!triggeredByPageChange) {
+        this.initializeGroupedData();
+      }
+
       // retrieve the list of lab results
-      this.labResultsList$ = this.labResultDataService
-        .getEntityLabResults(this.selectedOutbreak.id, EntityModel.getLinkForEntityType(this.personType), this.entityData.id, this.queryBuilder)
+      this.labResultsList$ = this.entityLabResultService.retrieveRecords(this.selectedOutbreak.id, EntityModel.getLinkForEntityType(this.personType), this.entityData.id, this.queryBuilder)
         .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            return throwError(err);
-          })
+          // should be the last pipe
+          takeUntil(this.destroyed$)
         );
     }
   }
@@ -727,6 +413,9 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
             this.personType &&
             this.entityData
     ) {
+      // reset
+      this.pageCount = undefined;
+
       // set apply value
       if (applyHasMoreLimit !== undefined) {
         this.applyHasMoreLimit = applyHasMoreLimit;
@@ -746,163 +435,174 @@ export class EntityLabResultsListComponent extends ListComponent implements OnIn
       }
 
       // count
-      this.labResultsListCount$ = this.labResultDataService
+      this.labResultDataService
         .getEntityLabResultsCount(this.selectedOutbreak.id, EntityModel.getLinkForEntityType(this.personType), this.entityData.id, countQueryBuilder)
         .pipe(
           catchError((err) => {
             this.toastV2Service.error(err);
             return throwError(err);
           }),
-          share()
-        );
+
+          // should be the last pipe
+          takeUntil(this.destroyed$)
+        )
+        .subscribe((response) => {
+          this.pageCount = response;
+        });
     }
-  }
-
-  /**
-     * Delete lab results
-     */
-  deleteLabResult(labResult: LabResultModel) {
-    // show confirm dialog to confirm the action
-    this.dialogService
-      .showConfirm('LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT')
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          // delete lab result
-          this.labResultDataService
-            .deleteLabResult(this.selectedOutbreak.id, labResult.id)
-            .pipe(
-              catchError((err) => {
-                this.toastV2Service.error(err);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              this.toastV2Service.success('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE');
-
-              // reload data
-              this.needsRefreshList(true);
-            });
-        }
-      });
-  }
-
-  /**
-     * Restore a deleted lab result
-     * @param labResult
-     */
-  restoreLabResult(labResult: LabResultModel) {
-    // show confirm dialog to confirm de action
-    this.dialogService
-      .showConfirm('LNG_DIALOG_CONFIRM_RESTORE_LAB_RESULT', new LabResultModel(labResult))
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          // restore lab result
-          this.labResultDataService
-            .restoreLabResult(
-              this.selectedOutbreak.id,
-              EntityModel.getLinkForEntityType(labResult.personType),
-              labResult.personId,
-              labResult.id
-            )
-            .pipe(
-              catchError((err) => {
-                this.toastV2Service.error(err);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              this.toastV2Service.success('LNG_PAGE_LIST_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT_SUCCESS_MESSAGE');
-
-              // reload data
-              this.needsRefreshList(true);
-            });
-        }
-      });
   }
 
   /**
      * Change case classification
      * @param {LabelValuePair} classificationOption
      */
-  changeCaseClassification(classificationOption: LabelValuePair) {
-    if (_.isEmpty(this.entityData)) {
-      return;
-    }
-
-    // show confirm dialog
-    this.dialogService
-      .showConfirm('LNG_DIALOG_CONFIRM_CHANGE_CASE_EPI_CLASSIFICATION', {
-        caseName: this.i18nService.instant(this.entityData.name),
-        classification: this.i18nService.instant(classificationOption.value)
-      })
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          this.caseDataService
-            .modifyCase(this.selectedOutbreak.id, this.entityData.id, { classification: classificationOption.value })
-            .pipe(
-              catchError((err) => {
-                this.toastV2Service.error(err);
-                return throwError(err);
-              })
-            )
-            .subscribe((caseData: CaseModel) => {
-              // update the initial case classification
-              this.initialCaseClassification = caseData.classification;
-              this.toastV2Service.success('LNG_PAGE_LIST_LAB_RESULTS_ACTION_CHANGE_CASE_EPI_CLASSIFICATION_SUCCESS_MESSAGE');
-            });
-        } else {
-          if (answer.button === DialogAnswerButton.Cancel) {
-            // update the ngModel for select
-            (this.entityData as CaseModel).classification = this.initialCaseClassification;
+  private changeCaseClassification() {
+    this.dialogV2Service
+      .showSideDialog({
+        // title
+        title: {
+          get: () => 'LNG_DIALOG_CONFIRM_CHANGE_CASE_EPI_CLASSIFICATION',
+          data: () => {
+            return {
+              caseName: this.i18nService.instant(this.entityData.name),
+              classification: '...'
+            };
           }
+        },
+
+        // inputs
+        inputs: [
+          {
+            type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+            placeholder: 'LNG_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION',
+            options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: undefined,
+            name: 'classification',
+            validators: {
+              required: () => true
+            }
+          }
+        ],
+
+        // buttons
+        bottomButtons: [
+          {
+            label: 'LNG_COMMON_BUTTON_UPDATE',
+            type: IV2SideDialogConfigButtonType.OTHER,
+            color: 'primary',
+            key: 'save',
+            disabled: (_data, handler): boolean => {
+              return !handler.form || handler.form.invalid;
+            }
+          }
+        ],
+
+        initialized: (handler) => {
+          // update title
+          handler.form.form.valueChanges.subscribe((response) => {
+            if (response.classification) {
+              handler.update.changeTitle('LNG_DIALOG_CONFIRM_CHANGE_CASE_EPI_CLASSIFICATION', { caseName: this.i18nService.instant(this.entityData.name), classification: this.i18nService.instant(response.classification) });
+            }
+          });
         }
+      }).subscribe((response) => {
+        // cancelled ?
+        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+          return;
+        }
+
+        // change case classification
+        this.caseDataService
+          .modifyCase(this.selectedOutbreak.id, this.entityData.id, { classification: (response.handler.data.inputs[0] as any).value })
+          .pipe(
+            catchError((err) => {
+              this.toastV2Service.error(err);
+              return throwError(err);
+            })
+          )
+          .subscribe(() => {
+            // success message
+            this.toastV2Service.success(
+              'LNG_PAGE_LIST_LAB_RESULTS_ACTION_CHANGE_CASE_EPI_CLASSIFICATION_SUCCESS_MESSAGE');
+
+            // close popup
+            response.handler.hide();
+
+            // refresh list
+            this.needsRefreshList(true);
+          });
       });
   }
 
-  /**
-     * Export selected records
-     */
-  exportSelectedLabResults() {
-    // // get list of selected ids
-    // const selectedRecords: false | string[] = this.validateCheckedRecords();
-    // if (!selectedRecords) {
-    //   return;
-    // }
-    //
-    // // construct query builder
-    // const qb = new RequestQueryBuilder();
-    // qb.filter.bySelect(
-    //   'id',
-    //   selectedRecords,
-    //   true,
-    //   null
-    // );
-    //
-    // // display export dialog
-    // this.dialogService.showExportDialog({
-    //   // required
-    //   message: 'LNG_PAGE_LIST_LAB_RESULTS_EXPORT_TITLE',
-    //   url: this.exportLabResultsUrl,
-    //   fileName: this.exportLabResultsFileName,
-    //
-    //   // configure
-    //   isAsyncExport: true,
-    //   displayUseDbColumns: true,
-    //   displayJsonReplaceUndefinedWithNull: true,
-    //   // exportProgress: (data) => { this.showExportProgress(data); },
-    //
-    //   // optional
-    //   allowedExportTypes: this.allowedExportTypes,
-    //   queryBuilder: qb,
-    //   displayEncrypt: true,
-    //   displayAnonymize: true,
-    //   displayFieldsGroupList: true,
-    //   displayUseQuestionVariable: true,
-    //   anonymizeFields: this.anonymizeFields,
-    //   fieldsGroupList: this.fieldsGroupList,
-    //   fieldsGroupListRequired: this.fieldsGroupListRequired,
-    //   exportStart: () => { this.showLoadingDialog(); },
-    //   exportFinished: () => { this.closeLoadingDialog(); }
-    // });
+  private exportLabResultsData(qb: RequestQueryBuilder) {
+    this.dialogV2Service.showExportDataAfterLoadingData({
+      title: {
+        get: () => 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_EXPORT_TITLE'
+      },
+      load: (finished) => {
+        // retrieve the list of export fields groups for model
+        this.outbreakDataService
+          .getExportFieldsGroups(ExportFieldsGroupModelNameEnum.LAB_RESULT)
+          .pipe(
+            // handle errors
+            catchError((err) => {
+              // show error
+              this.toastV2Service.error(err);
+
+              // send error further
+              return throwError(err);
+            }),
+
+            // should be the last pipe
+            takeUntil(this.destroyed$)
+          )
+          .subscribe((fieldsGroupList) => {
+            // set groups
+            const labResultsFieldGroups: ILabelValuePairModel[] = fieldsGroupList.options.map((item) => ({
+              label: item.name,
+              value: item.name
+            }));
+
+            // group restrictions
+            const labResultsFieldGroupsRequires: IV2ExportDataConfigGroupsRequired = fieldsGroupList.toRequiredList();
+
+            // show export
+            finished({
+              title: {
+                get: () => 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_EXPORT_TITLE'
+              },
+              export: {
+                url: `/outbreaks/${ this.selectedOutbreak.id }/${ EntityModel.getLinkForEntityType(this.personType) }/${ this.personType === EntityType.CONTACT ? this.activatedRoute.snapshot.params.contactId : this.activatedRoute.snapshot.params.caseId }/lab-results/export`,
+                async: true,
+                method: ExportDataMethod.POST,
+                fileName: `${ this.i18nService.instant(this.personType === EntityType.CONTACT ? 'LNG_PAGE_LIST_CONTACTS_TITLE' : 'LNG_PAGE_LIST_CASES_TITLE') } - ${ moment().format('YYYY-MM-DD') }`,
+                queryBuilder: qb,
+                allow: {
+                  types: [
+                    ExportDataExtension.CSV,
+                    ExportDataExtension.XLS,
+                    ExportDataExtension.XLSX,
+                    ExportDataExtension.JSON,
+                    ExportDataExtension.ODS,
+                    ExportDataExtension.PDF
+                  ],
+                  encrypt: true,
+                  anonymize: {
+                    fields: this.anonymizeFields
+                  },
+                  groups: {
+                    fields: labResultsFieldGroups,
+                    required: labResultsFieldGroupsRequires
+                  },
+                  dbColumns: true,
+                  dbValues: true,
+                  questionnaireVariables: true,
+                  jsonReplaceUndefinedWithNull: true
+                }
+              }
+            });
+          });
+      }
+    });
   }
 }
