@@ -11,7 +11,6 @@
 
     <!-- Spinner -->
     <mat-progress-spinner
-      class="gd-create-view-modify-loading-data-spinner"
       diameter="48"
       mode="indeterminate"></mat-progress-spinner>
   </div>
@@ -172,7 +171,8 @@
       <!-- Loading data -->
       <div
         *ngIf="loadingItemData; else itemDataLoaded"
-        fxLayout="row" fxLayoutAlign="center center">
+        fxLayout="row" fxLayoutAlign="center center"
+        class="gd-create-view-modify-content-loader">
 
         <!-- Spinner -->
         <mat-progress-spinner
