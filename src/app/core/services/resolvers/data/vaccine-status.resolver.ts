@@ -25,12 +25,13 @@ export class VaccineStatusDataResolver implements IMapResolverV2<ReferenceDataEn
       .pipe(
         map((data) => {
           // construct map
+          const entries: ReferenceDataEntryModel[] = data.entries || [];
           const response: IResolverV2ResponseModel<ReferenceDataEntryModel> = {
-            list: data.entries,
+            list: entries,
             map: {},
             options: []
           };
-          data.entries.forEach((item) => {
+          entries.forEach((item) => {
             // map
             response.map[item.id] = item;
 
