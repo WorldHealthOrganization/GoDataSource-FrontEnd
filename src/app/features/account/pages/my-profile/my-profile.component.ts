@@ -218,7 +218,9 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
             }, {
               type: CreateViewModifyV2TabInputType.MULTIPLE_SINGLE,
               name: 'outbreakIds',
-              placeholder: () => '...',
+              placeholder: () => this.isView || this.itemData.outbreakIds?.length > 0 ?
+                'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS' :
+                'LNG_USER_FIELD_LABEL_ALL_OUTBREAKS',
               description: () => 'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS_DESCRIPTION',
               options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options,
               value: {

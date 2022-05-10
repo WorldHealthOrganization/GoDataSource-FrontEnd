@@ -165,7 +165,7 @@
         class="gd-form-select-multiple-v2-viewonly-value">
         <!-- Has value -->
         <ng-container
-          *ngIf="value?.length > 0">
+          *ngIf="value?.length > 0; else noValue">
           <ng-container
             *ngFor="let selectedValue of value; let selectedIndex = index">
 
