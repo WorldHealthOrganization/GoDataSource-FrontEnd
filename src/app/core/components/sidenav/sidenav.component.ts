@@ -407,6 +407,14 @@ export class SidenavComponent implements OnInit, OnDestroy {
                 PERMISSION.BACKUP_LIST
               ],
               '/system-config/backups'
+            ),
+            new ChildNavItem(
+              'cloud-backup',
+              'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP_LABEL',
+              [
+                PERMISSION.BACKUP_VIEW_CLOUD_BACKUP
+              ],
+              '/cloud-backup'
             )
           ]
         ),

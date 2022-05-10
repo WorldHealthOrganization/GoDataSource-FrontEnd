@@ -188,12 +188,6 @@
       <!-- Almighty divider -->
       <mat-divider></mat-divider>
 
-      <!-- Cloud -->
-      <ng-template
-        *ngIf="BackupModel.canViewCloudBackupLocations(authUser)"
-        [ngTemplateOutlet]="menuOption"
-        [ngTemplateOutletContext]="{ link: '/cloud-backup', label: 'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP_LABEL' }"></ng-template>
-
       <!-- Terms of use -->
       <a
         mat-menu-item
