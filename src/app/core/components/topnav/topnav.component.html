@@ -114,9 +114,108 @@
     <button
       class="gd-top-right-user"
       type="button"
-      mat-icon-button>
+      mat-icon-button
+      [matMenuTriggerFor]="profileMenu">
       <mat-icon>person</mat-icon>
     </button>
+    <ng-template
+      #menuOption
+      let-link="link"
+      let-label="label">
+      <a
+        mat-menu-item
+        [routerLink]="link"
+        routerLinkActive="gd-top-right-user-menu-option-active"
+        [routerLinkActiveOptions]="activeSetup">
+        {{label | translate}}
+      </a>
+    </ng-template>
+    <mat-menu
+      #profileMenu="matMenu">
+
+      <!-- Name and email -->
+      <div
+        (click)="$event.preventDefault(); $event.stopPropagation(); $event.stopImmediatePropagation();">
+
+        <!-- Name -->
+        <div>
+          {{ authUser?.name }}
+        </div>
+
+        <!-- Email -->
+        <div>
+          {{ authUser?.email }}
+        </div>
+
+      </div>
+
+      <!-- Almighty divider -->
+      <mat-divider></mat-divider>
+
+      <!-- My profile -->
+      <ng-template
+        *ngIf="UserModel.canModifyOwnAccount(authUser)"
+        [ngTemplateOutlet]="menuOption"
+        [ngTemplateOutletContext]="{ link: '/account/my-profile', label: 'LNG_LAYOUT_MENU_ITEM_MY_PROFILE_LABEL' }"></ng-template>
+
+      <!-- Change password -->
+      <ng-template
+        *ngIf="UserModel.canModifyOwnAccount(authUser)"
+        [ngTemplateOutlet]="menuOption"
+        [ngTemplateOutletContext]="{ link: '/account/change-password', label: 'LNG_LAYOUT_MENU_ITEM_CHANGE_PASSWORD_LABEL' }"></ng-template>
+
+      <!-- Set security questions -->
+      <ng-template
+        *ngIf="UserModel.canModifyOwnAccount(authUser)"
+        [ngTemplateOutlet]="menuOption"
+        [ngTemplateOutletContext]="{ link: '/account/set-security-questions', label: 'LNG_LAYOUT_MENU_ITEM_SET_SECURITY_QUESTION_LABEL' }"></ng-template>
+
+      <!-- Almighty divider -->
+      <mat-divider></mat-divider>
+
+      <!-- Saved filters -->
+      <ng-template
+        *ngIf="authUser.hasPermissions(expressionPermissions.savedFilters)"
+        [ngTemplateOutlet]="menuOption"
+        [ngTemplateOutletContext]="{ link: '/saved-filters', label: 'LNG_LAYOUT_MENU_ITEM_SAVED_FILTERS_LABEL' }"></ng-template>
+
+      <!-- Saved import mappings -->
+      <ng-template
+        *ngIf="authUser.hasPermissions(expressionPermissions.savedImportMappings)"
+        [ngTemplateOutlet]="menuOption"
+        [ngTemplateOutletContext]="{ link: '/saved-import-mapping', label: 'LNG_LAYOUT_MENU_ITEM_SAVED_IMPORT_MAPPING_LABEL' }"></ng-template>
+
+      <!-- Almighty divider -->
+      <mat-divider></mat-divider>
+
+      <!-- Cloud -->
+      <ng-template
+        *ngIf="BackupModel.canViewCloudBackupLocations(authUser)"
+        [ngTemplateOutlet]="menuOption"
+        [ngTemplateOutletContext]="{ link: '/cloud-backup', label: 'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP_LABEL' }"></ng-template>
+
+      <!-- Terms of use -->
+      <ng-template
+        [ngTemplateOutlet]="menuOption"
+        [ngTemplateOutletContext]="{ link: '/terms-of-use', label: 'LNG_LAYOUT_MENU_ITEM_TERMS_OF_USE_LABEL' }"></ng-template>
+
+      <!-- Version -->
+      <ng-template
+        [ngTemplateOutlet]="menuOption"
+        [ngTemplateOutletContext]="{ link: '/version', label: 'LNG_LAYOUT_MENU_ITEM_VERSION_LABEL' }"></ng-template>
+
+      <!-- Almighty divider -->
+      <mat-divider></mat-divider>
+
+      <!-- Log out -->
+      <div
+        class="gd-top-right-user-menu-option-danger"
+        mat-menu-item
+        (click)="logout()">
+        {{'LNG_LAYOUT_MENU_ITEM_LOGOUT_LABEL' | translate}}
+      </div>
+
+    </mat-menu>
 
   </div>
 </div>

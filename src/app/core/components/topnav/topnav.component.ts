@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, HostListener, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { IAppFormIconButtonV2 } from '../../../shared/forms-v2/core/app-form-icon-button-v2';
-import { UserModel } from '../../models/user.model';
+import { PermissionExpression, UserModel } from '../../models/user.model';
 import { AuthDataService } from '../../services/data/auth.data.service';
 import { OutbreakDataService } from '../../services/data/outbreak.data.service';
 import { OutbreakModel } from '../../models/outbreak.model';
@@ -19,6 +19,9 @@ import {
 import { v4 as uuid } from 'uuid';
 import { IV2LoadingDialogHandler } from '../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
 import { determineRenderMode, RenderMode } from '../../enums/render-mode.enum';
+import { IsActiveMatchOptions, Router } from '@angular/router';
+import { PERMISSION } from '../../models/permission.model';
+import { BackupModel } from '../../models/backup.model';
 
 @Component({
   selector: 'app-topnav',
@@ -57,6 +60,8 @@ export class TopnavComponent implements OnInit, OnDestroy {
   OutbreakModel = OutbreakModel;
   ToastV2Service = ToastV2Service;
   RenderMode = RenderMode;
+  UserModel = UserModel;
+  BackupModel = BackupModel;
 
   // authenticated user
   authUser: UserModel;
@@ -77,6 +82,54 @@ export class TopnavComponent implements OnInit, OnDestroy {
 
   // loading handler
   private loadingHandler: IV2LoadingDialogHandler;
+
+  // active setup
+  activeSetup: IsActiveMatchOptions = {
+    matrixParams: 'exact',
+    queryParams: 'ignored',
+    paths: 'exact',
+    fragment: 'exact'
+  };
+
+  // expression permissions
+  expressionPermissions: {
+    savedFilters: PermissionExpression,
+    savedImportMappings: PermissionExpression
+  } = {
+      savedFilters: new PermissionExpression(
+        {
+          or: [
+            PERMISSION.SYSTEM_SETTINGS_MODIFY_SAVED_FILTERS,
+            PERMISSION.SYSTEM_SETTINGS_DELETE_SAVED_FILTERS,
+            PERMISSION.CASE_LIST,
+            PERMISSION.FOLLOW_UP_LIST,
+            PERMISSION.CONTACT_LIST,
+            PERMISSION.CASE_LIST_LAB_RESULT,
+            PERMISSION.CONTACT_LIST_LAB_RESULT,
+            PERMISSION.LAB_RESULT_LIST,
+            PERMISSION.CASE_CHANGE_SOURCE_RELATIONSHIP,
+            PERMISSION.CONTACT_CHANGE_SOURCE_RELATIONSHIP,
+            PERMISSION.EVENT_CHANGE_SOURCE_RELATIONSHIP,
+            PERMISSION.RELATIONSHIP_CREATE,
+            PERMISSION.RELATIONSHIP_SHARE
+          ]
+        }
+      ),
+      savedImportMappings: new PermissionExpression(
+        {
+          or: [
+            PERMISSION.SYSTEM_SETTINGS_MODIFY_SAVED_IMPORT,
+            PERMISSION.SYSTEM_SETTINGS_DELETE_SAVED_IMPORT,
+            PERMISSION.LOCATION_IMPORT,
+            PERMISSION.REFERENCE_DATA_IMPORT,
+            PERMISSION.CONTACT_IMPORT,
+            PERMISSION.CONTACT_IMPORT_LAB_RESULT,
+            PERMISSION.CASE_IMPORT,
+            PERMISSION.CASE_IMPORT_LAB_RESULT
+          ]
+        }
+      )
+    };
 
   // render mode
   renderMode: RenderMode = RenderMode.FULL;
@@ -102,7 +155,8 @@ export class TopnavComponent implements OnInit, OnDestroy {
     private authDataService: AuthDataService,
     private toastV2Service: ToastV2Service,
     private dialogV2Service: DialogV2Service,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private router: Router
   ) {
     // update render mode
     this.updateRenderMode();
@@ -490,5 +544,12 @@ export class TopnavComponent implements OnInit, OnDestroy {
    */
   showMainMenu(): void {
     this.showHoverMenu.emit();
+  }
+
+  /**
+   * Logout
+   */
+  logout(): void {
+    this.router.navigate(['/auth/logout']);
   }
 }

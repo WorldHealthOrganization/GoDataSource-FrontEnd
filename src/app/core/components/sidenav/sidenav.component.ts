@@ -63,105 +63,6 @@ export class SidenavComponent implements OnInit, OnDestroy {
     fragment: 'exact'
   };
 
-  // // Nav Item - Account
-  // accountItem: NavItem = new NavItem(
-  //   'my-account-group',
-  //   '',
-  //   'account',
-  //   [],
-  //   [
-  //     new ChildNavItem(
-  //       'logout',
-  //       'LNG_LAYOUT_MENU_ITEM_LOGOUT_LABEL',
-  //       [],
-  //       '/auth/logout'
-  //     ),
-  //     new ChildNavItem(
-  //       'my-profile',
-  //       'LNG_LAYOUT_MENU_ITEM_MY_PROFILE_LABEL',
-  //       [
-  //         PERMISSION.USER_MODIFY_OWN_ACCOUNT
-  //       ],
-  //       '/account/my-profile'
-  //     ),
-  //     new ChildNavItem(
-  //       'change-password',
-  //       'LNG_LAYOUT_MENU_ITEM_CHANGE_PASSWORD_LABEL',
-  //       [
-  //         PERMISSION.USER_MODIFY_OWN_ACCOUNT
-  //       ],
-  //       '/account/change-password'
-  //     ),
-  //     new ChildNavItem(
-  //       'security-questions',
-  //       'LNG_LAYOUT_MENU_ITEM_SET_SECURITY_QUESTION_LABEL',
-  //       [
-  //         PERMISSION.USER_MODIFY_OWN_ACCOUNT
-  //       ],
-  //       '/account/set-security-questions'
-  //     ),
-  //     new ChildNavItem(
-  //       'saved-filters',
-  //       'LNG_LAYOUT_MENU_ITEM_SAVED_FILTERS_LABEL',
-  //       new PermissionExpression({
-  //         or: [
-  //           PERMISSION.SYSTEM_SETTINGS_MODIFY_SAVED_FILTERS,
-  //           PERMISSION.SYSTEM_SETTINGS_DELETE_SAVED_FILTERS,
-  //           PERMISSION.CASE_LIST,
-  //           PERMISSION.FOLLOW_UP_LIST,
-  //           PERMISSION.CONTACT_LIST,
-  //           PERMISSION.CASE_LIST_LAB_RESULT,
-  //           PERMISSION.CONTACT_LIST_LAB_RESULT,
-  //           PERMISSION.LAB_RESULT_LIST,
-  //           PERMISSION.CASE_CHANGE_SOURCE_RELATIONSHIP,
-  //           PERMISSION.CONTACT_CHANGE_SOURCE_RELATIONSHIP,
-  //           PERMISSION.EVENT_CHANGE_SOURCE_RELATIONSHIP,
-  //           PERMISSION.RELATIONSHIP_CREATE,
-  //           PERMISSION.RELATIONSHIP_SHARE
-  //         ]
-  //       }),
-  //       '/saved-filters'
-  //     ),
-  //     new ChildNavItem(
-  //       'saved-import-mapping',
-  //       'LNG_LAYOUT_MENU_ITEM_SAVED_IMPORT_MAPPING_LABEL',
-  //       new PermissionExpression({
-  //         or: [
-  //           PERMISSION.SYSTEM_SETTINGS_MODIFY_SAVED_IMPORT,
-  //           PERMISSION.SYSTEM_SETTINGS_DELETE_SAVED_IMPORT,
-  //           PERMISSION.LOCATION_IMPORT,
-  //           PERMISSION.REFERENCE_DATA_IMPORT,
-  //           PERMISSION.CONTACT_IMPORT,
-  //           PERMISSION.CONTACT_IMPORT_LAB_RESULT,
-  //           PERMISSION.CASE_IMPORT,
-  //           PERMISSION.CASE_IMPORT_LAB_RESULT
-  //         ]
-  //       }),
-  //       '/saved-import-mapping'
-  //     ),
-  //     new ChildNavItem(
-  //       'cloud-backup',
-  //       'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP_LABEL',
-  //       [
-  //         PERMISSION.BACKUP_VIEW_CLOUD_BACKUP
-  //       ],
-  //       '/cloud-backup'
-  //     ),
-  //     new ChildNavItem(
-  //       'terms-of-use',
-  //       'LNG_LAYOUT_MENU_ITEM_TERMS_OF_USE_LABEL',
-  //       [],
-  //       '/terms-of-use'
-  //     ),
-  //     new ChildNavItem(
-  //       'version',
-  //       'LNG_LAYOUT_MENU_ITEM_VERSION_LABEL',
-  //       [],
-  //       '/version'
-  //     )
-  //   ]
-  // );
-
   // Menu groups
   menuGroups: {
     label: string,
@@ -523,8 +424,8 @@ export class SidenavComponent implements OnInit, OnDestroy {
     }];
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private authDataService: AuthDataService,
     private outbreakDataService: OutbreakDataService,
@@ -592,8 +493,8 @@ export class SidenavComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Check if a Menu Item should be displayed, based on the configured permissions that the authenticated user should have
-     */
+   * Check if a Menu Item should be displayed, based on the configured permissions that the authenticated user should have
+   */
   private updateMenuVisibility(): void {
     // go through menu option and set visibility
     this.menuGroups.forEach((menu) => {
