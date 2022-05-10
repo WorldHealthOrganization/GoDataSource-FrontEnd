@@ -218,6 +218,32 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       });
     }
 
+    // case onset
+    if (
+      this.activatedRoute.snapshot.queryParams.onset &&
+      CaseModel.canListOnsetBeforePrimaryReport(this.authUser)
+    ) {
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_CASES_DATE_ONSET_TITLE',
+        action: {
+          link: ['/relationships/date-onset']
+        }
+      });
+    }
+
+    // case onset long
+    if (
+      this.activatedRoute.snapshot.queryParams.longPeriod &&
+      CaseModel.canListLongPeriodBetweenOnsetDatesReport(this.authUser)
+    ) {
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_TITLE',
+        action: {
+          link: ['/relationships/long-period']
+        }
+      });
+    }
+
     // add info accordingly to page type
     if (this.isCreate) {
       this.breadcrumbs.push({
