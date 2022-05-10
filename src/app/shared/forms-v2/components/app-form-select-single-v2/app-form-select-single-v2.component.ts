@@ -41,6 +41,9 @@ export class AppFormSelectSingleV2Component
   // view only
   @Input() viewOnly: boolean;
 
+  // no value string
+  @Input() noValueLabel: string = '—';
+
   // clearable ?
   @Input() clearable: boolean = false;
 

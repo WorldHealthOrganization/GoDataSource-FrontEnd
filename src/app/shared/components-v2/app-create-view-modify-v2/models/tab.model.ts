@@ -67,6 +67,7 @@ interface ICreateViewModifyV2TabInputBase {
     condition: (item: CreateViewModifyV2TabInput) => boolean,
     html: string
   };
+  noValueLabel?: () => string;
 
   // never
   value: never;
@@ -83,7 +84,7 @@ interface ICreateViewModifyV2TabInputText extends Omit<ICreateViewModifyV2TabInp
   // optional
   validators?: {
     required?: () => boolean
-  }
+  };
 }
 
 /**
@@ -98,7 +99,7 @@ interface ICreateViewModifyV2TabInputSingleSelect extends Omit<ICreateViewModify
   // optional
   validators?: {
     required?: () => boolean
-  }
+  };
 }
 
 /**
@@ -113,7 +114,7 @@ interface ICreateViewModifyV2TabInputMultipleSelect extends Omit<ICreateViewModi
   // optional
   validators?: {
     required?: () => boolean
-  }
+  };
 }
 
 /**

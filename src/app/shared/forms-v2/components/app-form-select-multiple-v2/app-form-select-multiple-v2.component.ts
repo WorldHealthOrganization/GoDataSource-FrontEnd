@@ -47,6 +47,9 @@ export class AppFormSelectMultipleV2Component
   // view only
   @Input() viewOnly: boolean;
 
+  // no value string
+  @Input() noValueLabel: string = '—';
+
   // tooltip
   @Input() optionTooltipKey: string;
 

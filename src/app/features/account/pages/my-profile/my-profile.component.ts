@@ -10,6 +10,7 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-my-profile',
@@ -46,6 +47,7 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
     protected activatedRoute: ActivatedRoute,
     protected toastV2Service: ToastV2Service,
     protected userDataService: UserDataService,
+    protected translateService: TranslateService,
     authDataService: AuthDataService,
     renderer2: Renderer2
   ) {
@@ -166,10 +168,7 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
               description: () => 'LNG_USER_FIELD_LABEL_FIRST_NAME_DESCRIPTION',
               value: {
                 get: () => this.itemData.firstName,
-                set: (value) => {
-                  // set data
-                  this.itemData.firstName = value;
-                }
+                set: undefined
               },
               validators: {
                 required: () => true
@@ -182,10 +181,7 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
               description: () => 'LNG_USER_FIELD_LABEL_LAST_NAME_DESCRIPTION',
               value: {
                 get: () => this.itemData.lastName,
-                set: (value) => {
-                  // set data
-                  this.itemData.lastName = value;
-                }
+                set: undefined
               },
               validators: {
                 required: () => true
@@ -208,9 +204,7 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
               options: (this.activatedRoute.snapshot.data.userRole as IResolverV2ResponseModel<UserRoleModel>).options,
               value: {
                 get: () => this.itemData.roleIds,
-                set: (value) => {
-                  this.itemData.roleIds = value;
-                }
+                set: undefined
               },
               validators: {
                 required: () => true
@@ -218,17 +212,16 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
             }, {
               type: CreateViewModifyV2TabInputType.MULTIPLE_SINGLE,
               name: 'outbreakIds',
-              placeholder: () => this.isView || this.itemData.outbreakIds?.length > 0 ?
-                'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS' :
-                'LNG_USER_FIELD_LABEL_ALL_OUTBREAKS',
+              placeholder: () => 'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS',
               description: () => 'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS_DESCRIPTION',
               options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options,
               value: {
                 get: () => this.itemData.outbreakIds,
-                set: (value) => {
-                  this.itemData.outbreakIds = value;
-                }
-              }
+                set: undefined
+              },
+              noValueLabel: () => this.itemData.outbreakIds?.length > 0 ?
+                undefined :
+                this.translateService.instant('LNG_USER_FIELD_LABEL_ALL_OUTBREAKS')
             }
           ]
         }
@@ -246,12 +239,7 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
           link: () => ['/account', 'my-profile']
         }
       },
-      modify: {
-        link: {
-          link: () => ['/account', 'my-profile', 'modify']
-        },
-        visible: () => UserModel.canModifyOwnAccount(this.authUser)
-      },
+      modify: undefined,
       createCancel: undefined,
       viewCancel: undefined,
       modifyCancel: {

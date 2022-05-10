@@ -33,6 +33,9 @@ export class AppFormNumberV2Component
   // view only
   @Input() viewOnly: boolean;
 
+  // no value string
+  @Input() noValueLabel: string = '—';
+
   // autocomplete
   @Input() autocomplete: string;
 

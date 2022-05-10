@@ -38,6 +38,9 @@ export class AppFormSelectLocationSingleV2Component
   // view only
   @Input() viewOnly: boolean;
 
+  // no value string
+  @Input() noValueLabel: string = '—';
+
   // selected location
   selectedLocation: ILocation;
 

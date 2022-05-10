@@ -338,7 +338,7 @@
 
               <!-- Edit -->
               <a
-                *ngIf="isView && selectedOutbreakIsActive && (!tabData.buttons.modify.visible || tabData.buttons.modify.visible())"
+                *ngIf="isView && selectedOutbreakIsActive && tabData.buttons.modify && (!tabData.buttons.modify.visible || tabData.buttons.modify.visible())"
                 type="button"
                 mat-flat-button color="primary"
                 [routerLink]="tabData.buttons.modify.link.link()"
@@ -387,6 +387,7 @@
                     [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
                     [placeholder]="input.placeholder()"
                     [tooltip]="input.description ? input.description() : undefined"
+                    [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
                     [viewOnly]="isView || !input.value.set"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                     autocomplete="off"
@@ -401,6 +402,7 @@
                     [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
                     [placeholder]="input.placeholder()"
                     [tooltip]="input.description ? input.description() : undefined"
+                    [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
                     [viewOnly]="isView || !input.value.set"
                     [options]="input.options"
                     [clearable]="true"
@@ -416,6 +418,7 @@
                     [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
                     [placeholder]="input.placeholder()"
                     [tooltip]="input.description ? input.description() : undefined"
+                    [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
                     [viewOnly]="isView || !input.value.set"
                     [options]="input.options"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
@@ -442,6 +445,7 @@
                     [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
                     [placeholder]="input.placeholder()"
                     [viewOnly]="isView || !input.value.set"
+                    [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
                     [useOutbreakLocations]="input.useOutbreakLocations"
                     [clearable]="true"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
@@ -455,6 +459,7 @@
                     [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
                     [placeholder]="input.placeholder()"
                     [viewOnly]="isView || !input.value.set"
+                    [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-textarea-v2>
 

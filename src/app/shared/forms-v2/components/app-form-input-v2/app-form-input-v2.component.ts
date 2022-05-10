@@ -39,6 +39,9 @@ export class AppFormInputV2Component
   // view only
   @Input() viewOnly: boolean;
 
+  // no value string
+  @Input() noValueLabel: string = '—';
+
   // tooltip
   tooltipButton: IAppFormIconButtonV2;
   private _tooltip: string;
