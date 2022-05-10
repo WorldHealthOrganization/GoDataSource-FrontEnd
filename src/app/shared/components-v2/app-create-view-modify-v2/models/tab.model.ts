@@ -291,7 +291,7 @@ interface ICreateViewModifyV2TabInputCenterDateRange {
 type CreateViewModifyV2TabInput = ICreateViewModifyV2TabInputText | ICreateViewModifyV2TabInputSingleSelect | ICreateViewModifyV2TabInputMultipleSelect
 | ICreateViewModifyV2TabInputToggleCheckbox | ICreateViewModifyV2TabInputLocationSingle | ICreateViewModifyV2TabInputTextArea | ICreateViewModifyV2TabInputAgeOrDOB
 | ICreateViewModifyV2TabInputVisualID | ICreateViewModifyV2TabInputDate | ICreateViewModifyV2TabInputList | ICreateViewModifyV2TabInputDocument
-| ICreateViewModifyV2TabInputAddress| ICreateViewModifyV2TabInputVaccine | ICreateViewModifyV2TabInputCenterDateRange;
+| ICreateViewModifyV2TabInputAddress | ICreateViewModifyV2TabInputVaccine | ICreateViewModifyV2TabInputCenterDateRange;
 
 /**
  * Tab section
