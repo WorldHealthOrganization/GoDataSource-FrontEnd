@@ -35,7 +35,7 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
-import { IV2SideDialogConfigButtonType, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputToggle, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-component';
 import { FollowUpPage } from '../../typings/follow-up-page';
@@ -689,8 +689,8 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                           {
                             type: V2SideDialogConfigInputType.TOGGLE,
                             value: item.targeted ?
-                              Constants.FILTER_YES_NO_OPTIONS.YES.label :
-                              Constants.FILTER_YES_NO_OPTIONS.NO.label,
+                              Constants.FILTER_YES_NO_OPTIONS.YES.value :
+                              Constants.FILTER_YES_NO_OPTIONS.NO.value,
                             name: 'targeted',
                             options: [
                               {
@@ -713,7 +713,9 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                             color: 'primary',
                             key: 'save',
                             disabled: (_data, handler): boolean => {
-                              return !handler.form || handler.form.invalid;
+                              return !handler.form ||
+                                handler.form.invalid ||
+                                item.targeted === ((handler.data.map.targeted as IV2SideDialogConfigInputToggle).value) as boolean;
                             }
                           }, {
                             type: IV2SideDialogConfigButtonType.CANCEL,
@@ -729,7 +731,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
 
                         // change entity targeted
                         this.followUpsDataService
-                          .modifyFollowUp(this.selectedOutbreak.id, item.personId, item.id, { targeted: (response.handler.data.map.targeted as any).value })
+                          .modifyFollowUp(this.selectedOutbreak.id, item.personId, item.id, { targeted: (response.handler.data.map.targeted as IV2SideDialogConfigInputToggle).value })
                           .pipe(
                             catchError((err) => {
                               this.toastV2Service.error(err);
@@ -738,7 +740,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                           )
                           .subscribe(() => {
                             // update our record too
-                            item.targeted = (response.handler.data.map.targeted as any).value;
+                            item.targeted = ((response.handler.data.map.targeted as IV2SideDialogConfigInputToggle).value) as boolean;
 
                             // success message
                             this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TARGETED_SUCCESS_MESSAGE');
