@@ -684,16 +684,21 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                         // inputs
                         inputs: [
                           {
-                            type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
-                            placeholder: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
-                            options: (this.route.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+                            type: V2SideDialogConfigInputType.TOGGLE,
                             value: item.targeted ?
                               this.i18nService.instant('LNG_COMMON_LABEL_YES') :
                               this.i18nService.instant('LNG_COMMON_LABEL_NO'),
                             name: 'targeted',
-                            validators: {
-                              required: () => true
-                            }
+                            options: [
+                              {
+                                label: this.i18nService.instant('LNG_COMMON_LABEL_YES'),
+                                value: true
+                              },
+                              {
+                                label: this.i18nService.instant('LNG_COMMON_LABEL_NO'),
+                                value: false
+                              }
+                            ]
                           }
                         ],
 
