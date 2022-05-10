@@ -341,7 +341,7 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
         action: {
           link: DashboardModel.canViewDashboard(this.authUser) ?
             ['/dashboard'] :
-            ['/version']
+            ['/account/my-profile']
         }
       }, {
         label: this.entityHelperService.entityMap[this._entity.type].label,

@@ -217,7 +217,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
       if (DashboardModel.canViewDashboard(this.authUser)) {
         this.router.navigate(['/dashboard']);
       } else {
-        this.router.navigate(['/version']);
+        this.router.navigate(['/account/my-profile']);
       }
     };
 

@@ -203,7 +203,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         action: {
           link: DashboardModel.canViewDashboard(this.authUser) ?
             ['/dashboard'] :
-            ['/version']
+            ['/account/my-profile']
         }
       }
     ];

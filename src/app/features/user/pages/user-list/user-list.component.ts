@@ -494,7 +494,7 @@ export class UserListComponent extends ListComponent implements OnDestroy {
         action: {
           link: DashboardModel.canViewDashboard(this.authUser) ?
             ['/dashboard'] :
-            ['/version']
+            ['/account/my-profile']
         }
       }, {
         label: 'LNG_PAGE_LIST_USERS_TITLE',

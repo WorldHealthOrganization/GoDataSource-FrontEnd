@@ -307,7 +307,7 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
         action: {
           link: DashboardModel.canViewDashboard(this.authUser) ?
             ['/dashboard'] :
-            ['/version']
+            ['/account/my-profile']
         }
       }
     ];

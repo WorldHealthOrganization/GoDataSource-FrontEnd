@@ -153,15 +153,6 @@ const routes: Routes = [
           })
         }
       },
-      // Version
-      {
-        path: ModulePath.VersionModule,
-        loadChildren: () => import('./features/version/version.module').then(m => m.VersionModule),
-        canActivate: [
-          AuthGuard,
-          PasswordChangeGuard
-        ]
-      },
       // Outbreak Module routes
       {
         path: ModulePath.OutbreakModule,

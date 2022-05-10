@@ -350,7 +350,7 @@ export class RolesListComponent extends ListComponent implements OnDestroy {
         action: {
           link: DashboardModel.canViewDashboard(this.authUser) ?
             ['/dashboard'] :
-            ['/version']
+            ['/account/my-profile']
         }
       }, {
         label: 'LNG_PAGE_LIST_USER_ROLES_TITLE',

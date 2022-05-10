@@ -1229,7 +1229,7 @@ export class EventsListComponent
         action: {
           link: DashboardModel.canViewDashboard(this.authUser)
             ? ['/dashboard']
-            : ['/version']
+            : ['/account/my-profile']
         }
       },
       {

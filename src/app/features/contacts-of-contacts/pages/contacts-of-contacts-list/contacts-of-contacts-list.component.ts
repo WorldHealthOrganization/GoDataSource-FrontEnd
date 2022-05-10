@@ -1369,7 +1369,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
         action: {
           link: DashboardModel.canViewDashboard(this.authUser) ?
             ['/dashboard'] :
-            ['/version']
+            ['/account/my-profile']
         }
       }, {
         label: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',

@@ -278,7 +278,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
         action: {
           link: DashboardModel.canViewDashboard(this.authUser) ?
             ['/dashboard'] :
-            ['/version']
+            ['/account/my-profile']
         }
       }
     ];

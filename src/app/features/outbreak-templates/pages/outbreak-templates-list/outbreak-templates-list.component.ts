@@ -583,7 +583,7 @@ export class OutbreakTemplatesListComponent
         action: {
           link: DashboardModel.canViewDashboard(this.authUser) ?
             ['/dashboard'] :
-            ['/version']
+            ['/account/my-profile']
         }
       }, {
         label: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE',
