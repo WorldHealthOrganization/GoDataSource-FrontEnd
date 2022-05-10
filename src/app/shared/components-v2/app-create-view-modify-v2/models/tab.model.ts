@@ -61,7 +61,7 @@ interface ICreateViewModifyV2TabInputBase {
   placeholder: () => string;
 
   // optional
-  description?: string;
+  description?: () => string;
   disabled?: (item: CreateViewModifyV2TabInput) => boolean;
   replace?: {
     condition: (item: CreateViewModifyV2TabInput) => boolean,
