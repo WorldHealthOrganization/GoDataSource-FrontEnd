@@ -153,15 +153,6 @@ const routes: Routes = [
           })
         }
       },
-      // Terms of use Module routes
-      {
-        path: ModulePath.TermsOfUseModule,
-        loadChildren: () => import('./features/terms-of-use/terms-of-use.module').then(m => m.TermsOfUseModule),
-        canActivate: [
-          AuthGuard,
-          PasswordChangeGuard
-        ]
-      },
       // Version
       {
         path: ModulePath.VersionModule,

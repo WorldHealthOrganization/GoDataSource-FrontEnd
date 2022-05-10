@@ -195,9 +195,12 @@
         [ngTemplateOutletContext]="{ link: '/cloud-backup', label: 'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP_LABEL' }"></ng-template>
 
       <!-- Terms of use -->
-      <ng-template
-        [ngTemplateOutlet]="menuOption"
-        [ngTemplateOutletContext]="{ link: '/terms-of-use', label: 'LNG_LAYOUT_MENU_ITEM_TERMS_OF_USE_LABEL' }"></ng-template>
+      <a
+        mat-menu-item
+        href="/assets/terms-of-use/Go.Data - Terms of Use and Software License Agreement.pdf"
+        target="_blank">
+        {{'LNG_LAYOUT_MENU_ITEM_TERMS_OF_USE_LABEL' | translate}}
+      </a>
 
       <!-- Version -->
       <ng-template
