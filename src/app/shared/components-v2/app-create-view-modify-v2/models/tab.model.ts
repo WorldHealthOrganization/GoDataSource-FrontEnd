@@ -58,7 +58,7 @@ interface ICreateViewModifyV2TabInputBase {
   // required
   type: CreateViewModifyV2TabInputType;
   name: string;
-  placeholder: string;
+  placeholder: () => string;
 
   // optional
   description?: string;

@@ -335,7 +335,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             {
               type: CreateViewModifyV2TabInputType.TEXT,
               name: 'firstName',
-              placeholder: 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
+              placeholder: () => 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
               description: 'LNG_CASE_FIELD_LABEL_FIRST_NAME_DESCRIPTION',
               value: {
                 get: () => this.itemData.firstName,
@@ -353,7 +353,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             }, {
               type: CreateViewModifyV2TabInputType.TEXT,
               name: 'middleName',
-              placeholder: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
+              placeholder: () => 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
               description: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION',
               value: {
                 get: () => this.itemData.middleName,
@@ -368,7 +368,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             }, {
               type: CreateViewModifyV2TabInputType.TEXT,
               name: 'lastName',
-              placeholder: 'LNG_CASE_FIELD_LABEL_LAST_NAME',
+              placeholder: () => 'LNG_CASE_FIELD_LABEL_LAST_NAME',
               description: 'LNG_CASE_FIELD_LABEL_LAST_NAME_DESCRIPTION',
               value: {
                 get: () => this.itemData.lastName,
@@ -383,7 +383,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'gender',
-              placeholder: 'LNG_CASE_FIELD_LABEL_GENDER',
+              placeholder: () => 'LNG_CASE_FIELD_LABEL_GENDER',
               description: 'LNG_CASE_FIELD_LABEL_GENDER_DESCRIPTION',
               options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
               value: {
@@ -401,7 +401,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'pregnancyStatus',
-              placeholder: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
+              placeholder: () => 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
               description: 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION',
               options: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
               value: {
@@ -416,7 +416,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'occupation',
-              placeholder: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
+              placeholder: () => 'LNG_CASE_FIELD_LABEL_OCCUPATION',
               description: 'LNG_CASE_FIELD_LABEL_OCCUPATION_DESCRIPTION',
               options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
               value: {
@@ -466,7 +466,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             }, {
               type: CreateViewModifyV2TabInputType.VISUAL_ID,
               name: 'visualId',
-              placeholder: 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
+              placeholder: () => 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
               description: this.translateService.instant(
                 'LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
                 this._caseVisualIDMask
@@ -525,7 +525,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'responsibleUserId',
-              placeholder: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
+              placeholder: () => 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
               description: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
               options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
               value: {
@@ -634,7 +634,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           inputs: [{
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
             name: 'classification',
-            placeholder: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
             description: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION_DESCRIPTION',
             options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             value: {
@@ -649,7 +649,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }, {
             type: CreateViewModifyV2TabInputType.DATE,
             name: 'dateOfOnset',
-            placeholder: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
             description: 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_DESCRIPTION',
             value: {
               get: () => this.itemData.dateOfOnset,
@@ -671,7 +671,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }, {
             type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
             name: 'isDateOfOnsetApproximate',
-            placeholder: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
             description: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE_DESCRIPTION',
             value: {
               get: () => this.itemData.isDateOfOnsetApproximate,
@@ -682,7 +682,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }, {
             type: CreateViewModifyV2TabInputType.DATE,
             name: 'dateBecomeCase',
-            placeholder: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
             description: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE_DESCRIPTION',
             value: {
               get: () => this.itemData.dateBecomeCase,
@@ -699,7 +699,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }, {
             type: CreateViewModifyV2TabInputType.DATE,
             name: 'dateOfInfection',
-            placeholder: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
             description: 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION_DESCRIPTION',
             value: {
               get: () => this.itemData.dateOfInfection,
@@ -718,7 +718,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
             name: 'outcomeId',
-            placeholder: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_OUTCOME',
             description: 'LNG_CASE_FIELD_LABEL_OUTCOME_DESCRIPTION',
             options: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             value: {
@@ -739,7 +739,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }, {
             type: CreateViewModifyV2TabInputType.DATE,
             name: 'dateOfOutcome',
-            placeholder: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
             description: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME_DESCRIPTION',
             value: {
               get: () => this.itemData.dateOfOutcome,
@@ -761,7 +761,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }, {
             type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
             name: 'transferRefused',
-            placeholder: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
             description: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION',
             value: {
               get: () => this.itemData.transferRefused,
@@ -772,7 +772,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }, {
             type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
             name: 'safeBurial',
-            placeholder: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
             description: 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL_DESCRIPTION',
             value: {
               get: () => this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
@@ -788,7 +788,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }, {
             type: CreateViewModifyV2TabInputType.DATE,
             name: 'dateOfBurial',
-            placeholder: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL',
             description: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL_DESCRIPTION',
             value: {
               get: () => this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
@@ -813,7 +813,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }, {
             type: CreateViewModifyV2TabInputType.LOCATION_SINGLE,
             name: 'burialLocationId',
-            placeholder: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL',
             description: 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL_DESCRIPTION',
             useOutbreakLocations: true,
             value: {
@@ -830,7 +830,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }, {
             type: CreateViewModifyV2TabInputType.TEXT,
             name: 'burialPlaceName',
-            placeholder: 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME',
             description: 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME_DESCRIPTION',
             value: {
               get: () => this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
@@ -846,7 +846,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }, {
             type: CreateViewModifyV2TabInputType.DATE,
             name: 'dateOfReporting',
-            placeholder: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
             description: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
             value: {
               get: () => this.itemData.dateOfReporting,
@@ -864,7 +864,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }, {
             type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
             name: 'isDateOfReportingApproximate',
-            placeholder: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
             description: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION',
             value: {
               get: () => this.itemData.isDateOfReportingApproximate,
@@ -875,7 +875,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
             name: 'riskLevel',
-            placeholder: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
             description: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL_DESCRIPTION',
             options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             value: {
@@ -887,7 +887,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }, {
             type: CreateViewModifyV2TabInputType.TEXTAREA,
             name: 'riskReason',
-            placeholder: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_RISK_REASON',
             description: 'LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION',
             value: {
               get: () => this.itemData.riskReason,

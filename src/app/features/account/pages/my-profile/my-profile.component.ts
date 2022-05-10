@@ -162,7 +162,7 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
             {
               type: CreateViewModifyV2TabInputType.TEXT,
               name: 'firstName',
-              placeholder: 'LNG_USER_FIELD_LABEL_FIRST_NAME',
+              placeholder: () => 'LNG_USER_FIELD_LABEL_FIRST_NAME',
               description: 'LNG_USER_FIELD_LABEL_FIRST_NAME_DESCRIPTION',
               value: {
                 get: () => this.itemData.firstName,
@@ -178,7 +178,7 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
             {
               type: CreateViewModifyV2TabInputType.TEXT,
               name: 'lastName',
-              placeholder: 'LNG_USER_FIELD_LABEL_LAST_NAME',
+              placeholder: () => 'LNG_USER_FIELD_LABEL_LAST_NAME',
               description: 'LNG_USER_FIELD_LABEL_LAST_NAME_DESCRIPTION',
               value: {
                 get: () => this.itemData.lastName,
@@ -194,7 +194,7 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
             {
               type: CreateViewModifyV2TabInputType.TEXT,
               name: 'email',
-              placeholder: 'LNG_USER_FIELD_LABEL_EMAIL',
+              placeholder: () => 'LNG_USER_FIELD_LABEL_EMAIL',
               description: 'LNG_USER_FIELD_LABEL_EMAIL_DESCRIPTION',
               value: {
                 get: () => this.itemData.email,
@@ -203,7 +203,7 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
             }, {
               type: CreateViewModifyV2TabInputType.MULTIPLE_SINGLE,
               name: 'roleIds',
-              placeholder: 'LNG_USER_FIELD_LABEL_ROLES',
+              placeholder: () => 'LNG_USER_FIELD_LABEL_ROLES',
               description: 'LNG_USER_FIELD_LABEL_ROLES_DESCRIPTION',
               options: (this.activatedRoute.snapshot.data.userRole as IResolverV2ResponseModel<UserRoleModel>).options,
               value: {
@@ -218,7 +218,7 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
             }, {
               type: CreateViewModifyV2TabInputType.MULTIPLE_SINGLE,
               name: 'outbreakIds',
-              placeholder: '...',
+              placeholder: () => '...',
               description: 'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS_DESCRIPTION',
               options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options,
               value: {

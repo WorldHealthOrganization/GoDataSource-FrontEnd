@@ -385,7 +385,7 @@
                     fxFlex
                     [ngModel]="input.value.get(parentItemIndex)"
                     [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
-                    [placeholder]="input.placeholder"
+                    [placeholder]="input.placeholder()"
                     [tooltip]="input.description"
                     [viewOnly]="isView || !input.value.set"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
@@ -399,7 +399,7 @@
                     fxFlex
                     [ngModel]="input.value.get(parentItemIndex)"
                     [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
-                    [placeholder]="input.placeholder"
+                    [placeholder]="input.placeholder()"
                     [tooltip]="input.description"
                     [viewOnly]="isView || !input.value.set"
                     [options]="input.options"
@@ -414,7 +414,7 @@
                     fxFlex
                     [ngModel]="input.value.get(parentItemIndex)"
                     [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
-                    [placeholder]="input.placeholder"
+                    [placeholder]="input.placeholder()"
                     [tooltip]="input.description"
                     [viewOnly]="isView || !input.value.set"
                     [options]="input.options"
@@ -428,7 +428,7 @@
                     fxFlex
                     [ngModel]="input.value.get(parentItemIndex)"
                     [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
-                    [placeholder]="input.placeholder"
+                    [placeholder]="input.placeholder()"
                     [tooltip]="input.description"
                     [viewOnly]="isView || !input.value.set"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
@@ -440,7 +440,7 @@
                     fxFlex
                     [ngModel]="input.value.get(parentItemIndex)"
                     [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
-                    [placeholder]="input.placeholder"
+                    [placeholder]="input.placeholder()"
                     [viewOnly]="isView || !input.value.set"
                     [useOutbreakLocations]="input.useOutbreakLocations"
                     [clearable]="true"
@@ -453,7 +453,7 @@
                     fxFlex
                     [ngModel]="input.value.get(parentItemIndex)"
                     [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
-                    [placeholder]="input.placeholder"
+                    [placeholder]="input.placeholder()"
                     [viewOnly]="isView || !input.value.set"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-textarea-v2>
@@ -544,7 +544,7 @@
                     fxFlex
                     [ngModel]="input.value.get(parentItemIndex)"
                     [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
-                    [placeholder]="input.placeholder"
+                    [placeholder]="input.placeholder()"
                     [tooltip]="input.description"
                     [viewOnly]="isView || !input.value.set"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
@@ -562,7 +562,7 @@
                     fxFlex
                     [ngModel]="input.value.get(parentItemIndex)"
                     [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
-                    [placeholder]="input.placeholder"
+                    [placeholder]="input.placeholder()"
                     [tooltip]="input.description"
                     [viewOnly]="isView || !input.value.set"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
