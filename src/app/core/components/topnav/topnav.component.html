@@ -175,13 +175,13 @@
 
       <!-- Saved filters -->
       <ng-template
-        *ngIf="authUser.hasPermissions(expressionPermissions.savedFilters)"
+        *ngIf="authUser?.hasPermissions(expressionPermissions.savedFilters)"
         [ngTemplateOutlet]="menuOption"
         [ngTemplateOutletContext]="{ link: '/saved-filters', label: 'LNG_LAYOUT_MENU_ITEM_SAVED_FILTERS_LABEL' }"></ng-template>
 
       <!-- Saved import mappings -->
       <ng-template
-        *ngIf="authUser.hasPermissions(expressionPermissions.savedImportMappings)"
+        *ngIf="authUser?.hasPermissions(expressionPermissions.savedImportMappings)"
         [ngTemplateOutlet]="menuOption"
         [ngTemplateOutletContext]="{ link: '/saved-import-mapping', label: 'LNG_LAYOUT_MENU_ITEM_SAVED_IMPORT_MAPPING_LABEL' }"></ng-template>
 

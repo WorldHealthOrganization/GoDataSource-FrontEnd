@@ -162,17 +162,37 @@
     #viewOnlyTemplate>
     <div
       fxLayout="row" fxLayoutGap="1.6rem"
-      class="gd-form-input-v2-viewonly">
+      class="gd-form-select-single-v2-viewonly">
       <!-- Label -->
       <div
-        class="gd-form-input-v2-viewonly-label">
+        class="gd-form-select-single-v2-viewonly-label">
         {{ placeholder | translate }}:
       </div>
 
       <!-- Value -->
       <div
-        class="gd-form-input-v2-viewonly-value">
-        {{value ? (allOptionsMap[value]?.label | translate) : '—'}}
+        class="gd-form-select-single-v2-viewonly-value">
+        <!-- Has value -->
+        <ng-container
+          *ngIf="value">
+          <!-- Icon -->
+          <mat-icon
+            *ngIf="allOptionsMap[value]?.icon">{{allOptionsMap[value].icon}}</mat-icon>
+
+          <!-- Image -->
+          <img
+            *ngIf="allOptionsMap[value]?.iconUrl"
+            [src]="allOptionsMap[value]?.iconUrl"/>
+
+          <!-- Label -->
+          {{allOptionsMap[value]?.label | translate}}
+        </ng-container>
+
+        <!-- Doesn't have value -->
+        <ng-template
+          #noValue>
+          —
+        </ng-template>
       </div>
     </div>
   </ng-template>

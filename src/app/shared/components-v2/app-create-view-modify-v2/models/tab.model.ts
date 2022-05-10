@@ -22,6 +22,7 @@ export enum CreateViewModifyV2TabInputType {
   // inputs
   TEXT,
   SELECT_SINGLE,
+  MULTIPLE_SINGLE,
   AGE_DATE_OF_BIRTH,
   VISUAL_ID,
   DATE,
@@ -93,6 +94,21 @@ interface ICreateViewModifyV2TabInputSingleSelect extends Omit<ICreateViewModify
   type: CreateViewModifyV2TabInputType.SELECT_SINGLE;
   options: ILabelValuePairModel[];
   value: ICreateViewModifyV2TabInputValue<string>;
+
+  // optional
+  validators?: {
+    required?: () => boolean
+  }
+}
+
+/**
+ * Input - select multiple
+ */
+interface ICreateViewModifyV2TabInputMultipleSelect extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
+  // required
+  type: CreateViewModifyV2TabInputType.MULTIPLE_SINGLE;
+  options: ILabelValuePairModel[];
+  value: ICreateViewModifyV2TabInputValue<string[]>;
 
   // optional
   validators?: {
@@ -271,10 +287,10 @@ interface ICreateViewModifyV2TabInputCenterDateRange {
 /**
  * Input
  */
-type CreateViewModifyV2TabInput = ICreateViewModifyV2TabInputText | ICreateViewModifyV2TabInputSingleSelect | ICreateViewModifyV2TabInputToggleCheckbox
-| ICreateViewModifyV2TabInputLocationSingle | ICreateViewModifyV2TabInputTextArea | ICreateViewModifyV2TabInputAgeOrDOB | ICreateViewModifyV2TabInputVisualID
-| ICreateViewModifyV2TabInputDate | ICreateViewModifyV2TabInputList | ICreateViewModifyV2TabInputDocument | ICreateViewModifyV2TabInputAddress
-| ICreateViewModifyV2TabInputVaccine | ICreateViewModifyV2TabInputCenterDateRange;
+type CreateViewModifyV2TabInput = ICreateViewModifyV2TabInputText | ICreateViewModifyV2TabInputSingleSelect | ICreateViewModifyV2TabInputMultipleSelect
+| ICreateViewModifyV2TabInputToggleCheckbox | ICreateViewModifyV2TabInputLocationSingle | ICreateViewModifyV2TabInputTextArea | ICreateViewModifyV2TabInputAgeOrDOB
+| ICreateViewModifyV2TabInputVisualID | ICreateViewModifyV2TabInputDate | ICreateViewModifyV2TabInputList | ICreateViewModifyV2TabInputDocument
+| ICreateViewModifyV2TabInputAddress| ICreateViewModifyV2TabInputVaccine | ICreateViewModifyV2TabInputCenterDateRange;
 
 /**
  * Tab section

@@ -39,12 +39,7 @@ const routes: Routes = [
         canActivate: [
           AuthGuard,
           PasswordChangeGuard
-        ],
-        data: {
-          permissions: [
-            PERMISSION.USER_MODIFY_OWN_ACCOUNT
-          ]
-        }
+        ]
       },
       // User Module routes
       {
