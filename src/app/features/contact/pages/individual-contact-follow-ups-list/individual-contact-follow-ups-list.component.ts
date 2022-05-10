@@ -681,22 +681,25 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                           get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TARGETED_DIALOG_TITLE'
                         },
 
+                        // hide search bar
+                        hideInputFilter: true,
+
                         // inputs
                         inputs: [
                           {
                             type: V2SideDialogConfigInputType.TOGGLE,
                             value: item.targeted ?
-                              this.i18nService.instant('LNG_COMMON_LABEL_YES') :
-                              this.i18nService.instant('LNG_COMMON_LABEL_NO'),
+                              Constants.FILTER_YES_NO_OPTIONS.YES.label :
+                              Constants.FILTER_YES_NO_OPTIONS.NO.label,
                             name: 'targeted',
                             options: [
                               {
-                                label: this.i18nService.instant('LNG_COMMON_LABEL_YES'),
-                                value: true
+                                label: Constants.FILTER_YES_NO_OPTIONS.YES.label,
+                                value: Constants.FILTER_YES_NO_OPTIONS.YES.value
                               },
                               {
-                                label: this.i18nService.instant('LNG_COMMON_LABEL_NO'),
-                                value: false
+                                label: Constants.FILTER_YES_NO_OPTIONS.NO.label,
+                                value: Constants.FILTER_YES_NO_OPTIONS.NO.value
                               }
                             ]
                           }
