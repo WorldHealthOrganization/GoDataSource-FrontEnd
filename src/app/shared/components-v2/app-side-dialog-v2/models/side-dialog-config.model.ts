@@ -172,7 +172,7 @@ export interface IV2SideDialogConfigInputToggle extends IV2SideDialogConfigInput
   // required
   type: V2SideDialogConfigInputType.TOGGLE;
   options: ILabelValuePairModel[];
-  value: string;
+  value: string | boolean;
 
   // never
   placeholder?: never;

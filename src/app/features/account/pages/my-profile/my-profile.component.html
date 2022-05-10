@@ -1,3 +1,16 @@
+<app-create-view-modify-v2
+  [action]="action"
+  selectedOutbreakIsActive="true"
+  [loadingPage]="loadingPage"
+  [loadingItemData]="loadingItemData"
+  [breadcrumbs]="breadcrumbs"
+  [pageTitle]="pageTitle"
+  [pageTitleData]="pageTitleData"
+  [itemID]="itemData?.id"
+  [tabData]="tabData">
+</app-create-view-modify-v2>
+
+
 <!--
 <app-topnav>
     <ng-container dynamic-section>
@@ -6,118 +19,74 @@
 </app-topnav>
 -->
 
-<form
-    #form="ngForm"
-    [class.form-view-only]="viewOnly"
-    class="page-content form-section">
+<!--<form-->
+<!--    #form="ngForm"-->
+<!--    [class.form-view-only]="viewOnly"-->
+<!--    class="page-content form-section">-->
 
-    <div class="form-content">
+<!--    <div class="form-content">-->
 
-        <mat-tab-group class="page-tabs-navbar">
+<!--        <mat-tab-group class="page-tabs-navbar">-->
 
-            <mat-tab [label]="'LNG_PAGE_MODIFY_USER_TAB_DETAILS_TITLE' | translate">
+<!--            <mat-tab [label]="'LNG_PAGE_MODIFY_USER_TAB_DETAILS_TITLE' | translate">-->
 
-                <mat-card class="page-section">
-                    <div fxLayout="column">
-                        <div fxLayout="row" fxLayoutGap="20px">
-                            <app-form-input
-                                name="firstName"
-                                [(ngModel)]="user.firstName"
-                                [placeholder]="'LNG_USER_FIELD_LABEL_FIRST_NAME' | translate"
-                                tooltip="LNG_USER_FIELD_LABEL_FIRST_NAME_DESCRIPTION"
-                                required="true"
-                                [readonly]="true">
-                            </app-form-input>
+<!--                <mat-card class="page-section">-->
+<!--                    <div fxLayout="column">-->
+<!--                        <div fxLayout="row" fxLayoutGap="20px">-->
 
-                            <app-form-input
-                                name="lastName"
-                                [(ngModel)]="user.lastName"
-                                [placeholder]="'LNG_USER_FIELD_LABEL_LAST_NAME' | translate"
-                                tooltip="LNG_USER_FIELD_LABEL_LAST_NAME_DESCRIPTION"
-                                required="true"
-                                [readonly]="true">
-                            </app-form-input>
+<!--                            <app-form-select-->
+<!--                                name="outbreakIds"-->
+<!--                                [(ngModel)]="user.outbreakIds"-->
+<!--                                [placeholder]="(!user.outbreakIds || user.outbreakIds.length < 1 ? 'LNG_USER_FIELD_LABEL_ALL_OUTBREAKS' : 'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS') | translate"-->
+<!--                                tooltip="LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS_DESCRIPTION"-->
+<!--                                optionLabelKey="name"-->
+<!--                                optionValueKey="id"-->
+<!--                                optionTooltipKey="description"-->
+<!--                                [options]="outbreaksList$ | async"-->
+<!--                                [multiple]="true"-->
+<!--                                [disabled]="viewOnly"-->
+<!--                                [optionReadOnly]="true">-->
+<!--                            </app-form-select>-->
 
-                            <app-form-input
-                                name="email"
-                                [(ngModel)]="user.email"
-                                [placeholder]="'LNG_USER_FIELD_LABEL_EMAIL' | translate"
-                                tooltip="LNG_USER_FIELD_LABEL_EMAIL_DESCRIPTION"
-                                required="true"
-                                app-email-validator
-                                [readonly]="true">
-                            </app-form-input>
+<!--                            <app-form-select-->
+<!--                                name="activeOutbreakId"-->
+<!--                                [(ngModel)]="user.activeOutbreakId"-->
+<!--                                [placeholder]="'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK' | translate"-->
+<!--                                tooltip="LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK_DESCRIPTION"-->
+<!--                                optionLabelKey="name"-->
+<!--                                optionValueKey="id"-->
+<!--                                optionTooltipKey="description"-->
+<!--                                [options]="outbreaksList$ | async"-->
+<!--                                [disabled]="viewOnly"-->
+<!--                                [optionReadOnly]="true">-->
+<!--                            </app-form-select>-->
 
-                            <app-form-select
-                                name="roleIds"
-                                [(ngModel)]="user.roleIds"
-                                [placeholder]="'LNG_USER_FIELD_LABEL_ROLES' | translate"
-                                tooltip="LNG_USER_FIELD_LABEL_ROLES_DESCRIPTION"
-                                required="true"
-                                [options]="rolesList$ | async"
-                                optionLabelKey="name"
-                                optionValueKey="id"
-                                optionTooltipKey="description"
-                                multiple="true"
-                                [optionReadOnly]="true">
-                            </app-form-select>
-                        </div>
+<!--                            <app-form-slide-toggle-->
+<!--                                name="dontCacheFilters"-->
+<!--                                [(ngModel)]="user.dontCacheFilters"-->
+<!--                                [label]="'LNG_USER_FIELD_LABEL_DONT_CACHE_FILTERS' | translate"-->
+<!--                                tooltip="LNG_USER_FIELD_LABEL_DONT_CACHE_FILTERS_DESCRIPTION"-->
+<!--                                [disabled]="true">-->
+<!--                            </app-form-slide-toggle>-->
 
-                        <div fxLayout="row" fxLayoutGap="20px">
+<!--                            <div fxFlex>&lt;!&ndash; placeholder &ndash;&gt;</div>-->
 
-                            <app-form-select
-                                name="outbreakIds"
-                                [(ngModel)]="user.outbreakIds"
-                                [placeholder]="(!user.outbreakIds || user.outbreakIds.length < 1 ? 'LNG_USER_FIELD_LABEL_ALL_OUTBREAKS' : 'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS') | translate"
-                                tooltip="LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS_DESCRIPTION"
-                                optionLabelKey="name"
-                                optionValueKey="id"
-                                optionTooltipKey="description"
-                                [options]="outbreaksList$ | async"
-                                [multiple]="true"
-                                [disabled]="viewOnly"
-                                [optionReadOnly]="true">
-                            </app-form-select>
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </mat-card>-->
+<!--            </mat-tab>-->
+<!--        </mat-tab-group>-->
+<!--    </div>-->
 
-                            <app-form-select
-                                name="activeOutbreakId"
-                                [(ngModel)]="user.activeOutbreakId"
-                                [placeholder]="'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK' | translate"
-                                tooltip="LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK_DESCRIPTION"
-                                optionLabelKey="name"
-                                optionValueKey="id"
-                                optionTooltipKey="description"
-                                [options]="outbreaksList$ | async"
-                                [disabled]="viewOnly"
-                                [optionReadOnly]="true">
-                            </app-form-select>
+<!--    <div class="form-actions">-->
+<!--        <div class="page-tabs-navbar-placeholder"></div>-->
+<!--        <button-->
+<!--            *ngIf="UserModel.canList(authUser)"-->
+<!--            type="button"-->
+<!--            [routerLink]="'/users'"-->
+<!--            mat-raised-button>-->
+<!--            {{'LNG_COMMON_BUTTON_CANCEL' | translate}}-->
+<!--        </button>-->
+<!--    </div>-->
 
-                            <app-form-slide-toggle
-                                name="dontCacheFilters"
-                                [(ngModel)]="user.dontCacheFilters"
-                                [label]="'LNG_USER_FIELD_LABEL_DONT_CACHE_FILTERS' | translate"
-                                tooltip="LNG_USER_FIELD_LABEL_DONT_CACHE_FILTERS_DESCRIPTION"
-                                [disabled]="true">
-                            </app-form-slide-toggle>
-
-                            <div fxFlex><!-- placeholder --></div>
-
-                        </div>
-                    </div>
-                </mat-card>
-            </mat-tab>
-        </mat-tab-group>
-    </div>
-
-    <div class="form-actions">
-        <div class="page-tabs-navbar-placeholder"></div>
-        <button
-            *ngIf="UserModel.canList(authUser)"
-            type="button"
-            [routerLink]="'/users'"
-            mat-raised-button>
-            {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
-        </button>
-    </div>
-
-</form>
+<!--</form>-->

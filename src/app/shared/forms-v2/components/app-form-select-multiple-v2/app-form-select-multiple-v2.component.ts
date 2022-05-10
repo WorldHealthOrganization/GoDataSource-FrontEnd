@@ -14,6 +14,7 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { ILabelValuePairModel } from '../../core/label-value-pair.model';
 import { MAT_SELECT_CONFIG } from '@angular/material/select';
 import * as _ from 'lodash';
+import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 
 @Component({
   selector: 'app-form-select-multiple-v2',
@@ -43,8 +44,34 @@ export class AppFormSelectMultipleV2Component
   // float label
   @Input() neverFloatLabel: boolean = false;
 
+  // view only
+  @Input() viewOnly: boolean;
+
   // tooltip
   @Input() optionTooltipKey: string;
+
+  // tooltip
+  tooltipButton: IAppFormIconButtonV2;
+  private _tooltip: string;
+  @Input() set tooltip(tooltip: string) {
+    // set data
+    this._tooltip = tooltip;
+
+    // translate tooltip
+    const tooltipTranslated = this._tooltip ?
+      this.translateService.instant(this._tooltip) :
+      this._tooltip;
+
+    // add / remove tooltip icon
+    this.tooltipButton = !tooltipTranslated ?
+      undefined : {
+        icon: 'help',
+        tooltip: tooltipTranslated
+      };
+  }
+  get tooltip(): string {
+    return this._tooltip;
+  }
 
   // include no value ?
   private _includeNoValue: boolean;

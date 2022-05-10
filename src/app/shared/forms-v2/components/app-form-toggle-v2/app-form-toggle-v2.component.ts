@@ -27,7 +27,7 @@ import { ILabelValuePairModel } from '../../core/label-value-pair.model';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppFormToggleV2Component
-  extends AppFormBaseV2<string> implements OnDestroy {
+  extends AppFormBaseV2<string | boolean> implements OnDestroy {
 
   // options
   @Input() options: ILabelValuePairModel[];

@@ -56,21 +56,20 @@ export class AppFormSelectSingleV2Component
   // tooltip
   tooltipButton: IAppFormIconButtonV2;
   private _tooltip: string;
-  tooltipTranslated: string;
   @Input() set tooltip(tooltip: string) {
     // set data
     this._tooltip = tooltip;
 
     // translate tooltip
-    this.tooltipTranslated = this._tooltip ?
+    const tooltipTranslated = this._tooltip ?
       this.translateService.instant(this._tooltip) :
       this._tooltip;
 
     // add / remove tooltip icon
-    this.tooltipButton = !this.tooltipTranslated ?
+    this.tooltipButton = !tooltipTranslated ?
       undefined : {
         icon: 'help',
-        tooltip: this.tooltipTranslated
+        tooltip: tooltipTranslated
       };
   }
   get tooltip(): string {
