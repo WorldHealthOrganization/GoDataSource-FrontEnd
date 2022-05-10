@@ -52,6 +52,7 @@ import { GridApi } from '@ag-grid-community/core/dist/cjs/es5/gridApi';
 import { ColumnApi } from '@ag-grid-community/core/dist/cjs/es5/columns/columnApi';
 import { V2AdvancedFilter } from './models/advanced-filter.model';
 import { SavedFilterData } from '../../../core/models/saved-filters.model';
+import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model';
 
 /**
  * Component
@@ -288,6 +289,30 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // required
     html: string;
   }[];
+
+  // custom legends not related to columns
+  private _suffixLegendsHTML: {
+    // required
+    html: string;
+  }[] = [];
+  private _suffixLegends: ILabelValuePairModel[];
+  @Input() set suffixLegends(suffixLegends: ILabelValuePairModel[]) {
+    // set data
+    this._suffixLegends = suffixLegends;
+
+    // generate html
+    this._suffixLegendsHTML = [];
+    if (suffixLegends?.length > 0) {
+      suffixLegends.forEach((item) => {
+        this._suffixLegendsHTML.push({
+          html: `<span class="gd-list-table-bottom-left-legend-title">${this.translateService.instant(item.label)}</span><span class="gd-list-table-bottom-left-legend-item">${item.value}</span>`
+        });
+      });
+    }
+  }
+  get suffixLegends(): ILabelValuePairModel[] {
+    return this._suffixLegends;
+  }
 
   // selected ids
   private _selected: string[] = [];
@@ -781,6 +806,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         renderColumn(column);
       });
     }
+
+    // add suffix legends
+    this.legends.push(...this._suffixLegendsHTML);
 
     // update column defs
     this._agTable.api.setColumnDefs(columnDefs);

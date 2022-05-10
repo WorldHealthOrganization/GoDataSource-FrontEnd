@@ -23,6 +23,7 @@ import { V2AdvancedFilter } from '../../shared/components-v2/app-list-table-v2/m
 import { Directive, ViewChild } from '@angular/core';
 import { AppListTableV2Component } from '../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
 import { SavedFilterData } from '../models/saved-filters.model';
+import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 
 /**
  * List component
@@ -94,6 +95,9 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
 
   // info
   infos: string[];
+
+  // suffix legends
+  suffixLegends: ILabelValuePairModel[];
 
   // retrieve table handler
   @ViewChild(AppListTableV2Component, { static: true }) tableV2Component: AppListTableV2Component;
