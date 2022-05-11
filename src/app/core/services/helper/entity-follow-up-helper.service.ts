@@ -1,0 +1,896 @@
+import { Injectable } from '@angular/core';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, map, switchMap } from 'rxjs/operators';
+import { IV2BottomDialogConfigButtonType } from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { V2ActionType } from '../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { V2AdvancedFilter, V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2FilterType } from '../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
+import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
+import { EntityType } from '../../models/entity-type';
+import { QuestionModel } from '../../models/question.model';
+import { UserModel } from '../../models/user.model';
+import { DialogV2Service } from './dialog-v2.service';
+import { ToastV2Service } from './toast-v2.service';
+import { IBasicCount } from '../../models/basic-count.interface';
+import { FollowUpsDataService } from '../data/follow-ups.data.service';
+import { AddressModel } from '../../models/address.model';
+import { FollowUpModel } from '../../models/follow-up.model';
+import { IResolverV2ResponseModel } from '../resolvers/data/models/resolver-response.model';
+import { TeamModel } from '../../models/team.model';
+import { Params } from '@angular/router';
+import { Constants } from '../../models/constants';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputToggle, V2SideDialogConfigInputType } from '../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { TranslateService } from '@ngx-translate/core';
+import { CaseModel } from '../../models/case.model';
+import { ContactModel } from '../../models/contact.model';
+import { FollowUpPage } from '../../../features/contact/typings/follow-up-page';
+import { OutbreakModel } from '../../models/outbreak.model';
+import * as _ from 'lodash';
+import { LocationModel } from '../../models/location.model';
+import { LocationDataService } from '../data/location.data.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class EntityFollowUpHelperService {
+  /**
+   * Constructor
+   */
+  constructor(
+    private dialogV2Service: DialogV2Service,
+    private followUpsDataService: FollowUpsDataService,
+    private toastV2Service: ToastV2Service,
+    private translateService: TranslateService,
+    private locationDataService: LocationDataService
+  ) {}
+
+  /**
+   * Retrieve table columns
+   */
+  retrieveTableColumns(definitions: {
+    authUser: UserModel,
+    entityData: ContactModel | CaseModel,
+    selectedOutbreak: () => OutbreakModel,
+    selectedOutbreakIsActive: () => boolean,
+    team: IResolverV2ResponseModel<TeamModel>,
+    user: IResolverV2ResponseModel<UserModel>,
+    options: {
+      dailyFollowUpStatus: ILabelValuePairModel[],
+      yesNoAll: ILabelValuePairModel[]
+    },
+    refreshList: () => void
+  }): IV2Column[] {
+    // address model used to search by phone number, address line, postal code, city....
+    const filterAddressModel: AddressModel = new AddressModel({
+      geoLocationAccurate: ''
+    });
+
+    // default table columns
+    const tableColumns: IV2Column[] = [
+      {
+        field: 'date',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
+        field: 'teamId',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
+        notVisible: true,
+        format: {
+          type: (item: FollowUpModel) => {
+            return item.teamId && definitions.team.map[item.teamId] ?
+              definitions.team.map[item.teamId].name :
+              '';
+          }
+        },
+        link: (item: FollowUpModel) => {
+          return item.teamId &&
+            TeamModel.canView(definitions.authUser) &&
+            definitions.team.map[item.teamId] ?
+            `/teams/${ item.teamId }/view` :
+            undefined;
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: definitions.team.options
+        }
+      },
+      {
+        field: 'statusId',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: definitions.options.dailyFollowUpStatus
+        }
+      },
+      {
+        field: 'targeted',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
+        sortable: true,
+        format: {
+          type: (item: FollowUpModel) => {
+            return item && item.id && item.targeted ?
+              this.translateService.instant('LNG_COMMON_LABEL_YES') :
+              this.translateService.instant('LNG_COMMON_LABEL_NO');
+          }
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      },
+      {
+        field: 'index',
+        label: 'LNG_CONTACT_FIELD_LABEL_DAY_OF_FOLLOWUP',
+        sortable: true,
+        filter: {
+          type: V2FilterType.NUMBER_RANGE,
+          min: 0
+        }
+      },
+      {
+        field: 'location',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_AREA',
+        format: {
+          type: 'address.location.name'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_MULTIPLE_LOCATION,
+          address: filterAddressModel,
+          field: 'address',
+          fieldIsArray: false
+        },
+        link: (data) => {
+          return data.address?.location?.name ?
+            `/locations/${ data.address.location.id }/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'phoneNumber',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER',
+        sortable: true,
+        format: {
+          type: 'address.phoneNumber'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_PHONE_NUMBER,
+          address: filterAddressModel,
+          field: 'address',
+          fieldIsArray: false
+        }
+      },
+      {
+        field: 'address.emailAddress',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_EMAIL',
+        notVisible: true,
+        sortable: true,
+        format: {
+          type: 'address.emailAddress'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          address: filterAddressModel,
+          addressField: 'emailAddress',
+          field: 'address',
+          fieldIsArray: false
+        }
+      },
+      {
+        field: 'address.addressLine1',
+        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
+        notVisible: true,
+        format: {
+          type: 'address.addressLine1'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          address: filterAddressModel,
+          addressField: 'addressLine1',
+          field: 'address',
+          fieldIsArray: false
+        }
+      },
+      {
+        field: 'address.city',
+        label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+        notVisible: true,
+        sortable: true,
+        format: {
+          type: 'address.city'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          address: filterAddressModel,
+          addressField: 'city',
+          field: 'address',
+          fieldIsArray: false
+        }
+      },
+      {
+        field: 'address.geoLocation.lat',
+        label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
+        notVisible: true,
+        sortable: true,
+        format: {
+          type: 'address.geoLocation.lat'
+        }
+      },
+      {
+        field: 'address.geoLocation.lng',
+        label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
+        notVisible: true,
+        sortable: true,
+        format: {
+          type: 'address.geoLocation.lng'
+        }
+      },
+      {
+        field: 'address.postalCode',
+        label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
+        notVisible: true,
+        sortable: true,
+        format: {
+          type: 'address.postalCode'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          address: filterAddressModel,
+          addressField: 'postalCode',
+          field: 'address',
+          fieldIsArray: true
+        }
+      },
+      {
+        field: 'address.geoLocationAccurate',
+        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
+        notVisible: true,
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN,
+          field: 'address.geoLocationAccurate'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION,
+          address: filterAddressModel,
+          field: 'address',
+          fieldIsArray: true,
+          options: definitions.options.yesNoAll,
+          defaultValue: ''
+        }
+      },
+      {
+        field: 'responsibleUserId',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID',
+        notVisible: true,
+        format: {
+          type: (item) => item.responsibleUserId && definitions.user.map[item.responsibleUserId] ?
+            definitions.user.map[item.responsibleUserId].name :
+            ''
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: definitions.user.options,
+          includeNoValue: true
+        },
+        exclude: (): boolean => {
+          return !UserModel.canList(definitions.authUser);
+        },
+        link: (data) => {
+          return data.responsibleUserId ?
+            `/users/${ data.responsibleUserId }/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'deleted',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_DELETED',
+        notVisible: true,
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.DELETED,
+          value: false,
+          defaultValue: false
+        }
+      },
+      {
+        field: 'createdBy',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY',
+        notVisible: true,
+        format: {
+          type: (item) => item.createdBy && definitions.user.map[item.createdBy] ?
+            definitions.user.map[item.createdBy].name :
+            ''
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: definitions.user.options,
+          includeNoValue: true
+        },
+        exclude: (): boolean => {
+          return !UserModel.canView(definitions.authUser);
+        },
+        link: (data) => {
+          return data.createdBy ?
+            `/users/${ data.createdBy }/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'createdAt',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_AT',
+        notVisible: true,
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
+        field: 'updatedBy',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY',
+        notVisible: true,
+        format: {
+          type: (item) => item.updatedBy && definitions.user.map[item.updatedBy] ?
+            definitions.user.map[item.updatedBy].name :
+            ''
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: definitions.user.options,
+          includeNoValue: true
+        },
+        exclude: (): boolean => {
+          return !UserModel.canView(definitions.authUser);
+        },
+        link: (data) => {
+          return data.updatedBy ?
+            `/users/${ data.updatedBy }/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'updatedAt',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_AT',
+        notVisible: true,
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+
+      // actions
+      {
+        field: 'actions',
+        label: 'LNG_COMMON_LABEL_ACTIONS',
+        pinned: IV2ColumnPinned.RIGHT,
+        notResizable: true,
+        cssCellClass: 'gd-cell-no-focus',
+        format: {
+          type: V2ColumnFormat.ACTIONS
+        },
+        actions: [
+          // View Follow-up
+          {
+            type: V2ActionType.ICON,
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_VIEW_FOLLOW_UP',
+            action: {
+              link: (item: FollowUpModel): string[] => {
+                return ['/contacts', item.personId, 'follow-ups', item.id, definitions.entityData.type === EntityType.CONTACT ? 'view' : 'history'];
+              },
+              linkQueryParams: (): Params => {
+                return {
+                  rootPage: definitions.entityData.type === EntityType.CONTACT ?
+                    FollowUpPage.FOR_CONTACT :
+                    undefined
+                };
+              }
+            },
+            visible: (item: FollowUpModel): boolean => {
+              return !item.deleted &&
+                FollowUpModel.canView(definitions.authUser);
+            }
+          },
+
+          // Modify Follow-up
+          {
+            type: V2ActionType.ICON,
+            icon: 'edit',
+            iconTooltip: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MODIFY_FOLLOW_UP',
+            action: {
+              link: (item: FollowUpModel): string[] => {
+                return ['/contacts', item.personId, 'follow-ups', item.id, 'modify'];
+              },
+              linkQueryParams: (): Params => {
+                return {
+                  rootPage: definitions.entityData.type === EntityType.CONTACT ?
+                    FollowUpPage.FOR_CONTACT :
+                    undefined
+                };
+              }
+            },
+            visible: (item: FollowUpModel): boolean => {
+              return !item.deleted &&
+                definitions.entityData.type === EntityType.CONTACT &&
+                definitions.selectedOutbreakIsActive() &&
+                FollowUpModel.canModify(definitions.authUser);
+            }
+          },
+
+          // Other actions
+          {
+            type: V2ActionType.MENU,
+            icon: 'more_horiz',
+            menuOptions: [
+              // Delete Follow-up
+              {
+                label: {
+                  get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_FOLLOW_UP'
+                },
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+                action: {
+                  click: (item: FollowUpModel): void => {
+                    // determine what we need to delete
+                    this.dialogV2Service.showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_DELETE',
+                          data: () => ({
+                            name: item.person.name
+                          })
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_FOLLOW_UP',
+                          data: () => ({
+                            name: item.person.name
+                          })
+                        }
+                      }
+                    }).subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // delete follow up
+                      this.followUpsDataService
+                        .deleteFollowUp(
+                          definitions.selectedOutbreak().id,
+                          item.personId,
+                          item.id
+                        )
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            this.toastV2Service.error(err);
+
+                            // hide loading
+                            loading.close();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          // success
+                          this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                          // hide loading
+                          loading.close();
+
+                          // reload data
+                          definitions.refreshList();
+                        });
+                    });
+                  }
+                },
+                visible: (item: FollowUpModel): boolean => {
+                  return !item.deleted &&
+                    definitions.entityData.type === EntityType.CONTACT &&
+                    definitions.selectedOutbreakIsActive() &&
+                    FollowUpModel.canDelete(definitions.authUser);
+                }
+              },
+
+              // Restore a deleted Follow-up
+              {
+                label: {
+                  get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_FOLLOW_UP'
+                },
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+                action: {
+                  click: (item: FollowUpModel) => {
+                    // show confirm dialog to confirm the action
+                    this.dialogV2Service.showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_RESTORE',
+                          data: () => item as any
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP',
+                          data: () => item as any
+                        }
+                      }
+                    }).subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // delete follow up
+                      this.followUpsDataService
+                        .restoreFollowUp(
+                          definitions.selectedOutbreak().id,
+                          item.personId,
+                          item.id
+                        )
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            this.toastV2Service.error(err);
+
+                            // hide loading
+                            loading.close();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          // success
+                          this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SUCCESS_MESSAGE');
+
+                          // hide loading
+                          loading.close();
+
+                          // reload data
+                          definitions.refreshList();
+                        });
+                    });
+                  }
+                },
+                visible: (item: FollowUpModel): boolean => {
+                  return item.deleted &&
+                    definitions.entityData.type === EntityType.CONTACT &&
+                    definitions.selectedOutbreakIsActive() &&
+                    FollowUpModel.canRestore(definitions.authUser);
+                }
+              },
+
+              // Divider
+              {
+                visible: (item: FollowUpModel): boolean => {
+                  // visible only if at least one of the previous...
+                  return !item.deleted &&
+                    definitions.entityData.type === EntityType.CONTACT &&
+                    definitions.selectedOutbreakIsActive() &&
+                    FollowUpModel.canModify(definitions.authUser) &&
+                    !Constants.isDateInTheFuture(item.date);
+                }
+              },
+
+              // Change targeted
+              {
+                label: {
+                  get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TARGETED_FORM_BUTTON'
+                },
+                action: {
+                  click: (item: FollowUpModel) => {
+                    this.dialogV2Service
+                      .showSideDialog({
+                        // title
+                        title: {
+                          get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TARGETED_DIALOG_TITLE'
+                        },
+
+                        // hide search bar
+                        hideInputFilter: true,
+
+                        // inputs
+                        inputs: [
+                          {
+                            type: V2SideDialogConfigInputType.TOGGLE,
+                            value: item.targeted ?
+                              Constants.FILTER_YES_NO_OPTIONS.YES.value :
+                              Constants.FILTER_YES_NO_OPTIONS.NO.value,
+                            name: 'targeted',
+                            options: [
+                              {
+                                label: Constants.FILTER_YES_NO_OPTIONS.YES.label,
+                                value: Constants.FILTER_YES_NO_OPTIONS.YES.value
+                              },
+                              {
+                                label: Constants.FILTER_YES_NO_OPTIONS.NO.label,
+                                value: Constants.FILTER_YES_NO_OPTIONS.NO.value
+                              }
+                            ]
+                          }
+                        ],
+
+                        // buttons
+                        bottomButtons: [
+                          {
+                            label: 'LNG_COMMON_BUTTON_UPDATE',
+                            type: IV2SideDialogConfigButtonType.OTHER,
+                            color: 'primary',
+                            key: 'save',
+                            disabled: (_data, handler): boolean => {
+                              return !handler.form ||
+                                handler.form.invalid ||
+                                item.targeted === ((handler.data.map.targeted as IV2SideDialogConfigInputToggle).value) as boolean;
+                            }
+                          }, {
+                            type: IV2SideDialogConfigButtonType.CANCEL,
+                            label: 'LNG_COMMON_BUTTON_CANCEL',
+                            color: 'text'
+                          }
+                        ]
+                      }).subscribe((response) => {
+                        // cancelled ?
+                        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+                          return;
+                        }
+
+                        // change entity targeted
+                        this.followUpsDataService
+                          .modifyFollowUp(
+                            definitions.selectedOutbreak().id,
+                            item.personId,
+                            item.id,
+                            {
+                              targeted: (response.handler.data.map.targeted as IV2SideDialogConfigInputToggle).value
+                            }
+                          )
+                          .pipe(
+                            catchError((err) => {
+                              this.toastV2Service.error(err);
+                              return throwError(err);
+                            })
+                          )
+                          .subscribe(() => {
+                            // update our record too
+                            item.targeted = ((response.handler.data.map.targeted as IV2SideDialogConfigInputToggle).value) as boolean;
+
+                            // success message
+                            this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TARGETED_SUCCESS_MESSAGE');
+
+                            // close popup
+                            response.handler.hide();
+
+                            // reload data
+                            definitions.refreshList();
+                          });
+                      });
+                  }
+                },
+                visible: (item: FollowUpModel): boolean => {
+                  return !item.deleted &&
+                    definitions.entityData.type === EntityType.CONTACT &&
+                    definitions.selectedOutbreakIsActive() &&
+                    FollowUpModel.canModify(definitions.authUser);
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ];
+
+    // finished
+    return tableColumns;
+  }
+
+  /**
+   * Advanced filters
+   */
+  generateAdvancedFilters(data: {
+    authUser: UserModel,
+    contactFollowUpTemplate: () => QuestionModel[],
+    options: {
+      team: ILabelValuePairModel[],
+      yesNoAll: ILabelValuePairModel[],
+      dailyFollowUpStatus: ILabelValuePairModel[],
+      user: ILabelValuePairModel[]
+    }
+  }): V2AdvancedFilter[] {
+    // initialize
+    const advancedFilters: V2AdvancedFilter[] = [
+      {
+        type: V2AdvancedFilterType.ADDRESS,
+        field: 'address',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
+        isArray: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'date',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'teamId',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
+        options: data.options.team
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'targeted',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
+        options: data.options.team
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'statusId',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
+        options: data.options.dailyFollowUpStatus
+      },
+      {
+        type: V2AdvancedFilterType.NUMBER,
+        field: 'weekNumber',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_WEEK_NUMBER',
+        allowedComparators: [
+          _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.NUMBER], { value: V2AdvancedFilterComparatorType.IS })
+        ],
+        flagIt: true
+      },
+      {
+        type: V2AdvancedFilterType.DATE,
+        field: 'timeLastSeen',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_TIME_FILTER',
+        allowedComparators: [
+          _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.DATE], { value: V2AdvancedFilterComparatorType.DATE })
+        ],
+        flagIt: true
+      },
+      {
+        type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
+        field: 'questionnaireAnswers',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+        template: data.contactFollowUpTemplate
+      }
+    ];
+
+    // allowed to filter by responsible user ?
+    if (UserModel.canList(data.authUser)) {
+      advancedFilters.push(
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'responsibleUserId',
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID',
+          options: data.options.user
+        }
+      );
+    }
+
+    // finished
+    return advancedFilters;
+  }
+
+  /**
+   * Retrieve data
+   */
+  retrieveRecords(
+    outbreak: OutbreakModel,
+    queryBuilder: RequestQueryBuilder
+  ): Observable<FollowUpModel[]> {
+    return this.followUpsDataService
+      .getFollowUpsList(
+        outbreak.id,
+        queryBuilder
+      )
+      .pipe(
+        switchMap((data) => {
+          // determine locations that we need to retrieve
+          const locationsIdsMap: {
+            [locationId: string]: true
+          } = {};
+          data.forEach((item) => {
+            // nothing to add ?
+            if (!item.address?.locationId) {
+              return;
+            }
+
+            // add location to list
+            locationsIdsMap[item.address.locationId] = true;
+          });
+
+          // determine ids
+          const locationIds: string[] = Object.keys(locationsIdsMap);
+
+          // nothing to retrieve ?
+          if (locationIds.length < 1) {
+            return of(data);
+          }
+
+          // construct location query builder
+          const qb = new RequestQueryBuilder();
+          qb.filter.bySelect(
+            'id',
+            locationIds,
+            false,
+            null
+          );
+
+          // retrieve locations
+          return this.locationDataService
+            .getLocationsList(qb)
+            .pipe(
+              map((locations) => {
+                // map locations
+                const locationsMap: {
+                  [locationId: string]: LocationModel
+                } = {};
+                locations.forEach((location) => {
+                  locationsMap[location.id] = location;
+                });
+
+                // set locations
+                data.forEach((item) => {
+                  item.address.location = item.address.locationId && locationsMap[item.address.locationId] ?
+                    locationsMap[item.address.locationId] :
+                    item.address.location;
+                });
+
+                // finished
+                return data;
+              })
+            );
+        })
+      )
+      .pipe(
+        map((followUps: FollowUpModel[]) => {
+          return FollowUpModel.determineAlertness(
+            outbreak.contactFollowUpTemplate,
+            followUps
+          );
+        })
+      );
+  }
+
+  /**
+   * Retrieve data count
+   */
+  retrieveRecordsCount(
+    outbreakId: string,
+    queryBuilder: RequestQueryBuilder
+  ): Observable<IBasicCount> {
+    return this.followUpsDataService
+      .getFollowUpsCount(
+        outbreakId,
+        queryBuilder
+      )
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        })
+      );
+  }
+}

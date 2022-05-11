@@ -100,6 +100,8 @@ import { LanguageUserResolver } from './resolvers/language-user.resolver';
 import { LanguageDataResolver } from './resolvers/data/language.resolver';
 import { PersonDataResolver } from './resolvers/data/person.resolver';
 import { NotAuthRedirectGuard } from './guards/not-auth-redirect-guard.service';
+import { EntityFollowUpHelperService } from './helper/entity-follow-up-helper.service';
+import { EntityLabResultService } from './helper/entity-lab-result-helper.service';
 
 // export the list of services
 export const services: any[] = [
@@ -208,8 +210,10 @@ export const services: any[] = [
   DialogService,
   DialogV2Service,
   DomService,
-  RedirectService,
+  EntityFollowUpHelperService,
+  EntityLabResultService,
   EntityHelperService,
   ListHelperService,
+  RedirectService,
   ToastV2Service
 ];

@@ -39,7 +39,7 @@ import { EntityModel } from '../../../../core/models/entity-and-relationship.mod
 import * as _ from 'lodash';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
-import { RequestFilterGenerator, RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { RequestFilterGenerator, RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
@@ -53,6 +53,8 @@ import { RelationshipType } from '../../../../core/enums/relationship-type.enum'
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { EntityLabResultService } from '../../../../core/services/helper/entity-lab-result-helper.service';
+import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
+import { TeamModel } from '../../../../core/models/team.model';
 
 /**
  * Component
@@ -100,6 +102,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     protected entityDataService: EntityDataService,
     protected entityHelperService: EntityHelperService,
     protected entityLabResultService: EntityLabResultService,
+    protected entityFollowUpHelperService: EntityFollowUpHelperService,
     authDataService: AuthDataService,
     renderer2: Renderer2
   ) {
@@ -288,8 +291,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         // table tabs - specific to cases, contacts, contact of contacts and events
         this.initializeTabsContacts(),
         this.initializeTabsExposures(),
-        this.initializeTabsLabResults()
-        // this.initializeTabsViewFollowUps()
+        this.initializeTabsLabResults(),
+        this.initializeTabsViewFollowUps()
       ],
 
       // create details
@@ -1200,8 +1203,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     const newTab: ICreateViewModifyV2TabTable = {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       label: 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS',
-      pageSettingsKey: UserSettings.RELATIONSHIP_FIELDS,
-      advancedFilterType: Constants.APP_PAGE.RELATIONSHIPS.value,
+      pageSettingsKey: UserSettings.CASE_LAB_FIELDS,
+      advancedFilterType: Constants.APP_PAGE.CASE_LAB_RESULTS.value,
       visible: () => LabResultModel.canList(this.authUser) &&
         CaseModel.canListLabResult(this.authUser),
       tableColumns: this.entityLabResultService.retrieveTableColumns({
@@ -1209,6 +1212,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         personType: this.itemData.type,
         selectedOutbreak: () => this.selectedOutbreak,
         selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
+        user: this.activatedRoute.snapshot.data.user,
         options: {
           labName: (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           labSampleType: (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -1216,8 +1220,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           labTestResult: (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
           labResultProgress: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ILabelValuePairModel>).options,
           labSequenceLaboratory: (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-          labSequenceResult: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-          user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+          labSequenceResult: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
         },
         refreshList: () => {
           // reload data
@@ -1302,21 +1305,119 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     return newTab;
   }
 
-  // /**
-  //  * Initialize tabs - Follow-ups
-  //  */
-  // private initializeTabsViewFollowUps(): ICreateViewModifyV2TabTable {
-  //   return {
-  //     // #TODO
-  //     type: CreateViewModifyV2TabInputType.TAB_TABLE,
-  //     label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS',
-  //     pageSettingsKey: undefined,
-  //     advancedFilterType: undefined,
-  //     visible: () => FollowUpModel.canList(this.authUser),
-  //     records$: undefined,
-  //     tableColumns: undefined
-  //   };
-  // }
+  /**
+   * Initialize tabs - Follow-ups
+   */
+  private initializeTabsViewFollowUps(): ICreateViewModifyV2TabTable {
+    // create tab
+    const newTab: ICreateViewModifyV2TabTable = {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      label: 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE',
+      pageSettingsKey: UserSettings.CONTACT_RELATED_DAILY_FOLLOW_UP_FIELDS,
+      advancedFilterType: Constants.APP_PAGE.INDIVIDUAL_CONTACT_FOLLOW_UPS.value,
+      visible: () => FollowUpModel.canList(this.authUser) &&
+        this.itemData.wasContact,
+      tableColumns: this.entityFollowUpHelperService.retrieveTableColumns({
+        authUser: this.authUser,
+        entityData: this.itemData,
+        selectedOutbreak: () => this.selectedOutbreak,
+        selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
+        team: this.activatedRoute.snapshot.data.team,
+        user: this.activatedRoute.snapshot.data.user,
+        options: {
+          dailyFollowUpStatus: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options
+        },
+        refreshList: () => {
+          // reload data
+          newTab.refresh(newTab);
+        }
+      }),
+      advancedFilters: this.entityFollowUpHelperService.generateAdvancedFilters({
+        authUser: this.authUser,
+        contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
+        options: {
+          team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
+          yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          dailyFollowUpStatus: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+        }
+      }),
+      queryBuilder: new RequestQueryBuilder(),
+      pageIndex: 0,
+      refresh: (tab) => {
+        // add contact id
+        tab.queryBuilder.filter.byEquality(
+          'personId',
+          this.itemData.id
+        );
+
+        // make sure we always sort by something
+        // default by date asc
+        if (tab.queryBuilder.sort.isEmpty()) {
+          tab.queryBuilder.sort.by(
+            'date',
+            RequestSortDirection.ASC
+          );
+        }
+
+        // refresh data
+        tab.records$ = this.entityFollowUpHelperService
+          .retrieveRecords(
+            this.selectedOutbreak,
+            tab.queryBuilder
+          )
+          .pipe(
+            // should be the last pipe
+            takeUntil(this.destroyed$)
+          );
+
+        // count
+        tab.refreshCount(tab);
+      },
+      refreshCount: (
+        tab,
+        applyHasMoreLimit?: boolean
+      ) => {
+        // reset
+        tab.pageCount = undefined;
+
+        // set apply value
+        if (applyHasMoreLimit !== undefined) {
+          tab.applyHasMoreLimit = applyHasMoreLimit;
+        }
+
+        // remove paginator from query builder
+        const countQueryBuilder = _.cloneDeep(tab.queryBuilder);
+        countQueryBuilder.paginator.clear();
+        countQueryBuilder.sort.clear();
+
+        // apply has more limit
+        if (tab.applyHasMoreLimit) {
+          countQueryBuilder.flag(
+            'applyHasMoreLimit',
+            true
+          );
+        }
+
+        // count
+        this.entityFollowUpHelperService
+          .retrieveRecordsCount(
+            this.selectedOutbreak.id,
+            countQueryBuilder
+          )
+          .pipe(
+            // should be the last pipe
+            takeUntil(this.destroyed$)
+          ).subscribe((response) => {
+            tab.pageCount = response;
+          });
+      }
+    };
+
+    // finished
+    return newTab;
+  }
 
   /**
    * Initialize buttons

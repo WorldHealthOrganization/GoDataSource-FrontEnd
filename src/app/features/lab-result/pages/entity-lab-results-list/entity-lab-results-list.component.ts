@@ -16,7 +16,6 @@ import {
 } from '../../../../core/models/export-fields-group.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { UserModel } from '../../../../core/models/user.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
@@ -89,7 +88,10 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
     private dialogV2Service: DialogV2Service,
     private caseDataService: CaseDataService
   ) {
-    super(listHelperService);
+    super(
+      listHelperService,
+      true
+    );
 
     // retrieve data
     this.personType = this.activatedRoute.snapshot.data.personType;
@@ -124,6 +126,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
       personType: this.personType,
       selectedOutbreak: () => this.selectedOutbreak,
       selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
+      user: this.activatedRoute.snapshot.data.user,
       options: {
         labName: (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         labSampleType: (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -131,8 +134,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
         labTestResult: (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         labResultProgress: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         labSequenceLaboratory: (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        labSequenceResult: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+        labSequenceResult: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
       },
       refreshList: () => {
         // reload data
@@ -385,10 +387,6 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
       this.personType &&
       this.entityData
     ) {
-      // retrieve created user & modified user information
-      this.queryBuilder.include('createdByUser', true);
-      this.queryBuilder.include('updatedByUser', true);
-
       // refresh badges list with applied filter
       if (!triggeredByPageChange) {
         this.initializeGroupedData();

@@ -20,6 +20,7 @@ import { LabResultDataService } from '../data/lab-result.data.service';
 import { DialogV2Service } from './dialog-v2.service';
 import { ToastV2Service } from './toast-v2.service';
 import { IBasicCount } from '../../models/basic-count.interface';
+import { IResolverV2ResponseModel } from '../resolvers/data/models/resolver-response.model';
 
 @Injectable({
   providedIn: 'root'
@@ -42,6 +43,7 @@ export class EntityLabResultService {
     personType: EntityType,
     selectedOutbreak: () => OutbreakModel,
     selectedOutbreakIsActive: () => boolean,
+    user: IResolverV2ResponseModel<UserModel>,
     options: {
       labName: ILabelValuePairModel[],
       labSampleType: ILabelValuePairModel[],
@@ -49,8 +51,7 @@ export class EntityLabResultService {
       labTestResult: ILabelValuePairModel[],
       labResultProgress: ILabelValuePairModel[],
       labSequenceLaboratory: ILabelValuePairModel[],
-      labSequenceResult: ILabelValuePairModel[],
-      user: ILabelValuePairModel[],
+      labSequenceResult: ILabelValuePairModel[]
     },
     refreshList: () => void
   }): IV2Column[] {
@@ -243,11 +244,13 @@ export class EntityLabResultService {
         label: 'LNG_LAB_RESULT_FIELD_LABEL_CREATED_BY',
         notVisible: true,
         format: {
-          type: 'createdByUser.name'
+          type: (item) => item.createdBy && definitions.user.map[item.createdBy] ?
+            definitions.user.map[item.createdBy].name :
+            ''
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: definitions.options.user,
+          options: definitions.user.options,
           includeNoValue: true
         },
         exclude: (): boolean => {
@@ -276,11 +279,13 @@ export class EntityLabResultService {
         label: 'LNG_LAB_RESULT_FIELD_LABEL_UPDATED_BY',
         notVisible: true,
         format: {
-          type: 'updatedByUser.name'
+          type: (item) => item.updatedBy && definitions.user.map[item.updatedBy] ?
+            definitions.user.map[item.updatedBy].name :
+            ''
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: definitions.options.user,
+          options: definitions.user.options,
           includeNoValue: true
         },
         exclude: (): boolean => {

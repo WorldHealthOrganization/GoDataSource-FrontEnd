@@ -980,13 +980,12 @@ export class EntityHelperService {
     queryBuilder: RequestQueryBuilder
   ): Observable<EntityModel[]> {
     return relationshipType === RelationshipType.EXPOSURE ?
-      this.relationshipDataService
-        .getEntityExposures(
-          selectedOutbreak.id,
-          entity.type,
-          entity.id,
-          queryBuilder
-        ) :
+      this.relationshipDataService.getEntityExposures(
+        selectedOutbreak.id,
+        entity.type,
+        entity.id,
+        queryBuilder
+      ) :
       this.relationshipDataService.getEntityContacts(
         selectedOutbreak.id,
         entity.type,

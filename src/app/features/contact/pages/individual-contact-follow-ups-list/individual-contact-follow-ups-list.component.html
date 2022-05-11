@@ -1,5 +1,5 @@
 <app-list-table-v2
-  [pageTitle]="isContact ? 'LNG_PAGE_LIST_FOLLOW_UPS_TITLE' : 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE'"
+  [pageTitle]="entityData.type === EntityType.CONTACT ? 'LNG_PAGE_LIST_FOLLOW_UPS_TITLE' : 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE'"
   [records$]="followUpsList$"
   [columns]="tableColumns"
   [breadcrumbs]="breadcrumbs"

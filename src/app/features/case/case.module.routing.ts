@@ -36,6 +36,8 @@ import { LabTestResultDataResolver } from '../../core/services/resolvers/data/la
 import { LabProgressDataResolver } from '../../core/services/resolvers/data/lab-progress.resolver';
 import { LabSequenceLaboratoryDataResolver } from '../../core/services/resolvers/data/lab-sequence-laboratory.resolver';
 import { LabSequenceResultDataResolver } from '../../core/services/resolvers/data/lab-sequence-result.resolver';
+import { TeamDataResolver } from '../../core/services/resolvers/data/team.resolver';
+import { DailyFollowUpStatusDataResolver } from '../../core/services/resolvers/data/daily-follow-up-status.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -71,7 +73,9 @@ const createViewModifyFoundation: Route = {
     labTestResult: LabTestResultDataResolver,
     labResultProgress: LabProgressDataResolver,
     labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
-    labSequenceResult: LabSequenceResultDataResolver
+    labSequenceResult: LabSequenceResultDataResolver,
+    team: TeamDataResolver,
+    dailyFollowUpStatus: DailyFollowUpStatusDataResolver
   }
 };
 
