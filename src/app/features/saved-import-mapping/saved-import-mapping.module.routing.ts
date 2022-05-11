@@ -4,6 +4,8 @@ import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PermissionExpression } from '../../core/models/user.model';
 import { PERMISSION } from '../../core/models/permission.model';
 import { ModuleWithProviders } from '@angular/core';
+import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
+import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 
 const routes: Routes = [
   {
@@ -23,6 +25,10 @@ const routes: Routes = [
           PERMISSION.CASE_IMPORT_LAB_RESULT
         ]
       })
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      user: UserDataResolver
     }
   }
 ];
