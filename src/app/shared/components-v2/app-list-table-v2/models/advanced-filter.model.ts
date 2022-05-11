@@ -273,6 +273,9 @@ interface IV2AdvancedFilterBase {
 interface IV2AdvancedFilterText extends IV2AdvancedFilterBase {
   // required
   type: V2AdvancedFilterType.TEXT;
+
+  // optional
+  useLike?: boolean;
 }
 
 /**

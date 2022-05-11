@@ -690,7 +690,8 @@ export class EntityLabResultService {
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'sequence.noSequenceReason',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON'
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
+        useLike: true
       },
       {
         type: V2AdvancedFilterType.SELECT,
