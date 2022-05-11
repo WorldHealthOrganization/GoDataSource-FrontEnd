@@ -1,257 +1,28 @@
-<!--
-<app-topnav>
-    <ng-container dynamic-section>
-        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
-    </ng-container>
-</app-topnav>
--->
+<app-list-table-v2
+  [pageTitle]="'LNG_PAGE_LIST_SAVED_FILTERS_TITLE'"
+  [records$]="savedFiltersList$"
+  [columns]="tableColumns"
+  [breadcrumbs]="breadcrumbs"
+  [quickActions]="quickActions"
+  [groupActions]="groupActions"
+  [addAction]="addAction"
+  [groupedData]="groupedData"
+  [pageCount]="pageCount"
+  [pageSize]="pageSize"
+  [pageIndex]="pageIndex"
+  [pageSettingsKey]="UserSettings.SAVED_FILTER_FIELDS"
+  [sortColumn]="tableSortBy"
+  [infos]="infos"
+  [suffixLegends]="suffixLegends"
+  [filtersApplied]="filtersApplied"
+  [advancedFilterType]="undefined"
+  [advancedFilters]="advancedFilters"
+  (refreshData)="needsRefreshList(true)"
+  (refreshDataCount)="refreshListCount(false)"
+  (pageChange)="changePage($event)"
+  (sortBy)="sortBy($event)"
+  (filterBy)="filterBy($event)"
+  (resetHeaderFilters)="resetFiltersToSideFilters()"
+  (advancedFilterBy)="applySideFilters($event)">
+</app-list-table-v2>
 
-<!--Total number of records from the list-->
-<!--<app-total-number-of-records-->
-<!--    [value]="savedFiltersListCount$ | async">-->
-<!--</app-total-number-of-records>-->
-
-<mat-card class="page-section page-content">
-    <!-- Table top info -->
-    <div
-        fxLayout="row">
-        <!-- Filters message -->
-        <div
-            fxFlex fxGrow="0" fxLayoutAlign="start center"
-            class="filters-applied">
-<!--            {{ queryBuilder.isEmptyOnlyFilters() ? '' : ('LNG_COMMON_LABEL_FILTERS_USED' | translate) }}-->
-        </div>
-
-        <!-- Filter buttons -->
-        <div
-            fxFlex
-            class="reset-filters">
-            <button
-                type="button"
-                mat-raised-button
-                color="accent"
-                (click)="resetFiltersToSideFilters()">
-                {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
-            </button>
-            <button
-                type="button"
-                mat-raised-button
-                color="accent"
-                (click)="needsRefreshList(true)">
-                {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
-            </button>
-        </div>
-    </div>
-
-    <!-- Hover question effects / actions -->
-<!--    <app-hover-row-actions-->
-<!--        #hoverRow-->
-<!--        [active]="!refreshingList"-->
-<!--    ></app-hover-row-actions>-->
-
-    <mat-table #table [dataSource]="savedFiltersList$ | async" matSort (matSortChange)="sortBy($event)">
-
-        <!-- Name -->
-        <ng-container matColumnDef="name">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_SAVED_FILTERS_FIELD_LABEL_NAME' | translate}}</div>
-                    <div class="column-filter">
-<!--                        <app-form-input-->
-<!--                            name="nameFilter"-->
-<!--                            ngModel-->
-<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
-<!--                            (optionChanged)="filterByTextField('name', $event)"-->
-<!--                            app-reset-input-on-side-filter-->
-<!--                            [displayFilterIcon]="true">-->
-<!--                        </app-form-input>-->
-                    </div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item">
-                {{ item.name }}
-            </mat-cell>
-        </ng-container>
-
-        <!-- Public -->
-        <ng-container matColumnDef="public">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell" fxLayout="column">
-                    <div mat-sort-header class="column-header">{{'LNG_SAVED_FILTERS_FIELD_LABEL_PUBLIC' | translate}}</div>
-                    <div class="column-filter">
-<!--                        <app-form-select-->
-<!--                            name="publicFilter"-->
-<!--                            ngModel-->
-<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
-<!--                            [options]="yesNoOptionsList$ | async"-->
-<!--                            (optionChanged)="filterByBooleanField('isPublic', $event.value)"-->
-<!--                            app-reset-input-on-side-filter-->
-<!--                            [displayFilterIcon]="true"-->
-<!--                            [clearable]="false">-->
-<!--                        </app-form-select>-->
-                    </div>
-                </div>
-            </mat-header-cell>
-            <mat-cell *matCellDef="let item">
-                <app-form-slide-toggle
-                    *ngIf="!item.readOnly || SavedFilterModel.canModify(authUser); else readonlyValue"
-                    name="isPublic"
-                    [(ngModel)]="item.isPublic"
-                    [label]="'LNG_SAVED_FILTERS_FIELD_LABEL_PUBLIC' | translate"
-                    tooltip="LNG_SAVED_FILTERS_FIELD_LABEL_PUBLIC_DESCRIPTION"
-                    (optionChanged)="setPublicItem(item.id, $event)">
-                </app-form-slide-toggle>
-                <ng-template
-                    #readonlyValue>
-                    <app-yes-no-label
-                        [value]="item.isPublic">
-                    </app-yes-no-label>
-                </ng-template>
-            </mat-cell>
-        </ng-container>
-
-        <!-- For what page the filter was saved (Filter Keys) -->
-        <ng-container matColumnDef="filter-keys">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell" fxLayout="column">
-                    <div mat-sort-header class="column-header">{{'LNG_SAVED_FILTERS_FIELD_LABEL_FOR_PAGE' | translate}}</div>
-                    <div class="column-filter">
-<!--                        <app-form-select-->
-<!--                            name="filterKeysFilter"-->
-<!--                            ngModel-->
-<!--                            [options]="pagesWithSavedFilters"-->
-<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
-<!--                            (optionChanged)="filterBySelectField('filterKey', $event)"-->
-<!--                            app-reset-input-on-side-filter-->
-<!--                            optionLabelKey="label"-->
-<!--                            optionLabelValue="value"-->
-<!--                            [displayFilterIcon]="true"-->
-<!--                            [multiple]="true">-->
-<!--                        </app-form-select>-->
-                    </div>
-                </div>
-            </mat-header-cell>
-            <mat-cell *matCellDef="let item">
-                {{ item.filterKey | translate}}
-            </mat-cell>
-        </ng-container>
-
-        <!-- Created By -->
-        <ng-container matColumnDef="createdBy">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div class="column-header">
-                        {{ 'LNG_SAVED_FILTERS_FIELD_LABEL_CREATED_BY' | translate }}
-                    </div>
-                    <div class="column-filter">
-<!--                        <app-form-select-->
-<!--                            name="createdByFilter"-->
-<!--                            ngModel-->
-<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
-<!--                            [options]="userList$ | async"-->
-<!--                            (optionChanged)="filterBySelectField('createdBy', $event, 'id')"-->
-<!--                            app-reset-input-on-side-filter-->
-<!--                            [allowSelectionOfDisabledItems]="true"-->
-<!--                            [displayFilterIcon]="true"-->
-<!--                            optionLabelKey="name"-->
-<!--                            optionValueKey="id"-->
-<!--                            [multiple]="true">-->
-<!--                        </app-form-select>-->
-                    </div>
-                </div>
-            </mat-header-cell>
-            <mat-cell
-                *matCellDef="let item">
-                {{ item.createdByUser?.name }}
-            </mat-cell>
-        </ng-container>
-
-        <!-- Modified By -->
-        <ng-container matColumnDef="updatedBy">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div class="column-header">
-                        {{ 'LNG_SAVED_FILTERS_FIELD_LABEL_UPDATED_BY' | translate }}
-                    </div>
-                    <div class="column-filter">
-<!--                        <app-form-select-->
-<!--                            name="updatedByFilter"-->
-<!--                            ngModel-->
-<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
-<!--                            [options]="userList$ | async"-->
-<!--                            (optionChanged)="filterBySelectField('updatedBy', $event, 'id')"-->
-<!--                            app-reset-input-on-side-filter-->
-<!--                            [allowSelectionOfDisabledItems]="true"-->
-<!--                            [displayFilterIcon]="true"-->
-<!--                            optionLabelKey="name"-->
-<!--                            optionValueKey="id"-->
-<!--                            [multiple]="true">-->
-<!--                        </app-form-select>-->
-                    </div>
-                </div>
-            </mat-header-cell>
-            <mat-cell
-                *matCellDef="let item">
-                {{ item.updatedByUser?.name }}
-            </mat-cell>
-        </ng-container>
-
-        <!-- Updated At -->
-        <ng-container matColumnDef="updatedAt">
-            <mat-header-cell class="has-date-range-filter" *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">
-                        {{ 'LNG_SAVED_FILTERS_FIELD_LABEL_UPDATED_AT' | translate }}
-                    </div>
-                    <div class="column-filter">
-<!--                        <app-form-daterange-->
-<!--                            name="updatedAtFilter"-->
-<!--                            ngModel-->
-<!--                            (changed)="filterByDateRangeField('updatedAt', $event)"-->
-<!--                            app-reset-input-on-side-filter>-->
-<!--                        </app-form-daterange>-->
-                    </div>
-                </div>
-            </mat-header-cell>
-            <mat-cell
-                *matCellDef="let item"
-                class="has-date-range-filter">
-                {{ item.updatedAt | dateTimeDefault }}
-            </mat-cell>
-        </ng-container>
-
-        <mat-header-row *matHeaderRowDef="fixedTableColumns"></mat-header-row>
-        <mat-row
-            *matRowDef="let item; columns: fixedTableColumns">
-<!--            app-hover-row-actions-->
-<!--            [hoverRowActionsComponent]="hoverRow"-->
-<!--            [hoverRowActions]="recordActions"-->
-<!--            [hoverRowActionData]="item"-->
-        </mat-row>
-    </mat-table>
-
-<!--    <div-->
-<!--        *ngIf="refreshingList"-->
-<!--        class="mat-table-loading-data">-->
-<!--        <mat-spinner></mat-spinner>-->
-<!--    </div>-->
-
-<!--    &lt;!&ndash; No data &ndash;&gt;-->
-<!--    <div-->
-<!--        *ngIf="!refreshingList && isEmptyList"-->
-<!--        class="empty-table-text">-->
-<!--        {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}-->
-<!--    </div>-->
-
-<!--    &lt;!&ndash; Pages (need to be hidden and not ngIf, otherwise it makes a new duplicate request) &ndash;&gt;-->
-<!--    <app-mat-paginator-extended-->
-<!--        [hidden]="refreshingList || isEmptyList"-->
-<!--        [pageIndex]="pageIndex"-->
-<!--        [countData]="savedFiltersListCount$ | async"-->
-<!--        [pageSize]="pageSize"-->
-<!--        [pageSizeOptions]="[]"-->
-<!--        (page)="changePage($event)">-->
-<!--    </app-mat-paginator-extended>-->
-
-</mat-card>

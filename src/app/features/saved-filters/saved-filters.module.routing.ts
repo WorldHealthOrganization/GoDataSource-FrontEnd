@@ -4,6 +4,8 @@ import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
 import { PermissionExpression } from '../../core/models/user.model';
 import { ModuleWithProviders } from '@angular/core';
+import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 
 const routes: Routes = [
   {
@@ -28,6 +30,10 @@ const routes: Routes = [
           PERMISSION.RELATIONSHIP_SHARE
         ]
       })
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      user: UserDataResolver
     }
   }
 ];
