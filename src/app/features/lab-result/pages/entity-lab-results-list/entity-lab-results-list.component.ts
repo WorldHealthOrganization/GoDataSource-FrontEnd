@@ -233,7 +233,25 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
   /**
    * Initialize table add action
    */
-  protected initializeAddAction(): void {}
+  protected initializeAddAction(): void {
+    this.addAction = {
+      type: V2ActionType.ICON_LABEL,
+      label: 'LNG_COMMON_BUTTON_ADD',
+      icon: 'add_circle_outline',
+      action: {
+        link: (): string[] => ['/lab-results', EntityModel.getLinkForEntityType(this.entityData.type), this.entityData.id, 'create']
+      },
+      visible: (): boolean => {
+        return (
+          this.entityData.type === EntityType.CASE &&
+          CaseModel.canCreateLabResult(this.authUser)
+        ) || (
+          this.entityData.type === EntityType.CONTACT &&
+          ContactModel.canCreateLabResult(this.authUser)
+        );
+      }
+    };
+  }
 
   /**
    * Initialize table grouped data
