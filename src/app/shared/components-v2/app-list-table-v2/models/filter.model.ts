@@ -83,6 +83,7 @@ interface IV2FilterText extends Omit<IV2FilterBasic, 'value' | 'defaultValue'> {
   // optional
   value?: string;
   defaultValue?: string;
+  useLike?: boolean;
 }
 
 /**

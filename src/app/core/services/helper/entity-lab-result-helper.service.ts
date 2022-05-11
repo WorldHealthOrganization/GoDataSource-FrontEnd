@@ -222,7 +222,8 @@ export class EntityLabResultService {
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
-          textType: V2FilterTextType.STARTS_WITH
+          textType: V2FilterTextType.STARTS_WITH,
+          useLike: true
         }
       },
       {

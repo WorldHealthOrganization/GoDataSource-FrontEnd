@@ -318,7 +318,9 @@ export const applyFilterBy = (
           // filter
           query.filter.byText(
             column.columnDefinition.field,
-            column.columnDefinition.filter.value
+            column.columnDefinition.filter.value,
+            true,
+            column.columnDefinition.filter.useLike
           );
 
           // finished
