@@ -46,6 +46,16 @@ export abstract class AppFormBaseErrorMsgV2 {
           errData.details
         );
 
+      case 'minlength':
+        return translateService.instant(
+          'LNG_FORM_VALIDATION_ERROR_MIN_LENGTH', {
+            length: errData.requiredLength
+          }
+        );
+
+      case 'equalValidator':
+        return translateService.instant(errData.err);
+
       default:
         return `--- NOT HANDLED (${errKey}) ---`;
     }

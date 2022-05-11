@@ -9,6 +9,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
+import { PasswordChangeModel } from '../../../../core/models/password-change.model';
 
 @Component({
   selector: 'app-change-password',
@@ -17,8 +18,10 @@ import { AppMessages } from '../../../../core/enums/app-messages.enum';
   styleUrls: ['./change-password.component.less']
 })
 export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel> implements OnDestroy {
+  // data
+  private _passwordChange = new PasswordChangeModel();
+
   // #TODO
-  // passwordChange = new PasswordChangeModel();
   // passwordConfirmModel: string;
   // passwordChanged: boolean = false;
 
@@ -163,8 +166,10 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
               placeholder: () => 'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CURRENT_PASSWORD',
               description: () => 'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_CURRENT_PASSWORD_DESCRIPTION',
               value: {
-                get: () => '',
-                set: () => {}
+                get: () => this._passwordChange.oldPassword,
+                set: (value) => {
+                  this._passwordChange.oldPassword = value;
+                }
               },
               validators: {
                 required: () => true
@@ -176,11 +181,15 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
               placeholder: () => 'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_NEW_PASSWORD',
               description: () => 'LNG_PAGE_RESET_PASSWORD_FIELD_LABEL_NEW_PASSWORD_DESCRIPTION',
               value: {
-                get: () => '',
-                set: () => {}
+                get: () => this._passwordChange.newPassword,
+                set: (value) => {
+                  this._passwordChange.newPassword = value;
+                }
               },
               validators: {
-                required: () => true
+                required: () => true,
+                minlength: () => 12,
+                validateOther: () => 'newPasswordConfirm'
               }
             },
             {
@@ -193,7 +202,11 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
                 set: () => {}
               },
               validators: {
-                required: () => true
+                required: () => true,
+                equalValidator: () => ({
+                  input: 'newPassword',
+                  err: 'LNG_FORM_VALIDATION_ERROR_EQUAL_PASSWORD_VALUE'
+                })
               }
             }
           ]

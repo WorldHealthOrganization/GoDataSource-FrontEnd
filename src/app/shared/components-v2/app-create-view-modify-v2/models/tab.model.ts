@@ -98,7 +98,13 @@ interface ICreateViewModifyV2TabInputPassword extends Omit<ICreateViewModifyV2Ta
 
   // optional
   validators?: {
-    required?: () => boolean
+    required?: () => boolean,
+    minlength?: () => number,
+    validateOther?: () => string,
+    equalValidator?: () => {
+      input: string,
+      err: string
+    }
   };
 }
 
