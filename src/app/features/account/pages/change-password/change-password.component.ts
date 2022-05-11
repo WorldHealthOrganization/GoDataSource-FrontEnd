@@ -4,12 +4,13 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { PasswordChangeModel } from '../../../../core/models/password-change.model';
+import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-change-password',
@@ -21,19 +22,15 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
   // data
   private _passwordChange = new PasswordChangeModel();
 
-  // #TODO
-  // passwordConfirmModel: string;
-  // passwordChanged: boolean = false;
-
   /**
    * Constructor
    */
   constructor(
     protected userDataService: UserDataService,
     protected toastV2Service: ToastV2Service,
+    protected authDataService: AuthDataService,
     router: Router,
     activatedRoute: ActivatedRoute,
-    authDataService: AuthDataService,
     renderer2: Renderer2
   ) {
     // parent
@@ -141,9 +138,12 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
       // buttons
       buttons: this.initializeButtons(),
 
-      // update
-      createOrUpdate: undefined, // this.initializeProcessData(),
-      redirectAfterCreateUpdate: undefined
+      // create or update
+      createOrUpdate: this.initializeProcessData(),
+      redirectAfterCreateUpdate: () => {
+        // redirect to view
+        this.router.navigate([ '/account/my-profile' ]);
+      }
     };
   }
 
@@ -234,6 +234,71 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
   }
 
   /**
+   * Initialize process data
+   */
+  private initializeProcessData(): ICreateViewModifyV2CreateOrUpdate {
+    return (
+      _type,
+      _data,
+      finished,
+      _loading,
+      _forms
+    ) => {
+      // try to authenticate the user
+      this.userDataService
+        .changePassword(this._passwordChange)
+        .pipe(
+          catchError((err) => {
+            // show error
+            finished(err, undefined);
+
+            // finished
+            return throwError(err);
+          })
+        )
+        .subscribe(() => {
+          // refresh user information
+          const refreshUserAndShowMessage = () => {
+            this.authDataService
+              .reloadAndPersistAuthUser()
+              .subscribe((_authenticatedUser) => {
+                // #TODO
+                // in case user was forced to change password, then we don't need to redirect him since he has to set security questions
+                // const redirect: boolean = !this.authUser.passwordChange;
+
+                // update user settings
+                // this.authUser = authenticatedUser.user;
+
+                // display message
+                this.toastV2Service.success('LNG_PAGE_CHANGE_PASSWORD_ACTION_CHANGE_PASSWORD_SUCCESS_MESSAGE');
+
+                // redirect
+                finished(undefined, null);
+              });
+          };
+
+          // check if user was required to change password
+          if (this.authUser.passwordChange) {
+            // update user details so next time it's not required to change its password again
+            this.userDataService
+              .modifyUser(this.authUser.id, { passwordChange: false })
+              .subscribe(() => {
+                // refresh user data
+                refreshUserAndShowMessage();
+
+                // #TODO
+                // set passwordChanged to true so we can display the security questions notification.
+                // this.passwordChanged = true;
+              });
+          } else {
+            // refresh user data
+            refreshUserAndShowMessage();
+          }
+        });
+    };
+  }
+
+  /**
    * Initialize expand list column renderer fields
    */
   protected initializeExpandListColumnRenderer(): void {}
@@ -252,62 +317,4 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
    * Refresh expand list
    */
   refreshExpandList(): void {}
-
-  // #TODO
-//   changePassword(form: NgForm) {
-//     if (form.valid) {
-//       const dirtyFields: any[] = form.value;
-//
-//       const data = this.modelHelperService.getModelInstance(PasswordChangeModel, dirtyFields);
-//
-//       // try to authenticate the user
-//       this.userDataService
-//         .changePassword(data)
-//         .pipe(
-//           catchError((err) => {
-//             this.toastV2Service.error(err);
-//             return throwError(err);
-//           })
-//         )
-//         .subscribe(() => {
-//           const refreshUserAndShowMessage = () => {
-//             this.authDataService
-//               .reloadAndPersistAuthUser()
-//               .subscribe((authenticatedUser) => {
-//                 // in case user was forced to change password, then we don't need to redirect him since he has to set security questions
-//                 const redirect: boolean = !this.authUser.passwordChange;
-//
-//                 // update user settings
-//                 this.authUser = authenticatedUser.user;
-//
-//                 // display message
-//                 this.toastV2Service.success('LNG_PAGE_CHANGE_PASSWORD_ACTION_CHANGE_PASSWORD_SUCCESS_MESSAGE');
-//
-//                 // refresh page
-//                 if (redirect) {
-//                   this.router.navigate(['/']);
-//                 }
-//               });
-//           };
-//
-//           // check if user was required to change password
-//           if (this.authUser.passwordChange) {
-//             // update user details so next time it's not required to change its password again
-//             this.userDataService
-//               .modifyUser(this.authUser.id, { passwordChange: false })
-//               .subscribe(() => {
-//                 // refresh user data
-//                 refreshUserAndShowMessage();
-//                 // set passwordChanged to true so we can display the security questions notification.
-//                 this.passwordChanged = true;
-//
-//               });
-//           } else {
-//             // refresh user data
-//             refreshUserAndShowMessage();
-//           }
-//
-//         });
-//     }
-//   }
 }
