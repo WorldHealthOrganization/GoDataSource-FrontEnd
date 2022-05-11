@@ -37,8 +37,7 @@ export class LabProgressDataResolver implements IMapResolverV2<ILabelValuePairMo
             // add option
             response.options.push({
               label: item.value,
-              value: item.id,
-              iconUrl: item.iconUrl,
+              value: item.value,
               data: item
             });
           });
