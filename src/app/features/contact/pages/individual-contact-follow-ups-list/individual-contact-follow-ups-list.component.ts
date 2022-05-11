@@ -1,5 +1,5 @@
 import { Component, OnDestroy, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import { Observable, of } from 'rxjs';
@@ -21,13 +21,10 @@ import { UserModel } from '../../../../core/models/user.model';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { TeamDataService } from '../../../../core/services/data/team.data.service';
-import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
+import { ExportDataExtension, ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
@@ -37,8 +34,8 @@ import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v
 import { V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputToggle, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import { FollowUpsListComponent } from '../../helper-classes/follow-ups-list-component';
 import { FollowUpPage } from '../../typings/follow-up-page';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
 
 @Component({
   selector: 'app-individual-contact-follow-ups-list',
@@ -46,48 +43,43 @@ import { FollowUpPage } from '../../typings/follow-up-page';
   templateUrl: './individual-contact-follow-ups-list.component.html',
   styleUrls: ['./individual-contact-follow-ups-list.component.less']
 })
-export class IndividualContactFollowUpsListComponent extends FollowUpsListComponent implements OnDestroy {
-  // follow ups list
+export class IndividualContactFollowUpsListComponent extends ListComponent implements OnDestroy {
+  // follow-ups
   followUpsList$: Observable<FollowUpModel[]>;
 
+  // data
   entityId: string;
   entityData: ContactModel | CaseModel;
-  isContact: boolean = true;
+  isContact: boolean;
 
   // which follow-ups list page are we visiting?
   rootPage: FollowUpPage = FollowUpPage.FOR_CONTACT;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
-    protected dialogService: DialogService,
     protected followUpsDataService: FollowUpsDataService,
-    protected router: Router,
     protected i18nService: I18nService,
-    protected teamDataService: TeamDataService,
     protected outbreakDataService: OutbreakDataService,
-    protected userDataService: UserDataService,
     private toastV2Service: ToastV2Service,
     private route: ActivatedRoute,
     private locationDataService: LocationDataService,
     private dialogV2Service: DialogV2Service
   ) {
-    super(
-      listHelperService, dialogService, followUpsDataService,
-      router, i18nService, teamDataService, outbreakDataService, userDataService
-    );
+    // parent
+    super(listHelperService);
 
+    // data
     this.entityData = this.route.snapshot.data.entityData;
     this.entityId = this.route.snapshot.data.entityData.id;
-
-    // check model
-    if (this.entityData.type === EntityType.CASE) {
-      this.isContact = false;
+    this.isContact = this.entityData.type === EntityType.CONTACT;
+    if (!this.isContact) {
       this.rootPage = undefined;
     }
 
+    // additional information
     this.suffixLegends = [
       {
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
@@ -105,7 +97,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
@@ -117,10 +109,6 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
 
     // ...and re-load the list when the Selected Outbreak is changed
     this.needsRefreshList(true);
-
-    // initialize print and export
-    this.initializeFollowUpsExport();
-    this.initializeFollowUpsPrint();
   }
 
   /**
@@ -172,7 +160,6 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
       {
         field: 'statusId',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
-        sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
           options: (this.route.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
@@ -184,9 +171,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         sortable: true,
         format: {
           type: (item: FollowUpModel) => {
-            return item &&
-              item.id &&
-              item.targeted ?
+            return item && item.id && item.targeted ?
               this.i18nService.instant('LNG_COMMON_LABEL_YES') :
               this.i18nService.instant('LNG_COMMON_LABEL_NO');
           }
@@ -647,26 +632,6 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                 }
               },
 
-              // Modify follow-up questionnaire
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MODIFY_QUESTIONNAIRE'
-                },
-                action: {
-                  click: (item: FollowUpModel) => {
-                    // TODO: Dialog needs questionnaire component
-                    this.modifyQuestionnaire(item);
-                  }
-                },
-                visible: (item: FollowUpModel): boolean => {
-                  return !item.deleted &&
-                    this.isContact &&
-                    this.selectedOutbreakIsActive &&
-                    FollowUpModel.canModify(this.authUser) &&
-                    !Constants.isDateInTheFuture(item.date);
-                }
-              },
-
               // Change targeted
               {
                 label: {
@@ -835,7 +800,6 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
       }
     ];
 
-
     // allowed to filter by responsible user ?
     if (UserModel.canList(this.authUser)) {
       this.advancedFilters.push(
@@ -874,10 +838,10 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
                     get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_TITLE'
                   },
                   export: {
-                    url: this.printFollowUpsUrl,
+                    url: `outbreaks/${this.selectedOutbreak.id}/contacts/daily-followup-form/export`,
                     async: false,
                     method: ExportDataMethod.GET,
-                    fileName: this.printFollowUpsFileName,
+                    fileName: this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME'),
                     queryBuilder: this.queryBuilder,
                     allow: {
                       types: [ExportDataExtension.PDF]
@@ -929,69 +893,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
           },
           action: {
             click: () => {
-              this.dialogV2Service
-                .showExportDataAfterLoadingData({
-                  title: {
-                    get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE'
-                  },
-                  load: (finished) => {
-                    // retrieve the list of export fields groups for model
-                    this.outbreakDataService
-                      .getExportFieldsGroups(ExportFieldsGroupModelNameEnum.FOLLOWUP)
-                      .pipe(
-                        // handle errors
-                        catchError((err) => {
-                          // show error
-                          this.toastV2Service.error(err);
-
-                          // send error further
-                          return throwError(err);
-                        }),
-
-                        // should be the last pipe
-                        takeUntil(this.destroyed$)
-                      )
-                      .subscribe((fieldsGroupList) => {
-                        // set groups
-                        const followUpFieldGroups: ILabelValuePairModel[] = fieldsGroupList.options.map((item) => ({
-                          label: item.name,
-                          value: item.name
-                        }));
-
-                        // group restrictions
-                        const followUpFieldGroupsRequires: IV2ExportDataConfigGroupsRequired = fieldsGroupList.toRequiredList();
-
-                        // show export
-                        finished({
-                          title: {
-                            get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE'
-                          },
-                          export: {
-                            url: this.exportFollowUpsUrl,
-                            async: true,
-                            method: ExportDataMethod.POST,
-                            fileName: this.followUpsDataExportFileName,
-                            queryBuilder: this.queryBuilder,
-                            allow: {
-                              types: this.allowedExportTypes,
-                              encrypt: true,
-                              anonymize: {
-                                fields: this.anonymizeFields
-                              },
-                              groups: {
-                                fields: followUpFieldGroups,
-                                required: followUpFieldGroupsRequires
-                              },
-                              dbColumns: true,
-                              dbValues: true,
-                              jsonReplaceUndefinedWithNull: true,
-                              questionnaireVariables: true
-                            }
-                          }
-                        });
-                      });
-                  }
-                });
+              this.exportFollowUps(this.queryBuilder);
             }
           },
           visible: (): boolean => {
@@ -1046,70 +948,8 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
               null
             );
 
-            // show export dialog
-            this.dialogV2Service
-              .showExportDataAfterLoadingData({
-                title: {
-                  get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE'
-                },
-                load: (finished) => {
-                  // retrieve the list of export fields groups for model
-                  this.outbreakDataService
-                    .getExportFieldsGroups(ExportFieldsGroupModelNameEnum.FOLLOWUP)
-                    .pipe(
-                      // handle errors
-                      catchError((err) => {
-                        // show error
-                        this.toastV2Service.error(err);
-
-                        // send error further
-                        return throwError(err);
-                      }),
-
-                      // should be the last pipe
-                      takeUntil(this.destroyed$)
-                    )
-                    .subscribe((fieldsGroupList) => {
-                      // set groups
-                      const followUpFieldGroups: ILabelValuePairModel[] = fieldsGroupList.options.map((item) => ({
-                        label: item.name,
-                        value: item.name
-                      }));
-
-                      // group restrictions
-                      const followUpFieldGroupsRequires: IV2ExportDataConfigGroupsRequired = fieldsGroupList.toRequiredList();
-
-                      // show export
-                      finished({
-                        title: {
-                          get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE'
-                        },
-                        export: {
-                          url: this.exportFollowUpsUrl,
-                          async: true,
-                          method: ExportDataMethod.POST,
-                          fileName: this.followUpsDataExportFileName,
-                          queryBuilder: qb,
-                          allow: {
-                            types: this.allowedExportTypes,
-                            encrypt: true,
-                            anonymize: {
-                              fields: this.anonymizeFields
-                            },
-                            groups: {
-                              fields: followUpFieldGroups,
-                              required: followUpFieldGroupsRequires
-                            },
-                            dbColumns: true,
-                            dbValues: true,
-                            jsonReplaceUndefinedWithNull: true,
-                            questionnaireVariables: true
-                          }
-                        }
-                      });
-                    });
-                }
-              });
+            // export
+            this.exportFollowUps(qb);
           }
         },
         visible: (): boolean => {
@@ -1272,7 +1112,8 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
         link: (): string[] => ['/contacts', this.entityData?.id, 'follow-ups', 'create']
       },
       visible: (): boolean => {
-        return FollowUpModel.canCreate(this.authUser);
+        return this.isContact &&
+          FollowUpModel.canCreate(this.authUser);
       }
     };
   }
@@ -1319,16 +1160,21 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
     }
 
     // add record data ?
-    if (this.isContact) {
-      if (this.entityData &&
-        CaseModel.canView(this.authUser)) {
-        this.breadcrumbs.push({
-          label: this.entityData.name,
-          action: {
-            link: [this.isContact ? `/contacts/${ this.entityData.id }/view` : `/cases/${ this.entityData.id }/view`]
-          }
-        });
-      }
+    if (
+      this.entityData && (
+        (
+          this.isContact &&
+            ContactModel.canView(this.authUser)
+        ) ||
+        CaseModel.canView(this.authUser)
+      )
+    ) {
+      this.breadcrumbs.push({
+        label: this.entityData.name,
+        action: {
+          link: [this.isContact ? `/contacts/${ this.entityData.id }/view` : `/cases/${ this.entityData.id }/view`]
+        }
+      });
     }
 
     // add follow-ups breadcrumbs
@@ -1369,7 +1215,7 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
   refreshList() {
     if (
       this.selectedOutbreak &&
-            this.entityId
+      this.entityId
     ) {
       // add contact id
       this.queryBuilder.filter.byEquality(
@@ -1470,12 +1316,12 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
   }
 
   /**
-     * Get total number of items, based on the applied filters
-     */
+   * Get total number of items, based on the applied filters
+   */
   refreshListCount(applyHasMoreLimit?: boolean) {
     if (
       this.selectedOutbreak &&
-            this.entityId
+      this.entityId
     ) {
       // set apply value
       if (applyHasMoreLimit !== undefined) {
@@ -1521,5 +1367,101 @@ export class IndividualContactFollowUpsListComponent extends FollowUpsListCompon
           this.pageCount = response;
         });
     }
+  }
+
+  /**
+   * Export follow-ups
+   */
+  private exportFollowUps(qb: RequestQueryBuilder): void {
+    this.dialogV2Service
+      .showExportDataAfterLoadingData({
+        title: {
+          get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE'
+        },
+        load: (finished) => {
+          // retrieve the list of export fields groups for model
+          this.outbreakDataService
+            .getExportFieldsGroups(ExportFieldsGroupModelNameEnum.FOLLOWUP)
+            .pipe(
+              // handle errors
+              catchError((err) => {
+                // show error
+                this.toastV2Service.error(err);
+
+                // send error further
+                return throwError(err);
+              }),
+
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            )
+            .subscribe((fieldsGroupList) => {
+              // set groups
+              const followUpFieldGroups: ILabelValuePairModel[] = fieldsGroupList.options.map((item) => ({
+                label: item.name,
+                value: item.name
+              }));
+
+              // group restrictions
+              const followUpFieldGroupsRequires: IV2ExportDataConfigGroupsRequired = fieldsGroupList.toRequiredList();
+
+              // show export
+              finished({
+                title: {
+                  get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_TITLE'
+                },
+                export: {
+                  url: `outbreaks/${this.selectedOutbreak.id}/follow-ups/export`,
+                  async: true,
+                  method: ExportDataMethod.POST,
+                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_TITLE')} - ${moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)}`,
+                  queryBuilder: qb,
+                  allow: {
+                    types: [
+                      ExportDataExtension.CSV,
+                      ExportDataExtension.XLS,
+                      ExportDataExtension.XLSX,
+                      ExportDataExtension.JSON,
+                      ExportDataExtension.ODS,
+                      ExportDataExtension.PDF
+                    ],
+                    encrypt: true,
+                    anonymize: {
+                      fields: [
+                        { label: 'LNG_FOLLOW_UP_FIELD_LABEL_ID', value: 'id' },
+                        { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT', value: 'contact' },
+                        { label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE', value: 'date' },
+                        { label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS', value: 'address' },
+                        { label: 'LNG_FOLLOW_UP_FIELD_LABEL_FILL_LOCATION', value: 'fillLocation' },
+                        { label: 'LNG_FOLLOW_UP_FIELD_LABEL_INDEX', value: 'index' },
+                        { label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM', value: 'teamId' },
+                        { label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUSID', value: 'statusId' },
+                        { label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED', value: 'targeted' },
+                        { label: 'LNG_FOLLOW_UP_FIELD_LABEL_COMMENT', value: 'comment' },
+                        { label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUserId' },
+                        { label: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value: 'questionnaireAnswers' },
+                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
+                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
+                      ]
+                    },
+                    groups: {
+                      fields: followUpFieldGroups,
+                      required: followUpFieldGroupsRequires
+                    },
+                    dbColumns: true,
+                    dbValues: true,
+                    jsonReplaceUndefinedWithNull: true,
+                    questionnaireVariables: true
+                  }
+                }
+              });
+            });
+        }
+      });
   }
 }

@@ -20,7 +20,7 @@ import { VaccineDataResolver } from './../../core/services/resolvers/data/vaccin
 import * as fromPages from './pages';
 
 // Follow-ups list from a - contact / case
-const viewFolowUpsListFoundation: Route = {
+const viewFollowUpsListFoundation: Route = {
   component: fromPages.IndividualContactFollowUpsListComponent,
   canActivate: [AuthGuard],
   resolve: {
@@ -33,7 +33,7 @@ const viewFolowUpsListFoundation: Route = {
   }
 };
 
-
+// routes
 const routes: Routes = [
   // Contact list
   {
@@ -218,7 +218,7 @@ const routes: Routes = [
   // Follow-ups list from a contact
   {
     path: 'contact-related-follow-ups/:contactId',
-    ...viewFolowUpsListFoundation,
+    ...viewFollowUpsListFoundation,
     data: {
       permissions: [
         PERMISSION.FOLLOW_UP_LIST
@@ -228,7 +228,7 @@ const routes: Routes = [
   // Follow-ups list from a case
   {
     path: 'case-follow-ups/:caseId',
-    ...viewFolowUpsListFoundation,
+    ...viewFollowUpsListFoundation,
     data: {
       permissions: [
         PERMISSION.FOLLOW_UP_LIST

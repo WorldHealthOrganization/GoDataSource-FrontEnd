@@ -21,11 +21,10 @@ import { EventDataService } from '../../../../core/services/data/event.data.serv
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
+import { ExportDataExtension, ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';

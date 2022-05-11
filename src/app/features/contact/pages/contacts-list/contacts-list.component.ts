@@ -14,7 +14,6 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { ExportFieldsGroupModelNameEnum } from '../../../../core/models/export-fields-group.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { LocationModel } from '../../../../core/models/location.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -25,11 +24,10 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
+import { ExportDataExtension, ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
@@ -53,75 +51,75 @@ export class ContactsListComponent
   contactsList$: Observable<ContactModel[]>;
 
   // anonymize fields
-  anonymizeFields: LabelValuePair[] = [
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_ID', 'id'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_FIRST_NAME', 'firstName'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME', 'middleName'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_LAST_NAME', 'lastName'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_GENDER', 'gender'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER', 'phoneNumber'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_OCCUPATION', 'occupation'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH', 'dob'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_AGE', 'age'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DOCUMENTS', 'documents'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_ADDRESSES', 'addresses'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_RISK_LEVEL', 'riskLevel'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_RISK_REASON', 'riskReason'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_TYPE', 'type'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING', 'dateOfReporting'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', 'isDateOfReportingApproximate'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', 'createdAt'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', 'createdBy'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', 'updatedAt'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', 'updatedBy'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_DELETED', 'deleted'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', 'deletedAt'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', 'createdOn'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_VISUAL_ID', 'visualId'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_CLASSIFICATION', 'classification'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_WAS_CASE', 'wasCase'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_WAS_CONTACT', 'wasContact'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT', 'dateBecomeContact'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_OUTCOME_ID', 'outcomeId'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME', 'dateOfOutcome'),
-    new LabelValuePair('LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED', 'transferRefused'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_SAFE_BURIAL', 'safeBurial'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_BURIAL', 'dateOfBurial'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_FOLLOW_UP', 'followUp'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT', 'dateOfLastContact'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES', 'numberOfExposures'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS', 'numberOfContacts'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED', 'vaccinesReceived'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS', 'pregnancyStatus'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_RELATIONSHIP', 'relationship'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID', 'followUpTeamId'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID', 'responsibleUserId'),
-    new LabelValuePair('LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', 'questionnaireAnswers')
+  anonymizeFields: ILabelValuePairModel[] = [
+    { label: 'LNG_CONTACT_FIELD_LABEL_ID', value: 'id' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME', value: 'firstName' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME', value: 'middleName' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME', value: 'lastName' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_GENDER', value: 'gender' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER', value: 'phoneNumber' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION', value: 'occupation' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH', value: 'dob' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_AGE', value: 'age' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_DOCUMENTS', value: 'documents' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_ADDRESSES', value: 'addresses' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL', value: 'riskLevel' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_RISK_REASON', value: 'riskReason' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_TYPE', value: 'type' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING', value: 'dateOfReporting' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', value: 'isDateOfReportingApproximate' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID', value: 'visualId' },
+    { label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION', value: 'classification' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE', value: 'wasCase' },
+    { label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT', value: 'wasContact' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT', value: 'dateBecomeContact' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_OUTCOME_ID', value: 'outcomeId' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_OUTCOME', value: 'dateOfOutcome' },
+    { label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED', value: 'transferRefused' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_SAFE_BURIAL', value: 'safeBurial' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BURIAL', value: 'dateOfBurial' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP', value: 'followUp' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT', value: 'dateOfLastContact' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES', value: 'numberOfExposures' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS', value: 'numberOfContacts' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED', value: 'vaccinesReceived' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS', value: 'pregnancyStatus' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP', value: 'relationship' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID', value: 'followUpTeamId' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUserId' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value: 'questionnaireAnswers' }
   ];
 
   // relationship anonymize fields
-  relationshipAnonymizeFields: LabelValuePair[] = [
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_ID', 'id'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_SOURCE', 'sourcePerson'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_TARGET', 'targetPerson'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT', 'dateOfFirstContact'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE', 'contactDate'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED', 'contactDateEstimated'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL', 'certaintyLevelId'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE', 'exposureTypeId'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY', 'exposureFrequencyId'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION', 'exposureDurationId'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_RELATION', 'socialRelationshipTypeId'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL', 'socialRelationshipDetail'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER', 'clusterId'),
-    new LabelValuePair('LNG_RELATIONSHIP_FIELD_LABEL_COMMENT', 'comment'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', 'createdAt'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', 'createdBy'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', 'updatedAt'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', 'updatedBy'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_DELETED', 'deleted'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', 'deletedAt'),
-    new LabelValuePair('LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', 'createdOn')
+  relationshipAnonymizeFields: ILabelValuePairModel[] = [
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_ID', value: 'id' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_SOURCE', value: 'sourcePerson' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_TARGET', value: 'targetPerson' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT', value: 'dateOfFirstContact' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE', value: 'contactDate' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED', value: 'contactDateEstimated' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL', value: 'certaintyLevelId' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE', value: 'exposureTypeId' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY', value: 'exposureFrequencyId' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION', value: 'exposureDurationId' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION', value: 'socialRelationshipTypeId' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL', value: 'socialRelationshipDetail' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER', value: 'clusterId' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT', value: 'comment' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
   ];
 
   /**
