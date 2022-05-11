@@ -1,5 +1,5 @@
 import { ModuleWithProviders } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { Route, RouterModule, Routes } from '@angular/router';
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PERMISSION } from '../../core/models/permission.model';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
@@ -8,6 +8,7 @@ import { DailyFollowUpStatusDataResolver } from '../../core/services/resolvers/d
 import { FinalFollowUpStatusDataResolver } from '../../core/services/resolvers/data/final-follow-up-status.resolver';
 import { GenderDataResolver } from '../../core/services/resolvers/data/gender.resolver';
 import { OccupationDataResolver } from '../../core/services/resolvers/data/occupation.resolver';
+import { PersonDataResolver } from '../../core/services/resolvers/data/person.resolver';
 import { PregnancyStatusDataResolver } from '../../core/services/resolvers/data/pregnancy-status.resolver';
 import { RiskDataResolver } from '../../core/services/resolvers/data/risk.resolver';
 import { TeamDataResolver } from '../../core/services/resolvers/data/team.resolver';
@@ -17,6 +18,21 @@ import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.res
 import { VaccineStatusDataResolver } from './../../core/services/resolvers/data/vaccine-status.resolver';
 import { VaccineDataResolver } from './../../core/services/resolvers/data/vaccine.resolver';
 import * as fromPages from './pages';
+
+// Follow-ups list from a - contact / case
+const viewFolowUpsListFoundation: Route = {
+  component: fromPages.IndividualContactFollowUpsListComponent,
+  canActivate: [AuthGuard],
+  resolve: {
+    yesNoAll: YesNoAllDataResolver,
+    team: TeamDataResolver,
+    dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
+    user: UserDataResolver,
+    entityData: PersonDataResolver,
+    yesNo: YesNoDataResolver
+  }
+};
+
 
 const routes: Routes = [
   // Contact list
@@ -202,8 +218,7 @@ const routes: Routes = [
   // Follow-ups list from a contact
   {
     path: 'contact-related-follow-ups/:contactId',
-    component: fromPages.IndividualContactFollowUpsListComponent,
-    canActivate: [AuthGuard],
+    ...viewFolowUpsListFoundation,
     data: {
       permissions: [
         PERMISSION.FOLLOW_UP_LIST
@@ -213,8 +228,7 @@ const routes: Routes = [
   // Follow-ups list from a case
   {
     path: 'case-follow-ups/:caseId',
-    component: fromPages.IndividualContactFollowUpsListComponent,
-    canActivate: [AuthGuard],
+    ...viewFolowUpsListFoundation,
     data: {
       permissions: [
         PERMISSION.FOLLOW_UP_LIST
