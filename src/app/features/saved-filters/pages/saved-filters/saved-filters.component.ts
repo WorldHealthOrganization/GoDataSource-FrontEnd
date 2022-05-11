@@ -237,6 +237,16 @@ export class SavedFiltersComponent extends ListComponent implements OnDestroy {
                 }
               },
 
+              // Divider
+              {
+                visible: (item: SavedFilterModel): boolean => {
+                  return !item.readOnly || (
+                    SavedFilterModel.canDelete(this.authUser) &&
+                    SavedFilterModel.canModify(this.authUser)
+                  );
+                }
+              },
+
               // Change Public
               {
                 label: {
