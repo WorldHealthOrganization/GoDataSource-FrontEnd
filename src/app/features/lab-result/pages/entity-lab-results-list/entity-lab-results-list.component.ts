@@ -357,6 +357,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
     return [
       'id',
       'personId',
+      'personType',
       'sampleIdentifier',
       'dateSampleTaken',
       'dateSampleDelivered',

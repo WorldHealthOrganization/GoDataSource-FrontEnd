@@ -483,7 +483,7 @@ export class EntityLabResultService {
                 }
               },
 
-              // Restore a deleted case
+              // Restore
               {
                 label: {
                   get: () => 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT'
