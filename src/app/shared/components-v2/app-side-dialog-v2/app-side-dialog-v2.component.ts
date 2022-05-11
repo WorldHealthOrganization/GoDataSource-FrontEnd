@@ -641,9 +641,13 @@ export class AppSideDialogV2Component implements OnDestroy {
           }
 
           // set comparator options
-          filterItem.comparator.options = filterOption ?
-            V2AdvancedFilterComparatorOptions[filterOption.type] :
-            [];
+          if (filterOption.allowedComparators?.length > 0) {
+            filterItem.comparator.options = filterOption.allowedComparators;
+          } else {
+            filterItem.comparator.options = filterOption ?
+              V2AdvancedFilterComparatorOptions[filterOption.type] :
+              [];
+          }
         }
       },
 

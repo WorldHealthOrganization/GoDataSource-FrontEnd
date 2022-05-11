@@ -256,6 +256,7 @@ interface IV2AdvancedFilterBase {
   relationshipPath?: string[];
   relationshipLabel?: string;
   flagIt?: boolean;
+  allowedComparators?: ILabelValuePairModel[];
   extraConditions?: RequestQueryBuilder;
   childQueryBuilderKey?: string;
   sortable?: boolean;

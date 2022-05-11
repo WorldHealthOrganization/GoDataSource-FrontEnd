@@ -29,7 +29,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputToggle, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
@@ -48,7 +48,6 @@ export class IndividualContactFollowUpsListComponent extends ListComponent imple
   followUpsList$: Observable<FollowUpModel[]>;
 
   // data
-  entityId: string;
   entityData: ContactModel | CaseModel;
   isContact: boolean;
 
@@ -73,7 +72,6 @@ export class IndividualContactFollowUpsListComponent extends ListComponent imple
 
     // data
     this.entityData = this.route.snapshot.data.entityData;
-    this.entityId = this.route.snapshot.data.entityData.id;
     this.isContact = this.entityData.type === EntityType.CONTACT;
     if (!this.isContact) {
       this.rootPage = undefined;
@@ -772,26 +770,24 @@ export class IndividualContactFollowUpsListComponent extends ListComponent imple
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
         options: (this.route.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
       },
-      // TODO: allowedComparators needs to be implemented
-      // {
-      //   type: V2AdvancedFilterType.NUMBER,
-      //   field: 'weekNumber',
-      //   label: 'LNG_FOLLOW_UP_FIELD_LABEL_WEEK_NUMBER',
-      //   allowedComparators: [
-      //     _.find(AppliedFilterModel.allowedComparators[FilterType.NUMBER], { value: FilterComparator.IS })
-      //   ],
-      //   flagIt: true
-      // },
-      // {
-      //   type: V2AdvancedFilterType.DATE,
-      //   field: 'timeLastSeen',
-      //   label: 'LNG_FOLLOW_UP_FIELD_LABEL_TIME_FILTER',
-      //   allowedComparators: [
-      //     _.find(AppliedFilterModel.allowedComparators[FilterType.DATE], { value: FilterComparator.IS })
-      //   ],
-      //   extraConditions
-      //   flagIt: true
-      // },
+      {
+        type: V2AdvancedFilterType.NUMBER,
+        field: 'weekNumber',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_WEEK_NUMBER',
+        allowedComparators: [
+          _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.NUMBER], { value: V2AdvancedFilterComparatorType.IS })
+        ],
+        flagIt: true
+      },
+      {
+        type: V2AdvancedFilterType.DATE,
+        field: 'timeLastSeen',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_TIME_FILTER',
+        allowedComparators: [
+          _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.DATE], { value: V2AdvancedFilterComparatorType.DATE })
+        ],
+        flagIt: true
+      },
       {
         type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
         field: 'questionnaireAnswers',
@@ -856,7 +852,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent imple
                             'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_CASE_BUTTON',
                           options: [({
                             label: this.entityData.name,
-                            value: this.entityId
+                            value: this.entityData.id
                           }) as any],
                           value: this.entityData.id,
                           validators: {
@@ -1213,160 +1209,150 @@ export class IndividualContactFollowUpsListComponent extends ListComponent imple
    * Refresh list
    */
   refreshList() {
-    if (
-      this.selectedOutbreak &&
-      this.entityId
-    ) {
-      // add contact id
-      this.queryBuilder.filter.byEquality(
-        'personId',
-        this.entityId
+    // add contact id
+    this.queryBuilder.filter.byEquality(
+      'personId',
+      this.entityData.id
+    );
+
+    // make sure we always sort by something
+    // default by date asc
+    if (this.queryBuilder.sort.isEmpty()) {
+      this.queryBuilder.sort.by(
+        'date',
+        RequestSortDirection.ASC
       );
+    }
 
-      // make sure we always sort by something
-      // default by date asc
-      if (this.queryBuilder.sort.isEmpty()) {
-        this.queryBuilder.sort.by(
-          'date',
-          RequestSortDirection.ASC
-        );
-      }
+    // retrieve created user & modified user information
+    this.queryBuilder.include('createdByUser', true);
+    this.queryBuilder.include('updatedByUser', true);
 
-      // retrieve created user & modified user information
-      this.queryBuilder.include('createdByUser', true);
-      this.queryBuilder.include('updatedByUser', true);
+    // retrieve responsible user information
+    this.queryBuilder.include('responsibleUser', true);
 
-      // retrieve responsible user information
-      this.queryBuilder.include('responsibleUser', true);
-
-      // retrieve the list of Follow Ups
-      this.followUpsList$ = this.followUpsDataService
-        .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
-        .pipe(
-          switchMap((data) => {
-          // determine locations that we need to retrieve
-            const locationsIdsMap: {
-              [locationId: string]: true
-            } = {};
-            data.forEach((item) => {
-              // nothing to add ?
-              if (!item.address?.locationId) {
-                return;
-              }
-
-              // add location to list
-              locationsIdsMap[item.address.locationId] = true;
-            });
-
-            // determine ids
-            const locationIds: string[] = Object.keys(locationsIdsMap);
-
-            // nothing to retrieve ?
-            if (locationIds.length < 1) {
-              return of(data);
+    // retrieve the list of Follow Ups
+    this.followUpsList$ = this.followUpsDataService
+      .getFollowUpsList(this.selectedOutbreak.id, this.queryBuilder)
+      .pipe(
+        switchMap((data) => {
+        // determine locations that we need to retrieve
+          const locationsIdsMap: {
+            [locationId: string]: true
+          } = {};
+          data.forEach((item) => {
+            // nothing to add ?
+            if (!item.address?.locationId) {
+              return;
             }
 
-            // construct location query builder
-            const qb = new RequestQueryBuilder();
-            qb.filter.bySelect(
-              'id',
-              locationIds,
-              false,
-              null
+            // add location to list
+            locationsIdsMap[item.address.locationId] = true;
+          });
+
+          // determine ids
+          const locationIds: string[] = Object.keys(locationsIdsMap);
+
+          // nothing to retrieve ?
+          if (locationIds.length < 1) {
+            return of(data);
+          }
+
+          // construct location query builder
+          const qb = new RequestQueryBuilder();
+          qb.filter.bySelect(
+            'id',
+            locationIds,
+            false,
+            null
+          );
+
+          // retrieve locations
+          return this.locationDataService
+            .getLocationsList(qb)
+            .pipe(
+              map((locations) => {
+              // map locations
+                const locationsMap: {
+                  [locationId: string]: LocationModel
+                } = {};
+                locations.forEach((location) => {
+                  locationsMap[location.id] = location;
+                });
+
+                // set locations
+                data.forEach((item) => {
+                  item.address.location = item.address.locationId && locationsMap[item.address.locationId] ?
+                    locationsMap[item.address.locationId] :
+                    item.address.location;
+                });
+
+                // finished
+                return data;
+              })
             );
+        })
+      )
+      .pipe(
+        map((followUps: FollowUpModel[]) => {
+          return FollowUpModel.determineAlertness(
+            this.selectedOutbreak.contactFollowUpTemplate,
+            followUps
+          );
+        }),
 
-            // retrieve locations
-            return this.locationDataService
-              .getLocationsList(qb)
-              .pipe(
-                map((locations) => {
-                // map locations
-                  const locationsMap: {
-                    [locationId: string]: LocationModel
-                  } = {};
-                  locations.forEach((location) => {
-                    locationsMap[location.id] = location;
-                  });
-
-                  // set locations
-                  data.forEach((item) => {
-                    item.address.location = item.address.locationId && locationsMap[item.address.locationId] ?
-                      locationsMap[item.address.locationId] :
-                      item.address.location;
-                  });
-
-                  // finished
-                  return data;
-                })
-              );
-          })
-        )
-        .pipe(
-          map((followUps: FollowUpModel[]) => {
-            return FollowUpModel.determineAlertness(
-              this.selectedOutbreak.contactFollowUpTemplate,
-              followUps
-            );
-          }),
-
-          // should be the last pipe
-          takeUntil(this.destroyed$)
-        );
-    }
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
   }
 
   /**
    * Get total number of items, based on the applied filters
    */
   refreshListCount(applyHasMoreLimit?: boolean) {
-    if (
-      this.selectedOutbreak &&
-      this.entityId
-    ) {
-      // set apply value
-      if (applyHasMoreLimit !== undefined) {
-        this.applyHasMoreLimit = applyHasMoreLimit;
-      }
-
-      // include related people in response
-      const qb = new RequestQueryBuilder();
-      qb.merge(this.queryBuilder);
-
-      // add contact id
-      qb.filter.byEquality(
-        'personId',
-        this.entityId
-      );
-
-      // remove paginator from query builder
-      const countQueryBuilder = _.cloneDeep(qb);
-      countQueryBuilder.paginator.clear();
-      countQueryBuilder.sort.clear();
-
-      // apply has more limit
-      if (this.applyHasMoreLimit) {
-        countQueryBuilder.flag(
-          'applyHasMoreLimit',
-          true
-        );
-      }
-
-      // count
-      this.followUpsDataService
-        .getFollowUpsCount(this.selectedOutbreak.id, countQueryBuilder)
-        .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            return throwError(err);
-          }),
-
-          // should be the last pipe
-          takeUntil(this.destroyed$)
-        )
-        .subscribe((response) => {
-          this.pageCount = response;
-        });
+    // set apply value
+    if (applyHasMoreLimit !== undefined) {
+      this.applyHasMoreLimit = applyHasMoreLimit;
     }
+
+    // include related people in response
+    const qb = new RequestQueryBuilder();
+    qb.merge(this.queryBuilder);
+
+    // add contact id
+    qb.filter.byEquality(
+      'personId',
+      this.entityData.id
+    );
+
+    // remove paginator from query builder
+    const countQueryBuilder = _.cloneDeep(qb);
+    countQueryBuilder.paginator.clear();
+    countQueryBuilder.sort.clear();
+
+    // apply has more limit
+    if (this.applyHasMoreLimit) {
+      countQueryBuilder.flag(
+        'applyHasMoreLimit',
+        true
+      );
+    }
+
+    // count
+    this.followUpsDataService
+      .getFollowUpsCount(this.selectedOutbreak.id, countQueryBuilder)
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        }),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      )
+      .subscribe((response) => {
+        this.pageCount = response;
+      });
   }
 
   /**
