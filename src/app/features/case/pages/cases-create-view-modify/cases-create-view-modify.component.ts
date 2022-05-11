@@ -1249,6 +1249,13 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       queryBuilder: new RequestQueryBuilder(),
       pageIndex: 0,
       refresh: (tab) => {
+        // attach fields restrictions
+        const fields: string[] = this.entityLabResultService.refreshListFields();
+        if (fields.length > 0) {
+          tab.queryBuilder.clearFields();
+          tab.queryBuilder.fields(...fields);
+        }
+
         // refresh data
         tab.records$ = this.entityLabResultService
           .retrieveRecords(
@@ -1355,6 +1362,13 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       queryBuilder: new RequestQueryBuilder(),
       pageIndex: 0,
       refresh: (tab) => {
+        // attach fields restrictions
+        const fields: string[] = this.entityFollowUpHelperService.refreshListFields();
+        if (fields.length > 0) {
+          tab.queryBuilder.clearFields();
+          tab.queryBuilder.fields(...fields);
+        }
+
         // add contact id
         tab.queryBuilder.filter.byEquality(
           'personId',

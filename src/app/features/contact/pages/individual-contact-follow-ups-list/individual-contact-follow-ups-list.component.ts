@@ -521,25 +521,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent imple
    * Fields retrieved from api to reduce payload size
    */
   protected refreshListFields(): string[] {
-    return [
-      'id',
-      'date',
-      'teamId',
-      'statusId',
-      'targeted',
-      'index',
-      'address',
-      'responsibleUser',
-      'responsibleUserId',
-      'deleted',
-      'createdBy',
-      'createdByUser',
-      'createdAt',
-      'updatedBy',
-      'updatedByUser',
-      'updatedAt',
-      'personId'
-    ];
+    return this.entityFollowUpHelperService.refreshListFields();
   }
 
   /**

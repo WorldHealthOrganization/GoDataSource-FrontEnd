@@ -372,29 +372,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
    * Fields retrieved from api to reduce payload size
    */
   protected refreshListFields(): string[] {
-    return [
-      'id',
-      'personId',
-      'personType',
-      'sampleIdentifier',
-      'dateSampleTaken',
-      'dateSampleDelivered',
-      'dateOfResult',
-      'labName',
-      'sampleType',
-      'testType',
-      'result',
-      'status',
-      'testedFor',
-      'sequence',
-      'deleted',
-      'createdBy',
-      'createdAt',
-      'createdByUser',
-      'updatedBy',
-      'updatedAt',
-      'updatedByUser'
-    ];
+    return this.entityLabResultService.refreshListFields();
   }
 
   /**

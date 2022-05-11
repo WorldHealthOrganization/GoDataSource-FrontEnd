@@ -893,4 +893,29 @@ export class EntityFollowUpHelperService {
         })
       );
   }
+
+  /**
+   * Fields retrieved from api to reduce payload size
+   */
+  refreshListFields(): string[] {
+    return [
+      'id',
+      'date',
+      'teamId',
+      'statusId',
+      'targeted',
+      'index',
+      'address',
+      'responsibleUser',
+      'responsibleUserId',
+      'deleted',
+      'createdBy',
+      'createdByUser',
+      'createdAt',
+      'updatedBy',
+      'updatedByUser',
+      'updatedAt',
+      'personId'
+    ];
+  }
 }
