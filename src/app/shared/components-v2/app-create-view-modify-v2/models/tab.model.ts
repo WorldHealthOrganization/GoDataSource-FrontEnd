@@ -21,6 +21,7 @@ import { V2AdvancedFilter } from '../../app-list-table-v2/models/advanced-filter
 export enum CreateViewModifyV2TabInputType {
   // inputs
   TEXT,
+  PASSWORD,
   SELECT_SINGLE,
   SELECT_MULTIPLE,
   AGE_DATE_OF_BIRTH,
@@ -79,6 +80,20 @@ interface ICreateViewModifyV2TabInputBase {
 interface ICreateViewModifyV2TabInputText extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
   // required
   type: CreateViewModifyV2TabInputType.TEXT;
+  value: ICreateViewModifyV2TabInputValue<string>;
+
+  // optional
+  validators?: {
+    required?: () => boolean
+  };
+}
+
+/**
+ * Input - password
+ */
+interface ICreateViewModifyV2TabInputPassword extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
+  // required
+  type: CreateViewModifyV2TabInputType.PASSWORD;
   value: ICreateViewModifyV2TabInputValue<string>;
 
   // optional
@@ -288,10 +303,11 @@ interface ICreateViewModifyV2TabInputCenterDateRange {
 /**
  * Input
  */
-type CreateViewModifyV2TabInput = ICreateViewModifyV2TabInputText | ICreateViewModifyV2TabInputSingleSelect | ICreateViewModifyV2TabInputMultipleSelect
-| ICreateViewModifyV2TabInputToggleCheckbox | ICreateViewModifyV2TabInputLocationSingle | ICreateViewModifyV2TabInputTextArea | ICreateViewModifyV2TabInputAgeOrDOB
-| ICreateViewModifyV2TabInputVisualID | ICreateViewModifyV2TabInputDate | ICreateViewModifyV2TabInputList | ICreateViewModifyV2TabInputDocument
-| ICreateViewModifyV2TabInputAddress | ICreateViewModifyV2TabInputVaccine | ICreateViewModifyV2TabInputCenterDateRange;
+type CreateViewModifyV2TabInput = ICreateViewModifyV2TabInputText | ICreateViewModifyV2TabInputPassword | ICreateViewModifyV2TabInputSingleSelect
+| ICreateViewModifyV2TabInputMultipleSelect | ICreateViewModifyV2TabInputToggleCheckbox | ICreateViewModifyV2TabInputLocationSingle
+| ICreateViewModifyV2TabInputTextArea | ICreateViewModifyV2TabInputAgeOrDOB | ICreateViewModifyV2TabInputVisualID | ICreateViewModifyV2TabInputDate
+| ICreateViewModifyV2TabInputList | ICreateViewModifyV2TabInputDocument | ICreateViewModifyV2TabInputAddress | ICreateViewModifyV2TabInputVaccine
+| ICreateViewModifyV2TabInputCenterDateRange;
 
 /**
  * Tab section

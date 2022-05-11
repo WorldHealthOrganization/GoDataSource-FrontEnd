@@ -158,18 +158,6 @@
         [ngTemplateOutlet]="menuOption"
         [ngTemplateOutletContext]="{ link: '/account/my-profile', label: 'LNG_LAYOUT_MENU_ITEM_MY_PROFILE_LABEL' }"></ng-template>
 
-      <!-- Change password -->
-      <ng-template
-        *ngIf="UserModel.canModifyOwnAccount(authUser)"
-        [ngTemplateOutlet]="menuOption"
-        [ngTemplateOutletContext]="{ link: '/account/change-password', label: 'LNG_LAYOUT_MENU_ITEM_CHANGE_PASSWORD_LABEL' }"></ng-template>
-
-      <!-- Set security questions -->
-      <ng-template
-        *ngIf="UserModel.canModifyOwnAccount(authUser)"
-        [ngTemplateOutlet]="menuOption"
-        [ngTemplateOutletContext]="{ link: '/account/set-security-questions', label: 'LNG_LAYOUT_MENU_ITEM_SET_SECURITY_QUESTION_LABEL' }"></ng-template>
-
       <!-- Almighty divider -->
       <mat-divider></mat-divider>
 

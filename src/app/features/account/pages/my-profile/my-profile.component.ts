@@ -7,7 +7,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import { CreateViewModifyV2MenuType, CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { TranslateService } from '@ngx-translate/core';
@@ -114,14 +114,8 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
       buttons: this.initializeButtons(),
 
       // update
-      createOrUpdate: undefined, // this.initializeProcessData(),
-      redirectAfterCreateUpdate: () => {
-        // redirect to view
-        this.router.navigate([
-          '/account',
-          'my-profile'
-        ]);
-      }
+      createOrUpdate: undefined,
+      redirectAfterCreateUpdate: undefined
     };
   }
 
@@ -243,7 +237,29 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
           link: () => ['/account', 'my-profile']
         }
       },
-      quickActions: undefined
+      quickActions: {
+        options: [
+          // Change password
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_LAYOUT_MENU_ITEM_CHANGE_PASSWORD_LABEL',
+            action: {
+              link: () => ['/account/change-password']
+            },
+            visible: () => UserModel.canModifyOwnAccount(this.authUser)
+          },
+
+          // Set security questions
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_LAYOUT_MENU_ITEM_SET_SECURITY_QUESTION_LABEL',
+            action: {
+              link: () => ['/account/set-security-questions']
+            },
+            visible: () => UserModel.canModifyOwnAccount(this.authUser)
+          }
+        ]
+      }
     };
   }
 

@@ -2,7 +2,7 @@ import {
   ChangeDetectionStrategy, ChangeDetectorRef,
   Component,
   forwardRef,
-  Host,
+  Host, Input,
   OnDestroy,
   Optional,
   SkipSelf, ViewEncapsulation
@@ -26,6 +26,30 @@ import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 })
 export class AppFormPasswordV2Component
   extends AppFormBaseV2<string> implements OnDestroy {
+
+  // tooltip
+  tooltipButton: IAppFormIconButtonV2;
+  private _tooltip: string;
+  tooltipTranslated: string;
+  @Input() set tooltip(tooltip: string) {
+    // set data
+    this._tooltip = tooltip;
+
+    // translate tooltip
+    this.tooltipTranslated = this._tooltip ?
+      this.translateService.instant(this._tooltip) :
+      this._tooltip;
+
+    // add / remove tooltip icon
+    this.tooltipButton = !this.tooltipTranslated ?
+      undefined : {
+        icon: 'help',
+        tooltip: this.tooltipTranslated
+      };
+  }
+  get tooltip(): string {
+    return this._tooltip;
+  }
 
   // input type
   type: string = 'password';

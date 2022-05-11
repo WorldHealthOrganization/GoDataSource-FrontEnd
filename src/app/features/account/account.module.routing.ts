@@ -16,7 +16,8 @@ const routes: Routes = [
     data: {
       permissions: [
         PERMISSION.USER_MODIFY_OWN_ACCOUNT
-      ]
+      ],
+      action: CreateViewModifyV2Action.MODIFY
     }
   },
   {
