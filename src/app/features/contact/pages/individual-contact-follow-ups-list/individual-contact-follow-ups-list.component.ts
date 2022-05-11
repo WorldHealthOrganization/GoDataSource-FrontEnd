@@ -440,7 +440,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent imple
       label: 'LNG_COMMON_BUTTON_ADD',
       icon: 'add_circle_outline',
       action: {
-        link: (): string[] => ['/contacts', this.entityData?.id, 'follow-ups', 'create']
+        link: (): string[] => ['/contacts', this.entityData.id, 'follow-ups', 'create']
       },
       visible: (): boolean => {
         return this.entityData.type === EntityType.CONTACT &&

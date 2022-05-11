@@ -153,7 +153,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
    */
   protected initializeTableAdvancedFilters(): void {
     this.advancedFilters = this.entityLabResultService.generateAdvancedFilters({
-      caseInvestigationTemplate: () => this.selectedOutbreak.caseInvestigationTemplate,
+      labResultsTemplate: () => this.selectedOutbreak.labResultsTemplate,
       options: {
         labName: (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         labSampleType: (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,

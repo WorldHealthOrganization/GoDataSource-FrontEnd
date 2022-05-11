@@ -575,7 +575,7 @@ export class EntityLabResultService {
    * Advanced filters
    */
   generateAdvancedFilters(data: {
-    caseInvestigationTemplate: () => QuestionModel[],
+    labResultsTemplate: () => QuestionModel[],
     options: {
       labName: ILabelValuePairModel[],
       labSampleType: ILabelValuePairModel[],
@@ -715,7 +715,7 @@ export class EntityLabResultService {
         type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
         field: 'questionnaireAnswers',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-        template: data.caseInvestigationTemplate
+        template: data.labResultsTemplate
       }
     ];
 
