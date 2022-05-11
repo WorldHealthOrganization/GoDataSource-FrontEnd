@@ -77,7 +77,27 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   };
 
   // tabs to render
-  @Input() tabData: ICreateViewModifyV2;
+  private _tabData: ICreateViewModifyV2;
+  @Input() set tabData(tabData: ICreateViewModifyV2) {
+    // set data
+    this._tabData = tabData;
+
+    // set update ui methods
+    (this.tabData?.tabs || []).forEach((tab) => {
+      // not important ?
+      if (tab.type !== CreateViewModifyV2TabInputType.TAB_TABLE) {
+        return;
+      }
+
+      // attach update ui method
+      tab.updateUI = () => {
+        this.detectChanges();
+      };
+    });
+  }
+  get tabData(): ICreateViewModifyV2 {
+    return this._tabData;
+  }
 
   // age - dob options
   ageDOBOptions: ILabelValuePairModel[] = [
@@ -837,9 +857,6 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
       tab.previousRefreshRequest = setTimeout(() => {
         // refresh
         tab.refresh(tab);
-
-        // update ui
-        this.detectChanges();
       }, Constants.DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS);
     }
   }

@@ -1040,6 +1040,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
         // count
         tab.refreshCount(tab);
+
+        // update ui
+        tab.updateUI();
       },
       refreshCount: (
         tab,
@@ -1148,6 +1151,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
         // count
         tab.refreshCount(tab);
+
+        // update ui
+        tab.updateUI();
       },
       refreshCount: (
         tab,
@@ -1258,6 +1264,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
         // count
         tab.refreshCount(tab);
+
+        // update ui
+        tab.updateUI();
       },
       refreshCount: (
         tab,
@@ -1374,6 +1383,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
         // count
         tab.refreshCount(tab);
+
+        // update ui
+        tab.updateUI();
       },
       refreshCount: (
         tab,

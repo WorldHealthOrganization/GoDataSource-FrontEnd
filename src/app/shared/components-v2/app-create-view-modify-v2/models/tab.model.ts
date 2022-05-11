@@ -338,6 +338,7 @@ export interface ICreateViewModifyV2TabTable {
   visible?: () => boolean
 
   // used by ui
+  updateUI?: () => void;
   records$?: Observable<any[]>;
   queryBuilder?: RequestQueryBuilder;
   applyHasMoreLimit?: boolean;
