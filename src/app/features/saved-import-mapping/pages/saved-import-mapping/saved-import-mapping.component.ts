@@ -24,11 +24,12 @@ import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputToggle, V2SideDi
   templateUrl: './saved-import-mapping.component.html'
 })
 export class SavedImportMappingComponent extends ListComponent implements OnDestroy {
+  // data
   savedImportMappingsList$: Observable<SavedImportMappingModel[]>;
 
   /**
-  * Constructor
-  */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     private toastV2Service: ToastV2Service,
@@ -40,16 +41,16 @@ export class SavedImportMappingComponent extends ListComponent implements OnDest
   }
 
   /**
-  * Release resources
-  */
+   * Release resources
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
   }
 
   /**
-  * Component initialized
-  */
+   * Component initialized
+   */
   initialized(): void {
     // initialize pagination
     this.initPaginator();
@@ -58,10 +59,9 @@ export class SavedImportMappingComponent extends ListComponent implements OnDest
     this.needsRefreshList(true);
   }
 
-
   /**
-  * Initialize Side Table Columns
-  */
+   * Initialize Side Table Columns
+   */
   protected initializeTableColumns(): void {
     this.tableColumns = [
       {
