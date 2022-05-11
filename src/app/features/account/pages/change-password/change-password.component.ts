@@ -11,6 +11,8 @@ import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateView
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { PasswordChangeModel } from '../../../../core/models/password-change.model';
 import { catchError } from 'rxjs/operators';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 
 @Component({
   selector: 'app-change-password',
@@ -29,6 +31,7 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
     protected userDataService: UserDataService,
     protected toastV2Service: ToastV2Service,
     protected authDataService: AuthDataService,
+    protected dialogV2Service: DialogV2Service,
     router: Router,
     activatedRoute: ActivatedRoute,
     renderer2: Renderer2
@@ -241,8 +244,8 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
       _type,
       _data,
       finished,
-      _loading,
-      _forms
+      loading,
+      forms
     ) => {
       // try to authenticate the user
       this.userDataService
@@ -258,22 +261,50 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
         )
         .subscribe(() => {
           // refresh user information
-          const refreshUserAndShowMessage = () => {
+          const refreshUserAndShowMessage = (askForSecurityQuestions: boolean) => {
             this.authDataService
               .reloadAndPersistAuthUser()
               .subscribe((_authenticatedUser) => {
-                // #TODO
-                // in case user was forced to change password, then we don't need to redirect him since he has to set security questions
-                // const redirect: boolean = !this.authUser.passwordChange;
-
-                // update user settings
-                // this.authUser = authenticatedUser.user;
-
                 // display message
                 this.toastV2Service.success('LNG_PAGE_CHANGE_PASSWORD_ACTION_CHANGE_PASSWORD_SUCCESS_MESSAGE');
 
                 // redirect
-                finished(undefined, null);
+                if (!askForSecurityQuestions) {
+                  // hide loading & redirect
+                  finished(undefined, null);
+                } else {
+                  // mark pristine
+                  forms.markFormsAsPristine();
+
+                  // hide loading
+                  loading.hide();
+
+                  // ask what to do next
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
+                      },
+                      message: {
+                        get: () => 'LNG_PAGE_CHANGE_PASSWORD_SECURITY_QUESTIONS_NOTIFICATION'
+                      }
+                    },
+                    yesLabel: 'LNG_PAGE_CHANGE_PASSWORD_SECURITY_QUESTIONS_BUTTON',
+                    cancelLabel: 'LNG_PAGE_CHANGE_PASSWORD_LATER_BUTTON'
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // redirect to profile
+                      this.tabData.redirectAfterCreateUpdate(null);
+
+                      // finished
+                      return;
+                    }
+
+                    // redirect to set questions
+                    this.router.navigate(['/account/set-security-questions']);
+                  });
+                }
               });
           };
 
@@ -284,15 +315,11 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
               .modifyUser(this.authUser.id, { passwordChange: false })
               .subscribe(() => {
                 // refresh user data
-                refreshUserAndShowMessage();
-
-                // #TODO
-                // set passwordChanged to true so we can display the security questions notification.
-                // this.passwordChanged = true;
+                refreshUserAndShowMessage(true);
               });
           } else {
             // refresh user data
-            refreshUserAndShowMessage();
+            refreshUserAndShowMessage(false);
           }
         });
     };
