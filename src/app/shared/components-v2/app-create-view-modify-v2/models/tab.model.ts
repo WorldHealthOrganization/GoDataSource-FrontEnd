@@ -22,7 +22,7 @@ export enum CreateViewModifyV2TabInputType {
   // inputs
   TEXT,
   SELECT_SINGLE,
-  MULTIPLE_SINGLE,
+  SELECT_MULTIPLE,
   AGE_DATE_OF_BIRTH,
   VISUAL_ID,
   DATE,
@@ -107,7 +107,7 @@ interface ICreateViewModifyV2TabInputSingleSelect extends Omit<ICreateViewModify
  */
 interface ICreateViewModifyV2TabInputMultipleSelect extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
   // required
-  type: CreateViewModifyV2TabInputType.MULTIPLE_SINGLE;
+  type: CreateViewModifyV2TabInputType.SELECT_MULTIPLE;
   options: ILabelValuePairModel[];
   value: ICreateViewModifyV2TabInputValue<string[]>;
 

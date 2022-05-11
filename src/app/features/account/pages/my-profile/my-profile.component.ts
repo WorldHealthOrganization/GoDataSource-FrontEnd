@@ -17,28 +17,6 @@ import { TranslateService } from '@ngx-translate/core';
   templateUrl: './my-profile.component.html'
 })
 export class MyProfileComponent extends CreateViewModifyComponent<UserModel> implements OnDestroy {
-  // #TODO
-  // // constants
-  // UserModel = UserModel;
-  //
-  // // user data
-  // userId: string;
-  // user: UserModel = new UserModel();
-  //
-  // // role data
-  // rolesList$: Observable<UserRoleModel[]>;
-  // outbreaksList$: Observable<OutbreakModel[]>;
-
-  // #TODO
-  // /**
-  //  * Component initialized
-  //  */
-  // ngOnInit() {
-  //   // get the list of roles to populate the dropdown in UI
-  //   this.rolesList$ = this.userRoleDataService.getRolesList();
-  //   this.outbreaksList$ = this.outbreakDataService.getOutbreaksListReduced();
-  // }
-
   /**
    * Constructor
    */
@@ -136,7 +114,6 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
       buttons: this.initializeButtons(),
 
       // update
-      // #TODO
       createOrUpdate: undefined, // this.initializeProcessData(),
       redirectAfterCreateUpdate: () => {
         // redirect to view
@@ -197,7 +174,7 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
                 set: undefined
               }
             }, {
-              type: CreateViewModifyV2TabInputType.MULTIPLE_SINGLE,
+              type: CreateViewModifyV2TabInputType.SELECT_MULTIPLE,
               name: 'roleIds',
               placeholder: () => 'LNG_USER_FIELD_LABEL_ROLES',
               description: () => 'LNG_USER_FIELD_LABEL_ROLES_DESCRIPTION',
@@ -210,7 +187,7 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
                 required: () => true
               }
             }, {
-              type: CreateViewModifyV2TabInputType.MULTIPLE_SINGLE,
+              type: CreateViewModifyV2TabInputType.SELECT_MULTIPLE,
               name: 'outbreakIds',
               placeholder: () => 'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS',
               description: () => 'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS_DESCRIPTION',
@@ -222,6 +199,25 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
               noValueLabel: () => this.itemData.outbreakIds?.length > 0 ?
                 undefined :
                 this.translateService.instant('LNG_USER_FIELD_LABEL_ALL_OUTBREAKS')
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'activeOutbreakId',
+              placeholder: () => 'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK',
+              description: () => 'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK_DESCRIPTION',
+              options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options,
+              value: {
+                get: () => this.itemData.activeOutbreakId,
+                set: undefined
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'dontCacheFilters',
+              placeholder: () => 'LNG_USER_FIELD_LABEL_DONT_CACHE_FILTERS',
+              description: () => 'LNG_USER_FIELD_LABEL_DONT_CACHE_FILTERS_DESCRIPTION',
+              value: {
+                get: () => this.itemData.dontCacheFilters,
+                set: undefined
+              }
             }
           ]
         }
