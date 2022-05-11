@@ -44,7 +44,9 @@ export enum UserSettings {
   BACKUP_FIELDS = 'backupFields',
   CLUSTER_FIELDS = 'clusterFields',
   ONSET_FIELDS = 'onsetFields',
-  LONG_ONSET_FIELDS = 'longOnsetFields'
+  LONG_ONSET_FIELDS = 'longOnsetFields',
+  SAVED_FILTER_FIELDS = 'savedFilterFields',
+  SAVED_IMPORT_MAPPING_FIELDS = 'savedImportMappingFields'
 }
 
 export enum PhoneNumberType {
