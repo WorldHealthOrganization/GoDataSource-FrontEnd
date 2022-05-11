@@ -6,7 +6,6 @@ import { catchError, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { SavedFiltersService } from '../../../../core/services/data/saved-filters.data.service';
@@ -25,15 +24,12 @@ import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputToggle, V2SideDi
   templateUrl: './saved-filters.component.html'
 })
 export class SavedFiltersComponent extends ListComponent implements OnDestroy {
-  pagesWithSavedFilters: LabelValuePair[] = _.map(Constants.APP_PAGE, (page) => {
-    return new LabelValuePair(page.label, page.value);
-  });
-
+  // data
   savedFiltersList$: Observable<SavedFilterModel[]>;
 
   /**
-  * Constructor
-  */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     private savedFiltersService: SavedFiltersService,
@@ -45,16 +41,16 @@ export class SavedFiltersComponent extends ListComponent implements OnDestroy {
   }
 
   /**
-  * Release resources
-  */
+   * Release resources
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
   }
 
   /**
-  * Component initialized
-  */
+   * Component initialized
+   */
   initialized(): void {
     // initialize pagination
     this.initPaginator();
@@ -64,8 +60,8 @@ export class SavedFiltersComponent extends ListComponent implements OnDestroy {
   }
 
   /**
-  * Initialize Side Table Columns
-  */
+   * Initialize Side Table Columns
+   */
   protected initializeTableColumns(): void {
     this.tableColumns = [
       {
@@ -97,8 +93,10 @@ export class SavedFiltersComponent extends ListComponent implements OnDestroy {
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: this.pagesWithSavedFilters,
-          includeNoValue: true
+          options: Object.values(Constants.APP_PAGE).map((item) => ({
+            label: item.label,
+            value: item.value
+          }))
         }
       },
       {
@@ -337,38 +335,38 @@ export class SavedFiltersComponent extends ListComponent implements OnDestroy {
   }
 
   /**
-* Initialize table infos
-*/
+   * Initialize table infos
+   */
   protected initializeTableInfos(): void {}
 
   /**
-  * Initialize Table Advanced Filters
-  */
+   * Initialize Table Advanced Filters
+   */
   protected initializeTableAdvancedFilters(): void {}
 
   /**
-  * Initialize table quick actions
-  */
+   * Initialize table quick actions
+   */
   protected initializeQuickActions(): void {}
 
   /**
-  * Initialize table group actions
-  */
+   * Initialize table group actions
+   */
   protected initializeGroupActions(): void {}
 
   /**
-  * Initialize table add action
-  */
+   * Initialize table add action
+   */
   protected initializeAddAction(): void {}
 
   /**
-  * Initialize table grouped data
-  */
+   * Initialize table grouped data
+   */
   protected initializeGroupedData(): void {}
 
   /**
-  * Initialize breadcrumbs
-  */
+   * Initialize breadcrumbs
+   */
   protected initializeBreadcrumbs(): void {
     // set breadcrumbs
     this.breadcrumbs = [
@@ -387,8 +385,8 @@ export class SavedFiltersComponent extends ListComponent implements OnDestroy {
   }
 
   /**
-  * Fields retrieved from api to reduce payload size
-  */
+   * Fields retrieved from api to reduce payload size
+   */
   protected refreshListFields(): string[] {
     return [
       'id',
@@ -402,8 +400,8 @@ export class SavedFiltersComponent extends ListComponent implements OnDestroy {
   }
 
   /**
-  * Re(load) the Saved filters list, based on the applied filter, sort criterias
-  */
+   * Re(load) the Saved filters list, based on the applied filter, sort criterias
+   */
   refreshList() {
     // retrieve list
     this.savedFiltersList$ = this.savedFiltersService
@@ -415,8 +413,8 @@ export class SavedFiltersComponent extends ListComponent implements OnDestroy {
   }
 
   /**
-  * Get total number of items, based on the applied filters
-  */
+   * Get total number of items, based on the applied filters
+   */
   refreshListCount(applyHasMoreLimit?: boolean) {
     // reset
     this.pageCount = undefined;
