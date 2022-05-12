@@ -255,8 +255,7 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
             label: 'LNG_LAYOUT_MENU_ITEM_SET_SECURITY_QUESTION_LABEL',
             action: {
               link: () => ['/account/set-security-questions']
-            },
-            visible: () => UserModel.canModifyOwnAccount(this.authUser)
+            }
           }
         ]
       }

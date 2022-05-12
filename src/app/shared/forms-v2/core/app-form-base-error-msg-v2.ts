@@ -56,6 +56,9 @@ export abstract class AppFormBaseErrorMsgV2 {
       case 'equalValidator':
         return translateService.instant(errData.err);
 
+      case 'notEqualValidator':
+        return translateService.instant(errData.err);
+
       default:
         return `--- NOT HANDLED (${errKey}) ---`;
     }

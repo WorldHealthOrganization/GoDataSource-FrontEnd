@@ -119,7 +119,12 @@ interface ICreateViewModifyV2TabInputSingleSelect extends Omit<ICreateViewModify
 
   // optional
   validators?: {
-    required?: () => boolean
+    required?: () => boolean,
+    validateOther?: () => string,
+    notEqualValidator?: () => {
+      input: string,
+      err: string
+    }
   };
 }
 
@@ -323,6 +328,9 @@ interface ICreateViewModifyV2Section {
   type: CreateViewModifyV2TabInputType.SECTION;
   inputs: CreateViewModifyV2TabInput[];
   label: string;
+
+  // optional
+  visible?: () => boolean;
 }
 
 /**
@@ -514,4 +522,7 @@ export interface ICreateViewModifyV2 {
   buttons: ICreateViewModifyV2Buttons;
   createOrUpdate: ICreateViewModifyV2CreateOrUpdate;
   redirectAfterCreateUpdate: (data: any) => void;
+
+  // optional
+  modifyGetAllNotOnlyDirtyFields?: boolean;
 }

@@ -426,6 +426,11 @@
                     [clearable]="true"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                     [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
+                    app-trigger-validation-for
+                    [triggerValidationFor]="!isView && input.validators?.validateOther ? input.validators?.validateOther() : undefined"
+                    app-not-equal-validator
+                    [notEqualValidatorCompareTo]="!isView && input.validators?.notEqualValidator ? input.validators?.notEqualValidator().input : undefined"
+                    [notEqualValidatorError]="!isView && input.validators?.notEqualValidator ? input.validators?.notEqualValidator().err : undefined"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-select-single-v2>
 
                   <!-- Dropdown - multiple -->
@@ -963,25 +968,28 @@
               <div
                 *ngFor="let section of tab.sections"
                 class="gd-create-view-modify-bottom-section">
-                <!-- Section title -->
-                <div
-                  class="gd-create-view-modify-bottom-section-title">
-                  {{section.label | translate}}
-                </div>
+                <ng-container
+                  *ngIf="!section.visible || section.visible()">
+                  <!-- Section title -->
+                  <div
+                    class="gd-create-view-modify-bottom-section-title">
+                    {{section.label | translate}}
+                  </div>
 
-                <!-- Section content -->
-                <div
-                  class="gd-create-view-modify-bottom-section-content"
-                  fxLayout="row wrap" fxLayoutGap="1.6rem">
+                  <!-- Section content -->
+                  <div
+                    class="gd-create-view-modify-bottom-section-content"
+                    fxLayout="row wrap" fxLayoutGap="1.6rem">
 
-                  <!-- Input render -->
-                  <ng-container
-                    *ngFor="let input of section.inputs">
+                    <!-- Input render -->
                     <ng-container
-                      *ngTemplateOutlet="inputRender; context: { input, parentName: '', parentItemIndex: undefined }"></ng-container>
-                  </ng-container>
+                      *ngFor="let input of section.inputs">
+                      <ng-container
+                        *ngTemplateOutlet="inputRender; context: { input, parentName: '', parentItemIndex: undefined }"></ng-container>
+                    </ng-container>
 
-                </div>
+                  </div>
+                </ng-container>
               </div>
             </form>
           </ng-template>

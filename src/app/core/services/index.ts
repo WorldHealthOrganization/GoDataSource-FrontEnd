@@ -102,6 +102,7 @@ import { PersonDataResolver } from './resolvers/data/person.resolver';
 import { NotAuthRedirectGuard } from './guards/not-auth-redirect-guard.service';
 import { EntityFollowUpHelperService } from './helper/entity-follow-up-helper.service';
 import { EntityLabResultService } from './helper/entity-lab-result-helper.service';
+import { SecurityQuestionDataResolver } from './resolvers/data/security-question.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -143,6 +144,7 @@ export const services: any[] = [
   PregnancyStatusDataResolver,
   RelationshipPersonDataResolver,
   RiskDataResolver,
+  SecurityQuestionDataResolver,
   SelectedOutbreakDataResolver,
   TeamDataResolver,
   UserDataResolver,

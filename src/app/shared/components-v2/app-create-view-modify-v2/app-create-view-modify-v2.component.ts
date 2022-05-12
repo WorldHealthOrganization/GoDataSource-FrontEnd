@@ -587,7 +587,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     // call update
     this.runCreateOrUpdate(
       CreateViewModifyV2ActionType.UPDATE,
-      fieldData
+      this.tabData.modifyGetAllNotOnlyDirtyFields ?
+        this.formHelper.mergeFields(forms) :
+        fieldData
     );
   }
 
