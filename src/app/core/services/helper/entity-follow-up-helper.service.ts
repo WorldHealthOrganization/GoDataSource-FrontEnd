@@ -253,7 +253,7 @@ export class EntityFollowUpHelperService {
       },
       {
         field: 'address.geoLocationAccurate',
-        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
+        label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
         notVisible: true,
         sortable: true,
         format: {
