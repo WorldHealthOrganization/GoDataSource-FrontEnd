@@ -42,7 +42,7 @@ interface IV2FilterBasic {
 
   // optional
   search?: (column: IExtendedColDef) => void;
-  childQueryBuilder?: string;
+  childQueryBuilderKey?: string;
 
   // never
   options?: never;

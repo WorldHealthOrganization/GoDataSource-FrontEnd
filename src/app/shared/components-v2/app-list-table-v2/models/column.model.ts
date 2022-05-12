@@ -292,8 +292,8 @@ export const applyFilterBy = (
   valueOverwrite?: any
 ): void => {
   // apply to child query builder ?
-  if (column.columnDefinition.filter.childQueryBuilder) {
-    query = query.addChildQueryBuilder(column.columnDefinition.filter.childQueryBuilder);
+  if (column.columnDefinition.filter.childQueryBuilderKey) {
+    query = query.addChildQueryBuilder(column.columnDefinition.filter.childQueryBuilderKey);
   }
 
   // custom filter ?

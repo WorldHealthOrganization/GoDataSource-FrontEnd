@@ -656,7 +656,7 @@ export class EntityHelperService {
         },
         filter: {
           type: V2FilterType.DATE_RANGE,
-          childQueryBuilder: 'relationship'
+          childQueryBuilderKey: 'relationship'
         }
       },
       {
@@ -669,7 +669,7 @@ export class EntityHelperService {
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          childQueryBuilder: 'relationship',
+          childQueryBuilderKey: 'relationship',
           options: definitions.options.certaintyLevel,
           includeNoValue: true
         }
@@ -684,7 +684,7 @@ export class EntityHelperService {
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          childQueryBuilder: 'relationship',
+          childQueryBuilderKey: 'relationship',
           options: definitions.options.exposureType,
           includeNoValue: true
         }
@@ -699,7 +699,7 @@ export class EntityHelperService {
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          childQueryBuilder: 'relationship',
+          childQueryBuilderKey: 'relationship',
           options: definitions.options.exposureFrequency,
           includeNoValue: true
         }
@@ -714,7 +714,7 @@ export class EntityHelperService {
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          childQueryBuilder: 'relationship',
+          childQueryBuilderKey: 'relationship',
           options: definitions.options.exposureDuration,
           includeNoValue: true
         }
@@ -729,7 +729,7 @@ export class EntityHelperService {
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          childQueryBuilder: 'relationship',
+          childQueryBuilderKey: 'relationship',
           options: definitions.options.contextOfTransmission,
           includeNoValue: true
         }
@@ -743,7 +743,7 @@ export class EntityHelperService {
         filter: {
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH,
-          childQueryBuilder: 'relationship'
+          childQueryBuilderKey: 'relationship'
         }
       }
     ];
@@ -760,7 +760,7 @@ export class EntityHelperService {
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          childQueryBuilder: 'relationship',
+          childQueryBuilderKey: 'relationship',
           options: definitions.cluster.options,
           includeNoValue: true
         }
@@ -779,7 +779,7 @@ export class EntityHelperService {
           type: V2FilterType.MULTIPLE_SELECT,
           options: definitions.options.user,
           includeNoValue: true,
-          childQueryBuilder: 'relationship'
+          childQueryBuilderKey: 'relationship'
         },
         exclude: (): boolean => {
           return !UserModel.canView(definitions.authUser);
@@ -799,7 +799,7 @@ export class EntityHelperService {
         },
         filter: {
           type: V2FilterType.DATE_RANGE,
-          childQueryBuilder: 'relationship'
+          childQueryBuilderKey: 'relationship'
         }
       },
       {
@@ -812,7 +812,7 @@ export class EntityHelperService {
           type: V2FilterType.MULTIPLE_SELECT,
           options: definitions.options.user,
           includeNoValue: true,
-          childQueryBuilder: 'relationship'
+          childQueryBuilderKey: 'relationship'
         },
         exclude: (): boolean => {
           return !UserModel.canView(definitions.authUser);
@@ -832,7 +832,7 @@ export class EntityHelperService {
         },
         filter: {
           type: V2FilterType.DATE_RANGE,
-          childQueryBuilder: 'relationship'
+          childQueryBuilderKey: 'relationship'
         }
       },
 
