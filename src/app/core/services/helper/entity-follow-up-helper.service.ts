@@ -21,7 +21,7 @@ import { IResolverV2ResponseModel } from '../resolvers/data/models/resolver-resp
 import { TeamModel } from '../../models/team.model';
 import { Params } from '@angular/router';
 import { Constants } from '../../models/constants';
-import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputToggle, V2SideDialogConfigInputType } from '../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, IV2SideDialogConfigInputToggle, V2SideDialogConfigInputType } from '../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { TranslateService } from '@ngx-translate/core';
 import { CaseModel } from '../../models/case.model';
 import { ContactModel } from '../../models/contact.model';
@@ -691,6 +691,95 @@ export class EntityFollowUpHelperService {
                             // update our record too
                             item.targeted = ((response.handler.data.map.targeted as IV2SideDialogConfigInputToggle).value) as boolean;
 
+                            // success message
+                            this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TARGETED_SUCCESS_MESSAGE');
+
+                            // close popup
+                            response.handler.hide();
+
+                            // reload data
+                            definitions.refreshList();
+                          });
+                      });
+                  }
+                },
+                visible: (item: FollowUpModel): boolean => {
+                  return !item.deleted &&
+                    definitions.entityData.type === EntityType.CONTACT &&
+                    definitions.selectedOutbreakIsActive() &&
+                    FollowUpModel.canModify(definitions.authUser);
+                }
+              },
+
+              // Change team
+              {
+                label: {
+                  get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TEAM_FORM_BUTTON'
+                },
+                action: {
+                  click: (item: FollowUpModel) => {
+                    this.dialogV2Service
+                      .showSideDialog({
+                        // title
+                        title: {
+                          get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TEAM_DIALOG_TITLE'
+                        },
+
+                        // hide search bar
+                        hideInputFilter: true,
+
+                        // inputs
+                        inputs: [
+                          {
+                            type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+                            name: 'teamId',
+                            placeholder: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
+                            options: definitions.team.options,
+                            value: item.teamId
+                          }
+                        ],
+
+                        // buttons
+                        bottomButtons: [
+                          {
+                            label: 'LNG_COMMON_BUTTON_UPDATE',
+                            type: IV2SideDialogConfigButtonType.OTHER,
+                            color: 'primary',
+                            key: 'save',
+                            disabled: (_data, handler): boolean => {
+                              return !handler.form ||
+                                handler.form.invalid ||
+                                item.teamId === (handler.data.map.teamId as IV2SideDialogConfigInputSingleDropdown).value;
+                            }
+                          }, {
+                            type: IV2SideDialogConfigButtonType.CANCEL,
+                            label: 'LNG_COMMON_BUTTON_CANCEL',
+                            color: 'text'
+                          }
+                        ]
+                      }).subscribe((response) => {
+                        // cancelled ?
+                        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+                          return;
+                        }
+
+                        // change entity targeted
+                        this.followUpsDataService
+                          .modifyFollowUp(
+                            definitions.selectedOutbreak().id,
+                            item.personId,
+                            item.id,
+                            {
+                              teamId: (response.handler.data.map.teamId as IV2SideDialogConfigInputSingleDropdown).value
+                            }
+                          )
+                          .pipe(
+                            catchError((err) => {
+                              this.toastV2Service.error(err);
+                              return throwError(err);
+                            })
+                          )
+                          .subscribe(() => {
                             // success message
                             this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TARGETED_SUCCESS_MESSAGE');
 
