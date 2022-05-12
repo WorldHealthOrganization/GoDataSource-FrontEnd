@@ -534,11 +534,19 @@ export class EntityFollowUpHelperService {
                       config: {
                         title: {
                           get: () => 'LNG_COMMON_LABEL_RESTORE',
-                          data: () => item as any
+                          data: () => ({
+                            name: item.date ?
+                              moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                              ''
+                          })
                         },
                         message: {
                           get: () => 'LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP',
-                          data: () => item as any
+                          data: () => ({
+                            name: item.date ?
+                              moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                              ''
+                          })
                         }
                       }
                     }).subscribe((response) => {
