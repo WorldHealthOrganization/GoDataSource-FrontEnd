@@ -1093,6 +1093,11 @@ export class DialogV2Service {
         );
       }
 
+      // relationship query builders
+      if (filterDefinition.relationshipKey) {
+        qb = qb.include(filterDefinition.relationshipKey).queryBuilder;
+      }
+
       // do we need to merge extra conditions ?
       if (filterDefinition.extraConditions) {
         qb.merge(_.cloneDeep(filterDefinition.extraConditions));

@@ -80,32 +80,6 @@ export abstract class ListQueryComponent {
   //   // refresh list
   //   this.refreshCall();
   // }
-  //
-  // /**
-  //  * Filter by relation
-  //  */
-  // protected filterByRelation(
-  //   relation: string | string[]
-  // ): RequestFilter {
-  //   // make sure we always have an array of relations
-  //   const relations: string[] = (_.isArray(relation) ?
-  //     relation :
-  //     [relation]
-  //   ) as string[];
-  //
-  //   // go through all the relations until we get the desired query builder
-  //   let relationQB: RequestQueryBuilder = this.queryBuilder;
-  //   _.each(relations, (rel: string) => {
-  //     relationQB = relationQB.include(rel).queryBuilder;
-  //   });
-  //
-  //   // refresh list
-  //   // this one isn't executed instantly, so there should be enough time to setup the relation filter
-  //   this.refreshCall();
-  //
-  //   // retrieve filter
-  //   return relationQB.filter;
-  // }
 
   /**
    * Filter by

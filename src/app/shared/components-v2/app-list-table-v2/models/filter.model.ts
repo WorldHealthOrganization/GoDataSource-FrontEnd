@@ -43,6 +43,7 @@ interface IV2FilterBasic {
   // optional
   search?: (column: IExtendedColDef) => void;
   childQueryBuilderKey?: string;
+  relationshipKey?: string;
 
   // never
   options?: never;

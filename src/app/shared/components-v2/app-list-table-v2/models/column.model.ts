@@ -296,6 +296,11 @@ export const applyFilterBy = (
     query = query.addChildQueryBuilder(column.columnDefinition.filter.childQueryBuilderKey);
   }
 
+  // apply to relationship ?
+  if (column.columnDefinition.filter.relationshipKey) {
+    query = query.include(column.columnDefinition.filter.relationshipKey).queryBuilder;
+  }
+
   // custom filter ?
   if (column.columnDefinition.filter.search) {
     // call

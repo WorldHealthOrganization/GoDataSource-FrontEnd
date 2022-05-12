@@ -259,6 +259,7 @@ interface IV2AdvancedFilterBase {
   allowedComparators?: ILabelValuePairModel[];
   extraConditions?: RequestQueryBuilder;
   childQueryBuilderKey?: string;
+  relationshipKey?: string;
   sortable?: boolean;
   havingNotHavingApplyMongo?: boolean;
 
