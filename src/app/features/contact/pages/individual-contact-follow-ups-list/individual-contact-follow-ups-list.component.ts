@@ -30,6 +30,7 @@ import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/ap
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
+import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 
 @Component({
   selector: 'app-individual-contact-follow-ups-list',
@@ -66,6 +67,9 @@ export class IndividualContactFollowUpsListComponent extends ListComponent imple
       true
     );
 
+    // disable select outbreak
+    TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = true;
+
     // data
     this.entityData = this.route.snapshot.data.entityData;
 
@@ -88,6 +92,9 @@ export class IndividualContactFollowUpsListComponent extends ListComponent imple
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
+
+    // enable select outbreak
+    TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = false;
   }
 
   /**

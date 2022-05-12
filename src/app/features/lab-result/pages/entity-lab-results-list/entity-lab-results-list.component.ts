@@ -28,6 +28,7 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 
 @Component({
   selector: 'app-entity-lab-results-list',
@@ -88,10 +89,14 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
     private dialogV2Service: DialogV2Service,
     private caseDataService: CaseDataService
   ) {
+    // parent
     super(
       listHelperService,
       true
     );
+
+    // disable select outbreak
+    TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = true;
 
     // retrieve data
     this.personType = this.activatedRoute.snapshot.data.personType;
@@ -104,6 +109,9 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
+
+    // enable select outbreak
+    TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = false;
   }
 
   /**
