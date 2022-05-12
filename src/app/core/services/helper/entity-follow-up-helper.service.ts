@@ -106,6 +106,7 @@ export class EntityFollowUpHelperService {
       {
         field: 'statusId',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
+        sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
           options: definitions.options.dailyFollowUpStatus
