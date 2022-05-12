@@ -131,6 +131,67 @@ export class IndividualContactFollowUpsListComponent extends ListComponent imple
   }
 
   /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {
+    this.processSelectedData = [
+      // all selected records were not deleted ?
+      {
+        key: 'allNotDeleted',
+        process: (
+          dataMap: {
+            [id: string]: FollowUpModel
+          },
+          selected
+        ) => {
+          // determine if at least one record isn't deleted
+          let allNotDeleted: boolean = selected.length > 0;
+          for (let index = 0; index < selected.length; index++) {
+            // found not deleted ?
+            if (dataMap[selected[index]]?.deleted) {
+              // at least one not deleted
+              allNotDeleted = false;
+
+              // stop
+              break;
+            }
+          }
+
+          // finished
+          return allNotDeleted;
+        }
+      },
+
+      // all selected records were deleted ?
+      {
+        key: 'allDeleted',
+        process: (
+          dataMap: {
+            [id: string]: FollowUpModel
+          },
+          selected
+        ) => {
+          // determine if at least one record isn't deleted
+          let allDeleted: boolean = selected.length > 0;
+          for (let index = 0; index < selected.length; index++) {
+            // found not deleted ?
+            if (!dataMap[selected[index]]?.deleted) {
+              // at least one not deleted
+              allDeleted = false;
+
+              // stop
+              break;
+            }
+          }
+
+          // finished
+          return allDeleted;
+        }
+      }
+    ];
+  }
+
+  /**
    * Initialize table infos
    */
   protected initializeTableInfos(): void {}
@@ -363,7 +424,8 @@ export class IndividualContactFollowUpsListComponent extends ListComponent imple
           return FollowUpModel.canBulkDelete(this.authUser);
         },
         disable: (selected: string[]): boolean => {
-          return selected.length < 1;
+          return selected.length < 1 ||
+            !this.tableV2Component.processedSelectedResults.allNotDeleted;
         }
       },
 
@@ -432,7 +494,8 @@ export class IndividualContactFollowUpsListComponent extends ListComponent imple
           return FollowUpModel.canBulkDelete(this.authUser);
         },
         disable: (selected: string[]): boolean => {
-          return selected.length < 1;
+          return selected.length < 1 ||
+            !this.tableV2Component.processedSelectedResults.allDeleted;
         }
       }
     ];

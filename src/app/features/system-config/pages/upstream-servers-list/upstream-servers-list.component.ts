@@ -187,6 +187,11 @@ export class UpstreamServersListComponent extends ListComponent implements OnIni
   }
 
   /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
    * Initialize table infos
    */
   protected initializeTableInfos(): void {}

@@ -184,6 +184,11 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
   }
 
   /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
    * Initialize table infos
    */
   protected initializeTableInfos(): void {}

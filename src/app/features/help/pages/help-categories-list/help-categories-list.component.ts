@@ -156,6 +156,11 @@ export class HelpCategoriesListComponent extends ListComponent implements OnInit
   }
 
   /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
    * Initialize table infos
    */
   protected initializeTableInfos(): void {}

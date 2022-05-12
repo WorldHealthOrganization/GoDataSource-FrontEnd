@@ -106,6 +106,11 @@ export class ManageIconsListComponent extends ListComponent implements OnInit, O
   protected initializeTableColumns(): void {}
 
   /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
    * Initialize table infos
    */
   protected initializeTableInfos(): void {}

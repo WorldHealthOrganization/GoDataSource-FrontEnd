@@ -145,6 +145,11 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
   protected initializeTableColumns(): void {}
 
   /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
    * Initialize table infos
    */
   protected initializeTableInfos(): void {}

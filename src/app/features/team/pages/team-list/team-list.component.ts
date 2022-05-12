@@ -153,6 +153,11 @@ export class TeamListComponent extends ListComponent implements OnInit, OnDestro
   protected initializeTableColumns(): void {}
 
   /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {};
+
+  /**
    * Initialize table infos
    */
   protected initializeTableInfos(): void {}

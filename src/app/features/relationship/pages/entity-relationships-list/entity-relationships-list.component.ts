@@ -124,6 +124,11 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
   }
 
   /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
    * Initialize table infos
    */
   protected initializeTableInfos(): void {}

@@ -153,6 +153,11 @@ export class LocationUsageListComponent extends ListComponent implements OnInit,
   protected initializeTableColumns(): void {}
 
   /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
    * Initialize table infos
    */
   protected initializeTableInfos(): void {}

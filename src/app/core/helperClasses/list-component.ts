@@ -24,6 +24,7 @@ import { Directive, ViewChild } from '@angular/core';
 import { AppListTableV2Component } from '../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
 import { SavedFilterData } from '../models/saved-filters.model';
 import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
+import { IV2ProcessSelectedData } from '../../shared/components-v2/app-list-table-v2/models/process-data.model';
 
 /**
  * List component
@@ -98,6 +99,9 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
 
   // suffix legends
   suffixLegends: ILabelValuePairModel[];
+
+  // process data
+  processSelectedData: IV2ProcessSelectedData[];
 
   // retrieve table handler
   @ViewChild(AppListTableV2Component, { static: true }) tableV2Component: AppListTableV2Component;
@@ -236,6 +240,9 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
       // initialize side columns
       this.initializeTableColumns();
 
+      // initialize process data
+      this.initializeProcessSelectedData();
+
       // initialize infos
       this.initializeTableInfos();
 
@@ -355,6 +362,11 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
    * Initialize table columns
    */
   protected abstract initializeTableColumns(): void;
+
+  /**
+   * Initialize process data
+   */
+  protected abstract initializeProcessSelectedData(): void;
 
   /**
    * Initialize table infos

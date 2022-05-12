@@ -1,6 +1,7 @@
 <app-list-table-v2
   [pageTitle]="relationshipType === RelationshipType.CONTACT ? 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE' : 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE'"
   [records$]="relationshipsList$"
+  [processSelectedData]="processSelectedData"
   [columns]="tableColumns"
   [breadcrumbs]="breadcrumbs"
   [quickActions]="quickActions"

@@ -257,6 +257,11 @@ export class LocationsListComponent extends ListComponent implements OnInit, OnD
   }
 
   /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
    * Initialize table infos
    */
   protected initializeTableInfos(): void {}

@@ -1,6 +1,7 @@
 <app-list-table-v2
   [pageTitle]="appliedListFilter !== Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS ? 'LNG_PAGE_LIST_EVENTS_TITLE' : 'LNG_PAGE_DASHBOARD_EVENTS_WITHOUT_RELATIONSHIPS'"
   [records$]="eventsList$"
+  [processSelectedData]="processSelectedData"
   [columns]="tableColumns"
   [breadcrumbs]="breadcrumbs"
   [quickActions]="quickActions"

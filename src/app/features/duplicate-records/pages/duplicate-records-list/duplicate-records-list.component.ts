@@ -107,6 +107,11 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
   protected initializeTableColumns(): void {}
 
   /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
    * Initialize table infos
    */
   protected initializeTableInfos(): void {}

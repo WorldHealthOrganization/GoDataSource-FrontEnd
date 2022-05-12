@@ -1,6 +1,7 @@
 <app-list-table-v2
   [pageTitle]="entityData.type === EntityType.CONTACT ? 'LNG_PAGE_LIST_FOLLOW_UPS_TITLE' : 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE'"
   [records$]="followUpsList$"
+  [processSelectedData]="processSelectedData"
   [columns]="tableColumns"
   [breadcrumbs]="breadcrumbs"
   [quickActions]="quickActions"

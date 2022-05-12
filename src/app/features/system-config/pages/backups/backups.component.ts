@@ -202,6 +202,11 @@ export class BackupsComponent extends ListComponent implements OnInit, OnDestroy
   }
 
   /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
    * Initialize table infos
    */
   protected initializeTableInfos(): void {}

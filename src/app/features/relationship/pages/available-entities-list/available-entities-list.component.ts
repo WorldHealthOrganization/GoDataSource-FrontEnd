@@ -133,6 +133,11 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
   protected initializeTableColumns(): void {}
 
   /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
    * Initialize table infos
    */
   protected initializeTableInfos(): void {}

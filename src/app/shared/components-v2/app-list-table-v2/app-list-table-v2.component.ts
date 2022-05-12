@@ -53,6 +53,7 @@ import { ColumnApi } from '@ag-grid-community/core/dist/cjs/es5/columns/columnAp
 import { V2AdvancedFilter } from './models/advanced-filter.model';
 import { SavedFilterData } from '../../../core/models/saved-filters.model';
 import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model';
+import { IV2ProcessSelectedData } from './models/process-data.model';
 
 /**
  * Component
@@ -75,6 +76,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   // records
   recordsSubscription: Subscription;
+  private _recordsData: any[];
+  private _recordsDataMap: {
+    [id: string]: any
+  } = {};
   private _records$: Observable<any[]>;
   @Input() set records$(records$: Observable<any[]>) {
     // set the new observable
@@ -82,6 +87,17 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // retrieve data
     this.retrieveData();
+  }
+
+  // process rows data
+  @Input() processSelectedData: IV2ProcessSelectedData[];
+  private _processedSelectedResults: {
+    [key: string]: any
+  } = {};
+  get processedSelectedResults(): {
+    [key: string]: any
+  } {
+    return this._processedSelectedResults;
   }
 
   // columns
@@ -466,7 +482,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // nothing to do ?
     if (!this._records$) {
       // reset data
-      this._agTable.api.setRowData([]);
+      this._recordsData = [];
+      this._recordsDataMap = {};
+      this._processedSelectedResults = {};
+      this._agTable.api.setRowData(this._recordsData);
       this._agTable.api.hideOverlay();
 
       // re-render page
@@ -496,10 +515,18 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         this.recordsSubscription = undefined;
 
         // set data & hide loading overlay
-        this._agTable.api.setRowData(data);
+        this._recordsData = data;
+        this._processedSelectedResults = {};
+        this._agTable.api.setRowData(this._recordsData);
+
+        // map data
+        this._recordsDataMap = {};
+        data.forEach((record) => {
+          this._recordsDataMap[record[this.keyField]] = record;
+        });
 
         // no records found ?
-        if (data.length < 1) {
+        if (this._recordsData.length < 1) {
           this._agTable.api.showNoRowsOverlay();
         }
 
@@ -1527,6 +1554,17 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     this._selected = this._agTable.api.getSelectedNodes().map(
       (item) => _.get(item.data, this.keyField)
     );
+
+    // process data
+    this._processedSelectedResults = {};
+    if (this.processSelectedData?.length > 0) {
+      this.processSelectedData.forEach((processor) => {
+        this._processedSelectedResults[processor.key] = processor.process(
+          this._recordsDataMap,
+          this._selected
+        );
+      });
+    }
   }
 
   /**

@@ -108,6 +108,11 @@ export class ViewHelpDialogComponent extends ListComponent implements OnDestroy 
   protected initializeTableColumns(): void {}
 
   /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
    * Initialize table infos
    */
   protected initializeTableInfos(): void {}

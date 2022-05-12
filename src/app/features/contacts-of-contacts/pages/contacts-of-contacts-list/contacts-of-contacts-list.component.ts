@@ -822,6 +822,11 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
   }
 
   /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
    * Initialize table infos
    */
   protected initializeTableInfos(): void {}

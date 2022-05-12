@@ -162,6 +162,11 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
   protected initializeTableColumns(): void {}
 
   /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
    * Initialize table infos
    */
   protected initializeTableInfos(): void {}

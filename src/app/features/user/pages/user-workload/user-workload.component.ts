@@ -160,6 +160,11 @@ export class UserWorkloadComponent extends ListComponent implements OnInit, OnDe
   protected initializeTableColumns(): void {}
 
   /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
    * Initialize table infos
    */
   protected initializeTableInfos(): void {}

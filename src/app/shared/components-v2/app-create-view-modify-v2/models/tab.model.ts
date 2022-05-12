@@ -14,6 +14,7 @@ import { UserSettings } from '../../../../core/models/user.model';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { V2AdvancedFilter } from '../../app-list-table-v2/models/advanced-filter.model';
+import { IV2ProcessSelectedData } from '../../app-list-table-v2/models/process-data.model';
 
 /**
  * Input type
@@ -370,6 +371,7 @@ export interface ICreateViewModifyV2TabTable {
   // used by ui
   updateUI?: () => void;
   records$?: Observable<any[]>;
+  processSelectedData?: IV2ProcessSelectedData[];
   queryBuilder?: RequestQueryBuilder;
   applyHasMoreLimit?: boolean;
   pageCount?: IBasicCount;

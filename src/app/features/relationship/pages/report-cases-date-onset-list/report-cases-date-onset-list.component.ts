@@ -268,6 +268,11 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
   }
 
   /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
    * Initialize table infos
    */
   protected initializeTableInfos(): void {}

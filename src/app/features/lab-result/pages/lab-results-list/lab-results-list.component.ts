@@ -519,6 +519,11 @@ export class LabResultsListComponent extends ListComponent implements OnInit, On
   }
 
   /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
    * Initialize table infos
    */
   protected initializeTableInfos(): void {}

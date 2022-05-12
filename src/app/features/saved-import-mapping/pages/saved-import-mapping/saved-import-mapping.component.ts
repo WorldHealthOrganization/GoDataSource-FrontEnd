@@ -345,6 +345,11 @@ export class SavedImportMappingComponent extends ListComponent implements OnDest
   }
 
   /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
   * Initialize table infos
   */
   protected initializeTableInfos(): void {}
