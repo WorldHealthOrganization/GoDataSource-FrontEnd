@@ -73,6 +73,7 @@ export class EntityFollowUpHelperService {
       {
         field: 'date',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
+        pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         format: {
           type: V2ColumnFormat.DATE
