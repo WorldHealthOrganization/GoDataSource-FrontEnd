@@ -1,4 +1,4 @@
-import { Component, OnDestroy, Renderer2, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -16,9 +16,7 @@ import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v
 
 @Component({
   selector: 'app-change-password',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './change-password.component.html',
-  styleUrls: ['./change-password.component.less']
+  templateUrl: './change-password.component.html'
 })
 export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel> implements OnDestroy {
   // data
@@ -131,7 +129,7 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
     this.tabData = {
       // tabs
       tabs: [
-        this.initializeTabsPersonal()
+        this.initializeTabsChangePassword()
       ],
 
       // create details
@@ -153,7 +151,7 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
   /**
    * Initialize tabs - Personal
    */
-  private initializeTabsPersonal(): ICreateViewModifyV2Tab {
+  private initializeTabsChangePassword(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
       label: 'LNG_PAGE_RESET_PASSWORD_TAB_CHANGE_PASSWORD_TITLE',
