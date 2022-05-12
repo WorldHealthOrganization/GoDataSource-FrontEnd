@@ -248,7 +248,7 @@ export class EntityFollowUpHelperService {
           address: filterAddressModel,
           addressField: 'postalCode',
           field: 'address',
-          fieldIsArray: true
+          fieldIsArray: false
         }
       },
       {
@@ -264,7 +264,7 @@ export class EntityFollowUpHelperService {
           type: V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION,
           address: filterAddressModel,
           field: 'address',
-          fieldIsArray: true,
+          fieldIsArray: false,
           options: definitions.options.yesNoAll,
           defaultValue: ''
         }
