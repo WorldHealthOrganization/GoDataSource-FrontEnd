@@ -30,6 +30,7 @@ import { OutbreakModel } from '../../models/outbreak.model';
 import * as _ from 'lodash';
 import { LocationModel } from '../../models/location.model';
 import { LocationDataService } from '../data/location.data.service';
+import * as moment from 'moment';
 
 @Injectable({
   providedIn: 'root'
@@ -455,13 +456,17 @@ export class EntityFollowUpHelperService {
                         title: {
                           get: () => 'LNG_COMMON_LABEL_DELETE',
                           data: () => ({
-                            name: item.person.name
+                            name: item.date ?
+                              moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                              ''
                           })
                         },
                         message: {
                           get: () => 'LNG_DIALOG_CONFIRM_DELETE_FOLLOW_UP',
                           data: () => ({
-                            name: item.person.name
+                            name: item.date ?
+                              moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                              ''
                           })
                         }
                       }
