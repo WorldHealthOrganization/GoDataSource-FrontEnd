@@ -432,7 +432,7 @@ implements
     this.dontCacheFilters = _.get(data, 'dontCacheFilters', false);
 
     // initialize settings
-    _.each(data.settings, (settings, property) => {
+    _.each(data?.settings, (settings, property) => {
       // initialize settings
       if (property === UserSettings.DASHBOARD) {
         this.settings[property] = new UserSettingsDashboardModel(settings);
