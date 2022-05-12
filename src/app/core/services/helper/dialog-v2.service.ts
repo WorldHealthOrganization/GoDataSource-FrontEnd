@@ -1492,7 +1492,10 @@ export class DialogV2Service {
                         valueQuery = RequestFilterGenerator.textIs(value);
                         break;
                       case V2AdvancedFilterComparatorType.CONTAINS_TEXT:
-                        valueQuery = RequestFilterGenerator.textContains(value);
+                        valueQuery = RequestFilterGenerator.textContains(
+                          value,
+                          filterDefinition.useLike
+                        );
                         break;
                       case V2AdvancedFilterComparatorType.HAS_VALUE:
                         valueQuery = RequestFilterGenerator.hasValue();
@@ -1504,7 +1507,10 @@ export class DialogV2Service {
 
                       // V2AdvancedFilterComparatorType.TEXT_STARTS_WITH
                       default:
-                        valueQuery = RequestFilterGenerator.textStartWith(value);
+                        valueQuery = RequestFilterGenerator.textStartWith(
+                          value,
+                          filterDefinition.useLike
+                        );
                     }
 
                     // finished

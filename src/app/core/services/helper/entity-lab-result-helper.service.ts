@@ -716,7 +716,8 @@ export class EntityLabResultService {
         type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
         field: 'questionnaireAnswers',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-        template: data.labResultsTemplate
+        template: data.labResultsTemplate,
+        useLike: true
       }
     ];
 

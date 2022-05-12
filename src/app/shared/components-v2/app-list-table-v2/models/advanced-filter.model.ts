@@ -401,6 +401,7 @@ export interface IV2AdvancedFilterQuestionnaireAnswers extends IV2AdvancedFilter
   template: () => QuestionModel[];
 
   // optional
+  useLike?: boolean;
   templateOptions?: ILabelValuePairModel[];
   templateOptionsMap?: {
     [value: string]: ILabelValuePairModel
