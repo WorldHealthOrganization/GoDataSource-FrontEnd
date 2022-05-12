@@ -1189,7 +1189,6 @@
                         *ngIf="visitedTabs[tab.label]"
                         #listTable
                         [records$]="tab.records$"
-                        [processSelectedData]="tab.processSelectedData"
                         [columns]="tab.tableColumns"
                         [pageCount]="tab.pageCount"
                         [pageSize]="tab.queryBuilder.paginator.limit"
