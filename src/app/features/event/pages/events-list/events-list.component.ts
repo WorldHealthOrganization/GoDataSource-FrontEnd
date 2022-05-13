@@ -1382,6 +1382,7 @@ export class EventsListComponent
           this.toastV2Service.error(err);
           return throwError(err);
         }),
+
         // should be the last pipe
         takeUntil(this.destroyed$)
       )
