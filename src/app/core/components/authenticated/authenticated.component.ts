@@ -185,15 +185,8 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
         });
     }
 
-    // cache reference data
-    // #TODO
-    // this.referenceDataDataService.getReferenceData().subscribe();
-
     // redirect root to landing page
     const redirectRootToLandingPage = () => {
-      // determine to which page we should send this user
-      // #TODO - accordingly to user DEFAULT landing page and PERMISSIONS
-
       // redirect to default landing page
       if (DashboardModel.canViewDashboard(this._authUser)) {
         this.router.navigate(['/dashboard']);
