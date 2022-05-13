@@ -30,6 +30,7 @@ export enum V2SideDialogConfigInputType {
   LINK_WITH_ACTION,
   GROUP,
   BUTTON,
+  ROW,
   ACCORDION,
   ACCORDION_PANEL,
   KEY_VALUE,
@@ -228,6 +229,7 @@ export interface IV2SideDialogConfigInputLinkWithAction extends IV2SideDialogCon
 export interface IV2SideDialogConfigInputGroup extends IV2SideDialogConfigInputBase {
   // required
   type: V2SideDialogConfigInputType.GROUP;
+  name: string;
   inputs: V2SideDialogConfigInput[];
 
   // optional
@@ -244,6 +246,19 @@ export interface IV2SideDialogConfigInputButton extends IV2SideDialogConfigInput
   placeholder: string;
   color: 'text' | 'secondary' | 'primary' | 'warn' | 'accent' | undefined;
   click: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: IV2SideDialogConfigInputButton) => void;
+}
+
+/**
+ * Side dialog input - row
+ */
+export interface IV2SideDialogConfigInputRow extends IV2SideDialogConfigInputBase {
+  // required
+  type: V2SideDialogConfigInputType.ROW;
+  name: string;
+  inputs: V2SideDialogConfigInput[];
+
+  // optional
+  placeholder?: string;
 }
 
 /**
@@ -325,7 +340,7 @@ export type V2SideDialogConfigInputFromInput = IV2SideDialogConfigInputCheckbox 
 | IV2SideDialogConfigInputMultiDropdown | IV2SideDialogConfigInputToggle | IV2SideDialogConfigInputNumber;
 export type V2SideDialogConfigInput = IV2SideDialogConfigInputDivider | IV2SideDialogConfigInputKeyValue | IV2SideDialogConfigInputHTML
 | V2SideDialogConfigInputFromInput | IV2SideDialogConfigInputLink | IV2SideDialogConfigInputLinkWithAction | IV2SideDialogConfigInputGroup
-| IV2SideDialogConfigInputButton | IV2SideDialogConfigInputAccordion | IV2SideDialogConfigInputFilterList;
+| IV2SideDialogConfigInputButton | IV2SideDialogConfigInputRow | IV2SideDialogConfigInputAccordion | IV2SideDialogConfigInputFilterList;
 
 /**
  * Side dialog inputs map

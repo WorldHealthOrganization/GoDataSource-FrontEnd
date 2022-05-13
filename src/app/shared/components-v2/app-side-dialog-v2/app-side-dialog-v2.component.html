@@ -193,6 +193,17 @@
               {{input.placeholder | translate}}
             </button>
 
+            <!-- Row -->
+            <div
+              *ngSwitchCase="V2SideDialogConfigInputType.ROW"
+              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-row {{input.cssClasses}}">
+              <!-- Items -->
+              <ng-template
+                *ngFor="let rowItem of input.inputs"
+                [ngTemplateOutlet]="commonPart"
+                [ngTemplateOutletContext]="{ input: rowItem }"></ng-template>
+            </div>
+
             <!-- HTML -->
             <div
               *ngSwitchCase="V2SideDialogConfigInputType.HTML"

@@ -13,7 +13,7 @@ import { DialogV2Service } from '../../services/helper/dialog-v2.service';
 import {
   IV2SideDialogConfigButtonType,
   IV2SideDialogConfigInputAccordion,
-  IV2SideDialogConfigInputGroup,
+  IV2SideDialogConfigInputRow,
   IV2SideDialogConfigInputSingleDropdown,
   IV2SideDialogConfigInputText,
   V2SideDialogConfigInputType
@@ -755,22 +755,26 @@ export class TopnavComponent implements OnInit, OnDestroy {
     const defaultWidth: string = '60rem';
 
     // construct lst of help items
-    const helpInputs: IV2SideDialogConfigInputGroup[] = [];
+    const helpInputs: IV2SideDialogConfigInputRow[] = [];
     this.contextSearchHelpItems.forEach((helpItem) => {
       helpInputs.push({
-        type: V2SideDialogConfigInputType.GROUP,
-        name: `title-category-${helpItem.id}`,
+        type: V2SideDialogConfigInputType.ROW,
+        name: `row-${helpItem.id}`,
         placeholder: `${this.translateService.instant(helpItem.title)} - ${helpItem.category?.name ? this.translateService.instant(helpItem.category?.name) : ''}`,
         inputs: [{
-          type: V2SideDialogConfigInputType.KEY_VALUE,
-          name: `title-${helpItem.id}`,
-          placeholder: 'LNG_HELP_ITEM_FIELD_LABEL_TITLE',
-          value: helpItem.title
-        }, {
-          type: V2SideDialogConfigInputType.KEY_VALUE,
-          name: `category-${helpItem.id}`,
-          placeholder: 'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY',
-          value: helpItem.category?.name
+          type: V2SideDialogConfigInputType.GROUP,
+          name: `group-${helpItem.id}`,
+          inputs: [{
+            type: V2SideDialogConfigInputType.KEY_VALUE,
+            name: `title-${helpItem.id}`,
+            placeholder: 'LNG_HELP_ITEM_FIELD_LABEL_TITLE',
+            value: helpItem.title
+          }, {
+            type: V2SideDialogConfigInputType.KEY_VALUE,
+            name: `category-${helpItem.id}`,
+            placeholder: 'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY',
+            value: helpItem.category?.name
+          }]
         }, {
           type: V2SideDialogConfigInputType.BUTTON,
           name: `view-${helpItem.id}`,

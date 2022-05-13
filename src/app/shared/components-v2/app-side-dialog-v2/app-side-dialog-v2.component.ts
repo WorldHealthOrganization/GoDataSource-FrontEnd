@@ -504,7 +504,7 @@ export class AppSideDialogV2Component implements OnDestroy {
         }
 
         // filter if input has children ?
-        // - type V2SideDialogConfigInputType.GROUP is filtered by parent placeholder, so no need to filter children
+        // - type V2SideDialogConfigInputType.GROUP / ROW is filtered by parent placeholder, so no need to filter children
         if (input.type === V2SideDialogConfigInputType.ACCORDION) {
           if (deepSearch(input.panels)) {
             // at least one child is visible, so we should make parent visible too
