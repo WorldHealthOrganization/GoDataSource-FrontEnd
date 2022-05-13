@@ -21,7 +21,6 @@ import { IV2LoadingDialogHandler } from '../../../shared/components-v2/app-loadi
 import { determineRenderMode, RenderMode } from '../../enums/render-mode.enum';
 import { IsActiveMatchOptions, Router } from '@angular/router';
 import { PERMISSION } from '../../models/permission.model';
-import { BackupModel } from '../../models/backup.model';
 
 @Component({
   selector: 'app-topnav',
@@ -60,8 +59,6 @@ export class TopnavComponent implements OnInit, OnDestroy {
   OutbreakModel = OutbreakModel;
   ToastV2Service = ToastV2Service;
   RenderMode = RenderMode;
-  UserModel = UserModel;
-  BackupModel = BackupModel;
 
   // authenticated user
   authUser: UserModel;
