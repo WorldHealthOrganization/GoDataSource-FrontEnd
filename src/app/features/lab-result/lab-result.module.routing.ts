@@ -14,6 +14,7 @@ import { LabSequenceLaboratoryDataResolver } from '../../core/services/resolvers
 import { LabSequenceResultDataResolver } from '../../core/services/resolvers/data/lab-sequence-result.resolver';
 import { LabTestResultDataResolver } from '../../core/services/resolvers/data/lab-test-result.resolver';
 import { LabTestTypeDataResolver } from '../../core/services/resolvers/data/lab-test-type.resolver';
+import { PersonTypeDataResolver } from '../../core/services/resolvers/data/person-type.resolver';
 import { PersonDataResolver } from '../../core/services/resolvers/data/person.resolver';
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
@@ -56,6 +57,19 @@ const routes: Routes = [
           ]
         })
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      classification: ClassificationDataResolver,
+      labName: LabNameDataResolver,
+      labSampleType: LabSampleTypeDataResolver,
+      labTestType: LabTestTypeDataResolver,
+      labTestResult: LabTestResultDataResolver,
+      labResultProgress: LabProgressDataResolver,
+      labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
+      labSequenceResult: LabSequenceResultDataResolver,
+      user: UserDataResolver,
+      personType: PersonTypeDataResolver
     }
   },
   // View Gantt Chart
