@@ -26,7 +26,6 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
@@ -688,71 +687,15 @@ export class LabResultsListComponent extends ListComponent implements OnDestroy 
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
-    this.advancedFilters = [
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'sampleIdentifier',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateSampleTaken',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateSampleDelivered',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.RANGE_DATE,
-        field: 'dateOfResult',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'labName',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
-        options: (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'sampleType',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE',
-        options: (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'testType',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE',
-        options: (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'result',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
-        options: (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-      },
-      {
-        type: V2AdvancedFilterType.TEXT,
-        field: 'testedFor',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR',
-        sortable: true
-      },
-      {
-        type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
-        field: 'questionnaireAnswers',
-        label: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
-        template: () => this.selectedOutbreak.labResultsTemplate
+    this.advancedFilters = LabResultModel.generateAdvancedFilters({
+      selectedOutbreak: () => this.selectedOutbreak,
+      options: {
+        labName: (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        labSampleType: (this.activatedRoute.snapshot.data.labSampleType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        labTestType: (this.activatedRoute.snapshot.data.labTestType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        labTestResult: (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
       }
-    ];
+    });
   }
 
   /**

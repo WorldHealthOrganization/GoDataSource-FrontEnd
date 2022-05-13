@@ -1,15 +1,17 @@
 import * as _ from 'lodash';
-import { Constants } from './constants';
+import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
+import { BaseModel } from './base.model';
 import { CaseModel } from './case.model';
-import { IAnswerData } from './question.model';
+import { Constants } from './constants';
 import { ContactModel } from './contact.model';
 import { EntityType } from './entity-type';
-import { BaseModel } from './base.model';
-import { IPermissionBasic, IPermissionExportable, IPermissionImportable, IPermissionRestorable } from './permission.interface';
-import { UserModel } from './user.model';
-import { OutbreakModel } from './outbreak.model';
-import { PERMISSION } from './permission.model';
 import { LabResultSequenceModel } from './lab-result-sequence.model';
+import { OutbreakModel } from './outbreak.model';
+import { IPermissionBasic, IPermissionExportable, IPermissionImportable, IPermissionRestorable } from './permission.interface';
+import { PERMISSION } from './permission.model';
+import { IAnswerData } from './question.model';
+import { UserModel } from './user.model';
 
 export class LabResultModel
   extends BaseModel
@@ -39,6 +41,89 @@ export class LabResultModel
   person: CaseModel | ContactModel;
   testedFor: string;
   sequence: LabResultSequenceModel;
+
+  /**
+   * Advanced filters
+   */
+  static generateAdvancedFilters(data: {
+    selectedOutbreak: () => OutbreakModel,
+    options: {
+      labName: ILabelValuePairModel[],
+      labSampleType: ILabelValuePairModel[],
+      labTestType: ILabelValuePairModel[],
+      labTestResult: ILabelValuePairModel[],
+    }
+  }) {
+    // initialize
+    const advancedFilters: V2AdvancedFilter[] = [
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'sampleIdentifier',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateSampleTaken',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateSampleDelivered',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateOfResult',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'labName',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
+        options: data.options.labName,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'sampleType',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE',
+        options: data.options.labSampleType,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'testType',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE',
+        options: data.options.labTestType,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'result',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
+        options: data.options.labTestResult
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'testedFor',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS,
+        field: 'questionnaireAnswers',
+        label: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+        template: () => data.selectedOutbreak().labResultsTemplate
+      }
+    ];
+
+    // finished
+    return advancedFilters;
+  }
 
   /**
      * Static Permissions - IPermissionBasic
