@@ -13,8 +13,8 @@ export class LanguageUserResolver
 implements Resolve<any> {
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private translateService: TranslateService,
     private i18nService: I18nService,
@@ -40,17 +40,19 @@ implements Resolve<any> {
           .pipe(
             catchError((err) => {
               // unsubscribe - hack for observable that isn't a subject..it  still being called
-              if (
-                languageSubscriber &&
-                                !languageSubscriber.closed
-              ) {
-                languageSubscriber.unsubscribe();
-              }
+              try {
+                if (
+                  languageSubscriber &&
+                  !languageSubscriber.closed
+                ) {
+                  languageSubscriber.unsubscribe();
+                }
+              } catch (e) {}
 
               // determine if this is a token validation error or something else has gone bad
               if (
                 err &&
-                                err.statusCode === 401
+                err.statusCode === 401
               ) {
                 // remove cache
                 this.authDataService.clearStorage();
@@ -97,7 +99,7 @@ implements Resolve<any> {
             // unsubscribe - hack for observable that isn't a subject..it  still being called
             if (
               languageSubscriber &&
-                            !languageSubscriber.closed
+              !languageSubscriber.closed
             ) {
               languageSubscriber.unsubscribe();
             }

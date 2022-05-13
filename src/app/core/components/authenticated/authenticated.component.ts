@@ -19,8 +19,6 @@ import { determineRenderMode, RenderMode } from '../../enums/render-mode.enum';
   styleUrls: ['./authenticated.component.scss']
 })
 export class AuthenticatedComponent implements OnInit, OnDestroy {
-  // #TODO - must check the entire code not only what is commented since some of the code that isn't commented is old
-
   // disable page loading
   static DISABLE_PAGE_LOADING: boolean = false;
 
