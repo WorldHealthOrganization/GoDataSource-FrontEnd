@@ -1,9 +1,8 @@
 import { ModuleWithProviders } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { Routes, RouterModule, Route } from '@angular/router';
 import * as fromPages from './pages';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
-import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 import { OutbreakQestionnaireTypeEnum } from '../../core/enums/outbreak-qestionnaire-type.enum';
 import { PermissionExpression } from '../../core/models/user.model';
@@ -15,7 +14,16 @@ import { FollowUpGenerationTeamAssignmentAlgorithmDataResolver } from '../../cor
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 import { PersonTypeDataResolver } from '../../core/services/resolvers/data/person-type.resolver';
+import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 
+// common base - create / view / modify
+const createViewModifyFoundation: Route = {
+  component: fromPages.OutbreakCreateViewModifyComponent,
+  canActivate: [AuthGuard],
+  resolve: {}
+};
+
+// routes
 const routes: Routes = [
   // Outbreaks list
   {
@@ -40,14 +48,14 @@ const routes: Routes = [
   // Create Outbreak
   {
     path: 'create',
-    component: fromPages.CreateOutbreakComponent,
-    canActivate: [AuthGuard],
+    ...createViewModifyFoundation,
     data: {
       permissions: [
         // list for checking if there is another outbreak with the same name
         PERMISSION.OUTBREAK_LIST,
         PERMISSION.OUTBREAK_CREATE
-      ]
+      ],
+      action: CreateViewModifyV2Action.CREATE
     },
     canDeactivate: [
       PageChangeConfirmationGuard
@@ -56,33 +64,19 @@ const routes: Routes = [
   // View Outbreak
   {
     path: ':outbreakId/view',
-    component: fromPages.ModifyOutbreakComponent,
-    // resolve: {
-    //      outbreak: OutbreakResolver - the outbreak provided in url and not the selected one
-    // },
-    // return this.outbreakDataService.getOutbreak(
-    //   route.paramMap.get('outbreakId'),
-    //   true
-    // );
+    ...createViewModifyFoundation,
     canActivate: [AuthGuard],
     data: {
       permissions: [
         PERMISSION.OUTBREAK_VIEW
       ],
-      action: ViewModifyComponentAction.VIEW
+      action: CreateViewModifyV2Action.VIEW
     }
   },
   // Edit Outbreak
   {
     path: ':outbreakId/modify',
-    component: fromPages.ModifyOutbreakComponent,
-    // resolve: {
-    //   outbreak: OutbreakResolver - the outbreak provided in url and not the selected one
-    // },
-    // return this.outbreakDataService.getOutbreak(
-    //   route.paramMap.get('outbreakId'),
-    //   true
-    // );
+    ...createViewModifyFoundation,
     canActivate: [AuthGuard],
     data: {
       permissions: [
@@ -91,7 +85,7 @@ const routes: Routes = [
         PERMISSION.OUTBREAK_VIEW,
         PERMISSION.OUTBREAK_MODIFY
       ],
-      action: ViewModifyComponentAction.MODIFY
+      action: CreateViewModifyV2Action.MODIFY
     },
     canDeactivate: [
       PageChangeConfirmationGuard

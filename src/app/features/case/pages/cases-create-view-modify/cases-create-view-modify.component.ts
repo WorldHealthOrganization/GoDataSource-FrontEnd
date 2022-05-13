@@ -322,7 +322,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         finalStep: {
           buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_BUTTON'),
           message: () => this.translateService.instant(
-            'LNG_STEPPER_FINAL_STEP_TEXT_CASE',
+            'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
           )
         }
