@@ -12,6 +12,16 @@ import { ChildActivationStart, NavigationEnd, Router } from '@angular/router';
 import { DashboardModel } from '../../models/dashboard.model';
 import { ConfirmOnFormChanges, PageChangeConfirmationGuard } from '../../services/guards/page-change-confirmation-guard.service';
 import { determineRenderMode, RenderMode } from '../../enums/render-mode.enum';
+import { DebounceTimeCaller, DebounceTimeCallerType } from '../../helperClasses/debounce-time-caller';
+import { Subscriber, throwError } from 'rxjs';
+import { ITokenInfo } from '../../models/auth.model';
+import { Moment } from 'moment';
+import * as moment from 'moment';
+import { UserDataService } from '../../services/data/user.data.service';
+import { catchError } from 'rxjs/operators';
+import { IV2BottomDialogConfigButtonType } from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { MatBottomSheetRef } from '@angular/material/bottom-sheet/bottom-sheet-ref';
+import { AppBottomDialogV2Component } from '../../../shared/components-v2/app-bottom-dialog-v2/app-bottom-dialog-v2.component';
 
 @Component({
   selector: 'app-authenticated',
@@ -21,6 +31,13 @@ import { determineRenderMode, RenderMode } from '../../enums/render-mode.enum';
 export class AuthenticatedComponent implements OnInit, OnDestroy {
   // disable page loading
   static DISABLE_PAGE_LOADING: boolean = false;
+
+  // display popup when less than 2 minutes
+  static NO_ACTIVITY_POPUP_SHOULD_REDIRECT_IF_LESS_THAN_SECONDS = -5;
+  static NO_ACTIVITY_POPUP_SHOULD_APPEAR_WHEN_LESS_THAN_SECONDS = 120;
+  static NO_ACTIVITY_POPUP_SHOULD_REFRESH_TOKEN_IF_USER_ACTIVE = 240;
+  static REFRESH_IF_USER_WAS_ACTIVE_IN_THE_LAST_SECONDS = 20;
+  static REFRESH_DISABLE_SECONDS = 7;
 
   // Side Nav
   @ViewChild('sideDialog', { static: true }) sideDialog: AppSideDialogV2Component;
@@ -35,24 +52,13 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
   // render mode
   renderMode: RenderMode = RenderMode.FULL;
 
-  // #TODO
-  // // display popup when less then 2 minutes
-  // static NO_ACTIVITY_POPUP_SHOULD_REDIRECT_IF_LESS_THAN_SECONDS = -5;
-  // static NO_ACTIVITY_POPUP_SHOULD_APPEAR_WHEN_LESS_THAN_SECONDS = 120;
-  // static NO_ACTIVITY_POPUP_SHOULD_REFRESH_TOKEN_IF_USER_ACTIVE = 240;
-  // static REFRESH_IF_USER_WAS_ACTIVE_IN_THE_LAST_SECONDS = 20;
-  // static REFRESH_DISABLE_SECONDS = 7;
-
   // authenticated user
   private _authUser: UserModel;
 
-  // #TODO
-  // // used to keep subscription and release it if we don't need it anymore
-  // tokenInfoSubjectSubscription: Subscription;
-
-  // router events subscription
+  // subscription
   private routerEventsSubscriptionLoad: Subscription;
   private routerEventsSubscriptionRepetitive: Subscription;
+  private tokenInfoSubjectSubscription: Subscription;
 
   // constants
   RenderMode = RenderMode;
@@ -60,47 +66,45 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
   // menu loading dialog
   private menuLoadingDialog: IV2LoadingDialogHandler;
 
-  // #TODO
-  // // token expire data
-  // private lastRefreshUserTokenOrLogOut: Moment;
-  // private lastInputTime: Moment;
-  // private loadingDialog: LoadingDialogModel;
-  // private confirmDialog: MatDialogRef<DialogComponent>;
-  // private tokenInfo: ITokenInfo;
-  // private tokenExpirePopupIsVisible: boolean = false;
-  // private documentKeyUp: () => void;
-  // private documentMouseMove: () => void;
-  // private tokenCheckIfLoggedOutCaller: DebounceTimeCaller = new DebounceTimeCaller(
-  //   new Subscriber<void>(() => {
-  //     // check if we must check if we;re logged out
-  //     // -7 seconds error marje
-  //     if (
-  //       !this.tokenInfo ||
-  //               this.tokenInfo.isValid ||
-  //               this.tokenInfo.approximatedExpireInSecondsReal > AuthenticatedComponent.NO_ACTIVITY_POPUP_SHOULD_REDIRECT_IF_LESS_THAN_SECONDS
-  //     ) {
-  //       // if user is active, then we need to refresh token
-  //       if (
-  //         this.lastInputTime &&
-  //                   this.tokenInfo &&
-  //                   this.tokenInfo.approximatedExpireInSecondsReal > AuthenticatedComponent.NO_ACTIVITY_POPUP_SHOULD_APPEAR_WHEN_LESS_THAN_SECONDS &&
-  //                   this.tokenInfo.approximatedExpireInSecondsReal < AuthenticatedComponent.NO_ACTIVITY_POPUP_SHOULD_REFRESH_TOKEN_IF_USER_ACTIVE &&
-  //                   Math.floor(moment().diff(this.lastInputTime) / 1000) < AuthenticatedComponent.REFRESH_IF_USER_WAS_ACTIVE_IN_THE_LAST_SECONDS
-  //       ) {
-  //         // retrieve the user instance or log out
-  //         this.refreshUserTokenOrLogOut(true);
-  //       } else {
-  //         // check again later
-  //         this.tokenCheckIfLoggedOutCaller.call();
-  //       }
-  //     } else {
-  //       // retrieve the user instance or log out
-  //       this.refreshUserTokenOrLogOut(false);
-  //     }
-  //   }),
-  //   800,
-  //   DebounceTimeCallerType.DONT_RESET_AND_WAIT
-  // );
+  // token expire data
+  private lastRefreshUserTokenOrLogOut: Moment;
+  private lastInputTime: Moment;
+  private confirmDialog: MatBottomSheetRef<AppBottomDialogV2Component>;
+  private tokenInfo: ITokenInfo;
+  private tokenExpirePopupIsVisible: boolean = false;
+  private documentKeyUp: () => void;
+  private documentMouseMove: () => void;
+  private tokenCheckIfLoggedOutCaller: DebounceTimeCaller = new DebounceTimeCaller(
+    new Subscriber<void>(() => {
+      // check if we must check if we;re logged out
+      // -7 seconds error marje
+      if (
+        !this.tokenInfo ||
+        this.tokenInfo.isValid ||
+        this.tokenInfo.approximatedExpireInSecondsReal > AuthenticatedComponent.NO_ACTIVITY_POPUP_SHOULD_REDIRECT_IF_LESS_THAN_SECONDS
+      ) {
+        // if user is active, then we need to refresh token
+        if (
+          this.lastInputTime &&
+          this.tokenInfo &&
+          this.tokenInfo.approximatedExpireInSecondsReal > AuthenticatedComponent.NO_ACTIVITY_POPUP_SHOULD_APPEAR_WHEN_LESS_THAN_SECONDS &&
+          this.tokenInfo.approximatedExpireInSecondsReal < AuthenticatedComponent.NO_ACTIVITY_POPUP_SHOULD_REFRESH_TOKEN_IF_USER_ACTIVE &&
+          Math.floor(moment().diff(this.lastInputTime) / 1000) < AuthenticatedComponent.REFRESH_IF_USER_WAS_ACTIVE_IN_THE_LAST_SECONDS
+        ) {
+          // retrieve the user instance or log out
+          this.refreshUserTokenOrLogOut(true);
+        } else {
+          // check again later
+          this.tokenCheckIfLoggedOutCaller.call();
+        }
+      } else {
+        // retrieve the user instance or log out
+        this.refreshUserTokenOrLogOut(false);
+      }
+    }),
+    800,
+    DebounceTimeCallerType.DONT_RESET_AND_WAIT
+  );
 
   /**
    * Constructor
@@ -109,7 +113,8 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
     private authDataService: AuthDataService,
     private outbreakDataService: OutbreakDataService,
     private dialogV2Service: DialogV2Service,
-    private router: Router
+    private router: Router,
+    private userDataService: UserDataService
   ) {
     // detect when the route is changed
     this.routerEventsSubscriptionLoad = this.router.events.subscribe((event) => {
@@ -145,9 +150,8 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // // handle auth token expire popup
-    // #TODO
-    // this.initializeTokenExpireHandler();
+    // handle auth token expire popup
+    this.initializeTokenExpireHandler();
 
     // used to handle side dialog requests
     this.sideDialogSubjectSubscription = this.dialogV2Service.sideDialogSubject$
@@ -240,8 +244,6 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
       this.routerEventsSubscriptionRepetitive = null;
     }
 
-    // #TODO
-    /*
     // release token info subscription
     if (this.tokenInfoSubjectSubscription) {
       this.tokenInfoSubjectSubscription.unsubscribe();
@@ -260,7 +262,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
     }
     if (this.documentMouseMove) {
       document.removeEventListener('mousemove', this.documentMouseMove);
-    }*/
+    }
   }
 
   /**
@@ -286,201 +288,195 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
     }
   }
 
-  // #TODO
   /**
-     * Refresh last input time
-     */
-  // private refreshLastInputTime() {
-  //   if (!this.lastInputTime) {
-  //     this.lastInputTime = moment();
-  //   } else if (moment().diff(this.lastInputTime) / 1000 > 3) {
-  //     this.lastInputTime = moment();
-  //   }
-  // }
+   * Refresh last input time
+   */
+  private refreshLastInputTime() {
+    if (!this.lastInputTime) {
+      this.lastInputTime = moment();
+    } else if (moment().diff(this.lastInputTime) / 1000 > 3) {
+      this.lastInputTime = moment();
+    }
+  }
 
-  // #TODO
   /**
-     * Handler for token expire
-     */
-  // private initializeTokenExpireHandler() {
-  //   // init checker if signed out
-  //   this.tokenCheckIfLoggedOutCaller.call();
-  //
-  //   // register idle handlers
-  //   this.documentKeyUp = () => {
-  //     this.refreshLastInputTime();
-  //   };
-  //   document.addEventListener('keyup', this.documentKeyUp);
-  //   this.documentMouseMove = () => {
-  //     this.refreshLastInputTime();
-  //   };
-  //   document.addEventListener('mousemove', this.documentMouseMove);
-  //
-  //   // subscribe to token estimated time
-  //   this.tokenInfoSubjectSubscription = this.authDataService
-  //     .getTokenInfoSubject()
-  //     .subscribe((tokenInfo) => {
-  //       // check if token expired - display popup
-  //       this.tokenInfo = tokenInfo;
-  //       if (this.tokenInfo) {
-  //         // check if we need to display popup
-  //         if (
-  //           !this.tokenExpirePopupIsVisible &&
-  //                       this.tokenInfo.approximatedExpireInSeconds > -1 &&
-  //                       this.tokenInfo.approximatedExpireInSeconds < AuthenticatedComponent.NO_ACTIVITY_POPUP_SHOULD_APPEAR_WHEN_LESS_THAN_SECONDS
-  //         ) {
-  //           // popup visible
-  //           this.tokenExpirePopupIsVisible = true;
-  //           setTimeout(() => {
-  //             // display popup
-  //             this.confirmDialog = this.dialogService
-  //               .showConfirmDialog(
-  //                 new DialogConfiguration({
-  //                   message: 'LNG_AUTHENTICATION_TOKEN_EXPIRE_DIALOG_TITLE',
-  //                   buttons: [
-  //                     new DialogButton({
-  //                       label: 'LNG_AUTHENTICATION_TOKEN_EXPIRE_DIALOG_CONTINUE_BUTTON',
-  //                       clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
-  //                         // show loading
-  //                         this.loadingDialog = this.dialogService.showLoadingDialog();
-  //
-  //                         // retrieve the user instance
-  //                         this.userDataService
-  //                           .getUser(this.authUser.id)
-  //                           .pipe(catchError((err) => {
-  //                             // log out
-  //                             this.authDataService
-  //                               .logout()
-  //                               .pipe(
-  //                                 catchError(() => {
-  //                                   this.prepareForRedirect();
-  //                                   this.router.navigate(['/auth/login']);
-  //                                   dialogHandler.close();
-  //                                   this.loadingDialog.close();
-  //                                   this.loadingDialog = null;
-  //                                   return throwError(err);
-  //                                 })
-  //                               )
-  //                               .subscribe(() => {
-  //                                 this.prepareForRedirect();
-  //                                 this.router.navigate(['/auth/login']);
-  //                                 dialogHandler.close();
-  //                                 this.loadingDialog.close();
-  //                                 this.loadingDialog = null;
-  //                               });
-  //
-  //                             // finished
-  //                             return throwError(err);
-  //                           }))
-  //                           .subscribe(() => {
-  //                             // still logged in
-  //                             // continue
-  //                             dialogHandler.close();
-  //                             this.loadingDialog.close();
-  //                             this.loadingDialog = null;
-  //                           });
-  //                       }
-  //                     })
-  //                   ]
-  //                 })
-  //               );
-  //
-  //             // show dialog
-  //             this.confirmDialog
-  //               .afterClosed()
-  //               .subscribe(() => {
-  //                 // popup closed
-  //                 this.tokenExpirePopupIsVisible = false;
-  //                 this.confirmDialog = null;
-  //               });
-  //           });
-  //
-  //         }
-  //       }
-  //     });
-  // }
+   * Handler for token expire
+   */
+  private initializeTokenExpireHandler() {
+    // init checker if signed out
+    this.tokenCheckIfLoggedOutCaller.call();
 
-  // #TODO
+    // register idle handlers
+    this.documentKeyUp = () => {
+      this.refreshLastInputTime();
+    };
+    document.addEventListener('keyup', this.documentKeyUp);
+    this.documentMouseMove = () => {
+      this.refreshLastInputTime();
+    };
+    document.addEventListener('mousemove', this.documentMouseMove);
+
+    // subscribe to token estimated time
+    this.tokenInfoSubjectSubscription = this.authDataService
+      .getTokenInfoSubject()
+      .subscribe((tokenInfo) => {
+        // check if token expired - display popup
+        this.tokenInfo = tokenInfo;
+        if (this.tokenInfo) {
+          // check if we need to display popup
+          if (
+            !this.tokenExpirePopupIsVisible &&
+            this.tokenInfo.approximatedExpireInSeconds > -1 &&
+            this.tokenInfo.approximatedExpireInSeconds < AuthenticatedComponent.NO_ACTIVITY_POPUP_SHOULD_APPEAR_WHEN_LESS_THAN_SECONDS
+          ) {
+            // popup visible
+            this.tokenExpirePopupIsVisible = true;
+            setTimeout(() => {
+              // display popup
+              this.confirmDialog = this.dialogV2Service
+                .showBottomDialogBare({
+                  config: {
+                    title: {
+                      get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
+                    },
+                    message: {
+                      get: () => 'LNG_AUTHENTICATION_TOKEN_EXPIRE_DIALOG_TITLE'
+                    }
+                  },
+                  bottomButtons: [{
+                    type: IV2BottomDialogConfigButtonType.CANCEL,
+                    label: 'LNG_AUTHENTICATION_TOKEN_EXPIRE_DIALOG_CONTINUE_BUTTON',
+                    color: 'text'
+                  }]
+                });
+
+              // show dialog
+              this.confirmDialog
+                .afterDismissed()
+                .subscribe(() => {
+                  // show loading
+                  this.showLoading();
+
+                  // retrieve the user instance
+                  this.userDataService
+                    .getUser(this._authUser.id)
+                    .pipe(
+                      catchError((err) => {
+                        // log out
+                        this.authDataService
+                          .logout()
+                          .pipe(
+                            catchError(() => {
+                              this.prepareForRedirect();
+                              this.hideLoading();
+                              this.tokenExpirePopupIsVisible = false;
+                              this.confirmDialog = null;
+                              this.router.navigate(['/auth/login']);
+                              return throwError(err);
+                            })
+                          )
+                          .subscribe(() => {
+                            this.prepareForRedirect();
+                            this.hideLoading();
+                            this.tokenExpirePopupIsVisible = false;
+                            this.confirmDialog = null;
+                            this.router.navigate(['/auth/login']);
+                          });
+
+                        // finished
+                        return throwError(err);
+                      })
+                    )
+                    .subscribe(() => {
+                      // popup closed
+                      this.hideLoading();
+                      this.tokenExpirePopupIsVisible = false;
+                      this.confirmDialog = null;
+                    });
+                });
+            });
+          }
+        }
+      });
+  }
+
   /**
-     * Refresh user token or log out
-     */
-  // private refreshUserTokenOrLogOut(
-  //   hideDialogsOnSuccess: boolean
-  // ) {
-  //   // don't allow spam :)
-  //   if (
-  //     this.lastRefreshUserTokenOrLogOut &&
-  //           Math.floor(moment().diff(this.lastRefreshUserTokenOrLogOut) / 1000) < AuthenticatedComponent.REFRESH_DISABLE_SECONDS
-  //   ) {
-  //     // check again later
-  //     this.tokenCheckIfLoggedOutCaller.call();
-  //
-  //     // finished
-  //     return;
-  //   }
-  //
-  //   // retrieve the user instance
-  //   this.lastRefreshUserTokenOrLogOut = moment();
-  //   this.userDataService
-  //     .getUser(this.authUser.id)
-  //     .pipe(catchError((err) => {
-  //       // log out
-  //       this.authDataService
-  //         .logout()
-  //         .pipe(
-  //           catchError(() => {
-  //             // close dialogs
-  //             if (this.confirmDialog) {
-  //               this.confirmDialog.close();
-  //               this.confirmDialog = null;
-  //             }
-  //             if (this.loadingDialog) {
-  //               this.loadingDialog.close();
-  //               this.loadingDialog = null;
-  //             }
-  //
-  //             // finished
-  //             this.prepareForRedirect();
-  //             this.router.navigate(['/auth/login']);
-  //             return throwError(err);
-  //           })
-  //         )
-  //         .subscribe(() => {
-  //           // close dialogs
-  //           if (this.confirmDialog) {
-  //             this.confirmDialog.close();
-  //             this.confirmDialog = null;
-  //           }
-  //           if (this.loadingDialog) {
-  //             this.loadingDialog.close();
-  //             this.loadingDialog = null;
-  //           }
-  //
-  //           // finished
-  //           this.prepareForRedirect();
-  //           this.router.navigate(['/auth/login']);
-  //         });
-  //
-  //       // finished
-  //       return throwError(err);
-  //     }))
-  //     .subscribe(() => {
-  //       // close dialogs
-  //       if (hideDialogsOnSuccess) {
-  //         if (this.confirmDialog) {
-  //           this.confirmDialog.close();
-  //           this.confirmDialog = null;
-  //         }
-  //         if (this.loadingDialog) {
-  //           this.loadingDialog.close();
-  //           this.loadingDialog = null;
-  //         }
-  //       }
-  //
-  //       // check again later
-  //       this.tokenCheckIfLoggedOutCaller.call();
-  //     });
-  // }
+   * Refresh user token or log out
+   */
+  private refreshUserTokenOrLogOut(hideDialogsOnSuccess: boolean) {
+    // don't allow spam :)
+    if (
+      this.lastRefreshUserTokenOrLogOut &&
+      Math.floor(moment().diff(this.lastRefreshUserTokenOrLogOut) / 1000) < AuthenticatedComponent.REFRESH_DISABLE_SECONDS
+    ) {
+      // check again later
+      this.tokenCheckIfLoggedOutCaller.call();
+
+      // finished
+      return;
+    }
+
+    // retrieve the user instance
+    this.lastRefreshUserTokenOrLogOut = moment();
+    this.userDataService
+      .getUser(this._authUser.id)
+      .pipe(catchError((err) => {
+        // log out
+        this.authDataService
+          .logout()
+          .pipe(
+            catchError(() => {
+              // close dialogs
+              if (this.confirmDialog) {
+                this.confirmDialog.dismiss();
+                this.confirmDialog = null;
+              }
+
+              // hide loading
+              this.hideLoading();
+
+              // finished
+              this.prepareForRedirect();
+              this.router.navigate(['/auth/login']);
+
+              // error
+              return throwError(err);
+            })
+          )
+          .subscribe(() => {
+            // close dialogs
+            if (this.confirmDialog) {
+              this.confirmDialog.dismiss();
+              this.confirmDialog = null;
+            }
+
+            // hide loading
+            this.hideLoading();
+
+            // finished
+            this.prepareForRedirect();
+            this.router.navigate(['/auth/login']);
+          });
+
+        // finished
+        return throwError(err);
+      }))
+      .subscribe(() => {
+        // close dialogs
+        if (hideDialogsOnSuccess) {
+          if (this.confirmDialog) {
+            this.confirmDialog.dismiss();
+            this.confirmDialog = null;
+          }
+
+          // hide loading
+          this.hideLoading();
+        }
+
+        // check again later
+        this.tokenCheckIfLoggedOutCaller.call();
+      });
+  }
 
   /**
    * Disable dialogs before redirect
