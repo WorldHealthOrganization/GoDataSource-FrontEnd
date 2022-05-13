@@ -25,7 +25,6 @@ import { ModifyContactFollowUpQuestionnaireDialogComponent } from './modify-cont
 import { ColorListLegendComponent } from './color-list-legend/color-list-legend.component';
 import { FormContactQuickComponent } from './form-contact-quick/form-contact-quick.component';
 import { LoadingDialogComponent } from './loading-dialog/loading-dialog.component';
-import { GlobalEntitySearchComponent } from './global-entity-search/global-entity-search.component';
 import { NumberOfItemsLabelComponent } from './number-of-items-label/number-of-items-label.component';
 import { FormCaseCenterDaterangeComponent } from './form-case-center-daterange/form-case-center-daterange.component';
 import { FormCaseCenterDaterangeListComponent } from './form-case-center-daterange-list/form-case-center-daterange-list.component';
@@ -63,7 +62,6 @@ export const components: any[] = [
   // main layout
   BreadcrumbsComponent,
   SideFiltersComponent,
-  GlobalEntitySearchComponent,
 
   // authentication - #TODO - this needs to be refactored & removed
   NotAuthTemplateComponent,
