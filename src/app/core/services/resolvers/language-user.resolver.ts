@@ -24,8 +24,8 @@ implements Resolve<any> {
   ) {}
 
   /**
-     * Language loaded, we can display the website pages
-     */
+   * Language loaded, we can display the website pages
+   */
   resolve(): Observable<any> {
     return new Observable((observer: Subscriber<void>) => {
       if (this.translateService.currentLang) {
