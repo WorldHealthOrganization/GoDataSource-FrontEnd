@@ -174,9 +174,6 @@ export class ModifyHelpItemComponent extends ViewModifyComponent implements OnIn
       return;
     }
 
-    // since we change content, should we reset approve value to false?
-    // #TODO - #TBD
-
     // show loading
     this.showLoadingDialog();
 

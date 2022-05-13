@@ -89,10 +89,6 @@ export class ConfirmOnFormChanges {
     // check if we have forms with changes
     let foundChanges: boolean = false;
     canDeactivateForms.forEach((form: NgForm) => {
-      // do we need to ignore this form ?
-      // check if form has ignore attribute / directive - NOT needed until now, so it wasn't implemented
-      // #TODO
-
       // determine if we have changes
       if (form.dirty) {
         // we found changes, there is no point in going through the rest of the forms

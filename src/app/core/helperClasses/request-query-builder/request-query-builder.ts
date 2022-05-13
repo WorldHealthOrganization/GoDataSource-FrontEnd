@@ -127,11 +127,8 @@ export class RequestQueryBuilder {
   }
 
   /**
-     * #TODO Replace usage with RequestPaginator
-     * Sets a "limit" on the number of results retrieved in a list
-     * @param {number} limit
-     * @returns {RequestQueryBuilder}
-     */
+   * Sets a "limit" on the number of results retrieved in a list
+   */
   limit(limit: number) {
     // limit
     this.limitResultsNumber = limit;
