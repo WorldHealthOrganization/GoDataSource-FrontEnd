@@ -1,7 +1,6 @@
 import {
   Component,
-  OnDestroy,
-  ViewEncapsulation
+  OnDestroy
 } from '@angular/core';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
@@ -28,9 +27,7 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 
 @Component({
   selector: 'app-search-result-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './search-result-list.component.html',
-  styleUrls: ['./search-result-list.less']
+  templateUrl: './search-result-list.component.html'
 })
 export class SearchResultListComponent extends ListComponent implements OnDestroy {
   // list of search result
