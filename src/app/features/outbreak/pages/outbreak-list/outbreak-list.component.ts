@@ -599,6 +599,14 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
                 }
               },
 
+              // Divider
+              {
+                visible: (item: OutbreakModel): boolean => {
+                  return !item.deleted &&
+                    OutbreakModel.canSeeInconsistencies(this.authUser);
+                }
+              },
+
               // View Outbreak case form
               {
                 label: {
