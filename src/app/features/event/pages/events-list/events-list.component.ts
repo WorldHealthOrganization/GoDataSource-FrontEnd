@@ -181,10 +181,7 @@ export class EventsListComponent
 
     // number of contacts & exposures columns should be visible only on pages where we have relationships
     // for events without relationships we don't need these columns
-    if (
-      this.appliedListFilter !==
-      Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS
-    ) {
+    if (this.appliedListFilter !== Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS) {
       this.tableColumns.push(
         {
           field: 'numberOfContacts',
