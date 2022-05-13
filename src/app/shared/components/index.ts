@@ -15,7 +15,6 @@ import { FormFillQuestionnaireComponent } from './form-fill-questionnaire/form-f
 import { ReferenceDataLabelComponent } from './reference-data-label/reference-data-label.component';
 import { FormInputListComponent } from './form-input-list/form-input-list.component';
 import { ChronologyComponent } from './chronology/chronology.component';
-import { ExportButtonComponent } from './export-button/export-button.component';
 import { LocationBreadcrumbsComponent } from './location-breadcrumbs/location-breadcrumbs.component';
 import { FormAgeComponent } from './form-age/form-age.component';
 import { AgeLabelComponent } from './age-label/age-label.component';
@@ -112,7 +111,6 @@ export const components: any[] = [
   LocationDialogComponent,
 
   // general
-  ExportButtonComponent,
   NumberOfItemsLabelComponent,
   FormCaseCenterDaterangeComponent,
   FormCaseCenterDaterangeListComponent,

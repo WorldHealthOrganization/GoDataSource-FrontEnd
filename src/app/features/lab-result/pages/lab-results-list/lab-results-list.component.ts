@@ -2,7 +2,6 @@ import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
 import { Observable, throwError } from 'rxjs';
-import { Subscription } from 'rxjs/internal/Subscription';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
@@ -40,36 +39,6 @@ export class LabResultsListComponent extends ListComponent implements OnDestroy 
   // lab results list
   labResultsList$: Observable<any>;
 
-  outbreakSubscriber: Subscription;
-
-  anonymizeFields: ILabelValuePairModel[] = [
-    { label: 'LNG_LAB_RESULT_FIELD_LABEL_ID', value:  'id' },
-    { label: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON_ID', value:  'personId' },
-    { label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN', value:  'dateSampleTaken' },
-    { label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED', value:  'dateSampleDelivered' },
-    { label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING', value:  'dateTesting' },
-    { label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT', value:  'dateOfResult' },
-    { label: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME', value:  'labName' },
-    { label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID', value:  'sampleIdentifier' },
-    { label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE', value:  'sampleType' },
-    { label: 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE', value:  'testType' },
-    { label: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR', value:  'testedFor' },
-    { label: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT', value:  'result' },
-    { label: 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT', value:  'quantitativeResult' },
-    { label: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES', value:  'notes' },
-    { label: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS', value:  'status' },
-    { label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE', value:  'sequence' },
-    { label: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value:  'questionnaireAnswers' },
-    { label: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON', value:  'person' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value:  'createdAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value:  'createdBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value:  'updatedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value:  'updatedBy' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value:  'deleted' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value:  'deletedAt' },
-    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value:  'createdOn' }
-  ];
-
   /**
   * Constructor
   */
@@ -91,12 +60,6 @@ export class LabResultsListComponent extends ListComponent implements OnDestroy 
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
-
-    // outbreak subscriber
-    if (this.outbreakSubscriber) {
-      this.outbreakSubscriber.unsubscribe();
-      this.outbreakSubscriber = null;
-    }
   }
 
   /**
@@ -428,10 +391,7 @@ export class LabResultsListComponent extends ListComponent implements OnDestroy 
     ];
 
     // add to list type only if we're allowed to
-    if (
-      this.selectedOutbreak &&
-      this.selectedOutbreak.isContactLabResultsActive
-    ) {
+    if (this.selectedOutbreak?.isContactLabResultsActive) {
       this.tableColumns.push({
         field: 'personType',
         label: 'LNG_LAB_RESULT_FIELD_LABEL_ENTITY_TYPE',
@@ -715,18 +675,18 @@ export class LabResultsListComponent extends ListComponent implements OnDestroy 
   }
 
   /**
-  * Initialize process data
-  */
+   * Initialize process data
+   */
   protected initializeProcessSelectedData(): void {}
 
   /**
-    * Initialize table infos
-    */
+   * Initialize table infos
+   */
   protected initializeTableInfos(): void {}
 
   /**
-  * Initialize Table Advanced Filters
-  */
+   * Initialize Table Advanced Filters
+   */
   protected initializeTableAdvancedFilters(): void {
     this.advancedFilters = [
       {
@@ -796,8 +756,8 @@ export class LabResultsListComponent extends ListComponent implements OnDestroy 
   }
 
   /**
-  * Initialize table quick actions
-  */
+   * Initialize table quick actions
+   */
   protected initializeQuickActions(): void {
     this.quickActions = {
       type: V2ActionType.MENU,
@@ -861,8 +821,8 @@ export class LabResultsListComponent extends ListComponent implements OnDestroy 
   }
 
   /**
-  * Initialize table group actions
-  */
+   * Initialize table group actions
+   */
   protected initializeGroupActions(): void {
     this.groupActions = [
       // bulk export
@@ -891,18 +851,18 @@ export class LabResultsListComponent extends ListComponent implements OnDestroy 
   }
 
   /**
-  * Initialize table add action
-  */
+   * Initialize table add action
+   */
   protected initializeAddAction(): void {}
 
   /**
-  * Initialize table grouped data
-  */
+   * Initialize table grouped data
+   */
   protected initializeGroupedData(): void {}
 
   /**
-  * Initialize breadcrumbs
-  */
+   * Initialize breadcrumbs
+   */
   protected initializeBreadcrumbs(): void {
     this.breadcrumbs = [
       {
@@ -926,6 +886,7 @@ export class LabResultsListComponent extends ListComponent implements OnDestroy 
   protected refreshListFields(): string[] {
     return [
       'id',
+      'personId',
       'person',
       'sampleIdentifier',
       'dateSampleTaken',
@@ -948,8 +909,8 @@ export class LabResultsListComponent extends ListComponent implements OnDestroy 
   }
 
   /**
-  * Re(load) the Lab Results list
-  */
+   * Re(load) the Lab Results list
+   */
   refreshList() {
     // retrieve only case lab results ?
     if (
@@ -996,8 +957,8 @@ export class LabResultsListComponent extends ListComponent implements OnDestroy 
   }
 
   /**
-  * Get total number of items, based on the applied filters
-  */
+   * Get total number of items, based on the applied filters
+   */
   refreshListCount(applyHasMoreLimit?: boolean) {
     // reset
     this.pageCount = undefined;
@@ -1038,8 +999,8 @@ export class LabResultsListComponent extends ListComponent implements OnDestroy 
   }
 
   /**
-  * Export lab results
-  */
+   * Export lab results
+   */
   private exportLabResults(qb: RequestQueryBuilder) {
     this.dialogV2Service.showExportDataAfterLoadingData({
       title: {
@@ -1094,7 +1055,33 @@ export class LabResultsListComponent extends ListComponent implements OnDestroy 
                   ],
                   encrypt: true,
                   anonymize: {
-                    fields: this.anonymizeFields
+                    fields: [
+                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_ID', value:  'id' },
+                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON_ID', value:  'personId' },
+                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN', value:  'dateSampleTaken' },
+                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED', value:  'dateSampleDelivered' },
+                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING', value:  'dateTesting' },
+                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT', value:  'dateOfResult' },
+                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME', value:  'labName' },
+                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID', value:  'sampleIdentifier' },
+                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE', value:  'sampleType' },
+                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE', value:  'testType' },
+                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR', value:  'testedFor' },
+                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT', value:  'result' },
+                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT', value:  'quantitativeResult' },
+                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES', value:  'notes' },
+                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS', value:  'status' },
+                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE', value:  'sequence' },
+                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value:  'questionnaireAnswers' },
+                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON', value:  'person' },
+                      { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value:  'createdAt' },
+                      { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value:  'createdBy' },
+                      { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value:  'updatedAt' },
+                      { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value:  'updatedBy' },
+                      { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value:  'deleted' },
+                      { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value:  'deletedAt' },
+                      { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value:  'createdOn' }
+                    ]
                   },
                   groups: {
                     fields: labResultsFieldGroups,
