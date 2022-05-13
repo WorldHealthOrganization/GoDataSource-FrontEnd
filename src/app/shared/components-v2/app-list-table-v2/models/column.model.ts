@@ -49,6 +49,7 @@ export interface IV2ColumnBasic {
   cssCellClass?: string;
   sortable?: boolean;
   filter?: V2Filter;
+  highlight?: string;
 }
 
 /**
@@ -116,7 +117,7 @@ interface IV2ColumnBoolean extends Omit<IV2ColumnBasic, 'format'> {
 /**
  * Color column
  */
-export interface IV2ColumnColor extends Omit<IV2ColumnBasic, 'format'> {
+export interface IV2ColumnColor extends Omit<IV2ColumnBasic, 'format' | 'highlight'> {
   // required
   format: Omit<IV2ColumnBasicFormat, 'type'> & {
     type: V2ColumnFormat.COLOR
@@ -127,7 +128,7 @@ export interface IV2ColumnColor extends Omit<IV2ColumnBasic, 'format'> {
 /**
  * Color material icon
  */
-export interface IV2ColumnIconMaterial extends Omit<IV2ColumnBasic, 'format'> {
+export interface IV2ColumnIconMaterial extends Omit<IV2ColumnBasic, 'format' | 'highlight'> {
   // required
   format: Omit<IV2ColumnBasicFormat, 'type'> & {
     type: V2ColumnFormat.ICON_MATERIAL

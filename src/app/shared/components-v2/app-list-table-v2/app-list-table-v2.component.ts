@@ -54,6 +54,7 @@ import { V2AdvancedFilter } from './models/advanced-filter.model';
 import { SavedFilterData } from '../../../core/models/saved-filters.model';
 import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model';
 import { IV2ProcessSelectedData } from './models/process-data.model';
+import { HighlightSearchPipe } from '../../pipes/highlight-search/highlight-search';
 
 /**
  * Component
@@ -1008,7 +1009,16 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     if (basicColumn.link) {
       return (params: ValueFormatterParams) => {
         // determine value
-        const value: string = this.formatValue(params);
+        let value: string = this.formatValue(params);
+
+        // do we need to highlight anything ?
+        if ((column as any).highlight) {
+          // highlight text if necessary
+          value = HighlightSearchPipe.highlight(
+            value,
+            (column as any).highlight
+          );
+        }
 
         // retrieve url link
         const url: string = basicColumn.link(params.data);
@@ -1114,6 +1124,23 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           return statusHtml;
         };
       }
+    }
+
+    // do we need to highlight anything ?
+    if ((column as any).highlight) {
+      return (params: ValueFormatterParams) => {
+        // determine value
+        let value: any = this.formatValue(params);
+
+        // highlight text if necessary
+        value = HighlightSearchPipe.highlight(
+          value,
+          (column as any).highlight
+        );
+
+        // finished
+        return value;
+      };
     }
 
     // nothing to do ?

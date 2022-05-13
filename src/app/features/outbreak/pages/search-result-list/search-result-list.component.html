@@ -1,12 +1,32 @@
-<!--
-<app-topnav [activeOutbreakEditable]="false">
-    <ng-container dynamic-section>
-        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
-            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
-        </div>
-    </ng-container>
-</app-topnav>
--->
+<app-list-table-v2
+  pageTitle="LNG_PAGE_LIST_SEARCH_RESULT_TITLE"
+  [records$]="entityList$"
+  [processSelectedData]="processSelectedData"
+  [columns]="tableColumns"
+  [breadcrumbs]="breadcrumbs"
+  [quickActions]="quickActions"
+  [groupActions]="groupActions"
+  [addAction]="addAction"
+  [groupedData]="groupedData"
+  [pageCount]="pageCount"
+  [pageSize]="pageSize"
+  [pageIndex]="pageIndex"
+  [pageSettingsKey]="UserSettings.SEARCH_RESULTS_FIELDS"
+  [sortColumn]="tableSortBy"
+  [infos]="infos"
+  [suffixLegends]="suffixLegends"
+  [filtersApplied]="filtersApplied"
+  [advancedFilterType]="undefined"
+  [advancedFilters]="advancedFilters"
+  (refreshData)="needsRefreshList(true)"
+  (refreshDataCount)="refreshListCount(false)"
+  (pageChange)="changePage($event)"
+  (sortBy)="sortBy($event, { age: [ 'years', 'months' ] })"
+  (filterBy)="filterBy($event)"
+  (resetHeaderFilters)="resetFiltersToSideFilters()"
+  (advancedFilterBy)="applySideFilters($event)">
+</app-list-table-v2>
+
 
 <!--&lt;!&ndash; Side columns &ndash;&gt;-->
 <!--<app-side-columns-->
@@ -21,112 +41,34 @@
 <!--    (showAll)="refreshListCount(false)">-->
 <!--</app-total-number-of-records>-->
 
-<mat-card class="page-section page-content">
-    <div class="top-section-wrapper">
-        <!--Color Legend-->
-        <div>
-            <app-color-list-legend [referenceDataCategory]="ReferenceDataCategory.PERSON_TYPE">
-            </app-color-list-legend>
-        </div>
+<!--<mat-card class="page-section page-content">-->
+<!--    <div class="top-section-wrapper">-->
+<!--        &lt;!&ndash;Color Legend&ndash;&gt;-->
+<!--        <div>-->
+<!--            <app-color-list-legend [referenceDataCategory]="ReferenceDataCategory.PERSON_TYPE">-->
+<!--            </app-color-list-legend>-->
+<!--        </div>-->
 
-        <!-- Filters -->
-        <div class="reset-filters">
-            <button
-                type="button"
-                mat-raised-button
-                color="accent"
-                (click)="needsRefreshList(true)">
-                {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
-            </button>
-        </div>
-    </div>
-
-    <div fxLayout="column" fxLayoutGap="5px">
-        <div>
-            {{ 'LNG_PAGE_LIST_SEARCH_RESULT_DESCRIPTION' | translate }}
-        </div>
-    </div>
-
-    <!-- Hover question effects / actions -->
-<!--    <app-hover-row-actions-->
-<!--        #hoverRow-->
-<!--        [active]="!refreshingList"-->
-<!--    ></app-hover-row-actions>-->
-
-    <mat-table #table [dataSource]="entityList$ | async">
-        <!-- ID -->
-        <ng-container matColumnDef="id">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_COMMON_MODEL_FIELD_LABEL_ID' | translate}}</div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
-                <span
-                    [innerHTML]="item.id | highlight: searchValue">
-                </span>
-            </mat-cell>
-        </ng-container>
-
-        <!-- Visual ID -->
-        <ng-container matColumnDef="visualId">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_PAGE_LIST_SEARCH_RESULT_ENTITY_ID' | translate}}</div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
-               <span
-                   [innerHTML]="item.visualId | highlight: searchValue">
-                </span>
-            </mat-cell>
-        </ng-container>
-
-        <!-- Name -->
-        <ng-container matColumnDef="name">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_ENTITY_FIELD_LABEL_NAME' | translate}}</div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
-                {{item.name }}
-            </mat-cell>
-        </ng-container>
-
-        <mat-header-row *matHeaderRowDef="[]"></mat-header-row>
-        <mat-row
-            *matRowDef="let item; columns: []">
-<!--            app-hover-row-actions-->
-<!--            [hoverRowActionsComponent]="hoverRow"-->
-<!--            [hoverRowActions]="recordActions"-->
-<!--            [hoverRowActionData]="item"-->
-        </mat-row>
-    </mat-table>
-
-<!--    <div-->
-<!--        *ngIf="refreshingList"-->
-<!--        class="mat-table-loading-data">-->
-<!--        <mat-spinner></mat-spinner>-->
+<!--        &lt;!&ndash; Filters &ndash;&gt;-->
+<!--        <div class="reset-filters">-->
+<!--            <button-->
+<!--                type="button"-->
+<!--                mat-raised-button-->
+<!--                color="accent"-->
+<!--                (click)="needsRefreshList(true)">-->
+<!--                {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}-->
+<!--            </button>-->
+<!--        </div>-->
 <!--    </div>-->
 
-<!--    &lt;!&ndash; No data &ndash;&gt;-->
-<!--    <div-->
-<!--        *ngIf="!refreshingList && isEmptyList"-->
-<!--        class="empty-table-text">-->
-<!--        {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}-->
+<!--    <div fxLayout="column" fxLayoutGap="5px">-->
+<!--        <div>-->
+<!--            {{ 'LNG_PAGE_LIST_SEARCH_RESULT_DESCRIPTION' | translate }}-->
+<!--        </div>-->
 <!--    </div>-->
 
-<!--    &lt;!&ndash; Pages (need to be hidden and not ngIf, otherwise it makes a new duplicate request) &ndash;&gt;-->
-<!--    <app-mat-paginator-extended-->
-<!--        [hidden]="refreshingList || isEmptyList"-->
-<!--        [pageIndex]="pageIndex"-->
-<!--        [countData]="entityListCount$ | async"-->
-<!--        [pageSize]="pageSize"-->
-<!--        [pageSizeOptions]="[]"-->
-<!--        (page)="changePage($event)">-->
-<!--    </app-mat-paginator-extended>-->
-</mat-card>
+<!--    &lt;!&ndash; Hover question effects / actions &ndash;&gt;-->
+<!--&lt;!&ndash;    <app-hover-row-actions&ndash;&gt;-->
+<!--&lt;!&ndash;        #hoverRow&ndash;&gt;-->
+<!--&lt;!&ndash;        [active]="!refreshingList"&ndash;&gt;-->
+<!--&lt;!&ndash;    ></app-hover-row-actions>&ndash;&gt;-->

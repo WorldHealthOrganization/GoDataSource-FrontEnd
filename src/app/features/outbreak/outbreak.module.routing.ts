@@ -14,6 +14,7 @@ import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.res
 import { FollowUpGenerationTeamAssignmentAlgorithmDataResolver } from '../../core/services/resolvers/data/follow-up-generation-team-assignment-algorithm.resolver';
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
+import { PersonTypeDataResolver } from '../../core/services/resolvers/data/person-type.resolver';
 
 const routes: Routes = [
   // Outbreaks list
@@ -195,6 +196,10 @@ const routes: Routes = [
           PERMISSION.EVENT_LIST
         ]
       })
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      personType: PersonTypeDataResolver
     }
   }
 ];
