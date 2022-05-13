@@ -20,7 +20,13 @@ import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-
 const createViewModifyFoundation: Route = {
   component: fromPages.OutbreakCreateViewModifyComponent,
   canActivate: [AuthGuard],
-  resolve: {}
+  resolve: {
+    disease: DiseaseDataResolver,
+    country: CountryDataResolver,
+    geographicalLevel: LocationGeographicalLevelDataResolver,
+    followUpGenerationTeamAssignmentAlgorithm: FollowUpGenerationTeamAssignmentAlgorithmDataResolver,
+    yesNo: YesNoDataResolver
+  }
 };
 
 // routes

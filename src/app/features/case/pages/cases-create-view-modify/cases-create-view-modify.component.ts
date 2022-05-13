@@ -2072,6 +2072,10 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       .getCasesList(
         this.selectedOutbreak.id,
         data.queryBuilder
+      )
+      .pipe(
+        // should be the last pipe
+        takeUntil(this.destroyed$)
       );
   }
 

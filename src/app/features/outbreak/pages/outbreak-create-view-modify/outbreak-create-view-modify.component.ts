@@ -15,6 +15,11 @@ import {
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { takeUntil } from 'rxjs/operators';
+import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 
 /**
  * Component
@@ -163,7 +168,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
         // Details
         this.initializeTabsDetails()
 
-        // Map Server
+        // Map servers
         // #TODO
         // this.initializeMapServers()
       ],
@@ -329,63 +334,36 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
    * Initialize expand list advanced filters
    */
   protected initializeExpandListAdvancedFilters(): void {
-    // #TODO
-    // this.expandListAdvancedFilters = CaseModel.generateAdvancedFilters({
-    //   authUser: this.authUser,
-    //   caseInvestigationTemplate: () => this.selectedOutbreak.caseInvestigationTemplate,
-    //   options: {
-    //     gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     occupation: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     risk: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     classification: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-    //     outcome: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     clusterLoad: (finished) => {
-    //       finished(this.activatedRoute.snapshot.data.cluster);
-    //     },
-    //     pregnancy: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     vaccine: (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     vaccineStatus: (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
-    //   }
-    // });
+    this.expandListAdvancedFilters = OutbreakModel.generateAdvancedFilters({
+      options: {
+        disease: (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        country: (this.activatedRoute.snapshot.data.country as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        geographicalLevel: (this.activatedRoute.snapshot.data.geographicalLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        followUpGenerationTeamAssignmentAlgorithm: (this.activatedRoute.snapshot.data.followUpGenerationTeamAssignmentAlgorithm as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
+      }
+    });
   }
 
   /**
    * Refresh expand list
    */
-  refreshExpandList(_data): void {
-    // #TODO
-    // // append / remove search
-    // if (data.searchBy) {
-    //   data.queryBuilder.filter.where({
-    //     or: [
-    //       {
-    //         firstName: RequestFilterGenerator.textContains(
-    //           data.searchBy
-    //         )
-    //       }, {
-    //         lastName: RequestFilterGenerator.textContains(
-    //           data.searchBy
-    //         )
-    //       }, {
-    //         middleName: RequestFilterGenerator.textContains(
-    //           data.searchBy
-    //         )
-    //       }, {
-    //         visualId: RequestFilterGenerator.textContains(
-    //           data.searchBy
-    //         )
-    //       }
-    //     ]
-    //   });
-    // }
-    //
-    // // retrieve data
-    // this.expandListRecords$ = this.caseDataService
-    //   .getCasesList(
-    //     this.selectedOutbreak.id,
-    //     data.queryBuilder
-    //   );
+  refreshExpandList(data): void {
+    // append / remove search
+    if (data.searchBy) {
+      data.queryBuilder.filter.where({
+        name: RequestFilterGenerator.textContains(
+          data.searchBy
+        )
+      });
+    }
+
+    // retrieve data
+    this.expandListRecords$ = this.outbreakDataService
+      .getOutbreaksList(data.queryBuilder)
+      .pipe(
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
   }
 }
