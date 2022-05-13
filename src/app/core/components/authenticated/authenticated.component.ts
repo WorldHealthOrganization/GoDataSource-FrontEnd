@@ -79,8 +79,8 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
       // check if we must check if we;re logged out
       // -7 seconds error marje
       if (
-        !this.tokenInfo ||
-        this.tokenInfo.isValid ||
+        this.tokenInfo &&
+        this.tokenInfo.isValid &&
         this.tokenInfo.approximatedExpireInSecondsReal > AuthenticatedComponent.NO_ACTIVITY_POPUP_SHOULD_REDIRECT_IF_LESS_THAN_SECONDS
       ) {
         // if user is active, then we need to refresh token
@@ -102,7 +102,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
         this.refreshUserTokenOrLogOut(false);
       }
     }),
-    800,
+    3000,
     DebounceTimeCallerType.DONT_RESET_AND_WAIT
   );
 
@@ -416,6 +416,9 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // show loading
+    this.showLoading();
+
     // retrieve the user instance
     this.lastRefreshUserTokenOrLogOut = moment();
     this.userDataService
@@ -468,10 +471,10 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
             this.confirmDialog.dismiss();
             this.confirmDialog = null;
           }
-
-          // hide loading
-          this.hideLoading();
         }
+
+        // hide loading
+        this.hideLoading();
 
         // check again later
         this.tokenCheckIfLoggedOutCaller.call();
