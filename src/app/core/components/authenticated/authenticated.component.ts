@@ -44,7 +44,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
   // render mode
   renderMode: RenderMode = RenderMode.FULL;
 
-  //
+  // #TODO
   // // display popup when less then 2 minutes
   // static NO_ACTIVITY_POPUP_SHOULD_REDIRECT_IF_LESS_THAN_SECONDS = -5;
   // static NO_ACTIVITY_POPUP_SHOULD_APPEAR_WHEN_LESS_THAN_SECONDS = 120;
@@ -58,6 +58,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
   // authenticated user
   authUser: UserModel;
 
+  // #TODO
   // // used to keep subscription and release it if we don't need it anymore
   // tokenInfoSubjectSubscription: Subscription;
   //
@@ -74,7 +75,8 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
 
   // menu loading dialog
   private menuLoadingDialog: IV2LoadingDialogHandler;
-  //
+
+  // #TODO
   // // token expire data
   // private lastRefreshUserTokenOrLogOut: Moment;
   // private lastInputTime: Moment;
@@ -115,7 +117,6 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
   //   800,
   //   DebounceTimeCallerType.DONT_RESET_AND_WAIT
   // );
-
 
   /**
    * Constructor
@@ -165,6 +166,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
     }
 
     // // handle auth token expire popup
+    // #TODO
     // this.initializeTokenExpireHandler();
 
     // used to handle side dialog requests
@@ -202,6 +204,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
     }
 
     // cache reference data
+    // #TODO
     // this.referenceDataDataService.getReferenceData().subscribe();
 
     // redirect root to landing page
@@ -232,6 +235,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
       // collapse hovering menu on page change
       this.hoveringMenu = false;
 
+      // #TODO
       // // check for context help
       // if (
       //   this.router.url &&
@@ -253,6 +257,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
       return redirectRootToLandingPage();
     }
 
+    // #TODO
     // //  help items
     // this.helpDataService.getContextHelpItems(this.router.url)
     //   .subscribe((items) => {
@@ -289,6 +294,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
       this.routerEventsSubscriptionRepetitive = null;
     }
 
+    // #TODO
     /*
     // release token info subscription
     if (this.tokenInfoSubjectSubscription) {
@@ -334,6 +340,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
     }
   }
 
+  // #TODO
   /**
      * Display help dialog
      */
@@ -351,6 +358,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
   //   );
   // }
 
+  // #TODO
   /**
      * Refresh last input time
      */
@@ -362,6 +370,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
   //   }
   // }
 
+  // #TODO
   /**
      * Handler for token expire
      */
@@ -463,6 +472,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
   //     });
   // }
 
+  // #TODO
   /**
      * Refresh user token or log out
      */
