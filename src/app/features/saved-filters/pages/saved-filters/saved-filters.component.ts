@@ -267,6 +267,10 @@ export class SavedFiltersComponent extends ListComponent implements OnDestroy {
                         // inputs
                         inputs: [
                           {
+                            type: V2SideDialogConfigInputType.DIVIDER,
+                            placeholder: 'LNG_SAVED_FILTERS_FIELD_LABEL_PUBLIC'
+                          },
+                          {
                             type: V2SideDialogConfigInputType.TOGGLE,
                             value: item.isPublic ?
                               Constants.FILTER_YES_NO_OPTIONS.YES.value :

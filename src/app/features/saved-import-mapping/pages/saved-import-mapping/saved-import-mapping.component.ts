@@ -267,6 +267,10 @@ export class SavedImportMappingComponent extends ListComponent implements OnDest
                         // inputs
                         inputs: [
                           {
+                            type: V2SideDialogConfigInputType.DIVIDER,
+                            placeholder: 'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_IS_PUBLIC'
+                          },
+                          {
                             type: V2SideDialogConfigInputType.TOGGLE,
                             value: item.isPublic ?
                               Constants.FILTER_YES_NO_OPTIONS.YES.value :
