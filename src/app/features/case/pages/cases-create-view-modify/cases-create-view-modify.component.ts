@@ -86,6 +86,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       middleName: ''
     };
 
+  // custom uuid creation ?
+  customCaseUUID: string;
+
   /**
    * Constructor
    */
@@ -113,6 +116,14 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       renderer2,
       router
     );
+
+    // do we need to use custom id ?
+    if (this.isCreate) {
+      const uid: string = this.activatedRoute.snapshot.queryParams.uid;
+      if (uid) {
+        this.customCaseUUID = uid;
+      }
+    }
   }
 
   /**
@@ -249,10 +260,21 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
     // add info accordingly to page type
     if (this.isCreate) {
-      this.breadcrumbs.push({
-        label: 'LNG_PAGE_CREATE_CASE_TITLE',
-        action: null
-      });
+      if (this.customCaseUUID) {
+        this.breadcrumbs.push({
+          label: this.translateService.instant(
+            'LNG_PAGE_CREATE_CASE_WITH_UID_TITLE', {
+              uid: this.customCaseUUID
+            }
+          ),
+          action: null
+        });
+      } else {
+        this.breadcrumbs.push({
+          label: 'LNG_PAGE_CREATE_CASE_TITLE',
+          action: null
+        });
+      }
     } else if (this.isModify) {
       this.breadcrumbs.push({
         label: this.translateService.instant(
@@ -1668,6 +1690,14 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
       // create / update
       const runCreateOrUpdate = (overwriteFinished: (item: CaseModel) => void) => {
+        // attach custom id if we have one
+        if (
+          type === CreateViewModifyV2ActionType.CREATE &&
+          this.customCaseUUID
+        ) {
+          data.id = this.customCaseUUID;
+        }
+
         // create / update
         (type === CreateViewModifyV2ActionType.CREATE ?
           this.caseDataService

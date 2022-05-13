@@ -26,6 +26,11 @@ import { PERMISSION } from '../../models/permission.model';
 import { HelpDataService } from '../../services/data/help.data.service';
 import { HelpItemModel } from '../../models/help-item.model';
 import { TranslateService } from '@ngx-translate/core';
+import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
+import { EntityModel } from '../../models/entity-and-relationship.model';
+import { GlobalEntitySearchDataService } from '../../services/data/global-entity-search.data.service';
+import { RedirectService } from '../../services/helper/redirect.service';
+import { IV2BottomDialogConfigButtonType } from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 
 @Component({
   selector: 'app-topnav',
@@ -166,7 +171,9 @@ export class TopnavComponent implements OnInit, OnDestroy {
     private changeDetectorRef: ChangeDetectorRef,
     private router: Router,
     private helpDataService: HelpDataService,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private globalEntitySearchDataService: GlobalEntitySearchDataService,
+    private redirectService: RedirectService
   ) {
     // update render mode
     this.updateRenderMode();
@@ -410,8 +417,109 @@ export class TopnavComponent implements OnInit, OnDestroy {
    * Global search
    */
   globalSearch(): void {
-    // #TODO
-    // console.log('global search by ', this.globalSearchValue);
+    // nothing to do ?
+    if (!this.globalSearchValue) {
+      return;
+    }
+
+    // display loading
+    const loading = this.dialogV2Service.showLoadingDialog();
+
+    // search for the entity
+    const qb: RequestQueryBuilder = new RequestQueryBuilder();
+    qb.filter.firstLevelConditions();
+    qb.limit(2);
+    this.globalEntitySearchDataService
+      .searchEntity(
+        this.selectedOutbreak.id,
+        this.globalSearchValue,
+        qb
+      )
+      .pipe(
+        catchError((err) => {
+          // hide loading
+          loading.close();
+
+          // show error
+          this.toastV2Service.error(err);
+
+          // finished
+          return throwError(err);
+        })
+      )
+      .subscribe((results) => {
+        // check the number of results
+        if (results?.length > 0) {
+          // if there is a single result, navigate to the entity view page, otherwise display all results in a new page
+          if (results.length === 1) {
+            // generate the link for the entity view
+            // navigate to the person view page
+            this.router.navigate([EntityModel.getPersonLink(results[0])]);
+
+            // empty search field
+            this.globalSearchValue = '';
+          } else {
+            // display all results
+            this.redirectService.to(
+              [`/outbreaks/${this.selectedOutbreak.id}/search-results`],
+              {
+                search: this.globalSearchValue
+              }
+            );
+
+            // empty search field
+            this.globalSearchValue = '';
+          }
+        } else {
+          // no records found
+          this.toastV2Service.notice('LNG_GLOBAL_ENTITY_SEARCH_NO_ENTITIES_MESSAGE');
+
+          // did user enter a UID?
+          if (this.globalSearchValue.length === 36) {
+            // ask user about creating a new case with the given UID
+            this.dialogV2Service
+              .showConfirmDialog({
+                config: {
+                  title: {
+                    get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
+                  },
+                  message: {
+                    get: () => 'LNG_GLOBAL_ENTITY_SEARCH_DIALOG_CREATE_CASE_WITH_UID_TITLE'
+                  }
+                }
+              })
+              .subscribe((response) => {
+                // canceled ?
+                if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                  // finished
+                  return;
+                }
+
+                // empty search field
+                const uid: string = this.globalSearchValue;
+                this.globalSearchValue = '';
+
+                // update ui
+                this.changeDetectorRef.detectChanges();
+
+                // create case
+                this.router.navigate(
+                  ['/cases/create'], {
+                    queryParams: {
+                      uid
+                    }
+                  }
+                );
+              });
+          }
+        }
+
+        // hide loading
+        loading.close();
+
+        // update ui
+        this.changeDetectorRef.detectChanges();
+      });
   }
 
   /**

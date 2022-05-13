@@ -34,6 +34,7 @@
       [suffixIconButtons]="globalSearchSuffixButtons"
       [neverFloatLabel]="true"
       tooltip="LNG_GLOBAL_ENTITY_SEARCH_ENTITY_ID_LABEL_VALUE_DESCRIPTION"
+      [disabled]="!selectedOutbreak?.id"
       (keyup.enter)="globalSearch()">
     </app-form-input-v2>
 
@@ -97,6 +98,7 @@
         type="button"
         mat-icon-button
         [matTooltip]="'LNG_COMMON_LABEL_SEARCH' | translate"
+        [disabled]="!selectedOutbreak?.id"
         (click)="mobileGlobalSearch()">
         <mat-icon>search</mat-icon>
       </button>
