@@ -172,6 +172,27 @@
 
             </div>
 
+            <!-- Group -->
+            <div
+              *ngSwitchCase="V2SideDialogConfigInputType.GROUP"
+              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-group {{input.cssClasses}}">
+              <!-- Items -->
+              <ng-template
+                *ngFor="let groupItem of input.inputs"
+                [ngTemplateOutlet]="commonPart"
+                [ngTemplateOutletContext]="{ input: groupItem }"></ng-template>
+            </div>
+
+            <!-- Button -->
+            <button
+              *ngSwitchCase="V2SideDialogConfigInputType.BUTTON"
+              type="button"
+              mat-flat-button
+              [color]="input.color"
+              (click)="input.click(dialogHandler.data, dialogHandler, input)">
+              {{input.placeholder | translate}}
+            </button>
+
             <!-- HTML -->
             <div
               *ngSwitchCase="V2SideDialogConfigInputType.HTML"

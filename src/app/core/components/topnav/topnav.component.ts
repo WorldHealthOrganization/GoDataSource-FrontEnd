@@ -13,14 +13,19 @@ import { DialogV2Service } from '../../services/helper/dialog-v2.service';
 import {
   IV2SideDialogConfigButtonType,
   IV2SideDialogConfigInputAccordion,
-  IV2SideDialogConfigInputSingleDropdown, IV2SideDialogConfigInputText,
+  IV2SideDialogConfigInputGroup,
+  IV2SideDialogConfigInputSingleDropdown,
+  IV2SideDialogConfigInputText,
   V2SideDialogConfigInputType
 } from '../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { v4 as uuid } from 'uuid';
 import { IV2LoadingDialogHandler } from '../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
 import { determineRenderMode, RenderMode } from '../../enums/render-mode.enum';
-import { IsActiveMatchOptions, Router } from '@angular/router';
+import { IsActiveMatchOptions, NavigationEnd, Router } from '@angular/router';
 import { PERMISSION } from '../../models/permission.model';
+import { HelpDataService } from '../../services/data/help.data.service';
+import { HelpItemModel } from '../../models/help-item.model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-topnav',
@@ -72,6 +77,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
   // subscriptions
   getSelectedOutbreakSubject: Subscription;
   historyChangedSubscription: Subscription;
+  private _routerEventsSubscription: Subscription;
 
   // outbreak list
   outbreakListOptions: ILabelValuePairModel[] = [];
@@ -128,6 +134,11 @@ export class TopnavComponent implements OnInit, OnDestroy {
       )
     };
 
+  // help
+  private _contextSearchHelpSubscription: Subscription;
+  contextSearchHelpItems: HelpItemModel[];
+  contextSearchHelpLoading: boolean = false;
+
   // render mode
   renderMode: RenderMode = RenderMode.FULL;
 
@@ -153,7 +164,9 @@ export class TopnavComponent implements OnInit, OnDestroy {
     private toastV2Service: ToastV2Service,
     private dialogV2Service: DialogV2Service,
     private changeDetectorRef: ChangeDetectorRef,
-    private router: Router
+    private router: Router,
+    private helpDataService: HelpDataService,
+    private translateService: TranslateService
   ) {
     // update render mode
     this.updateRenderMode();
@@ -167,6 +180,61 @@ export class TopnavComponent implements OnInit, OnDestroy {
     TopnavComponent._REFRESH_CALLBACK = () => {
       this.refreshOutbreaksList();
     };
+
+    // listen for route change
+    this._routerEventsSubscription = this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        // parse url
+        const urlQuestionIndex: number = this.router.url ?
+          this.router.url.indexOf('?') :
+          -1;
+        const url: string = urlQuestionIndex < 0 ?
+          this.router.url :
+          this.router.url.substring(0, urlQuestionIndex);
+
+        // reset
+        this.contextSearchHelpItems = undefined;
+
+        // nothing to do ?
+        if (
+          !url ||
+          url === '/'
+        ) {
+          return;
+        }
+
+        // loading data
+        this.contextSearchHelpLoading = true;
+
+        // update ui
+        this.changeDetectorRef.detectChanges();
+
+        // release subscription
+        if (this._contextSearchHelpSubscription) {
+          this._contextSearchHelpSubscription.unsubscribe();
+          this._contextSearchHelpSubscription = null;
+        }
+
+        // check for context help
+        this._contextSearchHelpSubscription = this.helpDataService
+          .getContextHelpItems(url)
+          .subscribe((items) => {
+            // finished
+            this._contextSearchHelpSubscription = undefined;
+
+            // set items
+            this.contextSearchHelpItems = items?.length > 0 ?
+              items :
+              undefined;
+
+            // finished loading data
+            this.contextSearchHelpLoading = false;
+
+            // update ui
+            this.changeDetectorRef.detectChanges();
+          });
+      }
+    });
   }
 
   /**
@@ -211,6 +279,18 @@ export class TopnavComponent implements OnInit, OnDestroy {
     if (this.historyChangedSubscription) {
       this.historyChangedSubscription.unsubscribe();
       this.historyChangedSubscription = null;
+    }
+
+    // release subscription
+    if (this._routerEventsSubscription) {
+      this._routerEventsSubscription.unsubscribe();
+      this._routerEventsSubscription = null;
+    }
+
+    // release subscription
+    if (this._contextSearchHelpSubscription) {
+      this._contextSearchHelpSubscription.unsubscribe();
+      this._contextSearchHelpSubscription = null;
     }
 
     // close loading handler
@@ -330,6 +410,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
    * Global search
    */
   globalSearch(): void {
+    // #TODO
     // console.log('global search by ', this.globalSearchValue);
   }
 
@@ -548,5 +629,100 @@ export class TopnavComponent implements OnInit, OnDestroy {
    */
   logout(): void {
     this.router.navigate(['/auth/logout']);
+  }
+
+  /**
+   * Display dialog with help items for this page
+   */
+  displayPageHelpDialog(): void {
+    // nothing to show ?
+    if (
+      !this.contextSearchHelpItems ||
+      this.contextSearchHelpItems.length < 1
+    ) {
+      return;
+    }
+
+    // default dialog width
+    const defaultWidth: string = '60rem';
+
+    // construct lst of help items
+    const helpInputs: IV2SideDialogConfigInputGroup[] = [];
+    this.contextSearchHelpItems.forEach((helpItem) => {
+      helpInputs.push({
+        type: V2SideDialogConfigInputType.GROUP,
+        name: `title-category-${helpItem.id}`,
+        placeholder: `${this.translateService.instant(helpItem.title)} - ${helpItem.category?.name ? this.translateService.instant(helpItem.category?.name) : ''}`,
+        inputs: [{
+          type: V2SideDialogConfigInputType.KEY_VALUE,
+          name: `title-${helpItem.id}`,
+          placeholder: 'LNG_HELP_ITEM_FIELD_LABEL_TITLE',
+          value: helpItem.title
+        }, {
+          type: V2SideDialogConfigInputType.KEY_VALUE,
+          name: `category-${helpItem.id}`,
+          placeholder: 'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY',
+          value: helpItem.category?.name
+        }, {
+          type: V2SideDialogConfigInputType.BUTTON,
+          name: `view-${helpItem.id}`,
+          placeholder: 'LNG_PAGE_ACTION_VIEW',
+          color: 'text',
+          click: (_data, handler) => {
+            // close main dialog
+            handler.hide();
+
+            // show item details dialog
+            this.dialogV2Service.showSideDialog({
+              title: {
+                get: () => 'LNG_DIALOG_LOCAL_HELP_DIALOG_TITLE'
+              },
+              width: defaultWidth,
+              hideInputFilter: true,
+              inputs: [{
+                type: V2SideDialogConfigInputType.DIVIDER,
+                placeholder: helpItem.title
+              }, {
+                type: V2SideDialogConfigInputType.HTML,
+                name: 'html',
+                placeholder: helpItem.content
+              }],
+              bottomButtons: [{
+                type: IV2SideDialogConfigButtonType.OTHER,
+                label: 'LNG_COMMON_BUTTON_BACK',
+                color: 'text'
+              }, {
+                type: IV2SideDialogConfigButtonType.CANCEL,
+                label: 'LNG_COMMON_BUTTON_CANCEL',
+                color: 'text'
+              }]
+            }).subscribe((response) => {
+              // cancelled ?
+              if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+                // finished
+                return;
+              }
+
+              // display back main dialog
+              this.displayPageHelpDialog();
+            });
+          }
+        }]
+      });
+    });
+
+    // display help dialog
+    this.dialogV2Service.showSideDialog({
+      title: {
+        get: () => 'LNG_DIALOG_LOCAL_HELP_DIALOG_TITLE'
+      },
+      width: defaultWidth,
+      inputs: helpInputs,
+      bottomButtons: [{
+        type: IV2SideDialogConfigButtonType.CANCEL,
+        label: 'LNG_COMMON_BUTTON_CANCEL',
+        color: 'text'
+      }]
+    }).subscribe();
   }
 }

@@ -21,13 +21,6 @@ import { determineRenderMode, RenderMode } from '../../enums/render-mode.enum';
 export class AuthenticatedComponent implements OnInit, OnDestroy {
   // #TODO - must check the entire code not only what is commented since some of the code that isn't commented is old
 
-  // #TODO - old html code - must remove once not needed anymore
-  // <div *ngIf="contextSearchHelpItems"
-  // class="context-help-trigger"
-  // (click)="displayHelpDialog()">
-  // <span class="xt-icon">help</span>
-  //   </div>
-
   // disable page loading
   static DISABLE_PAGE_LOADING: boolean = false;
 
@@ -65,9 +58,6 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
   // router events subscription
   private routerEventsSubscriptionLoad: Subscription;
   private routerEventsSubscriptionRepetitive: Subscription;
-  //
-  // // help items for search
-  // contextSearchHelpItems: string[];
 
   // constants
   RenderMode = RenderMode;
@@ -234,39 +224,12 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
 
       // collapse hovering menu on page change
       this.hoveringMenu = false;
-
-      // #TODO
-      // // check for context help
-      // if (
-      //   this.router.url &&
-      //   this.router.url !== '/'
-      // ) {
-      //   this.helpDataService.getContextHelpItems(this.router.url)
-      //     .subscribe((items) => {
-      //       if (_.isEmpty(items)) {
-      //         this.contextSearchHelpItems = null;
-      //       } else {
-      //         this.contextSearchHelpItems = _.map(items, 'id');
-      //       }
-      //     });
-      // }
     });
 
     // redirect root to landing page
     if (this.router.url === '/') {
       return redirectRootToLandingPage();
     }
-
-    // #TODO
-    // //  help items
-    // this.helpDataService.getContextHelpItems(this.router.url)
-    //   .subscribe((items) => {
-    //     if (_.isEmpty(items)) {
-    //       this.contextSearchHelpItems = null;
-    //     } else {
-    //       this.contextSearchHelpItems = _.map(items, 'id');
-    //     }
-    //   });
   }
 
   /**
@@ -339,24 +302,6 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
       this.menuLoadingDialog = null;
     }
   }
-
-  // #TODO
-  /**
-     * Display help dialog
-     */
-  // displayHelpDialog() {
-  //   this.dialogService.showCustomDialog(
-  //     ViewHelpDialogComponent,
-  //     {
-  //       ...ViewHelpDialogComponent.DEFAULT_CONFIG,
-  //       ...{
-  //         data: new ViewHelpData({
-  //           helpItemsIds: this.contextSearchHelpItems
-  //         })
-  //       }
-  //     }
-  //   );
-  // }
 
   // #TODO
   /**

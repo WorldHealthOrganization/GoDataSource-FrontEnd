@@ -105,9 +105,23 @@
 
     <!-- Help -->
     <button
+      *ngIf="contextSearchHelpLoading || contextSearchHelpItems?.length > 0"
       type="button"
-      mat-icon-button>
-      <mat-icon>help</mat-icon>
+      mat-icon-button
+      [disabled]="contextSearchHelpLoading"
+      (click)="displayPageHelpDialog()">
+
+      <!-- Icon -->
+      <mat-icon
+        *ngIf="!contextSearchHelpLoading; else loadingHelp">help</mat-icon>
+
+      <!-- Loading -->
+      <ng-template
+        #loadingHelp>
+        <mat-progress-spinner
+          diameter="24"
+          mode="indeterminate"></mat-progress-spinner>
+      </ng-template>
     </button>
 
     <!-- Profile -->

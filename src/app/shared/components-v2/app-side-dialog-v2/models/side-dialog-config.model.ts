@@ -28,6 +28,8 @@ export enum V2SideDialogConfigInputType {
   TOGGLE,
   LINK,
   LINK_WITH_ACTION,
+  GROUP,
+  BUTTON,
   ACCORDION,
   ACCORDION_PANEL,
   KEY_VALUE,
@@ -221,6 +223,30 @@ export interface IV2SideDialogConfigInputLinkWithAction extends IV2SideDialogCon
 }
 
 /**
+ * Side dialog input - group
+ */
+export interface IV2SideDialogConfigInputGroup extends IV2SideDialogConfigInputBase {
+  // required
+  type: V2SideDialogConfigInputType.GROUP;
+  inputs: V2SideDialogConfigInput[];
+
+  // optional
+  placeholder?: string;
+}
+
+/**
+ * Side dialog input - button
+ */
+export interface IV2SideDialogConfigInputButton extends IV2SideDialogConfigInputBase {
+  // required
+  type: V2SideDialogConfigInputType.BUTTON;
+  name: string;
+  placeholder: string;
+  color: 'text' | 'secondary' | 'primary' | 'warn' | 'accent' | undefined;
+  click: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: IV2SideDialogConfigInputButton) => void;
+}
+
+/**
  * Side dialog input - accordion panel
  */
 export interface IV2SideDialogConfigInputAccordionPanel extends IV2SideDialogConfigInputBase {
@@ -298,8 +324,8 @@ export interface IV2SideDialogConfigInputFilterList extends IV2SideDialogConfigI
 export type V2SideDialogConfigInputFromInput = IV2SideDialogConfigInputCheckbox | IV2SideDialogConfigInputText | IV2SideDialogConfigInputSingleDropdown
 | IV2SideDialogConfigInputMultiDropdown | IV2SideDialogConfigInputToggle | IV2SideDialogConfigInputNumber;
 export type V2SideDialogConfigInput = IV2SideDialogConfigInputDivider | IV2SideDialogConfigInputKeyValue | IV2SideDialogConfigInputHTML
-| V2SideDialogConfigInputFromInput | IV2SideDialogConfigInputLink | IV2SideDialogConfigInputLinkWithAction | IV2SideDialogConfigInputAccordion
-| IV2SideDialogConfigInputFilterList;
+| V2SideDialogConfigInputFromInput | IV2SideDialogConfigInputLink | IV2SideDialogConfigInputLinkWithAction | IV2SideDialogConfigInputGroup
+| IV2SideDialogConfigInputButton | IV2SideDialogConfigInputAccordion | IV2SideDialogConfigInputFilterList;
 
 /**
  * Side dialog inputs map

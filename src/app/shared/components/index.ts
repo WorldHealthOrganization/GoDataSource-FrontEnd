@@ -32,8 +32,6 @@ import { FormCaseCenterDaterangeComponent } from './form-case-center-daterange/f
 import { FormCaseCenterDaterangeListComponent } from './form-case-center-daterange-list/form-case-center-daterange-list.component';
 import { ViewCotNodeDialogComponent } from './view-cot-node-dialog/view-cot-node-dialog.component';
 import { ViewCotEdgeDialogComponent } from './view-cot-edge-dialog/view-cot-edge-dialog.component';
-import { ViewHelpDialogComponent } from './view-help-dialog/view-help-dialog.component';
-import { ViewHelpDetailsDialogComponent } from './view-help-details-dialog/view-help-details-dialog.component';
 import { FormModifyQuestionnaireComponent } from './form-modify-questionnaire/form-modify-questionnaire.component';
 import { HoverRowActionsComponent } from './hover-row-actions/hover-row-actions.component';
 import { FormLocationIdentifierListComponent } from './form-location-identifier-list/form-location-identifier-list.component';
@@ -57,8 +55,6 @@ export * from './loading-dialog/loading-dialog.component';
 export * from './counted-items-list/counted-items-list.component';
 export * from './view-cot-node-dialog/view-cot-node-dialog.component';
 export * from './view-cot-edge-dialog/view-cot-edge-dialog.component';
-export * from './view-help-dialog/view-help-dialog.component';
-export * from './view-help-details-dialog/view-help-details-dialog.component';
 export * from './form-modify-questionnaire/form-modify-questionnaire.component';
 export * from './hover-row-actions/hover-row-actions.component';
 export * from './location-dialog/location-dialog.component';
@@ -113,8 +109,6 @@ export const components: any[] = [
   LoadingDialogComponent,
   ViewCotNodeDialogComponent,
   ViewCotEdgeDialogComponent,
-  ViewHelpDialogComponent,
-  ViewHelpDetailsDialogComponent,
   LocationDialogComponent,
 
   // general
