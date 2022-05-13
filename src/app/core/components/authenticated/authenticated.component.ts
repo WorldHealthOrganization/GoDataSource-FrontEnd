@@ -44,24 +44,20 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
   // static NO_ACTIVITY_POPUP_SHOULD_REFRESH_TOKEN_IF_USER_ACTIVE = 240;
   // static REFRESH_IF_USER_WAS_ACTIVE_IN_THE_LAST_SECONDS = 20;
   // static REFRESH_DISABLE_SECONDS = 7;
-  //
-  // // slide nav menu
-  // @ViewChild('snav') sideNav: MatSidenav;
-  //
+
   // authenticated user
-  authUser: UserModel;
+  private _authUser: UserModel;
 
   // #TODO
   // // used to keep subscription and release it if we don't need it anymore
   // tokenInfoSubjectSubscription: Subscription;
-  //
+
   // router events subscription
   private routerEventsSubscriptionLoad: Subscription;
   private routerEventsSubscriptionRepetitive: Subscription;
 
   // constants
   RenderMode = RenderMode;
-  // Constants = Constants;
 
   // menu loading dialog
   private menuLoadingDialog: IV2LoadingDialogHandler;
@@ -116,10 +112,6 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
     private outbreakDataService: OutbreakDataService,
     private dialogV2Service: DialogV2Service,
     private router: Router
-    // private referenceDataDataService: ReferenceDataDataService,
-    // private helpDataService: HelpDataService,
-    // private dialogService: DialogService,
-    // private userDataService: UserDataService
   ) {
     // detect when the route is changed
     this.routerEventsSubscriptionLoad = this.router.events.subscribe((event) => {
@@ -145,10 +137,10 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
    */
   ngOnInit(): void {
     // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
+    this._authUser = this.authDataService.getAuthenticatedUser();
 
     // check if user is authenticated
-    if (!this.authUser) {
+    if (!this._authUser) {
       // user is NOT authenticated; redirect to Login page
       this.prepareForRedirect();
       this.router.navigate(['/auth/login']);
@@ -182,7 +174,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
       });
 
     // determine the Selected Outbreak and display message if different than the active one.
-    if (OutbreakModel.canView(this.authUser)) {
+    if (OutbreakModel.canView(this._authUser)) {
       this.outbreakDataService
         .determineSelectedOutbreak()
         .subscribe(() => {
@@ -203,7 +195,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
       // #TODO - accordingly to user DEFAULT landing page and PERMISSIONS
 
       // redirect to default landing page
-      if (DashboardModel.canViewDashboard(this.authUser)) {
+      if (DashboardModel.canViewDashboard(this._authUser)) {
         this.router.navigate(['/dashboard']);
       } else {
         this.router.navigate(['/account/my-profile']);

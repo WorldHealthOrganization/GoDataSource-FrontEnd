@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { SheetCellValidator } from './sheet-cell-validator';
+// import { SheetCellValidator } from './sheet-cell-validator';
 import { SheetCellType } from './sheet-cell-type';
 import { SheetCellValidationType } from './sheet-cell-validation-type';
 import { map } from 'rxjs/operators';
@@ -30,10 +30,10 @@ export abstract class AbstractSheetColumn {
     public type: SheetCellType
   ) {
     // get validator by Cell Type
-    const validationType = SheetCellValidator.CELL_VALIDATION_TYPE[this.type];
-    if (validationType) {
-      this.addValidation(validationType);
-    }
+    // const validationType = SheetCellValidator.CELL_VALIDATION_TYPE[this.type];
+    // if (validationType) {
+    //   this.addValidation(validationType);
+    // }
   }
 
   public setTitle(title: string) {
@@ -73,10 +73,10 @@ export abstract class AbstractSheetColumn {
     this.validations.push(validationType);
 
     // merge all individual validators into a single validation function that will be passed to 'handsontable'
-    this.validationFunc = SheetCellValidator.mergeValidations(
-      this.validations,
-      this
-    );
+    // this.validationFunc = SheetCellValidator.mergeValidations(
+    //   this.validations,
+    //   this
+    // );
   }
 
   /**
