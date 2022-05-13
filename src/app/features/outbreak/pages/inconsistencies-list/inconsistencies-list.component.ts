@@ -1,268 +1,338 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { Observable } from 'rxjs';
-import { CaseModel } from '../../../../core/models/case.model';
-import { ContactModel } from '../../../../core/models/contact.model';
-import { EventModel } from '../../../../core/models/event.model';
-import { EntityType } from '../../../../core/models/entity-type';
-import { InconsistencyModel } from '../../../../core/models/inconsistency.model';
-import * as _ from 'lodash';
-import { InconsistencyIssueEnum } from '../../../../core/enums/inconsistency-issue.enum';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { catchError, share } from 'rxjs/operators';
-import { HoverRowAction } from '../../../../shared/components';
-import { throwError } from 'rxjs/internal/observable/throwError';
-import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import * as _ from 'lodash';
+import { Observable } from 'rxjs';
+import { takeUntil, tap } from 'rxjs/operators';
+import { InconsistencyIssueEnum } from '../../../../core/enums/inconsistency-issue.enum';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { CaseModel } from '../../../../core/models/case.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { ContactModel } from '../../../../core/models/contact.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { EntityType } from '../../../../core/models/entity-type';
+import { EventModel } from '../../../../core/models/event.model';
+import { InconsistencyModel } from '../../../../core/models/inconsistency.model';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 
 @Component({
   selector: 'app-inconsistencies-list',
   templateUrl: './inconsistencies-list.component.html'
 })
-export class InconsistenciesListComponent extends ListComponent implements OnInit, OnDestroy {
-  // breadcrumbs
-  // breadcrumbs: BreadcrumbItemModel[] = [];
+export class InconsistenciesListComponent extends ListComponent implements OnDestroy {
 
   // Outbreak
-  outbreak: OutbreakModel;
+  outbreak: OutbreakModel = this.route.snapshot.data.outbreak.map[this.route.snapshot.params.outbreakId];
 
   // entities
   entitiesList$: Observable<(CaseModel | ContactModel | EventModel | ContactOfContactModel)[]>;
 
-  personTypesListMap: { [id: string]: ReferenceDataEntryModel };
-
-  // constants
-  EntityType = EntityType;
-  ReferenceDataCategory = ReferenceDataCategory;
-
-  fixedTableColumns: string[] = [
-    'lastName',
-    'firstName',
-    'inconsistencies'
-  ];
-
-  recordActions: HoverRowAction[] = [
-    // View Item
-    new HoverRowAction({
-      icon: 'visibility',
-      iconTooltip: 'LNG_PAGE_ACTION_VIEW',
-      linkGenerator: (item: CaseModel | ContactModel | EventModel): string[] => {
-        return [this.getItemRouterLink(item, 'view')];
-      },
-      visible: (item: CaseModel | ContactModel | EventModel): boolean => {
-        return !item.deleted &&
-                    this.authUser &&
-                    this.canViewItem(item);
-      }
-    }),
-
-    // Modify Item
-    new HoverRowAction({
-      icon: 'settings',
-      iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
-      linkGenerator: (item: CaseModel | ContactModel | EventModel): string[] => {
-        return [this.getItemRouterLink(item, 'modify')];
-      },
-      visible: (item: CaseModel | ContactModel | EventModel): boolean => {
-        return !item.deleted &&
-                    this.authUser &&
-                    this.outbreak &&
-                    this.authUser.activeOutbreakId === this.outbreak.id &&
-                    this.canModifyItem(item);
-      }
-    })
-  ];
 
   /**
-     * Constructor
-     */
+  * Constructor
+  */
   constructor(
     protected listHelperService: ListHelperService,
-    private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
     private i18nService: I18nService,
-    private route: ActivatedRoute,
-    private referenceDataDataService: ReferenceDataDataService
+    private route: ActivatedRoute
   ) {
     super(listHelperService);
   }
 
   /**
-     * Component initialized
-     */
-  ngOnInit() {
-    // update breadcrumbs
-    this.initializeBreadcrumbs();
-
-    // reference data
-    const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).pipe(share());
-    personTypes$.subscribe((personTypeCategory: ReferenceDataCategoryModel) => {
-      this.personTypesListMap = _.transform(
-        personTypeCategory.entries,
-        (result, entry: ReferenceDataEntryModel) => {
-          // groupBy won't work here since groupBy will put an array instead of one value
-          result[entry.id] = entry;
-        },
-        {}
-      );
-    });
-
-    // retrieve route params
-    this.route.params
-      .subscribe((params: { outbreakId }) => {
-        this.outbreakDataService
-          .getOutbreak(params.outbreakId)
-          .subscribe((outbreak: OutbreakModel) => {
-            // outbreak
-            this.outbreak = outbreak;
-
-            // update breadcrumbs
-            this.initializeBreadcrumbs();
-
-            // ...and re-load the list when the Selected Outbreak is changed
-            this.needsRefreshList(true);
-          });
-      });
-  }
-
-  /**
-     * Release resources
-     */
+  * Release resources
+  */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
   }
 
   /**
-   * Initialize Side Table Columns
-   */
-  protected initializeTableColumns(): void {}
+  * Selected outbreak was changed
+  */
+  selectedOutbreakChanged(): void {
+    // initialize pagination
+    this.initPaginator();
+
+    // ...and re-load the list when the Selected Outbreak is changed
+    this.needsRefreshList(true);
+  }
 
   /**
-   * Initialize process data
-   */
+  * Initialize Side Table Columns
+  */
+  protected initializeTableColumns(): void {
+    this.tableColumns = [
+      {
+        field: 'firstName',
+        label: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
+        sortable: true,
+        color: 'warn',
+        // color: (item) => this.getPersonTypeColor(item.type),
+        format: {
+          type: (item) => item.type === EntityType.EVENT ? item.name : item.firstName
+        },
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'lastName',
+        label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'inconsistencies',
+        label: 'LNG_ENTITY_FIELD_LABEL_INCONSISTENCIES',
+        format: {
+          type: (item) => this.inconsistencyToText(item)
+        }
+      },
+      {
+        field: 'statuses',
+        label: 'LNG_COMMON_LABEL_STATUSES',
+        format: {
+          type: V2ColumnFormat.STATUS
+        },
+        notResizable: true,
+        legends: [
+          // person type
+          {
+            title: 'LNG_ENTITY_FIELD_LABEL_TYPE',
+            items: (this.route.snapshot.data.personType as IResolverV2ResponseModel<ReferenceDataEntryModel>).list.map((item) => {
+              return {
+                form: {
+                  type: IV2ColumnStatusFormType.CIRCLE,
+                  color: item.getColorCode()
+                },
+                label: item.id
+              };
+            })
+          }
+        ],
+        forms: (_column, data): V2ColumnStatusForm[] => {
+          // construct list of forms that we need to display
+          const forms: V2ColumnStatusForm[] = [];
+
+          // person type
+          if (
+            data.type &&
+            (this.route.snapshot.data.personType as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[data.type]
+          ) {
+            forms.push({
+              type: IV2ColumnStatusFormType.CIRCLE,
+              color: (this.route.snapshot.data.personType as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[data.type].getColorCode(),
+              tooltip: this.i18nService.instant(data.type)
+            });
+          }
+
+          // finished
+          return forms;
+        }
+      },
+
+      // actions
+      {
+        field: 'actions',
+        label: 'LNG_COMMON_LABEL_ACTIONS',
+        pinned: IV2ColumnPinned.RIGHT,
+        notResizable: true,
+        cssCellClass: 'gd-cell-no-focus',
+        format: {
+          type: V2ColumnFormat.ACTIONS
+        },
+        actions: [
+          // View Case
+          {
+            type: V2ActionType.ICON,
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_ACTION_VIEW',
+            action: {
+              link: (item: CaseModel | ContactModel | EventModel): string[] => {
+                return [this.getItemRouterLink(item, 'view')];
+              }
+            },
+            visible: (item: CaseModel | ContactModel | EventModel): boolean => {
+              return !item.deleted &&
+                this.authUser &&
+                this.canViewItem(item);
+            }
+          },
+
+          // Modify Case
+          {
+            type: V2ActionType.ICON,
+            icon: 'edit',
+            iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
+            action: {
+              link: (item: CaseModel | ContactModel | EventModel): string[] => {
+                return [this.getItemRouterLink(item, 'modify')];
+              }
+            },
+            visible: (item: CaseModel | ContactModel | EventModel): boolean => {
+              return !item.deleted &&
+                this.selectedOutbreakIsActive &&
+                this.canModifyItem(item);
+            }
+          }
+        ]
+      }
+    ];
+  }
+
+  /**
+  * Initialize process data
+  */
   protected initializeProcessSelectedData(): void {}
 
   /**
-   * Initialize table infos
-   */
+  * Initialize table infos
+  */
   protected initializeTableInfos(): void {}
 
   /**
-   * Initialize Table Advanced Filters
-   */
+  * Initialize Table Advanced Filters
+  */
   protected initializeTableAdvancedFilters(): void {}
 
   /**
-   * Initialize table quick actions
-   */
+  * Initialize table quick actions
+  */
   protected initializeQuickActions(): void {}
 
   /**
-   * Initialize table group actions
-   */
+  * Initialize table group actions
+  */
   protected initializeGroupActions(): void {}
 
   /**
-   * Initialize table add action
-   */
+  * Initialize table add action
+  */
   protected initializeAddAction(): void {}
 
   /**
-   * Initialize table grouped data
-   */
+  * Initialize table grouped data
+  */
   protected initializeGroupedData(): void {}
 
   /**
-   * Initialize breadcrumbs
-   */
-  initializeBreadcrumbs(): void {
+  * Initialize breadcrumbs
+  */
+  protected initializeBreadcrumbs(): void {
+    // set breadcrumbs
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
+        }
+      }
+    ];
+
+    // add list breadcrumb only if we have permission
+    if (
+      OutbreakModel.canList(this.authUser)
+    ) {
+      this.breadcrumbs.push(
+        {
+          label: 'LNG_PAGE_LIST_OUTBREAKS_TITLE',
+          action: {
+            link: ['/outbreaks']
+          }
+        }
+      );
+    }
+
+    // add outbreak details ?
+    if (
+      OutbreakModel.canModify(this.authUser)
+    ) {
+      this.breadcrumbs.push(
+        {
+          label: this.outbreak.name,
+          action: {
+            link: [`/outbreaks/${ this.outbreak.id }/modify`]
+          }
+        }
+      );
+    } else if (OutbreakModel.canView(this.authUser)) {
+      this.breadcrumbs.push(
+        {
+          label: this.outbreak.name,
+          action: {
+            link: [`/outbreaks/${ this.outbreak.id }/view`]
+          }
+        }
+      );
+    }
+
+    // add inconsistencies breadcrumb
+    this.breadcrumbs.push(
+      {
+        label: 'LNG_PAGE_LIST_INCONSISTENCIES_TITLE',
+        action: null
+      }
+    );
   }
 
   /**
-   * Fields retrieved from api to reduce payload size
-   */
+  * Fields retrieved from api to reduce payload size
+  */
   protected refreshListFields(): string[] {
-    return [];
+    return [
+      'id',
+      'firstName',
+      'lastName',
+      'inconsistencies'
+    ];
   }
 
   /**
-   * Re(load) list
-   */
+  * Re(load) list
+  */
   refreshList() {
     this.entitiesList$ = this.outbreakDataService
       .getPeopleInconsistencies(this.outbreak.id, this.queryBuilder)
       .pipe(
-        catchError((err) => {
-          this.toastV2Service.error(err);
-          return throwError(err);
-        })
+        // update page count
+        tap((entitiesList: []) => {
+          this.pageCount = {
+            count: entitiesList.length,
+            hasMore: false
+          };
+        }),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
       );
   }
 
   /**
-     * Init breadcrumbs
-     */
-  // initializeBreadcrumbs() {
-  //   // reset
-  //   this.breadcrumbs = [];
-  //
-  //   // add list breadcrumb only if we have permission
-  //   if (OutbreakModel.canList(this.authUser)) {
-  //     this.breadcrumbs.push(
-  //       new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '/outbreaks')
-  //     );
-  //   }
-  //
-  //   // add outbreak details ?
-  //   if (this.outbreak) {
-  //     if (OutbreakModel.canModify(this.authUser)) {
-  //       this.breadcrumbs.push(
-  //         new BreadcrumbItemModel(
-  //           this.outbreak.name,
-  //           `/outbreaks/${this.outbreak.id}/modify`
-  //         )
-  //       );
-  //     } else if (OutbreakModel.canView(this.authUser)) {
-  //       this.breadcrumbs.push(
-  //         new BreadcrumbItemModel(
-  //           this.outbreak.name,
-  //           `/outbreaks/${this.outbreak.id}/view`
-  //         )
-  //       );
-  //     }
-  //   }
-  //
-  //   // add inconsistencies breadcrumb
-  //   this.breadcrumbs.push(
-  //     new BreadcrumbItemModel(
-  //       'LNG_PAGE_LIST_INCONSISTENCIES_TITLE',
-  //       '.',
-  //       true
-  //     )
-  //   );
-  // }
+   * Get total number of items, based on the applied filters
+   */
+  refreshListCount(): void { }
 
   /**
-     * Retrieve Person Type color
-     */
-  getPersonTypeColor(personType: string) {
-    const personTypeData = _.get(this.personTypesListMap, personType);
-    return _.get(personTypeData, 'colorCode', '');
-  }
-
-  /**
-     * Get the link to redirect to view page depending on item type and action
-     * @param {Object} item
-     * @param {string} action
-     * @returns {string}
-     */
+  * Get the link to redirect to view page depending on item type and action
+  * @param {Object} item
+  * @param {string} action
+  * @returns {string}
+  */
   getItemRouterLink(item: CaseModel | ContactModel | EventModel, action: string) {
     switch (item.type) {
       case EntityType.CASE:
@@ -275,10 +345,10 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
   }
 
   /**
-     * Check if we can view item
-     * @param {Object} item
-     * @returns {boolean}
-     */
+  * Check if we can view item
+  * @param {Object} item
+  * @returns {boolean}
+  */
   canViewItem(item: CaseModel | ContactModel | EventModel): boolean {
     // check if we can modify item
     switch (item.type) {
@@ -295,10 +365,10 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
   }
 
   /**
-     * Check if we can modify item
-     * @param {Object} item
-     * @returns {boolean}
-     */
+  * Check if we can modify item
+  * @param {Object} item
+  * @returns {boolean}
+  */
   canModifyItem(item: CaseModel | ContactModel | EventModel): boolean {
     // check if we can modify item
     switch (item.type) {
@@ -315,9 +385,9 @@ export class InconsistenciesListComponent extends ListComponent implements OnIni
   }
 
   /**
-     * Inconsistencies
-     * @param item
-     */
+  * Inconsistencies
+  * @param item
+  */
   inconsistencyToText(item: CaseModel | ContactModel | EventModel): string {
     // construct inconsistencies text
     let text: string = '';

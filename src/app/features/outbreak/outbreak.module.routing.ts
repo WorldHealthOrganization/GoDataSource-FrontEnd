@@ -15,6 +15,7 @@ import { FollowUpGenerationTeamAssignmentAlgorithmDataResolver } from '../../cor
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 import { PersonTypeDataResolver } from '../../core/services/resolvers/data/person-type.resolver';
+import { OutbreakDataResolver } from '../../core/services/resolvers/data/outbreak.resolver';
 
 const routes: Routes = [
   // Outbreaks list
@@ -179,6 +180,11 @@ const routes: Routes = [
       permissions: [
         PERMISSION.OUTBREAK_SEE_INCONSISTENCIES
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      outbreak: OutbreakDataResolver,
+      personType: PersonTypeDataResolver
     }
   },
 
