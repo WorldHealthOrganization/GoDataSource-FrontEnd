@@ -79,8 +79,8 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
       // check if we must check if we;re logged out
       // -7 seconds error marje
       if (
-        this.tokenInfo &&
-        this.tokenInfo.isValid &&
+        !this.tokenInfo ||
+        this.tokenInfo.isValid ||
         this.tokenInfo.approximatedExpireInSecondsReal > AuthenticatedComponent.NO_ACTIVITY_POPUP_SHOULD_REDIRECT_IF_LESS_THAN_SECONDS
       ) {
         // if user is active, then we need to refresh token
