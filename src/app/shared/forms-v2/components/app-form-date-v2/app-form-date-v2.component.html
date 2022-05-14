@@ -30,6 +30,7 @@
       [max]="maxDate"
       [min]="minDate"
       [matDatepicker]="pickerStartDate"
+      (click)="pickerStartDate.open()"
       (blur)="onTouchItem()"
       (ngModelChange)="onTouchItem()">
     <mat-datepicker-toggle
