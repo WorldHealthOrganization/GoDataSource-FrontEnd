@@ -356,10 +356,12 @@
 
           <!-- Section render -->
           <ng-template
-            #sectionsRender
+            #formRender
             let-tab="tab">
             <form
-              #form="ngForm">
+              #form="ngForm"
+              [ngSwitch]="tab.type">
+
               <!-- Hack to set form :) -->
               {{ updateForm(tab, form) }}
 
@@ -377,7 +379,12 @@
                   [class.gd-create-view-modify-bottom-section-content-input-has-textarea]="input.type === CreateViewModifyV2TabInputType.TEXTAREA"
                   [class.gd-create-view-modify-bottom-section-content-input-has-age-dob]="input.type === CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH"
                   [class.gd-create-view-modify-bottom-section-content-input-has-list]="input.type === CreateViewModifyV2TabInputType.LIST"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-edit-questionnaire]="input.type === CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE"
                   [ngSwitch]="input.type">
+
+                  <!-- Edit questionnaire -->
+                  <app-form-edit-questionnaire-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE"></app-form-edit-questionnaire-v2>
 
                   <!-- Text -->
                   <app-form-input-v2
@@ -1082,32 +1089,43 @@
 
 
               <!-- Render Section -->
-              <div
-                *ngFor="let section of tab.sections"
-                class="gd-create-view-modify-bottom-section">
-                <ng-container
-                  *ngIf="!section.visible || section.visible()">
-                  <!-- Section title -->
-                  <div
-                    class="gd-create-view-modify-bottom-section-title">
-                    {{section.label | translate}}
-                  </div>
+              <ng-container
+                *ngSwitchCase="CreateViewModifyV2TabInputType.TAB">
+                <div
+                  *ngFor="let section of tab.sections"
+                  class="gd-create-view-modify-bottom-section">
+                  <ng-container
+                    *ngIf="!section.visible || section.visible()">
+                    <!-- Section title -->
+                    <div
+                      class="gd-create-view-modify-bottom-section-title">
+                      {{section.label | translate}}
+                    </div>
 
-                  <!-- Section content -->
-                  <div
-                    class="gd-create-view-modify-bottom-section-content"
-                    fxLayout="row wrap" fxLayoutGap="1.6rem">
+                    <!-- Section content -->
+                    <div
+                      class="gd-create-view-modify-bottom-section-content"
+                      fxLayout="row wrap" fxLayoutGap="1.6rem">
 
-                    <!-- Input render -->
-                    <ng-container
-                      *ngFor="let input of section.inputs">
+                      <!-- Input render -->
                       <ng-container
-                        *ngTemplateOutlet="inputRender; context: { input, parentName: '', parentItemIndex: undefined }"></ng-container>
-                    </ng-container>
+                        *ngFor="let input of section.inputs">
+                        <ng-container
+                          *ngTemplateOutlet="inputRender; context: { input, parentName: '', parentItemIndex: undefined }"></ng-container>
+                      </ng-container>
 
-                  </div>
-                </ng-container>
-              </div>
+                    </div>
+                  </ng-container>
+                </div>
+              </ng-container>
+
+              <!-- Render tab table -->
+              <ng-container
+                *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE">
+                <ng-container
+                  *ngTemplateOutlet="inputRender; context: { input: tab.definition, parentName: '', parentItemIndex: undefined }"></ng-container>
+              </ng-container>
+
             </form>
           </ng-template>
 
@@ -1145,6 +1163,12 @@
                 </app-list-table-v2>
               </ng-container>
 
+              <!-- Edit questionnaire -->
+              <ng-template
+                *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE"
+                [ngTemplateOutlet]="formRender"
+                [ngTemplateOutletContext]="{ tab }"></ng-template>
+
             </ng-container>
           </ng-template>
 
@@ -1174,7 +1198,7 @@
                   <!-- Tab -->
                   <ng-template
                     *ngSwitchCase="CreateViewModifyV2TabInputType.TAB"
-                    [ngTemplateOutlet]="sectionsRender"
+                    [ngTemplateOutlet]="formRender"
                     [ngTemplateOutletContext]="{ tab }"></ng-template>
 
                   <!-- Tab table -->
@@ -1344,7 +1368,7 @@
                     <!-- Tab -->
                     <ng-template
                       *ngSwitchCase="CreateViewModifyV2TabInputType.TAB"
-                      [ngTemplateOutlet]="sectionsRender"
+                      [ngTemplateOutlet]="formRender"
                       [ngTemplateOutletContext]="{ tab }"></ng-template>
 
                     <!-- Table tab -->
