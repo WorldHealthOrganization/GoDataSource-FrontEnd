@@ -15,6 +15,7 @@ import { UserDataResolver } from '../../core/services/resolvers/data/user.resolv
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 import { PersonTypeDataResolver } from '../../core/services/resolvers/data/person-type.resolver';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
+import { MapVectorTypeDataResolver } from '../../core/services/resolvers/data/map-vector-type.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -25,7 +26,8 @@ const createViewModifyFoundation: Route = {
     country: CountryDataResolver,
     geographicalLevel: LocationGeographicalLevelDataResolver,
     followUpGenerationTeamAssignmentAlgorithm: FollowUpGenerationTeamAssignmentAlgorithmDataResolver,
-    yesNo: YesNoDataResolver
+    yesNo: YesNoDataResolver,
+    mapVectorType: MapVectorTypeDataResolver
   }
 };
 

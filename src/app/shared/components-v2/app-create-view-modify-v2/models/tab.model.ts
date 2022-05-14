@@ -14,6 +14,7 @@ import { UserSettings } from '../../../../core/models/user.model';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { V2AdvancedFilter } from '../../app-list-table-v2/models/advanced-filter.model';
+import { MapServerModel } from '../../../../core/models/map-server.model';
 
 /**
  * Input type
@@ -39,11 +40,15 @@ export enum CreateViewModifyV2TabInputType {
   ADDRESS,
   VACCINE,
   CENTER_DATE_RANGE,
+  MAP_SERVER,
 
   // layout
   TAB,
   TAB_TABLE,
-  SECTION
+  SECTION,
+
+  // other
+  LABEL
 }
 
 /**
@@ -351,13 +356,43 @@ interface ICreateViewModifyV2TabInputCenterDateRange {
 }
 
 /**
+ * Input - map server
+ */
+interface ICreateViewModifyV2TabInputMapServer {
+  // required
+  type: CreateViewModifyV2TabInputType.MAP_SERVER;
+  vectorTypeOptions: ILabelValuePairModel[];
+  styleSourceOptions: {
+    [url: string]: ILabelValuePairModel[]
+  };
+  value: {
+    get: (index?: number) => MapServerModel;
+  };
+  styleAsyncValidator: (
+    input: ICreateViewModifyV2TabInputMapServer,
+    index: number
+  ) => Observable<boolean | IGeneralAsyncValidatorResponse>;
+}
+
+/**
+ * Input - label
+ */
+interface ICreateViewModifyV2TabLabel {
+  // required
+  type: CreateViewModifyV2TabInputType.LABEL;
+  value: {
+    get: () => string
+  };
+}
+
+/**
  * Input
  */
 type CreateViewModifyV2TabInput = ICreateViewModifyV2TabInputText | ICreateViewModifyV2TabInputPassword | ICreateViewModifyV2TabInputSingleSelect
 | ICreateViewModifyV2TabInputMultipleSelect | ICreateViewModifyV2TabInputToggleCheckbox | ICreateViewModifyV2TabInputLocationSingle | ICreateViewModifyV2TabInputLocationMultiple
 | ICreateViewModifyV2TabInputTextArea | ICreateViewModifyV2TabInputNumber | ICreateViewModifyV2TabInputAgeOrDOB | ICreateViewModifyV2TabInputAsyncValidatorText
 | ICreateViewModifyV2TabInputDate | ICreateViewModifyV2TabInputList | ICreateViewModifyV2TabInputDocument | ICreateViewModifyV2TabInputAddress
-| ICreateViewModifyV2TabInputVaccine | ICreateViewModifyV2TabInputCenterDateRange;
+| ICreateViewModifyV2TabInputVaccine | ICreateViewModifyV2TabInputCenterDateRange | ICreateViewModifyV2TabInputMapServer | ICreateViewModifyV2TabLabel;
 
 /**
  * Tab section
