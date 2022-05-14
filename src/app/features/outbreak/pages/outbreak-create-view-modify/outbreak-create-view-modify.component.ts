@@ -200,13 +200,13 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
         this.initializeTabsDetails(),
 
         // Map servers
-        this.initializeTabsMapServers(),
+        this.initializeTabsMapServers()
 
         // Questionnaires
-        this.initializeTabsQuestionnaireCase(),
-        this.initializeTabsQuestionnaireContact(),
-        this.initializeTabsQuestionnaireFollowUp(),
-        this.initializeTabsQuestionnaireLabResult()
+        // this.initializeTabsQuestionnaireCase(),
+        // this.initializeTabsQuestionnaireContact(),
+        // this.initializeTabsQuestionnaireFollowUp(),
+        // this.initializeTabsQuestionnaireLabResult()
       ],
 
       // create details
@@ -821,53 +821,53 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     };
   }
 
-  /**
-   * Initialize tabs - Questionnaire - Case
-   */
-  private initializeTabsQuestionnaireCase(): ICreateViewModifyV2Tab {
-    // #TODO - remove route..and component
-    return {
-      type: CreateViewModifyV2TabInputType.TAB,
-      label: 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE',
-      sections: []
-    };
-  }
-
-  /**
-   * Initialize tabs - Questionnaire - Contact
-   */
-  private initializeTabsQuestionnaireContact(): ICreateViewModifyV2Tab {
-    // #TODO - remove route..and component
-    return {
-      type: CreateViewModifyV2TabInputType.TAB,
-      label: 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE',
-      sections: []
-    };
-  }
-
-  /**
-   * Initialize tabs - Questionnaire - FollowUp
-   */
-  private initializeTabsQuestionnaireFollowUp(): ICreateViewModifyV2Tab {
-    // #TODO - remove route..and component
-    return {
-      type: CreateViewModifyV2TabInputType.TAB,
-      label: 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE',
-      sections: []
-    };
-  }
-
-  /**
-   * Initialize tabs - Questionnaire - Lab result
-   */
-  private initializeTabsQuestionnaireLabResult(): ICreateViewModifyV2Tab {
-    // #TODO - remove route..and component
-    return {
-      type: CreateViewModifyV2TabInputType.TAB,
-      label: 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE',
-      sections: []
-    };
-  }
+  // /**
+  //  * Initialize tabs - Questionnaire - Case
+  //  */
+  // private initializeTabsQuestionnaireCase(): ICreateViewModifyV2TabFull {
+  //   // #TODO - remove route..and component
+  //   return {
+  //     type: CreateViewModifyV2TabInputType.TAB_FULL,
+  //     label: 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE',
+  //     definition: null
+  //   };
+  // }
+  //
+  // /**
+  //  * Initialize tabs - Questionnaire - Contact
+  //  */
+  // private initializeTabsQuestionnaireContact(): ICreateViewModifyV2TabFull {
+  //   // #TODO - remove route..and component
+  //   return {
+  //     type: CreateViewModifyV2TabInputType.TAB_TABLE,
+  //     label: 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE',
+  //     definition: null
+  //   };
+  // }
+  //
+  // /**
+  //  * Initialize tabs - Questionnaire - FollowUp
+  //  */
+  // private initializeTabsQuestionnaireFollowUp(): ICreateViewModifyV2TabFull {
+  //   // #TODO - remove route..and component
+  //   return {
+  //     type: CreateViewModifyV2TabInputType.TAB_FULL,
+  //     label: 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE',
+  //     definition: null
+  //   };
+  // }
+  //
+  // /**
+  //  * Initialize tabs - Questionnaire - Lab result
+  //  */
+  // private initializeTabsQuestionnaireLabResult(): ICreateViewModifyV2TabFull {
+  //   // #TODO - remove route..and component
+  //   return {
+  //     type: CreateViewModifyV2TabInputType.TAB_FULL,
+  //     label: 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE',
+  //     definition: null
+  //   };
+  // }
 
   /**
    * Initialize buttons

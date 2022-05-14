@@ -1017,7 +1017,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       label: 'LNG_COMMON_BUTTON_EXPOSURES_FROM',
       pageSettingsKey: UserSettings.RELATIONSHIP_FIELDS,
       advancedFilterType: Constants.APP_PAGE.RELATIONSHIPS.value,
-      visible: () => CaseModel.canListRelationshipContacts(this.authUser),
+      visible: () => this.isView &&
+        CaseModel.canListRelationshipContacts(this.authUser),
       tableColumns: this.entityHelperService
         .retrieveTableColumns({
           selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
@@ -1128,7 +1129,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       label: 'LNG_COMMON_BUTTON_EXPOSURES_TO',
       pageSettingsKey: UserSettings.RELATIONSHIP_FIELDS,
       advancedFilterType: Constants.APP_PAGE.RELATIONSHIPS.value,
-      visible: () => CaseModel.canListRelationshipExposures(this.authUser),
+      visible: () => this.isView &&
+        CaseModel.canListRelationshipExposures(this.authUser),
       tableColumns: this.entityHelperService
         .retrieveTableColumns({
           selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
@@ -1239,7 +1241,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       label: 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS',
       pageSettingsKey: UserSettings.CASE_LAB_FIELDS,
       advancedFilterType: Constants.APP_PAGE.CASE_LAB_RESULTS.value,
-      visible: () => LabResultModel.canList(this.authUser) &&
+      visible: () => this.isView &&
+        LabResultModel.canList(this.authUser) &&
         CaseModel.canListLabResult(this.authUser),
       tableColumns: this.entityLabResultService.retrieveTableColumns({
         authUser: this.authUser,
@@ -1359,7 +1362,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       label: 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE',
       pageSettingsKey: UserSettings.CONTACT_RELATED_DAILY_FOLLOW_UP_FIELDS,
       advancedFilterType: Constants.APP_PAGE.INDIVIDUAL_CONTACT_FOLLOW_UPS.value,
-      visible: () => FollowUpModel.canList(this.authUser) &&
+      visible: () => this.isView &&
+        FollowUpModel.canList(this.authUser) &&
         this.itemData.wasContact,
       tableColumns: this.entityFollowUpHelperService.retrieveTableColumns({
         authUser: this.authUser,

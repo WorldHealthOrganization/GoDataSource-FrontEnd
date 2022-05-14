@@ -1120,7 +1120,7 @@
             <ng-container
               *ngFor="let tab of tabData.tabs; let tabIndex = index">
               <mat-step
-                *ngIf="tab.type === CreateViewModifyV2TabInputType.TAB"
+                *ngIf="!tab.visible || tab.visible()"
                 [stepControl]="tab.form">
 
                 <!-- Tab Label -->
@@ -1131,9 +1131,17 @@
 
                 <!-- Content -->
                 <div
-                  class="gd-create-view-modify-bottom-content">
-                  <ng-container
-                    *ngTemplateOutlet="sectionsRender; context: { tab }"></ng-container>
+                  class="gd-create-view-modify-bottom-content"
+                  [ngSwitch]="tab.type">
+
+                  <!-- Tab -->
+                  <ng-template
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.TAB"
+                    [ngTemplateOutlet]="sectionsRender"
+                    [ngTemplateOutletContext]="{ tab }"></ng-template>
+
+                  <!-- Tab table -->
+<!--                  CreateViewModifyV2TabInputType.TAB_TABLE-->
                 </div>
 
                 <!-- Bottom -->
@@ -1271,7 +1279,7 @@
               <ng-container
                 *ngFor="let tab of tabData.tabs">
                 <mat-tab
-                  *ngIf="(isView && (!tab.visible || tab.visible())) || tab.type === CreateViewModifyV2TabInputType.TAB"
+                  *ngIf="!tab.visible || tab.visible()"
                   [bodyClass]="tab.type === CreateViewModifyV2TabInputType.TAB_TABLE ? 'gd-create-view-modify-tab-list' : undefined">
 
                   <!-- Label & valid -->
@@ -1290,18 +1298,18 @@
 
                   <!-- Content -->
                   <div
-                    class="gd-create-view-modify-bottom-content">
+                    class="gd-create-view-modify-bottom-content"
+                    [ngSwitch]="tab.type">
 
-                    <!-- Inputs tab -->
-                    <ng-container
-                      *ngIf="tab.type === CreateViewModifyV2TabInputType.TAB; else tableTab">
-                      <ng-container
-                        *ngTemplateOutlet="sectionsRender; context: { tab }"></ng-container>
-                    </ng-container>
+                    <!-- Tab -->
+                    <ng-template
+                      *ngSwitchCase="CreateViewModifyV2TabInputType.TAB"
+                      [ngTemplateOutlet]="sectionsRender"
+                      [ngTemplateOutletContext]="{ tab }"></ng-template>
 
                     <!-- Table tab -->
-                    <ng-template
-                      #tableTab>
+                    <ng-container
+                      *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE">
                       <app-list-table-v2
                         *ngIf="visitedTabs[tab.label]"
                         #listTable
@@ -1322,7 +1330,7 @@
                         (resetHeaderFilters)="tabListResetHeaderFilters(listTable, tab)"
                         (advancedFilterBy)="tabListFilterByAdvanced(listTable, tab, $event)">
                       </app-list-table-v2>
-                    </ng-template>
+                    </ng-container>
                   </div>
                 </mat-tab>
               </ng-container>

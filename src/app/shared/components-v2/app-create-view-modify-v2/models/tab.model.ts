@@ -420,6 +420,7 @@ export interface ICreateViewModifyV2Tab {
   sections: ICreateViewModifyV2Section[];
 
   // optional
+  visible?: () => boolean
   form?: NgForm;
 }
 
