@@ -939,25 +939,31 @@
                       [viewOnly]="isView"
                       required="true"></app-form-input-v2>
 
-                    <!-- Style Url -->
-                    <app-form-input-v2
-                      [(ngModel)]="input.value.get(parentItemIndex).styleUrl"
-                      name="styleUrl"
-                      placeholder="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_STYLE"
-                      tooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_STYLE_DESCRIPTION"
-                      [viewOnly]="isView"
-                      app-general-async-validator
-                      [asyncValidatorObservable]="input.styleAsyncValidator(input, parentItemIndex)"></app-form-input-v2>
+                    <!-- Show only if specific type -->
+                    <ng-container
+                      *ngIf="input.value.get(parentItemIndex).type === Constants.OUTBREAK_MAP_SERVER_TYPES.VECTOR_TILE_VECTOR_TILE_LAYER.value">
 
-                    <!-- Style source -->
-                    <app-form-select-single-v2
-                      [(ngModel)]="input.value.get(parentItemIndex).styleUrlSource"
-                      name="styleUrlSource"
-                      placeholder="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_STYLE_SOURCE"
-                      tooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_STYLE_SOURCE_DESCRIPTION"
-                      [viewOnly]="isView"
-                      [options]="input.styleSourceOptions[input.value.get(parentItemIndex).styleUrl]"
-                      [required]="!!input.value.get(parentItemIndex).styleUrl"></app-form-select-single-v2>
+                      <!-- Style Url -->
+                      <app-form-input-v2
+                        [(ngModel)]="input.value.get(parentItemIndex).styleUrl"
+                        name="styleUrl"
+                        placeholder="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_STYLE"
+                        tooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_STYLE_DESCRIPTION"
+                        [viewOnly]="isView"
+                        app-general-async-validator
+                        [asyncValidatorObservable]="input.styleAsyncValidator(input, parentItemIndex)"></app-form-input-v2>
+
+                      <!-- Style source -->
+                      <app-form-select-single-v2
+                        [(ngModel)]="input.value.get(parentItemIndex).styleUrlSource"
+                        name="styleUrlSource"
+                        placeholder="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_STYLE_SOURCE"
+                        tooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_STYLE_SOURCE_DESCRIPTION"
+                        [viewOnly]="isView"
+                        [options]="input.styleSourceOptions[input.value.get(parentItemIndex).styleUrl]"
+                        [required]="!!input.value.get(parentItemIndex).styleUrl"></app-form-select-single-v2>
+
+                    </ng-container>
 
                   </div>
 
