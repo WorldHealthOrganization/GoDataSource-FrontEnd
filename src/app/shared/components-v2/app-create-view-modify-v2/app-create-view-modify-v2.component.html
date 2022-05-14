@@ -413,7 +413,6 @@
                     [required]="!isView && input.validators.required ? input.validators.required() : undefined"
                     app-general-async-validator
                     [asyncValidatorObservable]="!isView ? input.validators.async : undefined"
-                    [validateOnlyWhenDirty]="true"
                     [maxlength]="255"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-input-v2>
 

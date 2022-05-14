@@ -104,6 +104,7 @@ import { EntityFollowUpHelperService } from './helper/entity-follow-up-helper.se
 import { EntityLabResultService } from './helper/entity-lab-result-helper.service';
 import { SecurityQuestionDataResolver } from './resolvers/data/security-question.resolver';
 import { MapVectorTypeDataResolver } from './resolvers/data/map-vector-type.resolver';
+import { OutbreakTemplateDataResolver } from './resolvers/data/outbreak-template.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -138,6 +139,7 @@ export const services: any[] = [
   MapVectorTypeDataResolver,
   OccupationDataResolver,
   OutbreakDataResolver,
+  OutbreakTemplateDataResolver,
   OutcomeDataResolver,
   PermissionDataResolver,
   PersonDataResolver,

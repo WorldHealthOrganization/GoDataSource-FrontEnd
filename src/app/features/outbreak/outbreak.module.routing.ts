@@ -16,6 +16,7 @@ import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-
 import { PersonTypeDataResolver } from '../../core/services/resolvers/data/person-type.resolver';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { MapVectorTypeDataResolver } from '../../core/services/resolvers/data/map-vector-type.resolver';
+import { OutbreakTemplateDataResolver } from '../../core/services/resolvers/data/outbreak-template.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -28,7 +29,8 @@ const createViewModifyFoundation: Route = {
     followUpGenerationTeamAssignmentAlgorithm: FollowUpGenerationTeamAssignmentAlgorithmDataResolver,
     yesNo: YesNoDataResolver,
     mapVectorType: MapVectorTypeDataResolver,
-    user: UserDataResolver
+    user: UserDataResolver,
+    outbreakTemplate: OutbreakTemplateDataResolver
   }
 };
 

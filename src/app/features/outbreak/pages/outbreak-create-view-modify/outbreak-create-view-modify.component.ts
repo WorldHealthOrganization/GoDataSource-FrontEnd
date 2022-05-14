@@ -27,6 +27,7 @@ import * as _ from 'lodash';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
 
 /**
  * Component
@@ -40,6 +41,9 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
   private _styleUrlValidationCache: {
     [url: string]: Observable<boolean | IGeneralAsyncValidatorResponse>
   } = {};
+
+  // created from a template ?
+  private _outbreakTemplateId: string;
 
   /**
    * Constructor
@@ -94,7 +98,20 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
   /**
    * Data initialized
    */
-  protected initializedData(): void {}
+  protected initializedData(): void {
+    // replace data with template ?
+    if (this.isCreate) {
+      const outbreakTemplate: OutbreakTemplateModel = this.activatedRoute.snapshot.data.outbreakTemplate;
+      if (outbreakTemplate) {
+        // delete the id of the outbreak template
+        this._outbreakTemplateId = outbreakTemplate.id;
+        delete outbreakTemplate.id;
+
+        // make the new outbreak which is merged with the outbreak template
+        this.itemData = new OutbreakModel(outbreakTemplate);
+      }
+    }
+  }
 
   /**
    * Initialize page title
@@ -915,10 +932,24 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
       data,
       finished
     ) => {
+      // are we creating an outbreak from a template ?
+      if (
+        type === CreateViewModifyV2ActionType.CREATE &&
+        this._outbreakTemplateId
+      ) {
+        data = {
+          ...this.itemData,
+          ...data
+        };
+      }
+
       // create / modify
       (
         type === CreateViewModifyV2ActionType.CREATE ?
-          this.outbreakDataService.createOutbreak(data) :
+          this.outbreakDataService.createOutbreak(
+            data,
+            this._outbreakTemplateId
+          ) :
           this.outbreakDataService.modifyOutbreak(
             this.itemData.id,
             data
