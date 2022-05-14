@@ -59,6 +59,13 @@ export abstract class AppFormBaseErrorMsgV2 {
       case 'notEqualValidator':
         return translateService.instant(errData.err);
 
+      case 'regexNotMatched':
+        return translateService.instant(
+          errData.msg ?
+            errData.msg :
+            'LNG_FORM_VALIDATION_ERROR_INVALID_REGEX'
+        );
+
       default:
         return `--- NOT HANDLED (${errKey}) ---`;
     }
