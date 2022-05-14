@@ -491,7 +491,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                 }
               }
             }, {
-              type: CreateViewModifyV2TabInputType.VISUAL_ID,
+              type: CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT,
               name: 'visualId',
               placeholder: () => 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
               description: () => this.translateService.instant(
@@ -522,33 +522,35 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                   }
                 }
               ],
-              validator: new Observable((observer) => {
-                // construct cache key
-                const cacheKey: string = 'CCA_' + this.selectedOutbreak.id +
-                  this._caseVisualIDMask.mask +
-                  this.itemData.visualId +
-                  (
-                    this.isCreate ?
-                      '' :
-                      this.itemData.id
-                  );
+              validators: {
+                async: new Observable((observer) => {
+                  // construct cache key
+                  const cacheKey: string = 'CCA_' + this.selectedOutbreak.id +
+                    this._caseVisualIDMask.mask +
+                    this.itemData.visualId +
+                    (
+                      this.isCreate ?
+                        '' :
+                        this.itemData.id
+                    );
 
-                // get data from cache or execute validator
-                TimerCache.run(
-                  cacheKey,
-                  this.caseDataService.checkCaseVisualIDValidity(
-                    this.selectedOutbreak.id,
-                    this._caseVisualIDMask.mask,
-                    this.itemData.visualId,
-                    this.isCreate ?
-                      undefined :
-                      this.itemData.id
-                  )
-                ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
-                  observer.next(isValid);
-                  observer.complete();
-                });
-              })
+                  // get data from cache or execute validator
+                  TimerCache.run(
+                    cacheKey,
+                    this.caseDataService.checkCaseVisualIDValidity(
+                      this.selectedOutbreak.id,
+                      this._caseVisualIDMask.mask,
+                      this.itemData.visualId,
+                      this.isCreate ?
+                        undefined :
+                        this.itemData.id
+                    )
+                  ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                    observer.next(isValid);
+                    observer.complete();
+                  });
+                })
+              }
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'responsibleUserId',

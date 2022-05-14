@@ -394,6 +394,25 @@
                     [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-input-v2>
 
+                  <!-- Async validator text -->
+                  <app-form-input-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [placeholder]="input.placeholder()"
+                    [tooltip]="input.description ? input.description() : undefined"
+                    [viewOnly]="isView || !input.value.set"
+                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    [suffixIconButtons]="input.suffixIconButtons"
+                    autocomplete="off"
+                    [required]="!isView && input.validators.required ? input.validators.required() : undefined"
+                    app-general-async-validator
+                    [asyncValidatorObservable]="!isView ? input.validators.async : undefined"
+                    [validateOnlyWhenDirty]="true"
+                    [maxlength]="255"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-input-v2>
+
                   <!-- Password -->
                   <app-form-password-v2
                     *ngSwitchCase="CreateViewModifyV2TabInputType.PASSWORD"
@@ -578,24 +597,6 @@
                         (ngModelChange)="input.value.dob.set($event)"></app-form-date-v2>
                     </ng-template>
                   </div>
-
-                  <!-- Visual ID -->
-                  <app-form-input-v2
-                    *ngSwitchCase="CreateViewModifyV2TabInputType.VISUAL_ID"
-                    fxFlex
-                    [ngModel]="input.value.get(parentItemIndex)"
-                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
-                    [placeholder]="input.placeholder()"
-                    [tooltip]="input.description ? input.description() : undefined"
-                    [viewOnly]="isView || !input.value.set"
-                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
-                    [suffixIconButtons]="input.suffixIconButtons"
-                    autocomplete="off"
-                    app-general-async-validator
-                    [asyncValidatorObservable]="!isView ? input.validator : undefined"
-                    [validateOnlyWhenDirty]="true"
-                    [maxlength]="255"
-                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-input-v2>
 
                   <!-- Date -->
                   <app-form-date-v2

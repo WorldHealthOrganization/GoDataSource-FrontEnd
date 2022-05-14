@@ -25,10 +25,11 @@ export enum CreateViewModifyV2TabInputType {
   SELECT_SINGLE,
   SELECT_MULTIPLE,
   AGE_DATE_OF_BIRTH,
-  VISUAL_ID,
+  ASYNC_VALIDATOR_TEXT,
   DATE,
   TOGGLE_CHECKBOX,
   LOCATION_SINGLE,
+  LOCATION_MULTIPLE,
   TEXTAREA,
 
   // input groups
@@ -86,6 +87,25 @@ interface ICreateViewModifyV2TabInputText extends Omit<ICreateViewModifyV2TabInp
   validators?: {
     required?: () => boolean
   };
+}
+
+/**
+ * Input - async validator text
+ */
+interface ICreateViewModifyV2TabInputAsyncValidatorText extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
+  // required
+  type: CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT;
+  value: ICreateViewModifyV2TabInputValue<string>;
+  validators: {
+    // required
+    async: Observable<boolean | IGeneralAsyncValidatorResponse>,
+
+    // optional
+    required?: () => boolean
+  };
+
+  // optional
+  suffixIconButtons?: IAppFormIconButtonV2[];
 }
 
 /**
@@ -165,6 +185,18 @@ interface ICreateViewModifyV2TabInputLocationSingle extends Omit<ICreateViewModi
 }
 
 /**
+ * Input - location multiple
+ */
+interface ICreateViewModifyV2TabInputLocationMultiple extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
+  // required
+  type: CreateViewModifyV2TabInputType.LOCATION_MULTIPLE;
+  value: ICreateViewModifyV2TabInputValue<string[]>;
+
+  // optional
+  useOutbreakLocations?: boolean;
+}
+
+/**
  * Input - textarea
  */
 interface ICreateViewModifyV2TabInputTextArea extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
@@ -198,19 +230,6 @@ interface ICreateViewModifyV2TabInputAgeOrDOB extends Omit<ICreateViewModifyV2Ta
     age: string,
     dob: string
   }
-}
-
-/**
- * Input - visual ID
- */
-interface ICreateViewModifyV2TabInputVisualID extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
-  // required
-  type: CreateViewModifyV2TabInputType.VISUAL_ID;
-  value: ICreateViewModifyV2TabInputValue<string>;
-  validator: Observable<boolean | IGeneralAsyncValidatorResponse>;
-
-  // optional
-  suffixIconButtons?: IAppFormIconButtonV2[];
 }
 
 /**
@@ -315,8 +334,8 @@ interface ICreateViewModifyV2TabInputCenterDateRange {
  * Input
  */
 type CreateViewModifyV2TabInput = ICreateViewModifyV2TabInputText | ICreateViewModifyV2TabInputPassword | ICreateViewModifyV2TabInputSingleSelect
-| ICreateViewModifyV2TabInputMultipleSelect | ICreateViewModifyV2TabInputToggleCheckbox | ICreateViewModifyV2TabInputLocationSingle
-| ICreateViewModifyV2TabInputTextArea | ICreateViewModifyV2TabInputAgeOrDOB | ICreateViewModifyV2TabInputVisualID | ICreateViewModifyV2TabInputDate
+| ICreateViewModifyV2TabInputMultipleSelect | ICreateViewModifyV2TabInputToggleCheckbox | ICreateViewModifyV2TabInputLocationSingle | ICreateViewModifyV2TabInputLocationMultiple
+| ICreateViewModifyV2TabInputTextArea | ICreateViewModifyV2TabInputAgeOrDOB | ICreateViewModifyV2TabInputAsyncValidatorText | ICreateViewModifyV2TabInputDate
 | ICreateViewModifyV2TabInputList | ICreateViewModifyV2TabInputDocument | ICreateViewModifyV2TabInputAddress | ICreateViewModifyV2TabInputVaccine
 | ICreateViewModifyV2TabInputCenterDateRange;
 
