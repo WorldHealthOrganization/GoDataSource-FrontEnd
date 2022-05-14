@@ -48,6 +48,5 @@ export class AppFormEditQuestionnaireV2Component
    */
   ngOnDestroy(): void {
     super.onDestroy();
-    console.log(1);
   }
 }
