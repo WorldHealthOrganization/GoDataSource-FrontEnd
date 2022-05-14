@@ -6,7 +6,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { Observable, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { TranslateService } from '@ngx-translate/core';
-import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import { CreateViewModifyV2MenuType, CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -19,6 +19,7 @@ import { MapServerModel } from '../../../../core/models/map-server.model';
 import * as _ from 'lodash';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 
 /**
  * Component
@@ -40,6 +41,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     private outbreakDataService: OutbreakDataService,
     private activatedRoute: ActivatedRoute,
     private translateService: TranslateService,
+    private dialogV2Service: DialogV2Service,
     authDataService: AuthDataService,
     toastV2Service: ToastV2Service,
     renderer2: Renderer2,
@@ -822,23 +824,22 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
       },
       quickActions: {
         options: [
-          // #TODO
-          // // Record details
-          // {
-          //   type: CreateViewModifyV2MenuType.OPTION,
-          //   label: 'LNG_PAGE_MODIFY_CASE_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
-          //   action: {
-          //     click: () => {
-          //       // show record details dialog
-          //       this.dialogV2Service.showRecordDetailsDialog(
-          //         'LNG_PAGE_MODIFY_CASE_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
-          //         this.itemData,
-          //         this.activatedRoute.snapshot.data.user
-          //       );
-          //     }
-          //   },
-          //   visible: () => !this.isCreate
-          // }
+          // Record details
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_PAGE_MODIFY_OUTBREAK_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
+            action: {
+              click: () => {
+                // show record details dialog
+                this.dialogV2Service.showRecordDetailsDialog(
+                  'LNG_PAGE_MODIFY_OUTBREAK_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
+                  this.itemData,
+                  this.activatedRoute.snapshot.data.user
+                );
+              }
+            },
+            visible: () => !this.isCreate
+          }
         ]
       }
     };

@@ -27,7 +27,8 @@ const createViewModifyFoundation: Route = {
     geographicalLevel: LocationGeographicalLevelDataResolver,
     followUpGenerationTeamAssignmentAlgorithm: FollowUpGenerationTeamAssignmentAlgorithmDataResolver,
     yesNo: YesNoDataResolver,
-    mapVectorType: MapVectorTypeDataResolver
+    mapVectorType: MapVectorTypeDataResolver,
+    user: UserDataResolver
   }
 };
 
