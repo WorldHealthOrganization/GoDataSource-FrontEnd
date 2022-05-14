@@ -395,6 +395,54 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
                   this.itemData.applyGeographicRestrictions = value;
                 }
               }
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'reportingGeographicalLevelId',
+              placeholder: () => 'LNG_OUTBREAK_FIELD_LABEL_LOCATION_GEOGRAPHICAL_LEVEL',
+              description: () => 'LNG_OUTBREAK_FIELD_LABEL_LOCATION_GEOGRAPHICAL_LEVEL_DESCRIPTION',
+              options: (this.activatedRoute.snapshot.data.geographicalLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              value: {
+                get: () => this.itemData.reportingGeographicalLevelId,
+                set: (value) => {
+                  this.itemData.reportingGeographicalLevelId = value;
+                }
+              },
+              validators: {
+                required: () => true
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'isContactLabResultsActive',
+              placeholder: () => 'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_LAB_RESULTS_ACTIVE',
+              description: () => 'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_LAB_RESULTS_ACTIVE_DESCRIPTION',
+              value: {
+                get: () => this.itemData.isContactLabResultsActive,
+                set: (value) => {
+                  this.itemData.isContactLabResultsActive = value;
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'isDateOfOnsetRequired',
+              placeholder: () => 'LNG_OUTBREAK_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED',
+              description: () => 'LNG_OUTBREAK_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED_DESCRIPTION',
+              value: {
+                get: () => this.itemData.isDateOfOnsetRequired,
+                set: (value) => {
+                  this.itemData.isDateOfOnsetRequired = value;
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'isContactsOfContactsActive',
+              placeholder: () => 'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_OF_CONTACT_ACTIVE',
+              description: () => 'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_OF_CONTACT_ACTIVE_DESCRIPTION',
+              value: {
+                get: () => this.itemData.isContactsOfContactsActive,
+                set: (value) => {
+                  this.itemData.isContactsOfContactsActive = value;
+                }
+              }
             }
           ]
         },
@@ -481,11 +529,111 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
                 }
               },
               validators: {
-                required: () => true,
                 regex: () => ({
                   expression: '^\\s*([1-9][0-9]*)(\\s*,\\s*([1-9][0-9]*))*$',
                   msg: 'LNG_FORM_VALIDATION_ERROR_PATTERN'
                 })
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'generateFollowUpsDateOfLastContact',
+              placeholder: () => 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT',
+              description: () => 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT_DESCRIPTION',
+              value: {
+                get: () => this.itemData.generateFollowUpsDateOfLastContact,
+                set: (value) => {
+                  this.itemData.generateFollowUpsDateOfLastContact = value;
+                }
+              }
+            }
+          ]
+        },
+
+        // Reports
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_OUTBREAK_FIELD_LABEL_REPORT',
+          inputs: [
+            {
+              type: CreateViewModifyV2TabInputType.NUMBER,
+              name: 'noDaysAmongContacts',
+              placeholder: () => 'LNG_OUTBREAK_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS',
+              description: () => 'LNG_OUTBREAK_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS_DESCRIPTION',
+              value: {
+                get: () => this.itemData.noDaysAmongContacts,
+                set: (value) => {
+                  this.itemData.noDaysAmongContacts = value;
+                }
+              },
+              validators: {
+                required: () => true
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.NUMBER,
+              name: 'noDaysInChains',
+              placeholder: () => 'LNG_OUTBREAK_FIELD_LABEL_DAYS_IN_KNOWN_TRANSMISSION_CHAINS',
+              description: () => 'LNG_OUTBREAK_FIELD_LABEL_DAYS_IN_KNOWN_TRANSMISSION_CHAINS_DESCRIPTION',
+              value: {
+                get: () => this.itemData.noDaysInChains,
+                set: (value) => {
+                  this.itemData.noDaysInChains = value;
+                }
+              },
+              validators: {
+                required: () => true
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.NUMBER,
+              name: 'noDaysNotSeen',
+              placeholder: () => 'LNG_OUTBREAK_FIELD_LABEL_DAYS_NOT_SEEN',
+              description: () => 'LNG_OUTBREAK_FIELD_LABEL_DAYS_NOT_SEEN_DESCRIPTION',
+              value: {
+                get: () => this.itemData.noDaysNotSeen,
+                set: (value) => {
+                  this.itemData.noDaysNotSeen = value;
+                }
+              },
+              validators: {
+                required: () => true
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.NUMBER,
+              name: 'noLessContacts',
+              placeholder: () => 'LNG_OUTBREAK_FIELD_LABEL_LESS_THAN_X_CONTACTS',
+              description: () => 'LNG_OUTBREAK_FIELD_LABEL_LESS_THAN_X_CONTACTS_DESCRIPTION',
+              value: {
+                get: () => this.itemData.noLessContacts,
+                set: (value) => {
+                  this.itemData.noLessContacts = value;
+                }
+              },
+              validators: {
+                required: () => true
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.NUMBER,
+              name: 'longPeriodsBetweenCaseOnset',
+              placeholder: () => 'LNG_OUTBREAK_FIELD_LABEL_DAYS_LONG_PERIODS',
+              description: () => 'LNG_OUTBREAK_FIELD_LABEL_DAYS_LONG_PERIODS_DESCRIPTION',
+              value: {
+                get: () => this.itemData.longPeriodsBetweenCaseOnset,
+                set: (value) => {
+                  this.itemData.longPeriodsBetweenCaseOnset = value;
+                }
+              },
+              validators: {
+                required: () => true
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.NUMBER,
+              name: 'noDaysNewContacts',
+              placeholder: () => 'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT',
+              description: () => 'LNG_OUTBREAK_FIELD_LABEL_DAYS_NEW_CONTACT_DESCRIPTION',
+              value: {
+                get: () => this.itemData.noDaysNewContacts,
+                set: (value) => {
+                  this.itemData.noDaysNewContacts = value;
+                }
               }
             }
           ]

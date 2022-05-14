@@ -63,7 +63,8 @@ export const EnglishUsLang = {
     'LNG_DIALOG_LOCAL_HELP_DIALOG_TITLE': 'Help',
     'LNG_ENTITY_FIELD_LABEL_NUMBER_OF_CONTACTS': 'Number of contacts',
     'LNG_ENTITY_FIELD_LABEL_NUMBER_OF_EXPOSURES': 'Number of exposures',
-    'LNG_OUTBREAK_FIELD_LABEL_FOLLOW_UP': 'Follow-ups'
+    'LNG_OUTBREAK_FIELD_LABEL_FOLLOW_UP': 'Follow-ups',
+    'LNG_OUTBREAK_FIELD_LABEL_REPORT': 'Reports'
 
 
 
