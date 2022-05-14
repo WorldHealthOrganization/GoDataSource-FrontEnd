@@ -471,6 +471,7 @@ export interface ICreateViewModifyV2TabTable {
 
   // optional
   visible?: () => boolean
+  form?: NgForm;
 }
 
 /**

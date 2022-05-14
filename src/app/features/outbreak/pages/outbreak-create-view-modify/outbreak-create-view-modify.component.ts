@@ -12,7 +12,8 @@ import {
   CreateViewModifyV2TabInputType,
   ICreateViewModifyV2Buttons,
   ICreateViewModifyV2CreateOrUpdate,
-  ICreateViewModifyV2Tab
+  ICreateViewModifyV2Tab,
+  ICreateViewModifyV2TabTable
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -200,10 +201,10 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
         this.initializeTabsDetails(),
 
         // Map servers
-        this.initializeTabsMapServers()
+        this.initializeTabsMapServers(),
 
         // Questionnaires
-        // this.initializeTabsQuestionnaireCase(),
+        this.initializeTabsQuestionnaireCase()
         // this.initializeTabsQuestionnaireContact(),
         // this.initializeTabsQuestionnaireFollowUp(),
         // this.initializeTabsQuestionnaireLabResult()
@@ -821,18 +822,20 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     };
   }
 
-  // /**
-  //  * Initialize tabs - Questionnaire - Case
-  //  */
-  // private initializeTabsQuestionnaireCase(): ICreateViewModifyV2TabFull {
-  //   // #TODO - remove route..and component
-  //   return {
-  //     type: CreateViewModifyV2TabInputType.TAB_FULL,
-  //     label: 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE',
-  //     definition: null
-  //   };
-  // }
-  //
+  /**
+   * Initialize tabs - Questionnaire - Case
+   */
+  private initializeTabsQuestionnaireCase(): ICreateViewModifyV2TabTable {
+    // #TODO - remove route..and component
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      label: 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE',
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE
+      }
+    };
+  }
+
   // /**
   //  * Initialize tabs - Questionnaire - Contact
   //  */

@@ -135,10 +135,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
     // check forms
     for (let index: number = 0; index < this.tabData.tabs.length; index++) {
-      if (
-        this.tabData.tabs[index].type === CreateViewModifyV2TabInputType.TAB &&
-        (this.tabData.tabs[index] as ICreateViewModifyV2Tab).form?.pending
-      ) {
+      if (this.tabData.tabs[index].form?.pending) {
         return true;
       }
     }
@@ -464,7 +461,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    * Update form
    */
   updateForm(
-    tab: ICreateViewModifyV2Tab,
+    tab: ICreateViewModifyV2Tab | ICreateViewModifyV2TabTable,
     form: NgForm
   ): void {
     tab.form = form;
@@ -518,8 +515,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   markFormsAsPristine(): void {
     // mark all forms as pristine
     (this.tabData?.tabs || [])
-      .filter((tab) => tab.type === CreateViewModifyV2TabInputType.TAB)
-      .forEach((tab: ICreateViewModifyV2Tab) => {
+      .forEach((tab) => {
         // nothing to do ?
         if (!tab.form) {
           return;
@@ -536,8 +532,8 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   create(): void {
     // determine forms
     const forms: NgForm[] = this.tabData.tabs
-      .filter((tab) => tab.type === CreateViewModifyV2TabInputType.TAB)
-      .map((tab: ICreateViewModifyV2Tab) => tab.form).filter((item) => !!item);
+      .map((tab) => tab.form)
+      .filter((item) => !!item);
 
     // validate
     if (!this.formHelper.isFormsSetValid(forms)) {
@@ -563,8 +559,8 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   modify(): void {
     // determine forms
     const forms: NgForm[] = this.tabData.tabs
-      .filter((tab) => tab.type === CreateViewModifyV2TabInputType.TAB)
-      .map((tab: ICreateViewModifyV2Tab) => tab.form).filter((item) => !!item);
+      .map((tab) => tab.form)
+      .filter((item) => !!item);
 
     // submit to validate forms
     forms.forEach((form) => {
