@@ -287,7 +287,7 @@ export class SetSecurityQuestionsComponent extends CreateViewModifyComponent<Use
       data,
       finished
     ) => {
-      // try to authenticate the user
+      // modify
       this.userDataService
         .modifyUser(
           this.authUser.id,

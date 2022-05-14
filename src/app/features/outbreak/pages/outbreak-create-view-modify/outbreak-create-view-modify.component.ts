@@ -6,7 +6,14 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { Observable, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { TranslateService } from '@ngx-translate/core';
-import { CreateViewModifyV2MenuType, CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import {
+  CreateViewModifyV2ActionType,
+  CreateViewModifyV2MenuType,
+  CreateViewModifyV2TabInputType,
+  ICreateViewModifyV2Buttons,
+  ICreateViewModifyV2CreateOrUpdate,
+  ICreateViewModifyV2Tab
+} from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -850,13 +857,37 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
    */
   private initializeProcessData(): ICreateViewModifyV2CreateOrUpdate {
     return (
-      _type,
-      _data,
-      _finished,
-      _loading,
-      _forms
+      type,
+      data,
+      finished
     ) => {
-      // #TODO
+      // create / modify
+      (
+        type === CreateViewModifyV2ActionType.CREATE ?
+          this.outbreakDataService.createOutbreak(data) :
+          this.outbreakDataService.modifyOutbreak(
+            this.itemData.id,
+            data
+          )
+      ).pipe(
+        catchError((err) => {
+          // show error
+          finished(err, undefined);
+
+          // finished
+          return throwError(err);
+        })
+      ).subscribe((outbreak) => {
+        // display message
+        this.toastV2Service.success(
+          type === CreateViewModifyV2ActionType.CREATE ?
+            'LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON' :
+            'LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE'
+        );
+
+        // hide loading & redirect
+        finished(undefined, outbreak);
+      });
     };
   }
 
