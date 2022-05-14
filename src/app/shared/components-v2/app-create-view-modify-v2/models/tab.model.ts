@@ -45,6 +45,7 @@ export enum CreateViewModifyV2TabInputType {
   // layout
   TAB,
   TAB_TABLE,
+  TAB_TABLE_RECORDS_LIST,
   SECTION,
 
   // other
@@ -425,12 +426,11 @@ export interface ICreateViewModifyV2Tab {
 }
 
 /**
- * Tab table
+ * Tab table - list of records
  */
-export interface ICreateViewModifyV2TabTable {
+export interface ICreateViewModifyV2TabTableRecordsList {
   // required
-  type: CreateViewModifyV2TabInputType.TAB_TABLE;
-  label: string;
+  type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST;
   tableColumns: IV2Column[];
   pageSettingsKey: UserSettings;
   advancedFilterType: string;
@@ -442,9 +442,6 @@ export interface ICreateViewModifyV2TabTable {
   ) => void;
   pageIndex: number;
 
-  // optional
-  visible?: () => boolean
-
   // used by ui
   updateUI?: () => void;
   records$?: Observable<any[]>;
@@ -452,6 +449,19 @@ export interface ICreateViewModifyV2TabTable {
   applyHasMoreLimit?: boolean;
   pageCount?: IBasicCount;
   previousRefreshRequest?: any;
+}
+
+/**
+ * Tab table
+ */
+export interface ICreateViewModifyV2TabTable {
+  // required
+  type: CreateViewModifyV2TabInputType.TAB_TABLE;
+  label: string;
+  definition: ICreateViewModifyV2TabTableRecordsList;
+
+  // optional
+  visible?: () => boolean
 }
 
 /**

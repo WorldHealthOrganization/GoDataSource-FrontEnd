@@ -91,7 +91,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
       }
 
       // attach update ui method
-      tab.updateUI = () => {
+      tab.definition.updateUI = () => {
         this.detectChanges();
       };
     });
@@ -851,18 +851,18 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     instant: boolean
   ): void {
     // cancel previous request
-    if (tab.previousRefreshRequest) {
-      clearTimeout(tab.previousRefreshRequest);
-      tab.previousRefreshRequest = undefined;
+    if (tab.definition.previousRefreshRequest) {
+      clearTimeout(tab.definition.previousRefreshRequest);
+      tab.definition.previousRefreshRequest = undefined;
     }
 
     // refresh
     if (instant) {
-      tab.refresh(tab);
+      tab.definition.refresh(tab);
     } else {
-      tab.previousRefreshRequest = setTimeout(() => {
+      tab.definition.previousRefreshRequest = setTimeout(() => {
         // refresh
-        tab.refresh(tab);
+        tab.definition.refresh(tab);
       }, Constants.DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS);
     }
   }
@@ -896,10 +896,10 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     page: PageEvent
   ): void {
     // update API pagination params
-    tab.queryBuilder.paginator.setPage(page);
+    tab.definition.queryBuilder.paginator.setPage(page);
 
     // update page index
-    tab.pageIndex = tab.queryBuilder.paginator.skip / tab.queryBuilder.paginator.limit;
+    tab.definition.pageIndex = tab.definition.queryBuilder.paginator.skip / tab.definition.queryBuilder.paginator.limit;
 
     // refresh list
     this.refreshTabList(
@@ -922,7 +922,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     // apply sort
     applySortBy(
       data,
-      tab.queryBuilder,
+      tab.definition.queryBuilder,
       listTable.advancedFiltersQueryBuilder,
       undefined
     );
@@ -946,7 +946,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   ): void {
     // filter
     applyFilterBy(
-      tab.queryBuilder,
+      tab.definition.queryBuilder,
       data.column,
       data.valueOverwrite
     );
@@ -966,10 +966,10 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     tab: ICreateViewModifyV2TabTable
   ): void {
     // clear query builder of conditions and sorting criteria
-    tab.queryBuilder.clear();
+    tab.definition.queryBuilder.clear();
 
     // clear table filters
-    applyResetOnAllFilters(tab.tableColumns);
+    applyResetOnAllFilters(tab.definition.tableColumns);
     listTable.updateColumnDefinitions();
 
     // reset table sort columns
@@ -980,18 +980,18 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     );
 
     // initialize query paginator
-    tab.queryBuilder.paginator.setPage({
-      pageSize: tab.queryBuilder.paginator.limit,
+    tab.definition.queryBuilder.paginator.setPage({
+      pageSize: tab.definition.queryBuilder.paginator.limit,
       pageIndex: 0
     }, true);
 
     // update page index
-    tab.pageIndex = 0;
+    tab.definition.pageIndex = 0;
 
     // retrieve Side filters
     let queryBuilder;
     if ((queryBuilder = listTable.advancedFiltersQueryBuilder)) {
-      tab.queryBuilder.merge(queryBuilder);
+      tab.definition.queryBuilder.merge(queryBuilder);
     }
 
     // if no side query builder then clear side filters too
@@ -1015,10 +1015,10 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     queryBuilder?: RequestQueryBuilder
   ): void {
     // clear query builder of conditions and sorting criteria
-    tab.queryBuilder.clear();
+    tab.definition.queryBuilder.clear();
 
     // clear table filters
-    applyResetOnAllFilters(tab.tableColumns);
+    applyResetOnAllFilters(tab.definition.tableColumns);
     listTable.updateColumnDefinitions();
 
     // reset table sort columns
@@ -1029,17 +1029,17 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     );
 
     // initialize query paginator
-    tab.queryBuilder.paginator.setPage({
-      pageSize: tab.queryBuilder.paginator.limit,
+    tab.definition.queryBuilder.paginator.setPage({
+      pageSize: tab.definition.queryBuilder.paginator.limit,
       pageIndex: 0
     }, true);
 
     // update page index
-    tab.pageIndex = 0;
+    tab.definition.pageIndex = 0;
 
     // merge query builder with side filters
     if (queryBuilder) {
-      tab.queryBuilder.merge(queryBuilder);
+      tab.definition.queryBuilder.merge(queryBuilder);
     }
 
     // refresh
