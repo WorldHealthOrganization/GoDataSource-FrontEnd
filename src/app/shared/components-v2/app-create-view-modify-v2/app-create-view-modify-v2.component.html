@@ -1113,6 +1113,43 @@
 
 
 
+          <!-- Table render -->
+          <ng-template
+            #tableRender
+            let-tab="tab">
+            <ng-container
+              [ngSwitch]="tab.definition.type">
+
+              <!-- Records list -->
+              <ng-container
+                *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST">
+                <app-list-table-v2
+                  *ngIf="visitedTabs[tab.label]"
+                  #listTable
+                  [records$]="tab.definition.records$"
+                  [columns]="tab.definition.tableColumns"
+                  [pageCount]="tab.definition.pageCount"
+                  [pageSize]="tab.definition.queryBuilder.paginator.limit"
+                  [pageIndex]="tab.definition.pageIndex"
+                  [pageSettingsKey]="tab.definition.pageSettingsKey"
+                  [filtersApplied]="!tab.definition.queryBuilder.isEmptyOnlyFilters()"
+                  [advancedFilterType]="tab.definition.advancedFilterType"
+                  [advancedFilters]="tab.definition.advancedFilters"
+                  (refreshData)="refreshTabList(tab, true)"
+                  (refreshDataCount)="tab.definition.refreshCount(tab, false)"
+                  (pageChange)="tabListPageChange(tab, $event)"
+                  (sortBy)="tabListSortBy(listTable, tab, $event)"
+                  (filterBy)="tabListFilterBy(tab, $event)"
+                  (resetHeaderFilters)="tabListResetHeaderFilters(listTable, tab)"
+                  (advancedFilterBy)="tabListFilterByAdvanced(listTable, tab, $event)">
+                </app-list-table-v2>
+              </ng-container>
+
+            </ng-container>
+          </ng-template>
+
+
+
           <!-- Render tabs - Create layout -->
           <mat-horizontal-stepper
             *ngIf="isCreate; else viewModify"
@@ -1141,7 +1178,10 @@
                     [ngTemplateOutletContext]="{ tab }"></ng-template>
 
                   <!-- Tab table -->
-<!--                  CreateViewModifyV2TabInputType.TAB_TABLE-->
+                  <ng-template
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE"
+                    [ngTemplateOutlet]="tableRender"
+                    [ngTemplateOutletContext]="{ tab }"></ng-template>
                 </div>
 
                 <!-- Bottom -->
@@ -1308,29 +1348,10 @@
                       [ngTemplateOutletContext]="{ tab }"></ng-template>
 
                     <!-- Table tab -->
-                    <ng-container
-                      *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE">
-                      <app-list-table-v2
-                        *ngIf="visitedTabs[tab.label]"
-                        #listTable
-                        [records$]="tab.definition.records$"
-                        [columns]="tab.definition.tableColumns"
-                        [pageCount]="tab.definition.pageCount"
-                        [pageSize]="tab.definition.queryBuilder.paginator.limit"
-                        [pageIndex]="tab.definition.pageIndex"
-                        [pageSettingsKey]="tab.definition.pageSettingsKey"
-                        [filtersApplied]="!tab.definition.queryBuilder.isEmptyOnlyFilters()"
-                        [advancedFilterType]="tab.definition.advancedFilterType"
-                        [advancedFilters]="tab.definition.advancedFilters"
-                        (refreshData)="refreshTabList(tab, true)"
-                        (refreshDataCount)="tab.definition.refreshCount(tab, false)"
-                        (pageChange)="tabListPageChange(tab, $event)"
-                        (sortBy)="tabListSortBy(listTable, tab, $event)"
-                        (filterBy)="tabListFilterBy(tab, $event)"
-                        (resetHeaderFilters)="tabListResetHeaderFilters(listTable, tab)"
-                        (advancedFilterBy)="tabListFilterByAdvanced(listTable, tab, $event)">
-                      </app-list-table-v2>
-                    </ng-container>
+                    <ng-template
+                      *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE"
+                      [ngTemplateOutlet]="tableRender"
+                      [ngTemplateOutletContext]="{ tab }"></ng-template>
                   </div>
                 </mat-tab>
               </ng-container>
