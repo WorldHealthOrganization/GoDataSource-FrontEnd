@@ -30,6 +30,7 @@ import { applyFilterBy, applyResetOnAllFilters, applySortBy } from '../app-list-
 import { AppListTableV2Component } from '../app-list-table-v2/app-list-table-v2.component';
 import { PageEvent } from '@angular/material/paginator';
 import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 /**
  * Component
@@ -276,6 +277,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   visitedTabs: {
     [tabLabel: string]: true
   } = {};
+
+  // invalid drag zone
+  isInvalidDragEvent: boolean = true;
 
   // render mode
   renderMode: RenderMode = RenderMode.FULL;
@@ -1052,5 +1056,44 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   private updateRenderMode(): void {
     // determine render mode
     this.renderMode = determineRenderMode();
+  }
+
+  /**
+   * Started the drag from a zone that isn't allowed
+   */
+  notInvalidDragZone(): void {
+    this.isInvalidDragEvent = false;
+  }
+
+  /**
+   * Drop item
+   */
+  dropItem(event: CdkDragDrop<any[]>, input: ICreateViewModifyV2TabInputList): void {
+    if (this.isInvalidDragEvent) {
+      return;
+    }
+
+    // disable drag
+    this.isInvalidDragEvent = true;
+    moveItemInArray(
+      input.items,
+      event.previousIndex,
+      event.currentIndex
+    );
+
+    // changed
+    input.itemsChanged(input);
+
+    // update ui
+    this.detectChanges();
+  }
+
+  /**
+   * Drag started
+   */
+  dragStarted(): void {
+    if (this.isInvalidDragEvent) {
+      document.dispatchEvent(new Event('mouseup'));
+    }
   }
 }

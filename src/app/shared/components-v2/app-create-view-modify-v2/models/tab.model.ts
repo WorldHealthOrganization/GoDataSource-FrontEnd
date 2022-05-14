@@ -295,6 +295,9 @@ export interface ICreateViewModifyV2TabInputList {
     }
   };
   itemsChanged: (list: ICreateViewModifyV2TabInputList) => void;
+
+  // optional
+  sortable?: boolean;
 }
 
 /**

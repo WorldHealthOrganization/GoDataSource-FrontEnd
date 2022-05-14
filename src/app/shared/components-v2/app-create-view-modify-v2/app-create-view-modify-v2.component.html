@@ -987,20 +987,35 @@
 
                     <!-- List Items -->
                     <div
-                      class="gd-create-view-modify-bottom-section-content-input-list">
+                      class="gd-create-view-modify-bottom-section-content-input-list"
+                      cdkDropList [cdkDropListData]="input.items" (cdkDropListDropped)="dropItem($event, input)">
 
                       <!-- Display items -->
                       <ng-container
                         *ngIf="!isView || input.items?.length > 0; else emptyList">
                         <div
                           *ngFor="let item of input.items; let itemIndex = index; trackBy: trackByIndex"
-                          class="gd-create-view-modify-bottom-section-content-input-list-item">
+                          class="gd-create-view-modify-bottom-section-content-input-list-item"
+                          cdkDrag (cdkDragStarted)="dragStarted()" [cdkDragData]="item">
 
-                          <!-- Remove button -->
+                          <!-- Sort & Remove buttons -->
                           <div
                             *ngIf="!isView"
                             fxLayoutAlign="end"
                             class="gd-create-view-modify-bottom-section-content-input-list-item-delete">
+
+                            <!-- Sort -->
+                            <button
+                              *ngIf="input.sortable"
+                              cdkDragHandle
+                              type="button"
+                              mat-icon-button
+                              [matTooltip]="'LNG_COMMON_BUTTON_DRAG' | translate"
+                              (mousedown)="notInvalidDragZone()">
+                              <mat-icon>drag_handle</mat-icon>
+                            </button>
+
+                            <!-- Remove -->
                             <button
                               type="button"
                               mat-icon-button

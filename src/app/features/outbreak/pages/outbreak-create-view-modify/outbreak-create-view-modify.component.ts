@@ -673,6 +673,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
               type: CreateViewModifyV2TabInputType.LIST,
               name: 'arcGisServers',
               items: this.itemData.arcGisServers,
+              sortable: true,
               itemsChanged: (list) => {
                 // update
                 this.itemData.arcGisServers = list.items;
