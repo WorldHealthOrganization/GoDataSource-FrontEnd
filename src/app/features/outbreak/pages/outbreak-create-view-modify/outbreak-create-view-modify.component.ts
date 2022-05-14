@@ -699,7 +699,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
               // move to legend
               type: CreateViewModifyV2TabInputType.LABEL,
               value: {
-                get: () => 'LNG_PAGE_CREATE_OUTBREAK_TAB_MAP_SERVERS_DETAILS'
+                get: () => 'LNG_PAGE_CREATE_OUTBREAK_TAB_MAP_SERVERS_DETAILS - vizibil doar pe create'
               }
             }, {
               type: CreateViewModifyV2TabInputType.LIST,
