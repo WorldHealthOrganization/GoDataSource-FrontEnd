@@ -15,6 +15,7 @@
     <!-- Left - Icon buttons -->
     <mat-icon
       *ngIf="tooltipButton"
+      tabindex="-1"
       matPrefix
       [matTooltip]="tooltipButton.tooltip">{{tooltipButton.icon}}</mat-icon>
 
@@ -34,6 +35,7 @@
       (blur)="onTouchItem()"
       (ngModelChange)="onTouchItem()">
     <mat-datepicker-toggle
+      tabindex="-1"
       matSuffix
       [for]="pickerStartDate"></mat-datepicker-toggle>
     <mat-datepicker

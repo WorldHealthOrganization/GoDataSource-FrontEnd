@@ -16,6 +16,7 @@
   <!-- Tooltip -->
   <mat-icon
     *ngIf="tooltipButton"
+    tabindex="-1"
     matPrefix
     [matTooltip]="tooltipButton.tooltip">{{tooltipButton.icon}}</mat-icon>
 

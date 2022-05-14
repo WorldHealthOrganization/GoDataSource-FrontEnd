@@ -15,6 +15,7 @@
     <!-- Left - Icon buttons -->
     <mat-icon
       *ngIf="tooltipButton"
+      tabindex="-1"
       matPrefix
       [matTooltip]="tooltipButton.tooltip">{{tooltipButton.icon}}</mat-icon>
 
@@ -41,6 +42,7 @@
     <!-- Right - Icon buttons -->
     <button
       *ngFor="let iconB of suffixIconButtons"
+      tabindex="-1"
       type="button"
       mat-icon-button
       matSuffix
