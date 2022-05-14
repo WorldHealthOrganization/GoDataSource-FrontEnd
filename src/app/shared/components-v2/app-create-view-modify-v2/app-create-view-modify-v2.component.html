@@ -338,7 +338,7 @@
 
               <!-- Edit -->
               <a
-                *ngIf="isView && selectedOutbreakIsActive && tabData.buttons.modify && (!tabData.buttons.modify.visible || tabData.buttons.modify.visible())"
+                *ngIf="isView && allowEdit && tabData.buttons.modify && (!tabData.buttons.modify.visible || tabData.buttons.modify.visible())"
                 type="button"
                 mat-flat-button color="primary"
                 [routerLink]="tabData.buttons.modify.link.link()"
@@ -473,6 +473,19 @@
                     [clearable]="true"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-select-location-single-v2>
+
+                  <!-- Location multiple -->
+                  <app-form-select-location-multiple-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.LOCATION_MULTIPLE"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [placeholder]="input.placeholder()"
+                    [viewOnly]="isView || !input.value.set"
+                    [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
+                    [useOutbreakLocations]="input.useOutbreakLocations"
+                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-select-location-multiple-v2>
 
                   <!-- Textarea -->
                   <app-form-textarea-v2

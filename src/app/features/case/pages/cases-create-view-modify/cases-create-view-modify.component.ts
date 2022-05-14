@@ -350,7 +350,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   private initializeTabsPersonal(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
-      label: 'LNG_PAGE_CREATE_CASE_TAB_PERSONAL_TITLE',
+      label: this.isCreate ?
+        'LNG_PAGE_CREATE_CASE_TAB_PERSONAL_TITLE' :
+        'LNG_PAGE_MODIFY_CASE_TAB_PERSONAL_TITLE',
       sections: [
         // Details
         {
@@ -650,7 +652,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   private initializeTabsEpidemiology(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
-      label: 'LNG_PAGE_CREATE_CASE_TAB_INFECTION_TITLE',
+      label: this.isCreate ?
+        'LNG_PAGE_CREATE_CASE_TAB_INFECTION_TITLE' :
+        'LNG_PAGE_MODIFY_CASE_TAB_INFECTION_TITLE',
       sections: [
         // Details
         {

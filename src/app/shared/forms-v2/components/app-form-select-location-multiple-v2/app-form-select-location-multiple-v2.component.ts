@@ -2,7 +2,7 @@ import {
   ChangeDetectionStrategy, ChangeDetectorRef,
   Component, EventEmitter,
   forwardRef,
-  Host,
+  Host, Input,
   OnDestroy, OnInit,
   Optional, Output,
   SkipSelf, ViewEncapsulation
@@ -37,6 +37,12 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 })
 export class AppFormSelectLocationMultipleV2Component
   extends AppFormLocationBaseV2<string[]> implements OnInit, OnDestroy {
+
+  // view only
+  @Input() viewOnly: boolean;
+
+  // no value string
+  @Input() noValueLabel: string = '—';
 
   // selected locations
   selectedLocations: ILocation[] = [];

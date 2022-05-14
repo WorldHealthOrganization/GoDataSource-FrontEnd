@@ -56,7 +56,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   }
 
   // selected outbreak is active ?
-  @Input() selectedOutbreakIsActive: boolean;
+  @Input() allowEdit: boolean;
 
   // loading data
   @Input() loadingPage: boolean;
