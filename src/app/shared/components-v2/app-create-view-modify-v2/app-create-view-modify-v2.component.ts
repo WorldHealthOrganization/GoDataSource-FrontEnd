@@ -91,9 +91,11 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
       }
 
       // attach update ui method
-      tab.definition.updateUI = () => {
-        this.detectChanges();
-      };
+      if (tab.definition.type === CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST) {
+        tab.definition.updateUI = () => {
+          this.detectChanges();
+        };
+      }
     });
   }
   get tabData(): ICreateViewModifyV2 {
@@ -850,6 +852,11 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     tab: ICreateViewModifyV2TabTable,
     instant: boolean
   ): void {
+    // applies only for records lists
+    if (tab.definition.type !== CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST) {
+      return;
+    }
+
     // cancel previous request
     if (tab.definition.previousRefreshRequest) {
       clearTimeout(tab.definition.previousRefreshRequest);
@@ -861,6 +868,11 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
       tab.definition.refresh(tab);
     } else {
       tab.definition.previousRefreshRequest = setTimeout(() => {
+        // applies only for records lists
+        if (tab.definition.type !== CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST) {
+          return;
+        }
+
         // refresh
         tab.definition.refresh(tab);
       }, Constants.DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS);
@@ -895,6 +907,11 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     tab: ICreateViewModifyV2TabTable,
     page: PageEvent
   ): void {
+    // applies only for records lists
+    if (tab.definition.type !== CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST) {
+      return;
+    }
+
     // update API pagination params
     tab.definition.queryBuilder.paginator.setPage(page);
 
@@ -919,6 +936,11 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
       direction: RequestSortDirection
     }
   ): void {
+    // applies only for records lists
+    if (tab.definition.type !== CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST) {
+      return;
+    }
+
     // apply sort
     applySortBy(
       data,
@@ -944,6 +966,11 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
       valueOverwrite?: any
     }
   ): void {
+    // applies only for records lists
+    if (tab.definition.type !== CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST) {
+      return;
+    }
+
     // filter
     applyFilterBy(
       tab.definition.queryBuilder,
@@ -965,6 +992,11 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     listTable: AppListTableV2Component,
     tab: ICreateViewModifyV2TabTable
   ): void {
+    // applies only for records lists
+    if (tab.definition.type !== CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST) {
+      return;
+    }
+
     // clear query builder of conditions and sorting criteria
     tab.definition.queryBuilder.clear();
 
@@ -1014,6 +1046,11 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     tab: ICreateViewModifyV2TabTable,
     queryBuilder?: RequestQueryBuilder
   ): void {
+    // applies only for records lists
+    if (tab.definition.type !== CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST) {
+      return;
+    }
+
     // clear query builder of conditions and sorting criteria
     tab.definition.queryBuilder.clear();
 

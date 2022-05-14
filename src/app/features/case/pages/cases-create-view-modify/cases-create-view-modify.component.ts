@@ -15,7 +15,7 @@ import {
   ICreateViewModifyV2Buttons,
   ICreateViewModifyV2CreateOrUpdate,
   ICreateViewModifyV2Tab,
-  ICreateViewModifyV2TabTable
+  ICreateViewModifyV2TabTable, ICreateViewModifyV2TabTableRecordsList
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -1040,7 +1040,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             },
             refreshList: () => {
               // reload data
-              newTab.definition.refresh(newTab);
+              const localTab: ICreateViewModifyV2TabTableRecordsList = newTab.definition as ICreateViewModifyV2TabTableRecordsList;
+              localTab.refresh(newTab);
             }
           }),
         advancedFilters: this.entityHelperService.generateAdvancedFilters({
@@ -1057,12 +1058,13 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         pageIndex: 0,
         refresh: (tab) => {
           // refresh data
-          tab.definition.records$ = this.entityHelperService
+          const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
+          localTab.records$ = this.entityHelperService
             .retrieveRecords(
               RelationshipType.CONTACT,
               this.selectedOutbreak,
               this.itemData,
-              tab.definition.queryBuilder
+              localTab.queryBuilder
             )
             .pipe(
               // should be the last pipe
@@ -1070,30 +1072,31 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             );
 
           // count
-          tab.definition.refreshCount(tab);
+          localTab.refreshCount(tab);
 
           // update ui
-          tab.definition.updateUI();
+          localTab.updateUI();
         },
         refreshCount: (
           tab,
           applyHasMoreLimit?: boolean
         ) => {
           // reset
-          tab.definition.pageCount = undefined;
+          const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
+          localTab.pageCount = undefined;
 
           // set apply value
           if (applyHasMoreLimit !== undefined) {
-            tab.definition.applyHasMoreLimit = applyHasMoreLimit;
+            localTab.applyHasMoreLimit = applyHasMoreLimit;
           }
 
           // remove paginator from query builder
-          const countQueryBuilder = _.cloneDeep(tab.definition.queryBuilder);
+          const countQueryBuilder = _.cloneDeep(localTab.queryBuilder);
           countQueryBuilder.paginator.clear();
           countQueryBuilder.sort.clear();
 
           // apply has more limit
-          if (tab.definition.applyHasMoreLimit) {
+          if (localTab.applyHasMoreLimit) {
             countQueryBuilder.flag(
               'applyHasMoreLimit',
               true
@@ -1112,7 +1115,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               // should be the last pipe
               takeUntil(this.destroyed$)
             ).subscribe((response) => {
-              tab.definition.pageCount = response;
+              localTab.pageCount = response;
             });
         }
       }
@@ -1155,7 +1158,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             },
             refreshList: () => {
               // reload data
-              newTab.definition.refresh(newTab);
+              const localTab: ICreateViewModifyV2TabTableRecordsList = newTab.definition as ICreateViewModifyV2TabTableRecordsList;
+              localTab.refresh(newTab);
             }
           }),
         advancedFilters: this.entityHelperService.generateAdvancedFilters({
@@ -1172,12 +1176,13 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         pageIndex: 0,
         refresh: (tab) => {
           // refresh data
-          tab.definition.records$ = this.entityHelperService
+          const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
+          localTab.records$ = this.entityHelperService
             .retrieveRecords(
               RelationshipType.EXPOSURE,
               this.selectedOutbreak,
               this.itemData,
-              tab.definition.queryBuilder
+              localTab.queryBuilder
             )
             .pipe(
               // should be the last pipe
@@ -1185,30 +1190,31 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             );
 
           // count
-          tab.definition.refreshCount(tab);
+          localTab.refreshCount(tab);
 
           // update ui
-          tab.definition.updateUI();
+          localTab.updateUI();
         },
         refreshCount: (
           tab,
           applyHasMoreLimit?: boolean
         ) => {
           // reset
-          tab.definition.pageCount = undefined;
+          const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
+          localTab.pageCount = undefined;
 
           // set apply value
           if (applyHasMoreLimit !== undefined) {
-            tab.definition.applyHasMoreLimit = applyHasMoreLimit;
+            localTab.applyHasMoreLimit = applyHasMoreLimit;
           }
 
           // remove paginator from query builder
-          const countQueryBuilder = _.cloneDeep(tab.definition.queryBuilder);
+          const countQueryBuilder = _.cloneDeep(localTab.queryBuilder);
           countQueryBuilder.paginator.clear();
           countQueryBuilder.sort.clear();
 
           // apply has more limit
-          if (tab.definition.applyHasMoreLimit) {
+          if (localTab.applyHasMoreLimit) {
             countQueryBuilder.flag(
               'applyHasMoreLimit',
               true
@@ -1227,7 +1233,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               // should be the last pipe
               takeUntil(this.destroyed$)
             ).subscribe((response) => {
-              tab.definition.pageCount = response;
+              localTab.pageCount = response;
             });
         }
       }
@@ -1269,7 +1275,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           },
           refreshList: () => {
             // reload data
-            newTab.definition.refresh(newTab);
+            const localTab: ICreateViewModifyV2TabTableRecordsList = newTab.definition as ICreateViewModifyV2TabTableRecordsList;
+            localTab.refresh(newTab);
           }
         }),
         advancedFilters: this.entityLabResultService.generateAdvancedFilters({
@@ -1289,19 +1296,20 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         pageIndex: 0,
         refresh: (tab) => {
           // attach fields restrictions
+          const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
           const fields: string[] = this.entityLabResultService.refreshListFields();
           if (fields.length > 0) {
-            tab.definition.queryBuilder.clearFields();
-            tab.definition.queryBuilder.fields(...fields);
+            localTab.queryBuilder.clearFields();
+            localTab.queryBuilder.fields(...fields);
           }
 
           // refresh data
-          tab.definition.records$ = this.entityLabResultService
+          localTab.records$ = this.entityLabResultService
             .retrieveRecords(
               this.selectedOutbreak.id,
               EntityModel.getLinkForEntityType(this.itemData.type),
               this.itemData.id,
-              tab.definition.queryBuilder
+              localTab.queryBuilder
             )
             .pipe(
               // should be the last pipe
@@ -1309,30 +1317,31 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             );
 
           // count
-          tab.definition.refreshCount(tab);
+          localTab.refreshCount(tab);
 
           // update ui
-          tab.definition.updateUI();
+          localTab.updateUI();
         },
         refreshCount: (
           tab,
           applyHasMoreLimit?: boolean
         ) => {
           // reset
-          tab.definition.pageCount = undefined;
+          const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
+          localTab.pageCount = undefined;
 
           // set apply value
           if (applyHasMoreLimit !== undefined) {
-            tab.definition.applyHasMoreLimit = applyHasMoreLimit;
+            localTab.applyHasMoreLimit = applyHasMoreLimit;
           }
 
           // remove paginator from query builder
-          const countQueryBuilder = _.cloneDeep(tab.definition.queryBuilder);
+          const countQueryBuilder = _.cloneDeep(localTab.queryBuilder);
           countQueryBuilder.paginator.clear();
           countQueryBuilder.sort.clear();
 
           // apply has more limit
-          if (tab.definition.applyHasMoreLimit) {
+          if (localTab.applyHasMoreLimit) {
             countQueryBuilder.flag(
               'applyHasMoreLimit',
               true
@@ -1351,7 +1360,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               // should be the last pipe
               takeUntil(this.destroyed$)
             ).subscribe((response) => {
-              tab.definition.pageCount = response;
+              localTab.pageCount = response;
             });
         }
       }
@@ -1389,7 +1398,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           },
           refreshList: () => {
             // reload data
-            newTab.definition.refresh(newTab);
+            const localTab: ICreateViewModifyV2TabTableRecordsList = newTab.definition as ICreateViewModifyV2TabTableRecordsList;
+            localTab.refresh(newTab);
           }
         }),
         advancedFilters: this.entityFollowUpHelperService.generateAdvancedFilters({
@@ -1406,32 +1416,33 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         pageIndex: 0,
         refresh: (tab) => {
           // attach fields restrictions
+          const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
           const fields: string[] = this.entityFollowUpHelperService.refreshListFields();
           if (fields.length > 0) {
-            tab.definition.queryBuilder.clearFields();
-            tab.definition.queryBuilder.fields(...fields);
+            localTab.queryBuilder.clearFields();
+            localTab.queryBuilder.fields(...fields);
           }
 
           // add contact id
-          tab.definition.queryBuilder.filter.byEquality(
+          localTab.queryBuilder.filter.byEquality(
             'personId',
             this.itemData.id
           );
 
           // make sure we always sort by something
           // default by date asc
-          if (tab.definition.queryBuilder.sort.isEmpty()) {
-            tab.definition.queryBuilder.sort.by(
+          if (localTab.queryBuilder.sort.isEmpty()) {
+            localTab.queryBuilder.sort.by(
               'date',
               RequestSortDirection.ASC
             );
           }
 
           // refresh data
-          tab.definition.records$ = this.entityFollowUpHelperService
+          localTab.records$ = this.entityFollowUpHelperService
             .retrieveRecords(
               this.selectedOutbreak,
-              tab.definition.queryBuilder
+              localTab.queryBuilder
             )
             .pipe(
               // should be the last pipe
@@ -1439,30 +1450,31 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             );
 
           // count
-          tab.definition.refreshCount(tab);
+          localTab.refreshCount(tab);
 
           // update ui
-          tab.definition.updateUI();
+          localTab.updateUI();
         },
         refreshCount: (
           tab,
           applyHasMoreLimit?: boolean
         ) => {
           // reset
-          tab.definition.pageCount = undefined;
+          const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
+          localTab.pageCount = undefined;
 
           // set apply value
           if (applyHasMoreLimit !== undefined) {
-            tab.definition.applyHasMoreLimit = applyHasMoreLimit;
+            localTab.applyHasMoreLimit = applyHasMoreLimit;
           }
 
           // remove paginator from query builder
-          const countQueryBuilder = _.cloneDeep(tab.definition.queryBuilder);
+          const countQueryBuilder = _.cloneDeep(localTab.queryBuilder);
           countQueryBuilder.paginator.clear();
           countQueryBuilder.sort.clear();
 
           // apply has more limit
-          if (tab.definition.applyHasMoreLimit) {
+          if (localTab.applyHasMoreLimit) {
             countQueryBuilder.flag(
               'applyHasMoreLimit',
               true
@@ -1479,7 +1491,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               // should be the last pipe
               takeUntil(this.destroyed$)
             ).subscribe((response) => {
-              tab.definition.pageCount = response;
+              localTab.pageCount = response;
             });
         }
       }
