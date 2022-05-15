@@ -414,7 +414,10 @@ export class AppFormEditQuestionnaireV2Component
     setTimeout(() => {
       // determine index
       const indexOfMovedItem: number = this.flattenedQuestions.findIndex((item) => item.data === scrollToItem);
-      if (indexOfMovedItem > -1) {
+      if (
+        this.cdkViewport &&
+        indexOfMovedItem > -1
+      ) {
         this.cdkViewport.scrollToIndex(indexOfMovedItem);
       }
     });
