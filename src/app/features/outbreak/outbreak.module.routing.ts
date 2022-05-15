@@ -14,6 +14,7 @@ import { FollowUpGenerationTeamAssignmentAlgorithmDataResolver } from '../../cor
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 import { PersonTypeDataResolver } from '../../core/services/resolvers/data/person-type.resolver';
+import { OutbreakDataResolver } from '../../core/services/resolvers/data/outbreak.resolver';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { MapVectorTypeDataResolver } from '../../core/services/resolvers/data/map-vector-type.resolver';
 import { OutbreakTemplateDataResolver } from '../../core/services/resolvers/data/outbreak-template.resolver';
@@ -184,6 +185,11 @@ const routes: Routes = [
       permissions: [
         PERMISSION.OUTBREAK_SEE_INCONSISTENCIES
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      outbreak: OutbreakDataResolver,
+      personType: PersonTypeDataResolver
     }
   },
 
