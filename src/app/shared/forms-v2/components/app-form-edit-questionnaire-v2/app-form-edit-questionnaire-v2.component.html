@@ -89,14 +89,12 @@
 
           <!-- Buttons -->
           <div
-            *ngIf="!viewOnly"
-
             change123
             fxGrow="0">
 
             <!-- Add answer -->
             <button
-              *ngIf="item.canHaveChildren"
+              *ngIf="!viewOnly && item.canHaveChildren"
               type="button"
               mat-icon-button
               [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW' | translate"
@@ -109,8 +107,8 @@
               type="button"
               mat-icon-button
               [matTooltip]="'LNG_COMMON_BUTTON_UPDATE' | translate"
-              (click)="editQuestion(item.data)">
-              <mat-icon>edit</mat-icon>
+              (click)="viewEditQuestion(item.data)">
+              <mat-icon>{{viewOnly ? 'visibility' : 'edit'}}</mat-icon>
             </button>
 
           </div>
@@ -155,13 +153,12 @@
 
           <!-- Buttons -->
           <div
-            *ngIf="!viewOnly"
-
             change123
             fxGrow="0">
 
             <!-- Add question -->
             <button
+              *ngIf="!viewOnly"
               type="button"
               mat-icon-button
               [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW' | translate"
@@ -174,8 +171,8 @@
               type="button"
               mat-icon-button
               [matTooltip]="'LNG_COMMON_BUTTON_UPDATE' | translate"
-              (click)="editAnswer(item.data, item.parent.data)">
-              <mat-icon>edit</mat-icon>
+              (click)="viewEditAnswer(item.data, item.parent.data)">
+              <mat-icon>{{viewOnly ? 'visibility' : 'edit'}}</mat-icon>
             </button>
 
           </div>

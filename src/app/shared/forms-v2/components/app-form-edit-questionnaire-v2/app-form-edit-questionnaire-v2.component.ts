@@ -10,6 +10,7 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { v4 as uuid } from 'uuid';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import {
+  IV2SideDialogConfigButton,
   IV2SideDialogConfigButtonType,
   IV2SideDialogConfigInputSingleDropdown,
   IV2SideDialogConfigInputText,
@@ -475,6 +476,7 @@ export class AppFormEditQuestionnaireV2Component
         value: modifyQuestion ?
           modifyQuestion.text :
           '',
+        viewOnly: () => this.viewOnly,
         validators: {
           required: () => true
         },
@@ -503,6 +505,7 @@ export class AppFormEditQuestionnaireV2Component
           modifyQuestion.answerType :
           '',
         options: (this.activatedRoute.snapshot.data.questionnaireAnswerType as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        viewOnly: () => this.viewOnly,
         validators: {
           required: () => true
         }
@@ -518,6 +521,7 @@ export class AppFormEditQuestionnaireV2Component
           '',
         visible: (data) => (data.map.answerType as IV2SideDialogConfigInputSingleDropdown).value !== Constants.ANSWER_TYPES.MARKUP.value,
         disabled: () => !!modifyQuestion,
+        viewOnly: () => this.viewOnly,
         validators: {
           required: () => true,
           notNumber: () => !modifyQuestion,
@@ -540,27 +544,45 @@ export class AppFormEditQuestionnaireV2Component
           modifyQuestion.category :
           '',
         options: (this.activatedRoute.snapshot.data.questionnaireQuestionCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        viewOnly: () => this.viewOnly,
         validators: {
           required: () => true
         }
-      },
+      }
+    );
 
-      // answer display
-      {
-        type: V2SideDialogConfigInputType.DIVIDER,
-        placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWERS_DISPLAY',
-        visible: (data) => (data.map.answerType as IV2SideDialogConfigInputSingleDropdown).value !== Constants.ANSWER_TYPES.MARKUP.value
-      },
-      {
-        type: V2SideDialogConfigInputType.TOGGLE,
-        name: 'answersDisplay',
-        value: modifyQuestion ?
-          modifyQuestion.answersDisplay :
-          Constants.ANSWERS_DISPLAY.VERTICAL.value,
-        options: (this.activatedRoute.snapshot.data.questionnaireAnswerDisplay as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-        visible: (data) => (data.map.answerType as IV2SideDialogConfigInputSingleDropdown).value !== Constants.ANSWER_TYPES.MARKUP.value
-      },
+    // toggle options
+    if (this.viewOnly) {
+      inputs.push(
+        {
+          type: V2SideDialogConfigInputType.KEY_VALUE,
+          name: 'answersDisplay',
+          placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWERS_DISPLAY',
+          value: modifyQuestion.answersDisplay,
+          visible: (data) => (data.map.answerType as IV2SideDialogConfigInputSingleDropdown).value !== Constants.ANSWER_TYPES.MARKUP.value
+        }
+      );
+    } else {
+      inputs.push(
+        {
+          type: V2SideDialogConfigInputType.DIVIDER,
+          placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWERS_DISPLAY',
+          visible: (data) => (data.map.answerType as IV2SideDialogConfigInputSingleDropdown).value !== Constants.ANSWER_TYPES.MARKUP.value
+        },
+        {
+          type: V2SideDialogConfigInputType.TOGGLE,
+          name: 'answersDisplay',
+          value: modifyQuestion ?
+            modifyQuestion.answersDisplay :
+            Constants.ANSWERS_DISPLAY.VERTICAL.value,
+          options: (this.activatedRoute.snapshot.data.questionnaireAnswerDisplay as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          visible: (data) => (data.map.answerType as IV2SideDialogConfigInputSingleDropdown).value !== Constants.ANSWER_TYPES.MARKUP.value
+        }
+      );
+    }
 
+    // add the rest
+    inputs.push(
       // inactive & required & multi answer
       {
         type: V2SideDialogConfigInputType.ROW,
@@ -573,7 +595,8 @@ export class AppFormEditQuestionnaireV2Component
             placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_INACTIVE',
             value: modifyQuestion ?
               modifyQuestion.inactive :
-              false
+              false,
+            viewOnly: () => this.viewOnly
           },
 
           // required
@@ -584,6 +607,7 @@ export class AppFormEditQuestionnaireV2Component
             value: modifyQuestion ?
               modifyQuestion.required :
               false,
+            viewOnly: () => this.viewOnly,
             visible: (data) => (data.map.answerType as IV2SideDialogConfigInputSingleDropdown).value !== Constants.ANSWER_TYPES.MARKUP.value
           },
 
@@ -595,11 +619,35 @@ export class AppFormEditQuestionnaireV2Component
             value: modifyQuestion ?
               modifyQuestion.multiAnswer :
               false,
+            viewOnly: () => this.viewOnly,
             visible: (data) => (data.map.answerType as IV2SideDialogConfigInputSingleDropdown).value !== Constants.ANSWER_TYPES.MARKUP.value
           }
         ]
       }
     );
+
+    // buttons
+    const bottomButtons: IV2SideDialogConfigButton[] = [];
+
+    // save
+    if (!this.viewOnly) {
+      bottomButtons.push({
+        type: IV2SideDialogConfigButtonType.OTHER,
+        label: 'LNG_COMMON_BUTTON_SAVE',
+        color: 'primary',
+        key: 'apply',
+        disabled: (_data, handler): boolean => {
+          return !handler.form || handler.form.invalid;
+        }
+      });
+    }
+
+    // cancel
+    bottomButtons.push({
+      type: IV2SideDialogConfigButtonType.CANCEL,
+      label: 'LNG_COMMON_BUTTON_CANCEL',
+      color: 'text'
+    });
 
     // show dialog
     this.dialogV2Service
@@ -612,19 +660,7 @@ export class AppFormEditQuestionnaireV2Component
         hideInputFilter: true,
         dontCloseOnBackdrop: true,
         width: '50rem',
-        bottomButtons: [{
-          type: IV2SideDialogConfigButtonType.OTHER,
-          label: 'LNG_COMMON_BUTTON_SAVE',
-          color: 'primary',
-          key: 'apply',
-          disabled: (_data, handler): boolean => {
-            return !handler.form || handler.form.invalid;
-          }
-        }, {
-          type: IV2SideDialogConfigButtonType.CANCEL,
-          label: 'LNG_COMMON_BUTTON_CANCEL',
-          color: 'text'
-        }],
+        bottomButtons,
         inputs
       })
       .subscribe((response) => {
@@ -703,9 +739,9 @@ export class AppFormEditQuestionnaireV2Component
   }
 
   /**
-   * Edit question
+   * View / Edit question
    */
-  editQuestion(question: QuestionModel): void {
+  viewEditQuestion(question: QuestionModel): void {
     this.showAddModifyQuestion(
       false,
       undefined,
@@ -764,6 +800,7 @@ export class AppFormEditQuestionnaireV2Component
         value: modifyAnswer ?
           modifyAnswer.label :
           '',
+        viewOnly: () => this.viewOnly,
         validators: {
           required: () => true
         }
@@ -777,6 +814,7 @@ export class AppFormEditQuestionnaireV2Component
         value: modifyAnswer ?
           modifyAnswer.value :
           '',
+        viewOnly: () => this.viewOnly,
         validators: {
           required: () => true,
           notInObject: () => ({
@@ -793,9 +831,33 @@ export class AppFormEditQuestionnaireV2Component
         placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT',
         value: modifyAnswer ?
           modifyAnswer.alert :
-          false
+          false,
+        viewOnly: () => this.viewOnly
       }
     );
+
+    // buttons
+    const bottomButtons: IV2SideDialogConfigButton[] = [];
+
+    // save
+    if (!this.viewOnly) {
+      bottomButtons.push({
+        type: IV2SideDialogConfigButtonType.OTHER,
+        label: 'LNG_COMMON_BUTTON_SAVE',
+        color: 'primary',
+        key: 'apply',
+        disabled: (_data, handler): boolean => {
+          return !handler.form || handler.form.invalid;
+        }
+      });
+    }
+
+    // cancel
+    bottomButtons.push({
+      type: IV2SideDialogConfigButtonType.CANCEL,
+      label: 'LNG_COMMON_BUTTON_CANCEL',
+      color: 'text'
+    });
 
     // show dialog
     this.dialogV2Service
@@ -808,19 +870,7 @@ export class AppFormEditQuestionnaireV2Component
         hideInputFilter: true,
         dontCloseOnBackdrop: true,
         width: '50rem',
-        bottomButtons: [{
-          type: IV2SideDialogConfigButtonType.OTHER,
-          label: 'LNG_COMMON_BUTTON_SAVE',
-          color: 'primary',
-          key: 'apply',
-          disabled: (_data, handler): boolean => {
-            return !handler.form || handler.form.invalid;
-          }
-        }, {
-          type: IV2SideDialogConfigButtonType.CANCEL,
-          label: 'LNG_COMMON_BUTTON_CANCEL',
-          color: 'text'
-        }],
+        bottomButtons,
         inputs
       })
       .subscribe((response) => {
@@ -883,9 +933,9 @@ export class AppFormEditQuestionnaireV2Component
   }
 
   /**
-   * Edit answer
+   * View / Edit answer
    */
-  editAnswer(
+  viewEditAnswer(
     answer: AnswerModel,
     parent: QuestionModel
   ): void {
