@@ -1187,7 +1187,14 @@
                 <!-- Tab Label -->
                 <div
                   *matStepLabel>
-                  {{tab.label | translate}}
+                  <!-- Label -->
+                  <span>{{tab.label | translate}}</span>
+
+                  <!-- Invalid -->
+                  <mat-icon
+                    *ngIf="tab.form?.dirty && tab.form?.invalid"
+                    color="warn"
+                    [matTooltip]="'LNG_COMMON_LABEL_INVALID_TAB' | translate">warning</mat-icon>
                 </div>
 
                 <!-- Content -->
