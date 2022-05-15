@@ -1101,7 +1101,11 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   /**
    * Drop item
    */
-  dropItem(event: CdkDragDrop<any[]>, input: ICreateViewModifyV2TabInputList): void {
+  dropItem(
+    event: CdkDragDrop<any[]>,
+    input: ICreateViewModifyV2TabInputList,
+    form: NgForm
+  ): void {
     if (this.isInvalidDragEvent) {
       return;
     }
@@ -1114,8 +1118,16 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
       event.currentIndex
     );
 
-    // changed
-    input.itemsChanged(input);
+    // trigger items changed
+    if (input.itemsChanged) {
+      input.itemsChanged(input);
+    }
+
+    // mark list as dirty
+    this.markArrayItemsAsDirty(
+      form,
+      input.name
+    );
 
     // update ui
     this.detectChanges();

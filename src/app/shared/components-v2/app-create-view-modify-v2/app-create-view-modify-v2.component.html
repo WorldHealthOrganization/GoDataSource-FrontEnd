@@ -994,7 +994,7 @@
                     <!-- List Items -->
                     <div
                       class="gd-create-view-modify-bottom-section-content-input-list"
-                      cdkDropList [cdkDropListData]="input.items" (cdkDropListDropped)="dropItem($event, input)">
+                      cdkDropList [cdkDropListData]="input.items" (cdkDropListDropped)="dropItem($event, input, tab.form)">
 
                       <!-- Display items -->
                       <ng-container
