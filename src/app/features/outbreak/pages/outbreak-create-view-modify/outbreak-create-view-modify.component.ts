@@ -831,7 +831,14 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       label: 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE',
       definition: {
-        type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE,
+        name: 'caseInvestigationTemplate',
+        value: {
+          get: () => this.itemData.caseInvestigationTemplate,
+          set: (value) => {
+            this.itemData.caseInvestigationTemplate = value;
+          }
+        }
       }
     };
   }

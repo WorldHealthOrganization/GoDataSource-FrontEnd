@@ -384,7 +384,12 @@
 
                   <!-- Edit questionnaire -->
                   <app-form-edit-questionnaire-v2
-                    *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE"></app-form-edit-questionnaire-v2>
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [viewOnly]="isView || !input.value.set"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-edit-questionnaire-v2>
 
                   <!-- Text -->
                   <app-form-input-v2
@@ -993,7 +998,7 @@
 
                     <!-- List Items -->
                     <div
-                      class="gd-create-view-modify-bottom-section-content-input-list"
+                      class="gd-create-view-modify-bottom-section-content-input-list gd-create-view-modify-bottom-section-content-input-list-{{input.name}}"
                       cdkDropList [cdkDropListData]="input.items" (cdkDropListDropped)="dropItem($event, input, tab.form)">
 
                       <!-- Display items -->
@@ -1002,7 +1007,7 @@
                         <div
                           *ngFor="let item of input.items; let itemIndex = index; trackBy: trackByIndex"
                           class="gd-create-view-modify-bottom-section-content-input-list-item"
-                          cdkDrag (cdkDragStarted)="dragStarted()" [cdkDragData]="item" [cdkDragDisabled]="!input.sortable">
+                          cdkDrag cdkDragLockAxis="y" [cdkDragData]="item" [cdkDragDisabled]="!input.sortable" cdkDragBoundary=".gd-create-view-modify-bottom-section-content-input-list-{{input.name}}" (cdkDragStarted)="dragStarted()">
 
                           <!-- Sort & Remove buttons -->
                           <div
@@ -1018,7 +1023,7 @@
                               mat-icon-button
                               [matTooltip]="'LNG_COMMON_BUTTON_DRAG' | translate"
                               (mousedown)="notInvalidDragZone()">
-                              <mat-icon>drag_handle</mat-icon>
+                              <mat-icon>drag_indicator</mat-icon>
                             </button>
 
                             <!-- Remove -->

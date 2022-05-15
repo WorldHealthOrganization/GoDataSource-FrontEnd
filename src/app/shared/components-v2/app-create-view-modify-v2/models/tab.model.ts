@@ -15,6 +15,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { V2AdvancedFilter } from '../../app-list-table-v2/models/advanced-filter.model';
 import { MapServerModel } from '../../../../core/models/map-server.model';
+import { QuestionModel } from '../../../../core/models/question.model';
 
 /**
  * Input type
@@ -458,6 +459,8 @@ export interface ICreateViewModifyV2TabTableRecordsList {
 export interface ICreateViewModifyV2TabTableEditQuestionnaire {
   // required
   type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE;
+  name: string;
+  value: ICreateViewModifyV2TabInputValue<QuestionModel[]>;
 }
 
 /**

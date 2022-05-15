@@ -1,1 +1,85 @@
-TODO V2
+<div
+  class="gd-form-edit-questionnaire-v2">
+
+  <!-- Records -->
+  <cdk-virtual-scroll-viewport
+    #cdkViewport
+    class="gd-form-edit-questionnaire-v2-list-{{name}}"
+    cdkDropList [cdkDropListData]="flattenedQuestions" [cdkDropListSortPredicate]="canDrop" (cdkDropListDropped)="dropItem($event)"
+
+    change123
+    [itemSize]="32"
+    [minBufferPx]="640"
+    [maxBufferPx]="640"
+    style="height: 400px">
+
+    <!-- Item -->
+    <div
+      *cdkVirtualFor="let item of flattenedQuestions; templateCacheSize: 0"
+      class="gd-form-edit-questionnaire-v2-item"
+      cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".gd-form-edit-questionnaire-v2-list-{{name}}" [cdkDragData]="item" (cdkDragStarted)="dragStarted($event)"
+      [ngSwitch]="item.type"
+
+      change123
+      [style.paddingLeft.px]="item.level * 20"
+      style="height: 32px; {{item.hide ? 'opacity: 0.3;' : 'opacity: 1;'}}">
+
+      <!-- Question -->
+      <div
+        *ngSwitchCase="FlattenType.QUESTION"
+        class="gd-form-edit-questionnaire-v2-item-question"
+
+        change123
+        fxLayout="row">
+
+        <!-- Sort -->
+        <mat-icon
+          cdkDragHandle
+          (mousedown)="notInvalidDragZone()">drag_indicator</mat-icon>
+
+        <!-- Type -->
+        <mat-icon
+          change123
+          fxGrow="0">help_center</mat-icon>
+
+        <!-- Label -->
+        <div
+          change123
+          fxFlex>
+          {{item.data.text | translate}}
+        </div>
+
+      </div>
+
+      <!-- Answer -->
+      <div
+        *ngSwitchCase="FlattenType.ANSWER"
+        class="gd-form-edit-questionnaire-v2-item-answer"
+
+        change123
+        fxLayout="row">
+
+        <!-- Sort -->
+        <mat-icon
+          cdkDragHandle
+          (mousedown)="notInvalidDragZone()">drag_indicator</mat-icon>
+
+        <!-- Type -->
+        <mat-icon
+          change123
+          fxGrow="0">font_download</mat-icon>
+
+        <!-- Label -->
+        <div
+          change123
+          fxFlex>
+          {{item.data.label | translate}}
+        </div>
+
+      </div>
+
+    </div>
+
+  </cdk-virtual-scroll-viewport>
+
+</div>

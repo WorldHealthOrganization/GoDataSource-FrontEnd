@@ -278,7 +278,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   } = {};
 
   // invalid drag zone
-  isInvalidDragEvent: boolean = true;
+  private _isInvalidDragEvent: boolean = true;
 
   // render mode
   renderMode: RenderMode = RenderMode.FULL;
@@ -1095,7 +1095,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    * Started the drag from a zone that isn't allowed
    */
   notInvalidDragZone(): void {
-    this.isInvalidDragEvent = false;
+    this._isInvalidDragEvent = false;
   }
 
   /**
@@ -1106,12 +1106,13 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     input: ICreateViewModifyV2TabInputList,
     form: NgForm
   ): void {
-    if (this.isInvalidDragEvent) {
+    // stop ?
+    if (this._isInvalidDragEvent) {
       return;
     }
 
     // disable drag
-    this.isInvalidDragEvent = true;
+    this._isInvalidDragEvent = true;
     moveItemInArray(
       input.items,
       event.previousIndex,
@@ -1137,7 +1138,8 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    * Drag started
    */
   dragStarted(): void {
-    if (this.isInvalidDragEvent) {
+    // stop ?
+    if (this._isInvalidDragEvent) {
       document.dispatchEvent(new Event('mouseup'));
     }
   }
