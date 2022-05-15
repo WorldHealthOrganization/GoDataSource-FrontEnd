@@ -137,7 +137,8 @@ export interface IV2SideDialogConfigInputText extends IV2SideDialogConfigInput {
 
   // optional
   validators?: IV2SideDialogConfigInputValidator | {
-    async?: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: V2SideDialogConfigInput) => Observable<boolean | IGeneralAsyncValidatorResponse>;
+    async?: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: V2SideDialogConfigInput) => Observable<boolean | IGeneralAsyncValidatorResponse>,
+    notNumber?: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: V2SideDialogConfigInput) => boolean;
   };
 }
 

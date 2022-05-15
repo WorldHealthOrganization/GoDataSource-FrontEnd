@@ -16,21 +16,26 @@ import * as _ from 'lodash';
   ]
 })
 export class NotNumberValidatorDirective implements Validator {
+  // validate ?
   @Input() notNumberValidatorDisabled: boolean = false;
 
+  // validate
   validate(control: AbstractControl): { [key: string]: any } {
+    // disabled ?
     if (
-      this.notNumberValidatorDisabled || (
-        _.isEmpty(control.value) &&
-                !_.isNumber(control.value)
+      this.notNumberValidatorDisabled ||
+      (
+        !control.value &&
+        control.value !== 0
       )
     ) {
-      return null;
+      return;
     }
 
+    // validate
     const isValid: boolean = !_.isNumber(control.value) && (
       !_.isString(control.value) ||
-            !/^[0-9.]+$/.test(control.value)
+      !/^[0-9.]+$/.test(control.value)
     );
     return isValid ?
       null : {

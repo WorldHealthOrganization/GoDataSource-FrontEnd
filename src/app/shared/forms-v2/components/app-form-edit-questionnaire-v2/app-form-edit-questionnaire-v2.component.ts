@@ -9,12 +9,20 @@ import { CdkDragStart } from '@angular/cdk/drag-drop/drag-events';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { v4 as uuid } from 'uuid';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../../../components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import {
+  IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigInputSingleDropdown,
+  IV2SideDialogConfigInputText,
+  IV2SideDialogConfigInputTextarea,
+  V2SideDialogConfigInput,
+  V2SideDialogConfigInputType
+} from '../../../components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ActivatedRoute } from '@angular/router';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ILabelValuePairModel } from '../../core/label-value-pair.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
+import * as _ from 'lodash';
 
 /**
  * Flatten type
@@ -431,6 +439,7 @@ export class AppFormEditQuestionnaireV2Component
     }
 
     // inputs
+    let variableManuallyChanged: boolean = false;
     inputs.push(
       // text
       {
@@ -442,6 +451,20 @@ export class AppFormEditQuestionnaireV2Component
           '',
         validators: {
           required: () => true
+        },
+        change: (data) => {
+          // nothing to do ?
+          const text: string = (data.map.text as IV2SideDialogConfigInputTextarea).value?.trim();
+          if (
+            modifyQuestion ||
+            !text ||
+            variableManuallyChanged
+          ) {
+            return;
+          }
+
+          // update variable if question is new
+          (data.map.variable as IV2SideDialogConfigInputText).value = _.snakeCase(text);
         }
       },
 
@@ -468,8 +491,13 @@ export class AppFormEditQuestionnaireV2Component
           modifyQuestion.variable :
           '',
         visible: (data) => (data.map.answerType as IV2SideDialogConfigInputSingleDropdown).value !== Constants.ANSWER_TYPES.MARKUP.value,
+        disabled: () => !!modifyQuestion,
         validators: {
-          required: () => true
+          required: () => true,
+          notNumber: () => true
+        },
+        change: () => {
+          variableManuallyChanged = true;
         }
       },
 

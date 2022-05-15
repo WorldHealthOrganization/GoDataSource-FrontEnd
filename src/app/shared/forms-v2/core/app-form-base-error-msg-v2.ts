@@ -66,6 +66,9 @@ export abstract class AppFormBaseErrorMsgV2 {
             'LNG_FORM_VALIDATION_ERROR_INVALID_REGEX'
         );
 
+      case 'notNumberValidator':
+        return translateService.instant('LNG_FORM_VALIDATION_ERROR_FIELD_NOT_NUMBER');
+
       default:
         return `--- NOT HANDLED (${errKey}) ---`;
     }

@@ -355,22 +355,22 @@
                             <div
                                 *ngIf="questionInEditModeClone?.answerType !== answerTypes.MARKUP.value"
                                 fxFlex="200px">
-                                <app-form-input
-                                    name="questionVariable"
-                                    [(ngModel)]="questionInEditModeClone.variable"
-                                    [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE' | translate"
-                                    tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE_DESCRIPTION"
-                                    [required]="true"
-                                    [readonly]="!allowQuestionVariableChange && !questionInEditModeClone.new && questionInEditModeClone.variable"
-                                    [disabled]="questionAnswerIndexInEditMode !== null"
-                                    app-has-property-validator
-                                    [checkObject]="questionVariables"
-                                    checkErrorMsg="LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_DUPLICATE_VARIABLE"
-                                    [checkCompareValue]="questionInEditModeClone.uuid"
-                                    (lostFocus)="questionVariableBlurred($event)"
-                                    app-not-number-validator
-                                    [notNumberValidatorDisabled]="!allowQuestionVariableChange && !questionInEditModeClone.new && questionInEditModeClone.variable">
-                                </app-form-input>
+<!--                                <app-form-input-->
+<!--                                    name="questionVariable"-->
+<!--                                    [(ngModel)]="questionInEditModeClone.variable"-->
+<!--                                    [placeholder]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE' | translate"-->
+<!--                                    tooltip="LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE_DESCRIPTION"-->
+<!--                                    [required]="true"-->
+<!--                                    [readonly]="!allowQuestionVariableChange && !questionInEditModeClone.new && questionInEditModeClone.variable"-->
+<!--                                    [disabled]="questionAnswerIndexInEditMode !== null"-->
+<!--                                    app-has-property-validator-->
+<!--                                    [checkObject]="questionVariables"-->
+<!--                                    checkErrorMsg="LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_DUPLICATE_VARIABLE"-->
+<!--                                    [checkCompareValue]="questionInEditModeClone.uuid"-->
+<!--                                    (lostFocus)="questionVariableBlurred($event)"-->
+<!--                                    app-not-number-validator-->
+<!--                                    [notNumberValidatorDisabled]="!allowQuestionVariableChange && !questionInEditModeClone.new && questionInEditModeClone.variable">-->
+<!--                                </app-form-input>-->
                             </div>
 
                             <!-- question category -->
