@@ -422,6 +422,24 @@ export class AppFormEditQuestionnaireV2Component
     // construct array of inputs
     const inputs: V2SideDialogConfigInput[] = [];
 
+    // determine current question variables
+    const usedVariables: {
+      [variable: string]: true
+    } = {};
+    this.flattenedQuestions.forEach((item) => {
+      // not important ?
+      if (
+        item.type === FlattenType.ANSWER ||
+        item.data === modifyQuestion ||
+        !(item.data as QuestionModel).variable
+      ) {
+        return;
+      }
+
+      // remember variable
+      usedVariables[(item.data as QuestionModel).variable.toLowerCase()] = true;
+    });
+
     // details ?
     if (add) {
       inputs.push({
@@ -494,7 +512,11 @@ export class AppFormEditQuestionnaireV2Component
         disabled: () => !!modifyQuestion,
         validators: {
           required: () => true,
-          notNumber: () => true
+          notNumber: () => !modifyQuestion,
+          notInObject: () => ({
+            values: usedVariables,
+            err: 'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_DUPLICATE_VARIABLE'
+          })
         },
         change: () => {
           variableManuallyChanged = true;
@@ -694,6 +716,20 @@ export class AppFormEditQuestionnaireV2Component
     // construct array of inputs
     const inputs: V2SideDialogConfigInput[] = [];
 
+    // determine current answer values
+    const usedValues: {
+      [variable: string]: true
+    } = {};
+    (parent.answers || []).forEach((item) => {
+      // not important ?
+      if (item === modifyAnswer) {
+        return;
+      }
+
+      // remember variable
+      usedValues[(item.value || '').toLowerCase()] = true;
+    });
+
     // details ?
     if (add) {
       inputs.push({
@@ -734,7 +770,11 @@ export class AppFormEditQuestionnaireV2Component
           modifyAnswer.value :
           '',
         validators: {
-          required: () => true
+          required: () => true,
+          notInObject: () => ({
+            values: usedValues,
+            err: 'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_DUPLICATE_ANSWER_VALUE'
+          })
         }
       },
 
@@ -837,10 +877,13 @@ export class AppFormEditQuestionnaireV2Component
   /**
    * Edit answer
    */
-  editAnswer(answer: AnswerModel): void {
+  editAnswer(
+    answer: AnswerModel,
+    parent: QuestionModel
+  ): void {
     this.showAddModifyAnswer(
       false,
-      undefined,
+      parent,
       answer
     );
   }

@@ -69,6 +69,9 @@ export abstract class AppFormBaseErrorMsgV2 {
       case 'notNumberValidator':
         return translateService.instant('LNG_FORM_VALIDATION_ERROR_FIELD_NOT_NUMBER');
 
+      case 'hasPropertyValidator':
+        return translateService.instant(errData.err);
+
       default:
         return `--- NOT HANDLED (${errKey}) ---`;
     }

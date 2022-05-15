@@ -136,7 +136,7 @@
               type="button"
               mat-icon-button
               [matTooltip]="'LNG_COMMON_BUTTON_UPDATE' | translate"
-              (click)="editAnswer(item.data)">
+              (click)="editAnswer(item.data, item.parent.data)">
               <mat-icon>edit</mat-icon>
             </button>
 

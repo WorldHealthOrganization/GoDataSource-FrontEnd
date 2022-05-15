@@ -110,6 +110,9 @@
               asyncValidatorTouchOnError="true"
               app-not-number-validator
               [notNumberValidatorDisabled]="!input.validators?.notNumber || !input.validators.notNumber(dialogHandler.data, dialogHandler, input)"
+              app-has-property-validator
+              [checkObject]="input.validators?.notInObject ? input.validators?.notInObject(dialogHandler.data, dialogHandler, input)?.values : undefined"
+              [checkErrorMsg]="input.validators?.notInObject ? input.validators?.notInObject(dialogHandler.data, dialogHandler, input)?.err : undefined"
               (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-input-v2>
 
             <!-- Textarea -->
