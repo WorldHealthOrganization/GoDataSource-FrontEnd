@@ -3,6 +3,7 @@
 
   <!-- Top -->
   <div
+    *ngIf="!viewOnly"
     class="gd-form-edit-questionnaire-v2-top"
     fxLayoutAlign="end">
     <button
@@ -43,6 +44,7 @@
         <div
           *ngSwitchCase="FlattenType.QUESTION"
           class="gd-form-edit-questionnaire-v2-item-question"
+          [class.gd-form-edit-questionnaire-v2-item-question-inactive]="item.data.inactive"
 
           change123
           fxLayout="row">
@@ -57,15 +59,36 @@
             change123
             fxGrow="0">help_center</mat-icon>
 
-          <!-- Label -->
+          <!-- Label & icons -->
           <div
             change123
             fxFlex>
-            {{item.data.text}}
+
+            <!-- Label -->
+            <span>{{item.data.text}}</span>
+
+            <!-- Icons -->
+            <span>
+              <!-- Multiple answers -->
+              <mat-icon
+                *ngIf="item.data.multiAnswer">format_list_numbered_rtl</mat-icon>
+
+              <!-- Required -->
+              <mat-icon
+                *ngIf="item.data.required">stars</mat-icon>
+
+              <!-- Inactive -->
+              <mat-icon
+                *ngIf="item.data.inactive"
+                color="warn">do_not_disturb</mat-icon>
+            </span>
+
           </div>
 
           <!-- Buttons -->
           <div
+            *ngIf="!viewOnly"
+
             change123
             fxGrow="0">
 
@@ -110,15 +133,27 @@
             change123
             fxGrow="0">font_download</mat-icon>
 
-          <!-- Label -->
+          <!-- Label & icons -->
           <div
             change123
             fxFlex>
-            {{item.data.label}}
+
+            <!-- Label -->
+            <span>{{item.data.label}}</span>
+
+            <!-- Icons -->
+            <span>
+              <!-- Alert -->
+              <mat-icon
+                *ngIf="item.data.alert">notification_important</mat-icon>
+            </span>
+
           </div>
 
           <!-- Buttons -->
           <div
+            *ngIf="!viewOnly"
+
             change123
             fxGrow="0">
 
