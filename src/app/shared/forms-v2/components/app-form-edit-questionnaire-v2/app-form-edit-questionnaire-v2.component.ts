@@ -604,8 +604,16 @@ export class AppFormEditQuestionnaireV2Component
           // scroll item
           this.scrollToItem(question);
         } else {
-          // update
-          // #TODO
+          // update question
+          const formData = this.formHelperService.getFields(response.handler.form);
+          modifyQuestion.text = formData.text;
+          modifyQuestion.answerType = formData.answerType;
+          modifyQuestion.variable = formData.variable;
+          modifyQuestion.category = formData.category;
+          modifyQuestion.answersDisplay = formData.answersDisplay;
+          modifyQuestion.inactive = formData.inactive;
+          modifyQuestion.required = formData.required;
+          modifyQuestion.multiAnswer = formData.multiAnswer;
         }
 
         // close popup
