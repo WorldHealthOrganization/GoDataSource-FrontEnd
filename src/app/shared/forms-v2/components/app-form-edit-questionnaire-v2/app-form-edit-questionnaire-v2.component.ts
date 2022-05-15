@@ -15,6 +15,7 @@ import { Constants } from '../../../../core/models/constants';
 import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CdkDragStart } from '@angular/cdk/drag-drop/drag-events';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
+import { v4 as uuid } from 'uuid';
 
 /**
  * Flatten type
@@ -29,19 +30,20 @@ enum FlattenType {
  */
 interface IFlattenNode {
   // required
+  id: string;
   type: FlattenType;
   level: number;
   canHaveChildren: boolean;
   data: QuestionModel | AnswerModel;
   parent: IFlattenNode;
+  parents: {
+    [id: string]: true
+  };
   children: IFlattenNode[];
-  real: {
+  nonFLat: {
     index: number,
     array: (QuestionModel | AnswerModel)[]
   };
-
-  // optional
-  hide?: boolean;
 }
 
 @Component({
@@ -73,6 +75,8 @@ export class AppFormEditQuestionnaireV2Component
   FlattenType = FlattenType;
 
   // check if we can drop element to the selected position
+  readonly bufferToRender: number = 1024;
+  maxBufferPx: number;
   canDrop: (
     index: number,
     drag: CdkDrag,
@@ -81,7 +85,14 @@ export class AppFormEditQuestionnaireV2Component
       index: number,
       drag: CdkDrag
     ): boolean => {
-      return drag.data.parent === this.flattenedQuestions[index + this.cdkViewport.getRenderedRange().start].parent;
+      // determine how much should be visible
+      const scrollIndex: number = this.cdkViewport.getRenderedRange().start;
+
+      // make sure we have everything visible
+      this.maxBufferPx = this.cdkViewport.measureScrollOffset() + this.bufferToRender;
+
+      // check if allowed
+      return drag.data.parent === this.flattenedQuestions[index + scrollIndex].parent;
     };
 
   /**
@@ -153,12 +164,7 @@ export class AppFormEditQuestionnaireV2Component
     super.writeValue(value);
 
     // flatten
-    this.flattenedQuestions = [];
-    this.flatten(
-      this.value,
-      0,
-      null
-    );
+    this.nonFlatToFlat();
   }
 
   /**
@@ -166,6 +172,20 @@ export class AppFormEditQuestionnaireV2Component
    */
   detectChanges(): void {
     this.changeDetectorRef.detectChanges();
+  }
+
+  /**
+   * Convert non flat value to flat value
+   */
+  private nonFlatToFlat(): void {
+    // flatten
+    this.flattenedQuestions = [];
+    this.flatten(
+      this.value,
+      0,
+      null,
+      {}
+    );
   }
 
   /**
@@ -179,48 +199,78 @@ export class AppFormEditQuestionnaireV2Component
    * Drop item
    */
   dropItem(event: CdkDragDrop<any[]>): void {
-    // show children once again
-    this.showHideChildrenDivs(
-      event.item.data,
-      true
-    );
-
-    // stop ?
-    if (this._isInvalidDragEvent) {
-      return;
-    }
-
-    // disable drag
-    this._isInvalidDragEvent = true;
+    // reset
+    this.maxBufferPx = undefined;
 
     // drag indexes
     const scrollRange = this.cdkViewport.getRenderedRange();
     const previousIndex: number = event.previousIndex + scrollRange.start;
     const currentIndex: number = event.currentIndex + scrollRange.start;
 
-    // nothing changed ?
-    if (previousIndex === currentIndex) {
+    // retrieve data
+    const node: IFlattenNode = previousIndex > -1 ?
+      this.flattenedQuestions[previousIndex] :
+      undefined;
+    const otherNode: IFlattenNode = currentIndex > -1 ?
+      this.flattenedQuestions[currentIndex] :
+      undefined;
+
+    // make sure our item is visible
+    const scrollToItem = () => {
+      // not valid ?
+      if (!node) {
+        return;
+      }
+
+      // scroll
+      setTimeout(() => {
+        // determine index
+        const indexOfMovedItem: number = this.flattenedQuestions.findIndex((item) => item.data === node.data);
+        if (indexOfMovedItem > -1) {
+          this.cdkViewport.scrollToIndex(indexOfMovedItem);
+        }
+      });
+    };
+
+    // stop ?
+    if (this._isInvalidDragEvent) {
+      // re-render all
+      this.nonFlatToFlat();
+
+      // scroll item
+      scrollToItem();
+
+      // finished
       return;
     }
 
-    // retrieve data
-    const node: IFlattenNode = this.flattenedQuestions[previousIndex];
-    const otherNode: IFlattenNode = this.flattenedQuestions[currentIndex];
+    // disable drag
+    this._isInvalidDragEvent = true;
+
+    // nothing changed ?
+    if (previousIndex === currentIndex) {
+      // re-render all
+      this.nonFlatToFlat();
+
+      // scroll item
+      scrollToItem();
+
+      // finished
+      return;
+    }
 
     // disable drag
     moveItemInArray(
-      node.real.array,
-      node.real.index,
-      otherNode.real.index
+      node.nonFLat.array,
+      node.nonFLat.index,
+      otherNode.nonFLat.index
     );
 
+    // scroll item
+    scrollToItem();
+
     // flatten
-    this.flattenedQuestions = [];
-    this.flatten(
-      this.value,
-      0,
-      null
-    );
+    this.nonFlatToFlat();
 
     // trigger on change
     this.onChange(this.value);
@@ -241,42 +291,11 @@ export class AppFormEditQuestionnaireV2Component
       document.dispatchEvent(new Event('mouseup'));
     }
 
-    // go through children and make them invisible
-    this.showHideChildrenDivs(
-      event.source.data,
-      false
-    );
-  }
+    // render only what is necessary
+    this.flattenedQuestions = this.flattenedQuestions.filter((item) => item.parent === event.source.data.parent || event.source.data.parents[item.id]);
 
-  /**
-   * Show / Hide children divs
-   */
-  private showHideChildrenDivs(
-    parent: IFlattenNode,
-    show: boolean
-  ): void {
-    // change hide value
-    const updateHideProp = (children: IFlattenNode[]) => {
-      // nothing to update ?
-      if (
-        !children ||
-        children.length < 1
-      ) {
-        return;
-      }
-
-      // update
-      children.forEach((child) => {
-        // update
-        child.hide = !show;
-
-        // check children
-        updateHideProp(child.children);
-      });
-    };
-
-    // update
-    updateHideProp(parent.children);
+    // update ui
+    this.detectChanges();
   }
 
   /**
@@ -285,7 +304,10 @@ export class AppFormEditQuestionnaireV2Component
   private flatten(
     questions: QuestionModel[],
     level: number,
-    parent: IFlattenNode
+    parent: IFlattenNode,
+    parents: {
+      [id: string]: true
+    }
   ): void {
     // no questions ?
     if (
@@ -299,14 +321,16 @@ export class AppFormEditQuestionnaireV2Component
     questions.forEach((question, questionIndex) => {
       // flatten
       const flattenedQuestion: IFlattenNode = {
+        id: uuid(),
         type: FlattenType.QUESTION,
         level,
         canHaveChildren: question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value ||
           question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value,
         data: question,
         parent,
+        parents,
         children: [],
-        real: {
+        nonFLat: {
           index: questionIndex,
           array: questions
         }
@@ -325,13 +349,18 @@ export class AppFormEditQuestionnaireV2Component
         (question.answers || []).forEach((answer, answerIndex) => {
           // flatten
           const flattenedAnswer: IFlattenNode = {
+            id: uuid(),
             type: FlattenType.ANSWER,
             level: level + 1,
             canHaveChildren: answer.additionalQuestionsShow,
             data: answer,
             parent: flattenedQuestion,
+            parents: {
+              ...parents,
+              [flattenedQuestion.id]: true
+            },
             children: [],
-            real: {
+            nonFLat: {
               index: answerIndex,
               array: question.answers
             }
@@ -348,7 +377,8 @@ export class AppFormEditQuestionnaireV2Component
             this.flatten(
               answer.additionalQuestions,
               level + 2,
-              flattenedAnswer
+              flattenedAnswer,
+              flattenedAnswer.parents
             );
           }
         });

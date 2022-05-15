@@ -9,8 +9,8 @@
 
     change123
     [itemSize]="32"
-    [minBufferPx]="640"
-    [maxBufferPx]="640"
+    [minBufferPx]="maxBufferPx ? maxBufferPx : bufferToRender"
+    [maxBufferPx]="maxBufferPx ? maxBufferPx : bufferToRender"
     style="height: 400px">
 
     <!-- Item -->
@@ -22,7 +22,7 @@
 
       change123
       [style.paddingLeft.px]="item.level * 20"
-      style="height: 32px; {{item.hide ? 'opacity: 0.3;' : 'opacity: 1;'}}">
+      style="height: 32px">
 
       <!-- Question -->
       <div
