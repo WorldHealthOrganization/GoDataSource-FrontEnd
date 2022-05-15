@@ -69,7 +69,7 @@ interface IFlattenNode {
 export class AppFormEditQuestionnaireV2Component
   extends AppFormBaseV2<QuestionModel[]> implements OnDestroy {
   // viewport
-  @ViewChild('cdkViewport', { static: true }) cdkViewport: CdkVirtualScrollViewport;
+  @ViewChild('cdkViewport') cdkViewport: CdkVirtualScrollViewport;
 
   // view only
   @Input() viewOnly: boolean;

@@ -37,7 +37,7 @@
         <div
           *cdkVirtualFor="let item of flattenedQuestions; templateCacheSize: 0"
           class="gd-form-edit-questionnaire-v2-item"
-          cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".gd-form-edit-questionnaire-v2-list-{{name}}" [cdkDragData]="item" (cdkDragStarted)="dragStarted($event)"
+          cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".gd-form-edit-questionnaire-v2-list-{{name}}" [cdkDragData]="item" [cdkDragDisabled]="viewOnly" (cdkDragStarted)="dragStarted($event)"
           [ngSwitch]="item.type"
 
           change123
@@ -55,6 +55,7 @@
 
             <!-- Sort -->
             <mat-icon
+              *ngIf="!viewOnly"
               cdkDragHandle
               (mousedown)="notInvalidDragZone()">drag_indicator</mat-icon>
 
