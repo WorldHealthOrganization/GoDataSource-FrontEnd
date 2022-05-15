@@ -18,174 +18,188 @@
   <!-- Records -->
   <div
     class="gd-form-edit-questionnaire-v2-list">
-    <cdk-virtual-scroll-viewport
-      #cdkViewport
-      class="gd-form-edit-questionnaire-v2-list-{{name}}"
-      cdkDropList [cdkDropListData]="flattenedQuestions" [cdkDropListSortPredicate]="canDrop" (cdkDropListDropped)="dropItem($event)"
 
-      change123
-      [itemSize]="32"
-      [minBufferPx]="maxBufferPx ? maxBufferPx : bufferToRender"
-      [maxBufferPx]="maxBufferPx ? maxBufferPx : bufferToRender"
-      style="height: 350px">
-
-      <!-- Item -->
-      <div
-        *cdkVirtualFor="let item of flattenedQuestions; templateCacheSize: 0"
-        class="gd-form-edit-questionnaire-v2-item"
-        cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".gd-form-edit-questionnaire-v2-list-{{name}}" [cdkDragData]="item" (cdkDragStarted)="dragStarted($event)"
-        [ngSwitch]="item.type"
+    <!-- Records -->
+    <ng-container
+      *ngIf="flattenedQuestions?.length > 0; else noQuestions">
+      <cdk-virtual-scroll-viewport
+        #cdkViewport
+        class="gd-form-edit-questionnaire-v2-list-{{name}}"
+        cdkDropList [cdkDropListData]="flattenedQuestions" [cdkDropListSortPredicate]="canDrop" (cdkDropListDropped)="dropItem($event)"
 
         change123
-        [style.paddingLeft.px]="item.level * 20"
-        style="height: 32px">
+        [itemSize]="32"
+        [minBufferPx]="maxBufferPx ? maxBufferPx : bufferToRender"
+        [maxBufferPx]="maxBufferPx ? maxBufferPx : bufferToRender"
+        style="height: 350px">
 
-        <!-- Question -->
+        <!-- Item -->
         <div
-          *ngSwitchCase="FlattenType.QUESTION"
-          class="gd-form-edit-questionnaire-v2-item-question"
-          [class.gd-form-edit-questionnaire-v2-item-question-inactive]="item.data.inactive"
+          *cdkVirtualFor="let item of flattenedQuestions; templateCacheSize: 0"
+          class="gd-form-edit-questionnaire-v2-item"
+          cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".gd-form-edit-questionnaire-v2-list-{{name}}" [cdkDragData]="item" (cdkDragStarted)="dragStarted($event)"
+          [ngSwitch]="item.type"
 
           change123
-          fxLayout="row">
+          [style.paddingLeft.px]="item.level * 20"
+          style="height: 32px">
 
-          <!-- Sort -->
-          <mat-icon
-            cdkDragHandle
-            (mousedown)="notInvalidDragZone()">drag_indicator</mat-icon>
-
-          <!-- Type -->
-          <mat-icon
-            change123
-            fxGrow="0">help_center</mat-icon>
-
-          <!-- Label & icons -->
+          <!-- Question -->
           <div
+            *ngSwitchCase="FlattenType.QUESTION"
+            class="gd-form-edit-questionnaire-v2-item-question"
+            [class.gd-form-edit-questionnaire-v2-item-question-inactive]="item.data.inactive"
+
             change123
-            fxFlex>
+            fxLayout="row">
 
-            <!-- Label -->
-            <span>{{item.data.text}}</span>
+            <!-- Sort -->
+            <mat-icon
+              cdkDragHandle
+              (mousedown)="notInvalidDragZone()">drag_indicator</mat-icon>
 
-            <!-- Icons -->
-            <span
-              *ngIf="renderMode !== RenderMode.SMALL">
+            <!-- Type -->
+            <mat-icon
+              change123
+              fxGrow="0">help_center</mat-icon>
 
-              <!-- Multiple answers -->
-              <mat-icon
-                *ngIf="item.data.multiAnswer">format_list_numbered_rtl</mat-icon>
+            <!-- Label & icons -->
+            <div
+              change123
+              fxFlex>
 
-              <!-- Required -->
-              <mat-icon
-                *ngIf="item.data.required">stars</mat-icon>
+              <!-- Label -->
+              <span>{{item.data.text}}</span>
 
-              <!-- Inactive -->
-              <mat-icon
-                *ngIf="item.data.inactive"
-                color="warn">do_not_disturb</mat-icon>
-            </span>
+              <!-- Icons -->
+              <span
+                *ngIf="renderMode !== RenderMode.SMALL">
+
+                <!-- Multiple answers -->
+                <mat-icon
+                  *ngIf="item.data.multiAnswer">format_list_numbered_rtl</mat-icon>
+
+                <!-- Required -->
+                <mat-icon
+                  *ngIf="item.data.required">stars</mat-icon>
+
+                <!-- Inactive -->
+                <mat-icon
+                  *ngIf="item.data.inactive"
+                  color="warn">do_not_disturb</mat-icon>
+              </span>
+
+            </div>
+
+            <!-- Buttons -->
+            <div
+              change123
+              fxGrow="0">
+
+              <!-- Add answer -->
+              <button
+                *ngIf="!viewOnly && item.canHaveChildren"
+                type="button"
+                mat-icon-button
+                [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW' | translate"
+                (click)="addAnswer(item.data)">
+                <mat-icon>text_increase</mat-icon>
+              </button>
+
+              <!-- Edit question -->
+              <button
+                type="button"
+                mat-icon-button
+                [matTooltip]="'LNG_COMMON_BUTTON_UPDATE' | translate"
+                (click)="viewEditQuestion(item.data)">
+                <mat-icon>{{viewOnly ? 'visibility' : 'edit'}}</mat-icon>
+              </button>
+
+            </div>
 
           </div>
 
-          <!-- Buttons -->
+          <!-- Answer -->
           <div
+            *ngSwitchCase="FlattenType.ANSWER"
+            class="gd-form-edit-questionnaire-v2-item-answer"
+
             change123
-            fxGrow="0">
+            fxLayout="row">
 
-            <!-- Add answer -->
-            <button
-              *ngIf="!viewOnly && item.canHaveChildren"
-              type="button"
-              mat-icon-button
-              [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW' | translate"
-              (click)="addAnswer(item.data)">
-              <mat-icon>text_increase</mat-icon>
-            </button>
+            <!-- Sort -->
+            <mat-icon
+              cdkDragHandle
+              (mousedown)="notInvalidDragZone()">drag_indicator</mat-icon>
 
-            <!-- Edit question -->
-            <button
-              type="button"
-              mat-icon-button
-              [matTooltip]="'LNG_COMMON_BUTTON_UPDATE' | translate"
-              (click)="viewEditQuestion(item.data)">
-              <mat-icon>{{viewOnly ? 'visibility' : 'edit'}}</mat-icon>
-            </button>
+            <!-- Type -->
+            <mat-icon
+              change123
+              fxGrow="0">font_download</mat-icon>
+
+            <!-- Label & icons -->
+            <div
+              change123
+              fxFlex>
+
+              <!-- Label -->
+              <span>{{item.data.label}}</span>
+
+              <!-- Icons -->
+              <span
+                *ngIf="renderMode !== RenderMode.SMALL">
+                <!-- Alert -->
+                <mat-icon
+                  *ngIf="item.data.alert">notification_important</mat-icon>
+              </span>
+
+            </div>
+
+            <!-- Buttons -->
+            <div
+              change123
+              fxGrow="0">
+
+              <!-- Add question -->
+              <button
+                *ngIf="!viewOnly"
+                type="button"
+                mat-icon-button
+                [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW' | translate"
+                (click)="addQuestion(item.data)">
+                <mat-icon>add_comment</mat-icon>
+              </button>
+
+              <!-- Edit answer -->
+              <button
+                type="button"
+                mat-icon-button
+                [matTooltip]="'LNG_COMMON_BUTTON_UPDATE' | translate"
+                (click)="viewEditAnswer(item.data, item.parent.data)">
+                <mat-icon>{{viewOnly ? 'visibility' : 'edit'}}</mat-icon>
+              </button>
+
+            </div>
 
           </div>
 
         </div>
 
-        <!-- Answer -->
-        <div
-          *ngSwitchCase="FlattenType.ANSWER"
-          class="gd-form-edit-questionnaire-v2-item-answer"
+      </cdk-virtual-scroll-viewport>
+    </ng-container>
 
-          change123
-          fxLayout="row">
-
-          <!-- Sort -->
-          <mat-icon
-            cdkDragHandle
-            (mousedown)="notInvalidDragZone()">drag_indicator</mat-icon>
-
-          <!-- Type -->
-          <mat-icon
-            change123
-            fxGrow="0">font_download</mat-icon>
-
-          <!-- Label & icons -->
-          <div
-            change123
-            fxFlex>
-
-            <!-- Label -->
-            <span>{{item.data.label}}</span>
-
-            <!-- Icons -->
-            <span
-              *ngIf="renderMode !== RenderMode.SMALL">
-              <!-- Alert -->
-              <mat-icon
-                *ngIf="item.data.alert">notification_important</mat-icon>
-            </span>
-
-          </div>
-
-          <!-- Buttons -->
-          <div
-            change123
-            fxGrow="0">
-
-            <!-- Add question -->
-            <button
-              *ngIf="!viewOnly"
-              type="button"
-              mat-icon-button
-              [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW' | translate"
-              (click)="addQuestion(item.data)">
-              <mat-icon>add_comment</mat-icon>
-            </button>
-
-            <!-- Edit answer -->
-            <button
-              type="button"
-              mat-icon-button
-              [matTooltip]="'LNG_COMMON_BUTTON_UPDATE' | translate"
-              (click)="viewEditAnswer(item.data, item.parent.data)">
-              <mat-icon>{{viewOnly ? 'visibility' : 'edit'}}</mat-icon>
-            </button>
-
-          </div>
-
-        </div>
-
+    <!-- No questions image -->
+    <ng-template
+      #noQuestions>
+      <div>
+        empty list image....
       </div>
-
-    </cdk-virtual-scroll-viewport>
+    </ng-template>
   </div>
 
   <!-- Legend -->
   <div
+    *ngIf="flattenedQuestions?.length > 0"
     class="gd-form-edit-questionnaire-v2-legend">
 
     <!-- Header -->
