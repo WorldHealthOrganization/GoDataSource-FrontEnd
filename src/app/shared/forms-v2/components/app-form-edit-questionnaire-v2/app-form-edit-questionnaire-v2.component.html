@@ -74,7 +74,8 @@
               *ngIf="item.canHaveChildren"
               type="button"
               mat-icon-button
-              [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW' | translate">
+              [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW' | translate"
+              (click)="addAnswer(item.data)">
               <mat-icon>text_increase</mat-icon>
             </button>
 
@@ -134,7 +135,8 @@
             <button
               type="button"
               mat-icon-button
-              [matTooltip]="'LNG_COMMON_BUTTON_UPDATE' | translate">
+              [matTooltip]="'LNG_COMMON_BUTTON_UPDATE' | translate"
+              (click)="editAnswer(item.data)">
               <mat-icon>edit</mat-icon>
             </button>
 

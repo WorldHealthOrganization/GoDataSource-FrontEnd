@@ -67,7 +67,9 @@ export const EnglishUsLang = {
     'LNG_OUTBREAK_FIELD_LABEL_FOLLOW_UP': 'Follow-ups',
     'LNG_OUTBREAK_FIELD_LABEL_REPORT': 'Reports',
     'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_DETAILS': 'You are going to add a new question to: <div class="gd-form-edit-questionnaire-v2-details-label">{{details}}</div>',
-    'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_MODIFY': 'Modify question'
+    'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_DETAILS': 'You are going to add a new answer to: <div class="gd-form-edit-questionnaire-v2-details-label">{{details}}</div>',
+    'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_MODIFY': 'Modify question',
+    'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_MODIFY': 'Modify answer'
 
 
 

@@ -404,7 +404,7 @@ export class AppFormEditQuestionnaireV2Component
   }
 
   /**
-   * Show add / modify dialog
+   * Show add / modify dialog - question
    */
   private showAddModifyQuestion(
     add: boolean,
@@ -423,7 +423,7 @@ export class AppFormEditQuestionnaireV2Component
         placeholder: this.translateService.instant(
           'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_DETAILS', {
             details: parent ?
-              this.translateService.instant(parent.label) :
+              parent.label :
               '-'
           }
         )
@@ -652,6 +652,168 @@ export class AppFormEditQuestionnaireV2Component
       false,
       undefined,
       question
+    );
+  }
+
+  /**
+   * Show add / modify dialog - answer
+   */
+  private showAddModifyAnswer(
+    add: boolean,
+    parent: QuestionModel,
+    modifyAnswer: AnswerModel
+  ): void {
+    // construct array of inputs
+    const inputs: V2SideDialogConfigInput[] = [];
+
+    // details ?
+    if (add) {
+      inputs.push({
+        type: V2SideDialogConfigInputType.HTML,
+        name: 'details',
+        cssClasses: 'gd-form-edit-questionnaire-v2-details',
+        placeholder: this.translateService.instant(
+          'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_DETAILS', {
+            details: parent ?
+              parent.text :
+              '-'
+          }
+        )
+      });
+    }
+
+    // inputs
+    inputs.push(
+      // label
+      {
+        type: V2SideDialogConfigInputType.TEXTAREA,
+        name: 'label',
+        placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL',
+        value: modifyAnswer ?
+          modifyAnswer.label :
+          '',
+        validators: {
+          required: () => true
+        }
+      },
+
+      // answer value
+      {
+        type: V2SideDialogConfigInputType.TEXT,
+        name: 'value',
+        placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE',
+        value: modifyAnswer ?
+          modifyAnswer.value :
+          '',
+        validators: {
+          required: () => true
+        }
+      },
+
+      // alert
+      {
+        type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+        name: 'alert',
+        placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT',
+        value: modifyAnswer ?
+          modifyAnswer.alert :
+          false
+      }
+    );
+
+    // show dialog
+    this.dialogV2Service
+      .showSideDialog({
+        title: {
+          get: () => modifyAnswer ?
+            'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_MODIFY' :
+            'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW'
+        },
+        hideInputFilter: true,
+        dontCloseOnBackdrop: true,
+        width: '50rem',
+        bottomButtons: [{
+          type: IV2SideDialogConfigButtonType.OTHER,
+          label: 'LNG_COMMON_BUTTON_SAVE',
+          color: 'primary',
+          key: 'apply',
+          disabled: (_data, handler): boolean => {
+            return !handler.form || handler.form.invalid;
+          }
+        }, {
+          type: IV2SideDialogConfigButtonType.CANCEL,
+          label: 'LNG_COMMON_BUTTON_CANCEL',
+          color: 'text'
+        }],
+        inputs
+      })
+      .subscribe((response) => {
+        // cancelled ?
+        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+          // finished
+          return;
+        }
+
+        // add / update answer
+        if (add) {
+          // create answer
+          const formData = this.formHelperService.getFields(response.handler.form);
+          const answer: AnswerModel = new AnswerModel(formData);
+
+          // must initialize ?
+          if (!parent.answers) {
+            parent.answers = [];
+          }
+
+          // add to list
+          parent.answers.push(answer);
+
+          // scroll item
+          this.scrollToItem(answer);
+        } else {
+          // update answer
+          const formData = this.formHelperService.getFields(response.handler.form);
+          modifyAnswer.label = formData.label;
+          modifyAnswer.value = formData.value;
+          modifyAnswer.alert = formData.alert;
+        }
+
+        // close popup
+        response.handler.hide();
+
+        // flatten
+        this.nonFlatToFlat();
+
+        // trigger on change
+        this.onChange(this.value);
+
+        // mark dirty
+        this.control?.markAsDirty();
+
+        // update ui
+        this.detectChanges();
+      });
+  }
+
+  /**
+   * Add answer
+   */
+  addAnswer(parent: QuestionModel): void {
+    this.showAddModifyAnswer(
+      true,
+      parent,
+      undefined
+    );
+  }
+
+  /**
+   * Edit answer
+   */
+  editAnswer(answer: AnswerModel): void {
+    this.showAddModifyAnswer(
+      false,
+      undefined,
+      answer
     );
   }
 }
