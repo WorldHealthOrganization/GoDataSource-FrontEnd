@@ -68,7 +68,9 @@
             <span>{{item.data.text}}</span>
 
             <!-- Icons -->
-            <span>
+            <span
+              *ngIf="renderMode !== RenderMode.SMALL">
+
               <!-- Multiple answers -->
               <mat-icon
                 *ngIf="item.data.multiAnswer">format_list_numbered_rtl</mat-icon>
@@ -142,7 +144,8 @@
             <span>{{item.data.label}}</span>
 
             <!-- Icons -->
-            <span>
+            <span
+              *ngIf="renderMode !== RenderMode.SMALL">
               <!-- Alert -->
               <mat-icon
                 *ngIf="item.data.alert">notification_important</mat-icon>

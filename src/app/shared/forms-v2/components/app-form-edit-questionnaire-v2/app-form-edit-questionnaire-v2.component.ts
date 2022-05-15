@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Host, Input, OnDestroy, Optional, SkipSelf, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Host, HostListener, Input, OnDestroy, Optional, SkipSelf, ViewChild } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
@@ -23,6 +23,7 @@ import { ILabelValuePairModel } from '../../core/label-value-pair.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import * as _ from 'lodash';
+import { determineRenderMode, RenderMode } from '../../../../core/enums/render-mode.enum';
 
 /**
  * Flatten type
@@ -72,6 +73,9 @@ export class AppFormEditQuestionnaireV2Component
   // view only
   @Input() viewOnly: boolean;
 
+  // render mode
+  renderMode: RenderMode = RenderMode.FULL;
+
   // flattened questions
   flattenedQuestions: IFlattenNode[];
 
@@ -80,6 +84,7 @@ export class AppFormEditQuestionnaireV2Component
 
   // constants
   FlattenType = FlattenType;
+  RenderMode = RenderMode;
 
   // check if we can drop element to the selected position
   readonly bufferToRender: number = 1024;
@@ -119,6 +124,9 @@ export class AppFormEditQuestionnaireV2Component
       translateService,
       changeDetectorRef
     );
+
+    // update render mode
+    this.updateRenderMode();
   }
 
   /**
@@ -886,5 +894,14 @@ export class AppFormEditQuestionnaireV2Component
       parent,
       answer
     );
+  }
+
+  /**
+   * Update website render mode
+   */
+  @HostListener('window:resize')
+  private updateRenderMode(): void {
+    // determine render mode
+    this.renderMode = determineRenderMode();
   }
 }
