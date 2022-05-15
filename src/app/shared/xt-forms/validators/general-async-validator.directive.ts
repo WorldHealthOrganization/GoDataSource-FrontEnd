@@ -43,8 +43,10 @@ export class GeneralAsyncValidatorDirective {
     // no need to validate ?
     // - requires job
     if (
-      !control.value &&
-      control.value !== 0
+      !this.asyncValidatorObservable || (
+        !control.value &&
+        control.value !== 0
+      )
     ) {
       return of(null);
     }

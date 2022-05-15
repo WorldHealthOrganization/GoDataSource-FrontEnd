@@ -149,6 +149,9 @@ export interface IV2SideDialogConfigInputTextarea extends IV2SideDialogConfigInp
   type: V2SideDialogConfigInputType.TEXTAREA;
   placeholder: string;
   value: string;
+
+  // optional
+  validators?: IV2SideDialogConfigInputValidator;
 }
 
 /**

@@ -61,7 +61,7 @@
           <div
             change123
             fxFlex>
-            {{item.data.text | translate}}
+            {{item.data.text}}
           </div>
 
           <!-- Buttons -->
@@ -71,6 +71,7 @@
 
             <!-- Add answer -->
             <button
+              *ngIf="item.canHaveChildren"
               type="button"
               mat-icon-button
               [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW' | translate">
@@ -78,7 +79,13 @@
             </button>
 
             <!-- Edit question -->
-            <!-- TODO -->
+            <button
+              type="button"
+              mat-icon-button
+              [matTooltip]="'LNG_COMMON_BUTTON_UPDATE' | translate"
+              (click)="editQuestion(item.data)">
+              <mat-icon>edit</mat-icon>
+            </button>
 
           </div>
 
@@ -106,7 +113,7 @@
           <div
             change123
             fxFlex>
-            {{item.data.label | translate}}
+            {{item.data.label}}
           </div>
 
           <!-- Buttons -->
@@ -124,7 +131,12 @@
             </button>
 
             <!-- Edit answer -->
-            <!-- TODO -->
+            <button
+              type="button"
+              mat-icon-button
+              [matTooltip]="'LNG_COMMON_BUTTON_UPDATE' | translate">
+              <mat-icon>edit</mat-icon>
+            </button>
 
           </div>
 
@@ -231,6 +243,18 @@
 
         <!-- Label -->
         <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW' | translate}}</span>
+
+      </div>
+
+      <!-- Edit -->
+      <div
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+
+        <!-- Icon -->
+        <mat-icon>edit</mat-icon>
+
+        <!-- Label -->
+        <span>{{'LNG_COMMON_BUTTON_UPDATE' | translate}}</span>
 
       </div>
 
