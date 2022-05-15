@@ -27,13 +27,11 @@ import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2
   templateUrl: './inconsistencies-list.component.html'
 })
 export class InconsistenciesListComponent extends ListComponent implements OnDestroy {
-
   // Outbreak
-  outbreak: OutbreakModel = this.route.snapshot.data.outbreak.map[this.route.snapshot.params.outbreakId];
+  private _outbreak: OutbreakModel;
 
   // entities
   entitiesList$: Observable<(CaseModel | ContactModel | EventModel | ContactOfContactModel)[]>;
-
 
   /**
   * Constructor
@@ -44,31 +42,38 @@ export class InconsistenciesListComponent extends ListComponent implements OnDes
     private i18nService: I18nService,
     private route: ActivatedRoute
   ) {
-    super(listHelperService);
+    // parent
+    super(
+      listHelperService,
+      true
+    );
+
+    // get data
+    this._outbreak = this.route.snapshot.data.outbreak.map[this.route.snapshot.params.outbreakId];
   }
 
   /**
-  * Release resources
-  */
+   * Release resources
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
   }
 
   /**
-  * Selected outbreak was changed
-  */
+   * Selected outbreak was changed
+   */
   selectedOutbreakChanged(): void {
     // initialize pagination
-    this.initPaginator();
+    // this page doesn't have pagination
 
     // ...and re-load the list when the Selected Outbreak is changed
     this.needsRefreshList(true);
   }
 
   /**
-  * Initialize Side Table Columns
-  */
+   * Initialize Side Table Columns
+   */
   protected initializeTableColumns(): void {
     this.tableColumns = [
       {
@@ -155,7 +160,7 @@ export class InconsistenciesListComponent extends ListComponent implements OnDes
           type: V2ColumnFormat.ACTIONS
         },
         actions: [
-          // View Case
+          // View
           {
             type: V2ActionType.ICON,
             icon: 'visibility',
@@ -167,12 +172,11 @@ export class InconsistenciesListComponent extends ListComponent implements OnDes
             },
             visible: (item: CaseModel | ContactModel | EventModel): boolean => {
               return !item.deleted &&
-                this.authUser &&
-                this.canViewItem(item);
+                item.canView(this.authUser);
             }
           },
 
-          // Modify Case
+          // Modify
           {
             type: V2ActionType.ICON,
             icon: 'edit',
@@ -185,7 +189,7 @@ export class InconsistenciesListComponent extends ListComponent implements OnDes
             visible: (item: CaseModel | ContactModel | EventModel): boolean => {
               return !item.deleted &&
                 this.selectedOutbreakIsActive &&
-                this.canModifyItem(item);
+                item.canModify(this.authUser);
             }
           }
         ]
@@ -194,43 +198,43 @@ export class InconsistenciesListComponent extends ListComponent implements OnDes
   }
 
   /**
-  * Initialize process data
-  */
+   * Initialize process data
+   */
   protected initializeProcessSelectedData(): void {}
 
   /**
-  * Initialize table infos
-  */
+   * Initialize table infos
+   */
   protected initializeTableInfos(): void {}
 
   /**
-  * Initialize Table Advanced Filters
-  */
+   * Initialize Table Advanced Filters
+   */
   protected initializeTableAdvancedFilters(): void {}
 
   /**
-  * Initialize table quick actions
-  */
+   * Initialize table quick actions
+   */
   protected initializeQuickActions(): void {}
 
   /**
-  * Initialize table group actions
-  */
+   * Initialize table group actions
+   */
   protected initializeGroupActions(): void {}
 
   /**
-  * Initialize table add action
-  */
+   * Initialize table add action
+   */
   protected initializeAddAction(): void {}
 
   /**
-  * Initialize table grouped data
-  */
+   * Initialize table grouped data
+   */
   protected initializeGroupedData(): void {}
 
   /**
-  * Initialize breadcrumbs
-  */
+   * Initialize breadcrumbs
+   */
   protected initializeBreadcrumbs(): void {
     // set breadcrumbs
     this.breadcrumbs = [
@@ -245,9 +249,7 @@ export class InconsistenciesListComponent extends ListComponent implements OnDes
     ];
 
     // add list breadcrumb only if we have permission
-    if (
-      OutbreakModel.canList(this.authUser)
-    ) {
+    if (OutbreakModel.canList(this.authUser)) {
       this.breadcrumbs.push(
         {
           label: 'LNG_PAGE_LIST_OUTBREAKS_TITLE',
@@ -259,23 +261,21 @@ export class InconsistenciesListComponent extends ListComponent implements OnDes
     }
 
     // add outbreak details ?
-    if (
-      OutbreakModel.canModify(this.authUser)
-    ) {
+    if (OutbreakModel.canModify(this.authUser)) {
       this.breadcrumbs.push(
         {
-          label: this.outbreak.name,
+          label: this._outbreak.name,
           action: {
-            link: [`/outbreaks/${ this.outbreak.id }/modify`]
+            link: [`/outbreaks/${ this._outbreak.id }/modify`]
           }
         }
       );
     } else if (OutbreakModel.canView(this.authUser)) {
       this.breadcrumbs.push(
         {
-          label: this.outbreak.name,
+          label: this._outbreak.name,
           action: {
-            link: [`/outbreaks/${ this.outbreak.id }/view`]
+            link: [`/outbreaks/${ this._outbreak.id }/view`]
           }
         }
       );
@@ -291,23 +291,22 @@ export class InconsistenciesListComponent extends ListComponent implements OnDes
   }
 
   /**
-  * Fields retrieved from api to reduce payload size
-  */
+   * Fields retrieved from api to reduce payload size
+   */
   protected refreshListFields(): string[] {
-    return [
-      'id',
-      'firstName',
-      'lastName',
-      'inconsistencies'
-    ];
+    return [];
   }
 
   /**
-  * Re(load) list
-  */
+   * Re(load) list
+   */
   refreshList() {
+    // remove paginator
+    this.queryBuilder.paginator.clear();
+
+    // retrieve data
     this.entitiesList$ = this.outbreakDataService
-      .getPeopleInconsistencies(this.outbreak.id, this.queryBuilder)
+      .getPeopleInconsistencies(this._outbreak.id, this.queryBuilder)
       .pipe(
         // update page count
         tap((entitiesList: []) => {
@@ -328,67 +327,26 @@ export class InconsistenciesListComponent extends ListComponent implements OnDes
   refreshListCount(): void { }
 
   /**
-  * Get the link to redirect to view page depending on item type and action
-  * @param {Object} item
-  * @param {string} action
-  * @returns {string}
-  */
-  getItemRouterLink(item: CaseModel | ContactModel | EventModel, action: string) {
+   * Get the link to redirect to view page depending on item type and action
+   */
+  private getItemRouterLink(
+    item: CaseModel | ContactModel | EventModel,
+    action: string
+  ) {
     switch (item.type) {
       case EntityType.CASE:
-        return `/cases/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
+        return `/cases/${item.id}/${action}`;
       case EntityType.CONTACT:
-        return `/contacts/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
+        return `/contacts/${item.id}/${action}`;
       case EntityType.EVENT:
-        return `/events/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
+        return `/events/${item.id}/${action}`;
     }
   }
 
   /**
-  * Check if we can view item
-  * @param {Object} item
-  * @returns {boolean}
-  */
-  canViewItem(item: CaseModel | ContactModel | EventModel): boolean {
-    // check if we can modify item
-    switch (item.type) {
-      case EntityType.CASE:
-        return CaseModel.canView(this.authUser);
-      case EntityType.CONTACT:
-        return ContactModel.canView(this.authUser);
-      case EntityType.EVENT:
-        return EventModel.canView(this.authUser);
-    }
-
-    // :)
-    return false;
-  }
-
-  /**
-  * Check if we can modify item
-  * @param {Object} item
-  * @returns {boolean}
-  */
-  canModifyItem(item: CaseModel | ContactModel | EventModel): boolean {
-    // check if we can modify item
-    switch (item.type) {
-      case EntityType.CASE:
-        return CaseModel.canModify(this.authUser);
-      case EntityType.CONTACT:
-        return ContactModel.canModify(this.authUser);
-      case EntityType.EVENT:
-        return EventModel.canModify(this.authUser);
-    }
-
-    // :)
-    return false;
-  }
-
-  /**
-  * Inconsistencies
-  * @param item
-  */
-  inconsistencyToText(item: CaseModel | ContactModel | EventModel): string {
+   * Inconsistencies
+   */
+  private inconsistencyToText(item: CaseModel | ContactModel | EventModel): string {
     // construct inconsistencies text
     let text: string = '';
     _.each(item.inconsistencies, (inconsistency: InconsistencyModel) => {
