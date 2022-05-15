@@ -356,7 +356,7 @@ export class AppFormEditQuestionnaireV2Component
             data: answer,
             parent: flattenedQuestion,
             parents: {
-              ...parents,
+              ...flattenedQuestion.parents,
               [flattenedQuestion.id]: true
             },
             children: [],
@@ -378,7 +378,10 @@ export class AppFormEditQuestionnaireV2Component
               answer.additionalQuestions,
               level + 2,
               flattenedAnswer,
-              flattenedAnswer.parents
+              {
+                ...flattenedAnswer.parents,
+                [flattenedAnswer.id]: true
+              }
             );
           }
         });

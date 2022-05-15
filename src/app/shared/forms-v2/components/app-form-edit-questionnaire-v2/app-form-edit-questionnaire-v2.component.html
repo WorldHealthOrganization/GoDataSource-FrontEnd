@@ -4,14 +4,14 @@
   <!-- Records -->
   <cdk-virtual-scroll-viewport
     #cdkViewport
-    class="gd-form-edit-questionnaire-v2-list-{{name}}"
+    class="gd-form-edit-questionnaire-v2-list gd-form-edit-questionnaire-v2-list-{{name}}"
     cdkDropList [cdkDropListData]="flattenedQuestions" [cdkDropListSortPredicate]="canDrop" (cdkDropListDropped)="dropItem($event)"
 
     change123
     [itemSize]="32"
     [minBufferPx]="maxBufferPx ? maxBufferPx : bufferToRender"
     [maxBufferPx]="maxBufferPx ? maxBufferPx : bufferToRender"
-    style="height: 400px">
+    style="height: 350px">
 
     <!-- Item -->
     <div
@@ -81,5 +81,84 @@
     </div>
 
   </cdk-virtual-scroll-viewport>
+
+  <!-- Legend -->
+  <div
+    class="gd-form-edit-questionnaire-v2-legend">
+
+    <!-- Header -->
+    <div
+      class="gd-form-edit-questionnaire-v2-legend-title">
+      {{'LNG_COMMON_LABEL_LEGEND' | translate}}
+    </div>
+
+    <!-- Items -->
+    <div
+      class="gd-form-edit-questionnaire-v2-legend-items">
+
+      <!-- Drag -->
+      <div
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+
+        <!-- Icon -->
+        <mat-icon>drag_indicator</mat-icon>
+
+        <!-- Label -->
+        <span>{{'LNG_COMMON_BUTTON_DRAG' | translate}}</span>
+
+      </div>
+
+      <!-- Multiple answers -->
+      <div
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+
+        <!-- Icon -->
+        <mat-icon>format_list_numbered_rtl</mat-icon>
+
+        <!-- Label -->
+        <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER' | translate}}</span>
+
+      </div>
+
+      <!-- Required -->
+      <div
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+
+        <!-- Icon -->
+        <mat-icon>stars</mat-icon>
+
+        <!-- Label -->
+        <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED' | translate}}</span>
+
+      </div>
+
+      <!-- Inactive -->
+      <div
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+
+        <!-- Icon -->
+        <mat-icon
+          color="warn">do_not_disturb</mat-icon>
+
+        <!-- Label -->
+        <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_INACTIVE' | translate}}</span>
+
+      </div>
+
+      <!-- Alert -->
+      <div
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+
+        <!-- Icon -->
+        <mat-icon>notification_important</mat-icon>
+
+        <!-- Label -->
+        <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT' | translate}}</span>
+
+      </div>
+
+    </div>
+
+  </div>
 
 </div>
