@@ -12,7 +12,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { AnswerModel, QuestionModel } from '../../../../core/models/question.model';
 import { Constants } from '../../../../core/models/constants';
-import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
+import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CdkDragStart } from '@angular/cdk/drag-drop/drag-events';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 
@@ -35,7 +35,10 @@ interface IFlattenNode {
   data: QuestionModel | AnswerModel;
   parent: IFlattenNode;
   children: IFlattenNode[];
-  deepChildrenCount: number;
+  real: {
+    index: number,
+    array: (QuestionModel | AnswerModel)[]
+  };
 
   // optional
   hide?: boolean;
@@ -151,92 +154,7 @@ export class AppFormEditQuestionnaireV2Component
 
     // flatten
     this.flattenedQuestions = [];
-    const flatten = (
-      questions: QuestionModel[],
-      level: number,
-      parent: IFlattenNode
-    ): number => {
-      // no questions ?
-      if (
-        !questions ||
-        questions.length < 1
-      ) {
-        return 0;
-      }
-
-      // go through each question
-      let counted: number = 0;
-      questions.forEach((question) => {
-        // flatten
-        const flattenedQuestion: IFlattenNode = {
-          type: FlattenType.QUESTION,
-          level,
-          canHaveChildren: question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value ||
-            question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value,
-          data: question,
-          parent,
-          children: [],
-          deepChildrenCount: 0
-        };
-
-        // count
-        counted++;
-
-        // add to list
-        this.flattenedQuestions.push(flattenedQuestion);
-
-        // add to children list
-        if (parent) {
-          parent.children.push(flattenedQuestion);
-        }
-
-        // attach answers if we have any
-        if (flattenedQuestion.canHaveChildren) {
-          (question.answers || []).forEach((answer) => {
-            // flatten
-            const flattenedAnswer: IFlattenNode = {
-              type: FlattenType.ANSWER,
-              level: level + 1,
-              canHaveChildren: answer.additionalQuestionsShow,
-              data: answer,
-              parent: flattenedQuestion,
-              children: [],
-              deepChildrenCount: 0
-            };
-
-            // count
-            counted++;
-            flattenedQuestion.deepChildrenCount++;
-
-            // add to list
-            this.flattenedQuestions.push(flattenedAnswer);
-
-            // add to children list
-            flattenedQuestion.children.push(flattenedAnswer);
-
-            // check for children questions
-            if (flattenedAnswer.canHaveChildren) {
-              // update count
-              flattenedAnswer.deepChildrenCount = flatten(
-                answer.additionalQuestions,
-                level + 2,
-                flattenedAnswer
-              );
-
-              // count
-              counted += flattenedAnswer.deepChildrenCount;
-              flattenedQuestion.deepChildrenCount += flattenedAnswer.deepChildrenCount;
-            }
-          });
-        }
-      });
-
-      // finished
-      return counted;
-    };
-
-    // flatten
-    flatten(
+    this.flatten(
       this.value,
       0,
       null
@@ -289,43 +207,26 @@ export class AppFormEditQuestionnaireV2Component
     const node: IFlattenNode = this.flattenedQuestions[previousIndex];
     const otherNode: IFlattenNode = this.flattenedQuestions[currentIndex];
 
-    // create a new flattened array to copy data
-    const newFlattenedQuestions: IFlattenNode[] = [];
+    // disable drag
+    moveItemInArray(
+      node.real.array,
+      node.real.index,
+      otherNode.real.index
+    );
 
-    // start copying proper items
-    if (previousIndex > currentIndex) {
-      // copy items
-      newFlattenedQuestions.push(...this.flattenedQuestions.slice(0, currentIndex));
-      newFlattenedQuestions.push(...this.flattenedQuestions.slice(previousIndex, previousIndex + node.deepChildrenCount + 1));
-      this.flattenedQuestions.splice(previousIndex, node.deepChildrenCount + 1);
-      this.flattenedQuestions.splice(0, currentIndex);
-      newFlattenedQuestions.push(...this.flattenedQuestions);
-    } else {
-      // copy items
-      newFlattenedQuestions.push(...this.flattenedQuestions.slice(0, previousIndex));
-      newFlattenedQuestions.push(...this.flattenedQuestions.slice(previousIndex + node.deepChildrenCount + 1, currentIndex + otherNode.deepChildrenCount + 1));
-      newFlattenedQuestions.push(...this.flattenedQuestions.slice(previousIndex, previousIndex + node.deepChildrenCount + 1));
-      newFlattenedQuestions.push(...this.flattenedQuestions.slice(currentIndex + otherNode.deepChildrenCount + 1));
-    }
+    // flatten
+    this.flattenedQuestions = [];
+    this.flatten(
+      this.value,
+      0,
+      null
+    );
 
-    // update list
-    this.flattenedQuestions = newFlattenedQuestions;
+    // trigger on change
+    this.onChange(this.value);
 
-    // #TODO
-    // update tree of questions
-
-    // #TODO
-    // // trigger items changed
-    // if (input.itemsChanged) {
-    //   input.itemsChanged(input);
-    // }
-
-    // #TODO
-    // // mark list as dirty
-    // this.markArrayItemsAsDirty(
-    //   form,
-    //   input.name
-    // );
+    // mark dirty
+    this.control?.markAsDirty();
 
     // update ui
     this.detectChanges();
@@ -376,5 +277,82 @@ export class AppFormEditQuestionnaireV2Component
 
     // update
     updateHideProp(parent.children);
+  }
+
+  /**
+   * Flatten
+   */
+  private flatten(
+    questions: QuestionModel[],
+    level: number,
+    parent: IFlattenNode
+  ): void {
+    // no questions ?
+    if (
+      !questions ||
+      questions.length < 1
+    ) {
+      return;
+    }
+
+    // go through each question
+    questions.forEach((question, questionIndex) => {
+      // flatten
+      const flattenedQuestion: IFlattenNode = {
+        type: FlattenType.QUESTION,
+        level,
+        canHaveChildren: question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value ||
+          question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value,
+        data: question,
+        parent,
+        children: [],
+        real: {
+          index: questionIndex,
+          array: questions
+        }
+      };
+
+      // add to list
+      this.flattenedQuestions.push(flattenedQuestion);
+
+      // add to children list
+      if (parent) {
+        parent.children.push(flattenedQuestion);
+      }
+
+      // attach answers if we have any
+      if (flattenedQuestion.canHaveChildren) {
+        (question.answers || []).forEach((answer, answerIndex) => {
+          // flatten
+          const flattenedAnswer: IFlattenNode = {
+            type: FlattenType.ANSWER,
+            level: level + 1,
+            canHaveChildren: answer.additionalQuestionsShow,
+            data: answer,
+            parent: flattenedQuestion,
+            children: [],
+            real: {
+              index: answerIndex,
+              array: question.answers
+            }
+          };
+
+          // add to list
+          this.flattenedQuestions.push(flattenedAnswer);
+
+          // add to children list
+          flattenedQuestion.children.push(flattenedAnswer);
+
+          // check for children questions
+          if (flattenedAnswer.canHaveChildren) {
+            this.flatten(
+              answer.additionalQuestions,
+              level + 2,
+              flattenedAnswer
+            );
+          }
+        });
+      }
+    });
   }
 }
