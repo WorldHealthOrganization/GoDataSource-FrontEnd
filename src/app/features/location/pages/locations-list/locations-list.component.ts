@@ -29,7 +29,7 @@ import { AppFormLocationBaseV2 } from '../../../../shared/forms-v2/core/app-form
   templateUrl: './locations-list.component.html',
   styleUrls: ['./locations-list.component.less']
 })
-export class LocationsListComponent extends ListComponent implements OnInit, OnDestroy {
+export class LocationsListComponent extends ListComponent<LocationModel> implements OnInit, OnDestroy {
   // breadcrumb header
   // public breadcrumbs: BreadcrumbItemModel[] =  [
   //   new BreadcrumbItemModel(

@@ -22,7 +22,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   selector: 'app-help-items-list',
   templateUrl: './help-items-list.component.html'
 })
-export class HelpItemsListComponent extends ListComponent implements OnInit, OnDestroy {
+export class HelpItemsListComponent extends ListComponent<HelpItemModel> implements OnInit, OnDestroy {
   // breadcrumbs
   // breadcrumbs: BreadcrumbItemModel[] = [];
 

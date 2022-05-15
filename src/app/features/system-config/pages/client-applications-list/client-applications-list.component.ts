@@ -24,7 +24,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   templateUrl: './client-applications-list.component.html'
 })
 export class ClientApplicationsListComponent
-  extends ListComponent
+  extends ListComponent<SystemClientApplicationModel>
   implements OnInit, OnDestroy {
 
   // breadcrumbs

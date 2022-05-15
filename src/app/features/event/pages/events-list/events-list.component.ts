@@ -2,7 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import { Observable, of, throwError } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
@@ -40,12 +40,9 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
   templateUrl: './events-list.component.html'
 })
 export class EventsListComponent
-  extends ListComponent
+  extends ListComponent<EventModel>
   implements OnDestroy
 {
-  // list of existing events
-  eventsList$: Observable<EventModel[]>;
-
   /**
    * Constructor
    */
@@ -1282,7 +1279,7 @@ export class EventsListComponent
     }
 
     // retrieve the list of Events
-    this.eventsList$ = this.eventDataService
+    this.records$ = this.eventDataService
       .getEventsList(this.selectedOutbreak.id, this.queryBuilder)
       .pipe(
         switchMap((data) => {

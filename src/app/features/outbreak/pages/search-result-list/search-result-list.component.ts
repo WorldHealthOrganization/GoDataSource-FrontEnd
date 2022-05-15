@@ -8,7 +8,7 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { EventModel } from '../../../../core/models/event.model';
-import { Observable, throwError } from 'rxjs';
+import { throwError } from 'rxjs';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { ActivatedRoute } from '@angular/router';
 import { GlobalEntitySearchDataService } from '../../../../core/services/data/global-entity-search.data.service';
@@ -29,10 +29,7 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
   selector: 'app-search-result-list',
   templateUrl: './search-result-list.component.html'
 })
-export class SearchResultListComponent extends ListComponent implements OnDestroy {
-  // list of search result
-  entityList$: Observable<(CaseModel | ContactModel | ContactOfContactModel | EventModel)[]>;
-
+export class SearchResultListComponent extends ListComponent<CaseModel | ContactModel | ContactOfContactModel | EventModel> implements OnDestroy {
   // search by value
   private _searchValue: string;
 
@@ -311,7 +308,7 @@ export class SearchResultListComponent extends ListComponent implements OnDestro
    */
   refreshList(): void {
     // retrieve the list of entities
-    this.entityList$ = this.globalEntitySearchDataService
+    this.records$ = this.globalEntitySearchDataService
       .searchEntity(
         this.selectedOutbreak.id,
         this._searchValue,

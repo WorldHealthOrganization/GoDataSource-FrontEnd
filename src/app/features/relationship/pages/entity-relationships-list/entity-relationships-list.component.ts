@@ -1,6 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable } from 'rxjs';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -31,9 +30,8 @@ import { UserModel } from '../../../../core/models/user.model';
   selector: 'app-entity-relationships-list',
   templateUrl: './entity-relationships-list.component.html'
 })
-export class EntityRelationshipsListComponent extends ListComponent implements OnDestroy {
+export class EntityRelationshipsListComponent extends ListComponent<EntityModel> implements OnDestroy {
   // list of relationships
-  relationshipsList$: Observable<EntityModel[]>;
   private _relationshipsListRecordsMap: {
     [idRelationship: string]: EntityModel
   } = {};
@@ -383,7 +381,7 @@ export class EntityRelationshipsListComponent extends ListComponent implements O
    */
   refreshList(): void {
     // request data
-    this.relationshipsList$ = this.entityHelperService
+    this.records$ = this.entityHelperService
       .retrieveRecords(
         this.relationshipType,
         this.selectedOutbreak,

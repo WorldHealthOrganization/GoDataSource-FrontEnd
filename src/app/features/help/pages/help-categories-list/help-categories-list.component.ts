@@ -23,7 +23,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   templateUrl: './help-categories-list.component.html',
   styleUrls: ['./help-categories-list.component.less']
 })
-export class HelpCategoriesListComponent extends ListComponent implements OnInit, OnDestroy {
+export class HelpCategoriesListComponent extends ListComponent<HelpCategoryModel> implements OnInit, OnDestroy {
   // breadcrumbs: BreadcrumbItemModel[] = [
   //   new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '.', true)
   // ];

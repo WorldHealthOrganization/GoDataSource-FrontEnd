@@ -18,7 +18,7 @@ import { ContactOfContactModel } from '../../../core/models/contact-of-contact.m
  * Relationship list
  */
 @Directive()
-export abstract class RelationshipsListComponent extends ListComponent implements OnInit, OnDestroy {
+export abstract class RelationshipsListComponent extends ListComponent<CaseModel | ContactModel | EventModel> implements OnInit, OnDestroy {
   // Entities Map for specific data
   entityMap: {
     [entityType: string]: {

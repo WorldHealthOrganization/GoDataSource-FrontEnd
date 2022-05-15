@@ -1,7 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { Params } from '@angular/router';
 import * as _ from 'lodash';
-import { Observable } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -17,10 +16,7 @@ import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v
   selector: 'app-report-relationships-long-period',
   templateUrl: './report-relationships-long-period-list.component.html'
 })
-export class ReportRelationshipsLongPeriodListComponent extends ListComponent implements OnDestroy {
-  // list of long periods in the dates of onset between cases in the chain of transmission i.e. indicate where an intermediate contact may have been missed
-  relationshipList$: Observable<ReportDifferenceOnsetRelationshipModel[]>;
-
+export class ReportRelationshipsLongPeriodListComponent extends ListComponent<ReportDifferenceOnsetRelationshipModel> implements OnDestroy {
   /**
    * Constructor
    */
@@ -353,7 +349,7 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent im
    */
   refreshList() {
     // retrieve the list
-    this.relationshipList$ = this.relationshipDataService
+    this.records$ = this.relationshipDataService
       .getLongPeriodBetweenDateOfOnset(this.selectedOutbreak.id)
       .pipe(
         // update page count

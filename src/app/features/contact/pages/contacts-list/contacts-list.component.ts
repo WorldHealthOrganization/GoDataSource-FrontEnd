@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import * as _ from 'lodash';
-import { Observable, of, throwError } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
@@ -44,12 +44,9 @@ import * as moment from 'moment';
   templateUrl: './contacts-list.component.html'
 })
 export class ContactsListComponent
-  extends ListComponent
+  extends ListComponent<ContactModel>
   implements OnDestroy
 {
-  // list of existing contacts
-  contactsList$: Observable<ContactModel[]>;
-
   // anonymize fields
   anonymizeFields: ILabelValuePairModel[] = [
     { label: 'LNG_CONTACT_FIELD_LABEL_ID', value: 'id' },
@@ -2143,7 +2140,7 @@ export class ContactsListComponent
     }
 
     // retrieve the list of Contacts
-    this.contactsList$ = this.contactDataService
+    this.records$ = this.contactDataService
       .getContactsList(this.selectedOutbreak.id, this.queryBuilder)
       .pipe(
         switchMap((data) => {

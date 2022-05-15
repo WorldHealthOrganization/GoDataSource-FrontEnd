@@ -25,7 +25,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   templateUrl: './location-usage-list.component.html',
   styleUrls: ['./location-usage-list.component.less']
 })
-export class LocationUsageListComponent extends ListComponent implements OnInit, OnDestroy {
+export class LocationUsageListComponent extends ListComponent<any> implements OnInit, OnDestroy {
   // breadcrumbs
   // breadcrumbs: BreadcrumbItemModel[] = [];
 

@@ -27,7 +27,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   templateUrl: './backups.component.html',
   styleUrls: ['./backups.component.less']
 })
-export class BackupsComponent extends ListComponent implements OnInit, OnDestroy {
+export class BackupsComponent extends ListComponent<BackupModel> implements OnInit, OnDestroy {
   // breadcrumbs
   // breadcrumbs: BreadcrumbItemModel[] = [
   //   new BreadcrumbItemModel('LNG_PAGE_SYSTEM_BACKUPS_TITLE', '.', true)

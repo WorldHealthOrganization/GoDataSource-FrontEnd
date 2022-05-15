@@ -39,14 +39,13 @@ import { LocationDataService } from '../../../../core/services/data/location.dat
   templateUrl: './marked-not-duplicates-list.component.html'
 })
 export class MarkedNotDuplicatesListComponent
-  extends ListComponent
+  extends ListComponent<EventModel | CaseModel | ContactModel | ContactOfContactModel>
   implements OnDestroy {
 
   // list of not duplicates
   recordId: string;
   recordType: EntityType;
   recordData: CaseModel | ContactModel | ContactOfContactModel;
-  notDuplicatesList$: Observable<(EventModel | CaseModel | ContactModel | ContactOfContactModel)[]>;
 
   // provide constants to template
   Constants = Constants;
@@ -580,7 +579,7 @@ export class MarkedNotDuplicatesListComponent
    */
   refreshList() {
     // retrieve the list of Entities
-    this.notDuplicatesList$ = this.entityDataService
+    this.records$ = this.entityDataService
       .getEntitiesMarkedAsNotDuplicates(
         this.selectedOutbreak.id,
         this.recordType,

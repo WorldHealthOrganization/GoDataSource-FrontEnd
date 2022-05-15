@@ -27,7 +27,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   templateUrl: './duplicate-records-list.component.html',
   styleUrls: ['./duplicate-records-list.component.less']
 })
-export class DuplicateRecordsListComponent extends ListComponent implements OnInit, OnDestroy {
+export class DuplicateRecordsListComponent extends ListComponent<any> implements OnInit, OnDestroy {
   // breadcrumbs
   // breadcrumbs: BreadcrumbItemModel[] = [
   //   new BreadcrumbItemModel('LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE', '.', true)

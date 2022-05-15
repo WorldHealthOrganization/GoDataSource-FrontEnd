@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-import { Observable, throwError } from 'rxjs';
+import { throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -24,10 +24,7 @@ import { IV2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../.
   selector: 'app-user-list',
   templateUrl: './user-list.component.html'
 })
-export class UserListComponent extends ListComponent implements OnDestroy {
-  // list of existing users
-  usersList$: Observable<UserModel[]>;
-
+export class UserListComponent extends ListComponent<UserModel> implements OnDestroy {
   // list of existing teams mapped by user
   userTeamMap: {
     [userId: string]: TeamModel[]
@@ -531,7 +528,7 @@ export class UserListComponent extends ListComponent implements OnDestroy {
    */
   refreshList() {
     // get the list of existing users
-    this.usersList$ = this.userDataService
+    this.records$ = this.userDataService
       .getUsersList(this.queryBuilder)
       .pipe(
         // should be the last pipe

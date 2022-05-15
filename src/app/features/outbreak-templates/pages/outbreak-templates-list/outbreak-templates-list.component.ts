@@ -27,11 +27,8 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
   templateUrl: './outbreak-templates-list.component.html'
 })
 export class OutbreakTemplatesListComponent
-  extends ListComponent
+  extends ListComponent<OutbreakTemplateModel>
   implements OnDestroy {
-  // list of existing outbreak templates
-  outbreakTemplatesList$: Observable<OutbreakTemplateModel[]>;
-
   /**
    * Constructor
    */
@@ -618,7 +615,7 @@ export class OutbreakTemplatesListComponent
    */
   refreshList() {
     // retrieve the list of outbreak templates
-    this.outbreakTemplatesList$ = this.outbreakTemplateDataService
+    this.records$ = this.outbreakTemplateDataService
       .getOutbreakTemplatesList(this.queryBuilder)
       .pipe(
         // should be the last pipe

@@ -25,7 +25,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   templateUrl: './upstream-servers-list.component.html',
   styleUrls: ['./upstream-servers-list.component.less']
 })
-export class UpstreamServersListComponent extends ListComponent implements OnInit, OnDestroy {
+export class UpstreamServersListComponent extends ListComponent<SystemUpstreamServerModel> implements OnInit, OnDestroy {
   // Breadcrumbs
   // breadcrumbs: BreadcrumbItemModel[] = [
   //   new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_TITLE', '.', true)

@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import * as _ from 'lodash';
-import { Observable, of, throwError } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
@@ -32,7 +32,6 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
-import { FilterModel } from '../../../../shared/components/side-filters/model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import * as moment from 'moment';
 
@@ -40,13 +39,7 @@ import * as moment from 'moment';
   selector: 'app-contacts-of-contacts-list',
   templateUrl: './contacts-of-contacts-list.component.html'
 })
-export class ContactsOfContactsListComponent extends ListComponent implements OnDestroy {
-  // list of existing contacts
-  contactsOfContactsList$: Observable<ContactOfContactModel[]>;
-
-  // available side filters
-  availableSideFilters: FilterModel[];
-
+export class ContactsOfContactsListComponent extends ListComponent<ContactOfContactModel> implements OnDestroy {
   // anonymize fields
   private contactsOfContactsAnonymizeFields: ILabelValuePairModel[] = [
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME', value: 'firstName' },
@@ -1424,7 +1417,7 @@ export class ContactsOfContactsListComponent extends ListComponent implements On
     }
 
     // retrieve the list of Contacts
-    this.contactsOfContactsList$ = this.contactsOfContactsDataService
+    this.records$ = this.contactsOfContactsDataService
       .getContactsOfContactsList(this.selectedOutbreak.id, this.queryBuilder)
       .pipe(
         switchMap((data) => {

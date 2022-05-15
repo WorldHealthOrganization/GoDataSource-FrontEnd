@@ -1,6 +1,6 @@
 import { RequestQueryBuilder, RequestSortDirection } from './request-query-builder';
 import * as _ from 'lodash';
-import { ReplaySubject, Subscriber, Subscription } from 'rxjs';
+import { Observable, ReplaySubject, Subscriber, Subscription } from 'rxjs';
 import { Constants } from '../models/constants';
 import { PageEvent } from '@angular/material/paginator';
 import { DebounceTimeCaller } from './debounce-time-caller';
@@ -30,7 +30,7 @@ import { IV2ProcessSelectedData } from '../../shared/components-v2/app-list-tabl
  * List component
  */
 @Directive()
-export abstract class ListComponent extends ListAppliedFiltersComponent {
+export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
   // handle pop state changes
   private static locationSubscription: SubscriptionLike;
 
@@ -87,6 +87,9 @@ export abstract class ListComponent extends ListAppliedFiltersComponent {
   // pagination
   public pageSize: number = Constants.DEFAULT_PAGE_SIZE;
   private paginatorInitialized = false;
+
+  // records
+  records$: Observable<T[]>;
 
   // table sort by
   tableSortBy: {

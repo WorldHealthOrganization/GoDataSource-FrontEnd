@@ -1,6 +1,6 @@
-import { Component, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
-import { Observable, throwError } from 'rxjs';
+import { throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ClusterModel } from '../../../../core/models/cluster.model';
@@ -17,14 +17,9 @@ import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2
 
 @Component({
   selector: 'app-clusters-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './clusters-list.component.html',
-  styleUrls: ['./clusters-list.component.less']
+  templateUrl: './clusters-list.component.html'
 })
-export class ClustersListComponent extends ListComponent implements OnDestroy {
-  // list of existing clusters
-  clustersList$: Observable<ClusterModel[]>;
-
+export class ClustersListComponent extends ListComponent<ClusterModel> implements OnDestroy {
   /**
      * Constructor
      */
@@ -336,7 +331,7 @@ export class ClustersListComponent extends ListComponent implements OnDestroy {
    * Re(load) the Clusters list, based on the applied filter, sort criterias
    */
   refreshList() {
-    this.clustersList$ = this.clusterDataService
+    this.records$ = this.clusterDataService
       .getClusterList(this.selectedOutbreak.id, this.queryBuilder)
       .pipe(
         // should be the last pipe

@@ -25,14 +25,14 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   selector: 'app-clusters-people-list',
   templateUrl: './clusters-people-list.component.html'
 })
-export class ClustersPeopleListComponent extends ListComponent implements OnInit, OnDestroy {
+export class ClustersPeopleListComponent extends ListComponent<CaseModel | ContactModel | EventModel | ContactOfContactModel> implements OnInit, OnDestroy {
   // breadcrumbs
   // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // present cluster
   cluster: ClusterModel;
   // cluster people list
-  clusterPeopleList$: Observable<any>;
+  clusterPeopleList$: Observable<(CaseModel | ContactModel | EventModel | ContactOfContactModel)[]>;
   clusterPeopleListCount$: Observable<IBasicCount>;
 
   // reference data

@@ -18,7 +18,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   selector: 'app-system-devices-list',
   templateUrl: './system-devices.component.html'
 })
-export class SystemDevicesComponent extends ListComponent implements OnInit, OnDestroy {
+export class SystemDevicesComponent extends ListComponent<DeviceModel> implements OnInit, OnDestroy {
   // Breadcrumbs
   // breadcrumbs: BreadcrumbItemModel[] = [
   //   new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_DEVICES_TITLE', '.', true)

@@ -1,5 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
-import { Observable, of, throwError } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { UserModel } from '../../../../core/models/user.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
@@ -46,10 +46,7 @@ import * as moment from 'moment';
   selector: 'app-cases-list',
   templateUrl: './cases-list.component.html'
 })
-export class CasesListComponent extends ListComponent implements OnDestroy {
-  // list of existing cases
-  casesList$: Observable<CaseModel[]>;
-
+export class CasesListComponent extends ListComponent<CaseModel> implements OnDestroy {
   // case anonymize fields
   private caseAnonymizeFields: ILabelValuePairModel[] = [
     { label: 'LNG_CASE_FIELD_LABEL_ID', value: 'id' },
@@ -2174,7 +2171,7 @@ export class CasesListComponent extends ListComponent implements OnDestroy {
     }
 
     // retrieve the list of Cases
-    this.casesList$ = this.caseDataService
+    this.records$ = this.caseDataService
       .getCasesList(this.selectedOutbreak.id, this.queryBuilder)
       .pipe(
         switchMap((data) => {

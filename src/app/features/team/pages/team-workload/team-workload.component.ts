@@ -29,7 +29,7 @@ interface ITeamMap {
   templateUrl: './team-workload.component.html',
   styleUrls: ['./team-workload.component.less']
 })
-export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDestroy {
+export class TeamWorkloadComponent extends ListComponent<any> implements OnInit, OnDestroy {
   // breadcrumbs
   // breadcrumbs: BreadcrumbItemModel[] = [];
 

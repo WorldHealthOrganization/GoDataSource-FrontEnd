@@ -28,7 +28,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   templateUrl: './system-sync-logs.component.html'
 })
 export class SystemSyncLogsComponent
-  extends ListComponent
+  extends ListComponent<SystemSyncLogModel>
   implements OnInit, OnDestroy {
 
   // breadcrumbs

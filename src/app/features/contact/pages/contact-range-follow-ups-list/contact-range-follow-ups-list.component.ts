@@ -38,7 +38,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   styleUrls: ['./contact-range-follow-ups-list.component.less']
 })
 export class ContactRangeFollowUpsListComponent
-  extends ListComponent
+  extends ListComponent<any>
   implements OnInit, OnDestroy {
 
   // breadcrumbs

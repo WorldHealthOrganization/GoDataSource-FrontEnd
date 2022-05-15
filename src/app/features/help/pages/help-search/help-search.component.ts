@@ -18,7 +18,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   selector: 'app-help-search',
   templateUrl: './help-search.component.html'
 })
-export class HelpSearchComponent extends ListComponent implements OnInit, OnDestroy {
+export class HelpSearchComponent extends ListComponent<HelpItemModel> implements OnInit, OnDestroy {
   // breadcrumbs: BreadcrumbItemModel[] = [
   //   new BreadcrumbItemModel('LNG_PAGE_GLOBAL_HELP_TITLE', '/help', true)
   // ];

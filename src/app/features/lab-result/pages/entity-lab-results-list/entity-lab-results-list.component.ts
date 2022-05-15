@@ -1,7 +1,7 @@
-import { Component, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-import { Observable, throwError } from 'rxjs';
+import { throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
@@ -32,17 +32,12 @@ import { TopnavComponent } from '../../../../core/components/topnav/topnav.compo
 
 @Component({
   selector: 'app-entity-lab-results-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './entity-lab-results-list.component.html',
-  styleUrls: ['./entity-lab-results-list.component.less']
+  templateUrl: './entity-lab-results-list.component.html'
 })
-export class EntityLabResultsListComponent extends ListComponent implements OnDestroy {
+export class EntityLabResultsListComponent extends ListComponent<LabResultModel> implements OnDestroy {
   // entity
   personType: EntityType;
   entityData: CaseModel | ContactModel;
-
-  // list of existing case lab results
-  labResultsList$: Observable<LabResultModel[]>;
 
   // constants
   EntityType = EntityType;
@@ -403,7 +398,7 @@ export class EntityLabResultsListComponent extends ListComponent implements OnDe
       }
 
       // retrieve the list of lab results
-      this.labResultsList$ = this.entityLabResultService
+      this.records$ = this.entityLabResultService
         .retrieveRecords(
           this.selectedOutbreak.id,
           EntityModel.getLinkForEntityType(this.personType),

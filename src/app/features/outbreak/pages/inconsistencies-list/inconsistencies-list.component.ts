@@ -1,7 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-import { Observable } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import { InconsistencyIssueEnum } from '../../../../core/enums/inconsistency-issue.enum';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -26,12 +25,9 @@ import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2
   selector: 'app-inconsistencies-list',
   templateUrl: './inconsistencies-list.component.html'
 })
-export class InconsistenciesListComponent extends ListComponent implements OnDestroy {
+export class InconsistenciesListComponent extends ListComponent<CaseModel | ContactModel | EventModel | ContactOfContactModel> implements OnDestroy {
   // Outbreak
   private _outbreak: OutbreakModel;
-
-  // entities
-  entitiesList$: Observable<(CaseModel | ContactModel | EventModel | ContactOfContactModel)[]>;
 
   /**
   * Constructor
@@ -305,7 +301,7 @@ export class InconsistenciesListComponent extends ListComponent implements OnDes
     this.queryBuilder.paginator.clear();
 
     // retrieve data
-    this.entitiesList$ = this.outbreakDataService
+    this.records$ = this.outbreakDataService
       .getPeopleInconsistencies(this._outbreak.id, this.queryBuilder)
       .pipe(
         // update page count

@@ -1,8 +1,7 @@
-import { Component, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import { Observable } from 'rxjs';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
@@ -34,14 +33,9 @@ import { TopnavComponent } from '../../../../core/components/topnav/topnav.compo
 
 @Component({
   selector: 'app-individual-contact-follow-ups-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './individual-contact-follow-ups-list.component.html',
-  styleUrls: ['./individual-contact-follow-ups-list.component.less']
+  templateUrl: './individual-contact-follow-ups-list.component.html'
 })
-export class IndividualContactFollowUpsListComponent extends ListComponent implements OnDestroy {
-  // follow-ups
-  followUpsList$: Observable<FollowUpModel[]>;
-
+export class IndividualContactFollowUpsListComponent extends ListComponent<FollowUpModel> implements OnDestroy {
   // data
   entityData: ContactModel | CaseModel;
 
@@ -614,7 +608,7 @@ export class IndividualContactFollowUpsListComponent extends ListComponent imple
     }
 
     // retrieve the list of Follow Ups
-    this.followUpsList$ = this.entityFollowUpHelperService
+    this.records$ = this.entityFollowUpHelperService
       .retrieveRecords(
         this.selectedOutbreak,
         this.queryBuilder

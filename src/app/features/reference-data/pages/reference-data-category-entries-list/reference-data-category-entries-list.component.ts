@@ -22,7 +22,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   templateUrl: './reference-data-category-entries-list.component.html',
   styleUrls: ['./reference-data-category-entries-list.component.less']
 })
-export class ReferenceDataCategoryEntriesListComponent extends ListComponent implements OnInit, OnDestroy {
+export class ReferenceDataCategoryEntriesListComponent extends ListComponent<ReferenceDataEntryModel> implements OnInit, OnDestroy {
   // breadcrumbs
   // breadcrumbs: BreadcrumbItemModel[] = [];
 

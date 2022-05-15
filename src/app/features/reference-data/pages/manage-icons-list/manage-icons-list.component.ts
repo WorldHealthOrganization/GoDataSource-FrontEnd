@@ -18,7 +18,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   selector: 'app-manage-icons-list',
   templateUrl: './manage-icons-list.component.html'
 })
-export class ManageIconsListComponent extends ListComponent implements OnInit, OnDestroy {
+export class ManageIconsListComponent extends ListComponent<IconModel> implements OnInit, OnDestroy {
   // Breadcrumbs
   // breadcrumbs: BreadcrumbItemModel[] = [];
 

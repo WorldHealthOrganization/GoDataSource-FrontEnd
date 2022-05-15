@@ -28,7 +28,7 @@ import { UserDataService } from '../../../core/services/data/user.data.service';
  * Follow-up list component
  */
 @Directive()
-export abstract class FollowUpsListComponent extends ListComponent implements OnInit, OnDestroy {
+export abstract class FollowUpsListComponent extends ListComponent<FollowUpModel> implements OnInit, OnDestroy {
   // list of export fields groups
   fieldsGroupList: LabelValuePair[];
   fieldsGroupListRequired: IExportFieldsGroupRequired;

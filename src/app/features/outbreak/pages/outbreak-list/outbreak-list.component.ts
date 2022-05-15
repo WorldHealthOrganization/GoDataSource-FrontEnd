@@ -32,10 +32,7 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
   selector: 'app-outbreak-list',
   templateUrl: './outbreak-list.component.html'
 })
-export class OutbreakListComponent extends ListComponent implements OnDestroy {
-  // list of existing outbreaks
-  outbreaksList$: Observable<OutbreakModel[]>;
-
+export class OutbreakListComponent extends ListComponent<OutbreakModel> implements OnDestroy {
   /**
    * Constructor
    */
@@ -1047,7 +1044,7 @@ export class OutbreakListComponent extends ListComponent implements OnDestroy {
     this.queryBuilder.include('updatedByUser', true);
 
     // retrieve the list of Outbreaks
-    this.outbreaksList$ = this.outbreakDataService
+    this.records$ = this.outbreakDataService
       .getOutbreaksList(this.queryBuilder)
       .pipe(
         // should be the last pipe

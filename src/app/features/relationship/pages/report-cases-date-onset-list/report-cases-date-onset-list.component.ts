@@ -2,7 +2,6 @@ import { Component, OnDestroy } from '@angular/core';
 import { Params } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import * as _ from 'lodash';
-import { Observable } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -19,10 +18,7 @@ import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v
   selector: 'app-report-cases-date-onset-list',
   templateUrl: './report-cases-date-onset-list.component.html'
 })
-export class ReportCasesDateOnsetListComponent extends ListComponent implements OnDestroy {
-  // list of secondary cases with onset date that is before the date of onset of the primary case
-  casesWithOnsetList$: Observable<ReportCasesWithOnsetModel[]>;
-
+export class ReportCasesDateOnsetListComponent extends ListComponent<ReportCasesWithOnsetModel> implements OnDestroy {
   /**
    * Constructor
    */
@@ -348,7 +344,7 @@ export class ReportCasesDateOnsetListComponent extends ListComponent implements 
    */
   refreshList() {
     // retrieve the list
-    this.casesWithOnsetList$ = this.relationshipDataService
+    this.records$ = this.relationshipDataService
       .getCasesWithDateOnsetBeforePrimaryCase(this.selectedOutbreak.id)
       .pipe(
         // update page count

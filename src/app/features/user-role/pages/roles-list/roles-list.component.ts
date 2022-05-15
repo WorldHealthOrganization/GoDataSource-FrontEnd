@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import * as _ from 'lodash';
-import { Observable, throwError } from 'rxjs';
+import { throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -22,10 +22,7 @@ import { PermissionModel } from '../../../../core/models/permission.model';
   selector: 'app-roles-list',
   templateUrl: './roles-list.component.html'
 })
-export class RolesListComponent extends ListComponent implements OnDestroy {
-  // list of existing roles
-  rolesList$: Observable<UserRoleModel[]>;
-
+export class RolesListComponent extends ListComponent<UserRoleModel> implements OnDestroy {
   /**
    * Constructor
    */
@@ -388,7 +385,7 @@ export class RolesListComponent extends ListComponent implements OnDestroy {
     );
 
     // get the list of existing roles
-    this.rolesList$ = this.userRoleDataService
+    this.records$ = this.userRoleDataService
       .getRolesList(this.queryBuilder)
       .pipe(
         // should be the last pipe

@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-import { Observable, throwError } from 'rxjs';
+import { throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
@@ -23,10 +23,7 @@ import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputToggle, V2SideDi
   selector: 'app-saved-import-mapping',
   templateUrl: './saved-import-mapping.component.html'
 })
-export class SavedImportMappingComponent extends ListComponent implements OnDestroy {
-  // data
-  savedImportMappingsList$: Observable<SavedImportMappingModel[]>;
-
+export class SavedImportMappingComponent extends ListComponent<SavedImportMappingModel> implements OnDestroy {
   /**
    * Constructor
    */
@@ -423,7 +420,7 @@ export class SavedImportMappingComponent extends ListComponent implements OnDest
   */
   refreshList() {
     // retrieve list
-    this.savedImportMappingsList$ = this.savedImportMappingService
+    this.records$ = this.savedImportMappingService
       .getImportMappingsList(this.queryBuilder)
       .pipe(
         // should be the last pipe

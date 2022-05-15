@@ -23,7 +23,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   selector: 'app-team-list',
   templateUrl: './team-list.component.html'
 })
-export class TeamListComponent extends ListComponent implements OnInit, OnDestroy {
+export class TeamListComponent extends ListComponent<TeamModel> implements OnInit, OnDestroy {
   // breadcrumb header
   // public breadcrumbs: BreadcrumbItemModel[] = [
   //   new BreadcrumbItemModel(

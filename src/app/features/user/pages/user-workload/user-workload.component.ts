@@ -29,7 +29,7 @@ interface IUserMap {
   templateUrl: './user-workload.component.html',
   styleUrls: ['./user-workload.component.less']
 })
-export class UserWorkloadComponent extends ListComponent implements OnInit, OnDestroy {
+export class UserWorkloadComponent extends ListComponent<any> implements OnInit, OnDestroy {
   // breadcrumbs
   // breadcrumbs: BreadcrumbItemModel[] = [];
 

@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-import { Observable, throwError } from 'rxjs';
+import { throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { Constants } from '../../../../core/models/constants';
@@ -23,10 +23,7 @@ import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputToggle, V2SideDi
   selector: 'app-saved-filters',
   templateUrl: './saved-filters.component.html'
 })
-export class SavedFiltersComponent extends ListComponent implements OnDestroy {
-  // data
-  savedFiltersList$: Observable<SavedFilterModel[]>;
-
+export class SavedFiltersComponent extends ListComponent<SavedFilterModel> implements OnDestroy {
   /**
    * Constructor
    */
@@ -423,7 +420,7 @@ export class SavedFiltersComponent extends ListComponent implements OnDestroy {
    */
   refreshList() {
     // retrieve list
-    this.savedFiltersList$ = this.savedFiltersService
+    this.records$ = this.savedFiltersService
       .getSavedFiltersList(this.queryBuilder)
       .pipe(
         // should be the last pipe

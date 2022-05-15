@@ -17,7 +17,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   templateUrl: './languages-list.component.html'
 })
 export class LanguagesListComponent
-  extends ListComponent
+  extends ListComponent<LanguageModel>
   implements OnInit, OnDestroy {
 
   // breadcrumbs

@@ -105,7 +105,7 @@ interface IImportErrorDetailsProcessedImported {
   styleUrls: ['./import-data.component.less']
 })
 export class ImportDataComponent
-  extends ListComponent
+  extends ListComponent<any>
   implements OnInit, OnDestroy {
 
   // Extension mapped to mimes

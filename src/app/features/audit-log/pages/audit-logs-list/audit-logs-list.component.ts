@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import * as _ from 'lodash';
@@ -18,12 +18,10 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 
 @Component({
   selector: 'app-audit-logs-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './audit-logs-list.component.html',
-  styleUrls: ['./audit-logs-list.component.less']
+  templateUrl: './audit-logs-list.component.html'
 })
 export class AuditLogsListComponent
-  extends ListComponent
+  extends ListComponent<AuditLogModel>
   implements OnInit, OnDestroy {
 
   // breadcrumbs

@@ -23,7 +23,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   templateUrl: './transmission-chains-snapshot-list.component.html',
   styleUrls: ['./transmission-chains-snapshot-list.component.less']
 })
-export class TransmissionChainsSnapshotListComponent extends ListComponent implements OnInit, OnDestroy {
+export class TransmissionChainsSnapshotListComponent extends ListComponent<CotSnapshotModel> implements OnInit, OnDestroy {
   // breadcrumbs
   // breadcrumbs: BreadcrumbItemModel[] = [
   //   new BreadcrumbItemModel('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE', '/transmission-chains', false),

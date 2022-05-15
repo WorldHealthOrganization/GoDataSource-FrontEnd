@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-import { Observable, throwError } from 'rxjs';
+import { throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
@@ -34,10 +34,7 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
   selector: 'app-lab-results',
   templateUrl: './lab-results-list.component.html'
 })
-export class LabResultsListComponent extends ListComponent implements OnDestroy {
-  // lab results list
-  labResultsList$: Observable<any>;
-
+export class LabResultsListComponent extends ListComponent<LabResultModel> implements OnDestroy {
   /**
   * Constructor
   */
@@ -891,7 +888,7 @@ export class LabResultsListComponent extends ListComponent implements OnDestroy 
     }
 
     // retrieve the list of lab results
-    this.labResultsList$ = this.labResultDataService
+    this.records$ = this.labResultDataService
       .getOutbreakLabResults(this.selectedOutbreak.id, this.queryBuilder)
       .pipe(
         // should be the last pipe

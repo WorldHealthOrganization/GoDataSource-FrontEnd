@@ -21,7 +21,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   selector: 'app-transmission-chains-list',
   templateUrl: './transmission-chains-list.component.html'
 })
-export class TransmissionChainsListComponent extends ListComponent implements OnInit, OnDestroy {
+export class TransmissionChainsListComponent extends ListComponent<TransmissionChainModel> implements OnInit, OnDestroy {
   // breadcrumbs
   // breadcrumbs: BreadcrumbItemModel[] = [
   //   new BreadcrumbItemModel('LNG_PAGE_LIST_TRANSMISSION_CHAINS_TITLE', null, true)
