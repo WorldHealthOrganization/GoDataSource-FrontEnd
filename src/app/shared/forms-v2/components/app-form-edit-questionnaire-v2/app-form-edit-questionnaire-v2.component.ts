@@ -1,12 +1,4 @@
-import {
-  ChangeDetectionStrategy, ChangeDetectorRef,
-  Component,
-  forwardRef,
-  Host, Input,
-  OnDestroy,
-  Optional,
-  SkipSelf, ViewChild
-} from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, Host, Input, OnDestroy, Optional, SkipSelf, ViewChild } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
@@ -16,6 +8,13 @@ import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk
 import { CdkDragStart } from '@angular/cdk/drag-drop/drag-events';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { v4 as uuid } from 'uuid';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../../../components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { ActivatedRoute } from '@angular/router';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { ILabelValuePairModel } from '../../core/label-value-pair.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 
 /**
  * Flatten type
@@ -101,7 +100,10 @@ export class AppFormEditQuestionnaireV2Component
   constructor(
     @Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer,
     protected translateService: TranslateService,
-    protected changeDetectorRef: ChangeDetectorRef
+    protected changeDetectorRef: ChangeDetectorRef,
+    protected dialogV2Service: DialogV2Service,
+    protected activatedRoute: ActivatedRoute,
+    protected formHelperService: FormHelperService
   ) {
     // parent
     super(
@@ -387,5 +389,202 @@ export class AppFormEditQuestionnaireV2Component
         });
       }
     });
+  }
+
+  /**
+   * Show add / modify dialog
+   */
+  private showAddModifyQuestion(
+    add: boolean,
+    parent: AnswerModel,
+    modifyQuestion: QuestionModel
+  ): void {
+    // construct array of inputs
+    const inputs: V2SideDialogConfigInput[] = [];
+
+    // details ?
+    if (add) {
+      inputs.push({
+        type: V2SideDialogConfigInputType.HTML,
+        name: 'details',
+        cssClasses: 'gd-form-edit-questionnaire-v2-details',
+        placeholder: this.translateService.instant(
+          'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_DETAILS', {
+            details: parent ?
+              this.translateService.instant(parent.label) :
+              '-'
+          }
+        )
+      });
+    }
+
+    // text
+    inputs.push({
+      type: V2SideDialogConfigInputType.TEXTAREA,
+      name: 'text',
+      placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT',
+      value: modifyQuestion ?
+        modifyQuestion.text :
+        ''
+    });
+
+    // answer type
+    inputs.push({
+      type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+      name: 'answerType',
+      placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE',
+      value: modifyQuestion ?
+        modifyQuestion.answerType :
+        '',
+      options: (this.activatedRoute.snapshot.data.questionnaireAnswerType as IResolverV2ResponseModel<ILabelValuePairModel>).options
+    });
+
+    // variable
+    inputs.push({
+      type: V2SideDialogConfigInputType.TEXT,
+      name: 'variable',
+      placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE',
+      value: modifyQuestion ?
+        modifyQuestion.variable :
+        '',
+      visible: (data) => (data.map.answerType as IV2SideDialogConfigInputSingleDropdown).value !== Constants.ANSWER_TYPES.MARKUP.value
+    });
+
+    // category
+    inputs.push({
+      type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+      name: 'category',
+      placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY',
+      value: modifyQuestion ?
+        modifyQuestion.category :
+        '',
+      options: (this.activatedRoute.snapshot.data.questionnaireQuestionCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+    });
+
+    // answer display
+    inputs.push({
+      type: V2SideDialogConfigInputType.DIVIDER,
+      placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWERS_DISPLAY',
+      visible: (data) => (data.map.answerType as IV2SideDialogConfigInputSingleDropdown).value !== Constants.ANSWER_TYPES.MARKUP.value
+    });
+    inputs.push({
+      type: V2SideDialogConfigInputType.TOGGLE,
+      name: 'answersDisplay',
+      value: modifyQuestion ?
+        modifyQuestion.answersDisplay :
+        Constants.ANSWERS_DISPLAY.VERTICAL.value,
+      options: (this.activatedRoute.snapshot.data.questionnaireAnswerDisplay as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+      visible: (data) => (data.map.answerType as IV2SideDialogConfigInputSingleDropdown).value !== Constants.ANSWER_TYPES.MARKUP.value
+    });
+
+    // inactive & required & multi answer
+    inputs.push({
+      type: V2SideDialogConfigInputType.ROW,
+      name: 'inactive_required_multi_answer',
+      inputs: [
+        // inactive
+        {
+          type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+          name: 'inactive',
+          placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_INACTIVE',
+          value: modifyQuestion ?
+            modifyQuestion.inactive :
+            false
+        },
+
+        // required
+        {
+          type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+          name: 'required',
+          placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED',
+          value: modifyQuestion ?
+            modifyQuestion.required :
+            false,
+          visible: (data) => (data.map.answerType as IV2SideDialogConfigInputSingleDropdown).value !== Constants.ANSWER_TYPES.MARKUP.value
+        },
+
+        // multi answer
+        {
+          type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+          name: 'multiAnswer',
+          placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER',
+          value: modifyQuestion ?
+            modifyQuestion.multiAnswer :
+            false,
+          visible: (data) => (data.map.answerType as IV2SideDialogConfigInputSingleDropdown).value !== Constants.ANSWER_TYPES.MARKUP.value
+        }
+      ]
+    });
+
+    // show dialog
+    this.dialogV2Service
+      .showSideDialog({
+        title: {
+          get: () => modifyQuestion ?
+            'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_MODIFY' :
+            'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW'
+        },
+        hideInputFilter: true,
+        dontCloseOnBackdrop: true,
+        width: '50rem',
+        bottomButtons: [{
+          type: IV2SideDialogConfigButtonType.OTHER,
+          label: 'LNG_COMMON_BUTTON_SAVE',
+          color: 'primary',
+          key: 'apply',
+          disabled: (_data, handler): boolean => {
+            return !handler.form || handler.form.invalid;
+          }
+        }, {
+          type: IV2SideDialogConfigButtonType.CANCEL,
+          label: 'LNG_COMMON_BUTTON_CANCEL',
+          color: 'text'
+        }],
+        inputs
+      })
+      .subscribe((response) => {
+        // cancelled ?
+        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+          // finished
+          return;
+        }
+
+        // add / update question
+        if (add) {
+          // create question
+          const formData = this.formHelperService.getFields(response.handler.form);
+          const question: QuestionModel = new QuestionModel(formData);
+
+          console.log(formData);
+          console.log(question);
+
+          // // to value ?
+          // if (!parent) {
+          //   this.value
+          // }
+        }
+      });
+  }
+
+  /**
+   * Add question
+   */
+  addQuestion(parent: AnswerModel): void {
+    this.showAddModifyQuestion(
+      true,
+      parent,
+      undefined
+    );
+  }
+
+  /**
+   * Edit question
+   */
+  editQuestion(question: QuestionModel): void {
+    this.showAddModifyQuestion(
+      false,
+      undefined,
+      question
+    );
   }
 }

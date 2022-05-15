@@ -1,86 +1,139 @@
 <div
   class="gd-form-edit-questionnaire-v2">
 
+  <!-- Top -->
+  <div
+    class="gd-form-edit-questionnaire-v2-top"
+    fxLayoutAlign="end">
+    <button
+      type="button"
+      mat-flat-button
+      color="primary"
+      (click)="addQuestion(undefined)">
+      {{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW' | translate}}
+    </button>
+  </div>
+
   <!-- Records -->
-  <cdk-virtual-scroll-viewport
-    #cdkViewport
-    class="gd-form-edit-questionnaire-v2-list gd-form-edit-questionnaire-v2-list-{{name}}"
-    cdkDropList [cdkDropListData]="flattenedQuestions" [cdkDropListSortPredicate]="canDrop" (cdkDropListDropped)="dropItem($event)"
-
-    change123
-    [itemSize]="32"
-    [minBufferPx]="maxBufferPx ? maxBufferPx : bufferToRender"
-    [maxBufferPx]="maxBufferPx ? maxBufferPx : bufferToRender"
-    style="height: 350px">
-
-    <!-- Item -->
-    <div
-      *cdkVirtualFor="let item of flattenedQuestions; templateCacheSize: 0"
-      class="gd-form-edit-questionnaire-v2-item"
-      cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".gd-form-edit-questionnaire-v2-list-{{name}}" [cdkDragData]="item" (cdkDragStarted)="dragStarted($event)"
-      [ngSwitch]="item.type"
+  <div
+    class="gd-form-edit-questionnaire-v2-list">
+    <cdk-virtual-scroll-viewport
+      #cdkViewport
+      class="gd-form-edit-questionnaire-v2-list-{{name}}"
+      cdkDropList [cdkDropListData]="flattenedQuestions" [cdkDropListSortPredicate]="canDrop" (cdkDropListDropped)="dropItem($event)"
 
       change123
-      [style.paddingLeft.px]="item.level * 20"
-      style="height: 32px">
+      [itemSize]="32"
+      [minBufferPx]="maxBufferPx ? maxBufferPx : bufferToRender"
+      [maxBufferPx]="maxBufferPx ? maxBufferPx : bufferToRender"
+      style="height: 350px">
 
-      <!-- Question -->
+      <!-- Item -->
       <div
-        *ngSwitchCase="FlattenType.QUESTION"
-        class="gd-form-edit-questionnaire-v2-item-question"
+        *cdkVirtualFor="let item of flattenedQuestions; templateCacheSize: 0"
+        class="gd-form-edit-questionnaire-v2-item"
+        cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".gd-form-edit-questionnaire-v2-list-{{name}}" [cdkDragData]="item" (cdkDragStarted)="dragStarted($event)"
+        [ngSwitch]="item.type"
 
         change123
-        fxLayout="row">
+        [style.paddingLeft.px]="item.level * 20"
+        style="height: 32px">
 
-        <!-- Sort -->
-        <mat-icon
-          cdkDragHandle
-          (mousedown)="notInvalidDragZone()">drag_indicator</mat-icon>
-
-        <!-- Type -->
-        <mat-icon
-          change123
-          fxGrow="0">help_center</mat-icon>
-
-        <!-- Label -->
+        <!-- Question -->
         <div
+          *ngSwitchCase="FlattenType.QUESTION"
+          class="gd-form-edit-questionnaire-v2-item-question"
+
           change123
-          fxFlex>
-          {{item.data.text | translate}}
+          fxLayout="row">
+
+          <!-- Sort -->
+          <mat-icon
+            cdkDragHandle
+            (mousedown)="notInvalidDragZone()">drag_indicator</mat-icon>
+
+          <!-- Type -->
+          <mat-icon
+            change123
+            fxGrow="0">help_center</mat-icon>
+
+          <!-- Label -->
+          <div
+            change123
+            fxFlex>
+            {{item.data.text | translate}}
+          </div>
+
+          <!-- Buttons -->
+          <div
+            change123
+            fxGrow="0">
+
+            <!-- Add answer -->
+            <button
+              type="button"
+              mat-icon-button
+              [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW' | translate">
+              <mat-icon>text_increase</mat-icon>
+            </button>
+
+            <!-- Edit question -->
+            <!-- TODO -->
+
+          </div>
+
+        </div>
+
+        <!-- Answer -->
+        <div
+          *ngSwitchCase="FlattenType.ANSWER"
+          class="gd-form-edit-questionnaire-v2-item-answer"
+
+          change123
+          fxLayout="row">
+
+          <!-- Sort -->
+          <mat-icon
+            cdkDragHandle
+            (mousedown)="notInvalidDragZone()">drag_indicator</mat-icon>
+
+          <!-- Type -->
+          <mat-icon
+            change123
+            fxGrow="0">font_download</mat-icon>
+
+          <!-- Label -->
+          <div
+            change123
+            fxFlex>
+            {{item.data.label | translate}}
+          </div>
+
+          <!-- Buttons -->
+          <div
+            change123
+            fxGrow="0">
+
+            <!-- Add question -->
+            <button
+              type="button"
+              mat-icon-button
+              [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW' | translate"
+              (click)="addQuestion(item.data)">
+              <mat-icon>add_comment</mat-icon>
+            </button>
+
+            <!-- Edit answer -->
+            <!-- TODO -->
+
+          </div>
+
         </div>
 
       </div>
 
-      <!-- Answer -->
-      <div
-        *ngSwitchCase="FlattenType.ANSWER"
-        class="gd-form-edit-questionnaire-v2-item-answer"
-
-        change123
-        fxLayout="row">
-
-        <!-- Sort -->
-        <mat-icon
-          cdkDragHandle
-          (mousedown)="notInvalidDragZone()">drag_indicator</mat-icon>
-
-        <!-- Type -->
-        <mat-icon
-          change123
-          fxGrow="0">font_download</mat-icon>
-
-        <!-- Label -->
-        <div
-          change123
-          fxFlex>
-          {{item.data.label | translate}}
-        </div>
-
-      </div>
-
-    </div>
-
-  </cdk-virtual-scroll-viewport>
+    </cdk-virtual-scroll-viewport>
+  </div>
 
   <!-- Legend -->
   <div
@@ -154,6 +207,30 @@
 
         <!-- Label -->
         <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT' | translate}}</span>
+
+      </div>
+
+      <!-- Add question -->
+      <div
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+
+        <!-- Icon -->
+        <mat-icon>add_comment</mat-icon>
+
+        <!-- Label -->
+        <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW' | translate}}</span>
+
+      </div>
+
+      <!-- Add answers -->
+      <div
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+
+        <!-- Icon -->
+        <mat-icon>text_increase</mat-icon>
+
+        <!-- Label -->
+        <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW' | translate}}</span>
 
       </div>
 

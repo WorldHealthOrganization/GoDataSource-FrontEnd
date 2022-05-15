@@ -22,10 +22,12 @@ export enum V2SideDialogConfigInputType {
   DIVIDER,
   CHECKBOX,
   TEXT,
+  TEXTAREA,
   NUMBER,
   DROPDOWN_SINGLE,
   DROPDOWN_MULTI,
   TOGGLE,
+  TOGGLE_CHECKBOX,
   LINK,
   LINK_WITH_ACTION,
   GROUP,
@@ -140,6 +142,16 @@ export interface IV2SideDialogConfigInputText extends IV2SideDialogConfigInput {
 }
 
 /**
+ * Side dialog input - textarea
+ */
+export interface IV2SideDialogConfigInputTextarea extends IV2SideDialogConfigInput {
+  // required
+  type: V2SideDialogConfigInputType.TEXTAREA;
+  placeholder: string;
+  value: string;
+}
+
+/**
  * Side dialog input - dropdown single
  */
 export interface IV2SideDialogConfigInputSingleDropdown extends IV2SideDialogConfigInput {
@@ -179,6 +191,16 @@ export interface IV2SideDialogConfigInputToggle extends IV2SideDialogConfigInput
 
   // never
   placeholder?: never;
+}
+
+/**
+ * Side dialog input - toggle checkbox
+ */
+export interface IV2SideDialogConfigInputToggleCheckbox extends IV2SideDialogConfigInput {
+  // required
+  type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX;
+  placeholder: string;
+  value: boolean;
 }
 
 /**
@@ -336,8 +358,9 @@ export interface IV2SideDialogConfigInputFilterList extends IV2SideDialogConfigI
 /**
  * Side dialog inputs
  */
-export type V2SideDialogConfigInputFromInput = IV2SideDialogConfigInputCheckbox | IV2SideDialogConfigInputText | IV2SideDialogConfigInputSingleDropdown
-| IV2SideDialogConfigInputMultiDropdown | IV2SideDialogConfigInputToggle | IV2SideDialogConfigInputNumber;
+export type V2SideDialogConfigInputFromInput = IV2SideDialogConfigInputCheckbox | IV2SideDialogConfigInputText | IV2SideDialogConfigInputTextarea
+| IV2SideDialogConfigInputSingleDropdown | IV2SideDialogConfigInputMultiDropdown | IV2SideDialogConfigInputToggle | IV2SideDialogConfigInputToggleCheckbox
+| IV2SideDialogConfigInputNumber;
 export type V2SideDialogConfigInput = IV2SideDialogConfigInputDivider | IV2SideDialogConfigInputKeyValue | IV2SideDialogConfigInputHTML
 | V2SideDialogConfigInputFromInput | IV2SideDialogConfigInputLink | IV2SideDialogConfigInputLinkWithAction | IV2SideDialogConfigInputGroup
 | IV2SideDialogConfigInputButton | IV2SideDialogConfigInputRow | IV2SideDialogConfigInputAccordion | IV2SideDialogConfigInputFilterList;

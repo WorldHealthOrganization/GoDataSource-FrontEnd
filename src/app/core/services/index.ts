@@ -105,6 +105,9 @@ import { EntityLabResultService } from './helper/entity-lab-result-helper.servic
 import { SecurityQuestionDataResolver } from './resolvers/data/security-question.resolver';
 import { MapVectorTypeDataResolver } from './resolvers/data/map-vector-type.resolver';
 import { OutbreakTemplateDataResolver } from './resolvers/data/outbreak-template.resolver';
+import { QuestionnaireAnswerTypeDataResolver } from './resolvers/data/questionnaire-answer-type.resolver';
+import { QuestionnaireQuestionCategoryDataResolver } from './resolvers/data/questionnaire-question-category.resolver';
+import { QuestionnaireAnswerDisplayDataResolver } from './resolvers/data/questionnaire-answer-display.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -146,6 +149,9 @@ export const services: any[] = [
   PersonDateTypeDataResolver,
   PersonTypeDataResolver,
   PregnancyStatusDataResolver,
+  QuestionnaireAnswerDisplayDataResolver,
+  QuestionnaireAnswerTypeDataResolver,
+  QuestionnaireQuestionCategoryDataResolver,
   RelationshipPersonDataResolver,
   RiskDataResolver,
   SecurityQuestionDataResolver,

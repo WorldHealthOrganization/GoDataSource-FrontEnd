@@ -18,6 +18,9 @@ import { OutbreakDataResolver } from '../../core/services/resolvers/data/outbrea
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { MapVectorTypeDataResolver } from '../../core/services/resolvers/data/map-vector-type.resolver';
 import { OutbreakTemplateDataResolver } from '../../core/services/resolvers/data/outbreak-template.resolver';
+import { QuestionnaireAnswerTypeDataResolver } from '../../core/services/resolvers/data/questionnaire-answer-type.resolver';
+import { QuestionnaireQuestionCategoryDataResolver } from '../../core/services/resolvers/data/questionnaire-question-category.resolver';
+import { QuestionnaireAnswerDisplayDataResolver } from '../../core/services/resolvers/data/questionnaire-answer-display.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -31,7 +34,10 @@ const createViewModifyFoundation: Route = {
     yesNo: YesNoDataResolver,
     mapVectorType: MapVectorTypeDataResolver,
     user: UserDataResolver,
-    outbreakTemplate: OutbreakTemplateDataResolver
+    outbreakTemplate: OutbreakTemplateDataResolver,
+    questionnaireAnswerType: QuestionnaireAnswerTypeDataResolver,
+    questionnaireQuestionCategory: QuestionnaireQuestionCategoryDataResolver,
+    questionnaireAnswerDisplay: QuestionnaireAnswerDisplayDataResolver
   }
 };
 
