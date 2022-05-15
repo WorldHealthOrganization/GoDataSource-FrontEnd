@@ -3,6 +3,7 @@
 
   <!-- Input data -->
   <mat-form-field
+    *ngIf="!viewOnly; else viewOnlyTemplate"
     appearance="outline">
 
     <!-- Place holder -->
@@ -85,4 +86,44 @@
     </mat-error>
 
   </mat-form-field>
+
+  <!-- View only -->
+  <ng-template
+    #viewOnlyTemplate>
+    <div
+      fxLayout="row" fxLayoutGap="1.6rem"
+      class="gd-form-select-location-multiple-v2-viewonly">
+      <!-- Label -->
+      <div
+        class="gd-form-select-location-multiple-v2-viewonly-label">
+        {{ placeholder | translate }}:
+      </div>
+
+      <!-- Value -->
+      <div
+        class="gd-form-select-location-multiple-v2-viewonly-value">
+        <!-- Has value -->
+        <ng-container
+          *ngIf="value?.length > 0; else noValue">
+          <ng-container
+            *ngFor="let selectedLocation of selectedLocations; let selectedIndex = index">
+
+            <!-- separator -->
+            <ng-container
+              *ngIf="selectedIndex > 0">, </ng-container>
+
+            <!-- Label -->
+            {{selectedLocation.label}}
+
+          </ng-container>
+        </ng-container>
+
+        <!-- Doesn't have value -->
+        <ng-template
+          #noValue>
+          {{noValueLabel}}
+        </ng-template>
+      </div>
+    </div>
+  </ng-template>
 </div>

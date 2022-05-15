@@ -40,20 +40,40 @@ export class PersonDataResolver implements Resolve<CaseModel | ContactModel | Ev
         this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID),
         route.params.contactId
       );
+    } else if (route.queryParams.contactId) {
+      request = this.contactDataService.getContact(
+        this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID),
+        route.queryParams.contactId
+      );
     } else if (route.params.caseId) {
       request = this.caseDataService.getCase(
         this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID),
         route.params.caseId
+      );
+    } else if (route.queryParams.caseId) {
+      request = this.caseDataService.getCase(
+        this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID),
+        route.queryParams.caseId
       );
     } else if (route.params.eventId) {
       request = this.eventDataService.getEvent(
         this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID),
         route.params.eventId
       );
+    } else if (route.queryParams.eventId) {
+      request = this.eventDataService.getEvent(
+        this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID),
+        route.queryParams.eventId
+      );
     } else if (route.params.contactOfContactId) {
       request = this.contactsOfContactsDataService.getContactOfContact(
         this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID),
         route.params.contactOfContactId
+      );
+    } else if (route.queryParams.contactOfContactId) {
+      request = this.contactsOfContactsDataService.getContactOfContact(
+        this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID),
+        route.queryParams.contactOfContactId
       );
     }
 

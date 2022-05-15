@@ -338,7 +338,7 @@
 
               <!-- Edit -->
               <a
-                *ngIf="isView && selectedOutbreakIsActive && tabData.buttons.modify && (!tabData.buttons.modify.visible || tabData.buttons.modify.visible())"
+                *ngIf="isView && allowEdit && tabData.buttons.modify && (!tabData.buttons.modify.visible || tabData.buttons.modify.visible())"
                 type="button"
                 mat-flat-button color="primary"
                 [routerLink]="tabData.buttons.modify.link.link()"
@@ -356,10 +356,12 @@
 
           <!-- Section render -->
           <ng-template
-            #sectionsRender
+            #formRender
             let-tab="tab">
             <form
-              #form="ngForm">
+              #form="ngForm"
+              [ngSwitch]="tab.type">
+
               <!-- Hack to set form :) -->
               {{ updateForm(tab, form) }}
 
@@ -377,7 +379,12 @@
                   [class.gd-create-view-modify-bottom-section-content-input-has-textarea]="input.type === CreateViewModifyV2TabInputType.TEXTAREA"
                   [class.gd-create-view-modify-bottom-section-content-input-has-age-dob]="input.type === CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH"
                   [class.gd-create-view-modify-bottom-section-content-input-has-list]="input.type === CreateViewModifyV2TabInputType.LIST"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-edit-questionnaire]="input.type === CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE"
                   [ngSwitch]="input.type">
+
+                  <!-- Edit questionnaire -->
+                  <app-form-edit-questionnaire-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE"></app-form-edit-questionnaire-v2>
 
                   <!-- Text -->
                   <app-form-input-v2
@@ -392,6 +399,28 @@
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                     autocomplete="off"
                     [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
+                    app-regex-validator
+                    [regexExpr]="!isView && input.validators?.regex ? input.validators?.regex().expression : undefined"
+                    [regexExprFlags]="!isView && input.validators?.regex ? input.validators?.regex().flags : undefined"
+                    [regexExprMsg]="!isView && input.validators?.regex ? input.validators?.regex().msg : undefined"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-input-v2>
+
+                  <!-- Async validator text -->
+                  <app-form-input-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [placeholder]="input.placeholder()"
+                    [tooltip]="input.description ? input.description() : undefined"
+                    [viewOnly]="isView || !input.value.set"
+                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    [suffixIconButtons]="input.suffixIconButtons"
+                    autocomplete="off"
+                    [required]="!isView && input.validators.required ? input.validators.required() : undefined"
+                    app-general-async-validator
+                    [asyncValidatorObservable]="!isView ? input.validators.async : undefined"
+                    [maxlength]="255"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-input-v2>
 
                   <!-- Password -->
@@ -474,6 +503,19 @@
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-select-location-single-v2>
 
+                  <!-- Location multiple -->
+                  <app-form-select-location-multiple-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.LOCATION_MULTIPLE"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [placeholder]="input.placeholder()"
+                    [viewOnly]="isView || !input.value.set"
+                    [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
+                    [useOutbreakLocations]="input.useOutbreakLocations"
+                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-select-location-multiple-v2>
+
                   <!-- Textarea -->
                   <app-form-textarea-v2
                     *ngSwitchCase="CreateViewModifyV2TabInputType.TEXTAREA"
@@ -485,6 +527,21 @@
                     [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-textarea-v2>
+
+                  <!-- Number -->
+                  <app-form-number-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.NUMBER"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [placeholder]="input.placeholder()"
+                    [tooltip]="input.description ? input.description() : undefined"
+                    [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
+                    [viewOnly]="isView || !input.value.set"
+                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    autocomplete="off"
+                    [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-number-v2>
 
                   <!-- Age - Dob -->
                   <div
@@ -565,24 +622,6 @@
                         (ngModelChange)="input.value.dob.set($event)"></app-form-date-v2>
                     </ng-template>
                   </div>
-
-                  <!-- Visual ID -->
-                  <app-form-input-v2
-                    *ngSwitchCase="CreateViewModifyV2TabInputType.VISUAL_ID"
-                    fxFlex
-                    [ngModel]="input.value.get(parentItemIndex)"
-                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
-                    [placeholder]="input.placeholder()"
-                    [tooltip]="input.description ? input.description() : undefined"
-                    [viewOnly]="isView || !input.value.set"
-                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
-                    [suffixIconButtons]="input.suffixIconButtons"
-                    autocomplete="off"
-                    app-general-async-validator
-                    [asyncValidatorObservable]="!isView ? input.validator : undefined"
-                    [validateOnlyWhenDirty]="true"
-                    [maxlength]="255"
-                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-input-v2>
 
                   <!-- Date -->
                   <app-form-date-v2
@@ -872,6 +911,76 @@
 
                   </div>
 
+                  <!-- Map server -->
+                  <div
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.MAP_SERVER"
+                    fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem"
+                    class="gd-create-view-modify-bottom-section-content-input-list-multiple-rows"
+                    [ngModelGroup]="parentName !== undefined ? parentName + '[' + parentItemIndex + ']' : input.name">
+
+                    <!-- Name -->
+                    <app-form-input-v2
+                      [(ngModel)]="input.value.get(parentItemIndex).name"
+                      name="name"
+                      placeholder="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_NAME"
+                      tooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_NAME_DESCRIPTION"
+                      [viewOnly]="isView"
+                      required="true"></app-form-input-v2>
+
+                    <!-- Vector type -->
+                    <app-form-select-single-v2
+                      [(ngModel)]="input.value.get(parentItemIndex).type"
+                      name="type"
+                      placeholder="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_TYPE"
+                      tooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_TYPE_DESCRIPTION"
+                      [viewOnly]="isView"
+                      [options]="input.vectorTypeOptions"></app-form-select-single-v2>
+
+                    <!-- Url -->
+                    <app-form-input-v2
+                      [(ngModel)]="input.value.get(parentItemIndex).url"
+                      name="url"
+                      placeholder="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_URL"
+                      tooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_URL_DESCRIPTION"
+                      [viewOnly]="isView"
+                      required="true"></app-form-input-v2>
+
+                    <!-- Show only if specific type -->
+                    <ng-container
+                      *ngIf="input.value.get(parentItemIndex).type === Constants.OUTBREAK_MAP_SERVER_TYPES.VECTOR_TILE_VECTOR_TILE_LAYER.value">
+
+                      <!-- Style Url -->
+                      <app-form-input-v2
+                        [(ngModel)]="input.value.get(parentItemIndex).styleUrl"
+                        name="styleUrl"
+                        placeholder="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_STYLE"
+                        tooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_STYLE_DESCRIPTION"
+                        [viewOnly]="isView"
+                        app-general-async-validator
+                        [asyncValidatorObservable]="input.styleAsyncValidator(input, parentItemIndex)"></app-form-input-v2>
+
+                      <!-- Style source -->
+                      <app-form-select-single-v2
+                        [(ngModel)]="input.value.get(parentItemIndex).styleUrlSource"
+                        name="styleUrlSource"
+                        placeholder="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_STYLE_SOURCE"
+                        tooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_STYLE_SOURCE_DESCRIPTION"
+                        [viewOnly]="isView"
+                        [options]="input.styleSourceOptions[input.value.get(parentItemIndex).styleUrl]"
+                        [required]="!!input.value.get(parentItemIndex).styleUrl"></app-form-select-single-v2>
+
+                    </ng-container>
+
+                  </div>
+
+                  <!-- Label -->
+                  <div
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.LABEL"
+                    fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem"
+                    class="gd-create-view-modify-bottom-section-content-input-label">
+                    {{input.value.get() | translate}}
+                  </div>
+
                   <!-- List -->
                   <div
                     *ngSwitchCase="CreateViewModifyV2TabInputType.LIST">
@@ -884,20 +993,35 @@
 
                     <!-- List Items -->
                     <div
-                      class="gd-create-view-modify-bottom-section-content-input-list">
+                      class="gd-create-view-modify-bottom-section-content-input-list"
+                      cdkDropList [cdkDropListData]="input.items" (cdkDropListDropped)="dropItem($event, input)">
 
                       <!-- Display items -->
                       <ng-container
                         *ngIf="!isView || input.items?.length > 0; else emptyList">
                         <div
                           *ngFor="let item of input.items; let itemIndex = index; trackBy: trackByIndex"
-                          class="gd-create-view-modify-bottom-section-content-input-list-item">
+                          class="gd-create-view-modify-bottom-section-content-input-list-item"
+                          cdkDrag (cdkDragStarted)="dragStarted()" [cdkDragData]="item">
 
-                          <!-- Remove button -->
+                          <!-- Sort & Remove buttons -->
                           <div
                             *ngIf="!isView"
                             fxLayoutAlign="end"
                             class="gd-create-view-modify-bottom-section-content-input-list-item-delete">
+
+                            <!-- Sort -->
+                            <button
+                              *ngIf="input.sortable"
+                              cdkDragHandle
+                              type="button"
+                              mat-icon-button
+                              [matTooltip]="'LNG_COMMON_BUTTON_DRAG' | translate"
+                              (mousedown)="notInvalidDragZone()">
+                              <mat-icon>drag_handle</mat-icon>
+                            </button>
+
+                            <!-- Remove -->
                             <button
                               type="button"
                               mat-icon-button
@@ -965,33 +1089,87 @@
 
 
               <!-- Render Section -->
-              <div
-                *ngFor="let section of tab.sections"
-                class="gd-create-view-modify-bottom-section">
-                <ng-container
-                  *ngIf="!section.visible || section.visible()">
-                  <!-- Section title -->
-                  <div
-                    class="gd-create-view-modify-bottom-section-title">
-                    {{section.label | translate}}
-                  </div>
+              <ng-container
+                *ngSwitchCase="CreateViewModifyV2TabInputType.TAB">
+                <div
+                  *ngFor="let section of tab.sections"
+                  class="gd-create-view-modify-bottom-section">
+                  <ng-container
+                    *ngIf="!section.visible || section.visible()">
+                    <!-- Section title -->
+                    <div
+                      class="gd-create-view-modify-bottom-section-title">
+                      {{section.label | translate}}
+                    </div>
 
-                  <!-- Section content -->
-                  <div
-                    class="gd-create-view-modify-bottom-section-content"
-                    fxLayout="row wrap" fxLayoutGap="1.6rem">
+                    <!-- Section content -->
+                    <div
+                      class="gd-create-view-modify-bottom-section-content"
+                      fxLayout="row wrap" fxLayoutGap="1.6rem">
 
-                    <!-- Input render -->
-                    <ng-container
-                      *ngFor="let input of section.inputs">
+                      <!-- Input render -->
                       <ng-container
-                        *ngTemplateOutlet="inputRender; context: { input, parentName: '', parentItemIndex: undefined }"></ng-container>
-                    </ng-container>
+                        *ngFor="let input of section.inputs">
+                        <ng-container
+                          *ngTemplateOutlet="inputRender; context: { input, parentName: '', parentItemIndex: undefined }"></ng-container>
+                      </ng-container>
 
-                  </div>
-                </ng-container>
-              </div>
+                    </div>
+                  </ng-container>
+                </div>
+              </ng-container>
+
+              <!-- Render tab table -->
+              <ng-container
+                *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE">
+                <ng-container
+                  *ngTemplateOutlet="inputRender; context: { input: tab.definition, parentName: '', parentItemIndex: undefined }"></ng-container>
+              </ng-container>
+
             </form>
+          </ng-template>
+
+
+
+          <!-- Table render -->
+          <ng-template
+            #tableRender
+            let-tab="tab">
+            <ng-container
+              [ngSwitch]="tab.definition.type">
+
+              <!-- Records list -->
+              <ng-container
+                *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST">
+                <app-list-table-v2
+                  *ngIf="visitedTabs[tab.label]"
+                  #listTable
+                  [records$]="tab.definition.records$"
+                  [columns]="tab.definition.tableColumns"
+                  [pageCount]="tab.definition.pageCount"
+                  [pageSize]="tab.definition.queryBuilder.paginator.limit"
+                  [pageIndex]="tab.definition.pageIndex"
+                  [pageSettingsKey]="tab.definition.pageSettingsKey"
+                  [filtersApplied]="!tab.definition.queryBuilder.isEmptyOnlyFilters()"
+                  [advancedFilterType]="tab.definition.advancedFilterType"
+                  [advancedFilters]="tab.definition.advancedFilters"
+                  (refreshData)="refreshTabList(tab, true)"
+                  (refreshDataCount)="tab.definition.refreshCount(tab, false)"
+                  (pageChange)="tabListPageChange(tab, $event)"
+                  (sortBy)="tabListSortBy(listTable, tab, $event)"
+                  (filterBy)="tabListFilterBy(tab, $event)"
+                  (resetHeaderFilters)="tabListResetHeaderFilters(listTable, tab)"
+                  (advancedFilterBy)="tabListFilterByAdvanced(listTable, tab, $event)">
+                </app-list-table-v2>
+              </ng-container>
+
+              <!-- Edit questionnaire -->
+              <ng-template
+                *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE"
+                [ngTemplateOutlet]="formRender"
+                [ngTemplateOutletContext]="{ tab }"></ng-template>
+
+            </ng-container>
           </ng-template>
 
 
@@ -1003,7 +1181,7 @@
             <ng-container
               *ngFor="let tab of tabData.tabs; let tabIndex = index">
               <mat-step
-                *ngIf="tab.type === CreateViewModifyV2TabInputType.TAB"
+                *ngIf="!tab.visible || tab.visible()"
                 [stepControl]="tab.form">
 
                 <!-- Tab Label -->
@@ -1014,9 +1192,20 @@
 
                 <!-- Content -->
                 <div
-                  class="gd-create-view-modify-bottom-content">
-                  <ng-container
-                    *ngTemplateOutlet="sectionsRender; context: { tab }"></ng-container>
+                  class="gd-create-view-modify-bottom-content"
+                  [ngSwitch]="tab.type">
+
+                  <!-- Tab -->
+                  <ng-template
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.TAB"
+                    [ngTemplateOutlet]="formRender"
+                    [ngTemplateOutletContext]="{ tab }"></ng-template>
+
+                  <!-- Tab table -->
+                  <ng-template
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE"
+                    [ngTemplateOutlet]="tableRender"
+                    [ngTemplateOutletContext]="{ tab }"></ng-template>
                 </div>
 
                 <!-- Bottom -->
@@ -1154,7 +1343,7 @@
               <ng-container
                 *ngFor="let tab of tabData.tabs">
                 <mat-tab
-                  *ngIf="(isView && (!tab.visible || tab.visible())) || tab.type === CreateViewModifyV2TabInputType.TAB"
+                  *ngIf="!tab.visible || tab.visible()"
                   [bodyClass]="tab.type === CreateViewModifyV2TabInputType.TAB_TABLE ? 'gd-create-view-modify-tab-list' : undefined">
 
                   <!-- Label & valid -->
@@ -1173,39 +1362,20 @@
 
                   <!-- Content -->
                   <div
-                    class="gd-create-view-modify-bottom-content">
+                    class="gd-create-view-modify-bottom-content"
+                    [ngSwitch]="tab.type">
 
-                    <!-- Inputs tab -->
-                    <ng-container
-                      *ngIf="tab.type === CreateViewModifyV2TabInputType.TAB; else tableTab">
-                      <ng-container
-                        *ngTemplateOutlet="sectionsRender; context: { tab }"></ng-container>
-                    </ng-container>
+                    <!-- Tab -->
+                    <ng-template
+                      *ngSwitchCase="CreateViewModifyV2TabInputType.TAB"
+                      [ngTemplateOutlet]="formRender"
+                      [ngTemplateOutletContext]="{ tab }"></ng-template>
 
                     <!-- Table tab -->
                     <ng-template
-                      #tableTab>
-                      <app-list-table-v2
-                        *ngIf="visitedTabs[tab.label]"
-                        #listTable
-                        [records$]="tab.records$"
-                        [columns]="tab.tableColumns"
-                        [pageCount]="tab.pageCount"
-                        [pageSize]="tab.queryBuilder.paginator.limit"
-                        [pageIndex]="tab.pageIndex"
-                        [pageSettingsKey]="tab.pageSettingsKey"
-                        [filtersApplied]="!tab.queryBuilder.isEmptyOnlyFilters()"
-                        [advancedFilterType]="tab.advancedFilterType"
-                        [advancedFilters]="tab.advancedFilters"
-                        (refreshData)="refreshTabList(tab, true)"
-                        (refreshDataCount)="tab.refreshCount(tab, false)"
-                        (pageChange)="tabListPageChange(tab, $event)"
-                        (sortBy)="tabListSortBy(listTable, tab, $event)"
-                        (filterBy)="tabListFilterBy(tab, $event)"
-                        (resetHeaderFilters)="tabListResetHeaderFilters(listTable, tab)"
-                        (advancedFilterBy)="tabListFilterByAdvanced(listTable, tab, $event)">
-                      </app-list-table-v2>
-                    </ng-template>
+                      *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE"
+                      [ngTemplateOutlet]="tableRender"
+                      [ngTemplateOutletContext]="{ tab }"></ng-template>
                   </div>
                 </mat-tab>
               </ng-container>

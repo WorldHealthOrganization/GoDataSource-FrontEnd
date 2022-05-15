@@ -19,7 +19,6 @@ import { LocationBreadcrumbsComponent } from './location-breadcrumbs/location-br
 import { FormAgeComponent } from './form-age/form-age.component';
 import { AgeLabelComponent } from './age-label/age-label.component';
 import { FormAgeDobComponent } from './form-age-dob/form-age-dob.component';
-import { FormNameUrlListComponent } from './form-name-url-list/form-name-url-list.component';
 import { FormRelationshipQuickComponent } from './form-relationship-quick/form-relationship-quick.component';
 import { ModifyContactFollowUpQuestionnaireDialogComponent } from './modify-contact-follow-up-questionnaire-dialog/modify-contact-follow-up-questionnaire-dialog.component';
 import { ColorListLegendComponent } from './color-list-legend/color-list-legend.component';
@@ -74,7 +73,6 @@ export const components: any[] = [
   FormRangeComponent,
   FormRelationshipComponent,
   FormInputListComponent,
-  FormNameUrlListComponent,
   FormModifyQuestionnaireComponent,
   FormFillQuestionnaireComponent,
   FormAgeComponent,

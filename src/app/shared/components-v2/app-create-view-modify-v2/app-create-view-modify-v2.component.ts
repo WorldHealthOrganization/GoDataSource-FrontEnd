@@ -30,6 +30,7 @@ import { applyFilterBy, applyResetOnAllFilters, applySortBy } from '../app-list-
 import { AppListTableV2Component } from '../app-list-table-v2/app-list-table-v2.component';
 import { PageEvent } from '@angular/material/paginator';
 import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 /**
  * Component
@@ -56,7 +57,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   }
 
   // selected outbreak is active ?
-  @Input() selectedOutbreakIsActive: boolean;
+  @Input() allowEdit: boolean;
 
   // loading data
   @Input() loadingPage: boolean;
@@ -90,9 +91,11 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
       }
 
       // attach update ui method
-      tab.updateUI = () => {
-        this.detectChanges();
-      };
+      if (tab.definition.type === CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST) {
+        tab.definition.updateUI = () => {
+          this.detectChanges();
+        };
+      }
     });
   }
   get tabData(): ICreateViewModifyV2 {
@@ -132,10 +135,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
     // check forms
     for (let index: number = 0; index < this.tabData.tabs.length; index++) {
-      if (
-        this.tabData.tabs[index].type === CreateViewModifyV2TabInputType.TAB &&
-        (this.tabData.tabs[index] as ICreateViewModifyV2Tab).form?.pending
-      ) {
+      if (this.tabData.tabs[index].form?.pending) {
         return true;
       }
     }
@@ -276,6 +276,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   visitedTabs: {
     [tabLabel: string]: true
   } = {};
+
+  // invalid drag zone
+  isInvalidDragEvent: boolean = true;
 
   // render mode
   renderMode: RenderMode = RenderMode.FULL;
@@ -458,7 +461,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    * Update form
    */
   updateForm(
-    tab: ICreateViewModifyV2Tab,
+    tab: ICreateViewModifyV2Tab | ICreateViewModifyV2TabTable,
     form: NgForm
   ): void {
     tab.form = form;
@@ -512,8 +515,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   markFormsAsPristine(): void {
     // mark all forms as pristine
     (this.tabData?.tabs || [])
-      .filter((tab) => tab.type === CreateViewModifyV2TabInputType.TAB)
-      .forEach((tab: ICreateViewModifyV2Tab) => {
+      .forEach((tab) => {
         // nothing to do ?
         if (!tab.form) {
           return;
@@ -530,8 +532,8 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   create(): void {
     // determine forms
     const forms: NgForm[] = this.tabData.tabs
-      .filter((tab) => tab.type === CreateViewModifyV2TabInputType.TAB)
-      .map((tab: ICreateViewModifyV2Tab) => tab.form).filter((item) => !!item);
+      .map((tab) => tab.form)
+      .filter((item) => !!item);
 
     // validate
     if (!this.formHelper.isFormsSetValid(forms)) {
@@ -557,8 +559,8 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   modify(): void {
     // determine forms
     const forms: NgForm[] = this.tabData.tabs
-      .filter((tab) => tab.type === CreateViewModifyV2TabInputType.TAB)
-      .map((tab: ICreateViewModifyV2Tab) => tab.form).filter((item) => !!item);
+      .map((tab) => tab.form)
+      .filter((item) => !!item);
 
     // submit to validate forms
     forms.forEach((form) => {
@@ -846,19 +848,29 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     tab: ICreateViewModifyV2TabTable,
     instant: boolean
   ): void {
+    // applies only for records lists
+    if (tab.definition.type !== CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST) {
+      return;
+    }
+
     // cancel previous request
-    if (tab.previousRefreshRequest) {
-      clearTimeout(tab.previousRefreshRequest);
-      tab.previousRefreshRequest = undefined;
+    if (tab.definition.previousRefreshRequest) {
+      clearTimeout(tab.definition.previousRefreshRequest);
+      tab.definition.previousRefreshRequest = undefined;
     }
 
     // refresh
     if (instant) {
-      tab.refresh(tab);
+      tab.definition.refresh(tab);
     } else {
-      tab.previousRefreshRequest = setTimeout(() => {
+      tab.definition.previousRefreshRequest = setTimeout(() => {
+        // applies only for records lists
+        if (tab.definition.type !== CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST) {
+          return;
+        }
+
         // refresh
-        tab.refresh(tab);
+        tab.definition.refresh(tab);
       }, Constants.DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS);
     }
   }
@@ -891,11 +903,16 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     tab: ICreateViewModifyV2TabTable,
     page: PageEvent
   ): void {
+    // applies only for records lists
+    if (tab.definition.type !== CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST) {
+      return;
+    }
+
     // update API pagination params
-    tab.queryBuilder.paginator.setPage(page);
+    tab.definition.queryBuilder.paginator.setPage(page);
 
     // update page index
-    tab.pageIndex = tab.queryBuilder.paginator.skip / tab.queryBuilder.paginator.limit;
+    tab.definition.pageIndex = tab.definition.queryBuilder.paginator.skip / tab.definition.queryBuilder.paginator.limit;
 
     // refresh list
     this.refreshTabList(
@@ -915,10 +932,15 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
       direction: RequestSortDirection
     }
   ): void {
+    // applies only for records lists
+    if (tab.definition.type !== CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST) {
+      return;
+    }
+
     // apply sort
     applySortBy(
       data,
-      tab.queryBuilder,
+      tab.definition.queryBuilder,
       listTable.advancedFiltersQueryBuilder,
       undefined
     );
@@ -940,9 +962,14 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
       valueOverwrite?: any
     }
   ): void {
+    // applies only for records lists
+    if (tab.definition.type !== CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST) {
+      return;
+    }
+
     // filter
     applyFilterBy(
-      tab.queryBuilder,
+      tab.definition.queryBuilder,
       data.column,
       data.valueOverwrite
     );
@@ -961,11 +988,16 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     listTable: AppListTableV2Component,
     tab: ICreateViewModifyV2TabTable
   ): void {
+    // applies only for records lists
+    if (tab.definition.type !== CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST) {
+      return;
+    }
+
     // clear query builder of conditions and sorting criteria
-    tab.queryBuilder.clear();
+    tab.definition.queryBuilder.clear();
 
     // clear table filters
-    applyResetOnAllFilters(tab.tableColumns);
+    applyResetOnAllFilters(tab.definition.tableColumns);
     listTable.updateColumnDefinitions();
 
     // reset table sort columns
@@ -976,18 +1008,18 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     );
 
     // initialize query paginator
-    tab.queryBuilder.paginator.setPage({
-      pageSize: tab.queryBuilder.paginator.limit,
+    tab.definition.queryBuilder.paginator.setPage({
+      pageSize: tab.definition.queryBuilder.paginator.limit,
       pageIndex: 0
     }, true);
 
     // update page index
-    tab.pageIndex = 0;
+    tab.definition.pageIndex = 0;
 
     // retrieve Side filters
     let queryBuilder;
     if ((queryBuilder = listTable.advancedFiltersQueryBuilder)) {
-      tab.queryBuilder.merge(queryBuilder);
+      tab.definition.queryBuilder.merge(queryBuilder);
     }
 
     // if no side query builder then clear side filters too
@@ -1010,11 +1042,16 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     tab: ICreateViewModifyV2TabTable,
     queryBuilder?: RequestQueryBuilder
   ): void {
+    // applies only for records lists
+    if (tab.definition.type !== CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST) {
+      return;
+    }
+
     // clear query builder of conditions and sorting criteria
-    tab.queryBuilder.clear();
+    tab.definition.queryBuilder.clear();
 
     // clear table filters
-    applyResetOnAllFilters(tab.tableColumns);
+    applyResetOnAllFilters(tab.definition.tableColumns);
     listTable.updateColumnDefinitions();
 
     // reset table sort columns
@@ -1025,17 +1062,17 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     );
 
     // initialize query paginator
-    tab.queryBuilder.paginator.setPage({
-      pageSize: tab.queryBuilder.paginator.limit,
+    tab.definition.queryBuilder.paginator.setPage({
+      pageSize: tab.definition.queryBuilder.paginator.limit,
       pageIndex: 0
     }, true);
 
     // update page index
-    tab.pageIndex = 0;
+    tab.definition.pageIndex = 0;
 
     // merge query builder with side filters
     if (queryBuilder) {
-      tab.queryBuilder.merge(queryBuilder);
+      tab.definition.queryBuilder.merge(queryBuilder);
     }
 
     // refresh
@@ -1052,5 +1089,44 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   private updateRenderMode(): void {
     // determine render mode
     this.renderMode = determineRenderMode();
+  }
+
+  /**
+   * Started the drag from a zone that isn't allowed
+   */
+  notInvalidDragZone(): void {
+    this.isInvalidDragEvent = false;
+  }
+
+  /**
+   * Drop item
+   */
+  dropItem(event: CdkDragDrop<any[]>, input: ICreateViewModifyV2TabInputList): void {
+    if (this.isInvalidDragEvent) {
+      return;
+    }
+
+    // disable drag
+    this.isInvalidDragEvent = true;
+    moveItemInArray(
+      input.items,
+      event.previousIndex,
+      event.currentIndex
+    );
+
+    // changed
+    input.itemsChanged(input);
+
+    // update ui
+    this.detectChanges();
+  }
+
+  /**
+   * Drag started
+   */
+  dragStarted(): void {
+    if (this.isInvalidDragEvent) {
+      document.dispatchEvent(new Event('mouseup'));
+    }
   }
 }

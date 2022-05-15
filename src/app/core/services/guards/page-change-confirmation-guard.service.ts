@@ -8,7 +8,6 @@ import { DialogV2Service } from '../helper/dialog-v2.service';
 import { MatBottomSheetRef } from '@angular/material/bottom-sheet/bottom-sheet-ref';
 import { AppBottomDialogV2Component } from '../../../shared/components-v2/app-bottom-dialog-v2/app-bottom-dialog-v2.component';
 import { IV2BottomDialogConfigButtonType, IV2BottomDialogResponse } from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
-import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Tab } from '../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 
 /**
  * Extended by components that use ngForms to determine the dirtiness of a component & need confirmation before leaving a page
@@ -70,8 +69,7 @@ export class ConfirmOnFormChanges {
     // determine forms
     const canDeactivateForms: NgForm[] = [];
     (this.createViewModifyComponent.tabData?.tabs || [])
-      .filter((tab) => tab.type === CreateViewModifyV2TabInputType.TAB)
-      .forEach((tab: ICreateViewModifyV2Tab) => {
+      .forEach((tab) => {
         // nothing to do
         if (!tab.form) {
           return;

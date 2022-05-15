@@ -13,10 +13,24 @@
     </mat-label>
 
     <!-- Left - Icon buttons -->
-    <mat-icon
-      *ngIf="tooltipButton"
-      matPrefix
-      [matTooltip]="tooltipButton.tooltip">{{tooltipButton.icon}}</mat-icon>
+    <ng-container
+      *ngIf="tooltipButton?.tooltip">
+      <popper-content
+        #popperContent>
+        <div
+          [innerHtml]="tooltipButton.tooltip | safeHtml">
+        </div>
+      </popper-content>
+      <mat-icon
+        tabindex="-1"
+        matPrefix
+        [popper]="popperContent"
+        popperTrigger="hover"
+        popperApplyClass="gd-form-input-v2-tooltip"
+        popperPreventOverflow="true"
+        popperPositionFixed="true"
+        popperAppendTo="body">{{tooltipButton.icon}}</mat-icon>
+    </ng-container>
 
     <!-- Input -->
     <input

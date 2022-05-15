@@ -9,6 +9,7 @@ import { IPermissionBasic, IPermissionCloneable, IPermissionOutbreak, IPermissio
 import { Constants } from './constants';
 import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
+import { Moment } from '../helperClasses/x-moment';
 
 export class OutbreakModel
   extends BaseModel
@@ -22,8 +23,8 @@ export class OutbreakModel
   name: string;
   description: string;
   disease: string;
-  startDate: string;
-  endDate: string | null;
+  startDate: string | Moment;
+  endDate: string | Moment;
   periodOfFollowup: number;
   frequencyOfFollowUp: number;
   frequencyOfFollowUpPerDay: number;
@@ -37,14 +38,29 @@ export class OutbreakModel
   contactInvestigationTemplate: QuestionModel[];
   contactFollowUpTemplate: QuestionModel[];
   labResultsTemplate: QuestionModel[];
-  // TODO - need to allow to set case classifications on outbreak
-  // caseClassification: any | null;
   caseIdMask: string;
   contactIdMask: string;
   contactOfContactIdMask: string;
-  countries: {
+
+  // countries
+  private _countries: {
     id: string
   }[];
+  set countries(countries: {
+    id: string
+  }[]) {
+    // set value
+    this._countries = countries;
+
+    // update ids
+    this._countryIds = (this.countries || []).map((item) => item.id);
+  }
+  get countries(): {
+    id: string
+  }[] {
+    return this._countries;
+  }
+
   locationIds: string[];
   locations: LocationModel[] = [];
   longPeriodsBetweenCaseOnset: number;
@@ -63,6 +79,12 @@ export class OutbreakModel
   // used for displaying information when hovering an outbreak from topnav component
   // no need to save this one in the database
   details: string;
+
+  // countries array
+  private _countryIds: string[];
+  get countryIds(): string[] {
+    return this._countryIds;
+  }
 
   /**
    * Advanced filters

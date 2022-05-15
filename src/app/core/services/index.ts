@@ -103,6 +103,8 @@ import { NotAuthRedirectGuard } from './guards/not-auth-redirect-guard.service';
 import { EntityFollowUpHelperService } from './helper/entity-follow-up-helper.service';
 import { EntityLabResultService } from './helper/entity-lab-result-helper.service';
 import { SecurityQuestionDataResolver } from './resolvers/data/security-question.resolver';
+import { MapVectorTypeDataResolver } from './resolvers/data/map-vector-type.resolver';
+import { OutbreakTemplateDataResolver } from './resolvers/data/outbreak-template.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -134,8 +136,10 @@ export const services: any[] = [
   LanguageDataResolver,
   LanguageUserResolver,
   LocationGeographicalLevelDataResolver,
+  MapVectorTypeDataResolver,
   OccupationDataResolver,
   OutbreakDataResolver,
+  OutbreakTemplateDataResolver,
   OutcomeDataResolver,
   PermissionDataResolver,
   PersonDataResolver,

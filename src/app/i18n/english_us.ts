@@ -49,7 +49,7 @@ export const EnglishUsLang = {
     'LNG_COMMON_LABEL_ACTIVE': 'Activate {{name}}',
     'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CLONE_SUCCESS_MESSAGE': 'Outbreak template successfully cloned',
     'LNG_STEPPER_FINAL_STEP_TEXT': 'If you want to change something you can go back to any step and change it.</br> If all data is correct, click \'<span class="gd-message-button-label">{{buttonLabel}}</span>\' to complete the process.',
-    'LNG_STEPPER_FINAL_STEP_TEXT_CASE': 'Data entry for \'<span class="gd-message-name">{{name}}</span>\' has been successfully completed!',
+    'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL': 'Data entry for \'<span class="gd-message-name">{{name}}</span>\' has been successfully completed!',
     'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_CHANGE_CASE_CLASSIFICATION': 'Change case classification',
     'LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TARGETED_FORM_BUTTON': 'Change targeted',
     'LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TARGETED_DIALOG_TITLE': 'Change entity targeted',
@@ -62,7 +62,9 @@ export const EnglishUsLang = {
     'LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_CHANGE_PUBLIC_TITLE': 'Import mapping visibility',
     'LNG_DIALOG_LOCAL_HELP_DIALOG_TITLE': 'Help',
     'LNG_ENTITY_FIELD_LABEL_NUMBER_OF_CONTACTS': 'Number of contacts',
-    'LNG_ENTITY_FIELD_LABEL_NUMBER_OF_EXPOSURES': 'Number of exposures'
+    'LNG_ENTITY_FIELD_LABEL_NUMBER_OF_EXPOSURES': 'Number of exposures',
+    'LNG_OUTBREAK_FIELD_LABEL_FOLLOW_UP': 'Follow-ups',
+    'LNG_OUTBREAK_FIELD_LABEL_REPORT': 'Reports'
 
 
 

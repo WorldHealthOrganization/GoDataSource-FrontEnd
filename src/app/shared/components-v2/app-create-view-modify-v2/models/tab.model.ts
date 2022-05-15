@@ -14,6 +14,7 @@ import { UserSettings } from '../../../../core/models/user.model';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { V2AdvancedFilter } from '../../app-list-table-v2/models/advanced-filter.model';
+import { MapServerModel } from '../../../../core/models/map-server.model';
 
 /**
  * Input type
@@ -25,11 +26,13 @@ export enum CreateViewModifyV2TabInputType {
   SELECT_SINGLE,
   SELECT_MULTIPLE,
   AGE_DATE_OF_BIRTH,
-  VISUAL_ID,
+  ASYNC_VALIDATOR_TEXT,
   DATE,
   TOGGLE_CHECKBOX,
   LOCATION_SINGLE,
+  LOCATION_MULTIPLE,
   TEXTAREA,
+  NUMBER,
 
   // input groups
   LIST,
@@ -37,11 +40,17 @@ export enum CreateViewModifyV2TabInputType {
   ADDRESS,
   VACCINE,
   CENTER_DATE_RANGE,
+  MAP_SERVER,
 
   // layout
   TAB,
   TAB_TABLE,
-  SECTION
+  TAB_TABLE_RECORDS_LIST,
+  TAB_TABLE_EDIT_QUESTIONNAIRE,
+  SECTION,
+
+  // other
+  LABEL
 }
 
 /**
@@ -84,8 +93,32 @@ interface ICreateViewModifyV2TabInputText extends Omit<ICreateViewModifyV2TabInp
 
   // optional
   validators?: {
+    required?: () => boolean,
+    regex?: () => {
+      expression: string,
+      flags?: string,
+      msg?: string
+    }
+  };
+}
+
+/**
+ * Input - async validator text
+ */
+interface ICreateViewModifyV2TabInputAsyncValidatorText extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
+  // required
+  type: CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT;
+  value: ICreateViewModifyV2TabInputValue<string>;
+  validators: {
+    // required
+    async: Observable<boolean | IGeneralAsyncValidatorResponse>,
+
+    // optional
     required?: () => boolean
   };
+
+  // optional
+  suffixIconButtons?: IAppFormIconButtonV2[];
 }
 
 /**
@@ -165,12 +198,38 @@ interface ICreateViewModifyV2TabInputLocationSingle extends Omit<ICreateViewModi
 }
 
 /**
+ * Input - location multiple
+ */
+interface ICreateViewModifyV2TabInputLocationMultiple extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
+  // required
+  type: CreateViewModifyV2TabInputType.LOCATION_MULTIPLE;
+  value: ICreateViewModifyV2TabInputValue<string[]>;
+
+  // optional
+  useOutbreakLocations?: boolean;
+}
+
+/**
  * Input - textarea
  */
 interface ICreateViewModifyV2TabInputTextArea extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
   // required
   type: CreateViewModifyV2TabInputType.TEXTAREA;
   value: ICreateViewModifyV2TabInputValue<string>;
+}
+
+/**
+ * Input - number
+ */
+interface ICreateViewModifyV2TabInputNumber extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
+  // required
+  type: CreateViewModifyV2TabInputType.NUMBER;
+  value: ICreateViewModifyV2TabInputValue<number>;
+
+  // optional
+  validators?: {
+    required?: () => boolean
+  };
 }
 
 /**
@@ -198,19 +257,6 @@ interface ICreateViewModifyV2TabInputAgeOrDOB extends Omit<ICreateViewModifyV2Ta
     age: string,
     dob: string
   }
-}
-
-/**
- * Input - visual ID
- */
-interface ICreateViewModifyV2TabInputVisualID extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
-  // required
-  type: CreateViewModifyV2TabInputType.VISUAL_ID;
-  value: ICreateViewModifyV2TabInputValue<string>;
-  validator: Observable<boolean | IGeneralAsyncValidatorResponse>;
-
-  // optional
-  suffixIconButtons?: IAppFormIconButtonV2[];
 }
 
 /**
@@ -251,6 +297,9 @@ export interface ICreateViewModifyV2TabInputList {
     }
   };
   itemsChanged: (list: ICreateViewModifyV2TabInputList) => void;
+
+  // optional
+  sortable?: boolean;
 }
 
 /**
@@ -312,13 +361,43 @@ interface ICreateViewModifyV2TabInputCenterDateRange {
 }
 
 /**
+ * Input - map server
+ */
+interface ICreateViewModifyV2TabInputMapServer {
+  // required
+  type: CreateViewModifyV2TabInputType.MAP_SERVER;
+  vectorTypeOptions: ILabelValuePairModel[];
+  styleSourceOptions: {
+    [url: string]: ILabelValuePairModel[]
+  };
+  value: {
+    get: (index?: number) => MapServerModel;
+  };
+  styleAsyncValidator: (
+    input: ICreateViewModifyV2TabInputMapServer,
+    index: number
+  ) => Observable<boolean | IGeneralAsyncValidatorResponse>;
+}
+
+/**
+ * Input - label
+ */
+interface ICreateViewModifyV2TabLabel {
+  // required
+  type: CreateViewModifyV2TabInputType.LABEL;
+  value: {
+    get: () => string
+  };
+}
+
+/**
  * Input
  */
 type CreateViewModifyV2TabInput = ICreateViewModifyV2TabInputText | ICreateViewModifyV2TabInputPassword | ICreateViewModifyV2TabInputSingleSelect
-| ICreateViewModifyV2TabInputMultipleSelect | ICreateViewModifyV2TabInputToggleCheckbox | ICreateViewModifyV2TabInputLocationSingle
-| ICreateViewModifyV2TabInputTextArea | ICreateViewModifyV2TabInputAgeOrDOB | ICreateViewModifyV2TabInputVisualID | ICreateViewModifyV2TabInputDate
-| ICreateViewModifyV2TabInputList | ICreateViewModifyV2TabInputDocument | ICreateViewModifyV2TabInputAddress | ICreateViewModifyV2TabInputVaccine
-| ICreateViewModifyV2TabInputCenterDateRange;
+| ICreateViewModifyV2TabInputMultipleSelect | ICreateViewModifyV2TabInputToggleCheckbox | ICreateViewModifyV2TabInputLocationSingle | ICreateViewModifyV2TabInputLocationMultiple
+| ICreateViewModifyV2TabInputTextArea | ICreateViewModifyV2TabInputNumber | ICreateViewModifyV2TabInputAgeOrDOB | ICreateViewModifyV2TabInputAsyncValidatorText
+| ICreateViewModifyV2TabInputDate | ICreateViewModifyV2TabInputList | ICreateViewModifyV2TabInputDocument | ICreateViewModifyV2TabInputAddress
+| ICreateViewModifyV2TabInputVaccine | ICreateViewModifyV2TabInputCenterDateRange | ICreateViewModifyV2TabInputMapServer | ICreateViewModifyV2TabLabel;
 
 /**
  * Tab section
@@ -343,16 +422,16 @@ export interface ICreateViewModifyV2Tab {
   sections: ICreateViewModifyV2Section[];
 
   // optional
+  visible?: () => boolean
   form?: NgForm;
 }
 
 /**
- * Tab table
+ * Tab table - list of records
  */
-export interface ICreateViewModifyV2TabTable {
+export interface ICreateViewModifyV2TabTableRecordsList {
   // required
-  type: CreateViewModifyV2TabInputType.TAB_TABLE;
-  label: string;
+  type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST;
   tableColumns: IV2Column[];
   pageSettingsKey: UserSettings;
   advancedFilterType: string;
@@ -364,9 +443,6 @@ export interface ICreateViewModifyV2TabTable {
   ) => void;
   pageIndex: number;
 
-  // optional
-  visible?: () => boolean
-
   // used by ui
   updateUI?: () => void;
   records$?: Observable<any[]>;
@@ -374,6 +450,28 @@ export interface ICreateViewModifyV2TabTable {
   applyHasMoreLimit?: boolean;
   pageCount?: IBasicCount;
   previousRefreshRequest?: any;
+}
+
+/**
+ * Tab table - edit questionnaire
+ */
+export interface ICreateViewModifyV2TabTableEditQuestionnaire {
+  // required
+  type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE;
+}
+
+/**
+ * Tab table
+ */
+export interface ICreateViewModifyV2TabTable {
+  // required
+  type: CreateViewModifyV2TabInputType.TAB_TABLE;
+  label: string;
+  definition: ICreateViewModifyV2TabTableRecordsList | ICreateViewModifyV2TabTableEditQuestionnaire;
+
+  // optional
+  visible?: () => boolean
+  form?: NgForm;
 }
 
 /**

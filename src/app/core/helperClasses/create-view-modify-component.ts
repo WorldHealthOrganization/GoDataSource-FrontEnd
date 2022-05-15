@@ -94,13 +94,16 @@ export abstract class CreateViewModifyComponent<T>
     authDataService: AuthDataService,
     protected toastV2Service: ToastV2Service,
     protected renderer2: Renderer2,
-    protected router: Router
+    protected router: Router,
+    dontDisableOutbreakSelect?: boolean
   ) {
     // initialize parent
     super();
 
     // disable select outbreak
-    TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = true;
+    if (!dontDisableOutbreakSelect) {
+      TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = true;
+    }
 
     // get auth data
     this.authUser = authDataService.getAuthenticatedUser();
