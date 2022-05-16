@@ -47,7 +47,8 @@ export enum UserSettings {
   LONG_ONSET_FIELDS = 'longOnsetFields',
   SAVED_FILTER_FIELDS = 'savedFilterFields',
   SAVED_IMPORT_MAPPING_FIELDS = 'savedImportMappingFields',
-  OUTBREAK_INCONSISTENCIES_FIELDS = 'outbreakInconsistenciesFields'
+  OUTBREAK_INCONSISTENCIES_FIELDS = 'outbreakInconsistenciesFields',
+  COT_FIELDS = 'cotFields'
 }
 
 export enum PhoneNumberType {
