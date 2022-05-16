@@ -8,7 +8,7 @@ import * as _ from 'lodash';
 import { moment } from '../../../core/helperClasses/x-moment';
 import { Constants } from '../../../core/models/constants';
 import { Location } from '@angular/common';
-import { Router } from '@angular/router';
+import { Params, Router } from '@angular/router';
 import {
   IV2Column,
   IV2ColumnAction,
@@ -421,8 +421,30 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         event.stopPropagation();
         event.stopImmediatePropagation();
 
+        // retrieve url
+        let url: string = event.target.getAttribute('is-link');
+
+        // remove params
+        const urlQuestionIndex: number = url.indexOf('?');
+        let params: Params;
+        if (urlQuestionIndex > -1) {
+          // retrieve params
+          const urlParams: string = url.substring(urlQuestionIndex + 1);
+          if (urlParams) {
+            const urlSearchParams: any = new URLSearchParams(urlParams);
+            params = Object.fromEntries(urlSearchParams.entries());
+          }
+
+          // strip params
+          url = url.substring(0, urlQuestionIndex);
+        }
+
         // redirect
-        this.router.navigate([event.target.getAttribute('is-link')]);
+        this.router.navigate(
+          [url], {
+            queryParams: params
+          }
+        );
       }
     );
 

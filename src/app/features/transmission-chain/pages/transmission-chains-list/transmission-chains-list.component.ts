@@ -71,11 +71,12 @@ export class TransmissionChainsListComponent extends ListComponent<TransmissionC
         }
       },
       {
-        // TODO: Redirect link needs parameters left in template
         field: 'rootPerson.name',
         label: 'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_ROOT_CASE',
-        link: () => {
-          return TransmissionChainModel.canViewAnyGraph(this.authUser) ? '/transmission-chains' : '';
+        link: (item: TransmissionChainModel) => {
+          return item.rootPerson?.id && TransmissionChainModel.canViewAnyGraph(this.authUser) ?
+            `/transmission-chains?personId=${item.rootPerson.id}&selectedEntityType=${item.rootPerson.type}` :
+            undefined;
         }
       },
       {
