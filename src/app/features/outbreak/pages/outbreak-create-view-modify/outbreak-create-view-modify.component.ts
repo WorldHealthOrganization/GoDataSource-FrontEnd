@@ -849,7 +849,10 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
             this.itemData.caseInvestigationTemplate = value;
           }
         }
-      }
+      },
+      visible: () => this.isView ?
+        true :
+        OutbreakModel.canModifyCaseQuestionnaire(this.authUser)
     };
   }
 
@@ -869,7 +872,10 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
             this.itemData.contactInvestigationTemplate = value;
           }
         }
-      }
+      },
+      visible: () => this.isView ?
+        true :
+        OutbreakModel.canModifyContactQuestionnaire(this.authUser)
     };
   }
 
@@ -889,7 +895,10 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
             this.itemData.contactFollowUpTemplate = value;
           }
         }
-      }
+      },
+      visible: () => this.isView ?
+        true :
+        OutbreakModel.canModifyContactFollowUpQuestionnaire(this.authUser)
     };
   }
 
@@ -909,7 +918,10 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
             this.itemData.labResultsTemplate = value;
           }
         }
-      }
+      },
+      visible: () => this.isView ?
+        true :
+        OutbreakModel.canModifyCaseLabResultQuestionnaire(this.authUser)
     };
   }
 
