@@ -76,6 +76,10 @@
               <span
                 *ngIf="renderMode !== RenderMode.SMALL">
 
+                <!-- Category -->
+                <mat-icon
+                  [matTooltip]="item.data.category ? (item.data.category | translate) : undefined">folder_special</mat-icon>
+
                 <!-- Multiple answers -->
                 <mat-icon
                   *ngIf="item.data.multiAnswer">format_list_numbered_rtl</mat-icon>
@@ -227,6 +231,13 @@
         class="gd-form-edit-questionnaire-v2-legend-items-item">
         <mat-icon>format_list_numbered_rtl</mat-icon>
         <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER' | translate}}</span>
+      </div>
+
+      <!-- Category -->
+      <div
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        <mat-icon>folder_special</mat-icon>
+        <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY' | translate}}</span>
       </div>
 
       <!-- Required -->
