@@ -15,7 +15,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { V2AdvancedFilter } from '../../app-list-table-v2/models/advanced-filter.model';
 import { MapServerModel } from '../../../../core/models/map-server.model';
-import { QuestionModel } from '../../../../core/models/question.model';
+import { IAnswerData, QuestionModel } from '../../../../core/models/question.model';
 
 /**
  * Input type
@@ -48,6 +48,7 @@ export enum CreateViewModifyV2TabInputType {
   TAB_TABLE,
   TAB_TABLE_RECORDS_LIST,
   TAB_TABLE_EDIT_QUESTIONNAIRE,
+  TAB_TABLE_FILL_QUESTIONNAIRE,
   SECTION,
 
   // other
@@ -456,11 +457,24 @@ export interface ICreateViewModifyV2TabTableRecordsList {
 /**
  * Tab table - edit questionnaire
  */
-export interface ICreateViewModifyV2TabTableEditQuestionnaire {
+interface ICreateViewModifyV2TabTableEditQuestionnaire {
   // required
   type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE;
   name: string;
   value: ICreateViewModifyV2TabInputValue<QuestionModel[]>;
+}
+
+/**
+ * Tab table - fill questionnaire
+ */
+interface ICreateViewModifyV2TabTableFillQuestionnaire {
+  // required
+  type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE;
+  name: string;
+  value: ICreateViewModifyV2TabInputValue<{
+    [variable: string]: IAnswerData[];
+  }>;
+  questionnaire: QuestionModel[];
 }
 
 /**
@@ -470,7 +484,7 @@ export interface ICreateViewModifyV2TabTable {
   // required
   type: CreateViewModifyV2TabInputType.TAB_TABLE;
   label: string;
-  definition: ICreateViewModifyV2TabTableRecordsList | ICreateViewModifyV2TabTableEditQuestionnaire;
+  definition: ICreateViewModifyV2TabTableRecordsList | ICreateViewModifyV2TabTableEditQuestionnaire | ICreateViewModifyV2TabTableFillQuestionnaire;
 
   // optional
   visible?: () => boolean

@@ -310,7 +310,12 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         // Epidemiology
         this.initializeTabsEpidemiology(),
 
-        // table tabs - specific to cases, contacts, contact of contacts and events
+        // Questionnaires
+        this.initializeTabsQuestionnaire(),
+        // #TODO
+        // this.initializeTabsQuestionnaireAsContact(),
+
+        // Contacts, exposures ...
         this.initializeTabsContacts(),
         this.initializeTabsExposures(),
         this.initializeTabsLabResults(),
@@ -1004,6 +1009,27 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }]
         }
       ]
+    };
+  }
+
+  /**
+   * Initialize tabs - Questionnaire
+   */
+  private initializeTabsQuestionnaire(): ICreateViewModifyV2TabTable {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      label: 'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE',
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
+        name: 'questionnaireAnswers',
+        questionnaire: this.selectedOutbreak.caseInvestigationTemplate,
+        value: {
+          get: () => this.itemData.questionnaireAnswers,
+          set: (value) => {
+            this.itemData.questionnaireAnswers = value;
+          }
+        }
+      }
     };
   }
 

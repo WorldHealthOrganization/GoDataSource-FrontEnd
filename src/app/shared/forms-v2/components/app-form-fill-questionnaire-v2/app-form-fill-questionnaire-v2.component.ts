@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, forwardRef, Host, HostListener, Input, On
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
-import { QuestionModel } from '../../../../core/models/question.model';
+import { IAnswerData, QuestionModel } from '../../../../core/models/question.model';
 import { determineRenderMode, RenderMode } from '../../../../core/enums/render-mode.enum';
 //
 // /**
@@ -44,9 +44,15 @@ import { determineRenderMode, RenderMode } from '../../../../core/enums/render-m
   }]
 })
 export class AppFormFillQuestionnaireV2Component
-  extends AppFormBaseV2<QuestionModel[]> implements OnDestroy {
+  extends AppFormBaseV2<{
+    [variable: string]: IAnswerData[];
+  }> implements OnDestroy {
+
   // view only
   @Input() viewOnly: boolean;
+
+  // questionnaire
+  @Input() questionnaire: QuestionModel[];
 
   // render mode
   renderMode: RenderMode = RenderMode.FULL;
@@ -80,16 +86,16 @@ export class AppFormFillQuestionnaireV2Component
     super.onDestroy();
   }
 
-  /**
-   * Set value
-   */
-  writeValue(value: QuestionModel[]): void {
-    // set value
-    super.writeValue(value);
-
-    // flatten
-    this.nonFlatToFlat();
-  }
+  // /**
+  //  * Set value
+  //  */
+  // writeValue(value: QuestionModel[]): void {
+  //   // set value
+  //   super.writeValue(value);
+  //
+  //   // flatten
+  //   this.nonFlatToFlat();
+  // }
 
   /**
    * Re-render UI
@@ -98,19 +104,19 @@ export class AppFormFillQuestionnaireV2Component
     this.changeDetectorRef.detectChanges();
   }
 
-  /**
-   * Convert non flat value to flat value
-   */
-  private nonFlatToFlat(): void {
-    // // flatten
-    // this.flattenedQuestions = [];
-    // this.flatten(
-    //   this.value,
-    //   0,
-    //   null,
-    //   {}
-    // );
-  }
+  // /**
+  //  * Convert non flat value to flat value
+  //  */
+  // private nonFlatToFlat(): void {
+  //   // flatten
+  //   this.flattenedQuestions = [];
+  //   this.flatten(
+  //     this.value,
+  //     0,
+  //     null,
+  //     {}
+  //   );
+  // }
 
   /**
    * Flatten

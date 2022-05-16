@@ -380,6 +380,7 @@
                   [class.gd-create-view-modify-bottom-section-content-input-has-age-dob]="input.type === CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH"
                   [class.gd-create-view-modify-bottom-section-content-input-has-list]="input.type === CreateViewModifyV2TabInputType.LIST"
                   [class.gd-create-view-modify-bottom-section-content-input-has-edit-questionnaire]="input.type === CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-fill-questionnaire]="input.type === CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE"
                   [ngSwitch]="input.type">
 
                   <!-- Edit questionnaire -->
@@ -390,6 +391,16 @@
                     [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
                     [viewOnly]="isView || !input.value.set"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-edit-questionnaire-v2>
+
+                  <!-- Fill questionnaire -->
+                  <app-form-fill-questionnaire-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [viewOnly]="isView || !input.value.set"
+                    [questionnaire]="input.questionnaire"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-fill-questionnaire-v2>
 
                   <!-- Text -->
                   <app-form-input-v2
@@ -1171,6 +1182,12 @@
               <!-- Edit questionnaire -->
               <ng-template
                 *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE"
+                [ngTemplateOutlet]="formRender"
+                [ngTemplateOutletContext]="{ tab }"></ng-template>
+
+              <!-- Fill questionnaire -->
+              <ng-template
+                *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE"
                 [ngTemplateOutlet]="formRender"
                 [ngTemplateOutletContext]="{ tab }"></ng-template>
 
