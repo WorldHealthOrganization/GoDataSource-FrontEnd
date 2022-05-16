@@ -48,6 +48,7 @@
     }
 
     .gd-app-bottom-dialog-v2-middle {
+      flex: auto !important;
       min-height: 8rem;
       overflow-x: hidden;
       overflow-y: overlay;

@@ -119,6 +119,12 @@
 
           &:last-child {
             margin-bottom: 0;
+
+            .gd-app-side-dialog-v2-content-middle-item-input-row {
+              &:after {
+                display: none;
+              }
+            }
           }
 
           /* Slide-in panel divider */
@@ -537,6 +543,29 @@
                   }
                 }
               }
+            }
+          }
+
+          .gd-app-side-dialog-v2-content-middle-item-input-row {
+            @include flex_align_items(center);
+            @include flex(flex);
+            @include flex-direction(row);
+            padding-bottom: 0.8rem;
+            position: relative;
+
+            &:after {
+              background: rgba(var(--gd-secondary-rgb), 0.25);
+              bottom: 0;
+              content: '';
+              display: block;
+              height: 0.1rem;
+              left: -1.6rem;
+              position: absolute;
+              width: calc(100% + 3.2rem);
+            }
+
+            > div:first-child {
+              width: 100%;
             }
           }
         }

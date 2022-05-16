@@ -340,6 +340,8 @@ svg:not(:root) {
 
 /* Tooltips */
 .mat-tooltip-panel {
+  pointer-events: none;
+
   .mat-tooltip {
     background: var(--gd-text);
     font-family: $gd-font-family;
