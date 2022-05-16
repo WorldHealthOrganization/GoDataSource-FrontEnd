@@ -86,6 +86,7 @@ export class AppFormEditQuestionnaireV2Component
   // constants
   FlattenType = FlattenType;
   RenderMode = RenderMode;
+  Constants = Constants;
 
   // check if we can drop element to the selected position
   readonly bufferToRender: number = 1024;
@@ -141,44 +142,6 @@ export class AppFormEditQuestionnaireV2Component
    * Set value
    */
   writeValue(value: QuestionModel[]): void {
-    // // #TODO
-    // value = [];
-    // const attach = (where: any[], prefix: string, question: QuestionModel, level: number) => {
-    //   where.push(question);
-    //   if (level < 5) {
-    //     question.answerType = Constants.ANSWER_TYPES.SINGLE_SELECTION.value;
-    //     question.answers = [];
-    //     for (let i = 0; i < 2; i++) {
-    //       const a = new AnswerModel({
-    //         label: `${prefix}${question.text}A${i}`
-    //       });
-    //       question.answers.push(a);
-    //
-    //       a.additionalQuestions = [];
-    //       for (let j = 0; j < 2; j++) {
-    //         attach(
-    //           a.additionalQuestions,
-    //           `${prefix}${question.text}A${i}`,
-    //           new QuestionModel({
-    //             text: `${prefix}${question.text}A${i}Q${j}`
-    //           }),
-    //           level + 1
-    //         );
-    //       }
-    //     }
-    //   }
-    // };
-    // for (let i = 0; i < 3; i++) {
-    //   attach(
-    //     value,
-    //     '',
-    //     new QuestionModel({
-    //       text: `Q${i}`
-    //     }),
-    //     0
-    //   );
-    // }
-
     // set value
     super.writeValue(value);
 
@@ -438,6 +401,7 @@ export class AppFormEditQuestionnaireV2Component
     modifyQuestion: QuestionModel
   ): void {
     // construct array of inputs
+    let variableManuallyChanged: boolean = false;
     const inputs: V2SideDialogConfigInput[] = [];
 
     // determine current question variables
@@ -474,105 +438,173 @@ export class AppFormEditQuestionnaireV2Component
       });
     }
 
-    // inputs
-    let variableManuallyChanged: boolean = false;
-    inputs.push(
-      // text
-      {
-        type: V2SideDialogConfigInputType.TEXTAREA,
-        name: 'text',
-        placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT',
-        value: modifyQuestion ?
-          modifyQuestion.text :
-          '',
-        viewOnly: () => this.viewOnly,
-        validators: {
-          required: () => true
-        },
-        change: (data) => {
-          // nothing to do ?
-          const text: string = (data.map.text as IV2SideDialogConfigInputTextarea).value?.trim();
-          if (
-            modifyQuestion ||
-            !text ||
-            variableManuallyChanged
-          ) {
-            return;
-          }
-
-          // update variable if question is new
-          (data.map.variable as IV2SideDialogConfigInputText).value = _.snakeCase(text);
-        }
-      },
-
-      // answer type
-      {
-        type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
-        name: 'answerType',
-        placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE',
-        value: modifyQuestion ?
-          modifyQuestion.answerType :
-          '',
-        options: (this.activatedRoute.snapshot.data.questionnaireAnswerType as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-        viewOnly: () => this.viewOnly,
-        validators: {
-          required: () => true
-        }
-      },
-
-      // variable
-      {
-        type: V2SideDialogConfigInputType.TEXT,
-        name: 'variable',
-        placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE',
-        value: modifyQuestion ?
-          modifyQuestion.variable :
-          '',
-        visible: (data) => (data.map.answerType as IV2SideDialogConfigInputSingleDropdown).value !== Constants.ANSWER_TYPES.MARKUP.value,
-        disabled: () => !!modifyQuestion,
-        viewOnly: () => this.viewOnly,
-        validators: {
-          required: () => true,
-          notNumber: () => !modifyQuestion,
-          notInObject: () => ({
-            values: usedVariables,
-            err: 'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_DUPLICATE_VARIABLE'
-          })
-        },
-        change: () => {
-          variableManuallyChanged = true;
-        }
-      },
-
-      // category
-      {
-        type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
-        name: 'category',
-        placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY',
-        value: modifyQuestion ?
-          modifyQuestion.category :
-          '',
-        options: (this.activatedRoute.snapshot.data.questionnaireQuestionCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        viewOnly: () => this.viewOnly,
-        validators: {
-          required: () => true
-        }
-      }
-    );
-
-    // toggle options
+    // on view only we should display data differently
     if (this.viewOnly) {
+      // inputs
       inputs.push(
+        // text
+        {
+          type: V2SideDialogConfigInputType.KEY_VALUE,
+          name: 'text',
+          placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT',
+          value: modifyQuestion.text
+        },
+
+        // answer type
+        {
+          type: V2SideDialogConfigInputType.KEY_VALUE,
+          name: 'answerType',
+          placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE',
+          value: modifyQuestion.answerType
+        },
+
+        // variable
+        {
+          type: V2SideDialogConfigInputType.KEY_VALUE,
+          name: 'variable',
+          placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE',
+          value: modifyQuestion.variable,
+          visible: () => modifyQuestion.answerType !== Constants.ANSWER_TYPES.MARKUP.value
+        },
+
+        // category
+        {
+          type: V2SideDialogConfigInputType.KEY_VALUE,
+          name: 'category',
+          placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY',
+          value: modifyQuestion.category
+        },
+
+        // answer display
         {
           type: V2SideDialogConfigInputType.KEY_VALUE,
           name: 'answersDisplay',
           placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWERS_DISPLAY',
           value: modifyQuestion.answersDisplay,
-          visible: (data) => (data.map.answerType as IV2SideDialogConfigInputSingleDropdown).value !== Constants.ANSWER_TYPES.MARKUP.value
+          visible: () => modifyQuestion.answerType !== Constants.ANSWER_TYPES.MARKUP.value
+        },
+
+        // inactive & required & multi answer
+        {
+          type: V2SideDialogConfigInputType.ROW,
+          name: 'inactive_required_multi_answer',
+          inputs: [
+            // inactive
+            {
+              type: V2SideDialogConfigInputType.KEY_VALUE,
+              name: 'inactive',
+              placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_INACTIVE',
+              value: modifyQuestion.inactive ?
+                'LNG_COMMON_LABEL_YES' :
+                'LNG_COMMON_LABEL_NO'
+            },
+
+            // required
+            {
+              type: V2SideDialogConfigInputType.KEY_VALUE,
+              name: 'required',
+              placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED',
+              value: modifyQuestion.required ?
+                'LNG_COMMON_LABEL_YES' :
+                'LNG_COMMON_LABEL_NO',
+              visible: () => modifyQuestion.answerType !== Constants.ANSWER_TYPES.MARKUP.value
+            },
+
+            // multi answer
+            {
+              type: V2SideDialogConfigInputType.KEY_VALUE,
+              name: 'multiAnswer',
+              placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER',
+              value: modifyQuestion.multiAnswer ?
+                'LNG_COMMON_LABEL_YES' :
+                'LNG_COMMON_LABEL_NO',
+              visible: () => modifyQuestion.answerType !== Constants.ANSWER_TYPES.MARKUP.value
+            }
+          ]
         }
       );
     } else {
+      // inputs
       inputs.push(
+        // text
+        {
+          type: V2SideDialogConfigInputType.TEXTAREA,
+          name: 'text',
+          placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT',
+          value: modifyQuestion ?
+            modifyQuestion.text :
+            '',
+          validators: {
+            required: () => true
+          },
+          change: (data) => {
+            // nothing to do ?
+            const text: string = (data.map.text as IV2SideDialogConfigInputTextarea).value?.trim();
+            if (
+              modifyQuestion ||
+              !text ||
+              variableManuallyChanged
+            ) {
+              return;
+            }
+
+            // update variable if question is new
+            (data.map.variable as IV2SideDialogConfigInputText).value = _.snakeCase(text);
+          }
+        },
+
+        // answer type
+        {
+          type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+          name: 'answerType',
+          placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE',
+          value: modifyQuestion ?
+            modifyQuestion.answerType :
+            '',
+          options: (this.activatedRoute.snapshot.data.questionnaireAnswerType as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          validators: {
+            required: () => true
+          }
+        },
+
+        // variable
+        {
+          type: V2SideDialogConfigInputType.TEXT,
+          name: 'variable',
+          placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE',
+          value: modifyQuestion ?
+            modifyQuestion.variable :
+            '',
+          visible: (data) => (data.map.answerType as IV2SideDialogConfigInputSingleDropdown).value !== Constants.ANSWER_TYPES.MARKUP.value,
+          disabled: () => !!modifyQuestion,
+          validators: {
+            required: () => true,
+            notNumber: () => !modifyQuestion,
+            notInObject: () => ({
+              values: usedVariables,
+              err: 'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_DUPLICATE_VARIABLE'
+            })
+          },
+          change: () => {
+            variableManuallyChanged = true;
+          }
+        },
+
+        // category
+        {
+          type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+          name: 'category',
+          placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY',
+          value: modifyQuestion ?
+            modifyQuestion.category :
+            '',
+          options: (this.activatedRoute.snapshot.data.questionnaireQuestionCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          validators: {
+            required: () => true
+          }
+        },
+
+        // answer display
         {
           type: V2SideDialogConfigInputType.DIVIDER,
           placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWERS_DISPLAY',
@@ -586,54 +618,48 @@ export class AppFormEditQuestionnaireV2Component
             Constants.ANSWERS_DISPLAY.VERTICAL.value,
           options: (this.activatedRoute.snapshot.data.questionnaireAnswerDisplay as IResolverV2ResponseModel<ILabelValuePairModel>).options,
           visible: (data) => (data.map.answerType as IV2SideDialogConfigInputSingleDropdown).value !== Constants.ANSWER_TYPES.MARKUP.value
+        },
+
+        // inactive & required & multi answer
+        {
+          type: V2SideDialogConfigInputType.ROW,
+          name: 'inactive_required_multi_answer',
+          inputs: [
+            // inactive
+            {
+              type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+              name: 'inactive',
+              placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_INACTIVE',
+              value: modifyQuestion ?
+                modifyQuestion.inactive :
+                false
+            },
+
+            // required
+            {
+              type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+              name: 'required',
+              placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED',
+              value: modifyQuestion ?
+                modifyQuestion.required :
+                false,
+              visible: (data) => (data.map.answerType as IV2SideDialogConfigInputSingleDropdown).value !== Constants.ANSWER_TYPES.MARKUP.value
+            },
+
+            // multi answer
+            {
+              type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+              name: 'multiAnswer',
+              placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER',
+              value: modifyQuestion ?
+                modifyQuestion.multiAnswer :
+                false,
+              visible: (data) => (data.map.answerType as IV2SideDialogConfigInputSingleDropdown).value !== Constants.ANSWER_TYPES.MARKUP.value
+            }
+          ]
         }
       );
     }
-
-    // add the rest
-    inputs.push(
-      // inactive & required & multi answer
-      {
-        type: V2SideDialogConfigInputType.ROW,
-        name: 'inactive_required_multi_answer',
-        inputs: [
-          // inactive
-          {
-            type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
-            name: 'inactive',
-            placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_INACTIVE',
-            value: modifyQuestion ?
-              modifyQuestion.inactive :
-              false,
-            viewOnly: () => this.viewOnly
-          },
-
-          // required
-          {
-            type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
-            name: 'required',
-            placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED',
-            value: modifyQuestion ?
-              modifyQuestion.required :
-              false,
-            viewOnly: () => this.viewOnly,
-            visible: (data) => (data.map.answerType as IV2SideDialogConfigInputSingleDropdown).value !== Constants.ANSWER_TYPES.MARKUP.value
-          },
-
-          // multi answer
-          {
-            type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
-            name: 'multiAnswer',
-            placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER',
-            value: modifyQuestion ?
-              modifyQuestion.multiAnswer :
-              false,
-            viewOnly: () => this.viewOnly,
-            visible: (data) => (data.map.answerType as IV2SideDialogConfigInputSingleDropdown).value !== Constants.ANSWER_TYPES.MARKUP.value
-          }
-        ]
-      }
-    );
 
     // buttons
     const bottomButtons: IV2SideDialogConfigButton[] = [];
@@ -642,7 +668,7 @@ export class AppFormEditQuestionnaireV2Component
     if (!this.viewOnly) {
       bottomButtons.push({
         type: IV2SideDialogConfigButtonType.OTHER,
-        label: 'LNG_COMMON_BUTTON_SAVE',
+        label: 'LNG_COMMON_BUTTON_CHANGE',
         color: 'primary',
         key: 'apply',
         disabled: (_data, handler): boolean => {
@@ -799,51 +825,80 @@ export class AppFormEditQuestionnaireV2Component
       });
     }
 
-    // inputs
-    inputs.push(
-      // label
-      {
-        type: V2SideDialogConfigInputType.TEXTAREA,
-        name: 'label',
-        placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL',
-        value: modifyAnswer ?
-          modifyAnswer.label :
-          '',
-        viewOnly: () => this.viewOnly,
-        validators: {
-          required: () => true
-        }
-      },
+    // on view only we should display data differently
+    if (this.viewOnly) {
+      // inputs
+      inputs.push(
+        // label
+        {
+          type: V2SideDialogConfigInputType.KEY_VALUE,
+          name: 'label',
+          placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL',
+          value: modifyAnswer.label
+        },
 
-      // answer value
-      {
-        type: V2SideDialogConfigInputType.TEXT,
-        name: 'value',
-        placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE',
-        value: modifyAnswer ?
-          modifyAnswer.value :
-          '',
-        viewOnly: () => this.viewOnly,
-        validators: {
-          required: () => true,
-          notInObject: () => ({
-            values: usedValues,
-            err: 'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_DUPLICATE_ANSWER_VALUE'
-          })
-        }
-      },
+        // answer value
+        {
+          type: V2SideDialogConfigInputType.KEY_VALUE,
+          name: 'value',
+          placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE',
+          value: modifyAnswer.value
+        },
 
-      // alert
-      {
-        type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
-        name: 'alert',
-        placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT',
-        value: modifyAnswer ?
-          modifyAnswer.alert :
-          false,
-        viewOnly: () => this.viewOnly
-      }
-    );
+        // alert
+        {
+          type: V2SideDialogConfigInputType.KEY_VALUE,
+          name: 'alert',
+          placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT',
+          value: modifyAnswer.alert ?
+            'LNG_COMMON_LABEL_YES' :
+            'LNG_COMMON_LABEL_NO'
+        }
+      );
+    } else {
+      // inputs
+      inputs.push(
+        // label
+        {
+          type: V2SideDialogConfigInputType.TEXTAREA,
+          name: 'label',
+          placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL',
+          value: modifyAnswer ?
+            modifyAnswer.label :
+            '',
+          validators: {
+            required: () => true
+          }
+        },
+
+        // answer value
+        {
+          type: V2SideDialogConfigInputType.TEXT,
+          name: 'value',
+          placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE',
+          value: modifyAnswer ?
+            modifyAnswer.value :
+            '',
+          validators: {
+            required: () => true,
+            notInObject: () => ({
+              values: usedValues,
+              err: 'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_DUPLICATE_ANSWER_VALUE'
+            })
+          }
+        },
+
+        // alert
+        {
+          type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+          name: 'alert',
+          placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT',
+          value: modifyAnswer ?
+            modifyAnswer.alert :
+            false
+        }
+      );
+    }
 
     // buttons
     const bottomButtons: IV2SideDialogConfigButton[] = [];
@@ -852,7 +907,7 @@ export class AppFormEditQuestionnaireV2Component
     if (!this.viewOnly) {
       bottomButtons.push({
         type: IV2SideDialogConfigButtonType.OTHER,
-        label: 'LNG_COMMON_BUTTON_SAVE',
+        label: 'LNG_COMMON_BUTTON_CHANGE',
         color: 'primary',
         key: 'apply',
         disabled: (_data, handler): boolean => {

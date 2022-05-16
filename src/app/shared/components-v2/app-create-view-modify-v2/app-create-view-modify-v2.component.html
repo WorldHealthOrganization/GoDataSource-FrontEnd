@@ -1007,7 +1007,7 @@
                         <div
                           *ngFor="let item of input.items; let itemIndex = index; trackBy: trackByIndex"
                           class="gd-create-view-modify-bottom-section-content-input-list-item"
-                          cdkDrag cdkDragLockAxis="y" [cdkDragData]="item" [cdkDragDisabled]="!input.sortable" cdkDragBoundary=".gd-create-view-modify-bottom-section-content-input-list-{{input.name}}" (cdkDragStarted)="dragStarted()">
+                          cdkDrag cdkDragLockAxis="y" [cdkDragData]="item" [cdkDragDisabled]="!input.sortable || isView" cdkDragBoundary=".gd-create-view-modify-bottom-section-content-input-list-{{input.name}}" (cdkDragStarted)="dragStarted()">
 
                           <!-- Sort & Remove buttons -->
                           <div

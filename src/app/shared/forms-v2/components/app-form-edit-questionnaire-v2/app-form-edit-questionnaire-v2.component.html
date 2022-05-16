@@ -26,11 +26,11 @@
         #cdkViewport
         class="gd-form-edit-questionnaire-v2-list-{{name}}"
         cdkDropList [cdkDropListData]="flattenedQuestions" [cdkDropListSortPredicate]="canDrop" (cdkDropListDropped)="dropItem($event)"
+        [minBufferPx]="maxBufferPx ? maxBufferPx : bufferToRender"
+        [maxBufferPx]="maxBufferPx ? maxBufferPx : bufferToRender"
 
         change123
         [itemSize]="32"
-        [minBufferPx]="maxBufferPx ? maxBufferPx : bufferToRender"
-        [maxBufferPx]="maxBufferPx ? maxBufferPx : bufferToRender"
         style="height: 350px">
 
         <!-- Item -->
@@ -49,6 +49,7 @@
             *ngSwitchCase="FlattenType.QUESTION"
             class="gd-form-edit-questionnaire-v2-item-question"
             [class.gd-form-edit-questionnaire-v2-item-question-inactive]="item.data.inactive"
+            [class.gd-form-edit-questionnaire-v2-item-question-markup]="item.data.answerType === Constants.ANSWER_TYPES.MARKUP.value"
 
             change123
             fxLayout="row">
@@ -75,6 +76,14 @@
               <!-- Icons -->
               <span
                 *ngIf="renderMode !== RenderMode.SMALL">
+
+                <!-- Answer type -->
+                <mat-icon
+                  [matTooltip]="item.data.answerType ? (item.data.answerType | translate) : undefined">spellcheck</mat-icon>
+
+                <!-- Category -->
+                <mat-icon
+                  [matTooltip]="item.data.category ? (item.data.category | translate) : undefined">folder_special</mat-icon>
 
                 <!-- Multiple answers -->
                 <mat-icon
@@ -130,6 +139,7 @@
 
             <!-- Sort -->
             <mat-icon
+              *ngIf="!viewOnly"
               cdkDragHandle
               (mousedown)="notInvalidDragZone()">drag_indicator</mat-icon>
 
@@ -215,99 +225,77 @@
 
       <!-- Drag -->
       <div
+        *ngIf="!viewOnly"
         class="gd-form-edit-questionnaire-v2-legend-items-item">
-
-        <!-- Icon -->
         <mat-icon>drag_indicator</mat-icon>
-
-        <!-- Label -->
         <span>{{'LNG_COMMON_BUTTON_DRAG' | translate}}</span>
+      </div>
 
+      <!-- Answer type -->
+      <div
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        <mat-icon>spellcheck</mat-icon>
+        <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE' | translate}}</span>
+      </div>
+
+      <!-- Category -->
+      <div
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        <mat-icon>folder_special</mat-icon>
+        <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY' | translate}}</span>
       </div>
 
       <!-- Multiple answers -->
       <div
         class="gd-form-edit-questionnaire-v2-legend-items-item">
-
-        <!-- Icon -->
         <mat-icon>format_list_numbered_rtl</mat-icon>
-
-        <!-- Label -->
         <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER' | translate}}</span>
-
       </div>
 
       <!-- Required -->
       <div
         class="gd-form-edit-questionnaire-v2-legend-items-item">
-
-        <!-- Icon -->
         <mat-icon>stars</mat-icon>
-
-        <!-- Label -->
         <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED' | translate}}</span>
-
       </div>
 
       <!-- Inactive -->
       <div
         class="gd-form-edit-questionnaire-v2-legend-items-item">
-
-        <!-- Icon -->
         <mat-icon
           color="warn">do_not_disturb</mat-icon>
-
-        <!-- Label -->
         <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_INACTIVE' | translate}}</span>
-
       </div>
 
       <!-- Alert -->
       <div
         class="gd-form-edit-questionnaire-v2-legend-items-item">
-
-        <!-- Icon -->
         <mat-icon>notification_important</mat-icon>
-
-        <!-- Label -->
         <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT' | translate}}</span>
-
       </div>
 
       <!-- Add question -->
       <div
+        *ngIf="!viewOnly"
         class="gd-form-edit-questionnaire-v2-legend-items-item">
-
-        <!-- Icon -->
         <mat-icon>add_comment</mat-icon>
-
-        <!-- Label -->
         <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW' | translate}}</span>
-
       </div>
 
       <!-- Add answers -->
       <div
+        *ngIf="!viewOnly"
         class="gd-form-edit-questionnaire-v2-legend-items-item">
-
-        <!-- Icon -->
         <mat-icon>text_increase</mat-icon>
-
-        <!-- Label -->
         <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW' | translate}}</span>
-
       </div>
 
       <!-- Edit -->
       <div
+        *ngIf="!viewOnly"
         class="gd-form-edit-questionnaire-v2-legend-items-item">
-
-        <!-- Icon -->
         <mat-icon>edit</mat-icon>
-
-        <!-- Label -->
         <span>{{'LNG_COMMON_BUTTON_UPDATE' | translate}}</span>
-
       </div>
 
     </div>

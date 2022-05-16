@@ -8,7 +8,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { TranslateService } from '@ngx-translate/core';
 import {
   CreateViewModifyV2ActionType,
-  CreateViewModifyV2MenuType,
+  CreateViewModifyV2MenuType, CreateViewModifyV2TabInput,
   CreateViewModifyV2TabInputType,
   ICreateViewModifyV2Buttons,
   ICreateViewModifyV2CreateOrUpdate,
@@ -684,6 +684,137 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
    * Initialize tabs - Map servers
    */
   private initializeTabsMapServers(): ICreateViewModifyV2Tab {
+    // inputs
+    const inputs: CreateViewModifyV2TabInput[] = [];
+
+    // details
+    if (this.isCreate) {
+      inputs.push({
+        // move to legend
+        type: CreateViewModifyV2TabInputType.LABEL,
+        value: {
+          get: () => 'LNG_PAGE_CREATE_OUTBREAK_TAB_MAP_SERVERS_DETAILS'
+        }
+      });
+    }
+
+    // rest of inputs
+    inputs.push({
+      type: CreateViewModifyV2TabInputType.LIST,
+      name: 'arcGisServers',
+      items: this.itemData.arcGisServers,
+      sortable: true,
+      itemsChanged: (list) => {
+        // update
+        this.itemData.arcGisServers = list.items;
+      },
+      definition: {
+        add: {
+          label: 'LNG_INPUT_LABEL_ADD_ITEM',
+          newItem: () => new MapServerModel()
+        },
+        remove: {
+          label: 'LNG_COMMON_BUTTON_DELETE',
+          confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_ITEM'
+        },
+        input: {
+          type: CreateViewModifyV2TabInputType.MAP_SERVER,
+          vectorTypeOptions: (this.activatedRoute.snapshot.data.mapVectorType as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          styleSourceOptions: {},
+          value: {
+            get: (index: number) => {
+              return this.itemData.arcGisServers[index];
+            }
+          },
+          styleAsyncValidator: (input, itemIndex) => {
+            // determine url
+            const url: string = this.itemData.arcGisServers[itemIndex].styleUrl;
+
+            // need to initialize url validation ?
+            const cacheKey: string = `${itemIndex}_${url}`;
+            if (this._styleUrlValidationCache[cacheKey] === undefined) {
+              this._styleUrlValidationCache[cacheKey] = new Observable((finishedObs) => {
+                // not a valid url ?
+                if (!(/https?:\/\/([\da-z.-]+)\.([a-z.]{2,6})(.*)/i.test(url))) {
+                  // not a valid url
+                  finishedObs.next({
+                    isValid: false,
+                    errMsg: 'LNG_PAGE_CREATE_OUTBREAK_MAP_SERVER_STYLE_INVALID_URL'
+                  });
+                  finishedObs.complete();
+
+                  // finished
+                  return;
+                }
+
+                // try to fetch sources
+                fetch(url)
+                  .then(r => r.json())
+                  .then((glStyle: {
+                    sources: {
+                      [name: string]: any
+                    }
+                  }) => {
+                    // did we retrieve the response looking to something similar to what we're expecting ?
+                    if (
+                      !glStyle ||
+                      !glStyle.sources ||
+                      !_.isObject(glStyle.sources)
+                    ) {
+                      // not a valid url
+                      finishedObs.next({
+                        isValid: false,
+                        errMsg: 'LNG_PAGE_CREATE_OUTBREAK_MAP_SERVER_STYLE_INVALID_URL_RESPONSE'
+                      });
+                      finishedObs.complete();
+
+                      // finished
+                      return;
+                    }
+
+                    // set style options
+                    input.styleSourceOptions[url] = [];
+                    Object.keys(glStyle.sources).forEach((source: string) => {
+                      input.styleSourceOptions[url].push(new LabelValuePair(
+                        source,
+                        source
+                      ));
+                    });
+
+                    // select the first source
+                    this.itemData.arcGisServers[itemIndex].styleUrlSource = input.styleSourceOptions[url].length < 1 ?
+                      undefined : (
+                        this.itemData.arcGisServers[itemIndex].styleUrlSource ?
+                          (
+                            glStyle.sources[this.itemData.arcGisServers[itemIndex].styleUrlSource] ?
+                              this.itemData.arcGisServers[itemIndex].styleUrlSource :
+                              input.styleSourceOptions[url][0].value
+                          ) :
+                          input.styleSourceOptions[url][0].value
+                      );
+
+                    // sources retrieved
+                    finishedObs.next(true);
+                    finishedObs.complete();
+                  })
+                  .catch(() => {
+                    finishedObs.next({
+                      isValid: false,
+                      errMsg: 'LNG_PAGE_CREATE_OUTBREAK_MAP_SERVER_STYLE_INVALID_URL_RESPONSE'
+                    });
+                    finishedObs.complete();
+                  });
+              });
+            }
+
+            // finished
+            return this._styleUrlValidationCache[cacheKey];
+          }
+        }
+      }
+    });
+
+    // finished
     return {
       type: CreateViewModifyV2TabInputType.TAB,
       label: this.isCreate ?
@@ -696,129 +827,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
           label: this.isCreate ?
             'LNG_PAGE_CREATE_OUTBREAK_TAB_MAP_SERVERS' :
             'LNG_PAGE_MODIFY_OUTBREAK_TAB_MAP_SERVERS',
-          inputs: [
-            {
-              // #TODO - to change..since we can't hide it since we don't have visible here...
-              // move to legend
-              type: CreateViewModifyV2TabInputType.LABEL,
-              value: {
-                get: () => 'LNG_PAGE_CREATE_OUTBREAK_TAB_MAP_SERVERS_DETAILS - vizibil doar pe create'
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.LIST,
-              name: 'arcGisServers',
-              items: this.itemData.arcGisServers,
-              sortable: true,
-              itemsChanged: (list) => {
-                // update
-                this.itemData.arcGisServers = list.items;
-              },
-              definition: {
-                add: {
-                  label: 'LNG_INPUT_LABEL_ADD_ITEM',
-                  newItem: () => new MapServerModel()
-                },
-                remove: {
-                  label: 'LNG_COMMON_BUTTON_DELETE',
-                  confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_ITEM'
-                },
-                input: {
-                  type: CreateViewModifyV2TabInputType.MAP_SERVER,
-                  vectorTypeOptions: (this.activatedRoute.snapshot.data.mapVectorType as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-                  styleSourceOptions: {},
-                  value: {
-                    get: (index: number) => {
-                      return this.itemData.arcGisServers[index];
-                    }
-                  },
-                  styleAsyncValidator: (input, itemIndex) => {
-                    // determine url
-                    const url: string = this.itemData.arcGisServers[itemIndex].styleUrl;
-
-                    // need to initialize url validation ?
-                    const cacheKey: string = `${itemIndex}_${url}`;
-                    if (this._styleUrlValidationCache[cacheKey] === undefined) {
-                      this._styleUrlValidationCache[cacheKey] = new Observable((finishedObs) => {
-                        // not a valid url ?
-                        if (!(/https?:\/\/([\da-z.-]+)\.([a-z.]{2,6})(.*)/i.test(url))) {
-                          // not a valid url
-                          finishedObs.next({
-                            isValid: false,
-                            errMsg: 'LNG_PAGE_CREATE_OUTBREAK_MAP_SERVER_STYLE_INVALID_URL'
-                          });
-                          finishedObs.complete();
-
-                          // finished
-                          return;
-                        }
-
-                        // try to fetch sources
-                        fetch(url)
-                          .then(r => r.json())
-                          .then((glStyle: {
-                            sources: {
-                              [name: string]: any
-                            }
-                          }) => {
-                            // did we retrieve the response looking to something similar to what we're expecting ?
-                            if (
-                              !glStyle ||
-                              !glStyle.sources ||
-                              !_.isObject(glStyle.sources)
-                            ) {
-                              // not a valid url
-                              finishedObs.next({
-                                isValid: false,
-                                errMsg: 'LNG_PAGE_CREATE_OUTBREAK_MAP_SERVER_STYLE_INVALID_URL_RESPONSE'
-                              });
-                              finishedObs.complete();
-
-                              // finished
-                              return;
-                            }
-
-                            // set style options
-                            input.styleSourceOptions[url] = [];
-                            Object.keys(glStyle.sources).forEach((source: string) => {
-                              input.styleSourceOptions[url].push(new LabelValuePair(
-                                source,
-                                source
-                              ));
-                            });
-
-                            // select the first source
-                            this.itemData.arcGisServers[itemIndex].styleUrlSource = input.styleSourceOptions[url].length < 1 ?
-                              undefined : (
-                                this.itemData.arcGisServers[itemIndex].styleUrlSource ?
-                                  (
-                                    glStyle.sources[this.itemData.arcGisServers[itemIndex].styleUrlSource] ?
-                                      this.itemData.arcGisServers[itemIndex].styleUrlSource :
-                                      input.styleSourceOptions[url][0].value
-                                  ) :
-                                  input.styleSourceOptions[url][0].value
-                              );
-
-                            // sources retrieved
-                            finishedObs.next(true);
-                            finishedObs.complete();
-                          })
-                          .catch(() => {
-                            finishedObs.next({
-                              isValid: false,
-                              errMsg: 'LNG_PAGE_CREATE_OUTBREAK_MAP_SERVER_STYLE_INVALID_URL_RESPONSE'
-                            });
-                            finishedObs.complete();
-                          });
-                      });
-                    }
-
-                    // finished
-                    return this._styleUrlValidationCache[cacheKey];
-                  }
-                }
-              }
-            }
-          ]
+          inputs
         }
       ]
     };
@@ -840,7 +849,10 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
             this.itemData.caseInvestigationTemplate = value;
           }
         }
-      }
+      },
+      visible: () => this.isView ?
+        true :
+        OutbreakModel.canModifyCaseQuestionnaire(this.authUser)
     };
   }
 
@@ -860,7 +872,10 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
             this.itemData.contactInvestigationTemplate = value;
           }
         }
-      }
+      },
+      visible: () => this.isView ?
+        true :
+        OutbreakModel.canModifyContactQuestionnaire(this.authUser)
     };
   }
 
@@ -880,7 +895,10 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
             this.itemData.contactFollowUpTemplate = value;
           }
         }
-      }
+      },
+      visible: () => this.isView ?
+        true :
+        OutbreakModel.canModifyContactFollowUpQuestionnaire(this.authUser)
     };
   }
 
@@ -900,7 +918,10 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
             this.itemData.labResultsTemplate = value;
           }
         }
-      }
+      },
+      visible: () => this.isView ?
+        true :
+        OutbreakModel.canModifyCaseLabResultQuestionnaire(this.authUser)
     };
   }
 
@@ -1004,6 +1025,20 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
             'LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON' :
             'LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE'
         );
+
+        // no need to update language ?
+        if (
+          !data.caseInvestigationTemplate &&
+          !data.contactInvestigationTemplate &&
+          !data.contactFollowUpTemplate &&
+          !data.labResultsTemplate
+        ) {
+          // hide loading & redirect
+          finished(undefined, outbreak);
+
+          // finished
+          return;
+        }
 
         // update language tokens to get the translation of submitted questions and answers
         this.i18nService.loadUserLanguage()
