@@ -1014,6 +1014,20 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
             'LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE'
         );
 
+        // no need to update language ?
+        if (
+          !data.caseInvestigationTemplate &&
+          !data.contactInvestigationTemplate &&
+          !data.contactFollowUpTemplate &&
+          !data.labResultsTemplate
+        ) {
+          // hide loading & redirect
+          finished(undefined, outbreak);
+
+          // finished
+          return;
+        }
+
         // update language tokens to get the translation of submitted questions and answers
         this.i18nService.loadUserLanguage()
           .pipe(
