@@ -77,6 +77,10 @@
               <span
                 *ngIf="renderMode !== RenderMode.SMALL">
 
+                <!-- Answer type -->
+                <mat-icon
+                  [matTooltip]="item.data.answerType ? (item.data.answerType | translate) : undefined">spellcheck</mat-icon>
+
                 <!-- Category -->
                 <mat-icon
                   [matTooltip]="item.data.category ? (item.data.category | translate) : undefined">folder_special</mat-icon>
@@ -227,11 +231,11 @@
         <span>{{'LNG_COMMON_BUTTON_DRAG' | translate}}</span>
       </div>
 
-      <!-- Multiple answers -->
+      <!-- Answer type -->
       <div
         class="gd-form-edit-questionnaire-v2-legend-items-item">
-        <mat-icon>format_list_numbered_rtl</mat-icon>
-        <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER' | translate}}</span>
+        <mat-icon>spellcheck</mat-icon>
+        <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE' | translate}}</span>
       </div>
 
       <!-- Category -->
@@ -239,6 +243,13 @@
         class="gd-form-edit-questionnaire-v2-legend-items-item">
         <mat-icon>folder_special</mat-icon>
         <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY' | translate}}</span>
+      </div>
+
+      <!-- Multiple answers -->
+      <div
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        <mat-icon>format_list_numbered_rtl</mat-icon>
+        <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER' | translate}}</span>
       </div>
 
       <!-- Required -->
