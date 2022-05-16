@@ -136,7 +136,6 @@ export interface IV2SideDialogConfigInputText extends IV2SideDialogConfigInput {
   value: string;
 
   // optional
-  viewOnly?: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: V2SideDialogConfigInputFromInput) => boolean;
   validators?: IV2SideDialogConfigInputValidator | {
     async?: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: V2SideDialogConfigInput) => Observable<boolean | IGeneralAsyncValidatorResponse>,
     notNumber?: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: V2SideDialogConfigInput) => boolean,
@@ -159,7 +158,6 @@ export interface IV2SideDialogConfigInputTextarea extends IV2SideDialogConfigInp
   value: string;
 
   // optional
-  viewOnly?: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: V2SideDialogConfigInputFromInput) => boolean;
   validators?: IV2SideDialogConfigInputValidator;
 }
 
@@ -174,7 +172,6 @@ export interface IV2SideDialogConfigInputSingleDropdown extends IV2SideDialogCon
   value: string;
 
   // optional
-  viewOnly?: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: V2SideDialogConfigInputFromInput) => boolean;
   validators?: IV2SideDialogConfigInputValidator;
   clearable?: boolean;
 }
@@ -190,7 +187,6 @@ export interface IV2SideDialogConfigInputMultiDropdown extends IV2SideDialogConf
   values: string[];
 
   // optional
-  viewOnly?: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: V2SideDialogConfigInputFromInput) => boolean;
   validators?: IV2SideDialogConfigInputValidator;
 }
 
@@ -215,9 +211,6 @@ export interface IV2SideDialogConfigInputToggleCheckbox extends IV2SideDialogCon
   type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX;
   placeholder: string;
   value: boolean;
-
-  // optional
-  viewOnly?: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: V2SideDialogConfigInputFromInput) => boolean;
 }
 
 /**
@@ -230,7 +223,6 @@ export interface IV2SideDialogConfigInputNumber extends IV2SideDialogConfigInput
   value: number;
 
   // optional
-  viewOnly?: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: V2SideDialogConfigInputFromInput) => boolean;
   validators?: IV2SideDialogConfigInputValidator;
 }
 
