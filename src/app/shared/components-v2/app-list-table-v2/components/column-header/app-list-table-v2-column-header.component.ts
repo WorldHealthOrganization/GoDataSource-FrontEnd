@@ -91,14 +91,8 @@ export class AppListTableV2ColumnHeaderComponent implements IHeaderAngularComp {
    */
   reload(params: IHeaderParams): void {
     // retrieve extended column definition
-    this.extendedColDef = params.column.getColDef() as IExtendedColDef;
+    this.extendedColDef = params.column.getUserProvidedColDef() as IExtendedColDef;
     this.component = this.extendedColDef.columnDefinitionData;
-
-    // BUG / HACK FIX: get the actual object since getUserProvidedColDef doesn't work properly
-    const properColumnDefinition: IV2Column = this.component.columns.find((col) => col.field === this.extendedColDef.field && _.isEqual(this.extendedColDef.columnDefinition, col));
-    if (properColumnDefinition) {
-      this.extendedColDef.columnDefinition = properColumnDefinition;
-    }
   }
 
   /**
