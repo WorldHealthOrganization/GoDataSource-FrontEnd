@@ -326,6 +326,9 @@ export class AppFormEditQuestionnaireV2Component
         this.translateService.instant(question.text) :
         question.text;
 
+      // set order
+      question.order = questionIndex;
+
       // flatten
       const flattenedQuestion: IFlattenNode = {
         id: uuid(),
@@ -358,6 +361,9 @@ export class AppFormEditQuestionnaireV2Component
           answer.label = answer.label ?
             this.translateService.instant(answer.label) :
             answer.label;
+
+          // set order
+          answer.order = answerIndex;
 
           // flatten
           const flattenedAnswer: IFlattenNode = {

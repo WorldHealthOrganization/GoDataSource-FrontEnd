@@ -29,6 +29,7 @@ import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -53,6 +54,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     private outbreakDataService: OutbreakDataService,
     private activatedRoute: ActivatedRoute,
     private translateService: TranslateService,
+    private i18nService: I18nService,
     private dialogV2Service: DialogV2Service,
     authDataService: AuthDataService,
     toastV2Service: ToastV2Service,
@@ -204,10 +206,10 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
         this.initializeTabsMapServers(),
 
         // Questionnaires
-        this.initializeTabsQuestionnaireCase()
-        // this.initializeTabsQuestionnaireContact(),
-        // this.initializeTabsQuestionnaireFollowUp(),
-        // this.initializeTabsQuestionnaireLabResult()
+        this.initializeTabsQuestionnaireCase(),
+        this.initializeTabsQuestionnaireContact(),
+        this.initializeTabsQuestionnaireFollowUp(),
+        this.initializeTabsQuestionnaireLabResult()
       ],
 
       // create details
@@ -826,7 +828,6 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
    * Initialize tabs - Questionnaire - Case
    */
   private initializeTabsQuestionnaireCase(): ICreateViewModifyV2TabTable {
-    // #TODO - remove route..and component
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       label: 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE',
@@ -843,41 +844,65 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     };
   }
 
-  // /**
-  //  * Initialize tabs - Questionnaire - Contact
-  //  */
-  // private initializeTabsQuestionnaireContact(): ICreateViewModifyV2TabFull {
-  //   // #TODO - remove route..and component
-  //   return {
-  //     type: CreateViewModifyV2TabInputType.TAB_TABLE,
-  //     label: 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE',
-  //     definition: null
-  //   };
-  // }
-  //
-  // /**
-  //  * Initialize tabs - Questionnaire - FollowUp
-  //  */
-  // private initializeTabsQuestionnaireFollowUp(): ICreateViewModifyV2TabFull {
-  //   // #TODO - remove route..and component
-  //   return {
-  //     type: CreateViewModifyV2TabInputType.TAB_FULL,
-  //     label: 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE',
-  //     definition: null
-  //   };
-  // }
-  //
-  // /**
-  //  * Initialize tabs - Questionnaire - Lab result
-  //  */
-  // private initializeTabsQuestionnaireLabResult(): ICreateViewModifyV2TabFull {
-  //   // #TODO - remove route..and component
-  //   return {
-  //     type: CreateViewModifyV2TabInputType.TAB_FULL,
-  //     label: 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE',
-  //     definition: null
-  //   };
-  // }
+  /**
+   * Initialize tabs - Questionnaire - Contact
+   */
+  private initializeTabsQuestionnaireContact(): ICreateViewModifyV2TabTable {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      label: 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE',
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE,
+        name: 'contactInvestigationTemplate',
+        value: {
+          get: () => this.itemData.contactInvestigationTemplate,
+          set: (value) => {
+            this.itemData.contactInvestigationTemplate = value;
+          }
+        }
+      }
+    };
+  }
+
+  /**
+   * Initialize tabs - Questionnaire - FollowUp
+   */
+  private initializeTabsQuestionnaireFollowUp(): ICreateViewModifyV2TabTable {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      label: 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE',
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE,
+        name: 'contactFollowUpTemplate',
+        value: {
+          get: () => this.itemData.contactFollowUpTemplate,
+          set: (value) => {
+            this.itemData.contactFollowUpTemplate = value;
+          }
+        }
+      }
+    };
+  }
+
+  /**
+   * Initialize tabs - Questionnaire - Lab result
+   */
+  private initializeTabsQuestionnaireLabResult(): ICreateViewModifyV2TabTable {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      label: 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE',
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE,
+        name: 'labResultsTemplate',
+        value: {
+          get: () => this.itemData.labResultsTemplate,
+          set: (value) => {
+            this.itemData.labResultsTemplate = value;
+          }
+        }
+      }
+    };
+  }
 
   /**
    * Initialize buttons
@@ -980,8 +1005,24 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
             'LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE'
         );
 
-        // hide loading & redirect
-        finished(undefined, outbreak);
+        // update language tokens to get the translation of submitted questions and answers
+        this.i18nService.loadUserLanguage()
+          .pipe(
+            catchError((err) => {
+              // show err
+              this.toastV2Service.error(err);
+
+              // finished
+              finished(err, undefined);
+
+              // send further
+              return throwError(err);
+            })
+          )
+          .subscribe(() => {
+            // hide loading & redirect
+            finished(undefined, outbreak);
+          });
       });
     };
   }
