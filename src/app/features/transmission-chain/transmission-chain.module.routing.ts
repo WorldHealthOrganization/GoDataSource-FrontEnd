@@ -4,6 +4,7 @@ import * as fromPages from './pages';
 import { PERMISSION } from '../../core/models/permission.model';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PermissionExpression } from '../../core/models/user.model';
+import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 
 const routes: Routes = [
   // Transmission Chains Graph
@@ -33,6 +34,9 @@ const routes: Routes = [
       permissions: [
         PERMISSION.COT_LIST
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver
     }
   },
   // Case Count Map
