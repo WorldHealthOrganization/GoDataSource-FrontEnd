@@ -75,9 +75,7 @@ export class InconsistenciesListComponent extends ListComponent<CaseModel | Cont
       {
         field: 'firstName',
         label: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
-        sortable: true,
         color: 'warn',
-        // color: (item) => this.getPersonTypeColor(item.type),
         format: {
           type: (item) => item.type === EntityType.EVENT ? item.name : item.firstName
         },
@@ -89,7 +87,6 @@ export class InconsistenciesListComponent extends ListComponent<CaseModel | Cont
       {
         field: 'lastName',
         label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
-        sortable: true,
         filter: {
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH
