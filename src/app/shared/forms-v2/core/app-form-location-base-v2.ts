@@ -108,7 +108,7 @@ export abstract class AppFormLocationBaseV2<T>
   };
 
   // vscroll handler
-  @ViewChild('cdkVirtualScrollViewport', { static: true }) cdkVirtualScrollViewport: CdkVirtualScrollViewport;
+  @ViewChild('cdkVirtualScrollViewport') cdkVirtualScrollViewport: CdkVirtualScrollViewport;
 
   /**
    * Do a request or retrieve it from cache if it didn't expire

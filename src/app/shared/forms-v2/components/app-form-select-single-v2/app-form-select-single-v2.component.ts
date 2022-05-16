@@ -122,7 +122,7 @@ export class AppFormSelectSingleV2Component
   }
 
   // vscroll handler
-  @ViewChild('cdkVirtualScrollViewport', { static: true }) cdkVirtualScrollViewport: CdkVirtualScrollViewport;
+  @ViewChild('cdkVirtualScrollViewport') cdkVirtualScrollViewport: CdkVirtualScrollViewport;
 
   /**
    * Constructor
@@ -183,13 +183,10 @@ export class AppFormSelectSingleV2Component
       this.value &&
       this.cdkVirtualScrollViewport
     ) {
-      // hack to force re-render, otherwise we see an empty scroll
-      if (this.value) {
-        // determine value to search
-        const index: number = this.filteredOptions.findIndex((option) => option.value === this.value);
-        if (index > -1) {
-          this.cdkVirtualScrollViewport.scrollToIndex(index);
-        }
+      // determine value to search
+      const index: number = this.filteredOptions.findIndex((option) => option.value === this.value);
+      if (index > -1) {
+        this.cdkVirtualScrollViewport.scrollToIndex(index);
       }
     }
   }
