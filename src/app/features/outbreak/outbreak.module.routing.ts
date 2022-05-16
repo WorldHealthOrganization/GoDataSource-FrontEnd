@@ -4,7 +4,6 @@ import * as fromPages from './pages';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
-import { OutbreakQestionnaireTypeEnum } from '../../core/enums/outbreak-qestionnaire-type.enum';
 import { PermissionExpression } from '../../core/models/user.model';
 import { DiseaseDataResolver } from '../../core/services/resolvers/data/disease.resolver';
 import { CountryDataResolver } from '../../core/services/resolvers/data/country.resolver';
@@ -104,78 +103,6 @@ const routes: Routes = [
         PERMISSION.OUTBREAK_MODIFY
       ],
       action: CreateViewModifyV2Action.MODIFY
-    },
-    canDeactivate: [
-      PageChangeConfirmationGuard
-    ]
-  },
-
-  // Edit Outbreak Case Questionnaire
-  {
-    path: ':outbreakId/case-questionnaire',
-    component: fromPages.OutbreakQuestionnaireComponent,
-    canActivate: [AuthGuard],
-    data: {
-      permissions: [
-        PERMISSION.OUTBREAK_VIEW,
-        PERMISSION.OUTBREAK_MODIFY,
-        PERMISSION.OUTBREAK_MODIFY_CASE_QUESTIONNAIRE
-      ],
-      questionnaire: OutbreakQestionnaireTypeEnum.CASE
-    },
-    canDeactivate: [
-      PageChangeConfirmationGuard
-    ]
-  },
-
-  // Edit Outbreak Contact Questionnaire
-  {
-    path: ':outbreakId/contact-questionnaire',
-    component: fromPages.OutbreakQuestionnaireComponent,
-    canActivate: [AuthGuard],
-    data: {
-      permissions: [
-        PERMISSION.OUTBREAK_VIEW,
-        PERMISSION.OUTBREAK_MODIFY,
-        PERMISSION.OUTBREAK_MODIFY_CONTACT_QUESTIONNAIRE
-      ],
-      questionnaire: OutbreakQestionnaireTypeEnum.CONTACT
-    },
-    canDeactivate: [
-      PageChangeConfirmationGuard
-    ]
-  },
-
-  // Edit Outbreak Contact Follow-up Questionnaire
-  {
-    path: ':outbreakId/contact-follow-up-questionnaire',
-    component: fromPages.OutbreakQuestionnaireComponent,
-    canActivate: [AuthGuard],
-    data: {
-      permissions: [
-        PERMISSION.OUTBREAK_VIEW,
-        PERMISSION.OUTBREAK_MODIFY,
-        PERMISSION.OUTBREAK_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE
-      ],
-      questionnaire: OutbreakQestionnaireTypeEnum.FOLLOW_UP
-    },
-    canDeactivate: [
-      PageChangeConfirmationGuard
-    ]
-  },
-
-  // Edit Outbreak Case Lab Results Questionnaire
-  {
-    path: ':outbreakId/case-lab-results-questionnaire',
-    component: fromPages.OutbreakQuestionnaireComponent,
-    canActivate: [AuthGuard],
-    data: {
-      permissions: [
-        PERMISSION.OUTBREAK_VIEW,
-        PERMISSION.OUTBREAK_MODIFY,
-        PERMISSION.OUTBREAK_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE
-      ],
-      questionnaire: OutbreakQestionnaireTypeEnum.CASE_LAB_RESULT
     },
     canDeactivate: [
       PageChangeConfirmationGuard

@@ -275,41 +275,5 @@
                 {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
             </button>
         </ng-container>
-
-        <div
-            *ngIf="(viewOnly && OutbreakTemplateModel.canModify(authUser)) || !viewOnly"
-            class="page-tabs-navbar-placeholder"></div>
-
-        <button
-            *ngIf="OutbreakTemplateModel.canModifyCaseQuestionnaire(authUser)"
-            mat-raised-button
-            type="button"
-            [routerLink]="['/outbreak-templates', outbreakTemplateId, 'case-questionnaire']">
-            {{ 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE' | translate }}
-        </button>
-
-        <button
-            *ngIf="OutbreakTemplateModel.canModifyContactQuestionnaire(authUser)"
-            mat-raised-button
-            type="button"
-            [routerLink]="['/outbreak-templates', outbreakTemplateId, 'contact-questionnaire']">
-            {{ 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE' | translate }}
-        </button>
-
-        <button
-            *ngIf="OutbreakTemplateModel.canModifyContactFollowUpQuestionnaire(authUser)"
-            mat-raised-button
-            type="button"
-            [routerLink]="['/outbreak-templates', outbreakTemplateId, 'contact-follow-up-questionnaire']">
-            {{ 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE' | translate }}
-        </button>
-
-        <button
-            *ngIf="OutbreakTemplateModel.canModifyCaseLabResultQuestionnaire(authUser)"
-            mat-raised-button
-            type="button"
-            [routerLink]="['/outbreak-templates', outbreakTemplateId, 'case-lab-results-questionnaire']">
-            {{ 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE' | translate }}
-        </button>
     </div>
 </form>
