@@ -518,7 +518,7 @@ export class AppFormEditQuestionnaireV2Component
               value: modifyQuestion.multiAnswer ?
                 'LNG_COMMON_LABEL_YES' :
                 'LNG_COMMON_LABEL_NO',
-              visible: () => modifyQuestion.answerType !== Constants.ANSWER_TYPES.MARKUP.value
+              visible: () => !parent && modifyQuestion.answerType !== Constants.ANSWER_TYPES.MARKUP.value
             }
           ]
         }
@@ -654,7 +654,7 @@ export class AppFormEditQuestionnaireV2Component
               value: modifyQuestion ?
                 modifyQuestion.multiAnswer :
                 false,
-              visible: (data) => (data.map.answerType as IV2SideDialogConfigInputSingleDropdown).value !== Constants.ANSWER_TYPES.MARKUP.value
+              visible: (data) => !parent && (data.map.answerType as IV2SideDialogConfigInputSingleDropdown).value !== Constants.ANSWER_TYPES.MARKUP.value
             }
           ]
         }
@@ -776,10 +776,13 @@ export class AppFormEditQuestionnaireV2Component
   /**
    * View / Edit question
    */
-  viewEditQuestion(question: QuestionModel): void {
+  viewEditQuestion(
+    question: QuestionModel,
+    parent: AnswerModel
+  ): void {
     this.showAddModifyQuestion(
       false,
-      undefined,
+      parent,
       question
     );
   }
