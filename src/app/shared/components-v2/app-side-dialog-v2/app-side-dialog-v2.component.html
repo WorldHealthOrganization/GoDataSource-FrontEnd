@@ -234,7 +234,6 @@
             <div
               *ngSwitchCase="V2SideDialogConfigInputType.HTML"
               class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
-              fxLayout="row" fxLayoutGap="1.6rem"
               [innerHTML]="input.placeholder ? (input.placeholder | translate | safeHtml) : undefined">
             </div>
 

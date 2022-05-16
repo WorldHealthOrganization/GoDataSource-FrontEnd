@@ -316,10 +316,19 @@
     }
   }
 
-  .gd-form-input-v2-viewonly {
-    .gd-form-input-v2-viewonly-label {
+  .gd-form-select-single-v2-viewonly {
+    .gd-form-select-single-v2-viewonly-label {
       color: var(--gd-secondary);
       white-space: nowrap;
+    }
+
+    .gd-form-select-single-v2-viewonly-value {
+      img {
+        display: inline-block;
+        height: 2rem;
+        margin-right: 0.4rem;
+        vertical-align: text-bottom;
+      }
     }
   }
 }

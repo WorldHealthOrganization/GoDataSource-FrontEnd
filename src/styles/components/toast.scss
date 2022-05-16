@@ -56,6 +56,10 @@
   &.toast-top-center {
     .ngx-toastr {
       width: 50rem;
+
+      @include breakpoint('xxs') {
+        width: 100%;
+      }
     }
   }
 }

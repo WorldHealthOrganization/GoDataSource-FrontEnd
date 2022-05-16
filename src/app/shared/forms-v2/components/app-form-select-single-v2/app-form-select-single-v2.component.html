@@ -14,7 +14,8 @@
 
     <!-- Left - Icon buttons -->
     <ng-container
-      *ngIf="tooltipButton?.tooltip">
+      *ngIf="tooltipButton?.tooltip"
+      matPrefix>
       <popper-content
         #popperContent>
         <div
@@ -23,7 +24,6 @@
       </popper-content>
       <mat-icon
         tabindex="-1"
-        matPrefix
         [popper]="popperContent"
         popperTrigger="hover"
         popperApplyClass="gd-form-input-v2-tooltip"

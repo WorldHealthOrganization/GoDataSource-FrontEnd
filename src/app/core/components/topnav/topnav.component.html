@@ -151,15 +151,18 @@
 
       <!-- Name and email -->
       <div
+        class="gd-top-right-user-menu-option-user"
         (click)="$event.preventDefault(); $event.stopPropagation(); $event.stopImmediatePropagation();">
 
         <!-- Name -->
-        <div>
+        <div
+          class="gd-top-right-user-menu-option-user-name">
           {{ authUser?.name }}
         </div>
 
         <!-- Email -->
-        <div>
+        <div
+          class="gd-top-right-user-menu-option-user-email">
           {{ authUser?.email }}
         </div>
 
