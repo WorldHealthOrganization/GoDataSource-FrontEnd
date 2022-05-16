@@ -15,12 +15,14 @@ import { AppFormTextareaV2Component } from './app-form-textarea-v2/app-form-text
 import { AppFormSelectGroupsV2Component } from './app-form-select-groups-v2/app-form-select-groups-v2.component';
 import { AppFormPasswordV2Component } from './app-form-password-v2/app-form-password-v2.component';
 import { AppFormEditQuestionnaireV2Component } from './app-form-edit-questionnaire-v2/app-form-edit-questionnaire-v2.component';
+import { AppFormFillQuestionnaireV2Component } from './app-form-fill-questionnaire-v2/app-form-fill-questionnaire-v2.component';
 
 export const components: any[] = [
   AppFormCheckboxV2Component,
   AppFormDateRangeV2Component,
   AppFormDateV2Component,
   AppFormEditQuestionnaireV2Component,
+  AppFormFillQuestionnaireV2Component,
   AppFormInputV2Component,
   AppFormNumberRangeV2Component,
   AppFormNumberV2Component,
