@@ -699,6 +699,7 @@
 
                 <!-- Sort tab -->
                 <mat-tab
+                  *ngIf="input.sorts?.length > 0"
                   [label]="'LNG_SIDE_FILTERS_SECTION_SORT_TITLE' | translate">
 
                   <!-- Buttons -->
