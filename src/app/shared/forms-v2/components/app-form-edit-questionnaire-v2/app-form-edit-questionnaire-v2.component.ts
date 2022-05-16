@@ -86,6 +86,7 @@ export class AppFormEditQuestionnaireV2Component
   // constants
   FlattenType = FlattenType;
   RenderMode = RenderMode;
+  Constants = Constants;
 
   // check if we can drop element to the selected position
   readonly bufferToRender: number = 1024;

@@ -49,6 +49,7 @@
             *ngSwitchCase="FlattenType.QUESTION"
             class="gd-form-edit-questionnaire-v2-item-question"
             [class.gd-form-edit-questionnaire-v2-item-question-inactive]="item.data.inactive"
+            [class.gd-form-edit-questionnaire-v2-item-question-markup]="item.data.answerType === Constants.ANSWER_TYPES.MARKUP.value"
 
             change123
             fxLayout="row">
