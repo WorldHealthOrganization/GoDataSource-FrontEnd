@@ -781,7 +781,7 @@ export class EntityFollowUpHelperService {
                           )
                           .subscribe(() => {
                             // success message
-                            this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TARGETED_SUCCESS_MESSAGE');
+                            this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TEAM_SUCCESS_MESSAGE');
 
                             // close popup
                             response.handler.hide();
