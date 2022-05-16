@@ -18,31 +18,29 @@ import { V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-
   templateUrl: './transmission-chains-list.component.html'
 })
 export class TransmissionChainsListComponent extends ListComponent<TransmissionChainModel> implements OnDestroy {
-  queryParamsData: any;
-
   /**
-  * Constructor
-  */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     private transmissionChainDataService: TransmissionChainDataService,
-    private route: ActivatedRoute,
+    private activatedRoute: ActivatedRoute,
     private i18nService: I18nService
   ) {
-    super(listHelperService);
-
-    // get query params
-    this.queryParamsData = this.route.snapshot.queryParams;
-    this.appliedListFilter = this.queryParamsData.applyListFilter;
-
-    // init filters
-    this.resetFiltersAddDefault();
+    // parent
+    super(
+      listHelperService,
+      true
+    );
   }
 
   /**
-  * Selected outbreak was changed
-  */
+   * Selected outbreak was changed
+   */
   selectedOutbreakChanged(): void {
+    // init filters
+    this.resetFiltersAddDefault();
+
     // initialize pagination
     this.initPaginator();
 
@@ -51,16 +49,16 @@ export class TransmissionChainsListComponent extends ListComponent<TransmissionC
   }
 
   /**
-  * Component destroyed
-  */
+   * Component destroyed
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
   }
 
   /**
-  * Initialize Side Table Columns
-  */
+   * Initialize Side Table Columns
+   */
   protected initializeTableColumns(): void {
     this.tableColumns = [
       {
@@ -112,157 +110,159 @@ export class TransmissionChainsListComponent extends ListComponent<TransmissionC
   }
 
   /**
-  * Initialize process data
-  */
+   * Initialize process data
+   */
   protected initializeProcessSelectedData(): void { }
 
   /**
-  * Initialize table infos
-  */
+   * Initialize table infos
+   */
   protected initializeTableInfos(): void { }
 
   /**
-  * Initialize Table Advanced Filters
-  */
+   * Initialize Table Advanced Filters
+   */
   protected initializeTableAdvancedFilters(): void { }
 
   /**
-  * Initialize table quick actions
-  */
+   * Initialize table quick actions
+   */
   protected initializeQuickActions(): void { }
 
   /**
-  * Initialize table group actions
-  */
+   * Initialize table group actions
+   */
   protected initializeGroupActions(): void { }
 
   /**
-  * Initialize table add action
-  */
+   * Initialize table add action
+   */
   protected initializeAddAction(): void { }
 
   /**
-  * Initialize table grouped data
-  */
+   * Initialize table grouped data
+   */
   protected initializeGroupedData(): void { }
 
   /**
-  * Initialize filters
-  */
-  resetFiltersAddDefault() {
-    // get global filter values
-    if (this.queryParamsData) {
-      // get global filters
-      const globalFilters = this.getGlobalFilterValues(this.queryParamsData);
+   * Initialize filters
+   */
+  resetFiltersAddDefault(): void {
+    // do we have query params ?
+    if (!this.activatedRoute.snapshot.queryParams) {
+      return;
+    }
 
-      // generate query builder
-      let qb: RequestQueryBuilder;
-      switch (this.appliedListFilter) {
-        case ApplyListFilter.NO_OF_ACTIVE_TRANSMISSION_CHAINS:
-          // NOTHING - IGNORE
-          break;
+    // get global filters
+    const globalFilters = this.getGlobalFilterValues(this.activatedRoute.snapshot.queryParams);
 
-        case ApplyListFilter.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES:
-          // date
-          qb = new RequestQueryBuilder();
+    // generate query builder
+    let qb: RequestQueryBuilder;
+    switch (this.appliedListFilter) {
+      case ApplyListFilter.NO_OF_ACTIVE_TRANSMISSION_CHAINS:
+        // NOTHING - IGNORE
+        break;
 
-          // date
-          if (globalFilters.date) {
-            qb.filter.byDateRange(
-              'contactDate', {
-                endDate: globalFilters.date.endOf('day').toISOString()
+      case ApplyListFilter.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES:
+        // date
+        qb = new RequestQueryBuilder();
+
+        // date
+        if (globalFilters.date) {
+          qb.filter.byDateRange(
+            'contactDate', {
+              endDate: globalFilters.date.endOf('day').toISOString()
+            }
+          );
+        }
+
+        // location
+        if (globalFilters.locationId) {
+          qb.addChildQueryBuilder('case').filter
+            .byEquality('addresses.parentLocationIdFilter', globalFilters.locationId);
+        }
+
+        // classification
+        if (!_.isEmpty(globalFilters.classificationId)) {
+          // person
+          qb.addChildQueryBuilder('case').filter.where({
+            classification: {
+              inq: globalFilters.classificationId
+            }
+          });
+        }
+
+        // finished
+        break;
+
+      default:
+        // date
+        qb = new RequestQueryBuilder();
+
+        // date
+        if (globalFilters.date) {
+          qb.filter.byDateRange(
+            'contactDate', {
+              endDate: globalFilters.date.endOf('day').toISOString()
+            }
+          );
+        }
+
+        // location
+        if (globalFilters.locationId) {
+          qb.addChildQueryBuilder('person').filter.where({
+            or: [
+              {
+                type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT',
+                'address.parentLocationIdFilter': globalFilters.locationId
+              }, {
+                type: {
+                  inq: [
+                    'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+                    'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'
+                  ]
+                },
+                'addresses.parentLocationIdFilter': globalFilters.locationId
               }
-            );
-          }
+            ]
+          });
+        }
 
-          // location
-          if (globalFilters.locationId) {
-            qb.addChildQueryBuilder('case').filter
-              .byEquality('addresses.parentLocationIdFilter', globalFilters.locationId);
-          }
-
-          // classification
-          if (!_.isEmpty(globalFilters.classificationId)) {
-            // person
-            qb.addChildQueryBuilder('case').filter.where({
-              classification: {
-                inq: globalFilters.classificationId
-              }
-            });
-          }
-
-          // finished
-          break;
-
-        default:
-          // date
-          qb = new RequestQueryBuilder();
-
-          // date
-          if (globalFilters.date) {
-            qb.filter.byDateRange(
-              'contactDate', {
-                endDate: globalFilters.date.endOf('day').toISOString()
-              }
-            );
-          }
-
-          // location
-          if (globalFilters.locationId) {
-            qb.addChildQueryBuilder('person').filter.where({
-              or: [
-                {
-                  type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT',
-                  'address.parentLocationIdFilter': globalFilters.locationId
-                }, {
-                  type: {
-                    inq: [
-                      'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
-                      'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'
-                    ]
-                  },
-                  'addresses.parentLocationIdFilter': globalFilters.locationId
+        // classification
+        if (!_.isEmpty(globalFilters.classificationId)) {
+          // define classification conditions
+          const classificationConditions = {
+            or: [
+              {
+                type: {
+                  neq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE'
                 }
-              ]
-            });
-          }
-
-          // classification
-          if (!_.isEmpty(globalFilters.classificationId)) {
-            // define classification conditions
-            const classificationConditions = {
-              or: [
-                {
-                  type: {
-                    neq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE'
-                  }
-                }, {
-                  type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
-                  classification: {
-                    inq: globalFilters.classificationId
-                  }
+              }, {
+                type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+                classification: {
+                  inq: globalFilters.classificationId
                 }
-              ]
-            };
+              }
+            ]
+          };
 
-            // top level classification
-            qb.filter.where(classificationConditions);
+          // top level classification
+          qb.filter.where(classificationConditions);
 
-            // person
-            qb.addChildQueryBuilder('person').filter.where(classificationConditions);
-          }
-      }
+          // person
+          qb.addChildQueryBuilder('person').filter.where(classificationConditions);
+        }
+    }
 
-      // merge
-      if (qb) {
-        this.queryBuilder.merge(qb);
-      }
+    // merge
+    if (qb) {
+      this.queryBuilder.merge(qb);
     }
   }
 
   /**
-  * Initialize breadcrumbs
-  */
+   * Initialize breadcrumbs
+   */
   initializeBreadcrumbs(): void {
     // set breadcrumbs
     this.breadcrumbs = [
@@ -281,8 +281,8 @@ export class TransmissionChainsListComponent extends ListComponent<TransmissionC
   }
 
   /**
-  * Fields retrieved from api to reduce payload size
-  */
+   * Fields retrieved from api to reduce payload size
+   */
   protected refreshListFields(): string[] {
     return [
       // edges
@@ -303,9 +303,9 @@ export class TransmissionChainsListComponent extends ListComponent<TransmissionC
   }
 
   /**
-  * Re(load) the Transmission Chains list, based on the applied filter, sort criterias
-  */
-  refreshList() {
+   * Re(load) the Transmission Chains list, based on the applied filter, sort criterias
+   */
+  refreshList(): void {
     // retrieve only specific fields so we don't retrieve huge amounts of data that won't be used since we don't have pagination here
     const qb = new RequestQueryBuilder();
     qb.merge(this.queryBuilder);
@@ -357,7 +357,7 @@ export class TransmissionChainsListComponent extends ListComponent<TransmissionC
   }
 
   /**
-  * Get total number of items
-  */
-  refreshListCount() {}
+   * Get total number of items
+   */
+  refreshListCount(): void {}
 }

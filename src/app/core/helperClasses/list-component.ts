@@ -224,6 +224,12 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
         resetPagination?: boolean,
         triggeredByPageChange?: boolean
       ) => {
+        // do we have outbreak - if not, it will be refreshed by that ?
+        if (!this.selectedOutbreak?.id) {
+          return;
+        }
+
+        // refresh
         this.needsRefreshList(
           instant !== undefined ? instant : false,
           resetPagination !== undefined ? resetPagination : true,
