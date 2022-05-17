@@ -532,6 +532,11 @@
           }
         }
       }
+
+      > form,
+      .gd-create-view-modify-bottom-section-content-input-has-edit-questionnaire {
+        height: 100%;
+      }
     }
   }
 }
