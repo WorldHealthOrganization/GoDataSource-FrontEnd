@@ -48,6 +48,7 @@ interface IFlattenNode {
   parents: {
     [id: string]: true
   };
+  oneParentIsInactive: boolean;
   children: IFlattenNode[];
   nonFLat: {
     index: number,
@@ -166,7 +167,8 @@ export class AppFormEditQuestionnaireV2Component
       this.value,
       0,
       null,
-      {}
+      {},
+      false
     );
   }
 
@@ -272,7 +274,8 @@ export class AppFormEditQuestionnaireV2Component
     parent: IFlattenNode,
     parents: {
       [id: string]: true
-    }
+    },
+    oneParentIsInactive: boolean
   ): void {
     // no questions ?
     if (
@@ -302,6 +305,7 @@ export class AppFormEditQuestionnaireV2Component
         data: question,
         parent,
         parents,
+        oneParentIsInactive,
         children: [],
         nonFLat: {
           index: questionIndex,
@@ -340,6 +344,7 @@ export class AppFormEditQuestionnaireV2Component
               ...flattenedQuestion.parents,
               [flattenedQuestion.id]: true
             },
+            oneParentIsInactive: (flattenedQuestion.data as QuestionModel).inactive || flattenedQuestion.oneParentIsInactive,
             children: [],
             nonFLat: {
               index: answerIndex,
@@ -362,7 +367,8 @@ export class AppFormEditQuestionnaireV2Component
               {
                 ...flattenedAnswer.parents,
                 [flattenedAnswer.id]: true
-              }
+              },
+              flattenedAnswer.oneParentIsInactive
             );
           }
         });
