@@ -33,6 +33,11 @@
           width: 2rem;
 
           &:not(.mat-tooltip-trigger) {
+            font-size: 2rem;
+            width: 2.4rem;
+          }
+
+          &.gd-form-toggle-checkbox-v2-toggle-icon {
             font-size: 3rem;
             height: auto;
             width: 3rem;

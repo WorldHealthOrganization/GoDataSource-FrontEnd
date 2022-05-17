@@ -338,18 +338,6 @@ svg:not(:root) {
   font-feature-settings: 'liga';
 }
 
-/* Tooltips */
-.mat-tooltip-panel {
-  pointer-events: none;
-
-  .mat-tooltip {
-    background: var(--gd-text);
-    font-family: $gd-font-family;
-    margin: 0.4rem;
-    padding: 0.4rem 0.8rem;
-  }
-}
-
 /* Divider */
 .mat-divider {
   border-top-color: rgba(var(--gd-secondary-rgb), 0.25);

@@ -10,7 +10,8 @@ mat-sidenav-container {
   &.gd-body-content {
     background-color: transparent;
     color: var(--gd-text);
-    height: 100vh;
+    height: 100vh; /* Old Value - Fallback for browsers that do not support Custom Properties */
+    height: calc(var(--vh, 1vh) * 100);
     margin: 0;
     overflow: hidden;
     padding: 0;
@@ -170,7 +171,8 @@ mat-sidenav-container {
       .gd-body-content-right-bottom {
         background: rgba(var(--gd-secondary-rgb), 0.1);
         color: var(--gd-text);
-        height: calc(100vh - var(--gd-top-bar-height));
+        height: calc(100vh - var(--gd-top-bar-height)); /* Old Value - Fallback for browsers that do not support Custom Properties */
+        height: calc((var(--vh, 1vh) * 100) - var(--gd-top-bar-height));
         padding: 1.2rem 4rem 4rem;
         overflow-x: hidden;
         overflow-y: overlay;

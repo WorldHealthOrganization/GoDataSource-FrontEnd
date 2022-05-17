@@ -88,6 +88,8 @@
 
           .mat-icon {
             color: rgba(var(--gd-text-rgb), 0.75);
+            font-size: 2rem;
+            line-height: 1;
             text-align: center;
           }
 
@@ -231,6 +233,8 @@
 
           .mat-icon {
             color: rgba(var(--gd-text-rgb), 0.75);
+            font-size: 2rem;
+            line-height: 1;
             text-align: center;
           }
 
@@ -238,6 +242,10 @@
             font-size: 1.6rem;
             height: 2.4rem;
             width: 2.4rem;
+
+            + .mat-icon-button {
+              margin-left: 0.4rem;
+            }
           }
         }
       }
@@ -248,7 +256,7 @@
         line-height: 1;
         margin-top: 0;
         min-height: 1.6rem;
-        padding: 0.2rem 0;
+        padding: 0;
         position: static;
         top: 0;
 
