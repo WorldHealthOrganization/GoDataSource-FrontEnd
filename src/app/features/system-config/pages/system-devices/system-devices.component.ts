@@ -19,8 +19,8 @@ import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v
 })
 export class SystemDevicesComponent extends ListComponent<DeviceModel> implements OnDestroy {
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     private deviceDataService: DeviceDataService,
@@ -42,16 +42,16 @@ export class SystemDevicesComponent extends ListComponent<DeviceModel> implement
   }
 
   /**
-     * Release resources
-     */
+   * Release resources
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
   }
 
   /**
-     * Initialize Side Table Columns
-     */
+   * Initialize Side Table Columns
+   */
   protected initializeTableColumns() {
     // default table columns
     this.tableColumns = [
@@ -110,7 +110,7 @@ export class SystemDevicesComponent extends ListComponent<DeviceModel> implement
           type: V2ColumnFormat.ACTIONS
         },
         actions: [
-          // View Device
+          // View
           {
             type: V2ActionType.ICON,
             icon: 'visibility',
@@ -125,7 +125,7 @@ export class SystemDevicesComponent extends ListComponent<DeviceModel> implement
             }
           },
 
-          // Modify Case
+          // Modify
           {
             type: V2ActionType.ICON,
             icon: 'edit',
@@ -145,7 +145,7 @@ export class SystemDevicesComponent extends ListComponent<DeviceModel> implement
             type: V2ActionType.MENU,
             icon: 'more_horiz',
             menuOptions: [
-              // Delete Case
+              // Delete
               {
                 label: {
                   get: () => 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE'
@@ -220,7 +220,7 @@ export class SystemDevicesComponent extends ListComponent<DeviceModel> implement
                 }
               },
 
-              // Wipe Case
+              // Wipe
               {
                 label: {
                   get: () => 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_WIPE'
@@ -383,8 +383,8 @@ export class SystemDevicesComponent extends ListComponent<DeviceModel> implement
   }
 
   /**
-     * Get total number of items, based on the applied filters
-     */
+   * Get total number of items, based on the applied filters
+   */
   refreshListCount(applyHasMoreLimit?: boolean) {
     // reset
     this.pageCount = undefined;
@@ -407,6 +407,7 @@ export class SystemDevicesComponent extends ListComponent<DeviceModel> implement
       );
     }
 
+    // count
     this.deviceDataService
       .getDevicesCount(countQueryBuilder)
       .pipe(
