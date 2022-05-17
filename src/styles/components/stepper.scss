@@ -53,7 +53,7 @@
 
         &.mat-step-icon-selected {
           + .mat-step-label {
-            @include breakpoint('xs') {
+            @include breakpoint('lt-sm') {
               display: block;
             }
           }
@@ -67,12 +67,28 @@
         line-height: $gd-line-height;
         min-width: 2.4rem;
 
-        @include breakpoint('xs') {
+        @include breakpoint('md') {
+          font-size: 1.4rem;
+        }
+
+        @include breakpoint('lt-sm') {
           display: none;
         }
 
         &.mat-step-label-active {
           color: var(--gd-text);
+        }
+
+        .mat-step-text-label {
+          > div {
+            @include flex(flex);
+          }
+
+          .mat-icon {
+            height: 2.1rem;
+            margin-left: 0.8rem;
+            width: 2.1rem;
+          }
         }
       }
     }
@@ -80,6 +96,7 @@
     .mat-stepper-horizontal-line {
       border-top-color: rgba(var(--gd-secondary-rgb), 0.25);
       margin: 0;
+      min-width: 0.8rem;
     }
   }
 
@@ -89,12 +106,21 @@
     @include box-shadow(0 0.2rem 0.1rem -0.1rem rgb(0, 0, 0, 0.2),
                         0 0.1rem 0.1rem 0 rgb(0, 0, 0, 0.14),
                         0 0.1rem 0.3rem 0 rgb(0, 0, 0, 0.12));
+    height: 100%;
     max-height: calc(100% - 5.7rem);
     overflow-y: auto;
-    padding: 1.6rem;
+    padding: 0;
+
+    .mat-horizontal-stepper-content {
+      &[aria-expanded="true"] {
+        height: 100%;
+      }
+    }
 
     .gd-create-view-modify-bottom-content {
       margin-right: -1.6rem;
+      min-height: calc(100% - 6.9rem);
+      padding: 1.6rem;
     }
 
     .gd-create-view-modify-bottom-content-final-step {
@@ -120,8 +146,8 @@
       background: var(--gd-background);
       border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
       @include border-radius(0 0 0.4rem 0.4rem);
-      bottom: -1.6rem;
-      margin: 1.6rem -1.6rem -1.6rem;
+      bottom: 0;
+      margin: 0;
       padding: 1.6rem;
       position: sticky;
     }

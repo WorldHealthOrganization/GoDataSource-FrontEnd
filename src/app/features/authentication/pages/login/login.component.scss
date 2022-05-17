@@ -1,7 +1,9 @@
 @import 'mixins';
 
 .gd-login {
-  height: 100vh;
+  // height: 100vh;
+  height: 100vh; /* Old Value - Fallback for browsers that do not support Custom Properties */
+  height: calc(var(--vh, 1vh) * 100);
   overflow: hidden;
 
   .gd-login-left {

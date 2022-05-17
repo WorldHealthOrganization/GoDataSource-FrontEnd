@@ -44,6 +44,9 @@
           [style.paddingLeft.px]="item.level * 20"
           style="height: 32px">
 
+          <!-- Custom drag&drop placeholder -->
+          <div class="gd-drag-custom-placeholder" *cdkDragPlaceholder></div>
+
           <!-- Question -->
           <div
             *ngSwitchCase="FlattenType.QUESTION"

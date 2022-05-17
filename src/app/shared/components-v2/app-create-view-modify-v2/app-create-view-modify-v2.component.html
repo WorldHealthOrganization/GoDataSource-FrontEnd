@@ -947,6 +947,7 @@
                       name="url"
                       placeholder="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_URL"
                       tooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_URL_DESCRIPTION"
+                      class="gd-create-view-modify-bottom-section-content-input-url"
                       [viewOnly]="isView"
                       required="true"></app-form-input-v2>
 
@@ -960,6 +961,7 @@
                         name="styleUrl"
                         placeholder="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_STYLE"
                         tooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_STYLE_DESCRIPTION"
+                        class="gd-create-view-modify-bottom-section-content-input-url"
                         [viewOnly]="isView"
                         app-general-async-validator
                         [asyncValidatorObservable]="input.styleAsyncValidator(input, parentItemIndex)"></app-form-input-v2>
@@ -1007,13 +1009,16 @@
                         <div
                           *ngFor="let item of input.items; let itemIndex = index; trackBy: trackByIndex"
                           class="gd-create-view-modify-bottom-section-content-input-list-item"
-                          cdkDrag cdkDragLockAxis="y" [cdkDragData]="item" [cdkDragDisabled]="!input.sortable || isView" cdkDragBoundary=".gd-create-view-modify-bottom-section-content-input-list-{{input.name}}" (cdkDragStarted)="dragStarted()">
+                          cdkDrag cdkDragLockAxis="y" [cdkDragData]="item" [cdkDragDisabled]="!input.sortable || isView" cdkDragBoundary=".gd-create-view-modify-bottom-section-content-input-list-{{input.name}}" (cdkDragStarted)="dragStarted()" cdkDragPreviewContainer="parent">
+
+                          <!-- Custom drag&drop placeholder -->
+                          <div class="gd-drag-custom-placeholder" *cdkDragPlaceholder></div>
 
                           <!-- Sort & Remove buttons -->
                           <div
                             *ngIf="!isView"
                             fxLayoutAlign="end"
-                            class="gd-create-view-modify-bottom-section-content-input-list-item-delete">
+                            class="gd-create-view-modify-bottom-section-content-input-list-item-buttons">
 
                             <!-- Sort -->
                             <button

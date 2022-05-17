@@ -74,6 +74,8 @@
 
           .mat-icon {
             color: rgba(var(--gd-text-rgb), 0.75);
+            font-size: 2rem;
+            line-height: 1;
             text-align: center;
           }
 
@@ -115,7 +117,13 @@
 
         /* Form input suffix */
         .mat-form-field-suffix {
+          @include flex(flex);
+          @include flex_align_items(center);
           top: 0.3rem;
+
+          .mat-progress-spinner {
+            margin-right: 0.4rem;
+          }
 
           .mat-icon {
             color: rgba(var(--gd-text-rgb), 0.75);
@@ -131,6 +139,10 @@
             min-width: 0;
             padding: 0;
             width: 2.4rem;
+
+            + .mat-icon-button {
+              margin-left: 0.4rem;
+            }
           }
         }
       }
@@ -141,7 +153,7 @@
         line-height: 1;
         margin-top: 0;
         min-height: 1.6rem;
-        padding: 0.2rem 0;
+        padding: 0;
         position: static;
         top: 0;
 
@@ -229,6 +241,12 @@
     .gd-form-input-v2-viewonly-label {
       color: var(--gd-secondary);
       white-space: nowrap;
+    }
+
+    .gd-form-input-v2-viewonly-value {
+      .gd-create-view-modify-bottom-section-content-input-url & {
+        word-break: break-all;
+      }
     }
   }
 }
