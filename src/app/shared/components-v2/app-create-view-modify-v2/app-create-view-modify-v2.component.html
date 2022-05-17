@@ -162,7 +162,8 @@
             mat-flat-button
             (click)="expandCollapseList()"
             class="gd-create-view-modify-list-expand-collapse-button">
-            <span>{{listTitle | translate}}</span>
+            <mat-icon
+              [matTooltip]="listTitle | translate">fact_check</mat-icon>
           </button>
         </ng-template>
 
