@@ -108,11 +108,15 @@ import { OutbreakTemplateDataResolver } from './resolvers/data/outbreak-template
 import { QuestionnaireAnswerTypeDataResolver } from './resolvers/data/questionnaire-answer-type.resolver';
 import { QuestionnaireQuestionCategoryDataResolver } from './resolvers/data/questionnaire-question-category.resolver';
 import { QuestionnaireAnswerDisplayDataResolver } from './resolvers/data/questionnaire-answer-display.resolver';
+import { BackupModuleDataResolver } from './resolvers/data/backup-module.resolver';
+import { BackupStatusDataResolver } from './resolvers/data/backup-status.resolver';
 
 // export the list of services
 export const services: any[] = [
   // resolver services
   AddressTypeDataResolver,
+  BackupModuleDataResolver,
+  BackupStatusDataResolver,
   CertaintyLevelDataResolver,
   ClassificationDataResolver,
   ClusterDataResolver,

@@ -1,188 +1,311 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { UserSettings } from '../../../../core/models/user.model';
-import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { Observable, throwError } from 'rxjs';
-import { DeviceDataService } from '../../../../core/services/data/device.data.service';
-import { DeviceModel } from '../../../../core/models/device.model';
-import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
-import { catchError, share } from 'rxjs/operators';
-import { Router } from '@angular/router';
+import { Component, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
-import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { throwError } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { DeviceModel } from '../../../../core/models/device.model';
+import { DeviceDataService } from '../../../../core/services/data/device.data.service';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 
 @Component({
   selector: 'app-system-devices-list',
   templateUrl: './system-devices.component.html'
 })
-export class SystemDevicesComponent extends ListComponent<DeviceModel> implements OnInit, OnDestroy {
-  // Breadcrumbs
-  // breadcrumbs: BreadcrumbItemModel[] = [
-  //   new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_DEVICES_TITLE', '.', true)
-  // ];
-
-  devicesList$: Observable<DeviceModel[]>;
-  devicesListCount$: Observable<IBasicCount>;
-
-  // constants
-  UserSettings = UserSettings;
-
-  recordActions: HoverRowAction[] = [
-    // View Device
-    new HoverRowAction({
-      icon: 'visibility',
-      iconTooltip: 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_VIEW',
-      linkGenerator: (item: DeviceModel): string[] => {
-        return ['/system-config', 'devices', item.id, 'view'];
-      },
-      visible: (): boolean => {
-        return DeviceModel.canView(this.authUser);
-      }
-    }),
-
-    // Modify Device
-    new HoverRowAction({
-      icon: 'settings',
-      iconTooltip: 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_MODIFY',
-      linkGenerator: (item: DeviceModel): string[] => {
-        return ['/system-config', 'devices', item.id, 'modify'];
-      },
-      visible: (): boolean => {
-        return DeviceModel.canModify(this.authUser);
-      }
-    }),
-
-    // Other actions
-    new HoverRowAction({
-      type: HoverRowActionType.MENU,
-      icon: 'moreVertical',
-      menuOptions: [
-        // Delete Device
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE',
-          click: (item: DeviceModel) => {
-            this.deleteDevice(item);
-          },
-          visible: (): boolean => {
-            return DeviceModel.canDelete(this.authUser);
-          },
-          class: 'mat-menu-item-delete'
-        }),
-
-        // Divider
-        new HoverRowAction({
-          type: HoverRowActionType.DIVIDER,
-          visible: (): boolean => {
-            // visible only if at least one of the previous...
-            return DeviceModel.canDelete(this.authUser);
-          }
-        }),
-
-        // Wipe Device
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_WIPE',
-          click: (item: DeviceModel) => {
-            this.wipeDevice(item);
-          },
-          visible: (): boolean => {
-            // for now let use do another wipe even if one is in progress, because parse might fails..and status might remain pending..which might cause issues if we can't send a new notification
-            // [Constants.DEVICE_WIPE_STATUS.READY.value, Constants.DEVICE_WIPE_STATUS.PENDING.value].includes(item.status)
-            return DeviceModel.canWipe(this.authUser);
-          },
-          class: 'mat-menu-item-delete'
-        }),
-
-        // View Device History
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_VIEW_HISTORY',
-          click: (item: DeviceModel) => {
-            this.router.navigate(['/system-config', 'devices', item.id, 'history']);
-          },
-          visible: (): boolean => {
-            return DeviceModel.canListHistory(this.authUser);
-          }
-        })
-      ]
-    })
-  ];
-
+export class SystemDevicesComponent extends ListComponent<DeviceModel> implements OnDestroy {
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
-    private router: Router,
     private deviceDataService: DeviceDataService,
     private toastV2Service: ToastV2Service,
-    private dialogService: DialogService
+    private dialogV2Service: DialogV2Service
   ) {
     super(listHelperService);
   }
 
   /**
-     * Component initialized
-     */
-  ngOnInit() {
-    // initialize Side Table Columns
-    this.initializeTableColumns();
-
+   * Component initialized
+   */
+  initialized(): void {
     // initialize pagination
     this.initPaginator();
 
-    // retrieve devices
+    // ...and re-load the list when the Selected Outbreak is changed
     this.needsRefreshList(true);
   }
 
   /**
-     * Release resources
-     */
+   * Release resources
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
   }
 
   /**
-     * Initialize Side Table Columns
-     */
-  initializeTableColumns() {
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns() {
     // default table columns
-    // this.tableColumns = [
-    //   new VisibleColumnModel({
-    //     field: 'name',
-    //     label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_NAME'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'description',
-    //     label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_DESCRIPTION'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'physicalDeviceId',
-    //     label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_PHYSICAL_DEVICE_ID'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'manufacturer',
-    //     label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_MANUFACTURER'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'model',
-    //     label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_MODEL'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'os',
-    //     label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_OPERATING_SYSTEM'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'status',
-    //     label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_STATUS'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'lastSeen',
-    //     label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_LAST_SEEN'
-    //   })
-    // ];
+    this.tableColumns = [
+      {
+        field: 'name',
+        label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_NAME',
+        sortable: true
+      },
+      {
+        field: 'description',
+        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_DESCRIPTION',
+        sortable: true
+      },
+      {
+        field: 'physicalDeviceId',
+        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_PHYSICAL_DEVICE_ID',
+        sortable: true
+      },
+      {
+        field: 'manufacturer',
+        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_MANUFACTURER',
+        sortable: true
+      },
+      {
+        field: 'model',
+        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_MODEL',
+        sortable: true
+      },
+      {
+        field: 'os',
+        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_OPERATING_SYSTEM',
+        sortable: true
+      },
+      {
+        field: 'status',
+        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_STATUS',
+        sortable: true
+      },
+      {
+        field: 'lastSeen',
+        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_LAST_SEEN',
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.DATE
+        }
+      },
+
+      // actions
+      {
+        field: 'actions',
+        label: 'LNG_COMMON_LABEL_ACTIONS',
+        pinned: IV2ColumnPinned.RIGHT,
+        notResizable: true,
+        cssCellClass: 'gd-cell-no-focus',
+        format: {
+          type: V2ColumnFormat.ACTIONS
+        },
+        actions: [
+          // View
+          {
+            type: V2ActionType.ICON,
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_VIEW',
+            action: {
+              link: (item: DeviceModel): string[] => {
+                return ['/system-config', 'devices', item.id, 'view'];
+              }
+            },
+            visible: (): boolean => {
+              return DeviceModel.canView(this.authUser);
+            }
+          },
+
+          // Modify
+          {
+            type: V2ActionType.ICON,
+            icon: 'edit',
+            iconTooltip: 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_MODIFY',
+            action: {
+              link: (item: DeviceModel): string[] => {
+                return ['/system-config', 'devices', item.id, 'modify'];
+              }
+            },
+            visible: (): boolean => {
+              return DeviceModel.canModify(this.authUser);
+            }
+          },
+
+          // Other actions
+          {
+            type: V2ActionType.MENU,
+            icon: 'more_horiz',
+            menuOptions: [
+              // Delete
+              {
+                label: {
+                  get: () => 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE'
+                },
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+                action: {
+                  click: (item: DeviceModel): void => {
+                    // determine what we need to delete
+                    this.dialogV2Service.showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_DELETE',
+                          data: () => ({
+                            name: item.name
+                          })
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_DEVICE',
+                          data: () => ({
+                            name: item.name
+                          })
+                        }
+                      }
+                    }).subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // delete device
+                      this.deviceDataService
+                        .deleteDevice(item.id)
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            this.toastV2Service.error(err);
+
+                            // hide loading
+                            loading.close();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          // success
+                          this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                          // hide loading
+                          loading.close();
+
+                          // reload data
+                          this.needsRefreshList(true);
+                        });
+                    });
+                  }
+                },
+                visible: (): boolean => {
+                  return DeviceModel.canDelete(this.authUser);
+                }
+              },
+
+              // Divider
+              {
+                visible: (): boolean => {
+                  // visible only if at least one of the previous...
+                  return DeviceModel.canDelete(this.authUser);
+                }
+              },
+
+              // Wipe
+              {
+                label: {
+                  get: () => 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_WIPE'
+                },
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+                action: {
+                  click: (item: DeviceModel): void => {
+                    // determine what we need to wipe
+                    this.dialogV2Service.showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_DELETE',
+                          data: () => ({
+                            name: item.name
+                          })
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_WIPE_DEVICE',
+                          data: () => ({
+                            name: item.name
+                          })
+                        }
+                      }
+                    }).subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // wipe device
+                      this.deviceDataService
+                        .wipeDevice(item.id)
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            this.toastV2Service.error(err);
+
+                            // hide loading
+                            loading.close();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          // success
+                          this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_WIPE_SUCCESS_MESSAGE');
+
+                          // hide loading
+                          loading.close();
+
+                          // reload data
+                          this.needsRefreshList(true);
+                        });
+                    });
+                  }
+                },
+                visible: (): boolean => {
+                  // for now let use do another wipe even if one is in progress, because parse might fails..and status might remain pending..which might cause issues if we can't send a new notification
+                  // [Constants.DEVICE_WIPE_STATUS.READY.value, Constants.DEVICE_WIPE_STATUS.PENDING.value].includes(item.status)
+                  return DeviceModel.canWipe(this.authUser);
+                }
+              },
+
+              // View Device History
+              {
+                label: {
+                  get: () => 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_VIEW_HISTORY'
+                },
+                action: {
+                  link: (item: DeviceModel) => ['/system-config', 'devices', item.id, 'history']
+                },
+                visible: (): boolean => {
+                  return DeviceModel.canListHistory(this.authUser);
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ];
   }
 
   /**
@@ -224,6 +347,20 @@ export class SystemDevicesComponent extends ListComponent<DeviceModel> implement
    * Initialize breadcrumbs
    */
   initializeBreadcrumbs(): void {
+    // set breadcrumbs
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
+        }
+      }, {
+        label: 'LNG_PAGE_LIST_SYSTEM_DEVICES_TITLE',
+        action: null
+      }
+    ];
   }
 
   /**
@@ -237,87 +374,53 @@ export class SystemDevicesComponent extends ListComponent<DeviceModel> implement
    * Refresh list
    */
   refreshList() {
-    this.devicesList$ = this.deviceDataService
+    this.records$ = this.deviceDataService
       .getDevices(this.queryBuilder)
       .pipe(
-        catchError((err) => {
-          this.toastV2Service.error(err);
-          return throwError(err);
-        })
+        // should be the last pipe
+        takeUntil(this.destroyed$)
       );
   }
 
   /**
-     * Get total number of items, based on the applied filters
-     */
-  refreshListCount() {
+   * Get total number of items, based on the applied filters
+   */
+  refreshListCount(applyHasMoreLimit?: boolean) {
+    // reset
+    this.pageCount = undefined;
+
+    // set apply value
+    if (applyHasMoreLimit !== undefined) {
+      this.applyHasMoreLimit = applyHasMoreLimit;
+    }
+
     // remove paginator from query builder
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
-    this.devicesListCount$ = this.deviceDataService
+
+    // apply has more limit
+    if (this.applyHasMoreLimit) {
+      countQueryBuilder.flag(
+        'applyHasMoreLimit',
+        true
+      );
+    }
+
+    // count
+    this.deviceDataService
       .getDevicesCount(countQueryBuilder)
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
           return throwError(err);
         }),
-        share()
-      );
-  }
 
-  /**
-     * Deletes a device
-      * @param {DeviceModel} device
-     */
-  deleteDevice(device: DeviceModel) {
-    this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_DEVICE', device)
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          // this.showLoadingDialog();
-          this.deviceDataService
-            .deleteDevice(device.id)
-            .pipe(
-              catchError((err) => {
-                this.toastV2Service.error(err);
-                // this.closeLoadingDialog();
-                return throwError(err);
-              })
-            )
-            .subscribe( () => {
-              this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE_SUCCESS_MESSAGE');
-
-              this.needsRefreshList();
-              // this.closeLoadingDialog();
-            });
-        }
-      });
-
-  }
-
-  /**
-     * Wipes a device
-     * @param {DeviceModel} device
-     */
-  wipeDevice(device: DeviceModel) {
-    this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_WIPE_DEVICE', device)
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          // this.showLoadingDialog();
-          this.deviceDataService
-            .wipeDevice(device.id)
-            .pipe(
-              catchError((err) => {
-                this.toastV2Service.error(err);
-                // this.closeLoadingDialog();
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              this.needsRefreshList();
-              // this.closeLoadingDialog();
-            });
-        }
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      )
+      .subscribe((response) => {
+        this.pageCount = response;
       });
   }
 }

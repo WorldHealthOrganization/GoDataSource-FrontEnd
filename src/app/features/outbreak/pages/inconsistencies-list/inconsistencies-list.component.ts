@@ -165,7 +165,8 @@ export class InconsistenciesListComponent extends ListComponent<CaseModel | Cont
             },
             visible: (item: CaseModel | ContactModel | EventModel): boolean => {
               return !item.deleted &&
-                item.canView(this.authUser);
+                item.canView(this.authUser) &&
+                this.selectedOutbreak?.id === item.outbreakId;
             }
           },
 
@@ -182,7 +183,8 @@ export class InconsistenciesListComponent extends ListComponent<CaseModel | Cont
             visible: (item: CaseModel | ContactModel | EventModel): boolean => {
               return !item.deleted &&
                 this.selectedOutbreakIsActive &&
-                item.canModify(this.authUser);
+                item.canModify(this.authUser) &&
+                this.selectedOutbreak?.id === item.outbreakId;
             }
           }
         ]

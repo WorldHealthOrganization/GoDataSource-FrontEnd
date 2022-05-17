@@ -13,11 +13,11 @@ import { determineRenderMode, RenderMode } from '../../../../core/enums/render-m
 //   ANSWER
 // }
 //
-// /**
-//  * Flatten node
-//  */
+/**
+ * Flatten node
+ */
 // interface IFlattenNode {
-//   // required
+//   required
 //   id: string;
 //   type: FlattenType;
 //   level: number;
