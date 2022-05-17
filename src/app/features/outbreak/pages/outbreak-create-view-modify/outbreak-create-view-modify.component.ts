@@ -30,6 +30,7 @@ import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/vali
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 
 /**
  * Component
@@ -1019,12 +1020,8 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
           return throwError(err);
         })
       ).subscribe((outbreak) => {
-        // display message
-        this.toastV2Service.success(
-          type === CreateViewModifyV2ActionType.CREATE ?
-            'LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON' :
-            'LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE'
-        );
+        // refresh list of top nav outbreaks
+        TopnavComponent.REFRESH_OUTBREAK_LIST();
 
         // no need to update language ?
         if (
@@ -1033,6 +1030,13 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
           !data.contactFollowUpTemplate &&
           !data.labResultsTemplate
         ) {
+          // display message
+          this.toastV2Service.success(
+            type === CreateViewModifyV2ActionType.CREATE ?
+              'LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON' :
+              'LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE'
+          );
+
           // hide loading & redirect
           finished(undefined, outbreak);
 
@@ -1055,6 +1059,13 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
             })
           )
           .subscribe(() => {
+            // display message
+            this.toastV2Service.success(
+              type === CreateViewModifyV2ActionType.CREATE ?
+                'LNG_PAGE_CREATE_OUTBREAK_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON' :
+                'LNG_PAGE_MODIFY_OUTBREAK_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE'
+            );
+
             // hide loading & redirect
             finished(undefined, outbreak);
           });
