@@ -552,6 +552,7 @@
             @include flex_align_items(center);
             @include flex(flex);
             @include flex-direction(row);
+            gap: 0.8rem;
             padding-bottom: 0.8rem;
             position: relative;
 
@@ -565,10 +566,10 @@
               position: absolute;
               width: calc(100% + 3.2rem);
             }
+          }
 
-            > div:first-child {
-              width: 100%;
-            }
+          .gd-app-side-dialog-v2-content-middle-item-input-group {
+            width: 100%;
           }
         }
 
