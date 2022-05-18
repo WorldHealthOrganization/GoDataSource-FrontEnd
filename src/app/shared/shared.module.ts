@@ -20,6 +20,7 @@ import * as formV2Components from './forms-v2/components';
 import * as v2Components from './components-v2';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { ToastrModule } from 'ngx-toastr';
+import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
 
 @NgModule({
   imports: [
@@ -35,6 +36,7 @@ import { ToastrModule } from 'ngx-toastr';
     FileUploadModule,
     MglTimelineModule,
     NgxWigModule,
+    NgxMaterialTimepickerModule,,
     NgxMatSelectSearchModule,
     ScrollingModule,
     ExperimentalScrollingModule,
