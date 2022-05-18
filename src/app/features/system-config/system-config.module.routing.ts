@@ -6,6 +6,11 @@ import { PERMISSION } from '../../core/models/permission.model';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
+import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+import { BackupModuleDataResolver } from '../../core/services/resolvers/data/backup-module.resolver';
+import { BackupStatusDataResolver } from '../../core/services/resolvers/data/backup-status.resolver';
+import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
+import { BackupTypesDataResolver } from '../../core/services/resolvers/data/backup-types.resolver';
 
 const routes: Routes = [
   // Backups
@@ -17,6 +22,14 @@ const routes: Routes = [
       permissions: [
         PERMISSION.BACKUP_LIST
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      yesNo: YesNoDataResolver,
+      backupModules: BackupModuleDataResolver,
+      backupStatus: BackupStatusDataResolver,
+      backupTypes: BackupTypesDataResolver,
+      user: UserDataResolver
     }
   },
 
