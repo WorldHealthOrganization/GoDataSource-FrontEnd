@@ -274,19 +274,11 @@
       }
 
       @include breakpoint('lt-lg') {
+        background-color: var(--gd-primary-alt);
         @include border-radius(0 0.4rem 0.4rem 0);
-        padding: 1.6rem 0.8rem;
-        right: -3.6rem;
+        padding: 1rem;
+        right: -3.8rem;
         top: 0;
-      }
-
-      .mat-button-wrapper {
-        span {
-          @include breakpoint('lt-lg') {
-            text-orientation: upright;
-            writing-mode: vertical-lr;
-          }
-        }
       }
 
       .material-icons {
