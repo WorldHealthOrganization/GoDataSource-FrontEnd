@@ -532,7 +532,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                           loading.close();
 
                           // reload data
-                          this.refreshList();
+                          this.needsRefreshList(true);
                         });
                     });
                   }
@@ -645,7 +645,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                           loading.close();
 
                           // reload data
-                          this.refreshList();
+                          this.needsRefreshList(true);
                         });
                     });
                   }
