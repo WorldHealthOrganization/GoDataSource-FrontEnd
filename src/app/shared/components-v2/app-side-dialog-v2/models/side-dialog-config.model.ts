@@ -146,6 +146,7 @@ export interface IV2SideDialogConfigInputText extends IV2SideDialogConfigInput {
       err: string
     })
   };
+  tooltip?: string;
 }
 
 /**
@@ -174,6 +175,7 @@ export interface IV2SideDialogConfigInputSingleDropdown extends IV2SideDialogCon
   // optional
   validators?: IV2SideDialogConfigInputValidator;
   clearable?: boolean;
+  tooltip?: string;
 }
 
 /**
@@ -188,6 +190,7 @@ export interface IV2SideDialogConfigInputMultiDropdown extends IV2SideDialogConf
 
   // optional
   validators?: IV2SideDialogConfigInputValidator;
+  tooltip?: string;
 }
 
 /**
@@ -224,6 +227,7 @@ export interface IV2SideDialogConfigInputNumber extends IV2SideDialogConfigInput
 
   // optional
   validators?: IV2SideDialogConfigInputValidator;
+  tooltip?: string;
 }
 
 /**

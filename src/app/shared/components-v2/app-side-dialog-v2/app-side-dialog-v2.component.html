@@ -92,8 +92,8 @@
               [(ngModel)]="input.checked"
               [name]="input.name"
               [placeholder]="input.placeholder"
-              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
               [tooltip]="input.tooltip"
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
               (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-checkbox-v2>
 
             <!-- Text -->
@@ -103,6 +103,7 @@
               [(ngModel)]="input.value"
               [name]="input.name"
               [placeholder]="input.placeholder"
+              [tooltip]="input.tooltip"
               [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
               [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
               app-general-async-validator
@@ -133,6 +134,7 @@
               [(ngModel)]="input.value"
               [name]="input.name"
               [placeholder]="input.placeholder"
+              [tooltip]="input.tooltip"
               [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
               [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
               (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-number-v2>
@@ -144,6 +146,7 @@
               [(ngModel)]="input.value"
               [name]="input.name"
               [placeholder]="input.placeholder"
+              [tooltip]="input.tooltip"
               [options]="input.options"
               [clearable]="input.clearable"
               [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
@@ -157,6 +160,7 @@
               [(ngModel)]="input.values"
               [name]="input.name"
               [placeholder]="input.placeholder"
+              [tooltip]="input.tooltip"
               [options]="input.options"
               [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
               [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
