@@ -74,6 +74,18 @@ export class AppFormEditQuestionnaireV2Component
   // viewport
   @ViewChild('cdkViewport') cdkViewport: CdkVirtualScrollViewport;
 
+  // selected tab change
+  // - hack fix for virtual scroll problem
+  @Input() set selectedTab(selected: boolean) {
+    if (
+      selected &&
+      this.cdkViewport
+    ) {
+      this.cdkViewport.scrollToIndex(0);
+      this.cdkViewport.checkViewportSize();
+    }
+  }
+
   // view only
   @Input() viewOnly: boolean;
 

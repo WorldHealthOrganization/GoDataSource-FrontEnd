@@ -273,6 +273,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   }
 
   // visited tabs
+  selectedTab: ICreateViewModifyV2Tab | ICreateViewModifyV2TabTable;
   visitedTabs: {
     [tabLabel: string]: true
   } = {};
@@ -879,6 +880,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    * Visit tab
    */
   visitTab(tab: ICreateViewModifyV2Tab | ICreateViewModifyV2TabTable): void {
+    // trigger tab changed
+    this.selectedTab = tab;
+
     // already visited ?
     if (this.visitedTabs[tab.label]) {
       return;

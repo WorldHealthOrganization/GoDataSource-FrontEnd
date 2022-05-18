@@ -391,6 +391,7 @@
                     [ngModel]="input.value.get(parentItemIndex)"
                     [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
                     [viewOnly]="isView || !input.value.set"
+                    [selectedTab]="selectedTab === tab"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-edit-questionnaire-v2>
 
                   <!-- Fill questionnaire -->
@@ -401,6 +402,7 @@
                     [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
                     [viewOnly]="isView || !input.value.set"
                     [questionnaire]="input.questionnaire"
+                    [selectedTab]="selectedTab === tab"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-fill-questionnaire-v2>
 
                   <!-- Text -->
