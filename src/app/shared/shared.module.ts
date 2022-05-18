@@ -36,7 +36,7 @@ import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
     FileUploadModule,
     MglTimelineModule,
     NgxWigModule,
-    NgxMaterialTimepickerModule,,
+    NgxMaterialTimepickerModule,
     NgxMatSelectSearchModule,
     ScrollingModule,
     ExperimentalScrollingModule,
