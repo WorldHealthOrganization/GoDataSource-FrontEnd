@@ -14,12 +14,12 @@ import { LabSequenceLaboratoryDataResolver } from '../../core/services/resolvers
 import { LabSequenceResultDataResolver } from '../../core/services/resolvers/data/lab-sequence-result.resolver';
 import { LabTestResultDataResolver } from '../../core/services/resolvers/data/lab-test-result.resolver';
 import { LabTestTypeDataResolver } from '../../core/services/resolvers/data/lab-test-type.resolver';
-import { PersonTypeDataResolver } from '../../core/services/resolvers/data/person-type.resolver';
 import { PersonDataResolver } from '../../core/services/resolvers/data/person.resolver';
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
 import * as fromPages from './pages';
+import { LabPersonTypeDataResolver } from '../../core/services/resolvers/data/lab-person-type.resolver';
 
 // common base - cases lab results / contacts lab results
 const entityLabResultsFoundation = {
@@ -69,7 +69,7 @@ const routes: Routes = [
       labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
       labSequenceResult: LabSequenceResultDataResolver,
       user: UserDataResolver,
-      personType: PersonTypeDataResolver
+      labPersonType: LabPersonTypeDataResolver
     }
   },
   // View Gantt Chart

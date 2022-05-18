@@ -23,6 +23,7 @@ export enum V2SideDialogConfigInputType {
   CHECKBOX,
   TEXT,
   TEXTAREA,
+  TIMEPICKER,
   NUMBER,
   DROPDOWN_SINGLE,
   DROPDOWN_MULTI,
@@ -146,6 +147,7 @@ export interface IV2SideDialogConfigInputText extends IV2SideDialogConfigInput {
       err: string
     })
   };
+  tooltip?: string;
 }
 
 /**
@@ -162,6 +164,20 @@ export interface IV2SideDialogConfigInputTextarea extends IV2SideDialogConfigInp
 }
 
 /**
+ * Side dialog input - timepicker
+ */
+export interface IV2SideDialogConfigInputTimepicker extends IV2SideDialogConfigInput {
+  // required
+  type: V2SideDialogConfigInputType.TIMEPICKER;
+  placeholder: string;
+  value: string;
+
+  // optional
+  validators?: IV2SideDialogConfigInputValidator;
+  tooltip?: string;
+}
+
+/**
  * Side dialog input - dropdown single
  */
 export interface IV2SideDialogConfigInputSingleDropdown extends IV2SideDialogConfigInput {
@@ -174,6 +190,7 @@ export interface IV2SideDialogConfigInputSingleDropdown extends IV2SideDialogCon
   // optional
   validators?: IV2SideDialogConfigInputValidator;
   clearable?: boolean;
+  tooltip?: string;
 }
 
 /**
@@ -188,6 +205,7 @@ export interface IV2SideDialogConfigInputMultiDropdown extends IV2SideDialogConf
 
   // optional
   validators?: IV2SideDialogConfigInputValidator;
+  tooltip?: string;
 }
 
 /**
@@ -224,6 +242,7 @@ export interface IV2SideDialogConfigInputNumber extends IV2SideDialogConfigInput
 
   // optional
   validators?: IV2SideDialogConfigInputValidator;
+  tooltip?: string;
 }
 
 /**
@@ -369,8 +388,8 @@ export interface IV2SideDialogConfigInputFilterList extends IV2SideDialogConfigI
  * Side dialog inputs
  */
 export type V2SideDialogConfigInputFromInput = IV2SideDialogConfigInputCheckbox | IV2SideDialogConfigInputText | IV2SideDialogConfigInputTextarea
-| IV2SideDialogConfigInputSingleDropdown | IV2SideDialogConfigInputMultiDropdown | IV2SideDialogConfigInputToggle | IV2SideDialogConfigInputToggleCheckbox
-| IV2SideDialogConfigInputNumber;
+| IV2SideDialogConfigInputTimepicker | IV2SideDialogConfigInputSingleDropdown | IV2SideDialogConfigInputMultiDropdown | IV2SideDialogConfigInputToggle
+| IV2SideDialogConfigInputToggleCheckbox | IV2SideDialogConfigInputNumber;
 export type V2SideDialogConfigInput = IV2SideDialogConfigInputDivider | IV2SideDialogConfigInputKeyValue | IV2SideDialogConfigInputHTML
 | V2SideDialogConfigInputFromInput | IV2SideDialogConfigInputLink | IV2SideDialogConfigInputLinkWithAction | IV2SideDialogConfigInputGroup
 | IV2SideDialogConfigInputButton | IV2SideDialogConfigInputRow | IV2SideDialogConfigInputAccordion | IV2SideDialogConfigInputFilterList;

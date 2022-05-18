@@ -29,6 +29,7 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
   selector: 'app-lab-results',
@@ -395,7 +396,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.personType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+          options: (this.activatedRoute.snapshot.data.labPersonType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
         }
       });
     }
@@ -491,7 +492,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                         title: {
                           get: () => 'LNG_COMMON_LABEL_DELETE',
                           data: () => ({
-                            name: item.sampleIdentifier
+                            name: `${item.sampleIdentifier}${item.sampleIdentifier && item.dateSampleTaken ? ' - ' : ''}${item.dateSampleTaken ? moment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : ''}`
                           })
                         },
                         message: {
@@ -531,7 +532,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                           loading.close();
 
                           // reload data
-                          this.refreshList();
+                          this.needsRefreshList(true);
                         });
                     });
                   }
@@ -599,7 +600,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                         title: {
                           get: () => 'LNG_COMMON_LABEL_RESTORE',
                           data: () => ({
-                            name: item.sampleIdentifier
+                            name: `${item.sampleIdentifier}${item.sampleIdentifier && item.dateSampleTaken ? ' - ' : ''}${item.dateSampleTaken ? moment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : ''}`
                           })
                         },
                         message: {
@@ -644,7 +645,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                           loading.close();
 
                           // reload data
-                          this.refreshList();
+                          this.needsRefreshList(true);
                         });
                     });
                   }

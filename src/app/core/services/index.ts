@@ -110,6 +110,8 @@ import { QuestionnaireQuestionCategoryDataResolver } from './resolvers/data/ques
 import { QuestionnaireAnswerDisplayDataResolver } from './resolvers/data/questionnaire-answer-display.resolver';
 import { BackupModuleDataResolver } from './resolvers/data/backup-module.resolver';
 import { BackupStatusDataResolver } from './resolvers/data/backup-status.resolver';
+import { BackupTypesDataResolver } from './resolvers/data/backup-types.resolver';
+import { LabPersonTypeDataResolver } from './resolvers/data/lab-person-type.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -117,6 +119,7 @@ export const services: any[] = [
   AddressTypeDataResolver,
   BackupModuleDataResolver,
   BackupStatusDataResolver,
+  BackupTypesDataResolver,
   CertaintyLevelDataResolver,
   ClassificationDataResolver,
   ClusterDataResolver,
@@ -134,6 +137,7 @@ export const services: any[] = [
   GenderDataResolver,
   InstitutionDataResolver,
   LabNameDataResolver,
+  LabPersonTypeDataResolver,
   LabProgressDataResolver,
   LabSampleTypeDataResolver,
   LabSequenceLaboratoryDataResolver,
