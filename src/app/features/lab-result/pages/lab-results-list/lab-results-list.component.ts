@@ -395,7 +395,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.personType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+          options: (this.activatedRoute.snapshot.data.labPersonType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
         }
       });
     }
