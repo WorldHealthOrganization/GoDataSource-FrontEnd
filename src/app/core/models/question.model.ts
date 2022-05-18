@@ -15,6 +15,9 @@ export class AnswerModel {
   order: number = 1;
   additionalQuestions: QuestionModel[];
 
+  // used by ui
+  collapsed: boolean;
+
   constructor(data = null) {
     this.label = _.get(data, 'label');
     this.value = _.get(data, 'value');
@@ -43,6 +46,9 @@ export class QuestionModel {
   answerType: string;
   answersDisplay: string;
   answers: AnswerModel[];
+
+  // used by ui
+  collapsed: boolean;
 
   constructor(data = null) {
     this.text = _.get(data, 'text');

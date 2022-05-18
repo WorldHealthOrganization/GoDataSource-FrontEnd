@@ -54,6 +54,7 @@ interface IFlattenNode {
     index: number,
     array: (QuestionModel | AnswerModel)[]
   };
+  canCollapseOrExpand: boolean;
 }
 
 @Component({
@@ -311,7 +312,8 @@ export class AppFormEditQuestionnaireV2Component
         nonFLat: {
           index: questionIndex,
           array: questions
-        }
+        },
+        canCollapseOrExpand: question.answers?.length > 0
       };
 
       // add to list
@@ -323,7 +325,10 @@ export class AppFormEditQuestionnaireV2Component
       }
 
       // attach answers if we have any
-      if (flattenedQuestion.canHaveChildren) {
+      if (
+        flattenedQuestion.canHaveChildren &&
+        !question.collapsed
+      ) {
         (question.answers || []).forEach((answer, answerIndex) => {
           // translate
           answer.label = answer.label ?
@@ -350,7 +355,8 @@ export class AppFormEditQuestionnaireV2Component
             nonFLat: {
               index: answerIndex,
               array: question.answers
-            }
+            },
+            canCollapseOrExpand: answer.additionalQuestions?.length > 0
           };
 
           // add to list
@@ -360,7 +366,10 @@ export class AppFormEditQuestionnaireV2Component
           flattenedQuestion.children.push(flattenedAnswer);
 
           // check for children questions
-          if (flattenedAnswer.canHaveChildren) {
+          if (
+            flattenedAnswer.canHaveChildren &&
+            !answer.collapsed
+          ) {
             this.flatten(
               answer.additionalQuestions,
               flattenedAnswer.level + 1,
@@ -1011,6 +1020,26 @@ export class AppFormEditQuestionnaireV2Component
       parent,
       answer
     );
+  }
+
+  /**
+   * Expand collapse
+   */
+  expandCollapse(item: IFlattenNode): void {
+    // can't collapse or expand
+    if (!item.canCollapseOrExpand) {
+      return;
+    }
+
+    // expand / collapse
+    if (item.data.collapsed) {
+      delete item.data.collapsed;
+    } else {
+      item.data.collapsed = true;
+    }
+
+    // redraw
+    this.nonFlatToFlat();
   }
 
   /**

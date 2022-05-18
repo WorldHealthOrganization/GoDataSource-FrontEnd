@@ -50,6 +50,11 @@
             [class.gd-form-edit-questionnaire-v2-item-question-markup]="item.data.answerType === Constants.ANSWER_TYPES.MARKUP.value"
             fxLayout="row" fxLayoutAlign=" center">
 
+            <!-- Collapse / Expand -->
+            <mat-icon
+              [style.visibility]="item.canCollapseOrExpand ? 'visible' : 'hidden'"
+              (click)="expandCollapse(item)">{{item.data.collapsed ? 'expand_more' : 'expand_less'}}</mat-icon>
+
             <!-- Sort -->
             <mat-icon
               *ngIf="!viewOnly"
@@ -131,6 +136,11 @@
             *ngSwitchCase="FlattenType.ANSWER"
             class="gd-form-edit-questionnaire-v2-item-answer"
             fxLayout="row" fxLayoutAlign=" center">
+
+            <!-- Collapse / Expand -->
+            <mat-icon
+              [style.visibility]="item.canCollapseOrExpand ? 'visible' : 'hidden'"
+              (click)="expandCollapse(item)">{{item.data.collapsed ? 'expand_more' : 'expand_less'}}</mat-icon>
 
             <!-- Sort -->
             <mat-icon

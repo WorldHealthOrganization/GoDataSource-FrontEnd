@@ -31,6 +31,7 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
+import { QuestionModel } from '../../../../core/models/question.model';
 
 /**
  * Component
@@ -998,6 +999,26 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
           ...this.itemData,
           ...data
         };
+      }
+
+      // sanitize questionnaire - case
+      if (data.caseInvestigationTemplate) {
+        data.caseInvestigationTemplate = (data.caseInvestigationTemplate || []).map((question) => new QuestionModel(question));
+      }
+
+      // sanitize questionnaire - contact
+      if (data.contactInvestigationTemplate) {
+        data.contactInvestigationTemplate = (data.contactInvestigationTemplate || []).map((question) => new QuestionModel(question));
+      }
+
+      // sanitize questionnaire - follow-up
+      if (data.contactFollowUpTemplate) {
+        data.contactFollowUpTemplate = (data.contactFollowUpTemplate || []).map((question) => new QuestionModel(question));
+      }
+
+      // sanitize questionnaire - lab result
+      if (data.labResultsTemplate) {
+        data.labResultsTemplate = (data.labResultsTemplate || []).map((question) => new QuestionModel(question));
       }
 
       // create / modify
