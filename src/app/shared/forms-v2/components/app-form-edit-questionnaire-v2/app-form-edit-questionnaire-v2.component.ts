@@ -491,43 +491,36 @@ export class AppFormEditQuestionnaireV2Component
           visible: () => modifyQuestion.answerType !== Constants.ANSWER_TYPES.MARKUP.value
         },
 
-        // inactive & required & multi answer
+        // inactive
         {
-          type: V2SideDialogConfigInputType.ROW,
-          name: 'inactive_required_multi_answer',
-          inputs: [
-            // inactive
-            {
-              type: V2SideDialogConfigInputType.KEY_VALUE,
-              name: 'inactive',
-              placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_INACTIVE',
-              value: modifyQuestion.inactive ?
-                'LNG_COMMON_LABEL_YES' :
-                'LNG_COMMON_LABEL_NO'
-            },
+          type: V2SideDialogConfigInputType.KEY_VALUE,
+          name: 'inactive',
+          placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_INACTIVE',
+          value: modifyQuestion.inactive ?
+            'LNG_COMMON_LABEL_YES' :
+            'LNG_COMMON_LABEL_NO'
+        },
 
-            // required
-            {
-              type: V2SideDialogConfigInputType.KEY_VALUE,
-              name: 'required',
-              placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED',
-              value: modifyQuestion.required ?
-                'LNG_COMMON_LABEL_YES' :
-                'LNG_COMMON_LABEL_NO',
-              visible: () => modifyQuestion.answerType !== Constants.ANSWER_TYPES.MARKUP.value
-            },
+        // required
+        {
+          type: V2SideDialogConfigInputType.KEY_VALUE,
+          name: 'required',
+          placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED',
+          value: modifyQuestion.required ?
+            'LNG_COMMON_LABEL_YES' :
+            'LNG_COMMON_LABEL_NO',
+          visible: () => modifyQuestion.answerType !== Constants.ANSWER_TYPES.MARKUP.value
+        },
 
-            // multi answer
-            {
-              type: V2SideDialogConfigInputType.KEY_VALUE,
-              name: 'multiAnswer',
-              placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER',
-              value: modifyQuestion.multiAnswer ?
-                'LNG_COMMON_LABEL_YES' :
-                'LNG_COMMON_LABEL_NO',
-              visible: () => !parent && modifyQuestion.answerType !== Constants.ANSWER_TYPES.MARKUP.value
-            }
-          ]
+        // multi answer
+        {
+          type: V2SideDialogConfigInputType.KEY_VALUE,
+          name: 'multiAnswer',
+          placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER',
+          value: modifyQuestion.multiAnswer ?
+            'LNG_COMMON_LABEL_YES' :
+            'LNG_COMMON_LABEL_NO',
+          visible: () => !parent && modifyQuestion.answerType !== Constants.ANSWER_TYPES.MARKUP.value
         }
       );
     } else {
