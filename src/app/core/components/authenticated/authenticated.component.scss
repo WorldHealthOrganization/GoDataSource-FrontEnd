@@ -39,7 +39,7 @@ mat-sidenav-container {
         .gd-body-content-left-content-header {
           @include flex_align_items(center);
           @include flex(flex);
-          @include flex-direction(row);
+          @include flex_direction(row);
           @include flex_justify(space-between);
 
           /* Mobile Menu Close Trigger */

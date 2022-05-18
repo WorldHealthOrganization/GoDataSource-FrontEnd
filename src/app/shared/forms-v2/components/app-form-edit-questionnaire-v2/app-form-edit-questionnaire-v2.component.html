@@ -28,21 +28,17 @@
         cdkDropList [cdkDropListData]="flattenedQuestions" [cdkDropListSortPredicate]="canDrop" (cdkDropListDropped)="dropItem($event)"
         [minBufferPx]="maxBufferPx ? maxBufferPx : bufferToRender"
         [maxBufferPx]="maxBufferPx ? maxBufferPx : bufferToRender"
-
-        change123
-        [itemSize]="32"
-        style="height: 350px">
+        [itemSize]="45">
 
         <!-- Item -->
         <div
           *cdkVirtualFor="let item of flattenedQuestions; templateCacheSize: 0"
           class="gd-form-edit-questionnaire-v2-item"
+          [class.gd-form-edit-questionnaire-v2-item-inactive]="item.data.inactive || item.oneParentIsInactive"
           cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".gd-form-edit-questionnaire-v2-list-{{name}}" [cdkDragData]="item" [cdkDragDisabled]="viewOnly" (cdkDragStarted)="dragStarted($event)"
           [ngSwitch]="item.type"
-
-          change123
           [style.paddingLeft.px]="item.level * 20"
-          style="height: 32px">
+          style="height: 4.5rem">
 
           <!-- Custom drag&drop placeholder -->
           <div class="gd-drag-custom-placeholder" *cdkDragPlaceholder></div>
@@ -51,11 +47,8 @@
           <div
             *ngSwitchCase="FlattenType.QUESTION"
             class="gd-form-edit-questionnaire-v2-item-question"
-            [class.gd-form-edit-questionnaire-v2-item-question-inactive]="item.data.inactive || item.oneParentIsInactive"
             [class.gd-form-edit-questionnaire-v2-item-question-markup]="item.data.answerType === Constants.ANSWER_TYPES.MARKUP.value"
-
-            change123
-            fxLayout="row">
+            fxLayout="row" fxLayoutAlign=" center">
 
             <!-- Sort -->
             <mat-icon
@@ -65,20 +58,21 @@
 
             <!-- Type -->
             <mat-icon
-              change123
-              fxGrow="0">help_center</mat-icon>
+              fxGrow="0">help</mat-icon>
 
             <!-- Label & icons -->
             <div
-              change123
+              class="gd-form-edit-questionnaire-v2-item-question-content"
               fxFlex>
 
               <!-- Label -->
-              <span>{{item.data.text}}</span>
+              <span
+                class="gd-form-edit-questionnaire-v2-item-question-content-title">{{item.data.text}}</span>
 
               <!-- Icons -->
               <span
-                *ngIf="renderMode !== RenderMode.SMALL">
+                *ngIf="renderMode !== RenderMode.SMALL"
+                class="gd-form-edit-questionnaire-v2-item-question-content-icons">
 
                 <!-- Answer type -->
                 <mat-icon
@@ -106,7 +100,7 @@
 
             <!-- Buttons -->
             <div
-              change123
+              class="gd-form-edit-questionnaire-v2-item-question-buttons"
               fxGrow="0">
 
               <!-- Add answer -->
@@ -116,7 +110,7 @@
                 mat-icon-button
                 [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW' | translate"
                 (click)="addAnswer(item.data)">
-                <mat-icon>text_increase</mat-icon>
+                <mat-icon>playlist_add</mat-icon>
               </button>
 
               <!-- Edit question -->
@@ -136,9 +130,7 @@
           <div
             *ngSwitchCase="FlattenType.ANSWER"
             class="gd-form-edit-questionnaire-v2-item-answer"
-
-            change123
-            fxLayout="row">
+            fxLayout="row" fxLayoutAlign=" center">
 
             <!-- Sort -->
             <mat-icon
@@ -148,20 +140,21 @@
 
             <!-- Type -->
             <mat-icon
-              change123
               fxGrow="0">font_download</mat-icon>
 
             <!-- Label & icons -->
             <div
-              change123
+              class="gd-form-edit-questionnaire-v2-item-answer-content"
               fxFlex>
 
               <!-- Label -->
-              <span>{{item.data.label}}</span>
+              <span
+                class="gd-form-edit-questionnaire-v2-item-answer-content-title">{{item.data.label}}</span>
 
               <!-- Icons -->
               <span
-                *ngIf="renderMode !== RenderMode.SMALL">
+                *ngIf="renderMode !== RenderMode.SMALL"
+                class="gd-form-edit-questionnaire-v2-item-answer-content-icons">
                 <!-- Alert -->
                 <mat-icon
                   *ngIf="item.data.alert">notification_important</mat-icon>
@@ -171,7 +164,7 @@
 
             <!-- Buttons -->
             <div
-              change123
+              class="gd-form-edit-questionnaire-v2-item-answer-buttons"
               fxGrow="0">
 
               <!-- Add question -->
@@ -181,7 +174,7 @@
                 mat-icon-button
                 [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW' | translate"
                 (click)="addQuestion(item.data)">
-                <mat-icon>add_comment</mat-icon>
+                <mat-icon>post_add</mat-icon>
               </button>
 
               <!-- Edit answer -->
@@ -214,7 +207,8 @@
   <!-- Legend -->
   <div
     *ngIf="flattenedQuestions?.length > 0"
-    class="gd-form-edit-questionnaire-v2-legend">
+    class="gd-form-edit-questionnaire-v2-legend"
+    fxLayout="row" fxLayoutAlign="start center">
 
     <!-- Header -->
     <div
@@ -224,7 +218,8 @@
 
     <!-- Items -->
     <div
-      class="gd-form-edit-questionnaire-v2-legend-items">
+      class="gd-form-edit-questionnaire-v2-legend-items"
+      fxLayout="row wrap" fxLayoutAlign="start center">
 
       <!-- Drag -->
       <div
@@ -273,7 +268,8 @@
       <!-- Alert -->
       <div
         class="gd-form-edit-questionnaire-v2-legend-items-item">
-        <mat-icon>notification_important</mat-icon>
+        <mat-icon
+          color="primary">notification_important</mat-icon>
         <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT' | translate}}</span>
       </div>
 
@@ -281,7 +277,7 @@
       <div
         *ngIf="!viewOnly"
         class="gd-form-edit-questionnaire-v2-legend-items-item">
-        <mat-icon>add_comment</mat-icon>
+        <mat-icon>post_add</mat-icon>
         <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW' | translate}}</span>
       </div>
 
@@ -289,7 +285,7 @@
       <div
         *ngIf="!viewOnly"
         class="gd-form-edit-questionnaire-v2-legend-items-item">
-        <mat-icon>text_increase</mat-icon>
+        <mat-icon>playlist_add</mat-icon>
         <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW' | translate}}</span>
       </div>
 
