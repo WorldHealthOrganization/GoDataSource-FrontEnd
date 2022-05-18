@@ -338,6 +338,24 @@ svg:not(:root) {
   font-feature-settings: 'liga';
 }
 
+.mat-icon {
+  &.mat-primary {
+    color: var(--gd-primary);
+  }
+
+  &.mat-secondary {
+    color: var(--gd-secondary);
+  }
+
+  &.mat-accent {
+    color: var(--gd-success);
+  }
+
+  &.mat-warn {
+    color: var(--gd-danger);
+  }
+}
+
 /* Divider */
 .mat-divider {
   border-top-color: rgba(var(--gd-secondary-rgb), 0.25);
