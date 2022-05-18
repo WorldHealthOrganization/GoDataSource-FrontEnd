@@ -49,7 +49,7 @@
         @include flex_direction(row);
         font-size: 1.2rem;
         margin-left: 0.8rem;
-    
+
         .mat-icon {
           font-size: 2.4rem;
           height: 2.2rem;
@@ -96,8 +96,6 @@
         -webkit-box-orient: vertical;
         display: -webkit-box;
         display: -moz-box;
-        display: -ms-box;
-        display: box;
         max-height: 4.2rem;
         max-width: calc(100% - 16rem);
         overflow: hidden;
@@ -179,8 +177,6 @@
         -webkit-box-orient: vertical;
         display: -webkit-box;
         display: -moz-box;
-        display: -ms-box;
-        display: box;
         max-height: 4.2rem;
         max-width: calc(100% - 16rem);
         overflow: hidden;
