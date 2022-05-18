@@ -32,7 +32,7 @@ export class MapVectorTypeDataResolver implements IMapResolverV2<ILabelValuePair
           };
           data.forEach((item) => {
             // map
-            response.map[item.id] = item;
+            response.map[item.value] = item;
 
             // add option
             response.options.push({

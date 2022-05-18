@@ -32,7 +32,7 @@ export class LabProgressDataResolver implements IMapResolverV2<ILabelValuePairMo
           };
           data.forEach((item) => {
             // map
-            response.map[item.id] = item;
+            response.map[item.value] = item;
 
             // add option
             response.options.push({

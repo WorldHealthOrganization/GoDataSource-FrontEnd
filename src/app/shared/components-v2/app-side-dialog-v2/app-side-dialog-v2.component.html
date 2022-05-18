@@ -74,7 +74,7 @@
         <ng-template
           #commonPart
           let-input="input">
-          <div
+          <ng-container
             *ngIf="!input.visible || input.visible(dialogHandler.data, dialogHandler, input)"
             [ngSwitch]="input.type">
 
@@ -790,7 +790,7 @@
 
             </div>
 
-          </div>
+          </ng-container>
         </ng-template>
 
         <!-- Render root inputs -->

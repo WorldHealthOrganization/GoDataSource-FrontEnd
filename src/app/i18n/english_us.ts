@@ -71,7 +71,8 @@ export const EnglishUsLang = {
     'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_DETAILS': 'You are going to add a new answer to: <div class="gd-form-edit-questionnaire-v2-details-label">{{details}}</div>',
     'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_MODIFY': 'Modify question',
     'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_MODIFY': 'Modify answer',
-    'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_WIPE_SUCCESS_MESSAGE': 'Device wiped'
+    'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_WIPE_SUCCESS_MESSAGE': 'Device wiped',
+    'LNG_PAGE_LIST_TRANSMISSION_CHAINS_TITLE': 'Transmission chains'
 
 
 

@@ -13,7 +13,7 @@ import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { ILabelValuePairModel } from '../../core/label-value-pair.model';
 
 @Component({
-  selector: 'app-form-radio-button-v2',
+  selector: 'app-form-radio-button-group-v2',
   templateUrl: './app-form-radio-button-group-v2.component.html',
   styleUrls: ['./app-form-radio-button-group-v2.component.scss'],
   providers: [{
