@@ -71,7 +71,7 @@
               "budgets": [
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "64kb"
+                  "maximumWarning": "256kb"
                 }
               ],
               "fileReplacements": [
