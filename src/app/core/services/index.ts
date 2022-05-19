@@ -112,6 +112,7 @@ import { BackupModuleDataResolver } from './resolvers/data/backup-module.resolve
 import { BackupStatusDataResolver } from './resolvers/data/backup-status.resolver';
 import { BackupTypesDataResolver } from './resolvers/data/backup-types.resolver';
 import { LabPersonTypeDataResolver } from './resolvers/data/lab-person-type.resolver';
+import { SystemSettingsDataResolver } from './resolvers/data/system-settings.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -164,6 +165,7 @@ export const services: any[] = [
   RiskDataResolver,
   SecurityQuestionDataResolver,
   SelectedOutbreakDataResolver,
+  SystemSettingsDataResolver,
   TeamDataResolver,
   UserDataResolver,
   UserRoleDataResolver,
