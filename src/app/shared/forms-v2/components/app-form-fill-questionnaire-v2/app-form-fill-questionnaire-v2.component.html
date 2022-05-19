@@ -221,7 +221,7 @@
 
   <!-- Legend -->
   <div
-    *ngIf="flattenedQuestions?.length > 0"
+    *ngIf="flattenedQuestions?.length > 0 && !viewOnly"
     class="gd-form-fill-questionnaire-v2-legend">
 
     <!-- Header -->
@@ -233,7 +233,20 @@
     <!-- Items -->
     <div
       class="gd-form-fill-questionnaire-v2-legend-items">
-      TODO
+      <!-- Add answers -->
+      <div
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        <mat-icon>playlist_add</mat-icon>
+        <span>{{'LNG_QUESTIONNAIRE_BUTTON_ADD_MULTI_ANSWER' | translate}}</span>
+      </div>
+
+      <!-- Delete -->
+      <div
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        <mat-icon>delete</mat-icon>
+        <span>{{'LNG_QUESTIONNAIRE_BUTTON_REMOVE' | translate}}</span>
+      </div>
+
     </div>
 
   </div>
