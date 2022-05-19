@@ -1,3 +1,164 @@
-<div>
-  TODO
+<div
+  class="gd-form-fill-questionnaire-v2">
+
+  <!-- Records -->
+  <div
+    class="gd-form-fill-questionnaire-v2-list">
+    <!-- Records -->
+    <ng-container
+      *ngIf="flattenedQuestions?.length > 0; else noQuestions">
+      <cdk-virtual-scroll-viewport
+        #cdkViewport
+        [minBufferPx]="1024"
+        [maxBufferPx]="1024"
+
+        change123
+        [itemSize]="45"
+        style="height: 500px">
+        <!-- Item -->
+        <div
+          *cdkVirtualFor="let item of flattenedQuestions; templateCacheSize: 0"
+          class="gd-form-fill-questionnaire-v2-list-item"
+          [ngSwitch]="item.type"
+
+          change123
+          [style.paddingLeft.px]="item.level * 20"
+          style="height: 45px">
+
+          <!-- Question -->
+          <div
+            *ngSwitchCase="FlattenType.QUESTION"
+            class="gd-form-fill-questionnaire-v2-list-item-question"
+            [class.gd-form-fill-questionnaire-v2-list-item-question-inactive]="item.data.inactive || item.oneParentIsInactive"
+            [class.gd-form-fill-questionnaire-v2-list-item-question-markup]="item.data.answerType === Constants.ANSWER_TYPES.MARKUP.value"
+
+            change123
+            fxLayout="row">
+
+            <!-- Type -->
+            <mat-icon
+              change123
+              fxGrow="0">help_center</mat-icon>
+
+            <!-- Label -->
+            <div
+              change123
+              fxFlex>
+              <!-- Label -->
+              <span>{{item.data.text}}</span>
+            </div>
+
+          </div>
+
+          <!-- ANSWER -->
+          <div
+            *ngSwitchCase="FlattenType.ANSWER"
+            class="gd-form-fill-questionnaire-v2-list-item-answer"
+            [class.gd-form-fill-questionnaire-v2-list-item-answer-inactive]="item.oneParentIsInactive"
+
+            change123
+            fxLayout="row">
+
+            <!-- Type -->
+            <mat-icon
+              change123
+              fxGrow="0">font_download</mat-icon>
+
+            <!-- Render answer accordingly to question type -->
+            <ng-container
+              [ngSwitch]="item.definition.type">
+
+<!--              &lt;!&ndash; Single select &ndash;&gt;-->
+<!--              <app-form-select-single-v2-->
+<!--                *ngSwitchCase="FlattenAnswerDrawType.SINGLE_SELECT"-->
+<!--                [ngModel]="value[item.parent.data.variable][0].value"-->
+<!--                name="bla bla"-->
+<!--                [options]="item.definition.options"-->
+<!--                (ngModelChange)="updateQuestionnaire()"></app-form-select-single-v2>-->
+
+<!--              &lt;!&ndash; Multiple select &ndash;&gt;-->
+<!--              <app-form-select-multiple-v2-->
+<!--                *ngSwitchCase="FlattenAnswerDrawType.MULTIPLE_SELECT"-->
+<!--                [(ngModel)]="value[item.parent.data.variable][0].value"-->
+<!--                name="bla bla2"-->
+<!--                [options]="item.definition.options"-->
+<!--                (ngModelChange)="updateQuestionnaire()"></app-form-select-multiple-v2>-->
+
+<!--              &lt;!&ndash; Text &ndash;&gt;-->
+<!--              <app-form-input-v2-->
+<!--                *ngSwitchCase="Constants.ANSWER_TYPES.FREE_TEXT.value"-->
+<!--                [(ngModel)]="item.value"-->
+<!--                [name]="item.name"-->
+<!--                autocomplete="off"></app-form-input-v2>-->
+
+<!--              &lt;!&ndash; Number &ndash;&gt;-->
+<!--              <app-form-number-v2-->
+<!--                *ngSwitchCase="Constants.ANSWER_TYPES.NUMERIC.value"-->
+<!--                [(ngModel)]="item.value"-->
+<!--                [name]="item.name"-->
+<!--                autocomplete="off"></app-form-number-v2>-->
+
+<!--              &lt;!&ndash; Date &ndash;&gt;-->
+<!--              <app-form-number-v2-->
+<!--                *ngSwitchCase="Constants.ANSWER_TYPES.DATE_TIME.value"-->
+<!--                [(ngModel)]="item.value"-->
+<!--                [name]="item.name"-->
+<!--                autocomplete="off"></app-form-number-v2>-->
+
+<!--              &lt;!&ndash; File Upload &ndash;&gt;-->
+<!--              <div-->
+<!--                *ngSwitchCase="Constants.ANSWER_TYPES.FILE_UPLOAD.value">-->
+<!--                FILE UPLOAD-->
+<!--              </div>-->
+
+<!--              &lt;!&ndash; Multiple Select &ndash;&gt;-->
+<!--              <app-form-checkbox-v2-->
+<!--                *ngSwitchCase="Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value"-->
+<!--                ngModel-->
+<!--                [name]="item.parent.id"-->
+<!--                [placeholder]="item.data.label"></app-form-checkbox-v2>-->
+
+<!--              &lt;!&ndash; Single Select &ndash;&gt;-->
+<!--              <app-form-radio-button-v2-->
+<!--                *ngSwitchCase="Constants.ANSWER_TYPES.SINGLE_SELECTION.value"-->
+<!--                [ngModel]="item.data.value"-->
+<!--                [name]="item.parent.id"-->
+<!--                [placeholder]="item.data.label"></app-form-radio-button-v2>-->
+
+            </ng-container>
+
+          </div>
+
+        </div>
+      </cdk-virtual-scroll-viewport>
+    </ng-container>
+
+    <!-- No questions image -->
+    <ng-template
+      #noQuestions>
+      <div>
+        empty list image....
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Legend -->
+  <div
+    *ngIf="flattenedQuestions?.length > 0"
+    class="gd-form-fill-questionnaire-v2-legend">
+
+    <!-- Header -->
+    <div
+      class="gd-form-fill-questionnaire-v2-legend-title">
+      {{'LNG_COMMON_LABEL_LEGEND' | translate}}
+    </div>
+
+    <!-- Items -->
+    <div
+      class="gd-form-fill-questionnaire-v2-legend-items">
+      TODO
+    </div>
+
+  </div>
+
 </div>
