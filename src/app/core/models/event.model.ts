@@ -3,6 +3,7 @@ import { AddressModel } from './address.model';
 import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
+import { Moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
@@ -23,12 +24,12 @@ export class EventModel
         IPermissionRelatedContactBulk {
   id: string;
   name: string;
-  date: string;
+  date: string | Moment;
   dateApproximate: boolean;
   description: string;
   address: AddressModel;
   type: EntityType = EntityType.EVENT;
-  dateOfReporting: string;
+  dateOfReporting: string | Moment;
   isDateOfReportingApproximate: boolean;
   outbreakId: string;
 
