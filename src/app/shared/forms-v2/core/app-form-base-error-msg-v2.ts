@@ -72,6 +72,9 @@ export abstract class AppFormBaseErrorMsgV2 {
       case 'hasPropertyValidator':
         return translateService.instant(errData.err);
 
+      case 'noSpaces':
+        return translateService.instant('LNG_FORM_VALIDATION_ERROR_FIELD_NO_SPACES');
+
       default:
         return `--- NOT HANDLED (${errKey}) ---`;
     }

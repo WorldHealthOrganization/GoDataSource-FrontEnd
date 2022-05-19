@@ -599,12 +599,15 @@ export class AppFormEditQuestionnaireV2Component
           visible: (data) => (data.map.answerType as IV2SideDialogConfigInputSingleDropdown).value !== Constants.ANSWER_TYPES.MARKUP.value,
           disabled: () => !!modifyQuestion,
           validators: {
-            required: () => true,
+            required: () => !modifyQuestion,
             notNumber: () => !modifyQuestion,
-            notInObject: () => ({
-              values: usedVariables,
-              err: 'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_DUPLICATE_VARIABLE'
-            })
+            notInObject: () => !modifyQuestion ?
+              undefined :
+              {
+                values: usedVariables,
+                err: 'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_DUPLICATE_VARIABLE'
+              },
+            noSpace: () => true
           },
           change: () => {
             variableManuallyChanged = true;

@@ -145,7 +145,8 @@ export interface IV2SideDialogConfigInputText extends IV2SideDialogConfigInput {
         [prop: string]: true
       },
       err: string
-    })
+    }),
+    noSpace?: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: V2SideDialogConfigInput) => boolean
   };
   tooltip?: string;
 }
