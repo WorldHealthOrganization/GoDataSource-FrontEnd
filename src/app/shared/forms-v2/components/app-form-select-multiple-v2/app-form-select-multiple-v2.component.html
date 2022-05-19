@@ -44,7 +44,9 @@
       multiple="true"
       panelClass="gd-form-select-multiple-v2-panel"
       (click)="vScrollToFirstSelectedOption()"
-      (opened)="vScrollToFirstSelectedOption()">
+      (opened)="vScrollToFirstSelectedOption()"
+      (ngModelChange)="changedSinceLastChangedAndClosed = true"
+      (openedChange)="changedAndClosedTrigger($event)">
 
       <!-- Selected value -->
       <mat-select-trigger

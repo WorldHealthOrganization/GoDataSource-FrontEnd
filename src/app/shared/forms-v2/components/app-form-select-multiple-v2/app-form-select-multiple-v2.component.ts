@@ -1,10 +1,10 @@
 import {
   ChangeDetectionStrategy, ChangeDetectorRef,
-  Component,
+  Component, EventEmitter,
   forwardRef,
   Host,
   Input, OnDestroy,
-  Optional,
+  Optional, Output,
   SkipSelf, ViewChild, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -183,6 +183,10 @@ export class AppFormSelectMultipleV2Component
   // vscroll handler
   @ViewChild('cdkVirtualScrollViewport') cdkVirtualScrollViewport: CdkVirtualScrollViewport;
 
+  // value changed and dropdown closed
+  changedSinceLastChangedAndClosed: boolean = false;
+  @Output() changedAndClosed = new EventEmitter<void>();
+
   /**
    * Constructor
    */
@@ -295,5 +299,24 @@ export class AppFormSelectMultipleV2Component
       // change already triggered by setter
       this.value = this.value.filter((value) => !filteredOptionsMap[value]);
     }
+  }
+
+  /**
+   * Trigger change and close
+   */
+  changedAndClosedTrigger(opened: boolean): void {
+    // nothing to do ?
+    if (
+      opened ||
+      !this.changedSinceLastChangedAndClosed
+    ) {
+      return;
+    }
+
+    // reset
+    this.changedSinceLastChangedAndClosed = false;
+
+    // emit event
+    this.changedAndClosed.emit();
   }
 }

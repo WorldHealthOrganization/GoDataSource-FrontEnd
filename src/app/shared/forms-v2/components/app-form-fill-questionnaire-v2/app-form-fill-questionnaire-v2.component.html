@@ -37,6 +37,7 @@
 
             <!-- Collapse / Expand -->
             <mat-icon
+              change123
               [style.visibility]="item.canCollapseOrExpand ? 'visible' : 'hidden'"
               (click)="expandCollapse(item)">{{item.data.collapsed ? 'expand_more' : 'expand_less'}}</mat-icon>
 
@@ -64,6 +65,12 @@
             change123
             fxLayout="row">
 
+            <!-- Collapse / Expand -->
+            <!-- append padding and remove icon -->
+            <mat-icon
+              change123
+              style="visibility: hidden">expand_more</mat-icon>
+
             <!-- Type -->
             <mat-icon
               change123
@@ -76,59 +83,49 @@
               <!-- Single select -->
               <app-form-select-single-v2
                 *ngSwitchCase="FlattenAnswerDrawType.SINGLE_SELECT"
-                [(ngModel)]="value[item.parent.data.variable][0].value"
-                name="bla bla"
+                [(ngModel)]="value[item.parent.data.variable][item.index].value"
+                [name]="item.name"
                 [options]="item.definition.options"
-                (ngModelChange)="answersChanged()"></app-form-select-single-v2>
+                (ngModelChange)="answersWithChildrenQuestionsChanged()"></app-form-select-single-v2>
 
               <!-- Multiple select -->
               <app-form-select-multiple-v2
                 *ngSwitchCase="FlattenAnswerDrawType.MULTIPLE_SELECT"
-                [(ngModel)]="value[item.parent.data.variable][0].value"
-                name="bla bla2"
+                [(ngModel)]="value[item.parent.data.variable][item.index].value"
+                [name]="item.name"
                 [options]="item.definition.options"
-                (ngModelChange)="answersChanged()"></app-form-select-multiple-v2>
+                (changedAndClosed)="answersWithChildrenQuestionsChanged()"></app-form-select-multiple-v2>
 
-<!--              &lt;!&ndash; Text &ndash;&gt;-->
-<!--              <app-form-input-v2-->
-<!--                *ngSwitchCase="Constants.ANSWER_TYPES.FREE_TEXT.value"-->
-<!--                [(ngModel)]="item.value"-->
-<!--                [name]="item.name"-->
-<!--                autocomplete="off"></app-form-input-v2>-->
+              <!-- Text -->
+              <app-form-input-v2
+                *ngSwitchCase="FlattenAnswerDrawType.TEXT"
+                [(ngModel)]="value[item.parent.data.variable][item.index].value"
+                [name]="item.name"
+                autocomplete="off"
+                (ngModelChange)="onChange(value)"></app-form-input-v2>
 
-<!--              &lt;!&ndash; Number &ndash;&gt;-->
-<!--              <app-form-number-v2-->
-<!--                *ngSwitchCase="Constants.ANSWER_TYPES.NUMERIC.value"-->
-<!--                [(ngModel)]="item.value"-->
-<!--                [name]="item.name"-->
-<!--                autocomplete="off"></app-form-number-v2>-->
+              <!-- Number -->
+              <app-form-number-v2
+                *ngSwitchCase="FlattenAnswerDrawType.NUMBER"
+                [(ngModel)]="value[item.parent.data.variable][item.index].value"
+                [name]="item.name"
+                autocomplete="off"
+                (ngModelChange)="onChange(value)"></app-form-number-v2>
 
-<!--              &lt;!&ndash; Date &ndash;&gt;-->
-<!--              <app-form-number-v2-->
-<!--                *ngSwitchCase="Constants.ANSWER_TYPES.DATE_TIME.value"-->
-<!--                [(ngModel)]="item.value"-->
-<!--                [name]="item.name"-->
-<!--                autocomplete="off"></app-form-number-v2>-->
+              <!-- Date -->
+              <app-form-date-v2
+                *ngSwitchCase="FlattenAnswerDrawType.DATE"
+                [(ngModel)]="value[item.parent.data.variable][item.index].value"
+                [name]="item.name"
+                autocomplete="off"
+                app-date-validator
+                (ngModelChange)="onChange(value)"></app-form-date-v2>
 
-<!--              &lt;!&ndash; File Upload &ndash;&gt;-->
+              <!--              &lt;!&ndash; File Upload &ndash;&gt;-->
 <!--              <div-->
 <!--                *ngSwitchCase="Constants.ANSWER_TYPES.FILE_UPLOAD.value">-->
 <!--                FILE UPLOAD-->
 <!--              </div>-->
-
-<!--              &lt;!&ndash; Multiple Select &ndash;&gt;-->
-<!--              <app-form-checkbox-v2-->
-<!--                *ngSwitchCase="Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value"-->
-<!--                ngModel-->
-<!--                [name]="item.parent.id"-->
-<!--                [placeholder]="item.data.label"></app-form-checkbox-v2>-->
-
-<!--              &lt;!&ndash; Single Select &ndash;&gt;-->
-<!--              <app-form-radio-button-v2-->
-<!--                *ngSwitchCase="Constants.ANSWER_TYPES.SINGLE_SELECTION.value"-->
-<!--                [ngModel]="item.data.value"-->
-<!--                [name]="item.parent.id"-->
-<!--                [placeholder]="item.data.label"></app-form-radio-button-v2>-->
 
             </ng-container>
 

@@ -16,7 +16,6 @@ import { AppFormSelectGroupsV2Component } from './app-form-select-groups-v2/app-
 import { AppFormPasswordV2Component } from './app-form-password-v2/app-form-password-v2.component';
 import { AppFormEditQuestionnaireV2Component } from './app-form-edit-questionnaire-v2/app-form-edit-questionnaire-v2.component';
 import { AppFormFillQuestionnaireV2Component } from './app-form-fill-questionnaire-v2/app-form-fill-questionnaire-v2.component';
-import { AppFormRadioButtonV2Component } from './app-form-radio-button-v2/app-form-radio-button-v2.component';
 import { AppFormTimepickerV2Component } from './app-form-timepicker-v2/app-form-timepicker-v2.component';
 
 export const components: any[] = [
@@ -30,7 +29,6 @@ export const components: any[] = [
   AppFormNumberV2Component,
   AppFormPasswordV2Component,
   AppFormRadioButtonGroupV2Component,
-  AppFormRadioButtonV2Component,
   AppFormSelectGroupsV2Component,
   AppFormSelectLocationMultipleV2Component,
   AppFormSelectLocationSingleV2Component,
