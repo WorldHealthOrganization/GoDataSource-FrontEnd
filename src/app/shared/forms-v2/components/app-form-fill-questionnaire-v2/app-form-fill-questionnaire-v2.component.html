@@ -57,7 +57,7 @@
 
             <!-- Buttons -->
             <div
-              *ngIf="!viewOnly && item.data.multiAnswer && item.data.inactive"
+              *ngIf="!viewOnly && item.data.multiAnswer && !item.data.inactive"
               class="gd-form-fill-questionnaire-v2-list-item-question-buttons"
               fxGrow="0">
 
@@ -109,7 +109,7 @@
 
             <!-- Buttons -->
             <div
-              *ngIf="!viewOnly"
+              *ngIf="!viewOnly && !item.parent.data.inactive"
               class="gd-form-fill-questionnaire-v2-list-item-answer-multi-date-buttons"
               fxGrow="0">
 

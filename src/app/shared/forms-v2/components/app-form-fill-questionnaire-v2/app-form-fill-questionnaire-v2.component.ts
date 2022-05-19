@@ -699,7 +699,7 @@ export class AppFormFillQuestionnaireV2Component
    * On change multi date
    */
   onChangeMultiDate(item: IFlattenNodeAnswerMultiDate): void {
-    // add to list of items to clear up
+    // add to list of items to update
     const variables: string[] = this.determineMultiQuestionVariables(item.parent.data);
 
     // update children dates too...
@@ -717,10 +717,29 @@ export class AppFormFillQuestionnaireV2Component
    * Add multi answer
    */
   addMultiAnswer(item: IFlattenNodeQuestion): void {
-    // #TODO
-    console.log(item);
-    // side dialog..to enter date...so we can fill children with that date
-    // or...inline..and update children when date changes..on the same index
+    // add to list of items to add data
+    const variables: string[] = this.determineMultiQuestionVariables(item.data);
+    variables.forEach((variable) => {
+      this.value[variable].splice(0, 0, {
+        date: undefined,
+        value: undefined
+      });
+    });
+
+    // re-render
+    this.nonFlatToFlat(
+      true,
+      false
+    );
+
+    // trigger on change
+    this.onChange(this.value);
+
+    // mark dirty
+    this.control?.markAsDirty();
+
+    // update ui
+    this.detectChanges();
   }
 
   /**
