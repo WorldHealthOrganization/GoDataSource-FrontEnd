@@ -54,6 +54,23 @@
               <span>{{item.data.text}}</span>
             </div>
 
+            <!-- Buttons -->
+            <div
+              *ngIf="!viewOnly && item.data.multiAnswer && item.data.inactive"
+              class="gd-form-fill-questionnaire-v2-list-item-question-buttons"
+              fxGrow="0">
+
+              <!-- Add answer -->
+              <button
+                type="button"
+                mat-icon-button
+                [matTooltip]="'LNG_QUESTIONNAIRE_BUTTON_ADD_MULTI_ANSWER' | translate"
+                (click)="addMultiAnswer(item)">
+                <mat-icon>playlist_add</mat-icon>
+              </button>
+
+            </div>
+
           </div>
 
           <!-- ANSWER -->
@@ -86,6 +103,7 @@
                 [(ngModel)]="value[item.parent.data.variable][item.index].value"
                 [name]="item.name"
                 [options]="item.definition.options"
+                [viewOnly]="viewOnly"
                 (ngModelChange)="answersWithChildrenQuestionsChanged()"></app-form-select-single-v2>
 
               <!-- Multiple select -->
@@ -94,6 +112,7 @@
                 [(ngModel)]="value[item.parent.data.variable][item.index].value"
                 [name]="item.name"
                 [options]="item.definition.options"
+                [viewOnly]="viewOnly"
                 (changedAndClosed)="answersWithChildrenQuestionsChanged()"></app-form-select-multiple-v2>
 
               <!-- Text -->
@@ -102,6 +121,7 @@
                 [(ngModel)]="value[item.parent.data.variable][item.index].value"
                 [name]="item.name"
                 autocomplete="off"
+                [viewOnly]="viewOnly"
                 (ngModelChange)="onChange(value)"></app-form-input-v2>
 
               <!-- Number -->
@@ -110,6 +130,7 @@
                 [(ngModel)]="value[item.parent.data.variable][item.index].value"
                 [name]="item.name"
                 autocomplete="off"
+                [viewOnly]="viewOnly"
                 (ngModelChange)="onChange(value)"></app-form-number-v2>
 
               <!-- Date -->
@@ -119,13 +140,14 @@
                 [name]="item.name"
                 autocomplete="off"
                 app-date-validator
+                [viewOnly]="viewOnly"
                 (ngModelChange)="onChange(value)"></app-form-date-v2>
 
-              <!--              &lt;!&ndash; File Upload &ndash;&gt;-->
-<!--              <div-->
-<!--                *ngSwitchCase="Constants.ANSWER_TYPES.FILE_UPLOAD.value">-->
-<!--                FILE UPLOAD-->
-<!--              </div>-->
+              <!-- File -->
+              <div
+                *ngSwitchCase="FlattenAnswerDrawType.FILE">
+                FILE UPLOAD
+              </div>
 
             </ng-container>
 
