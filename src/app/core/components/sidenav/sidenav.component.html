@@ -52,8 +52,12 @@
           <!-- Menu without children - link -->
           <a
             *ngIf="menuOption.link; else childrenPanel"
-            [routerLink]="menuOption.link">
-            <div>
+            class="gd-main-menu-option gd-main-menu-option-link"
+            [routerLink]="menuOption.link"
+            routerLinkActive="gd-main-menu-option-active"
+            [routerLinkActiveOptions]="activeSetup">
+            <div
+              class="gd-main-menu-option-header">
               <ng-template
                 [ngTemplateOutlet]="commonPart"
                 [ngTemplateOutletContext]="{ option: menuOption }"></ng-template>
