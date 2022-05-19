@@ -104,6 +104,7 @@
                 autocomplete="off"
                 app-date-validator
                 [viewOnly]="viewOnly"
+                [required]="!!value[item.parent.data.variable][item.index].value || value[item.parent.data.variable][item.index].value === 0"
                 (ngModelChange)="onChangeMultiDate(item)"></app-form-date-v2>
             </div>
 
@@ -157,6 +158,7 @@
                 [name]="item.name"
                 [options]="item.definition.options"
                 [viewOnly]="viewOnly"
+                [required]="item.parent.data.required"
                 (ngModelChange)="answersWithChildrenQuestionsChanged()"></app-form-select-single-v2>
 
               <!-- Multiple select -->
@@ -166,6 +168,7 @@
                 [name]="item.name"
                 [options]="item.definition.options"
                 [viewOnly]="viewOnly"
+                [required]="item.parent.data.required"
                 (changedAndClosed)="answersWithChildrenQuestionsChanged()"></app-form-select-multiple-v2>
 
               <!-- Text -->
@@ -175,6 +178,7 @@
                 [name]="item.name"
                 autocomplete="off"
                 [viewOnly]="viewOnly"
+                [required]="item.parent.data.required"
                 (ngModelChange)="onChange(value)"></app-form-input-v2>
 
               <!-- Number -->
@@ -184,6 +188,7 @@
                 [name]="item.name"
                 autocomplete="off"
                 [viewOnly]="viewOnly"
+                [required]="item.parent.data.required"
                 (ngModelChange)="onChange(value)"></app-form-number-v2>
 
               <!-- Date -->
@@ -194,6 +199,7 @@
                 autocomplete="off"
                 app-date-validator
                 [viewOnly]="viewOnly"
+                [required]="item.parent.data.required"
                 (ngModelChange)="onChange(value)"></app-form-date-v2>
 
               <!-- File -->

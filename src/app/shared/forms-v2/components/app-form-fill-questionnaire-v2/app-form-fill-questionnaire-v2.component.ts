@@ -304,6 +304,18 @@ export class AppFormFillQuestionnaireV2Component
 
     // go through each question
     questions.forEach((question) => {
+      // should we show inactive question ?
+      if (
+        question.inactive && (
+          !this.value[question.variable] ||
+          this.value[question.variable].length < 1 ||
+          !this.value[question.variable][0].value
+        )
+      ) {
+        // don't render it
+        return;
+      }
+
       // translate
       question.text = question.text ?
         this.translateService.instant(question.text) :
