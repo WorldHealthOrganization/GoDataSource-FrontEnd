@@ -8,13 +8,16 @@ import { Constants } from '../../../../core/models/constants';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { ILabelValuePairModel } from '../../core/label-value-pair.model';
 import * as moment from 'moment';
+import { IV2BottomDialogConfigButtonType } from '../../../components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 
 /**
  * Flatten type
  */
 enum FlattenType {
   QUESTION,
-  ANSWER
+  ANSWER,
+  ANSWER_MULTI_DATE
 }
 
 /**
@@ -87,6 +90,19 @@ interface IFlattenNodeAnswer {
 }
 
 /**
+ * Flatten node answer multi date
+ */
+interface IFlattenNodeAnswerMultiDate {
+  // required
+  type: FlattenType.ANSWER_MULTI_DATE;
+  level: number;
+  parent: IFlattenNodeQuestion;
+  oneParentIsInactive: boolean;
+  name: string;
+  index: number;
+}
+
+/**
  * Flatten node question
  */
 interface IFlattenNodeQuestion {
@@ -151,7 +167,7 @@ export class AppFormFillQuestionnaireV2Component
   private _nonFlatToFlatWait: any;
 
   // flattened questions
-  flattenedQuestions: (IFlattenNodeQuestion | IFlattenNodeAnswer)[] = [];
+  flattenedQuestions: (IFlattenNodeQuestion | IFlattenNodeAnswerMultiDate | IFlattenNodeAnswer)[] = [];
 
   // constants
   FlattenType = FlattenType;
@@ -164,7 +180,8 @@ export class AppFormFillQuestionnaireV2Component
   constructor(
     @Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer,
     protected translateService: TranslateService,
-    protected changeDetectorRef: ChangeDetectorRef
+    protected changeDetectorRef: ChangeDetectorRef,
+    protected dialogV2Service: DialogV2Service
   ) {
     // parent
     super(
@@ -350,6 +367,22 @@ export class AppFormFillQuestionnaireV2Component
 
               // render
               const render = (answerIndex: number) => {
+                // attach date if we are on root response - question
+                if (
+                  flattenedQuestion.data.multiAnswer &&
+                  level === 0
+                ) {
+                  // flatten
+                  this.flattenedQuestions.push({
+                    type: FlattenType.ANSWER_MULTI_DATE,
+                    level: flattenedQuestion.level + 1,
+                    parent: flattenedQuestion,
+                    oneParentIsInactive: (flattenedQuestion.data as QuestionModel).inactive || flattenedQuestion.oneParentIsInactive,
+                    name: `${this.name}[${question.variable}][${answerIndex}].date`,
+                    index: answerIndex
+                  });
+                }
+
                 // get item
                 const item: IAnswerData = this.value[flattenedQuestion.data.variable][answerIndex];
 
@@ -450,6 +483,22 @@ export class AppFormFillQuestionnaireV2Component
 
             // render
             const render = (answerIndex: number) => {
+              // attach date if we are on root response - question
+              if (
+                flattenedQuestion.data.multiAnswer &&
+                level === 0
+              ) {
+                // flatten
+                this.flattenedQuestions.push({
+                  type: FlattenType.ANSWER_MULTI_DATE,
+                  level: flattenedQuestion.level + 1,
+                  parent: flattenedQuestion,
+                  oneParentIsInactive: (flattenedQuestion.data as QuestionModel).inactive || flattenedQuestion.oneParentIsInactive,
+                  name: `${this.name}[${question.variable}][${answerIndex}].date`,
+                  index: answerIndex
+                });
+              }
+
               // flatten
               const flattenedAnswer: IFlattenNodeAnswer = {
                 type: FlattenType.ANSWER,
@@ -620,25 +669,107 @@ export class AppFormFillQuestionnaireV2Component
   }
 
   /**
+   * Determine variables under a multi question
+   */
+  private determineMultiQuestionVariables(rootQuestion: QuestionModel): string[] {
+    // - remove answer from multi answer question... should remove child array items too
+    // opposite of fillOutValuesForMultiAnswerQuestion
+    // determine all variables for which we need to remove answers
+    const variables: string[] = [];
+    const determineVariables = (question: QuestionModel) => {
+      // add to list
+      variables.push(question.variable);
+
+      // check children
+      (question.answers || []).forEach((answer) => {
+        (answer.additionalQuestions || []).forEach((cQuestion) => {
+          determineVariables(cQuestion);
+        });
+      });
+    };
+
+    // start from root
+    determineVariables(rootQuestion);
+
+    // finished
+    return variables;
+  }
+
+  /**
+   * On change multi date
+   */
+  onChangeMultiDate(item: IFlattenNodeAnswerMultiDate): void {
+    // add to list of items to clear up
+    const variables: string[] = this.determineMultiQuestionVariables(item.parent.data);
+
+    // update children dates too...
+    // those on the same indexes
+    variables.forEach((variable) => {
+      if (this.value[variable].length > item.index) {
+        this.value[variable][item.index].date = this.value[item.parent.data.variable][item.index].date ?
+          moment(this.value[item.parent.data.variable][item.index].date) :
+          this.value[item.parent.data.variable][item.index].date;
+      }
+    });
+  }
+
+  /**
    * Add multi answer
    */
   addMultiAnswer(item: IFlattenNodeQuestion): void {
     // #TODO
     console.log(item);
-    // side dialog..to enter date..so we can fill children with that date
+    // side dialog..to enter date...so we can fill children with that date
     // or...inline..and update children when date changes..on the same index
   }
 
   /**
    * Remove item
    */
-  removeItem(item: IFlattenNodeQuestion): void {
-    // #TODO
-    // - remove answer from multi answer question... should remove child array items too
-    // the opposite of fillOutValuesForMultiAnswerQuestion
+  removeMultiAnswer(item: IFlattenNodeAnswerMultiDate): void {
+    this.dialogV2Service
+      .showConfirmDialog({
+        config: {
+          title: {
+            get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
+          },
+          message: {
+            get: () => 'LNG_DIALOG_CONFIRM_REMOVE_MULTI_ANSWER'
+          }
+        }
+      })
+      .subscribe((response) => {
+        // canceled ?
+        if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+          // finished
+          return;
+        }
 
-    // #TODO
-    console.log(item);
+        // add to list of items to clear up
+        const variables: string[] = this.determineMultiQuestionVariables(item.parent.data);
+
+        // clean up
+        variables.forEach((variable) => {
+          if (this.value[variable].length > item.index) {
+            this.value[variable].splice(item.index, 1);
+          }
+        });
+
+        // re-render
+        this.nonFlatToFlat(
+          true,
+          false
+        );
+
+        // trigger on change
+        this.onChange(this.value);
+
+        // mark dirty
+        this.control?.markAsDirty();
+
+        // update ui
+        this.detectChanges();
+      });
   }
 
   /**

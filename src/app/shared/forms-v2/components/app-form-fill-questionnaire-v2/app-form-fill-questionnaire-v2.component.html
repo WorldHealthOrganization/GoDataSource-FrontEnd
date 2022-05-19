@@ -31,6 +31,7 @@
             class="gd-form-fill-questionnaire-v2-list-item-question"
             [class.gd-form-fill-questionnaire-v2-list-item-question-inactive]="item.data.inactive || item.oneParentIsInactive"
             [class.gd-form-fill-questionnaire-v2-list-item-question-markup]="item.data.answerType === Constants.ANSWER_TYPES.MARKUP.value"
+            [class.gd-form-fill-questionnaire-v2-list-item-question-multiple]="item.data.multiAnswer"
 
             change123
             fxLayout="row">
@@ -67,6 +68,58 @@
                 [matTooltip]="'LNG_QUESTIONNAIRE_BUTTON_ADD_MULTI_ANSWER' | translate"
                 (click)="addMultiAnswer(item)">
                 <mat-icon>playlist_add</mat-icon>
+              </button>
+
+            </div>
+
+          </div>
+
+          <!-- ANSWER MULTI DATE -->
+          <div
+            *ngSwitchCase="FlattenType.ANSWER_MULTI_DATE"
+            class="gd-form-fill-questionnaire-v2-list-item-answer-multi-date"
+            [class.gd-form-fill-questionnaire-v2-list-item-answer-multi-date-inactive]="item.oneParentIsInactive"
+
+            change123
+            fxLayout="row">
+
+            <!-- Collapse / Expand -->
+            <!-- append padding and remove icon -->
+            <mat-icon
+              change123
+              style="visibility: hidden">expand_more</mat-icon>
+
+            <!-- Calendar -->
+            <mat-icon
+              change123
+              fxGrow="0">event</mat-icon>
+
+            <!-- Date -->
+            <div
+              change123
+              fxFlex>
+              <app-form-date-v2
+                [(ngModel)]="value[item.parent.data.variable][item.index].date"
+                [name]="item.name"
+                autocomplete="off"
+                app-date-validator
+                [viewOnly]="viewOnly"
+                (ngModelChange)="onChangeMultiDate(item)"></app-form-date-v2>
+            </div>
+
+            <!-- Buttons -->
+            <div
+              *ngIf="!viewOnly"
+              class="gd-form-fill-questionnaire-v2-list-item-answer-multi-date-buttons"
+              fxGrow="0">
+
+              <!-- Remove answer -->
+              <button
+                type="button"
+                mat-icon-button
+                [matTooltip]="'LNG_QUESTIONNAIRE_BUTTON_REMOVE' | translate"
+                (click)="removeMultiAnswer(item)">
+                <mat-icon>delete</mat-icon>
               </button>
 
             </div>
