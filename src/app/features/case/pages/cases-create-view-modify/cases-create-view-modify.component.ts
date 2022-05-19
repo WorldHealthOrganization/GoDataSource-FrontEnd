@@ -1029,7 +1029,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             this.itemData.questionnaireAnswers = value;
           }
         }
-      }
+      },
+      visible: () => this.selectedOutbreak.caseInvestigationTemplate?.length > 0
     };
   }
 

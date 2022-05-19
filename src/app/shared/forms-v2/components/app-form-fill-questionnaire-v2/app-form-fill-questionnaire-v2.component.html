@@ -35,6 +35,11 @@
             change123
             fxLayout="row">
 
+            <!-- Collapse / Expand -->
+            <mat-icon
+              [style.visibility]="item.canCollapseOrExpand ? 'visible' : 'hidden'"
+              (click)="expandCollapse(item)">{{item.data.collapsed ? 'expand_more' : 'expand_less'}}</mat-icon>
+
             <!-- Type -->
             <mat-icon
               change123
@@ -68,21 +73,21 @@
             <ng-container
               [ngSwitch]="item.definition.type">
 
-<!--              &lt;!&ndash; Single select &ndash;&gt;-->
-<!--              <app-form-select-single-v2-->
-<!--                *ngSwitchCase="FlattenAnswerDrawType.SINGLE_SELECT"-->
-<!--                [ngModel]="value[item.parent.data.variable][0].value"-->
-<!--                name="bla bla"-->
-<!--                [options]="item.definition.options"-->
-<!--                (ngModelChange)="updateQuestionnaire()"></app-form-select-single-v2>-->
+              <!-- Single select -->
+              <app-form-select-single-v2
+                *ngSwitchCase="FlattenAnswerDrawType.SINGLE_SELECT"
+                [(ngModel)]="value[item.parent.data.variable][0].value"
+                name="bla bla"
+                [options]="item.definition.options"
+                (ngModelChange)="answersChanged()"></app-form-select-single-v2>
 
-<!--              &lt;!&ndash; Multiple select &ndash;&gt;-->
-<!--              <app-form-select-multiple-v2-->
-<!--                *ngSwitchCase="FlattenAnswerDrawType.MULTIPLE_SELECT"-->
-<!--                [(ngModel)]="value[item.parent.data.variable][0].value"-->
-<!--                name="bla bla2"-->
-<!--                [options]="item.definition.options"-->
-<!--                (ngModelChange)="updateQuestionnaire()"></app-form-select-multiple-v2>-->
+              <!-- Multiple select -->
+              <app-form-select-multiple-v2
+                *ngSwitchCase="FlattenAnswerDrawType.MULTIPLE_SELECT"
+                [(ngModel)]="value[item.parent.data.variable][0].value"
+                name="bla bla2"
+                [options]="item.definition.options"
+                (ngModelChange)="answersChanged()"></app-form-select-multiple-v2>
 
 <!--              &lt;!&ndash; Text &ndash;&gt;-->
 <!--              <app-form-input-v2-->

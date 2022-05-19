@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, forwardRef, Host, HostListener, Input, On
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
-import { IAnswerData, QuestionModel } from '../../../../core/models/question.model';
+import { AnswerModel, IAnswerData, QuestionModel } from '../../../../core/models/question.model';
 import { determineRenderMode, RenderMode } from '../../../../core/enums/render-mode.enum';
 import { Constants } from '../../../../core/models/constants';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
@@ -68,6 +68,7 @@ interface IFlattenNodeQuestion {
   parent: IFlattenNodeAnswer;
   data: QuestionModel;
   oneParentIsInactive: boolean;
+  canCollapseOrExpand: boolean;
 }
 
 @Component({
@@ -109,11 +110,14 @@ export class AppFormFillQuestionnaireV2Component
     this._questionnaire = questionnaire;
 
     // flatten
-    this.nonFlatToFlat();
+    this.nonFlatToFlat(false);
   }
 
   // render mode
   renderMode: RenderMode = RenderMode.FULL;
+
+  // handlers
+  private _nonFlatToFlatWait: any;
 
   // flattened questions
   flattenedQuestions: (IFlattenNodeQuestion | IFlattenNodeAnswer)[] = [];
@@ -150,6 +154,22 @@ export class AppFormFillQuestionnaireV2Component
   }
 
   /**
+   * Write value and construct questionnaire
+   */
+  writeValue(value: { [p: string]: IAnswerData[] }): void {
+    // initialize value if necessary
+    if (!value) {
+      value = {};
+    }
+
+    // set value
+    super.writeValue(value);
+
+    // flatten
+    this.nonFlatToFlat(false);
+  }
+
+  /**
    * Re-render UI
    */
   detectChanges(): void {
@@ -159,7 +179,36 @@ export class AppFormFillQuestionnaireV2Component
   /**
    * Convert non flat value to flat value
    */
-  private nonFlatToFlat(): void {
+  private nonFlatToFlat(waited: boolean): void {
+    // wait for everything to be bound
+    if (
+      !this.value ||
+      !this._questionnaire
+    ) {
+      return;
+    }
+
+    // wait so we don't execute multiple times
+    if (!waited) {
+      // stop previous timeout
+      if (this._nonFlatToFlatWait) {
+        clearTimeout(this._nonFlatToFlatWait);
+        this._nonFlatToFlatWait = undefined;
+      }
+
+      // wait
+      this._nonFlatToFlatWait = setTimeout(() => {
+        // clear timeout
+        this._nonFlatToFlatWait = undefined;
+
+        // execute
+        this.nonFlatToFlat(true);
+      });
+
+      // finished
+      return;
+    }
+
     // flatten
     this.flattenedQuestions = [];
     this.flatten(
@@ -200,100 +249,182 @@ export class AppFormFillQuestionnaireV2Component
         level,
         data: question,
         parent,
-        oneParentIsInactive
+        oneParentIsInactive,
+        canCollapseOrExpand: question.answers?.length > 0
       };
 
       // add to list
       this.flattenedQuestions.push(flattenedQuestion);
 
-      // attach answers if we have any
-      if (
-        (
-          question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value ||
-          question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value
-        ) &&
-        question.answers?.length > 0
-      ) {
-        // go through answers and determine how we should render them
-        let atLeastOneChildHasQuestions: boolean = false;
-        question.answers.forEach((answer) => {
-          // translate
-          answer.label = answer.label ?
-            this.translateService.instant(answer.label) :
-            answer.label;
+      // collapsed ?
+      if (!question.collapsed) {
+        // process question type
+        switch (question.answerType) {
+          case Constants.ANSWER_TYPES.SINGLE_SELECTION.value:
+          case Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value:
+            // attach answers if we have any
+            if (question.answers?.length > 0) {
+              // go through answers and determine how we should render them
+              let atLeastOneChildHasQuestions: boolean = false;
+              const answersWithQuestionsMap: {
+                [answerKey: string]: AnswerModel
+              } = {};
+              question.answers.forEach((answer) => {
+                // translate
+                answer.label = answer.label ?
+                  this.translateService.instant(answer.label) :
+                  answer.label;
 
-          // determine if children have questions
-          if (answer.additionalQuestions?.length > 0) {
-            atLeastOneChildHasQuestions = true;
-          }
-        });
+                // determine if children have questions
+                if (answer.additionalQuestions?.length > 0) {
+                  // we have children questions
+                  atLeastOneChildHasQuestions = true;
 
-        // at least one answer has children questions ?
-        if (atLeastOneChildHasQuestions) {
-          // map options
-          const options: ILabelValuePairModel[] = question.answers.map((answer) => ({
-            label: answer.label,
-            value: answer.value
-          }));
+                  // map for easy access later
+                  answersWithQuestionsMap[answer.value] = answer;
+                }
+              });
 
-          // flatten
-          const flattenedAnswer: IFlattenNodeAnswer = {
-            type: FlattenType.ANSWER,
-            level: flattenedQuestion.level + 1,
-            parent: flattenedQuestion,
-            oneParentIsInactive: (flattenedQuestion.data as QuestionModel).inactive || flattenedQuestion.oneParentIsInactive,
-            definition: question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value ?
-              {
-                type: FlattenAnswerDrawType.SINGLE_SELECT,
-                options
-              } : {
-                type: FlattenAnswerDrawType.MULTIPLE_SELECT,
-                options
+              // at least one answer has children questions ?
+              if (atLeastOneChildHasQuestions) {
+                // map options
+                const options: ILabelValuePairModel[] = question.answers.map((answer) => ({
+                  label: answer.label,
+                  value: answer.value
+                }));
+
+                // flatten
+                const flattenedAnswer: IFlattenNodeAnswer = {
+                  type: FlattenType.ANSWER,
+                  level: flattenedQuestion.level + 1,
+                  parent: flattenedQuestion,
+                  oneParentIsInactive: (flattenedQuestion.data as QuestionModel).inactive || flattenedQuestion.oneParentIsInactive,
+                  definition: question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value ?
+                    {
+                      type: FlattenAnswerDrawType.MULTIPLE_SELECT,
+                      options
+                    } : {
+                      type: FlattenAnswerDrawType.SINGLE_SELECT,
+                      options
+                    }
+                };
+
+                // initialize value if necessary too
+                if (
+                  !this.value[flattenedQuestion.data.variable] ||
+                  this.value[flattenedQuestion.data.variable].length < 1
+                ) {
+                  this.value[flattenedQuestion.data.variable] = [{
+                    value: question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value ?
+                      [] :
+                      undefined
+                  }];
+                }
+
+                // add to list
+                this.flattenedQuestions.push(flattenedAnswer);
+
+                // determine if we need to show other things depending on what was selected
+                this.value[flattenedQuestion.data.variable].forEach((item) => {
+                  // multiple answer question ?
+                  if (question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value) {
+                    // go through each multiple response
+                    if (item.value?.length > 0) {
+                      item.value.forEach((answerValue: string) => {
+                        if (answersWithQuestionsMap[answerValue]) {
+                          // flatten children questions
+                          this.flatten(
+                            answersWithQuestionsMap[answerValue].additionalQuestions,
+                            flattenedAnswer.level + 1,
+                            flattenedAnswer,
+                            flattenedAnswer.oneParentIsInactive
+                          );
+                        }
+                      });
+                    }
+                  } else {
+                    if (answersWithQuestionsMap[item.value]) {
+                      // flatten children questions
+                      this.flatten(
+                        answersWithQuestionsMap[item.value].additionalQuestions,
+                        flattenedAnswer.level + 1,
+                        flattenedAnswer,
+                        flattenedAnswer.oneParentIsInactive
+                      );
+                    }
+                  }
+                });
+              } else {
+                // #TODO
+                // no child questions so we can display either radio-buttons or checkboxes
               }
-          };
+            }
 
-          // add to list
-          this.flattenedQuestions.push(flattenedAnswer);
-        } else {
-          // #TODO
-          // no child questions so we can display either radio-buttons or checkboxes
+            // finished
+            break;
+
+          case Constants.ANSWER_TYPES.FREE_TEXT.value:
+            // #TODO
+            // console.log('free');
+
+            // finished
+            break;
+
+          case Constants.ANSWER_TYPES.NUMERIC.value:
+            // #TODO
+            // console.log('num');
+
+            // finished
+            break;
+
+          case Constants.ANSWER_TYPES.DATE_TIME.value:
+            // #TODO
+            // console.log('date');
+
+            // finished
+            break;
+
+          case Constants.ANSWER_TYPES.FILE_UPLOAD.value:
+            // #TODO
+            // console.log('file');
+
+            // finished
+            break;
+
+            // markup nothing to do
+            // NOTHING
         }
-
-        // // check for children questions
-        // this.flatten(
-        //   answer.additionalQuestions,
-        //   flattenedAnswer.level + 1,
-        //   flattenedAnswer,
-        //   flattenedAnswer.oneParentIsInactive
-        // );
-
-      } else if (question.answerType !== Constants.ANSWER_TYPES.MARKUP.value) {
-        // // simple answer - text, number...date
-        // const flattenedAnswer: IFlattenNodeAnswer = {
-        //   type: FlattenType.ANSWER,
-        //   level: flattenedQuestion.level + 1,
-        //   data: null,
-        //   parent: flattenedQuestion,
-        //   oneParentIsInactive: (flattenedQuestion.data as QuestionModel).inactive || flattenedQuestion.oneParentIsInactive
-        // };
-        //
-        // // add to list
-        // this.flattenedQuestions.push(flattenedAnswer);
       }
     });
   }
 
-  // /**
-  //  * Update questionnaire
-  //  */
-  // updateQuestionnaire(
-  //   item: IFlattenNodeAnswer,
-  //   index: number,
-  //   value: any
-  // ): void {
-  //   // update questionnaire
-  //   this.nonFlatToFlat();
-  // }
+  /**
+   * Update questionnaire
+   */
+  answersChanged(): void {
+    // update questionnaire
+    this.nonFlatToFlat(true);
+  }
+
+  /**
+   * Expand collapse
+   */
+  expandCollapse(item: IFlattenNodeQuestion): void {
+    // can't collapse or expand
+    if (!item.canCollapseOrExpand) {
+      return;
+    }
+
+    // expand / collapse
+    if (item.data.collapsed) {
+      delete item.data.collapsed;
+    } else {
+      item.data.collapsed = true;
+    }
+
+    // redraw
+    this.nonFlatToFlat(true);
+  }
 
   /**
    * Update website render mode
