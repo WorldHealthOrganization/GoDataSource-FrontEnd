@@ -1002,21 +1002,25 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
       }
 
       // sanitize questionnaire - case
+      // - remove fields used by ui (e.g. collapsed...)
       if (data.caseInvestigationTemplate) {
         data.caseInvestigationTemplate = (data.caseInvestigationTemplate || []).map((question) => new QuestionModel(question));
       }
 
       // sanitize questionnaire - contact
+      // - remove fields used by ui (e.g. collapsed...)
       if (data.contactInvestigationTemplate) {
         data.contactInvestigationTemplate = (data.contactInvestigationTemplate || []).map((question) => new QuestionModel(question));
       }
 
       // sanitize questionnaire - follow-up
+      // - remove fields used by ui (e.g. collapsed...)
       if (data.contactFollowUpTemplate) {
         data.contactFollowUpTemplate = (data.contactFollowUpTemplate || []).map((question) => new QuestionModel(question));
       }
 
       // sanitize questionnaire - lab result
+      // - remove fields used by ui (e.g. collapsed...)
       if (data.labResultsTemplate) {
         data.labResultsTemplate = (data.labResultsTemplate || []).map((question) => new QuestionModel(question));
       }
