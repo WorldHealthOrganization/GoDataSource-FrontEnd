@@ -104,7 +104,13 @@
                 autocomplete="off"
                 app-date-validator
                 [viewOnly]="viewOnly"
-                [required]="!!value[item.parent.data.variable][item.index].value || value[item.parent.data.variable][item.index].value === 0"
+                [required]="
+                  (
+                    !!value[item.parent.data.variable][item.index].value && (
+                      value[item.parent.data.variable][item.index].value.length === undefined ||
+                      value[item.parent.data.variable][item.index].value.length > 0
+                    )
+                  ) || value[item.parent.data.variable][item.index].value === 0"
                 (ngModelChange)="onChangeMultiDate(item)"></app-form-date-v2>
             </div>
 
