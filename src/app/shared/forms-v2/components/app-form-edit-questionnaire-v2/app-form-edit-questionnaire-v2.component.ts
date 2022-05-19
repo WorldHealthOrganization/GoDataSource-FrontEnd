@@ -25,6 +25,7 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import * as _ from 'lodash';
 import { determineRenderMode, RenderMode } from '../../../../core/enums/render-mode.enum';
+import { IV2BottomDialogConfigButtonType } from '../../../components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 
 /**
  * Flatten type
@@ -809,6 +810,80 @@ export class AppFormEditQuestionnaireV2Component
       parent,
       question
     );
+  }
+
+  /**
+   * Delete item
+   */
+  deleteItem(item: IFlattenNode): void {
+    this.dialogV2Service
+      .showConfirmDialog({
+        config: {
+          title: {
+            get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
+          },
+          message: {
+            get: () => 'LNG_COMMON_LABEL_DELETE',
+            data: () => ({
+              name: item.type === FlattenType.QUESTION ?
+                (item.data as QuestionModel).text :
+                (item.data as AnswerModel).label
+            })
+          }
+        }
+      })
+      .subscribe((response) => {
+        // canceled ?
+        if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+          // finished
+          return;
+        }
+
+        // remove item
+        if (item.type === FlattenType.QUESTION) {
+          // retrieve array from which we need to remove question
+          const parentListOfQuestions: QuestionModel[] = item.parent ?
+            (item.parent.data as AnswerModel).additionalQuestions :
+            this.value;
+
+          // find our question
+          const questionIndex: number = parentListOfQuestions.findIndex((child) => child === item.data);
+
+          // remove
+          if (questionIndex > -1) {
+            parentListOfQuestions.splice(
+              questionIndex,
+              1
+            );
+          }
+        } else if (item.type === FlattenType.ANSWER) {
+          // retrieve array from which we need to remove answer
+          const parentListOfAnswers: AnswerModel[] = (item.parent.data as QuestionModel).answers;
+
+          // find our answer
+          const answerIndex: number = parentListOfAnswers.findIndex((child) => child === item.data);
+
+          // remove
+          if (answerIndex > -1) {
+            parentListOfAnswers.splice(
+              answerIndex,
+              1
+            );
+          }
+        }
+
+        // re-render
+        this.nonFlatToFlat();
+
+        // trigger on change
+        this.onChange(this.value);
+
+        // mark dirty
+        this.control?.markAsDirty();
+
+        // update ui
+        this.detectChanges();
+      });
   }
 
   /**

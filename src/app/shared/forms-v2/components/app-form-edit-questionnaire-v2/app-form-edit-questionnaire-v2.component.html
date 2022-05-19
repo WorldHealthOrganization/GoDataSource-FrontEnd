@@ -127,6 +127,17 @@
                 <mat-icon>{{viewOnly ? 'visibility' : 'edit'}}</mat-icon>
               </button>
 
+              <!-- Delete question -->
+              <button
+                *ngIf="!viewOnly"
+                type="button"
+                mat-icon-button
+                color="warn"
+                [matTooltip]="'LNG_COMMON_BUTTON_DELETE' | translate"
+                (click)="deleteItem(item)">
+                <mat-icon>delete</mat-icon>
+              </button>
+
             </div>
 
           </div>
@@ -194,6 +205,17 @@
                 [matTooltip]="'LNG_COMMON_BUTTON_UPDATE' | translate"
                 (click)="viewEditAnswer(item.data, item.parent.data)">
                 <mat-icon>{{viewOnly ? 'visibility' : 'edit'}}</mat-icon>
+              </button>
+
+              <!-- Delete answer -->
+              <button
+                *ngIf="!viewOnly"
+                type="button"
+                mat-icon-button
+                color="warn"
+                [matTooltip]="'LNG_COMMON_BUTTON_DELETE' | translate"
+                (click)="deleteItem(item)">
+                <mat-icon>delete</mat-icon>
               </button>
 
             </div>
