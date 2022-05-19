@@ -6,6 +6,7 @@ import { V2AdvancedFilter } from '../../app-list-table-v2/models/advanced-filter
 import { RequestFilterOperator, RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { IGeneralAsyncValidatorResponse } from '../../../xt-forms/validators/general-async-validator.directive';
 import { SavedFilterData } from '../../../../core/models/saved-filters.model';
+import { Moment } from '../../../../core/helperClasses/x-moment';
 
 /**
  * Side dialog config
@@ -24,6 +25,7 @@ export enum V2SideDialogConfigInputType {
   TEXT,
   TEXTAREA,
   TIMEPICKER,
+  DATE,
   NUMBER,
   DROPDOWN_SINGLE,
   DROPDOWN_MULTI,
@@ -172,6 +174,20 @@ export interface IV2SideDialogConfigInputTimepicker extends IV2SideDialogConfigI
   type: V2SideDialogConfigInputType.TIMEPICKER;
   placeholder: string;
   value: string;
+
+  // optional
+  validators?: IV2SideDialogConfigInputValidator;
+  tooltip?: string;
+}
+
+/**
+ * Side dialog input - date
+ */
+export interface IV2SideDialogConfigInputDate extends IV2SideDialogConfigInput {
+  // required
+  type: V2SideDialogConfigInputType.DATE;
+  placeholder: string;
+  value: string | Moment;
 
   // optional
   validators?: IV2SideDialogConfigInputValidator;
@@ -389,8 +405,8 @@ export interface IV2SideDialogConfigInputFilterList extends IV2SideDialogConfigI
  * Side dialog inputs
  */
 export type V2SideDialogConfigInputFromInput = IV2SideDialogConfigInputCheckbox | IV2SideDialogConfigInputText | IV2SideDialogConfigInputTextarea
-| IV2SideDialogConfigInputTimepicker | IV2SideDialogConfigInputSingleDropdown | IV2SideDialogConfigInputMultiDropdown | IV2SideDialogConfigInputToggle
-| IV2SideDialogConfigInputToggleCheckbox | IV2SideDialogConfigInputNumber;
+| IV2SideDialogConfigInputTimepicker | IV2SideDialogConfigInputDate | IV2SideDialogConfigInputSingleDropdown | IV2SideDialogConfigInputMultiDropdown
+| IV2SideDialogConfigInputToggle | IV2SideDialogConfigInputToggleCheckbox | IV2SideDialogConfigInputNumber;
 export type V2SideDialogConfigInput = IV2SideDialogConfigInputDivider | IV2SideDialogConfigInputKeyValue | IV2SideDialogConfigInputHTML
 | V2SideDialogConfigInputFromInput | IV2SideDialogConfigInputLink | IV2SideDialogConfigInputLinkWithAction | IV2SideDialogConfigInputGroup
 | IV2SideDialogConfigInputButton | IV2SideDialogConfigInputRow | IV2SideDialogConfigInputAccordion | IV2SideDialogConfigInputFilterList;
