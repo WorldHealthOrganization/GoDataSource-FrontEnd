@@ -135,6 +135,7 @@
             class="gd-form-fill-questionnaire-v2-list-item-answer"
             [class.gd-form-fill-questionnaire-v2-list-item-answer-inactive]="item.oneParentIsInactive"
             [class.gd-form-fill-questionnaire-v2-list-item-answer-multiple]="item.parent.data.multiAnswer"
+            [class.gd-form-fill-questionnaire-v2-list-item-answer-file]="item.definition.type === FlattenAnswerDrawType.FILE"
 
             change123
             fxLayout="row">
@@ -203,7 +204,69 @@
               <!-- File -->
               <div
                 *ngSwitchCase="FlattenAnswerDrawType.FILE">
-                FILE UPLOAD
+
+                <!-- easy...hack to load data when item becomes visible for the first time -->
+                {{loadFileData(item)}}
+
+                <!-- Wait to retrieve attachment data -->
+                <mat-progress-spinner
+                  *ngIf="item.uploading || (value[item.parent.data.variable][item.index].value && !loadedAttachments[value[item.parent.data.variable][item.index].value].loaded); else finishedProcessing"
+                  diameter="32"
+                  mode="indeterminate"></mat-progress-spinner>
+
+                <!-- Data processed -->
+                <ng-template
+                  #finishedProcessing>
+
+                  <!-- Attachment info -->
+                  <input
+                    #uploaderInput
+                    hidden
+                    type="file"
+                    ng2FileSelect
+                    [uploader]="item.uploader"/>
+
+                  <!-- No file attachment ? -->
+                  <ng-container
+                    *ngIf="!value[item.parent.data.variable][item.index].value || !loadedAttachments[value[item.parent.data.variable][item.index].value].attachment; else displayAttachment">
+                    —
+                  </ng-container>
+
+                  <!-- Attachment info -->
+                  <ng-template
+                    #displayAttachment>
+
+                    <!-- Name -->
+                    <span>{{loadedAttachments[value[item.parent.data.variable][item.index].value].attachment.name}}</span>
+
+                    <!-- Download -->
+                    <button
+                      type="button"
+                      mat-icon-button
+                      [matTooltip]="'LNG_QUESTIONNAIRE_BUTTON_DOWNLOAD' | translate"
+                      (click)="downloadAttachment(loadedAttachments[value[item.parent.data.variable][item.index].value].attachment)">
+                      <mat-icon>file_download</mat-icon>
+                    </button>
+
+                  </ng-template>
+
+                  <!-- Buttons -->
+                  <ng-container
+                    *ngIf="!viewOnly">
+
+                    <!-- Upload -->
+                    <button
+                      type="button"
+                      mat-icon-button
+                      [matTooltip]="(loadedAttachments[value[item.parent.data.variable][item.index].value].attachment ? 'LNG_QUESTIONNAIRE_BUTTON_REPLACE' : 'LNG_QUESTIONNAIRE_BUTTON_BROWSE') | translate"
+                      (click)="uploaderInput.click()">
+                      <mat-icon>file_upload</mat-icon>
+                    </button>
+
+                  </ng-container>
+
+                </ng-template>
+
               </div>
 
             </ng-container>
@@ -237,18 +300,32 @@
     <!-- Items -->
     <div
       class="gd-form-fill-questionnaire-v2-legend-items">
-      <!-- Add answers -->
+      <!-- Add multiple answers -->
       <div
         class="gd-form-edit-questionnaire-v2-legend-items-item">
         <mat-icon>playlist_add</mat-icon>
         <span>{{'LNG_QUESTIONNAIRE_BUTTON_ADD_MULTI_ANSWER' | translate}}</span>
       </div>
 
-      <!-- Delete -->
+      <!-- Delete multiple answer -->
       <div
         class="gd-form-edit-questionnaire-v2-legend-items-item">
         <mat-icon>delete</mat-icon>
         <span>{{'LNG_QUESTIONNAIRE_BUTTON_REMOVE' | translate}}</span>
+      </div>
+
+      <!-- Download file -->
+      <div
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        <mat-icon>file_download</mat-icon>
+        <span>{{'LNG_QUESTIONNAIRE_BUTTON_DOWNLOAD' | translate}}</span>
+      </div>
+
+      <!-- Upload file -->
+      <div
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        <mat-icon>file_upload</mat-icon>
+        <span>{{'LNG_QUESTIONNAIRE_BUTTON_BROWSE' | translate}}</span>
       </div>
 
     </div>

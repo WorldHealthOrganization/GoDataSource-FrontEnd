@@ -10,6 +10,18 @@ import { ILabelValuePairModel } from '../../core/label-value-pair.model';
 import * as moment from 'moment';
 import { IV2BottomDialogConfigButtonType } from '../../../components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { FileItem, FileUploader } from 'ng2-file-upload';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { ActivatedRoute } from '@angular/router';
+import { environment } from '../../../../../environments/environment';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { AttachmentModel } from '../../../../core/models/attachment.model';
+import { AttachmentDataService } from '../../../../core/services/data/attachment.data.service';
+import { ReplaySubject, throwError } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
+import * as FileSaver from 'file-saver';
+import { v4 as uuid } from 'uuid';
 
 /**
  * Flatten type
@@ -70,10 +82,17 @@ interface IFlattenNodeAnswerDrawDate {
 }
 
 /**
+ * Flatten node answer draw - file
+ */
+interface IFlattenNodeAnswerDrawFile {
+  type: FlattenAnswerDrawType.FILE;
+}
+
+/**
  * Allowed types
  */
 type FlattenNodeAnswerDraw = IFlattenNodeAnswerDrawSingleSelect | IFlattenNodeAnswerDrawMultipleSelect | IFlattenNodeAnswerDrawText
-| IFlattenNodeAnswerDrawNumber | IFlattenNodeAnswerDrawDate;
+| IFlattenNodeAnswerDrawNumber | IFlattenNodeAnswerDrawDate | IFlattenNodeAnswerDrawFile;
 
 /**
  * Flatten node answer
@@ -81,6 +100,7 @@ type FlattenNodeAnswerDraw = IFlattenNodeAnswerDrawSingleSelect | IFlattenNodeAn
 interface IFlattenNodeAnswer {
   // required
   type: FlattenType.ANSWER;
+  id: string;
   level: number;
   parent: IFlattenNodeQuestion;
   oneParentIsInactive: boolean;
@@ -88,6 +108,11 @@ interface IFlattenNodeAnswer {
   index: number;
   definition: FlattenNodeAnswerDraw;
   collapsed: boolean;
+
+  // might need this information if definition is FILE
+  // we need them here otherwise teh same uploader is used by multiple answers if question is multianswer per date
+  uploader?: FileUploader;
+  uploading?: boolean;
 }
 
 /**
@@ -119,7 +144,10 @@ interface IFlattenNodeQuestion {
   questionRow: number;
   no: string;
   collapsed: boolean;
-  usedAnswers: number[]
+  usedAnswers: number[];
+  pendingAnswers: {
+    [answerId: string]: true
+  };
 }
 
 @Component({
@@ -135,6 +163,9 @@ export class AppFormFillQuestionnaireV2Component
   extends AppFormBaseV2<{
     [variable: string]: IAnswerData[];
   }> implements OnDestroy {
+
+  // handler for stopping take until
+  protected destroyed$: ReplaySubject<boolean> = new ReplaySubject<boolean>();
 
   // viewport
   @ViewChild('cdkViewport') cdkViewport: CdkVirtualScrollViewport;
@@ -189,6 +220,17 @@ export class AppFormFillQuestionnaireV2Component
   private _allFlattenedQuestions: (IFlattenNodeQuestion | IFlattenNodeAnswerMultiDate | IFlattenNodeAnswer)[] = [];
   flattenedQuestions: (IFlattenNodeQuestion | IFlattenNodeAnswerMultiDate | IFlattenNodeAnswer)[] = [];
 
+  // retrieve selected outbreak - since on create, view & modify select outbreak dropdown should be disabled
+  private _selectedOutbreak: OutbreakModel = this.activatedRoute.snapshot.data.outbreak;
+
+  // loaded attachments
+  loadedAttachments: {
+    [attachmentId: string]: {
+      loaded: boolean,
+      attachment: AttachmentModel
+    }
+  } = {};
+
   // constants
   FlattenType = FlattenType;
   Constants = Constants;
@@ -201,7 +243,11 @@ export class AppFormFillQuestionnaireV2Component
     @Optional() @Host() @SkipSelf() protected controlContainer: ControlContainer,
     protected translateService: TranslateService,
     protected changeDetectorRef: ChangeDetectorRef,
-    protected dialogV2Service: DialogV2Service
+    protected dialogV2Service: DialogV2Service,
+    protected authDataService: AuthDataService,
+    protected activatedRoute: ActivatedRoute,
+    protected toastV2Service: ToastV2Service,
+    protected attachmentDataService: AttachmentDataService
   ) {
     // parent
     super(
@@ -218,7 +264,13 @@ export class AppFormFillQuestionnaireV2Component
    * Release resources
    */
   ngOnDestroy(): void {
+    // parent
     super.onDestroy();
+
+    // unsubscribe other requests
+    this.destroyed$.next(true);
+    this.destroyed$.complete();
+    this.destroyed$ = undefined;
   }
 
   /**
@@ -367,7 +419,8 @@ export class AppFormFillQuestionnaireV2Component
         questionRow: accumulator.length,
         no: `${noPrefix}${noPrefix ? '.' : ''}${no}`,
         collapsed,
-        usedAnswers: []
+        usedAnswers: [],
+        pendingAnswers: {}
       };
 
       // add to list
@@ -441,6 +494,7 @@ export class AppFormFillQuestionnaireV2Component
               // flatten
               const flattenedAnswer: IFlattenNodeAnswer = {
                 type: FlattenType.ANSWER,
+                id: uuid(),
                 level: flattenedQuestion.level + 1,
                 parent: flattenedQuestion,
                 oneParentIsInactive: (flattenedQuestion.data as QuestionModel).inactive || flattenedQuestion.oneParentIsInactive,
@@ -515,6 +569,7 @@ export class AppFormFillQuestionnaireV2Component
         case Constants.ANSWER_TYPES.FREE_TEXT.value:
         case Constants.ANSWER_TYPES.NUMERIC.value:
         case Constants.ANSWER_TYPES.DATE_TIME.value:
+        case Constants.ANSWER_TYPES.FILE_UPLOAD.value:
           // create definition
           let definition: FlattenNodeAnswerDraw;
           if (question.answerType === Constants.ANSWER_TYPES.FREE_TEXT.value) {
@@ -528,6 +583,11 @@ export class AppFormFillQuestionnaireV2Component
           } else if (question.answerType === Constants.ANSWER_TYPES.DATE_TIME.value) {
             definition = {
               type: FlattenAnswerDrawType.DATE
+            };
+          } else if (question.answerType === Constants.ANSWER_TYPES.FILE_UPLOAD.value) {
+            // define
+            definition = {
+              type: FlattenAnswerDrawType.FILE
             };
           }
 
@@ -564,6 +624,7 @@ export class AppFormFillQuestionnaireV2Component
             // flatten
             const flattenedAnswer: IFlattenNodeAnswer = {
               type: FlattenType.ANSWER,
+              id: uuid(),
               level: flattenedQuestion.level + 1,
               parent: flattenedQuestion,
               oneParentIsInactive: (flattenedQuestion.data as QuestionModel).inactive || flattenedQuestion.oneParentIsInactive,
@@ -572,6 +633,146 @@ export class AppFormFillQuestionnaireV2Component
               definition,
               collapsed: collapsed || flattenedQuestion.data.collapsed
             };
+
+            // file type ?
+            if (flattenedAnswer.definition.type === FlattenAnswerDrawType.FILE) {
+              // set data
+              flattenedAnswer.uploading = false;
+              flattenedAnswer.uploader = new FileUploader({
+                // configure
+                authToken: this.authDataService.getAuthToken(),
+                url: `${environment.apiUrl}/outbreaks/${this._selectedOutbreak.id}/attachments`,
+                autoUpload: true
+              });
+
+              // don't allow multiple files to be uploaded
+              // we could set queueLimit to 1, but we won't be able to replace the file that way
+              (function(childFlatAnswer: IFlattenNodeAnswer) {
+                childFlatAnswer.uploader.onAfterAddingFile = () => {
+                  // check if we need to replace existing item
+                  if (childFlatAnswer.uploader.queue.length > 1) {
+                    // remove old item
+                    childFlatAnswer.uploader.removeFromQueue(childFlatAnswer.uploader.queue[0]);
+                  }
+
+                  // set name property
+                  childFlatAnswer.uploader.options.additionalParameter = {
+                    name: childFlatAnswer.uploader.queue[0].file.name
+                  };
+                };
+
+                // handle server errors
+                childFlatAnswer.uploader.onErrorItem = () => {
+                  // display error
+                  this.toastV2Service.error('LNG_QUESTIONNAIRE_ERROR_UPLOADING_FILE');
+
+                  // reset uploading flag
+                  childFlatAnswer.uploading = false;
+
+                  // reset
+                  delete childFlatAnswer.parent.pendingAnswers[childFlatAnswer.id];
+
+                  // validate question
+                  this.validateQuestionAnswer(
+                    childFlatAnswer.parent,
+                    true
+                  );
+                };
+
+                // handle errors when trying to upload files
+                childFlatAnswer.uploader.onWhenAddingFileFailed = () => {
+                  // display error
+                  this.toastV2Service.error('LNG_QUESTIONNAIRE_ERROR_UPLOADING_FILE');
+
+                  // reset
+                  delete childFlatAnswer.parent.pendingAnswers[childFlatAnswer.id];
+                };
+
+                // progress handle
+                childFlatAnswer.uploader.onBeforeUploadItem = () => {
+                  // started uploading
+                  childFlatAnswer.uploading = true;
+
+                  // answer loading
+                  childFlatAnswer.parent.pendingAnswers[childFlatAnswer.id] = true;
+
+                  // validate question
+                  this.validateQuestionAnswer(
+                    childFlatAnswer.parent,
+                    true
+                  );
+
+                  // update ui
+                  this.detectChanges();
+                };
+
+                // everything went smoothly ?
+                childFlatAnswer.uploader.onCompleteItem = (_fileItem: FileItem, response: string, status: number) => {
+                  // finished uploading
+                  childFlatAnswer.uploading = false;
+
+                  // an error occurred ?
+                  if (status !== 200) {
+                    return;
+                  }
+
+                  // we should get a ImportableFileModel object
+                  let jsonResponse;
+                  try {
+                    jsonResponse = JSON.parse(response);
+                  } catch {
+                  }
+                  if (
+                    !response ||
+                    !jsonResponse
+                  ) {
+                    // show error
+                    this.toastV2Service.error('LNG_QUESTIONNAIRE_ERROR_UPLOADING_FILE');
+
+                    // reset
+                    delete childFlatAnswer.parent.pendingAnswers[childFlatAnswer.id];
+
+                    // validate question
+                    this.validateQuestionAnswer(
+                      childFlatAnswer.parent,
+                      true
+                    );
+
+                    // finished
+                    return;
+                  }
+
+                  // set file upload done
+                  const attachment: AttachmentModel = new AttachmentModel(jsonResponse);
+                  this.loadedAttachments[attachment.id] = {
+                    loaded: true,
+                    attachment
+                  };
+
+                  // set value
+                  // - might fail if we do change to the structure of the questionnaire answer while uploading data
+                  this.value[childFlatAnswer.parent.data.variable][childFlatAnswer.index].value = attachment.id;
+
+                  // reset
+                  delete childFlatAnswer.parent.pendingAnswers[childFlatAnswer.id];
+
+                  // validate question
+                  this.validateQuestionAnswer(
+                    childFlatAnswer.parent,
+                    true
+                  );
+
+                  // changed
+                  this.onChange(this.value);
+
+                  // update ui
+                  this.detectChanges();
+                };
+              }).call(
+                this,
+                flattenedAnswer
+              );
+            }
 
             // add to list
             flattenedQuestion.usedAnswers.push(answerIndex);
@@ -586,13 +787,6 @@ export class AppFormFillQuestionnaireV2Component
           } else {
             render(answerParentIndex);
           }
-
-          // finished
-          break;
-
-        case Constants.ANSWER_TYPES.FILE_UPLOAD.value:
-          // #TODO
-          // console.log('file');
 
           // finished
           break;
@@ -884,6 +1078,7 @@ export class AppFormFillQuestionnaireV2Component
 
       // validate
       if (
+        Object.keys(flatQuestion.pendingAnswers).length > 0 ||
         (
           flatQuestion.data.multiAnswer && (
             answer.value ||
@@ -973,6 +1168,87 @@ export class AppFormFillQuestionnaireV2Component
 
     // make dirty
     this.onChange(this.value);
+  }
+
+  /**
+   * Load attachment
+   */
+  loadFileData(item: IFlattenNodeAnswer): void {
+    // nothing to do ?
+    const fileID: string = this.value[item.parent.data.variable][item.index].value;
+    if (
+      !fileID ||
+      this.loadedAttachments[fileID]
+    ) {
+      return;
+    }
+
+    // retrieve attachment
+    this.loadedAttachments[fileID] = {
+      loaded: false,
+      attachment: null
+    };
+
+    // retrieve file
+    this.attachmentDataService
+      .getAttachment(
+        this._selectedOutbreak.id,
+        fileID
+      )
+      .pipe(
+        // handle error
+        catchError((err) => {
+          // show error
+          this.toastV2Service.error(err);
+
+          // something went wrong
+          this.loadedAttachments[fileID].loaded = true;
+
+          // send error down the road
+          return throwError(err);
+        }),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      )
+      .subscribe((attachment: AttachmentModel) => {
+        // update
+        this.loadedAttachments[attachment.id].attachment = attachment;
+        this.loadedAttachments[attachment.id].loaded = true;
+
+        // update ui
+        this.detectChanges();
+      });
+  }
+
+  /**
+   * Download attachment
+   */
+  downloadAttachment(attachment: AttachmentModel): void {
+    this.attachmentDataService
+      .downloadAttachment(
+        this._selectedOutbreak.id,
+        attachment.id
+      )
+      .pipe(
+        // handle error
+        catchError((err) => {
+          // show error
+          this.toastV2Service.error(err);
+
+          // send error down the road
+          return throwError(err);
+        }),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      )
+      .subscribe((blob) => {
+        FileSaver.saveAs(
+          blob,
+          attachment.name
+        );
+      });
   }
 
   /**
