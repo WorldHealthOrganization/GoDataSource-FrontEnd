@@ -426,7 +426,7 @@ export interface ICreateViewModifyV2Tab {
   // optional
   visible?: () => boolean
   form?: NgForm;
-  invalidErrMsg?: (tab: ICreateViewModifyV2Tab) => string;
+  invalidHTMLSuffix?: (tab: ICreateViewModifyV2Tab) => string;
 }
 
 /**
@@ -491,7 +491,7 @@ export interface ICreateViewModifyV2TabTable {
   // optional
   visible?: () => boolean
   form?: NgForm;
-  invalidErrMsg?: (tab: ICreateViewModifyV2TabTable) => string;
+  invalidHTMLSuffix?: (tab: ICreateViewModifyV2TabTable) => string;
 }
 
 /**

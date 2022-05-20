@@ -1228,7 +1228,7 @@
                     <popper-content
                       #popperContent>
                       <div
-                        [innerHtml]="('LNG_COMMON_LABEL_INVALID_TAB' | translate) + (!tab.invalidErrMsg ? '' : tab.invalidErrMsg(tab)) | safeHtml">
+                        [innerHtml]="('LNG_COMMON_LABEL_INVALID_TAB' | translate) + (!tab.invalidHTMLSuffix ? '' : tab.invalidHTMLSuffix(tab)) | safeHtml">
                       </div>
                     </popper-content>
                     <mat-icon
@@ -1413,7 +1413,7 @@
                       <popper-content
                         #popperContent>
                         <div
-                          [innerHtml]="('LNG_COMMON_LABEL_INVALID_TAB' | translate) + (!tab.invalidErrMsg ? '' : tab.invalidErrMsg(tab)) | safeHtml">
+                          [innerHtml]="('LNG_COMMON_LABEL_INVALID_TAB' | translate) + (!tab.invalidHTMLSuffix ? '' : tab.invalidHTMLSuffix(tab)) | safeHtml">
                         </div>
                       </popper-content>
                       <mat-icon
