@@ -258,7 +258,7 @@
                     <button
                       type="button"
                       mat-icon-button
-                      [matTooltip]="(loadedAttachments[value[item.parent.data.variable][item.index].value].attachment ? 'LNG_QUESTIONNAIRE_BUTTON_REPLACE' : 'LNG_QUESTIONNAIRE_BUTTON_BROWSE') | translate"
+                      [matTooltip]="(loadedAttachments[value[item.parent.data.variable][item.index].value]?.attachment ? 'LNG_QUESTIONNAIRE_BUTTON_REPLACE' : 'LNG_QUESTIONNAIRE_BUTTON_BROWSE') | translate"
                       (click)="uploaderInput.click()">
                       <mat-icon>file_upload</mat-icon>
                     </button>
