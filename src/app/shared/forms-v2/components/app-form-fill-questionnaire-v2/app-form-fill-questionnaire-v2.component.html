@@ -134,6 +134,7 @@
             *ngSwitchCase="FlattenType.ANSWER"
             class="gd-form-fill-questionnaire-v2-list-item-answer"
             [class.gd-form-fill-questionnaire-v2-list-item-answer-inactive]="item.oneParentIsInactive"
+            [class.gd-form-fill-questionnaire-v2-list-item-answer-multiple]="item.parent.data.multiAnswer"
 
             change123
             fxLayout="row">
