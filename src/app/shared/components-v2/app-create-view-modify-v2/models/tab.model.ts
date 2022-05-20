@@ -426,6 +426,7 @@ export interface ICreateViewModifyV2Tab {
   // optional
   visible?: () => boolean
   form?: NgForm;
+  invalidErrMsg?: (tab: ICreateViewModifyV2Tab) => string;
 }
 
 /**
@@ -475,6 +476,7 @@ interface ICreateViewModifyV2TabTableFillQuestionnaire {
     [variable: string]: IAnswerData[];
   }>;
   questionnaire: QuestionModel[];
+  updateErrors: (errorsHTML: string) => void;
 }
 
 /**
@@ -489,6 +491,7 @@ export interface ICreateViewModifyV2TabTable {
   // optional
   visible?: () => boolean
   form?: NgForm;
+  invalidErrMsg?: (tab: ICreateViewModifyV2TabTable) => string;
 }
 
 /**

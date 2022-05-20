@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, forwardRef, Host, HostListener, Input, OnDestroy, Optional, SkipSelf, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, forwardRef, Host, HostListener, Input, OnDestroy, Optional, Output, SkipSelf, ViewChild } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
@@ -173,15 +173,19 @@ export class AppFormFillQuestionnaireV2Component
   private _nonFlatToFlatWait: any;
 
   // handle errors
+  private _errorsCount: number;
   private _errors: {
     [row: number]: IFlattenNodeQuestion
   };
   get hasErrors(): boolean {
-    return Object.keys(this._errors ? this._errors : {}).length > 0;
+    return this._errorsCount > 0;
   }
 
+  // errors changed
+  @Output() errorsChanged = new EventEmitter<string>();
+
   // flattened questions
-  allFlattenedQuestions: (IFlattenNodeQuestion | IFlattenNodeAnswerMultiDate | IFlattenNodeAnswer)[] = [];
+  private _allFlattenedQuestions: (IFlattenNodeQuestion | IFlattenNodeAnswerMultiDate | IFlattenNodeAnswer)[] = [];
   flattenedQuestions: (IFlattenNodeQuestion | IFlattenNodeAnswerMultiDate | IFlattenNodeAnswer)[] = [];
 
   // constants
@@ -290,9 +294,10 @@ export class AppFormFillQuestionnaireV2Component
 
     // flatten
     this._errors = {};
-    this.allFlattenedQuestions = [];
+    this._errorsCount = 0;
+    this._allFlattenedQuestions = [];
     this.flatten(
-      this.allFlattenedQuestions,
+      this._allFlattenedQuestions,
       this._questionnaire,
       0,
       null,
@@ -303,7 +308,10 @@ export class AppFormFillQuestionnaireV2Component
     );
 
     // update visible
-    this.flattenedQuestions = this.allFlattenedQuestions.filter((item) => !item.collapsed);
+    this.flattenedQuestions = this._allFlattenedQuestions.filter((item) => !item.collapsed);
+
+    // update errors data
+    this.updateErrorsData();
   }
 
   /**
@@ -590,7 +598,10 @@ export class AppFormFillQuestionnaireV2Component
       }
 
       // validate question, answer
-      this.validateQuestionAnswer(flattenedQuestion);
+      this.validateQuestionAnswer(
+        flattenedQuestion,
+        false
+      );
     });
   }
 
@@ -767,7 +778,10 @@ export class AppFormFillQuestionnaireV2Component
     });
 
     // validate
-    this.validateQuestionAnswer(item.parent);
+    this.validateQuestionAnswer(
+      item.parent,
+      true
+    );
 
     // change
     this.onChange(this.value);
@@ -848,7 +862,10 @@ export class AppFormFillQuestionnaireV2Component
   /**
    * Validate question
    */
-  private validateQuestionAnswer(flatQuestion: IFlattenNodeQuestion): void {
+  private validateQuestionAnswer(
+    flatQuestion: IFlattenNodeQuestion,
+    updateErrorsData: boolean
+  ): void {
     // check all answers
     let isValid: boolean = true;
     const answers: IAnswerData[] = (this.value[flatQuestion.data.variable] || []);
@@ -888,11 +905,51 @@ export class AppFormFillQuestionnaireV2Component
     }
 
     // valid ?
+    let somethingChanged: boolean = false;
     if (isValid) {
-      delete this._errors[flatQuestion.questionRow];
+      if (this._errors[flatQuestion.questionRow]) {
+        // cleanup
+        delete this._errors[flatQuestion.questionRow];
+
+        // something changed
+        somethingChanged = true;
+      }
     } else {
-      this._errors[flatQuestion.questionRow] = flatQuestion;
+      if (!this._errors[flatQuestion.questionRow]) {
+        // put error
+        this._errors[flatQuestion.questionRow] = flatQuestion;
+
+        // something changed
+        somethingChanged = true;
+      }
     }
+
+    // reconstruct errors html
+    // - count errors
+    if (
+      updateErrorsData &&
+      somethingChanged
+    ) {
+      this.updateErrorsData();
+    }
+  }
+
+  /**
+   * Update errors data
+   */
+  private updateErrorsData(): void {
+    // determine and count errors
+    const errors: IFlattenNodeQuestion[] = Object.values(this._errors);
+    this._errorsCount = errors.length;
+
+    // construct errors html
+    let errorsString: string = '';
+    errors.forEach((error) => {
+      errorsString += `<br/>- ${error.no}`;
+    });
+
+    // emit errors updated
+    this.errorsChanged.emit(errorsString);
   }
 
   /**
@@ -900,7 +957,10 @@ export class AppFormFillQuestionnaireV2Component
    */
   onChangeValue(item: IFlattenNodeAnswer): void {
     // validate
-    this.validateQuestionAnswer(item.parent);
+    this.validateQuestionAnswer(
+      item.parent,
+      true
+    );
 
     // make dirty
     this.onChange(this.value);
