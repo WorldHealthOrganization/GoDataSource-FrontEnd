@@ -1016,6 +1016,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Initialize tabs - Questionnaire
    */
   private initializeTabsQuestionnaire(): ICreateViewModifyV2TabTable {
+    let errors: string = '';
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       label: 'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE',
@@ -1028,7 +1029,15 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           set: (value) => {
             this.itemData.questionnaireAnswers = value;
           }
+        },
+        updateErrors: (errorsHTML) => {
+          // #TODO
+          // console.log(1, errorsHTML);
+          errors = errorsHTML;
         }
+      },
+      invalidHTMLSuffix: () => {
+        return errors;
       },
       visible: () => this.selectedOutbreak.caseInvestigationTemplate?.length > 0
     };
@@ -1746,6 +1755,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       loading,
       forms
     ) => {
+      // #TODO
+      console.log(data);
+      return;
       // items marked as not duplicates
       let itemsMarkedAsNotDuplicates: string[];
 
