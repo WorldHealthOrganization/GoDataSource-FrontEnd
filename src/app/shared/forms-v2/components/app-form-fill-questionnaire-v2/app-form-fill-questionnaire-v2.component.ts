@@ -113,14 +113,8 @@ interface IFlattenNodeQuestion {
   data: QuestionModel;
   oneParentIsInactive: boolean;
   canCollapseOrExpand: boolean;
-}
-
-/**
- * Invalid data
- */
-interface IFlattenNodeInvalid {
-  row: number;
-  node: IFlattenNodeQuestion | IFlattenNodeAnswerMultiDate | IFlattenNodeAnswer;
+  questionRow: number;
+  no: string;
 }
 
 @Component({
@@ -175,9 +169,11 @@ export class AppFormFillQuestionnaireV2Component
   private _nonFlatToFlatWait: any;
 
   // handle errors
-  private _errors: IFlattenNodeInvalid[];
+  private _errors: {
+    [row: number]: IFlattenNodeQuestion
+  };
   get hasErrors(): boolean {
-    return this._errors?.length > 0;
+    return Object.keys(this._errors ? this._errors : {}).length > 0;
   }
 
   // flattened questions
@@ -288,15 +284,20 @@ export class AppFormFillQuestionnaireV2Component
     }
 
     // flatten
-    this._errors = [];
+    this._errors = {};
     this.flattenedQuestions = [];
     this.flatten(
       this._questionnaire,
       0,
       null,
       false,
-      0
+      0,
+      ''
     );
+
+
+    // #TODO
+    console.log(this._errors);
   }
 
   /**
@@ -307,7 +308,8 @@ export class AppFormFillQuestionnaireV2Component
     level: number,
     parent: IFlattenNodeAnswer,
     oneParentIsInactive: boolean,
-    answerParentIndex: number
+    answerParentIndex: number,
+    noPrefix: string
   ): void {
     // no questions ?
     if (
@@ -318,6 +320,7 @@ export class AppFormFillQuestionnaireV2Component
     }
 
     // go through each question
+    let no: number = 1;
     questions.forEach((question) => {
       // should we show inactive question ?
       if (
@@ -343,11 +346,14 @@ export class AppFormFillQuestionnaireV2Component
         data: question,
         parent,
         oneParentIsInactive,
-        canCollapseOrExpand: question.answers?.length > 0
+        canCollapseOrExpand: question.answers?.length > 0,
+        questionRow: this.flattenedQuestions.length,
+        no: `${noPrefix}${noPrefix ? '.' : ''}${no}`
       };
 
       // add to list
       this.flattenedQuestions.push(flattenedQuestion);
+      no++;
 
       // collapsed ?
       if (!question.collapsed) {
@@ -447,7 +453,8 @@ export class AppFormFillQuestionnaireV2Component
                           flattenedAnswer.level + 1,
                           flattenedAnswer,
                           flattenedAnswer.oneParentIsInactive,
-                          answerIndex
+                          answerIndex,
+                          flattenedQuestion.no
                         );
                       }
                     });
@@ -460,7 +467,8 @@ export class AppFormFillQuestionnaireV2Component
                       flattenedAnswer.level + 1,
                       flattenedAnswer,
                       flattenedAnswer.oneParentIsInactive,
-                      answerIndex
+                      answerIndex,
+                      flattenedQuestion.no
                     );
                   }
                 }
@@ -563,6 +571,9 @@ export class AppFormFillQuestionnaireV2Component
             // markup nothing to do
             // NOTHING
         }
+
+        // validate question, answer
+        this.validateQuestionAnswer(flattenedQuestion);
       }
     });
   }
@@ -739,6 +750,9 @@ export class AppFormFillQuestionnaireV2Component
       }
     });
 
+    // validate
+    this.validateQuestionAnswer(item.parent);
+
     // change
     this.onChange(this.value);
   }
@@ -813,6 +827,67 @@ export class AppFormFillQuestionnaireV2Component
         // update ui
         this.detectChanges();
       });
+  }
+
+  /**
+   * Validate question
+   */
+  private validateQuestionAnswer(flatQuestion: IFlattenNodeQuestion): void {
+    // check all answers
+    let isValid: boolean = true;
+    const answers: IAnswerData[] = (this.value[flatQuestion.data.variable] || []);
+    for (let answerIndex = 0; answerIndex < answers.length; answerIndex++) {
+      // retrieve answer
+      const answer: IAnswerData = answers[answerIndex];
+
+      // validate
+      if (
+        (
+          flatQuestion.data.multiAnswer && (
+            answer.value ||
+            answer.value === 0
+          ) && (
+            flatQuestion.data.answerType !== Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value ||
+            answer.value.length > 0
+          ) &&
+          !answer.date
+        ) || (
+          flatQuestion.data.required && (
+            (
+              !answer.value &&
+              answer.value !== 0
+            ) || (
+              flatQuestion.data.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value &&
+              answer.value.length < 1
+            )
+          )
+        )
+      ) {
+        // not valid
+        isValid = false;
+
+        // stop
+        break;
+      }
+    }
+
+    // valid ?
+    if (isValid) {
+      delete this._errors[flatQuestion.questionRow];
+    } else {
+      this._errors[flatQuestion.questionRow] = flatQuestion;
+    }
+  }
+
+  /**
+   * On change
+   */
+  onChangeValue(item: IFlattenNodeAnswer): void {
+    // validate
+    this.validateQuestionAnswer(item.parent);
+
+    // make dirty
+    this.onChange(this.value);
   }
 
   /**

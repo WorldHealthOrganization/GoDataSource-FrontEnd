@@ -42,15 +42,13 @@
               [style.visibility]="item.canCollapseOrExpand ? 'visible' : 'hidden'"
               (click)="expandCollapse(item)">{{item.data.collapsed ? 'expand_more' : 'expand_less'}}</mat-icon>
 
-            <!-- Type -->
-            <mat-icon
-              change123
-              fxGrow="0">help_center</mat-icon>
-
             <!-- Label -->
             <div
               change123
               fxFlex>
+              <!-- Number -->
+              <span>{{item.no}}. </span>
+
               <!-- Label -->
               <span>{{item.data.text}}</span>
             </div>
@@ -88,11 +86,6 @@
             <mat-icon
               change123
               style="visibility: hidden">expand_more</mat-icon>
-
-            <!-- Calendar -->
-            <mat-icon
-              change123
-              fxGrow="0">event</mat-icon>
 
             <!-- Date -->
             <div
@@ -148,11 +141,6 @@
               change123
               style="visibility: hidden">expand_more</mat-icon>
 
-            <!-- Type -->
-            <mat-icon
-              change123
-              fxGrow="0">font_download</mat-icon>
-
             <!-- Render answer accordingly to question type -->
             <ng-container
               [ngSwitch]="item.definition.type">
@@ -185,7 +173,7 @@
                 autocomplete="off"
                 [viewOnly]="viewOnly"
                 [required]="item.parent.data.required"
-                (ngModelChange)="onChange(value)"></app-form-input-v2>
+                (ngModelChange)="onChangeValue(item)"></app-form-input-v2>
 
               <!-- Number -->
               <app-form-number-v2
@@ -195,7 +183,7 @@
                 autocomplete="off"
                 [viewOnly]="viewOnly"
                 [required]="item.parent.data.required"
-                (ngModelChange)="onChange(value)"></app-form-number-v2>
+                (ngModelChange)="onChangeValue(item)"></app-form-number-v2>
 
               <!-- Date -->
               <app-form-date-v2
@@ -206,7 +194,7 @@
                 app-date-validator
                 [viewOnly]="viewOnly"
                 [required]="item.parent.data.required"
-                (ngModelChange)="onChange(value)"></app-form-date-v2>
+                (ngModelChange)="onChangeValue(item)"></app-form-date-v2>
 
               <!-- File -->
               <div
