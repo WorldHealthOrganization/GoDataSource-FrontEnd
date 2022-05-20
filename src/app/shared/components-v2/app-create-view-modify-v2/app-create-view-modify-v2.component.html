@@ -403,6 +403,7 @@
                     [viewOnly]="isView || !input.value.set"
                     [questionnaire]="input.questionnaire"
                     [selectedTab]="selectedTab === tab"
+                    app-questionnaire-answers-validator
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-fill-questionnaire-v2>
 
                   <!-- Text -->

@@ -87,6 +87,7 @@ interface IFlattenNodeAnswer {
   name: string;
   index: number;
   definition: FlattenNodeAnswerDraw;
+  collapsed: boolean;
 }
 
 /**
@@ -100,6 +101,8 @@ interface IFlattenNodeAnswerMultiDate {
   oneParentIsInactive: boolean;
   name: string;
   index: number;
+  no: string;
+  collapsed: boolean;
 }
 
 /**
@@ -115,6 +118,7 @@ interface IFlattenNodeQuestion {
   canCollapseOrExpand: boolean;
   questionRow: number;
   no: string;
+  collapsed: boolean;
 }
 
 @Component({
@@ -177,6 +181,7 @@ export class AppFormFillQuestionnaireV2Component
   }
 
   // flattened questions
+  allFlattenedQuestions: (IFlattenNodeQuestion | IFlattenNodeAnswerMultiDate | IFlattenNodeAnswer)[] = [];
   flattenedQuestions: (IFlattenNodeQuestion | IFlattenNodeAnswerMultiDate | IFlattenNodeAnswer)[] = [];
 
   // constants
@@ -285,16 +290,20 @@ export class AppFormFillQuestionnaireV2Component
 
     // flatten
     this._errors = {};
-    this.flattenedQuestions = [];
+    this.allFlattenedQuestions = [];
     this.flatten(
+      this.allFlattenedQuestions,
       this._questionnaire,
       0,
       null,
       false,
       0,
-      ''
+      '',
+      false
     );
 
+    // update visible
+    this.flattenedQuestions = this.allFlattenedQuestions.filter((item) => !item.collapsed);
 
     // #TODO
     console.log(this._errors);
@@ -304,12 +313,14 @@ export class AppFormFillQuestionnaireV2Component
    * Flatten
    */
   private flatten(
+    accumulator: (IFlattenNodeQuestion | IFlattenNodeAnswerMultiDate | IFlattenNodeAnswer)[],
     questions: QuestionModel[],
     level: number,
     parent: IFlattenNodeAnswer,
     oneParentIsInactive: boolean,
     answerParentIndex: number,
-    noPrefix: string
+    noPrefix: string,
+    collapsed: boolean
   ): void {
     // no questions ?
     if (
@@ -347,164 +358,37 @@ export class AppFormFillQuestionnaireV2Component
         parent,
         oneParentIsInactive,
         canCollapseOrExpand: question.answers?.length > 0,
-        questionRow: this.flattenedQuestions.length,
-        no: `${noPrefix}${noPrefix ? '.' : ''}${no}`
+        questionRow: accumulator.length,
+        no: `${noPrefix}${noPrefix ? '.' : ''}${no}`,
+        collapsed
       };
 
       // add to list
-      this.flattenedQuestions.push(flattenedQuestion);
+      accumulator.push(flattenedQuestion);
       no++;
 
-      // collapsed ?
-      if (!question.collapsed) {
-        // process question type
-        switch (question.answerType) {
-          case Constants.ANSWER_TYPES.SINGLE_SELECTION.value:
-          case Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value:
-            // attach answers if we have any
-            if (question.answers?.length > 0) {
-              // go through answers and map those with child questions
-              const answersWithQuestionsMap: {
-                [answerKey: string]: AnswerModel
-              } = {};
-              question.answers.forEach((answer) => {
-                // translate
-                answer.label = answer.label ?
-                  this.translateService.instant(answer.label) :
-                  answer.label;
+      // process question type
+      switch (question.answerType) {
+        case Constants.ANSWER_TYPES.SINGLE_SELECTION.value:
+        case Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value:
+          // attach answers if we have any
+          if (question.answers?.length > 0) {
+            // go through answers and map those with child questions
+            const answersWithQuestionsMap: {
+              [answerKey: string]: AnswerModel
+            } = {};
+            question.answers.forEach((answer) => {
+              // translate
+              answer.label = answer.label ?
+                this.translateService.instant(answer.label) :
+                answer.label;
 
-                // determine if children have questions
-                if (answer.additionalQuestions?.length > 0) {
-                  // map for easy access later
-                  answersWithQuestionsMap[answer.value] = answer;
-                }
-              });
-
-              // initialize value if necessary too
-              if (
-                !this.value[flattenedQuestion.data.variable] ||
-                this.value[flattenedQuestion.data.variable].length < 1
-              ) {
-                this.value[flattenedQuestion.data.variable] = [{
-                  value: question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value ?
-                    [] :
-                    undefined
-                }];
+              // determine if children have questions
+              if (answer.additionalQuestions?.length > 0) {
+                // map for easy access later
+                answersWithQuestionsMap[answer.value] = answer;
               }
-
-              // map options
-              const options: ILabelValuePairModel[] = question.answers.map((answer) => ({
-                label: answer.label,
-                value: answer.value
-              }));
-
-              // render
-              const render = (answerIndex: number) => {
-                // attach date if we are on root response - question
-                if (
-                  flattenedQuestion.data.multiAnswer &&
-                  level === 0
-                ) {
-                  // flatten
-                  this.flattenedQuestions.push({
-                    type: FlattenType.ANSWER_MULTI_DATE,
-                    level: flattenedQuestion.level + 1,
-                    parent: flattenedQuestion,
-                    oneParentIsInactive: (flattenedQuestion.data as QuestionModel).inactive || flattenedQuestion.oneParentIsInactive,
-                    name: `${this.name}[${question.variable}][${answerIndex}].date`,
-                    index: answerIndex
-                  });
-                }
-
-                // get item
-                const item: IAnswerData = this.value[flattenedQuestion.data.variable][answerIndex];
-
-                // flatten
-                const flattenedAnswer: IFlattenNodeAnswer = {
-                  type: FlattenType.ANSWER,
-                  level: flattenedQuestion.level + 1,
-                  parent: flattenedQuestion,
-                  oneParentIsInactive: (flattenedQuestion.data as QuestionModel).inactive || flattenedQuestion.oneParentIsInactive,
-                  name: `${this.name}[${question.variable}][${answerIndex}].value`,
-                  index: answerIndex,
-                  definition: question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value ?
-                    {
-                      type: FlattenAnswerDrawType.MULTIPLE_SELECT,
-                      options
-                    } : {
-                      type: FlattenAnswerDrawType.SINGLE_SELECT,
-                      options
-                    }
-                };
-
-                // add to list
-                this.flattenedQuestions.push(flattenedAnswer);
-
-                // determine if we need to show other things depending on what was selected
-                // multiple answer question ?
-                if (question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value) {
-                  // go through each multiple response
-                  if (item.value?.length > 0) {
-                    item.value.forEach((answerValue: string) => {
-                      if (answersWithQuestionsMap[answerValue]) {
-                        // flatten children questions
-                        this.flatten(
-                          answersWithQuestionsMap[answerValue].additionalQuestions,
-                          flattenedAnswer.level + 1,
-                          flattenedAnswer,
-                          flattenedAnswer.oneParentIsInactive,
-                          answerIndex,
-                          flattenedQuestion.no
-                        );
-                      }
-                    });
-                  }
-                } else {
-                  if (answersWithQuestionsMap[item.value]) {
-                    // flatten children questions
-                    this.flatten(
-                      answersWithQuestionsMap[item.value].additionalQuestions,
-                      flattenedAnswer.level + 1,
-                      flattenedAnswer,
-                      flattenedAnswer.oneParentIsInactive,
-                      answerIndex,
-                      flattenedQuestion.no
-                    );
-                  }
-                }
-              };
-
-              // determine how many answers we should generate
-              if (level === 0) {
-                this.value[flattenedQuestion.data.variable].forEach((_item, answerIndex) => {
-                  render(answerIndex);
-                });
-              } else {
-                render(answerParentIndex);
-              }
-            }
-
-            // finished
-            break;
-
-          case Constants.ANSWER_TYPES.FREE_TEXT.value:
-          case Constants.ANSWER_TYPES.NUMERIC.value:
-          case Constants.ANSWER_TYPES.DATE_TIME.value:
-            // create definition
-            let definition: FlattenNodeAnswerDraw;
-            if (question.answerType === Constants.ANSWER_TYPES.FREE_TEXT.value) {
-              definition = {
-                type: FlattenAnswerDrawType.TEXT
-              };
-            } else if (question.answerType === Constants.ANSWER_TYPES.NUMERIC.value) {
-              definition = {
-                type: FlattenAnswerDrawType.NUMBER
-              };
-            } else if (question.answerType === Constants.ANSWER_TYPES.DATE_TIME.value) {
-              definition = {
-                type: FlattenAnswerDrawType.DATE
-              };
-            }
+            });
 
             // initialize value if necessary too
             if (
@@ -512,9 +396,17 @@ export class AppFormFillQuestionnaireV2Component
               this.value[flattenedQuestion.data.variable].length < 1
             ) {
               this.value[flattenedQuestion.data.variable] = [{
-                value: undefined
+                value: question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value ?
+                  [] :
+                  undefined
               }];
             }
+
+            // map options
+            const options: ILabelValuePairModel[] = question.answers.map((answer) => ({
+              label: answer.label,
+              value: answer.value
+            }));
 
             // render
             const render = (answerIndex: number) => {
@@ -524,15 +416,20 @@ export class AppFormFillQuestionnaireV2Component
                 level === 0
               ) {
                 // flatten
-                this.flattenedQuestions.push({
+                accumulator.push({
                   type: FlattenType.ANSWER_MULTI_DATE,
                   level: flattenedQuestion.level + 1,
                   parent: flattenedQuestion,
                   oneParentIsInactive: (flattenedQuestion.data as QuestionModel).inactive || flattenedQuestion.oneParentIsInactive,
                   name: `${this.name}[${question.variable}][${answerIndex}].date`,
-                  index: answerIndex
+                  index: answerIndex,
+                  collapsed: collapsed || flattenedQuestion.data.collapsed,
+                  no: `${flattenedQuestion.no}.${answerIndex + 1}`
                 });
               }
+
+              // get item
+              const item: IAnswerData = this.value[flattenedQuestion.data.variable][answerIndex];
 
               // flatten
               const flattenedAnswer: IFlattenNodeAnswer = {
@@ -542,11 +439,56 @@ export class AppFormFillQuestionnaireV2Component
                 oneParentIsInactive: (flattenedQuestion.data as QuestionModel).inactive || flattenedQuestion.oneParentIsInactive,
                 name: `${this.name}[${question.variable}][${answerIndex}].value`,
                 index: answerIndex,
-                definition
+                collapsed: collapsed || flattenedQuestion.data.collapsed,
+                definition: question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value ?
+                  {
+                    type: FlattenAnswerDrawType.MULTIPLE_SELECT,
+                    options
+                  } : {
+                    type: FlattenAnswerDrawType.SINGLE_SELECT,
+                    options
+                  }
               };
 
               // add to list
-              this.flattenedQuestions.push(flattenedAnswer);
+              accumulator.push(flattenedAnswer);
+
+              // determine if we need to show other things depending on what was selected
+              // multiple answer question ?
+              if (question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value) {
+                // go through each multiple response
+                if (item.value?.length > 0) {
+                  item.value.forEach((answerValue: string) => {
+                    if (answersWithQuestionsMap[answerValue]) {
+                      // flatten children questions
+                      this.flatten(
+                        accumulator,
+                        answersWithQuestionsMap[answerValue].additionalQuestions,
+                        flattenedAnswer.level + 1,
+                        flattenedAnswer,
+                        flattenedAnswer.oneParentIsInactive,
+                        answerIndex,
+                        `${flattenedQuestion.no}.${answerIndex + 1}`,
+                        collapsed || flattenedQuestion.data.collapsed
+                      );
+                    }
+                  });
+                }
+              } else {
+                if (answersWithQuestionsMap[item.value]) {
+                  // flatten children questions
+                  this.flatten(
+                    accumulator,
+                    answersWithQuestionsMap[item.value].additionalQuestions,
+                    flattenedAnswer.level + 1,
+                    flattenedAnswer,
+                    flattenedAnswer.oneParentIsInactive,
+                    answerIndex,
+                    `${flattenedQuestion.no}.${answerIndex + 1}`,
+                    collapsed || flattenedQuestion.data.collapsed
+                  );
+                }
+              }
             };
 
             // determine how many answers we should generate
@@ -557,24 +499,101 @@ export class AppFormFillQuestionnaireV2Component
             } else {
               render(answerParentIndex);
             }
+          }
 
-            // finished
-            break;
+          // finished
+          break;
 
-          case Constants.ANSWER_TYPES.FILE_UPLOAD.value:
-            // #TODO
-            // console.log('file');
+        case Constants.ANSWER_TYPES.FREE_TEXT.value:
+        case Constants.ANSWER_TYPES.NUMERIC.value:
+        case Constants.ANSWER_TYPES.DATE_TIME.value:
+          // create definition
+          let definition: FlattenNodeAnswerDraw;
+          if (question.answerType === Constants.ANSWER_TYPES.FREE_TEXT.value) {
+            definition = {
+              type: FlattenAnswerDrawType.TEXT
+            };
+          } else if (question.answerType === Constants.ANSWER_TYPES.NUMERIC.value) {
+            definition = {
+              type: FlattenAnswerDrawType.NUMBER
+            };
+          } else if (question.answerType === Constants.ANSWER_TYPES.DATE_TIME.value) {
+            definition = {
+              type: FlattenAnswerDrawType.DATE
+            };
+          }
 
-            // finished
-            break;
+          // initialize value if necessary too
+          if (
+            !this.value[flattenedQuestion.data.variable] ||
+            this.value[flattenedQuestion.data.variable].length < 1
+          ) {
+            this.value[flattenedQuestion.data.variable] = [{
+              value: undefined
+            }];
+          }
 
-            // markup nothing to do
-            // NOTHING
-        }
+          // render
+          const render = (answerIndex: number) => {
+            // attach date if we are on root response - question
+            if (
+              flattenedQuestion.data.multiAnswer &&
+              level === 0
+            ) {
+              // flatten
+              accumulator.push({
+                type: FlattenType.ANSWER_MULTI_DATE,
+                level: flattenedQuestion.level + 1,
+                parent: flattenedQuestion,
+                oneParentIsInactive: (flattenedQuestion.data as QuestionModel).inactive || flattenedQuestion.oneParentIsInactive,
+                name: `${this.name}[${question.variable}][${answerIndex}].date`,
+                index: answerIndex,
+                collapsed: collapsed || flattenedQuestion.data.collapsed,
+                no: `${flattenedQuestion.no}.${answerIndex + 1}`
+              });
+            }
 
-        // validate question, answer
-        this.validateQuestionAnswer(flattenedQuestion);
+            // flatten
+            const flattenedAnswer: IFlattenNodeAnswer = {
+              type: FlattenType.ANSWER,
+              level: flattenedQuestion.level + 1,
+              parent: flattenedQuestion,
+              oneParentIsInactive: (flattenedQuestion.data as QuestionModel).inactive || flattenedQuestion.oneParentIsInactive,
+              name: `${this.name}[${question.variable}][${answerIndex}].value`,
+              index: answerIndex,
+              definition,
+              collapsed: collapsed || flattenedQuestion.data.collapsed
+            };
+
+            // add to list
+            accumulator.push(flattenedAnswer);
+          };
+
+          // determine how many answers we should generate
+          if (level === 0) {
+            this.value[flattenedQuestion.data.variable].forEach((_item, answerIndex) => {
+              render(answerIndex);
+            });
+          } else {
+            render(answerParentIndex);
+          }
+
+          // finished
+          break;
+
+        case Constants.ANSWER_TYPES.FILE_UPLOAD.value:
+          // #TODO
+          // console.log('file');
+
+          // finished
+          break;
+
+          // markup nothing to do
+          // NOTHING
       }
+
+      // validate question, answer
+      this.validateQuestionAnswer(flattenedQuestion);
     });
   }
 
@@ -755,6 +774,9 @@ export class AppFormFillQuestionnaireV2Component
 
     // change
     this.onChange(this.value);
+
+    // #TODO
+    console.log(this._errors);
   }
 
   /**
