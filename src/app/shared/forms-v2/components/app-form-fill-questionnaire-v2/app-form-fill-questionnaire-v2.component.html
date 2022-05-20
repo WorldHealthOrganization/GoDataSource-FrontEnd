@@ -51,6 +51,10 @@
 
               <!-- Label -->
               <span>{{item.data.text}}</span>
+
+              <!-- Required ? -->
+              <span
+                *ngIf="item.data.required && item.data.answerType === Constants.ANSWER_TYPES.FILE_UPLOAD.value">*</span>
             </div>
 
             <!-- Buttons -->
@@ -254,11 +258,22 @@
                   <ng-container
                     *ngIf="!viewOnly">
 
+                    <!-- Remove -->
+                    <button
+                      *ngIf="value[item.parent.data.variable][item.index].value"
+                      type="button"
+                      mat-icon-button
+                      [matTooltip]="'LNG_QUESTIONNAIRE_BUTTON_REMOVE' | translate"
+                      color="warn"
+                      (click)="removeAttachment(item, uploaderInput)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+
                     <!-- Upload -->
                     <button
                       type="button"
                       mat-icon-button
-                      [matTooltip]="(loadedAttachments[value[item.parent.data.variable][item.index].value]?.attachment ? 'LNG_QUESTIONNAIRE_BUTTON_REPLACE' : 'LNG_QUESTIONNAIRE_BUTTON_BROWSE') | translate"
+                      [matTooltip]="(value[item.parent.data.variable][item.index].value && loadedAttachments[value[item.parent.data.variable][item.index].value]?.attachment ? 'LNG_QUESTIONNAIRE_BUTTON_REPLACE' : 'LNG_QUESTIONNAIRE_BUTTON_BROWSE') | translate"
                       (click)="uploaderInput.click()">
                       <mat-icon>file_upload</mat-icon>
                     </button>

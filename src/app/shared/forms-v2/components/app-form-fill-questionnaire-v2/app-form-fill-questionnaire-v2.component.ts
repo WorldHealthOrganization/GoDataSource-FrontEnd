@@ -1252,6 +1252,53 @@ export class AppFormFillQuestionnaireV2Component
   }
 
   /**
+   * Remove attachment
+   */
+  removeAttachment(
+    item: IFlattenNodeAnswer,
+    uploaderInput: any
+  ): void {
+    this.dialogV2Service
+      .showConfirmDialog({
+        config: {
+          title: {
+            get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
+          },
+          message: {
+            get: () => 'LNG_DIALOG_CONFIRM_REMOVE_ATTACHMENT'
+          }
+        }
+      })
+      .subscribe((response) => {
+        // canceled ?
+        if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+          // finished
+          return;
+        }
+
+        // we should remove file from server ?
+        // - at a later time
+
+        // reset value
+        this.value[item.parent.data.variable][item.index].value = '';
+        item.uploader.clearQueue();
+        uploaderInput.value = '';
+
+        // update errors in case this item was required
+        this.validateQuestionAnswer(
+          item.parent,
+          true
+        );
+
+        // change
+        this.onChange(this.value);
+
+        // update ui
+        this.detectChanges();
+      });
+  }
+
+  /**
    * Update website render mode
    */
   @HostListener('window:resize')
