@@ -119,6 +119,7 @@ interface IFlattenNodeQuestion {
   questionRow: number;
   no: string;
   collapsed: boolean;
+  usedAnswers: number[]
 }
 
 @Component({
@@ -365,7 +366,8 @@ export class AppFormFillQuestionnaireV2Component
         canCollapseOrExpand: question.answers?.length > 0,
         questionRow: accumulator.length,
         no: `${noPrefix}${noPrefix ? '.' : ''}${no}`,
-        collapsed
+        collapsed,
+        usedAnswers: []
       };
 
       // add to list
@@ -456,6 +458,7 @@ export class AppFormFillQuestionnaireV2Component
               };
 
               // add to list
+              flattenedQuestion.usedAnswers.push(answerIndex);
               accumulator.push(flattenedAnswer);
 
               // determine if we need to show other things depending on what was selected
@@ -571,6 +574,7 @@ export class AppFormFillQuestionnaireV2Component
             };
 
             // add to list
+            flattenedQuestion.usedAnswers.push(answerIndex);
             accumulator.push(flattenedAnswer);
           };
 
@@ -869,9 +873,14 @@ export class AppFormFillQuestionnaireV2Component
     // check all answers
     let isValid: boolean = true;
     const answers: IAnswerData[] = (this.value[flatQuestion.data.variable] || []);
-    for (let answerIndex = 0; answerIndex < answers.length; answerIndex++) {
+    for (let answerIndex = 0; answerIndex < flatQuestion.usedAnswers.length; answerIndex++) {
       // retrieve answer
-      const answer: IAnswerData = answers[answerIndex];
+      const answer: IAnswerData = answers[flatQuestion.usedAnswers[answerIndex]];
+
+      // something went wrong
+      if (!answer) {
+        return;
+      }
 
       // validate
       if (

@@ -312,8 +312,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
         // Questionnaires
         this.initializeTabsQuestionnaire(),
-        // #TODO
-        // this.initializeTabsQuestionnaireAsContact(),
+        this.initializeTabsQuestionnaireAsContact(),
 
         // Contacts, exposures ...
         this.initializeTabsContacts(),
@@ -1031,8 +1030,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }
         },
         updateErrors: (errorsHTML) => {
-          // #TODO
-          // console.log(1, errorsHTML);
           errors = errorsHTML;
         }
       },
@@ -1040,6 +1037,30 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         return errors;
       },
       visible: () => this.selectedOutbreak.caseInvestigationTemplate?.length > 0
+    };
+  }
+
+  /**
+   * Initialize tabs - Contact Questionnaire
+   */
+  private initializeTabsQuestionnaireAsContact(): ICreateViewModifyV2TabTable {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      label: `${this.translateService.instant(EntityType.CONTACT)} ${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE')}`,
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
+        name: 'questionnaireAnswersContact',
+        questionnaire: this.selectedOutbreak.contactInvestigationTemplate,
+        value: {
+          get: () => this.itemData.questionnaireAnswersContact,
+          set: () => {}
+        },
+        updateErrors: () => {}
+      },
+      visible: () => this.isView &&
+        this.selectedOutbreak.contactInvestigationTemplate?.length > 0 &&
+        this.itemData.wasContact &&
+        this.itemData.hasQuestionnaireAnswersContact
     };
   }
 
@@ -1615,20 +1636,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             visible: () => this.selectedOutbreakIsActive && CaseModel.canCreateContact(this.authUser) && ContactModel.canCreate(this.authUser)
           },
 
-          // View Questionnaire
-          {
-            type: CreateViewModifyV2MenuType.OPTION,
-            label: 'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE',
-            action: {
-              link: () => ['/cases', this.itemData.id, 'view-questionnaire']
-            }
-          },
-
-          // Divider
-          {
-            type: CreateViewModifyV2MenuType.DIVIDER
-          },
-
           // Duplicate records marked as not duplicate
           {
             type: CreateViewModifyV2MenuType.OPTION,
@@ -1721,15 +1728,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               FollowUpModel.canList(this.authUser)
             )
           },
-          // case => contact questionnaire
-          {
-            type: CreateViewModifyV2MenuType.OPTION,
-            label: 'LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE',
-            action: {
-              link: () => ['/cases', this.itemData.id, 'history']
-            },
-            visible: () => this.itemData.wasContact && this.itemData.hasQuestionnaireAnswersContact
-          },
           // case => contact follow-ups
           {
             type: CreateViewModifyV2MenuType.OPTION,
@@ -1755,9 +1753,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       loading,
       forms
     ) => {
-      // #TODO
-      console.log(data);
-      return;
       // items marked as not duplicates
       let itemsMarkedAsNotDuplicates: string[];
 
