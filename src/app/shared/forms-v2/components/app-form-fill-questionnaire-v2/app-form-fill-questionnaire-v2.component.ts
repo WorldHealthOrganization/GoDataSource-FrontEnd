@@ -115,6 +115,14 @@ interface IFlattenNodeQuestion {
   canCollapseOrExpand: boolean;
 }
 
+/**
+ * Invalid data
+ */
+interface IFlattenNodeInvalid {
+  row: number;
+  node: IFlattenNodeQuestion | IFlattenNodeAnswerMultiDate | IFlattenNodeAnswer;
+}
+
 @Component({
   selector: 'app-form-fill-questionnaire-v2',
   templateUrl: './app-form-fill-questionnaire-v2.component.html',
@@ -165,6 +173,12 @@ export class AppFormFillQuestionnaireV2Component
 
   // handlers
   private _nonFlatToFlatWait: any;
+
+  // handle errors
+  private _errors: IFlattenNodeInvalid[];
+  get hasErrors(): boolean {
+    return this._errors?.length > 0;
+  }
 
   // flattened questions
   flattenedQuestions: (IFlattenNodeQuestion | IFlattenNodeAnswerMultiDate | IFlattenNodeAnswer)[] = [];
@@ -274,6 +288,7 @@ export class AppFormFillQuestionnaireV2Component
     }
 
     // flatten
+    this._errors = [];
     this.flattenedQuestions = [];
     this.flatten(
       this._questionnaire,
@@ -723,6 +738,9 @@ export class AppFormFillQuestionnaireV2Component
           this.value[item.parent.data.variable][item.index].date;
       }
     });
+
+    // change
+    this.onChange(this.value);
   }
 
   /**
@@ -746,9 +764,6 @@ export class AppFormFillQuestionnaireV2Component
 
     // trigger on change
     this.onChange(this.value);
-
-    // mark dirty
-    this.control?.markAsDirty();
 
     // update ui
     this.detectChanges();
@@ -794,9 +809,6 @@ export class AppFormFillQuestionnaireV2Component
 
         // trigger on change
         this.onChange(this.value);
-
-        // mark dirty
-        this.control?.markAsDirty();
 
         // update ui
         this.detectChanges();
