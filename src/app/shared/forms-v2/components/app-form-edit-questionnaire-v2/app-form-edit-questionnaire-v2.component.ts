@@ -56,6 +56,7 @@ interface IFlattenNode {
     array: (QuestionModel | AnswerModel)[]
   };
   canCollapseOrExpand: boolean;
+  no: string;
 }
 
 @Component({
@@ -183,7 +184,8 @@ export class AppFormEditQuestionnaireV2Component
       0,
       null,
       {},
-      false
+      false,
+      ''
     );
   }
 
@@ -290,7 +292,8 @@ export class AppFormEditQuestionnaireV2Component
     parents: {
       [id: string]: true
     },
-    oneParentIsInactive: boolean
+    oneParentIsInactive: boolean,
+    noPrefix: string
   ): void {
     // no questions ?
     if (
@@ -301,6 +304,7 @@ export class AppFormEditQuestionnaireV2Component
     }
 
     // go through each question
+    let no: number = 1;
     questions.forEach((question, questionIndex) => {
       // translate
       question.text = question.text ?
@@ -326,11 +330,13 @@ export class AppFormEditQuestionnaireV2Component
           index: questionIndex,
           array: questions
         },
-        canCollapseOrExpand: question.answers?.length > 0
+        canCollapseOrExpand: question.answers?.length > 0,
+        no: `${noPrefix}${noPrefix ? '.' : ''}${no}`
       };
 
       // add to list
       this.flattenedQuestions.push(flattenedQuestion);
+      no++;
 
       // add to children list
       if (parent) {
@@ -369,7 +375,8 @@ export class AppFormEditQuestionnaireV2Component
               index: answerIndex,
               array: question.answers
             },
-            canCollapseOrExpand: answer.additionalQuestions?.length > 0
+            canCollapseOrExpand: answer.additionalQuestions?.length > 0,
+            no: null
           };
 
           // add to list
@@ -391,7 +398,8 @@ export class AppFormEditQuestionnaireV2Component
                 ...flattenedAnswer.parents,
                 [flattenedAnswer.id]: true
               },
-              flattenedAnswer.oneParentIsInactive
+              flattenedAnswer.oneParentIsInactive,
+              flattenedQuestion.no
             );
           }
         });
