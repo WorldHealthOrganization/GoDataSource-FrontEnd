@@ -21,40 +21,16 @@ export class QuestionnaireAnswersValidatorDirective implements Validator {
    */
   constructor(
     private component: AppFormFillQuestionnaireV2Component
-  ) {
-  }
+  ) {}
 
   /**
    * Validate
    */
   validate(): { questionnaireAnswer: true } {
-    console.log(this.component.name, this.component.hasErrors);
-
-    // sau sa fie ceva facut de control..si asta doar sa verifice
-    // this.control.invalidValues...
-    // this.control.invalidValues...
-    // this.control.invalidValues...
-    // this.control.invalidValues...
-    // this.control.invalidValues...
-    // ca daca e sa fac aici for..nici nu stiu ce e afisat si mai tb sa si trec prin toate
-    // console.log(control.value);
-
-    // finished
-    return null;
-
-    // // disabled ?
-    // if (
-    //   this.noSpacesValidatorDisabled ||
-    //   !control.value ||
-    //   typeof control.value !== 'string'
-    // ) {
-    //   return;
-    // }
-    //
-    // // validate
-    // return control.value.indexOf(' ') < 0 ?
-    //   null : {
-    //     questionnaireAnswer: true
-    //   };
+    return this.component.hasErrors ?
+      {
+        questionnaireAnswer: true
+      } :
+      null;
   }
 }
