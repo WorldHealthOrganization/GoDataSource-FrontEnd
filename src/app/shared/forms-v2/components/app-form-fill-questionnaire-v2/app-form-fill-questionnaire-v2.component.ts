@@ -304,9 +304,6 @@ export class AppFormFillQuestionnaireV2Component
 
     // update visible
     this.flattenedQuestions = this.allFlattenedQuestions.filter((item) => !item.collapsed);
-
-    // #TODO
-    console.log(this._errors);
   }
 
   /**
@@ -774,9 +771,6 @@ export class AppFormFillQuestionnaireV2Component
 
     // change
     this.onChange(this.value);
-
-    // #TODO
-    console.log(this._errors);
   }
 
   /**
