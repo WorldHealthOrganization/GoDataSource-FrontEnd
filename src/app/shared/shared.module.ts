@@ -21,6 +21,7 @@ import * as v2Components from './components-v2';
 import { AgGridModule } from '@ag-grid-community/angular';
 import { ToastrModule } from 'ngx-toastr';
 import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
+import { HotTableModule } from '@handsontable/angular';
 
 @NgModule({
   imports: [
@@ -38,6 +39,7 @@ import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
     NgxWigModule,
     NgxMaterialTimepickerModule,
     NgxMatSelectSearchModule,
+    HotTableModule.forRoot(),
     ScrollingModule,
     ExperimentalScrollingModule,
     ToastrModule.forRoot({

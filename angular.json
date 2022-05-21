@@ -43,6 +43,7 @@
             },
             "scripts": [],
             "allowedCommonJsDependencies": [
+              "@handsontable/formulajs",
               "c3",
               "core-js",
               "cytoscape",
