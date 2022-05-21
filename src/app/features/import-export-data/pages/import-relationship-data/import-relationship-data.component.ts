@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -21,7 +20,7 @@ import { ContactOfContactModel } from '../../../../core/models/contact-of-contac
 })
 export class ImportRelationshipDataComponent implements OnInit, OnDestroy {
 
-  breadcrumbs: BreadcrumbItemModel[];
+  // breadcrumbs: BreadcrumbItemModel[];
 
   authUser: UserModel;
 
@@ -121,96 +120,96 @@ export class ImportRelationshipDataComponent implements OnInit, OnDestroy {
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // reset breadcrumbs
-    this.breadcrumbs = [];
-
-    // add breadcrumbs based on what page redirected to import relationship data
-    switch (this.fromPage) {
-      case Constants.APP_PAGE.CASES.value:
-        // update import title
-        this.title = 'LNG_PAGE_IMPORT_CASE_RELATIONSHIP_DATA_TITLE';
-
-        // add list breadcrumb only if we have permission
-        if (CaseModel.canList(this.authUser)) {
-          this.breadcrumbs.push(new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_CASES_TITLE',
-            '/cases'
-          ));
-        }
-
-        // import breadcrumb
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel(
-            'LNG_PAGE_IMPORT_CASE_RELATIONSHIP_DATA_TITLE',
-            '.',
-            true
-          )
-        );
-        break;
-      case Constants.APP_PAGE.CONTACTS.value:
-        // update import title
-        this.title = 'LNG_PAGE_IMPORT_CONTACT_RELATIONSHIP_DATA_TITLE';
-
-        // add list breadcrumb only if we have permission
-        if (ContactModel.canList(this.authUser)) {
-          this.breadcrumbs.push(new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_CONTACTS_TITLE',
-            '/contacts'
-          ));
-        }
-
-        // import breadcrumb
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel(
-            'LNG_PAGE_IMPORT_CONTACT_RELATIONSHIP_DATA_TITLE',
-            '.',
-            true
-          )
-        );
-        break;
-      case Constants.APP_PAGE.CONTACTS_OF_CONTACTS.value:
-        // update import title
-        this.title = 'LNG_PAGE_IMPORT_CONTACT_OF_CONTACT_RELATIONSHIP_DATA_TITLE';
-
-        // add list breadcrumb only if we have permission
-        if (ContactOfContactModel.canList(this.authUser)) {
-          this.breadcrumbs.push(new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
-            '/contacts-of-contacts'
-          ));
-        }
-
-        // import breadcrumb
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel(
-            'LNG_PAGE_IMPORT_CONTACT_OF_CONTACT_RELATIONSHIP_DATA_TITLE',
-            '.',
-            true
-          )
-        );
-        break;
-      case Constants.APP_PAGE.EVENTS.value:
-        // update import title
-        this.title = 'LNG_PAGE_IMPORT_EVENT_RELATIONSHIP_DATA_TITLE';
-
-        // add list breadcrumb only if we have permission
-        if (EventModel.canList(this.authUser)) {
-          this.breadcrumbs.push(new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_EVENTS_TITLE',
-            '/events'
-          ));
-        }
-
-        // import breadcrumb
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel(
-            'LNG_PAGE_IMPORT_EVENT_RELATIONSHIP_DATA_TITLE',
-            '.',
-            true
-          )
-        );
-        break;
-    }
+    // // reset breadcrumbs
+    // this.breadcrumbs = [];
+    //
+    // // add breadcrumbs based on what page redirected to import relationship data
+    // switch (this.fromPage) {
+    //   case Constants.APP_PAGE.CASES.value:
+    //     // update import title
+    //     this.title = 'LNG_PAGE_IMPORT_CASE_RELATIONSHIP_DATA_TITLE';
+    //
+    //     // add list breadcrumb only if we have permission
+    //     if (CaseModel.canList(this.authUser)) {
+    //       this.breadcrumbs.push(new BreadcrumbItemModel(
+    //         'LNG_PAGE_LIST_CASES_TITLE',
+    //         '/cases'
+    //       ));
+    //     }
+    //
+    //     // import breadcrumb
+    //     this.breadcrumbs.push(
+    //       new BreadcrumbItemModel(
+    //         'LNG_PAGE_IMPORT_CASE_RELATIONSHIP_DATA_TITLE',
+    //         '.',
+    //         true
+    //       )
+    //     );
+    //     break;
+    //   case Constants.APP_PAGE.CONTACTS.value:
+    //     // update import title
+    //     this.title = 'LNG_PAGE_IMPORT_CONTACT_RELATIONSHIP_DATA_TITLE';
+    //
+    //     // add list breadcrumb only if we have permission
+    //     if (ContactModel.canList(this.authUser)) {
+    //       this.breadcrumbs.push(new BreadcrumbItemModel(
+    //         'LNG_PAGE_LIST_CONTACTS_TITLE',
+    //         '/contacts'
+    //       ));
+    //     }
+    //
+    //     // import breadcrumb
+    //     this.breadcrumbs.push(
+    //       new BreadcrumbItemModel(
+    //         'LNG_PAGE_IMPORT_CONTACT_RELATIONSHIP_DATA_TITLE',
+    //         '.',
+    //         true
+    //       )
+    //     );
+    //     break;
+    //   case Constants.APP_PAGE.CONTACTS_OF_CONTACTS.value:
+    //     // update import title
+    //     this.title = 'LNG_PAGE_IMPORT_CONTACT_OF_CONTACT_RELATIONSHIP_DATA_TITLE';
+    //
+    //     // add list breadcrumb only if we have permission
+    //     if (ContactOfContactModel.canList(this.authUser)) {
+    //       this.breadcrumbs.push(new BreadcrumbItemModel(
+    //         'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE',
+    //         '/contacts-of-contacts'
+    //       ));
+    //     }
+    //
+    //     // import breadcrumb
+    //     this.breadcrumbs.push(
+    //       new BreadcrumbItemModel(
+    //         'LNG_PAGE_IMPORT_CONTACT_OF_CONTACT_RELATIONSHIP_DATA_TITLE',
+    //         '.',
+    //         true
+    //       )
+    //     );
+    //     break;
+    //   case Constants.APP_PAGE.EVENTS.value:
+    //     // update import title
+    //     this.title = 'LNG_PAGE_IMPORT_EVENT_RELATIONSHIP_DATA_TITLE';
+    //
+    //     // add list breadcrumb only if we have permission
+    //     if (EventModel.canList(this.authUser)) {
+    //       this.breadcrumbs.push(new BreadcrumbItemModel(
+    //         'LNG_PAGE_LIST_EVENTS_TITLE',
+    //         '/events'
+    //       ));
+    //     }
+    //
+    //     // import breadcrumb
+    //     this.breadcrumbs.push(
+    //       new BreadcrumbItemModel(
+    //         'LNG_PAGE_IMPORT_EVENT_RELATIONSHIP_DATA_TITLE',
+    //         '.',
+    //         true
+    //       )
+    //     );
+    //     break;
+    // }
   }
 
   /**

@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ImportDataExtension } from '../../components/import-data/model';
 import { LanguageModel } from '../../../../core/models/language.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -13,7 +12,7 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
 })
 export class ImportLanguageTokensComponent implements OnInit {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   authUser: UserModel;
 
@@ -57,24 +56,24 @@ export class ImportLanguageTokensComponent implements OnInit {
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (LanguageModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_LANGUAGES_TITLE', '/languages')
-      );
-    }
-
-    // import breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        'LNG_PAGE_IMPORT_LANGUAGE_TOKENS_TITLE',
-        '.',
-        true
-      )
-    );
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // add list breadcrumb only if we have permission
+    // if (LanguageModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel('LNG_PAGE_LIST_LANGUAGES_TITLE', '/languages')
+    //   );
+    // }
+    //
+    // // import breadcrumb
+    // this.breadcrumbs.push(
+    //   new BreadcrumbItemModel(
+    //     'LNG_PAGE_IMPORT_LANGUAGE_TOKENS_TITLE',
+    //     '.',
+    //     true
+    //   )
+    // );
   }
 
   /**

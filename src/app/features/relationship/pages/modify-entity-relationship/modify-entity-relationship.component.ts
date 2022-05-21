@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
@@ -30,7 +29,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 })
 export class ModifyEntityRelationshipComponent extends ViewModifyComponent implements OnInit {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // Entities Map for specific data
   entityMap: {
@@ -260,55 +259,55 @@ export class ModifyEntityRelationshipComponent extends ViewModifyComponent imple
   }
 
   private initializeBreadcrumbs() {
-    if (
-      this.relationshipType &&
-            this.entity &&
-            this.relationship
-    ) {
-      // add new breadcrumb: page title
-      const relationshipsListPageTitle = this.relationshipType === RelationshipType.EXPOSURE ?
-        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE' :
-        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE';
-
-      // get related person
-      const relatedPerson = _.get(this.relationship.relatedEntity(this.entityId), 'model', {});
-
-      // reset value
-      this.breadcrumbs = [];
-
-      // case / contact / event list page breadcrumb
-      if (this.entityMap[this.entityType].canList(this.authUser)) {
-        this.breadcrumbs.push(new BreadcrumbItemModel(
-          this.entityMap[this.entityType].label,
-          this.entityMap[this.entityType].link
-        ));
-      }
-
-      // case / contact / event view page breadcrumb
-      if (this.entityMap[this.entityType].canView(this.authUser)) {
-        this.breadcrumbs.push(new BreadcrumbItemModel(
-          this.entity.name,
-          `${this.entityMap[this.entityType].link}/${this.entityId}/view`
-        ));
-      }
-
-      // exposure / contacts list page
-      if (this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].list(this.authUser)) {
-        this.breadcrumbs.push(new BreadcrumbItemModel(
-          relationshipsListPageTitle,
-          `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`
-        ));
-      }
-
-      // page breadcrumb
-      this.breadcrumbs.push(new BreadcrumbItemModel(
-        this.viewOnly ? 'LNG_PAGE_VIEW_RELATIONSHIP_TITLE' : 'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TITLE',
-        null,
-        true,
-        {},
-        relatedPerson
-      ));
-    }
+    // if (
+    //   this.relationshipType &&
+    //         this.entity &&
+    //         this.relationship
+    // ) {
+    //   // add new breadcrumb: page title
+    //   const relationshipsListPageTitle = this.relationshipType === RelationshipType.EXPOSURE ?
+    //     'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE' :
+    //     'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE';
+    //
+    //   // get related person
+    //   const relatedPerson = _.get(this.relationship.relatedEntity(this.entityId), 'model', {});
+    //
+    //   // reset value
+    //   this.breadcrumbs = [];
+    //
+    //   // case / contact / event list page breadcrumb
+    //   if (this.entityMap[this.entityType].canList(this.authUser)) {
+    //     this.breadcrumbs.push(new BreadcrumbItemModel(
+    //       this.entityMap[this.entityType].label,
+    //       this.entityMap[this.entityType].link
+    //     ));
+    //   }
+    //
+    //   // case / contact / event view page breadcrumb
+    //   if (this.entityMap[this.entityType].canView(this.authUser)) {
+    //     this.breadcrumbs.push(new BreadcrumbItemModel(
+    //       this.entity.name,
+    //       `${this.entityMap[this.entityType].link}/${this.entityId}/view`
+    //     ));
+    //   }
+    //
+    //   // exposure / contacts list page
+    //   if (this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].list(this.authUser)) {
+    //     this.breadcrumbs.push(new BreadcrumbItemModel(
+    //       relationshipsListPageTitle,
+    //       `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`
+    //     ));
+    //   }
+    //
+    //   // page breadcrumb
+    //   this.breadcrumbs.push(new BreadcrumbItemModel(
+    //     this.viewOnly ? 'LNG_PAGE_VIEW_RELATIONSHIP_TITLE' : 'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_TITLE',
+    //     null,
+    //     true,
+    //     {},
+    //     relatedPerson
+    //   ));
+    // }
   }
 
   get relationshipTypeRoutePath(): string {

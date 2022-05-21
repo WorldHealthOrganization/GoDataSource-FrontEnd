@@ -1,5 +1,4 @@
 // import each component
-import { BreadcrumbsComponent } from './breadcrumbs/breadcrumbs.component';
 import { FormAddressComponent } from './form-address/form-address.component';
 import { FormAddressListComponent } from './form-address-list/form-address-list.component';
 import { FormDocumentComponent } from './form-document/form-document.component';
@@ -57,7 +56,6 @@ export * from './location-dialog/location-dialog.component';
 // export the list of all components
 export const components: any[] = [
   // main layout
-  BreadcrumbsComponent,
   SideFiltersComponent,
 
   // authentication - #TODO - this needs to be refactored & removed

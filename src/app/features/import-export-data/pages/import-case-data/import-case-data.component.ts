@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ImportServerModelNames } from '../../components/import-data/import-data.component';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Constants } from '../../../../core/models/constants';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { QuestionModel } from '../../../../core/models/question.model';
@@ -19,7 +18,7 @@ import { CaseModel } from '../../../../core/models/case.model';
 })
 export class ImportCaseDataComponent implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   outbreakSubscriber: Subscription;
 
@@ -132,27 +131,27 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (CaseModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          'LNG_PAGE_LIST_CASES_TITLE',
-          '/cases'
-        )
-      );
-    }
-
-    // import breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        'LNG_PAGE_IMPORT_CASE_DATA_TITLE',
-        '.',
-        true
-      )
-    );
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // add list breadcrumb only if we have permission
+    // if (CaseModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel(
+    //       'LNG_PAGE_LIST_CASES_TITLE',
+    //       '/cases'
+    //     )
+    //   );
+    // }
+    //
+    // // import breadcrumb
+    // this.breadcrumbs.push(
+    //   new BreadcrumbItemModel(
+    //     'LNG_PAGE_IMPORT_CASE_DATA_TITLE',
+    //     '.',
+    //     true
+    //   )
+    // );
   }
 
   /**

@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { Router } from '@angular/router';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ImportDataExtension } from '../../components/import-data/model';
 import { LocationModel } from '../../../../core/models/location.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -13,7 +12,7 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
   templateUrl: './import-hierarchical-locations.component.html'
 })
 export class ImportHierarchicalLocationsComponent {
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   authUser: UserModel;
 
@@ -43,24 +42,24 @@ export class ImportHierarchicalLocationsComponent {
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (LocationModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_LOCATIONS_TITLE', '/locations')
-      );
-    }
-
-    // import breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        'LNG_PAGE_IMPORT_HIERARCHICAL_LOCATIONS_TITLE',
-        '.',
-        true
-      )
-    );
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // add list breadcrumb only if we have permission
+    // if (LocationModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel('LNG_PAGE_LIST_LOCATIONS_TITLE', '/locations')
+    //   );
+    // }
+    //
+    // // import breadcrumb
+    // this.breadcrumbs.push(
+    //   new BreadcrumbItemModel(
+    //     'LNG_PAGE_IMPORT_HIERARCHICAL_LOCATIONS_TITLE',
+    //     '.',
+    //     true
+    //   )
+    // );
   }
 
   /**

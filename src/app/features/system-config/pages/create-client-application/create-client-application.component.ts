@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
@@ -26,7 +25,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 })
 export class CreateClientApplicationComponent extends ConfirmOnFormChanges implements OnInit {
   // breadcrumb header
-  public breadcrumbs: BreadcrumbItemModel[] = [];
+  // public breadcrumbs: BreadcrumbItemModel[] = [];
 
   clientApplicationData: SystemClientApplicationModel = new SystemClientApplicationModel();
 
@@ -74,16 +73,16 @@ export class CreateClientApplicationComponent extends ConfirmOnFormChanges imple
      * Initialize breadcrumbs
      */
   private initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (SystemClientApplicationModel.canList(this.authUser)) {
-      this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_TITLE', '/system-config/client-applications'));
-    }
-
-    // create breadcrumb
-    this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_TITLE', '.', true));
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // add list breadcrumb only if we have permission
+    // if (SystemClientApplicationModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_TITLE', '/system-config/client-applications'));
+    // }
+    //
+    // // create breadcrumb
+    // this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_TITLE', '.', true));
   }
 
   /**

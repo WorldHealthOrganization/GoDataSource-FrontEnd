@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ImportDataExtension } from '../../components/import-data/model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
@@ -12,8 +11,6 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
   templateUrl: './import-sync-package.component.html'
 })
 export class ImportSyncPackageComponent {
-  breadcrumbs: BreadcrumbItemModel[] = [];
-
   authUser: UserModel;
 
   allowedExtensions: string[] = [
@@ -41,24 +38,24 @@ export class ImportSyncPackageComponent {
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (SystemSyncLogModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_TITLE', '/system-config/sync-logs')
-      );
-    }
-
-    // import breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        'LNG_PAGE_IMPORT_SYNC_PACKAGE_TITLE',
-        '.',
-        true
-      )
-    );
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // add list breadcrumb only if we have permission
+    // if (SystemSyncLogModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_TITLE', '/system-config/sync-logs')
+    //   );
+    // }
+    //
+    // // import breadcrumb
+    // this.breadcrumbs.push(
+    //   new BreadcrumbItemModel(
+    //     'LNG_PAGE_IMPORT_SYNC_PACKAGE_TITLE',
+    //     '.',
+    //     true
+    //   )
+    // );
   }
 
   /**

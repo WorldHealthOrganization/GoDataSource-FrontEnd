@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
@@ -30,10 +29,10 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 })
 export class ContactOfContactMergeDuplicateComponent extends ConfirmOnFormChanges implements OnInit {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE', '/duplicated-records'),
-    new BreadcrumbItemModel('LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_TITLE', '.', true)
-  ];
+  // breadcrumbs: BreadcrumbItemModel[] = [
+  //   new BreadcrumbItemModel('LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE', '/duplicated-records'),
+  //   new BreadcrumbItemModel('LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_TITLE', '.', true)
+  // ];
 
   contactOfContactData: ContactOfContactModel = new ContactOfContactModel();
 

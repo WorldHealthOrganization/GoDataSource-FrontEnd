@@ -10,7 +10,6 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable, throwError } from 'rxjs/index';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
@@ -49,7 +48,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 })
 export class CreateContactOfContactComponent extends CreateConfirmOnChanges implements OnInit {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // selected outbreak
   selectedOutbreak: OutbreakModel;
@@ -225,27 +224,27 @@ export class CreateContactOfContactComponent extends CreateConfirmOnChanges impl
      * Initialize breadcrumbs
      */
   private initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    if (this.relatedEntityData) {
-      // Contacts list
-      if (ContactModel.canList(this.authUser)) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-        );
-      }
-      // view Contact
-      if (ContactModel.canView(this.authUser)) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel(this.relatedEntityData.name, `/contacts/${this.relatedEntityData.id}/view`)
-        );
-      }
-    }
-    // current page breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_TITLE', '.', true)
-    );
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // if (this.relatedEntityData) {
+    //   // Contacts list
+    //   if (ContactModel.canList(this.authUser)) {
+    //     this.breadcrumbs.push(
+    //       new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+    //     );
+    //   }
+    //   // view Contact
+    //   if (ContactModel.canView(this.authUser)) {
+    //     this.breadcrumbs.push(
+    //       new BreadcrumbItemModel(this.relatedEntityData.name, `/contacts/${this.relatedEntityData.id}/view`)
+    //     );
+    //   }
+    // }
+    // // current page breadcrumb
+    // this.breadcrumbs.push(
+    //   new BreadcrumbItemModel('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_TITLE', '.', true)
+    // );
   }
 
   /**

@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { AppliedFilterModel, FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import * as _ from 'lodash';
@@ -31,7 +30,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 })
 export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // selected outbreak ID
   outbreakId: string;
@@ -129,17 +128,17 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // set current page title
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        'LNG_PAGE_GANTT_CHART_TITLE',
-        '.',
-        true
-      )
-    );
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // set current page title
+    // this.breadcrumbs.push(
+    //   new BreadcrumbItemModel(
+    //     'LNG_PAGE_GANTT_CHART_TITLE',
+    //     '.',
+    //     true
+    //   )
+    // );
   }
 
   /**

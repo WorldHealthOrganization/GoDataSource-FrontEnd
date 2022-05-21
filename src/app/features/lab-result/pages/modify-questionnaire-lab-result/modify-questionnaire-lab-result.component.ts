@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
@@ -13,8 +12,6 @@ import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
-import { moment } from '../../../../core/helperClasses/x-moment';
-import { Constants } from '../../../../core/models/constants';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
@@ -24,7 +21,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 })
 export class ModifyQuestionnaireLabResultComponent extends ViewModifyComponent implements OnInit {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // authenticated user
   authUser: UserModel;
@@ -99,40 +96,40 @@ export class ModifyQuestionnaireLabResultComponent extends ViewModifyComponent i
      * Initialize breadcrumbs
      */
   private initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (LabResultModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_LAB_RESULTS_TITLE', '/lab-results')
-      );
-    }
-
-    // data
-    if (
-      this.labResultData &&
-            this.labResultData.id
-    ) {
-      // model bread
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          moment(this.labResultData.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
-          `/lab-results/${EntityModel.getLinkForEntityType(this.labResultData.personType)}/${this.labResultData.personId}/${this.labResultData.id}/${this.viewOnly ? 'view' : 'modify'}`
-        )
-      );
-
-      // view / modify breadcrumb
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          this.viewOnly ? 'LNG_PAGE_VIEW_LAB_RESULT_TITLE' : 'LNG_PAGE_MODIFY_LAB_RESULT_TITLE',
-          null,
-          true,
-          {},
-          this.labResultData
-        )
-      );
-    }
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // add list breadcrumb only if we have permission
+    // if (LabResultModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel('LNG_PAGE_LIST_LAB_RESULTS_TITLE', '/lab-results')
+    //   );
+    // }
+    //
+    // // data
+    // if (
+    //   this.labResultData &&
+    //         this.labResultData.id
+    // ) {
+    //   // model bread
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel(
+    //       moment(this.labResultData.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+    //       `/lab-results/${EntityModel.getLinkForEntityType(this.labResultData.personType)}/${this.labResultData.personId}/${this.labResultData.id}/${this.viewOnly ? 'view' : 'modify'}`
+    //     )
+    //   );
+    //
+    //   // view / modify breadcrumb
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel(
+    //       this.viewOnly ? 'LNG_PAGE_VIEW_LAB_RESULT_TITLE' : 'LNG_PAGE_MODIFY_LAB_RESULT_TITLE',
+    //       null,
+    //       true,
+    //       {},
+    //       this.labResultData
+    //     )
+    //   );
+    // }
   }
 
   /**

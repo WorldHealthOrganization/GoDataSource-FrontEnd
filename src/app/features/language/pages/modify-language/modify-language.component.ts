@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
@@ -19,7 +18,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 })
 export class ModifyLanguageComponent extends ViewModifyComponent implements OnInit {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // constants
   LanguageModel = LanguageModel;
@@ -80,28 +79,28 @@ export class ModifyLanguageComponent extends ViewModifyComponent implements OnIn
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (LanguageModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_LANGUAGES_TITLE', '/languages')
-      );
-    }
-
-    // view / modify breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        this.viewOnly ?
-          'LNG_PAGE_VIEW_LANGUAGE_TITLE' :
-          'LNG_PAGE_MODIFY_LANGUAGE_TITLE',
-        null,
-        true,
-        {},
-        this.languageData
-      )
-    );
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // add list breadcrumb only if we have permission
+    // if (LanguageModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel('LNG_PAGE_LIST_LANGUAGES_TITLE', '/languages')
+    //   );
+    // }
+    //
+    // // view / modify breadcrumb
+    // this.breadcrumbs.push(
+    //   new BreadcrumbItemModel(
+    //     this.viewOnly ?
+    //       'LNG_PAGE_VIEW_LANGUAGE_TITLE' :
+    //       'LNG_PAGE_MODIFY_LANGUAGE_TITLE',
+    //     null,
+    //     true,
+    //     {},
+    //     this.languageData
+    //   )
+    // );
   }
 
   /**

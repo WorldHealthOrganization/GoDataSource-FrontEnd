@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
@@ -26,7 +25,7 @@ export class CreateHelpItemComponent
   extends CreateConfirmOnChanges
   implements OnInit {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   helpItemData: HelpItemModel = new HelpItemModel();
   categoryId: string;
@@ -79,45 +78,45 @@ export class CreateHelpItemComponent
      * Initialize breadcrumbs
      */
   private initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (HelpCategoryModel.canList(this.authUser)) {
-      this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '/help/categories'));
-    }
-
-    // add list breadcrumb only if we have permission
-    if (
-      HelpCategoryModel.canView(this.authUser) &&
-            this.selectedCategory
-    ) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          this.selectedCategory.name,
-          `/help/categories/${this.categoryId}/view`,
-          false,
-          {},
-          this.selectedCategory
-        )
-      );
-    }
-
-    // list children
-    if (HelpItemModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          'LNG_PAGE_LIST_HELP_ITEMS_TITLE',
-          `/help/categories/${this.categoryId}/items`,
-          false,
-          {},
-          {}
-        )
-      );
-    }
-
-    // create breadcrumb
-    this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_HELP_ITEM_TITLE', '.', true));
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // add list breadcrumb only if we have permission
+    // if (HelpCategoryModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '/help/categories'));
+    // }
+    //
+    // // add list breadcrumb only if we have permission
+    // if (
+    //   HelpCategoryModel.canView(this.authUser) &&
+    //         this.selectedCategory
+    // ) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel(
+    //       this.selectedCategory.name,
+    //       `/help/categories/${this.categoryId}/view`,
+    //       false,
+    //       {},
+    //       this.selectedCategory
+    //     )
+    //   );
+    // }
+    //
+    // // list children
+    // if (HelpItemModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel(
+    //       'LNG_PAGE_LIST_HELP_ITEMS_TITLE',
+    //       `/help/categories/${this.categoryId}/items`,
+    //       false,
+    //       {},
+    //       {}
+    //     )
+    //   );
+    // }
+    //
+    // // create breadcrumb
+    // this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_HELP_ITEM_TITLE', '.', true));
   }
 
   /**

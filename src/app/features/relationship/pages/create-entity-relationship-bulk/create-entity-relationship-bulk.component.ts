@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
@@ -25,7 +24,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 })
 export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges implements OnInit {
 
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // Entities Map for specific data
   entityMap = {
@@ -143,40 +142,40 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
   }
 
   private initializeBreadcrumbs() {
-    if (
-      this.relationshipType &&
-            this.entity
-    ) {
-      // add new breadcrumb: page title
-      const relationshipsListPageTitle = this.relationshipType === RelationshipType.EXPOSURE ?
-        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE' :
-        'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE';
-
-      const assignRelationshipsPageTitle = this.relationshipType === RelationshipType.EXPOSURE ?
-        'LNG_PAGE_LIST_ENTITY_ASSIGN_EXPOSURES_TITLE' :
-        'LNG_PAGE_LIST_ENTITY_ASSIGN_CONTACTS_TITLE';
-
-      this.breadcrumbs = [
-        new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
-        new BreadcrumbItemModel(
-          this.entity.name,
-          `${this.entityMap[this.entityType].link}/${this.entityId}/view`
-        ),
-        new BreadcrumbItemModel(
-          relationshipsListPageTitle,
-          `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`
-        ),
-        new BreadcrumbItemModel(
-          assignRelationshipsPageTitle,
-          `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/share`,
-          false,
-          {
-            selectedTargetIds: JSON.stringify(this.selectedTargetIds)
-          }
-        ),
-        new BreadcrumbItemModel('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_TITLE', null, true)
-      ];
-    }
+    // if (
+    //   this.relationshipType &&
+    //         this.entity
+    // ) {
+    //   // add new breadcrumb: page title
+    //   const relationshipsListPageTitle = this.relationshipType === RelationshipType.EXPOSURE ?
+    //     'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE' :
+    //     'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE';
+    //
+    //   const assignRelationshipsPageTitle = this.relationshipType === RelationshipType.EXPOSURE ?
+    //     'LNG_PAGE_LIST_ENTITY_ASSIGN_EXPOSURES_TITLE' :
+    //     'LNG_PAGE_LIST_ENTITY_ASSIGN_CONTACTS_TITLE';
+    //
+    //   this.breadcrumbs = [
+    //     new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
+    //     new BreadcrumbItemModel(
+    //       this.entity.name,
+    //       `${this.entityMap[this.entityType].link}/${this.entityId}/view`
+    //     ),
+    //     new BreadcrumbItemModel(
+    //       relationshipsListPageTitle,
+    //       `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`
+    //     ),
+    //     new BreadcrumbItemModel(
+    //       assignRelationshipsPageTitle,
+    //       `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/share`,
+    //       false,
+    //       {
+    //         selectedTargetIds: JSON.stringify(this.selectedTargetIds)
+    //       }
+    //     ),
+    //     new BreadcrumbItemModel('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_TITLE', null, true)
+    //   ];
+    // }
   }
 
   get relationshipTypeRoutePath(): string {

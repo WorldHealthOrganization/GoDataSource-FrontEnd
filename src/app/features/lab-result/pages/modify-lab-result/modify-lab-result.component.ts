@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
@@ -34,7 +33,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 })
 export class ModifyLabResultComponent extends ViewModifyComponent implements OnInit {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   authUser: UserModel;
 
@@ -194,93 +193,93 @@ export class ModifyLabResultComponent extends ViewModifyComponent implements OnI
      * Initialize breadcrumbs
      */
   private initializeBreadcrumbs() {
-    // init
-    this.breadcrumbs = [];
-
-    // entity list
-    if (
-      this.personType === EntityType.CONTACT &&
-            ContactModel.canList(this.authUser)
-    ) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-      );
-    } else if (
-      this.personType === EntityType.CASE &&
-            CaseModel.canList(this.authUser)
-    ) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
-      );
-    }
-
-    // case / contact view
-    if (
-      !this.fromLabResultsList &&
-            this.labResultData &&
-            this.labResultData.person &&
-            this.labResultData.person.id
-    ) {
-      if (
-        this.personType === EntityType.CONTACT &&
-                ContactModel.canView(this.authUser)
-      ) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel(
-            this.labResultData.person.name,
-            `/contacts/${this.labResultData.person.id}/view`
-          )
-        );
-      } else if (
-        this.personType === EntityType.CASE &&
-                CaseModel.canView(this.authUser)
-      ) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel(
-            this.labResultData.person.name,
-            `/cases/${this.labResultData.person.id}/view`
-          )
-        );
-      }
-
-      // lab result list
-      if (
-        this.personType === EntityType.CONTACT &&
-                ContactModel.canListLabResult(this.authUser)
-      ) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE', `/lab-results/contacts/${this.labResultData.person.id}`)
-        );
-      } else if (
-        this.personType === EntityType.CASE &&
-                CaseModel.canListLabResult(this.authUser)
-      ) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE', `/lab-results/cases/${this.labResultData.person.id}`)
-        );
-      }
-    } else if (this.fromLabResultsList) {
-      // lab result list
-      if (LabResultModel.canList(this.authUser)) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel(
-            'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE',
-            '/lab-results'
-          )
-        );
-      }
-    }
-
-    // current page
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        this.viewOnly ? 'LNG_PAGE_VIEW_LAB_RESULT_TITLE' : 'LNG_PAGE_MODIFY_LAB_RESULT_TITLE',
-        null,
-        true,
-        {},
-        this.labResultData
-      )
-    );
+    // // init
+    // this.breadcrumbs = [];
+    //
+    // // entity list
+    // if (
+    //   this.personType === EntityType.CONTACT &&
+    //         ContactModel.canList(this.authUser)
+    // ) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+    //   );
+    // } else if (
+    //   this.personType === EntityType.CASE &&
+    //         CaseModel.canList(this.authUser)
+    // ) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
+    //   );
+    // }
+    //
+    // // case / contact view
+    // if (
+    //   !this.fromLabResultsList &&
+    //         this.labResultData &&
+    //         this.labResultData.person &&
+    //         this.labResultData.person.id
+    // ) {
+    //   if (
+    //     this.personType === EntityType.CONTACT &&
+    //             ContactModel.canView(this.authUser)
+    //   ) {
+    //     this.breadcrumbs.push(
+    //       new BreadcrumbItemModel(
+    //         this.labResultData.person.name,
+    //         `/contacts/${this.labResultData.person.id}/view`
+    //       )
+    //     );
+    //   } else if (
+    //     this.personType === EntityType.CASE &&
+    //             CaseModel.canView(this.authUser)
+    //   ) {
+    //     this.breadcrumbs.push(
+    //       new BreadcrumbItemModel(
+    //         this.labResultData.person.name,
+    //         `/cases/${this.labResultData.person.id}/view`
+    //       )
+    //     );
+    //   }
+    //
+    //   // lab result list
+    //   if (
+    //     this.personType === EntityType.CONTACT &&
+    //             ContactModel.canListLabResult(this.authUser)
+    //   ) {
+    //     this.breadcrumbs.push(
+    //       new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE', `/lab-results/contacts/${this.labResultData.person.id}`)
+    //     );
+    //   } else if (
+    //     this.personType === EntityType.CASE &&
+    //             CaseModel.canListLabResult(this.authUser)
+    //   ) {
+    //     this.breadcrumbs.push(
+    //       new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE', `/lab-results/cases/${this.labResultData.person.id}`)
+    //     );
+    //   }
+    // } else if (this.fromLabResultsList) {
+    //   // lab result list
+    //   if (LabResultModel.canList(this.authUser)) {
+    //     this.breadcrumbs.push(
+    //       new BreadcrumbItemModel(
+    //         'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE',
+    //         '/lab-results'
+    //       )
+    //     );
+    //   }
+    // }
+    //
+    // // current page
+    // this.breadcrumbs.push(
+    //   new BreadcrumbItemModel(
+    //     this.viewOnly ? 'LNG_PAGE_VIEW_LAB_RESULT_TITLE' : 'LNG_PAGE_MODIFY_LAB_RESULT_TITLE',
+    //     null,
+    //     true,
+    //     {},
+    //     this.labResultData
+    //   )
+    // );
   }
 
   /**

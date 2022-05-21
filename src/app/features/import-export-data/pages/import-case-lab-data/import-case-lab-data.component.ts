@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ImportServerModelNames } from '../../components/import-data/import-data.component';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Constants } from '../../../../core/models/constants';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { QuestionModel } from '../../../../core/models/question.model';
@@ -11,7 +10,6 @@ import { ImportDataExtension } from '../../components/import-data/model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { UserModel } from '../../../../core/models/user.model';
-import { CaseModel } from '../../../../core/models/case.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 
 @Component({
@@ -20,7 +18,7 @@ import { LabResultModel } from '../../../../core/models/lab-result.model';
 })
 export class ImportCaseLabDataComponent implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   Constants = Constants;
 
@@ -110,37 +108,37 @@ export class ImportCaseLabDataComponent implements OnInit, OnDestroy {
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (CaseModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          'LNG_PAGE_LIST_CASES_TITLE',
-          '/cases'
-        )
-      );
-    }
-
-    // add list breadcrumb only if we have permission
-    if (LabResultModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          'LNG_PAGE_LIST_LAB_RESULTS_TITLE',
-          '/lab-results'
-        )
-      );
-    }
-
-    // import breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        'LNG_PAGE_IMPORT_CASE_LAB_DATA_TITLE',
-        '.',
-        true
-      )
-    );
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // add list breadcrumb only if we have permission
+    // if (CaseModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel(
+    //       'LNG_PAGE_LIST_CASES_TITLE',
+    //       '/cases'
+    //     )
+    //   );
+    // }
+    //
+    // // add list breadcrumb only if we have permission
+    // if (LabResultModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel(
+    //       'LNG_PAGE_LIST_LAB_RESULTS_TITLE',
+    //       '/lab-results'
+    //     )
+    //   );
+    // }
+    //
+    // // import breadcrumb
+    // this.breadcrumbs.push(
+    //   new BreadcrumbItemModel(
+    //     'LNG_PAGE_IMPORT_CASE_LAB_DATA_TITLE',
+    //     '.',
+    //     true
+    //   )
+    // );
   }
 
   /**

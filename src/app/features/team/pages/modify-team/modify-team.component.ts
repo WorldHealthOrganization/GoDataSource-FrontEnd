@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
@@ -27,7 +26,7 @@ import { AppFormLocationBaseV2 } from '../../../../shared/forms-v2/core/app-form
 })
 export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
   // breadcrumb header
-  public breadcrumbs: BreadcrumbItemModel[] = [];
+  // public breadcrumbs: BreadcrumbItemModel[] = [];
 
   // constants
   TeamModel = TeamModel;
@@ -105,22 +104,22 @@ export class ModifyTeamComponent extends ViewModifyComponent implements OnInit {
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (TeamModel.canList(this.authUser)) {
-      this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_TEAMS_TITLE', '/teams'));
-    }
-
-    // view / modify breadcrumb
-    this.breadcrumbs.push(new BreadcrumbItemModel(
-      this.viewOnly ?
-        'LNG_PAGE_VIEW_TEAM_TITLE' :
-        'LNG_PAGE_MODIFY_TEAM_TITLE',
-      '.',
-      true
-    ));
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // add list breadcrumb only if we have permission
+    // if (TeamModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_TEAMS_TITLE', '/teams'));
+    // }
+    //
+    // // view / modify breadcrumb
+    // this.breadcrumbs.push(new BreadcrumbItemModel(
+    //   this.viewOnly ?
+    //     'LNG_PAGE_VIEW_TEAM_TITLE' :
+    //     'LNG_PAGE_MODIFY_TEAM_TITLE',
+    //   '.',
+    //   true
+    // ));
   }
 
   /**

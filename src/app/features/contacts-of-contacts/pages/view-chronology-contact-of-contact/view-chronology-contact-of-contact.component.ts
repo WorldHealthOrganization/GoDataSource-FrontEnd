@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ChronologyItem } from '../../../../shared/components/chronology/typings/chronology-item';
 import { UserModel } from '../../../../core/models/user.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
@@ -19,7 +18,7 @@ import { ContactOfContactChronology } from './typings/contact-of-contact-chronol
 export class ViewChronologyContactOfContactComponent implements OnInit {
 
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   contactOfContactData: ContactOfContactModel = new ContactOfContactModel();
   chronologyEntries: ChronologyItem[] = [];
@@ -90,39 +89,39 @@ export class ViewChronologyContactOfContactComponent implements OnInit {
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // contacts of contacts list page
-    if (ContactOfContactModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE', '/contacts-of-contacts')
-      );
-    }
-
-    // contact of contact breadcrumbs
-    if (this.contactOfContactData) {
-      // contacts view page
-      if (ContactOfContactModel.canView(this.authUser)) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel(
-            this.contactOfContactData.name,
-            `/contacts-of-contacts/${this.contactOfContactData.id}/view`
-          )
-        );
-      }
-
-      // current page
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_OF_CONTACT_TITLE',
-          '.',
-          true,
-          {},
-          this.contactOfContactData
-        )
-      );
-    }
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // contacts of contacts list page
+    // if (ContactOfContactModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE', '/contacts-of-contacts')
+    //   );
+    // }
+    //
+    // // contact of contact breadcrumbs
+    // if (this.contactOfContactData) {
+    //   // contacts view page
+    //   if (ContactOfContactModel.canView(this.authUser)) {
+    //     this.breadcrumbs.push(
+    //       new BreadcrumbItemModel(
+    //         this.contactOfContactData.name,
+    //         `/contacts-of-contacts/${this.contactOfContactData.id}/view`
+    //       )
+    //     );
+    //   }
+    //
+    //   // current page
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel(
+    //       'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_OF_CONTACT_TITLE',
+    //       '.',
+    //       true,
+    //       {},
+    //       this.contactOfContactData
+    //     )
+    //   );
+    // }
   }
 
 }

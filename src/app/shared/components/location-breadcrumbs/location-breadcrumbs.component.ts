@@ -1,8 +1,5 @@
 import { Component, Input, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../breadcrumbs/breadcrumb-item.model';
 import { LocationDataService } from '../../../core/services/data/location.data.service';
-import * as _ from 'lodash';
-import { HierarchicalLocationModel } from '../../../core/models/hierarchical-location.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LocationModel } from '../../../core/models/location.model';
 import { catchError } from 'rxjs/operators';
@@ -23,7 +20,7 @@ export class LocationBreadcrumbsComponent implements OnInit {
   locationId: string;
 
   // location breadcrumbs
-  public locationBreadcrumbs: BreadcrumbItemModel[] = [];
+  // public locationBreadcrumbs: BreadcrumbItemModel[] = [];
 
   constructor(
     private locationDataService: LocationDataService,
@@ -48,7 +45,7 @@ export class LocationBreadcrumbsComponent implements OnInit {
 
   refreshBreadcrumbs() {
     // reset breadcrumbs
-    this.locationBreadcrumbs = [];
+    // this.locationBreadcrumbs = [];
 
     // retrieve parents of this parent and create breadcrumbs if necessary
     if (this.parentId) {
@@ -86,45 +83,45 @@ export class LocationBreadcrumbsComponent implements OnInit {
      * Add breadcrumbs
      * @param locationParents
      */
-  addBreadcrumbs(locationParents) {
+  addBreadcrumbs(_locationParents) {
     // add location
-    this.locationBreadcrumbs.push(
-      new BreadcrumbItemModel(
-        'LNG_PAGE_LIST_LOCATIONS_ALL_TITLE',
-        '/locations'
-      )
-    );
+    // this.locationBreadcrumbs.push(
+    //   new BreadcrumbItemModel(
+    //     'LNG_PAGE_LIST_LOCATIONS_ALL_TITLE',
+    //     '/locations'
+    //   )
+    // );
 
-    // add parent locations
-    if (locationParents && locationParents.length > 0) {
-      let locationP = locationParents[0];
-      while (!_.isEmpty(locationP.location)) {
-        // add breadcrumbs
-        this.locationBreadcrumbs.push(
-          new BreadcrumbItemModel(
-            locationP.location.name,
-            `/locations/${locationP.location.id}/children`
-          )
-        );
-        locationP = _.isEmpty(locationP.children) ? {} as HierarchicalLocationModel : locationP.children[0];
-      }
-    }
-
-    // add active breadcrumb
-    if (this.activeLocationBreadcrumb) {
-      this.locationBreadcrumbs.push(
-        new BreadcrumbItemModel(
-          this.activeLocationBreadcrumb,
-          '.',
-          true,
-          {},
-          this.locationData
-        )
-      );
-    } else {
-      if (!_.isEmpty(this.locationBreadcrumbs)) {
-        this.locationBreadcrumbs[this.locationBreadcrumbs.length - 1].active = true;
-      }
-    }
+    // // add parent locations
+    // if (locationParents && locationParents.length > 0) {
+    //   let locationP = locationParents[0];
+    //   while (!_.isEmpty(locationP.location)) {
+    //     // add breadcrumbs
+    //     this.locationBreadcrumbs.push(
+    //       new BreadcrumbItemModel(
+    //         locationP.location.name,
+    //         `/locations/${locationP.location.id}/children`
+    //       )
+    //     );
+    //     locationP = _.isEmpty(locationP.children) ? {} as HierarchicalLocationModel : locationP.children[0];
+    //   }
+    // }
+    //
+    // // add active breadcrumb
+    // if (this.activeLocationBreadcrumb) {
+    //   this.locationBreadcrumbs.push(
+    //     new BreadcrumbItemModel(
+    //       this.activeLocationBreadcrumb,
+    //       '.',
+    //       true,
+    //       {},
+    //       this.locationData
+    //     )
+    //   );
+    // } else {
+    //   if (!_.isEmpty(this.locationBreadcrumbs)) {
+    //     this.locationBreadcrumbs[this.locationBreadcrumbs.length - 1].active = true;
+    //   }
+    // }
   }
 }

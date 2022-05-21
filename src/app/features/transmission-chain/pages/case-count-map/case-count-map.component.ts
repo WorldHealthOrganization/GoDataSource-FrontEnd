@@ -5,7 +5,6 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { WorldMapComponent, WorldMapMarker, WorldMapMarkerLayer, WorldMapPoint } from '../../../../common-modules/world-map/components/world-map/world-map.component';
 import * as _ from 'lodash';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Subscription, throwError } from 'rxjs';
 import { TransmissionChainFilters } from '../../components/transmission-chains-filters/transmission-chains-filters.component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
@@ -24,9 +23,9 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   styleUrls: ['./case-count-map.component.less']
 })
 export class CaseCountMapComponent implements OnInit, OnDestroy {
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_CASE_COUNT_TITLE', '', true)
-  ];
+  // breadcrumbs: BreadcrumbItemModel[] = [
+  //   new BreadcrumbItemModel('LNG_PAGE_CASE_COUNT_TITLE', '', true)
+  // ];
 
   // outbreak
   outbreakId: string;

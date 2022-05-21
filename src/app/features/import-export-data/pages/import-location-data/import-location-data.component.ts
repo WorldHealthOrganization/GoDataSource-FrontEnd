@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ImportServerModelNames } from '../../components/import-data/import-data.component';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { Constants } from '../../../../core/models/constants';
 import { ImportDataExtension } from '../../components/import-data/model';
@@ -15,7 +14,7 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
   templateUrl: './import-location-data.component.html'
 })
 export class ImportLocationDataComponent {
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   Constants = Constants;
 
@@ -66,23 +65,23 @@ export class ImportLocationDataComponent {
      */
   initializeBreadcrumbs() {
     // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (LocationModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_LOCATIONS_TITLE', '/locations')
-      );
-    }
-
-    // import breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        'LNG_PAGE_IMPORT_LOCATION_DATA_TITLE',
-        '.',
-        true
-      )
-    );
+    // this.breadcrumbs = [];
+    //
+    // // add list breadcrumb only if we have permission
+    // if (LocationModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel('LNG_PAGE_LIST_LOCATIONS_TITLE', '/locations')
+    //   );
+    // }
+    //
+    // // import breadcrumb
+    // this.breadcrumbs.push(
+    //   new BreadcrumbItemModel(
+    //     'LNG_PAGE_IMPORT_LOCATION_DATA_TITLE',
+    //     '.',
+    //     true
+    //   )
+    // );
   }
 
   /**

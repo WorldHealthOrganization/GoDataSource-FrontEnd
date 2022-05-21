@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -26,7 +25,6 @@ import {
 } from 'rxjs/operators';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EntityType } from '../../../../core/models/entity-type';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
@@ -38,7 +36,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 })
 export class ModifyContactFollowUpComponent extends ViewModifyComponent implements OnInit {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // authenticated user
   authUser: UserModel;
@@ -216,123 +214,123 @@ export class ModifyContactFollowUpComponent extends ViewModifyComponent implemen
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // do we have follow-up data
-    if (
-      this.followUpData &&
-            this.followUpData.id
-    ) {
-      switch (this.rootPage) {
-        case FollowUpPage.FOR_CONTACT:
-          // contacts list page
-          if (ContactModel.canList(this.authUser)) {
-            this.breadcrumbs.push(
-              new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-            );
-          }
-
-          // contacts view page
-          if (ContactModel.canView(this.authUser)) {
-            this.breadcrumbs.push(
-              new BreadcrumbItemModel(this.followUpData.person.name, `/contacts/${this.followUpData.person.id}/view`)
-            );
-          }
-
-          // follow-ups list page
-          if (FollowUpModel.canList(this.authUser)) {
-            this.breadcrumbs.push(
-              new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', this.rootPageUrl)
-            );
-          }
-
-          // finished
-          break;
-
-        case FollowUpPage.CASE_RELATED:
-          // cases list page
-          if (CaseModel.canList(this.authUser)) {
-            this.breadcrumbs.push(
-              new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
-            );
-          }
-
-          // case view page
-          if (
-            this.rootCaseData &&
-                        CaseModel.canView(this.authUser)
-          ) {
-            this.breadcrumbs.push(
-              new BreadcrumbItemModel(this.rootCaseData.name, `/cases/${this.rootCaseId}/view`)
-            );
-          }
-
-          // follow-ups related list page
-          if (FollowUpModel.canList(this.authUser)) {
-            this.breadcrumbs.push(
-              new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_FOR_RELATED_CONTACTS_TITLE', this.rootPageUrl)
-            );
-          }
-
-          // finished
-          break;
-
-        case FollowUpPage.RANGE:
-          // contacts list page
-          if (ContactModel.canList(this.authUser)) {
-            this.breadcrumbs.push(
-              new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-            );
-          }
-
-          // follow-ups range list page
-          if (FollowUpModel.canListDashboard(this.authUser)) {
-            this.breadcrumbs.push(
-              new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', this.rootPageUrl)
-            );
-          }
-
-          // finished
-          break;
-
-        default:
-          // contacts list page
-          if (ContactModel.canList(this.authUser)) {
-            this.breadcrumbs.push(
-              new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-            );
-          }
-
-          // follow-ups list page
-          if (FollowUpModel.canList(this.authUser)) {
-            this.breadcrumbs.push(
-              new BreadcrumbItemModel(
-                this.history ? 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE' : 'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
-                this.rootPageUrl
-              )
-            );
-          }
-
-          // finished
-          break;
-      }
-    }
-
-    // add breadcrumb for current page
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        this.viewOnly ? 'LNG_PAGE_VIEW_FOLLOW_UP_TITLE' : 'LNG_PAGE_MODIFY_FOLLOW_UP_TITLE',
-        '.',
-        true,
-        {},
-        this.followUpData ? {
-          ...this.followUpData, ...{
-            dateFormatted: moment(this.followUpData.date).format('YYYY-MM-DD')
-          }
-        } : {}
-      )
-    );
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // do we have follow-up data
+    // if (
+    //   this.followUpData &&
+    //         this.followUpData.id
+    // ) {
+    //   switch (this.rootPage) {
+    //     case FollowUpPage.FOR_CONTACT:
+    //       // contacts list page
+    //       if (ContactModel.canList(this.authUser)) {
+    //         this.breadcrumbs.push(
+    //           new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+    //         );
+    //       }
+    //
+    //       // contacts view page
+    //       if (ContactModel.canView(this.authUser)) {
+    //         this.breadcrumbs.push(
+    //           new BreadcrumbItemModel(this.followUpData.person.name, `/contacts/${this.followUpData.person.id}/view`)
+    //         );
+    //       }
+    //
+    //       // follow-ups list page
+    //       if (FollowUpModel.canList(this.authUser)) {
+    //         this.breadcrumbs.push(
+    //           new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', this.rootPageUrl)
+    //         );
+    //       }
+    //
+    //       // finished
+    //       break;
+    //
+    //     case FollowUpPage.CASE_RELATED:
+    //       // cases list page
+    //       if (CaseModel.canList(this.authUser)) {
+    //         this.breadcrumbs.push(
+    //           new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
+    //         );
+    //       }
+    //
+    //       // case view page
+    //       if (
+    //         this.rootCaseData &&
+    //                     CaseModel.canView(this.authUser)
+    //       ) {
+    //         this.breadcrumbs.push(
+    //           new BreadcrumbItemModel(this.rootCaseData.name, `/cases/${this.rootCaseId}/view`)
+    //         );
+    //       }
+    //
+    //       // follow-ups related list page
+    //       if (FollowUpModel.canList(this.authUser)) {
+    //         this.breadcrumbs.push(
+    //           new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_FOR_RELATED_CONTACTS_TITLE', this.rootPageUrl)
+    //         );
+    //       }
+    //
+    //       // finished
+    //       break;
+    //
+    //     case FollowUpPage.RANGE:
+    //       // contacts list page
+    //       if (ContactModel.canList(this.authUser)) {
+    //         this.breadcrumbs.push(
+    //           new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+    //         );
+    //       }
+    //
+    //       // follow-ups range list page
+    //       if (FollowUpModel.canListDashboard(this.authUser)) {
+    //         this.breadcrumbs.push(
+    //           new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', this.rootPageUrl)
+    //         );
+    //       }
+    //
+    //       // finished
+    //       break;
+    //
+    //     default:
+    //       // contacts list page
+    //       if (ContactModel.canList(this.authUser)) {
+    //         this.breadcrumbs.push(
+    //           new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+    //         );
+    //       }
+    //
+    //       // follow-ups list page
+    //       if (FollowUpModel.canList(this.authUser)) {
+    //         this.breadcrumbs.push(
+    //           new BreadcrumbItemModel(
+    //             this.history ? 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE' : 'LNG_PAGE_LIST_FOLLOW_UPS_TITLE',
+    //             this.rootPageUrl
+    //           )
+    //         );
+    //       }
+    //
+    //       // finished
+    //       break;
+    //   }
+    // }
+    //
+    // // add breadcrumb for current page
+    // this.breadcrumbs.push(
+    //   new BreadcrumbItemModel(
+    //     this.viewOnly ? 'LNG_PAGE_VIEW_FOLLOW_UP_TITLE' : 'LNG_PAGE_MODIFY_FOLLOW_UP_TITLE',
+    //     '.',
+    //     true,
+    //     {},
+    //     this.followUpData ? {
+    //       ...this.followUpData, ...{
+    //         dateFormatted: moment(this.followUpData.date).format('YYYY-MM-DD')
+    //       }
+    //     } : {}
+    //   )
+    // );
   }
 
   get rootPageUrl(): string {

@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ImportServerModelNames } from '../../components/import-data/import-data.component';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { Constants } from '../../../../core/models/constants';
@@ -12,17 +11,17 @@ import { ImportDataExtension } from '../../components/import-data/model';
   templateUrl: './import-reference-data.component.html'
 })
 export class ImportReferenceDataComponent {
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel(
-      'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE',
-      '/reference-data'
-    ),
-    new BreadcrumbItemModel(
-      'LNG_PAGE_IMPORT_REFERENCE_DATA_TITLE',
-      '',
-      true
-    )
-  ];
+  // breadcrumbs: BreadcrumbItemModel[] = [
+  //   new BreadcrumbItemModel(
+  //     'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE',
+  //     '/reference-data'
+  //   ),
+  //   new BreadcrumbItemModel(
+  //     'LNG_PAGE_IMPORT_REFERENCE_DATA_TITLE',
+  //     '',
+  //     true
+  //   )
+  // ];
 
   allowedExtensions: string[] = [
     ImportDataExtension.CSV,

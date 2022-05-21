@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute } from '@angular/router';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
@@ -20,7 +19,7 @@ import { UserModel } from '../../../../core/models/user.model';
 })
 export class ViewMovementCaseComponent implements OnInit {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // constants
   CaseModel = CaseModel;
@@ -85,39 +84,39 @@ export class ViewMovementCaseComponent implements OnInit {
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // case list page
-    if (CaseModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
-      );
-    }
-
-    // case breadcrumbs
-    if (this.caseData) {
-      // case view page
-      if (CaseModel.canView(this.authUser)) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel(
-            this.caseData.name,
-            `/cases/${this.caseData.id}/view`
-          )
-        );
-      }
-
-      // current page
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE',
-          '.',
-          true,
-          {},
-          this.caseData
-        )
-      );
-    }
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // case list page
+    // if (CaseModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
+    //   );
+    // }
+    //
+    // // case breadcrumbs
+    // if (this.caseData) {
+    //   // case view page
+    //   if (CaseModel.canView(this.authUser)) {
+    //     this.breadcrumbs.push(
+    //       new BreadcrumbItemModel(
+    //         this.caseData.name,
+    //         `/cases/${this.caseData.id}/view`
+    //       )
+    //     );
+    //   }
+    //
+    //   // current page
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel(
+    //       'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE',
+    //       '.',
+    //       true,
+    //       {},
+    //       this.caseData
+    //     )
+    //   );
+    // }
   }
 
   /**

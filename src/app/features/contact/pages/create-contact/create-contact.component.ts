@@ -1,6 +1,5 @@
 import * as _ from 'lodash';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
@@ -53,7 +52,7 @@ export class CreateContactComponent
   extends CreateConfirmOnChanges
   implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // selected outbreak
   selectedOutbreak: OutbreakModel = new OutbreakModel();
@@ -353,49 +352,49 @@ export class CreateContactComponent
      * Initialize breadcrumbs
      */
   private initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // do we have related data ?
-    if (this.relatedEntityData) {
-      // case or event?
-      if (this.relatedEntityData.type === EntityType.CASE) {
-        // case list
-        if (CaseModel.canList(this.authUser)) {
-          this.breadcrumbs.push(
-            new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
-          );
-        }
-
-        // case view - this oen is required, but might change later
-        if (CaseModel.canView(this.authUser)) {
-          this.breadcrumbs.push(
-            new BreadcrumbItemModel(this.relatedEntityData.name, `/cases/${this.relatedEntityData.id}/view`)
-          );
-        }
-      } else if (this.relatedEntityData.type === EntityType.EVENT) {
-        // event list
-        if (EventModel.canList(this.authUser)) {
-          this.breadcrumbs.push(
-            new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events')
-          );
-        }
-
-        // event view - this oen is required, but might change later
-        if (EventModel.canView(this.authUser)) {
-          this.breadcrumbs.push(
-            new BreadcrumbItemModel(this.relatedEntityData.name, `/events/${this.relatedEntityData.id}/view`)
-          );
-        }
-      } else {
-        // NOT SUPPORTED :)
-      }
-    }
-
-    // current page breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel('LNG_PAGE_CREATE_CONTACT_TITLE', '.', true)
-    );
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // do we have related data ?
+    // if (this.relatedEntityData) {
+    //   // case or event?
+    //   if (this.relatedEntityData.type === EntityType.CASE) {
+    //     // case list
+    //     if (CaseModel.canList(this.authUser)) {
+    //       this.breadcrumbs.push(
+    //         new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
+    //       );
+    //     }
+    //
+    //     // case view - this oen is required, but might change later
+    //     if (CaseModel.canView(this.authUser)) {
+    //       this.breadcrumbs.push(
+    //         new BreadcrumbItemModel(this.relatedEntityData.name, `/cases/${this.relatedEntityData.id}/view`)
+    //       );
+    //     }
+    //   } else if (this.relatedEntityData.type === EntityType.EVENT) {
+    //     // event list
+    //     if (EventModel.canList(this.authUser)) {
+    //       this.breadcrumbs.push(
+    //         new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events')
+    //       );
+    //     }
+    //
+    //     // event view - this oen is required, but might change later
+    //     if (EventModel.canView(this.authUser)) {
+    //       this.breadcrumbs.push(
+    //         new BreadcrumbItemModel(this.relatedEntityData.name, `/events/${this.relatedEntityData.id}/view`)
+    //       );
+    //     }
+    //   } else {
+    //     // NOT SUPPORTED :)
+    //   }
+    // }
+    //
+    // // current page breadcrumb
+    // this.breadcrumbs.push(
+    //   new BreadcrumbItemModel('LNG_PAGE_CREATE_CONTACT_TITLE', '.', true)
+    // );
   }
 
   /**

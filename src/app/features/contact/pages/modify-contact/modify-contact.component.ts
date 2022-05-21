@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm, NgModel } from '@angular/forms';
 import { Observable, Subscriber, throwError } from 'rxjs';
 import { ContactModel } from '../../../../core/models/contact.model';
@@ -56,7 +55,7 @@ export class ModifyContactComponent
   extends ViewModifyComponent
   implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // authenticated user
   authUser: UserModel;
@@ -282,28 +281,28 @@ export class ModifyContactComponent
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (ContactModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-      );
-    }
-
-    // view / modify breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        this.viewOnly ?
-          'LNG_PAGE_VIEW_CONTACT_TITLE' :
-          'LNG_PAGE_MODIFY_CONTACT_TITLE',
-        '.',
-        true,
-        {},
-        this.contactData
-      )
-    );
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // add list breadcrumb only if we have permission
+    // if (ContactModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+    //   );
+    // }
+    //
+    // // view / modify breadcrumb
+    // this.breadcrumbs.push(
+    //   new BreadcrumbItemModel(
+    //     this.viewOnly ?
+    //       'LNG_PAGE_VIEW_CONTACT_TITLE' :
+    //       'LNG_PAGE_MODIFY_CONTACT_TITLE',
+    //     '.',
+    //     true,
+    //     {},
+    //     this.contactData
+    //   )
+    // );
   }
 
   /**
