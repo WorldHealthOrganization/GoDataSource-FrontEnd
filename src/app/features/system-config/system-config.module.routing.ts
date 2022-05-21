@@ -11,6 +11,11 @@ import { BackupModuleDataResolver } from '../../core/services/resolvers/data/bac
 import { BackupStatusDataResolver } from '../../core/services/resolvers/data/backup-status.resolver';
 import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
 import { BackupTypesDataResolver } from '../../core/services/resolvers/data/backup-types.resolver';
+import { OutbreakDataResolver } from '../../core/services/resolvers/data/outbreak.resolver';
+import { SyncPackageStatusDataResolver } from '../../core/services/resolvers/data/sync-package-status.resolver';
+import { SystemSettingsDataResolver } from '../../core/services/resolvers/data/system-settings.resolver';
+import { SyncPackageModuleDataResolver } from '../../core/services/resolvers/data/sync-package-module.resolver';
+import { SyncPackageExportTypeDataResolver } from '../../core/services/resolvers/data/sync-package-export-type.resolver';
 
 const routes: Routes = [
   // Backups
@@ -154,6 +159,15 @@ const routes: Routes = [
       permissions: [
         PERMISSION.SYNC_LOG_LIST
       ]
+    },
+    resolve: {
+      outbreak: OutbreakDataResolver,
+      yesNoAll: YesNoAllDataResolver,
+      yesNo: YesNoDataResolver,
+      systemSettings: SystemSettingsDataResolver,
+      syncLogsStatus: SyncPackageStatusDataResolver,
+      syncLogsModule: SyncPackageModuleDataResolver,
+      syncLogsType: SyncPackageExportTypeDataResolver
     }
   }
 ];
