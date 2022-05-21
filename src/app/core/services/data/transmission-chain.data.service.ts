@@ -870,7 +870,7 @@ export class TransmissionChainDataService {
                     sourceNode.model instanceof EventModel
         ) {
           if (sourceNode.model.date) {
-            sourceDate = sourceNode.model.date;
+            sourceDate = sourceNode.model.date as string;
           }
         }
 
@@ -890,7 +890,7 @@ export class TransmissionChainDataService {
                     targetNode.model instanceof EventModel
         ) {
           if (targetNode.model.date) {
-            targetDate = targetNode.model.date;
+            targetDate = targetNode.model.date as string;
           }
         }
 
