@@ -667,7 +667,7 @@
                   <div
                     *ngSwitchCase="CreateViewModifyV2TabInputType.DOCUMENT"
                     fxFlex fxLayout="row wrap" fxLayout.lt-md="column" fxLayoutGap="1.6rem" fxLayoutGap.lt-md="0"
-                    [ngModelGroup]="parentName !== undefined ? parentName + '[' + parentItemIndex + ']' : input.name">
+                    [ngModelGroup]="parentName ? parentName + '[' + parentItemIndex + ']' : input.name">
 
                     <!-- Type -->
                     <app-form-select-single-v2
@@ -699,7 +699,7 @@
                     *ngSwitchCase="CreateViewModifyV2TabInputType.ADDRESS"
                     fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem"
                     class="gd-create-view-modify-bottom-section-content-input-list-multiple-rows"
-                    [ngModelGroup]="parentName !== undefined ? parentName + '[' + parentItemIndex + ']' : input.name">
+                    [ngModelGroup]="parentName ? parentName + '[' + parentItemIndex + ']' : input.name">
 
                     <!-- Type -->
                     <app-form-select-single-v2
@@ -832,7 +832,7 @@
                   <div
                     *ngSwitchCase="CreateViewModifyV2TabInputType.VACCINE"
                     fxFlex fxLayout="row wrap" fxLayout.lt-md="column" fxLayoutGap="1.6rem" fxLayoutGap.lt-md="0"
-                    [ngModelGroup]="parentName !== undefined ? parentName + '[' + parentItemIndex + ']' : input.name">
+                    [ngModelGroup]="parentName ? parentName + '[' + parentItemIndex + ']' : input.name">
 
                     <!-- Vaccine -->
                     <app-form-select-single-v2
@@ -869,7 +869,7 @@
                     *ngSwitchCase="CreateViewModifyV2TabInputType.CENTER_DATE_RANGE"
                     fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem"
                     class="gd-create-view-modify-bottom-section-content-input-list-multiple-rows"
-                    [ngModelGroup]="parentName !== undefined ? parentName + '[' + parentItemIndex + ']' : input.name">
+                    [ngModelGroup]="parentName ? parentName + '[' + parentItemIndex + ']' : input.name">
 
                     <!-- Type -->
                     <app-form-select-single-v2
@@ -937,7 +937,7 @@
                     *ngSwitchCase="CreateViewModifyV2TabInputType.MAP_SERVER"
                     fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem"
                     class="gd-create-view-modify-bottom-section-content-input-list-multiple-rows"
-                    [ngModelGroup]="parentName !== undefined ? parentName + '[' + parentItemIndex + ']' : input.name">
+                    [ngModelGroup]="parentName ? parentName + '[' + parentItemIndex + ']' : input.name">
 
                     <!-- Name -->
                     <app-form-input-v2

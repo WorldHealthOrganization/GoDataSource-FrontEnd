@@ -1,21 +1,12 @@
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { EventModel } from '../../../../core/models/event.model';
-import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { Location } from '@angular/common';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { EntityDataService } from '../../../../core/services/data/entity.data.service';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
-import { EntityLabResultService } from '../../../../core/services/helper/entity-lab-result-helper.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { EventDataService } from '../../../../core/services/data/event.data.service';
-import { AppMessages } from '../../../../core/enums/app-messages.enum';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { Observable, throwError } from 'rxjs';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import {
@@ -35,16 +26,13 @@ import {
   CreateViewModifyV2ExpandColumnType
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 
 @Component({
   selector: 'app-events-create-view-modify',
   templateUrl: './events-create-view-modify.component.html'
 })
 export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<EventModel> implements OnDestroy {
-
-  // today
-  private _today: Moment = moment();
-
   /**
    * Constructor
    */
@@ -52,15 +40,9 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
     protected router: Router,
     protected activatedRoute: ActivatedRoute,
     protected eventDataService: EventDataService,
-    protected outbreakDataService: OutbreakDataService,
     protected translateService: TranslateService,
-    protected systemSettingsDataService: SystemSettingsDataService,
     protected toastV2Service: ToastV2Service,
-    protected location: Location,
     protected dialogV2Service: DialogV2Service,
-    protected entityDataService: EntityDataService,
-    protected entityHelperService: EntityHelperService,
-    protected entityLabResultService: EntityLabResultService,
     authDataService: AuthDataService,
     renderer2: Renderer2
   ) {
@@ -79,9 +61,6 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
   ngOnDestroy(): void {
     // parent
     super.onDestroy();
-
-    // remove global notifications
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
   }
 
   /**
@@ -128,16 +107,19 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
    * Retrieve item
    */
   protected retrieveItem(record?: EventModel): Observable<EventModel> {
-    return this.eventDataService.getEvent(this.selectedOutbreak.id,
-      record ? record.id : this.activatedRoute.snapshot.params.eventId);
+    return this.eventDataService
+      .getEvent(
+        this.selectedOutbreak.id,
+        record ?
+          record.id :
+          this.activatedRoute.snapshot.params.eventId
+      );
   }
 
   /**
    * Data initialized
    */
-  protected initializedData(): void {
-
-  }
+  protected initializedData(): void {}
 
   /**
    * Initialize page title
@@ -224,9 +206,6 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
       tabs: [
         // Details
         this.initializeTabsDetails()
-
-        // Address
-        // this.initializeTabsAddress()
       ],
 
       // create details
@@ -288,6 +267,9 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
     });
   }
 
+  /**
+   * Initialize tab details
+   */
   private initializeTabsDetails(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
@@ -326,12 +308,8 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
                 this.itemData.date = value;
               }
             },
-            maxDate: this._today,
             validators: {
-              required: () => true,
-              dateSameOrBefore: () => [
-                this._today
-              ]
+              required: () => true
             }
           }, {
             type: CreateViewModifyV2TabInputType.DATE,
@@ -344,12 +322,8 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
                 this.itemData.dateOfReporting = value;
               }
             },
-            maxDate: this._today,
             validators: {
-              required: () => true,
-              dateSameOrBefore: () => [
-                this._today
-              ]
+              required: () => true
             }
           }, {
             type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
@@ -392,17 +366,6 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
           }]
         },
         {
-          /*
-          * TODO: when Event is created or modified the address is not sent to the data service;
-          *       -
-          *       POSSIBLE CAUSE:
-          *       on this Address input's div the attr ng-reflect-name comes back as undefined;
-          *       this causes data.undefined = itemData.address instead of
-          *       data.address = itemData.address in runCreateOrUpdate;
-          *       -
-          *       see app-create-view-modify-v2.component.html line 697;
-          *
-          **/
           type: CreateViewModifyV2TabInputType.SECTION,
           label: 'LNG_EVENT_FIELD_LABEL_ADDRESS',
           inputs: [{
@@ -451,6 +414,29 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
       },
       quickActions: {
         options: [
+          // Record details
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_PAGE_MODIFY_EVENT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
+            action: {
+              click: () => {
+                // show record details dialog
+                this.dialogV2Service.showRecordDetailsDialog(
+                  'LNG_PAGE_MODIFY_EVENT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
+                  this.itemData,
+                  this.activatedRoute.snapshot.data.user
+                );
+              }
+            },
+            visible: () => !this.isCreate
+          },
+
+          // Divider
+          {
+            type: CreateViewModifyV2MenuType.DIVIDER,
+            visible: () => !this.isCreate
+          },
+
           // Add contact
           {
             type: CreateViewModifyV2MenuType.OPTION,
@@ -473,11 +459,6 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
             visible: () => this.selectedOutbreakIsActive && EventModel.canCreateContact(this.authUser) && ContactModel.canCreate(this.authUser)
           },
 
-          // Divider
-          {
-            type: CreateViewModifyV2MenuType.DIVIDER
-          },
-
           // contacts
           {
             type: CreateViewModifyV2MenuType.OPTION,
@@ -487,6 +468,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
             },
             visible: () => EventModel.canListRelationshipContacts(this.authUser)
           },
+
           // exposures
           {
             type: CreateViewModifyV2MenuType.OPTION,
@@ -495,13 +477,6 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
               link: () => ['/relationships', EntityType.EVENT, this.itemData.id, 'exposures']
             },
             visible: () => EventModel.canListRelationshipExposures(this.authUser)
-          },
-
-          // Divider
-          {
-            type: CreateViewModifyV2MenuType.DIVIDER,
-            visible: () => EventModel.canList(this.authUser) || EventModel.canListRelationshipContacts(this.authUser) ||
-              EventModel.canListRelationshipExposures(this.authUser)
           }
         ]
       }
@@ -515,64 +490,42 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
     return (
       type,
       data,
-      finished,
-      loading,
-      forms
+      finished
     ) => {
-      const runCreateOrUpdate = (overwriteFinished: (item: EventModel) => void) => {
-        (type === CreateViewModifyV2ActionType.CREATE ?
-          this.eventDataService.createEvent(
-            this.selectedOutbreak.id,
-            data
-          ) :
-          this.eventDataService.modifyEvent(
-            this.selectedOutbreak.id,
-            this.itemData.id,
-            data
-          )).pipe(
-          // handle error
-          catchError((err) => {
-            // show error
-            finished(err, undefined);
+      // finished
+      (type === CreateViewModifyV2ActionType.CREATE ?
+        this.eventDataService.createEvent(
+          this.selectedOutbreak.id,
+          data
+        ) :
+        this.eventDataService.modifyEvent(
+          this.selectedOutbreak.id,
+          this.itemData.id,
+          data
+        )
+      ).pipe(
+        // handle error
+        catchError((err) => {
+          // show error
+          finished(err, undefined);
 
-            // finished
-            return throwError(err);
-          }),
-
-          // should be the last pipe
-          takeUntil(this.destroyed$)
-        ).subscribe((item: EventModel) => {
           // finished
-          const finishedProcessingData = () => {
-            // success creating / updating event
-            this.toastV2Service.success(
-              type === CreateViewModifyV2ActionType.CREATE ?
-                'LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_SUCCESS_MESSAGE' :
-                'LNG_PAGE_MODIFY_EVENT_ACTION_MODIFY_EVENT_SUCCESS_MESSAGE'
-            );
+          return throwError(err);
+        }),
 
-            // finished with success
-            if (!overwriteFinished) {
-              finished(undefined, item);
-            } else {
-              // mark pristine
-              forms.markFormsAsPristine();
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      ).subscribe((item: EventModel) => {
+        // success creating / updating event
+        this.toastV2Service.success(
+          type === CreateViewModifyV2ActionType.CREATE ?
+            'LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_SUCCESS_MESSAGE' :
+            'LNG_PAGE_MODIFY_EVENT_ACTION_MODIFY_EVENT_SUCCESS_MESSAGE'
+        );
 
-              // hide loading
-              loading.hide();
-
-              // call overwrite
-              overwriteFinished(item);
-            }
-          };
-
-          finishedProcessingData();
-        });
-      };
-
-      return runCreateOrUpdate(undefined);
+        // finished with success
+        finished(undefined, item);
+      });
     };
   }
-
-
 }
