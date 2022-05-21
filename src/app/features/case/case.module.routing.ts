@@ -3,7 +3,6 @@ import { Routes, RouterModule, Route } from '@angular/router';
 import * as fromPages from './pages';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
-import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 import { ClassificationDataResolver } from '../../core/services/resolvers/data/classification.resolver';
 import { OutcomeDataResolver } from '../../core/services/resolvers/data/outcome.resolver';
@@ -147,45 +146,6 @@ const routes: Routes = [
 
 
 
-  // Modify Case Questionnaire
-  {
-    path: ':caseId/view-questionnaire',
-    component: fromPages.ModifyQuestionnaireCaseComponent,
-    canActivate: [AuthGuard],
-    data: {
-      permissions: [
-        PERMISSION.CASE_VIEW
-      ],
-      action: ViewModifyComponentAction.VIEW
-    }
-  },
-  // Modify Case Questionnaire
-  {
-    path: ':caseId/modify-questionnaire',
-    component: fromPages.ModifyQuestionnaireCaseComponent,
-    canActivate: [AuthGuard],
-    data: {
-      permissions: [
-        PERMISSION.CASE_MODIFY
-      ],
-      action: ViewModifyComponentAction.MODIFY
-    },
-    canDeactivate: [
-      PageChangeConfirmationGuard
-    ]
-  },
-  // View Contact Questionnaire
-  {
-    path: ':caseId/history',
-    component: fromPages.ModifyQuestionnaireCaseComponent,
-    canActivate: [AuthGuard],
-    data: {
-      permissions: [
-        PERMISSION.CASE_VIEW
-      ],
-      action: ViewModifyComponentAction.HISTORY
-    }
-  },
   // View Case movement
   {
     path: ':caseId/movement',
