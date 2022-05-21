@@ -30,6 +30,7 @@ import {
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
+import { IV2LoadingDialogHandler } from '../../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
 
 @Component({
   selector: 'app-backups',
@@ -465,6 +466,10 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
         modules: (response.data.map.modules as IV2SideDialogConfigInputMultiDropdown).values
       };
 
+      // close popup
+      response.handler.loading.show();
+
+      // create backup
       this.systemBackupDataService
         .createBackup(backupSettings)
         .pipe(
@@ -582,16 +587,16 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
   */
   restoreBackup(item: BackupModel) {
     // restore backup handler
-    const restoreBackupNow = () => {
+    const restoreBackupNow = (loading: IV2LoadingDialogHandler) => {
       this._waitForBackupIdToBeReady = undefined;
-
-      // show loading
-      const loading = this.dialogV2Service.showLoadingDialog();
-
       this.systemBackupDataService
         .restoreBackup(item.id)
         .pipe(
           catchError((err) => {
+            // hide loading
+            loading.close();
+
+            // error
             this.toastV2Service.error(err);
             return throwError(err);
           })
@@ -609,7 +614,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
     };
 
     // start restore process when backup is ready
-    const backupCheckForReady = () => {
+    const backupCheckForReady = (loading: IV2LoadingDialogHandler) => {
       setTimeout(
         () => {
           // check if backup is ready
@@ -618,6 +623,9 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
             .pipe(
               catchError((err) => {
                 this.toastV2Service.error(err);
+
+                // hide loading
+                loading.close();
 
                 // can't continue with the restore
                 this._waitForBackupIdToBeReady = undefined;
@@ -631,11 +639,15 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
                 // backup ready ?
                 case Constants.SYSTEM_BACKUP_STATUS.SUCCESS.value:
                   // start restore process
-                  restoreBackupNow();
+                  restoreBackupNow(loading);
                   break;
 
                 // backup error ?
                 case Constants.SYSTEM_BACKUP_STATUS.FAILED.value:
+                  // hide loading
+                  loading.close();
+
+                  // error
                   this.toastV2Service.error('LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_FAILED_MESSAGE');
                   this._waitForBackupIdToBeReady = undefined;
                   this.needsRefreshList(true);
@@ -644,7 +656,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
                 // backup isn't ready ?
                 // Constants.SYSTEM_BACKUP_STATUS.PENDING.value
                 default:
-                  backupCheckForReady();
+                  backupCheckForReady(loading);
                   break;
               }
             });
@@ -716,8 +728,8 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
             modules: (answerBackup.data.map.modules as IV2SideDialogConfigInputMultiDropdown).values
           };
 
-          // show loading
-          const loading = this.dialogV2Service.showLoadingDialog();
+          // close popup
+          answerBackup.handler.loading.show();
 
           // create backup
           this.systemBackupDataService
@@ -728,32 +740,40 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
                 this.toastV2Service.error(err);
 
                 // hide loading
-                loading.close();
+                answerBackup.handler.hide();
 
                 // send error down the road
                 return throwError(err);
               })
-            ).subscribe((newBackup: BackupModel) => {
+            )
+            .subscribe((newBackup: BackupModel) => {
               // display success message
               this.toastV2Service.success('LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_SUCCESS_MESSAGE');
 
               // hide loading
-              loading.close();
+              answerBackup.handler.hide();
 
               // refresh page
               this.needsRefreshList(true);
 
+              // show global loading
+              const loading = this.dialogV2Service.showLoadingDialog();
+
               // restore data
               // should we wait for backup to be completed before proceeding ?
               this._waitForBackupIdToBeReady = newBackup.id;
-              backupCheckForReady();
+              backupCheckForReady(loading);
             });
         });
       }
 
       // restore
       else if (response.button.type === IV2BottomDialogConfigButtonType.OTHER && response.button.key === 'restore') {
-        restoreBackupNow();
+        // show global loading
+        const loading = this.dialogV2Service.showLoadingDialog();
+
+        // restore
+        restoreBackupNow(loading);
       }
     });
   }
