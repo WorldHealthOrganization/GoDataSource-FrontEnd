@@ -14,9 +14,6 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { catchError, share } from 'rxjs/operators';
-import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
-import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
-import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
@@ -26,6 +23,9 @@ import { ReferenceDataDataService } from '../../../../core/services/data/referen
 import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 
 @Component({
   selector: 'app-transmission-chain-bars',
@@ -34,9 +34,8 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   styleUrls: ['./transmission-chain-bars.component.less']
 })
 export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
-  // breadcrumbs: BreadcrumbItemModel[] = [
-  //   new BreadcrumbItemModel('LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE', null, true)
-  // ];
+  // breadcrumbs
+  breadcrumbs: IV2Breadcrumb[] = [];
 
   // constants
   TransmissionChainModel = TransmissionChainModel;
@@ -56,8 +55,6 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
   loadingDialog: LoadingDialogModel;
   // show filters?
   filtersVisible: boolean = false;
-  // do architecture is x32?
-  x86Architecture: boolean = false;
   // models for filters form elements
   filters: {
     date: any,
@@ -92,6 +89,9 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
     [token: string]: string
   } = {};
 
+  // quick actions
+  quickActions: IV2ActionMenuLabel;
+
   /**
      * Constructor
      */
@@ -104,7 +104,6 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
     private importExportDataService: ImportExportDataService,
     private i18nService: I18nService,
     protected toastV2Service: ToastV2Service,
-    private systemSettingsDataService: SystemSettingsDataService,
     private referenceDataDataService: ReferenceDataDataService
   ) {}
 
@@ -133,18 +132,32 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
       .getSelectedOutbreakSubject()
       .subscribe((selectedOutbreak: OutbreakModel) => {
         this.selectedOutbreak = selectedOutbreak;
-
         this.loadGraph();
       });
 
-    // check if platform architecture is x32
-    this.systemSettingsDataService
-      .getAPIVersion()
-      .subscribe((versionData: SystemSettingsVersionModel) => {
-        if (versionData.arch === Constants.PLATFORM_ARCH.X86) {
-          this.x86Architecture = true;
+    // initialize page breadcrumbs
+    this.initializeBreadcrumbs();
+
+    // quick actions
+    this.quickActions = {
+      type: V2ActionType.MENU,
+      label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
+      visible: () => TransmissionChainModel.canExportBarChart(this.authUser),
+      menuOptions: [
+        // Export map
+        {
+          label: {
+            get: () => 'LNG_PAGE_TRANSMISSION_CHAIN_BARS_EXPORT_CHAIN'
+          },
+          action: {
+            click: () => {
+              this.exportChain();
+            }
+          },
+          visible: () => TransmissionChainModel.canExportBarChart(this.authUser)
         }
-      });
+      ]
+    };
   }
 
   /**
@@ -159,6 +172,27 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
       this.outbreakSubscriber.unsubscribe();
       this.outbreakSubscriber = null;
     }
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs() {
+    // reset
+    this.breadcrumbs = [{
+      label: 'LNG_COMMON_LABEL_HOME',
+      action: {
+        link: DashboardModel.canViewDashboard(this.authUser) ?
+          ['/dashboard'] :
+          ['/account/my-profile']
+      }
+    }];
+
+    // current page
+    this.breadcrumbs.push({
+      label: 'LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE',
+      action: null
+    });
   }
 
   /**
