@@ -8,7 +8,6 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
 import { SystemSyncLogModel } from '../../../../core/models/system-sync-log.model';
 import { SystemUpstreamServerModel } from '../../../../core/models/system-upstream-server.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
@@ -508,14 +507,12 @@ export class SystemSyncLogsComponent
             tooltip: 'LNG_UPSTREAM_SERVER_SYNC_SETTINGS_FIELD_LABEL_TRIGGER_BACKUP_BEFORE_SYNC_DESCRIPTION',
             options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
             name: 'triggerBackupBeforeSync',
-            value: this.activatedRoute.snapshot.data.systemSettings?.sync?.triggerBackupBeforeSync as unknown as string,
+            value: undefined,
             validators: {
               required: () => true
             }
           }
         ],
-
-        // buttons
         bottomButtons: [
           {
             label: 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_SYNC_SETTINGS_DIALOG_SAVE_BUTTON',
@@ -531,7 +528,31 @@ export class SystemSyncLogsComponent
             label: 'LNG_COMMON_BUTTON_CANCEL',
             color: 'text'
           }
-        ]
+        ],
+        initialized: (handler) => {
+          // display loading
+          handler.loading.show();
+
+          // retrieve system settings
+          this.systemSettingsDataService
+            .getSystemSettings()
+            .pipe(
+              catchError((err) => {
+                this.toastV2Service.error(err);
+                return throwError(err);
+              }),
+
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            )
+            .subscribe((settings) => {
+              // set data
+              (handler.data.map.triggerBackupBeforeSync as IV2SideDialogConfigInputSingleDropdown).value = settings.sync?.triggerBackupBeforeSync as unknown as string;
+
+              // hide loading
+              handler.loading.hide();
+            });
+        }
       }
     ).subscribe((response) => {
       // cancelled ?
@@ -551,9 +572,7 @@ export class SystemSyncLogsComponent
             return throwError(err);
           })
         )
-        .subscribe((settings: SystemSettingsModel) => {
-          this.activatedRoute.snapshot.data.systemSettings = new SystemSettingsModel(settings);
-
+        .subscribe(() => {
           // success message
           this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_SYNC_SETTINGS_DIALOG_SUCCESS_MESSAGE');
 
@@ -644,12 +663,7 @@ export class SystemSyncLogsComponent
             type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
             placeholder: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_SERVER_URL',
             tooltip: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_SERVER_URL_DESCRIPTION',
-            options: (this.activatedRoute.snapshot.data.systemSettings.upstreamServers || []).map((upstreamServer: SystemUpstreamServerModel) => {
-              return {
-                label: upstreamServer.name,
-                value: upstreamServer.url
-              };
-            }),
+            options: [],
             name: 'syncServerUrl',
             value: null,
             validators: {
@@ -672,7 +686,36 @@ export class SystemSyncLogsComponent
             label: 'LNG_COMMON_BUTTON_CANCEL',
             color: 'text'
           }
-        ]
+        ],
+        initialized: (handler) => {
+          // display loading
+          handler.loading.show();
+
+          // retrieve system settings
+          this.systemSettingsDataService
+            .getSystemSettings()
+            .pipe(
+              catchError((err) => {
+                this.toastV2Service.error(err);
+                return throwError(err);
+              }),
+
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            )
+            .subscribe((settings) => {
+              // set data
+              (handler.data.map.syncServerUrl as IV2SideDialogConfigInputSingleDropdown).options = (settings.upstreamServers || []).map((upstreamServer: SystemUpstreamServerModel) => {
+                return {
+                  label: upstreamServer.name,
+                  value: upstreamServer.url
+                };
+              });
+
+              // hide loading
+              handler.loading.hide();
+            });
+        }
       }
     ).subscribe((response) => {
       // cancelled ?

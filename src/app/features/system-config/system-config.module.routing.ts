@@ -13,7 +13,6 @@ import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.res
 import { BackupTypesDataResolver } from '../../core/services/resolvers/data/backup-types.resolver';
 import { OutbreakDataResolver } from '../../core/services/resolvers/data/outbreak.resolver';
 import { SyncPackageStatusDataResolver } from '../../core/services/resolvers/data/sync-package-status.resolver';
-import { SystemSettingsDataResolver } from '../../core/services/resolvers/data/system-settings.resolver';
 import { SyncPackageModuleDataResolver } from '../../core/services/resolvers/data/sync-package-module.resolver';
 import { SyncPackageExportTypeDataResolver } from '../../core/services/resolvers/data/sync-package-export-type.resolver';
 
@@ -164,7 +163,6 @@ const routes: Routes = [
       outbreak: OutbreakDataResolver,
       yesNoAll: YesNoAllDataResolver,
       yesNo: YesNoDataResolver,
-      systemSettings: SystemSettingsDataResolver,
       syncLogsStatus: SyncPackageStatusDataResolver,
       syncLogsModule: SyncPackageModuleDataResolver,
       syncLogsType: SyncPackageExportTypeDataResolver

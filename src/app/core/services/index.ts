@@ -112,7 +112,6 @@ import { BackupModuleDataResolver } from './resolvers/data/backup-module.resolve
 import { BackupStatusDataResolver } from './resolvers/data/backup-status.resolver';
 import { BackupTypesDataResolver } from './resolvers/data/backup-types.resolver';
 import { LabPersonTypeDataResolver } from './resolvers/data/lab-person-type.resolver';
-import { SystemSettingsDataResolver } from './resolvers/data/system-settings.resolver';
 import { SyncPackageModuleDataResolver } from './resolvers/data/sync-package-module.resolver';
 import { SyncPackageExportTypeDataResolver } from './resolvers/data/sync-package-export-type.resolver';
 import { SyncPackageStatusDataResolver } from './resolvers/data/sync-package-status.resolver';
@@ -171,7 +170,6 @@ export const services: any[] = [
   SyncPackageExportTypeDataResolver,
   SyncPackageModuleDataResolver,
   SyncPackageStatusDataResolver,
-  SystemSettingsDataResolver,
   TeamDataResolver,
   UserDataResolver,
   UserRoleDataResolver,
