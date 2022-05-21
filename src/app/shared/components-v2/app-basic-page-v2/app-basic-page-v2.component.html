@@ -1,0 +1,113 @@
+<!-- Top -->
+<div
+  class="gd-basic-top">
+
+  <!-- Breadcrumbs -->
+  <app-breadcrumb-v2
+    *ngIf="breadcrumbs"
+    [breadcrumbs]="breadcrumbs"
+    (detectChanges)="resizeTable()"></app-breadcrumb-v2>
+
+  <!-- Title & buttons -->
+  <div
+    *ngIf="pageTitle"
+    fxLayout="row"
+    class="gd-basic-top-title-buttons">
+
+    <!-- Title -->
+    <div
+      fxFlex
+      class="gd-basic-top-title-buttons-title">
+      {{pageTitle | translate}}
+    </div>
+
+    <!-- Buttons -->
+    <div
+      fxFlex fxLayoutAlign="end" fxLayoutGap="0.8rem"
+      class="gd-basic-top-title-buttons-buttons">
+
+      <!-- Quick actions -->
+      <ng-container
+        *ngIf="quickActions && (!quickActions.visible || quickActions.visible(null))">
+
+        <!-- Menu -->
+        <!-- IMPORTANT: Menu of type icon isn't supported here -->
+        <button
+          #quickMenuTrigger="matMenuTrigger"
+          class="gd-basic-top-title-buttons-buttons-quick"
+          [class.gd-basic-top-title-buttons-buttons-quick-expanded]="quickMenuTrigger.menuOpen"
+          type="button"
+          mat-flat-button color="secondary"
+          [disabled]="quickActions.disable && quickActions.disable(null)"
+          [matMenuTriggerFor]="quickMenu"
+          (menuClosed)="detectChanges()">
+
+          <!-- Label -->
+          <span>
+            {{quickActions.label | translate}}
+          </span>
+
+          <!-- Icon -->
+          <mat-icon>expand_more</mat-icon>
+        </button>
+
+        <!-- Floating menu -->
+        <mat-menu
+          #quickMenu="matMenu"
+          class="gd-basic-top-title-buttons-buttons-quick-options">
+          <ng-container
+            *ngFor="let menuOption of quickActions.menuOptions">
+            <ng-container
+              *ngIf="!menuOption.visible || menuOption.visible(null)">
+
+              <!-- Child Menu link -->
+              <ng-container
+                *ngIf="menuOption.label; else divider">
+
+                <!-- Link -->
+                <a
+                  *ngIf="menuOption.action.link; else notLink"
+                  mat-menu-item
+                  class="gd-basic-top-title-buttons-buttons-quick-options-option {{menuOption.cssClasses}}"
+                  [routerLink]="menuOption.action.link && (!menuOption.disable || !menuOption.disable(null)) ? menuOption.action.link(null) : undefined"
+                  [queryParams]="menuOption.action.linkQueryParams ? menuOption.action.linkQueryParams(null) : undefined"
+                  [disabled]="menuOption.disable && menuOption.disable(null)">
+                  {{menuOption.label.get(null) | translate:(menuOption.label.data ? menuOption.label.data(null) : undefined)}}
+                </a>
+
+                <!-- Button -->
+                <ng-template
+                  #notLink>
+                  <button
+                    type="button"
+                    mat-menu-item
+                    class="gd-basic-top-title-buttons-buttons-quick-options-option {{menuOption.cssClasses}}"
+                    [disabled]="menuOption.disable && menuOption.disable(null)"
+                    (click)="menuOption.action.click ? menuOption.action.click(null) : undefined">
+                    {{menuOption.label.get(null) | translate:(menuOption.label.data ? menuOption.label.data(null) : undefined)}}
+                  </button>
+                </ng-template>
+
+              </ng-container>
+
+              <!-- Divider -->
+              <ng-template
+                #divider>
+                <mat-divider></mat-divider>
+              </ng-template>
+
+            </ng-container>
+          </ng-container>
+        </mat-menu>
+
+      </ng-container>
+    </div>
+  </div>
+
+</div>
+
+<!-- Content -->
+<mat-card
+  class="gd-basic-content">
+  <ng-content></ng-content>
+</mat-card>
