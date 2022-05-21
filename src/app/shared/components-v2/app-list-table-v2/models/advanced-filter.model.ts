@@ -6,6 +6,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { DomSanitizer } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
 import { ISelectGroupMap, ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from '../../../forms-v2/components/app-form-select-groups-v2/models/select-group.model';
+import { IV2SideDialogConfigInputFilterListFilter } from '../../app-side-dialog-v2/models/side-dialog-config.model';
 
 /**
  * Advanced filter type
@@ -262,6 +263,10 @@ interface IV2AdvancedFilterBase {
   relationshipKey?: string;
   sortable?: boolean;
   havingNotHavingApplyMongo?: boolean;
+  filterBy?: (
+    query: RequestQueryBuilder,
+    filter: IV2SideDialogConfigInputFilterListFilter
+  ) => void;
 
   // never
   optionsLoad?: never;

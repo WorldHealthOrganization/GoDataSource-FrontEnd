@@ -1123,6 +1123,12 @@ export class DialogV2Service {
             value
           );
         }
+      } else if (filterDefinition.filterBy) {
+        // custom filter
+        filterDefinition.filterBy(
+          qb,
+          appliedFilter
+        );
       } else {
         // filter
         let searchQb: RequestQueryBuilder;
