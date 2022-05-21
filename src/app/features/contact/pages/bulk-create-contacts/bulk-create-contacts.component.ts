@@ -29,6 +29,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { TeamModel } from '../../../../core/models/team.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 
 @Component({
   selector: 'app-bulk-create-contacts',
@@ -38,8 +39,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 })
 export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements OnInit, OnDestroy {
   // breadcrumbs
-  // #TODO
-  // breadcrumbs: BreadcrumbItemModel[] = [];
+  breadcrumbs: IV2Breadcrumb[] = [];
 
   @ViewChild('inputForMakingFormDirty', { static: true }) inputForMakingFormDirty;
   @ViewChild('hotTableWrapper', { static: true }) hotTableWrapper: HotTableWrapperComponent;
@@ -193,43 +193,49 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
    * Initialize breadcrumbs
    */
   initializeBreadcrumbs() {
-    // // reset
-    // this.breadcrumbs = [];
-    //
-    // // case or event?
-    // if (this.relatedEntityType === EntityType.CASE) {
-    //   // case list
-    //   if (CaseModel.canList(this.authUser)) {
-    //     this.breadcrumbs.push(
-    //       new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
-    //     );
-    //   }
-    // } else if (this.relatedEntityType === EntityType.EVENT) {
-    //   // event list
-    //   if (EventModel.canList(this.authUser)) {
-    //     this.breadcrumbs.push(
-    //       new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events'),
-    //     );
-    //   }
-    // } else {
-    //   // NOT SUPPORTED :)
-    // }
-    //
-    // // contacts list page
-    // if (ContactModel.canList(this.authUser)) {
-    //   this.breadcrumbs.push(
-    //     new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-    //   );
-    // }
-    //
-    // // current page breadcrumb
-    // this.breadcrumbs.push(
-    //   new BreadcrumbItemModel(
-    //     'LNG_PAGE_BULK_ADD_CONTACTS_TITLE',
-    //     '.',
-    //     true
-    //   )
-    // );
+    // reset
+    this.breadcrumbs = [];
+
+    // case or event?
+    if (this.relatedEntityType === EntityType.CASE) {
+      // case list
+      if (CaseModel.canList(this.authUser)) {
+        this.breadcrumbs.push({
+          label: 'LNG_PAGE_LIST_CASES_TITLE',
+          action: {
+            link: ['/cases']
+          }
+        });
+      }
+    } else if (this.relatedEntityType === EntityType.EVENT) {
+      // event list
+      if (EventModel.canList(this.authUser)) {
+        this.breadcrumbs.push({
+          label: 'LNG_PAGE_LIST_EVENTS_TITLE',
+          action: {
+            link: ['/events']
+          }
+        });
+      }
+    } else {
+      // NOT SUPPORTED :)
+    }
+
+    // contacts list page
+    if (ContactModel.canList(this.authUser)) {
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
+        action: {
+          link: ['/contacts']
+        }
+      });
+    }
+
+    // current page breadcrumb
+    this.breadcrumbs.push({
+      label: 'LNG_PAGE_BULK_ADD_CONTACTS_TITLE',
+      action: null
+    });
   }
 
   /**
