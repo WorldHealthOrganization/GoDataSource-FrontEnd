@@ -7,7 +7,6 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
 import { SystemSyncLogModel } from '../../../../core/models/system-sync-log.model';
@@ -15,13 +14,11 @@ import { SystemUpstreamServerModel } from '../../../../core/models/system-upstre
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { SystemSyncLogDataService } from '../../../../core/services/data/system-sync-log.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
+import { ExportDataExtension, ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
@@ -37,16 +34,12 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 export class SystemSyncLogsComponent
   extends ListComponent<SystemSyncLogModel>
   implements OnDestroy {
-  // upstream servers
-  upstreamServerList: LabelValuePair[];
-
   /**
   * Constructor
   */
   constructor(
     protected listHelperService: ListHelperService,
     private toastV2Service: ToastV2Service,
-    private dialogService: DialogService,
     private systemSyncLogDataService: SystemSyncLogDataService,
     private systemSettingsDataService: SystemSettingsDataService,
     private i18nService: I18nService,
@@ -54,18 +47,11 @@ export class SystemSyncLogsComponent
     private dialogV2Service: DialogV2Service
   ) {
     super(listHelperService);
-
-    this.upstreamServerList = _.map(_.get(this.activatedRoute.snapshot.data.systemSettings, 'upstreamServers', []), (upstreamServer: SystemUpstreamServerModel) => {
-      return new LabelValuePair(
-        upstreamServer.name,
-        upstreamServer.url
-      );
-    });
   }
 
   /**
-  * Component initialized
-  */
+   * Component initialized
+   */
   initialized(): void {
     // initialize pagination
     this.initPaginator();
@@ -75,16 +61,16 @@ export class SystemSyncLogsComponent
   }
 
   /**
-  * Release resources
-  */
+   * Release resources
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
   }
 
   /**
-  * Initialize Side Table Columns
-  */
+   * Initialize Side Table Columns
+   */
   protected initializeTableColumns() {
     // default table columns
     this.tableColumns = [
@@ -456,7 +442,6 @@ export class SystemSyncLogsComponent
     this.records$ = this.systemSyncLogDataService
       .getSyncLogList(this.queryBuilder)
       .pipe(
-
         // should be the last pipe
         takeUntil(this.destroyed$)
       );
@@ -523,7 +508,7 @@ export class SystemSyncLogsComponent
             tooltip: 'LNG_UPSTREAM_SERVER_SYNC_SETTINGS_FIELD_LABEL_TRIGGER_BACKUP_BEFORE_SYNC_DESCRIPTION',
             options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
             name: 'triggerBackupBeforeSync',
-            value: this.activatedRoute.snapshot.data.systemSettings.sync.triggerBackupBeforeSync as unknown as string,
+            value: this.activatedRoute.snapshot.data.systemSettings?.sync?.triggerBackupBeforeSync as unknown as string,
             validators: {
               required: () => true
             }
@@ -582,33 +567,6 @@ export class SystemSyncLogsComponent
   }
 
   /**
-  * Delete record
-  * @param item
-  */
-  deleteSyncLog(systemSyncLogModel: SystemSyncLogModel) {
-    this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_SYSTEM_SYNC_LOG', systemSyncLogModel)
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          this.systemSyncLogDataService
-            .deleteSyncLog(systemSyncLogModel.id)
-            .pipe(
-              catchError((err) => {
-                this.toastV2Service.error(err);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              // display success message
-              this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_DELETE_SUCCESS_MESSAGE');
-
-              // refresh
-              this.needsRefreshList(true);
-            });
-        }
-      });
-  }
-
-  /**
   * View Error details
   * @param systemSyncLogModel
   */
@@ -620,7 +578,6 @@ export class SystemSyncLogsComponent
     ) {
       return;
     }
-
 
     // fix api issue
     let error: string = systemSyncLogModel.error.trim();
@@ -677,21 +634,22 @@ export class SystemSyncLogsComponent
   deleteServerSyncLogs() {
     this.dialogV2Service.showSideDialog(
       {
-        // title
         title: {
           get: () => 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_SYNC_LOGS_DIALOG_TITLE'
         },
-
-        // hide search bar
         hideInputFilter: true,
-
-        // inputs
+        width: '50rem',
         inputs: [
           {
             type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
             placeholder: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_SERVER_URL',
             tooltip: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_SERVER_URL_DESCRIPTION',
-            options: this.upstreamServerList,
+            options: (this.activatedRoute.snapshot.data.systemSettings.upstreamServers || []).map((upstreamServer: SystemUpstreamServerModel) => {
+              return {
+                label: upstreamServer.name,
+                value: upstreamServer.url
+              };
+            }),
             name: 'syncServerUrl',
             value: null,
             validators: {
@@ -699,8 +657,6 @@ export class SystemSyncLogsComponent
             }
           }
         ],
-
-        // buttons
         bottomButtons: [
           {
             label: 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_DELETE_SYNC_LOGS_DIALOG_DELETE_BUTTON',
@@ -777,38 +733,34 @@ export class SystemSyncLogsComponent
           append: [
             {
               type: V2SideDialogConfigInputType.DATE,
-              placeholder:
-                'LNG_SYNC_PACKAGE_FIELD_LABEL_FROM_DATE',
+              placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_FROM_DATE',
               tooltip: 'LNG_SYNC_PACKAGE_FIELD_LABEL_FROM_DATE_DESCRIPTION',
               name: 'filter[where][fromDate]',
               value: null
             },
             {
               type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
-              placeholder:
-                'LNG_SYNC_PACKAGE_FIELD_LABEL_OUTBREAKS',
+              placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_OUTBREAKS',
               tooltip: 'LNG_SYNC_PACKAGE_FIELD_LABEL_OUTBREAKS_DESCRIPTION',
-              name: 'filter[where][fromDate]',
+              name: 'filter[where][outbreakId][inq]',
               options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options,
               values: null
             },
             {
               type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
-              placeholder:
-              'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE',
+              placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE',
               tooltip: 'LNG_SYNC_PACKAGE_FIELD_LABEL_EXPORT_TYPE_DESCRIPTION',
               name: 'filter[where][exportType]',
-              options: (this.activatedRoute.snapshot.data.syncLogsType as IResolverV2ResponseModel<OutbreakModel>).options,
+              options: (this.activatedRoute.snapshot.data.syncLogsType as IResolverV2ResponseModel<ILabelValuePairModel>).options,
               clearable: true,
               value: null
             },
             {
               type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
-              placeholder:
-              'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS',
+              placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS',
               tooltip: 'LNG_SYNC_PACKAGE_FIELD_LABEL_COLLECTIONS_DESCRIPTION',
               name: 'filter[where][collections]',
-              options: (this.activatedRoute.snapshot.data.syncLogsModule as IResolverV2ResponseModel<OutbreakModel>).options,
+              options: (this.activatedRoute.snapshot.data.syncLogsModule as IResolverV2ResponseModel<ILabelValuePairModel>).options,
               values: null,
               visible: (data): boolean => {
                 return _.isEmpty((data.map['filter[where][exportType]'] as IV2SideDialogConfigInputSingleDropdown).value);
