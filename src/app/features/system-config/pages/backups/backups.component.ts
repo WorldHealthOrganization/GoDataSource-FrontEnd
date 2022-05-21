@@ -771,7 +771,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
         },
 
         // width
-        width: '50rem',
+        width: '60rem',
 
         // hide search bar
         hideInputFilter: true,
@@ -785,13 +785,13 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
           },
           {
             type: V2SideDialogConfigInputType.KEY_VALUE,
-            name: 'disabled',
+            name: 'disabledLabel',
             placeholder: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_DISABLED'),
             value: undefined
           },
           {
             type: V2SideDialogConfigInputType.KEY_VALUE,
-            name: 'description',
+            name: 'descriptionLabel',
             placeholder: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION'),
             value: undefined,
             visible: () => {
@@ -800,7 +800,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
           },
           {
             type: V2SideDialogConfigInputType.KEY_VALUE,
-            name: 'location',
+            name: 'locationLabel',
             placeholder: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_LOCATION'),
             value: undefined,
             visible: (data) => {
@@ -809,7 +809,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
           },
           {
             type: V2SideDialogConfigInputType.KEY_VALUE,
-            name: 'backupInterval',
+            name: 'backupIntervalLabel',
             placeholder: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_INTERVAL'),
             value: undefined,
             visible: () => {
@@ -821,7 +821,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
           },
           {
             type: V2SideDialogConfigInputType.KEY_VALUE,
-            name: 'backupDailyAtTime',
+            name: 'backupDailyAtTimeLabel',
             placeholder: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_DAILY_AT_TIME'),
             value: undefined,
             visible: () => {
@@ -831,7 +831,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
           },
           {
             type: V2SideDialogConfigInputType.KEY_VALUE,
-            name: 'dataRetentionInterval',
+            name: 'dataRetentionIntervalLabel',
             placeholder: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_RETENTION_INTERVAL'),
             value: undefined,
             visible: () => {
@@ -840,7 +840,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
           },
           {
             type: V2SideDialogConfigInputType.KEY_VALUE,
-            name: 'modules',
+            name: 'modulesLabel',
             placeholder: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_MODULES'),
             value: undefined,
             visible: () => {
@@ -1006,19 +1006,19 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
               currentSettings = settings;
 
               // set data - key value
-              (handler.data.map.disabled as IV2SideDialogConfigInputKeyValue).value = settings.dataBackup.disabled ?
+              (handler.data.map.disabledLabel as IV2SideDialogConfigInputKeyValue).value = settings.dataBackup.disabled ?
                 this.i18nService.instant('LNG_COMMON_LABEL_YES') :
                 this.i18nService.instant('LNG_COMMON_LABEL_NO');
-              (handler.data.map.description as IV2SideDialogConfigInputKeyValue).value = settings.dataBackup.description;
-              (handler.data.map.location as IV2SideDialogConfigInputKeyValue).value = settings.dataBackup.location;
-              (handler.data.map.backupInterval as IV2SideDialogConfigInputKeyValue).value = settings.dataBackup.backupInterval !== undefined ?
+              (handler.data.map.descriptionLabel as IV2SideDialogConfigInputKeyValue).value = settings.dataBackup.description;
+              (handler.data.map.locationLabel as IV2SideDialogConfigInputKeyValue).value = settings.dataBackup.location;
+              (handler.data.map.backupIntervalLabel as IV2SideDialogConfigInputKeyValue).value = settings.dataBackup.backupInterval !== undefined ?
                 settings.dataBackup.backupInterval.toString() :
                 '';
-              (handler.data.map.backupDailyAtTime as IV2SideDialogConfigInputKeyValue).value = settings.dataBackup.backupDailyAtTime;
-              (handler.data.map.dataRetentionInterval as IV2SideDialogConfigInputKeyValue).value = settings.dataBackup.dataRetentionInterval !== undefined ?
+              (handler.data.map.backupDailyAtTimeLabel as IV2SideDialogConfigInputKeyValue).value = settings.dataBackup.backupDailyAtTime;
+              (handler.data.map.dataRetentionIntervalLabel as IV2SideDialogConfigInputKeyValue).value = settings.dataBackup.dataRetentionInterval !== undefined ?
                 settings.dataBackup.dataRetentionInterval.toString() :
                 '';
-              (handler.data.map.modules as IV2SideDialogConfigInputKeyValue).value = settings.dataBackup.modules?.length > 0 ?
+              (handler.data.map.modulesLabel as IV2SideDialogConfigInputKeyValue).value = settings.dataBackup.modules?.length > 0 ?
                 settings.dataBackup.modules.join(', ') :
                 '';
 
