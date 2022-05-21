@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute } from '@angular/router';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
@@ -10,21 +10,19 @@ import { WorldMapMovementComponent } from '../../../../common-modules/world-map-
 import { EntityType } from '../../../../core/models/entity-type';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
+import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 
 @Component({
   selector: 'app-view-movement-case',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './view-movement-case.component.html',
-  styleUrls: ['./view-movement-case.component.less']
+  templateUrl: './view-movement-case.component.html'
 })
 export class ViewMovementCaseComponent implements OnInit {
   // breadcrumbs
-  // breadcrumbs: BreadcrumbItemModel[] = [];
+  breadcrumbs: IV2Breadcrumb[] = [];
 
-  // constants
-  CaseModel = CaseModel;
-
-  caseData: CaseModel = new CaseModel();
+  private _caseData: CaseModel = new CaseModel();
   movementAddresses: AddressModel[] = [];
 
   @ViewChild('mapMovement', { static: true }) mapMovement: WorldMapMovementComponent;
@@ -33,7 +31,10 @@ export class ViewMovementCaseComponent implements OnInit {
   displayLoading: boolean = true;
 
   // authenticated user details
-  authUser: UserModel;
+  private _authUser: UserModel;
+
+  // quick actions
+  quickActions: IV2ActionMenuLabel;
 
   /**
      * Constructor
@@ -50,7 +51,7 @@ export class ViewMovementCaseComponent implements OnInit {
      */
   ngOnInit() {
     // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
+    this._authUser = this.authDataService.getAuthenticatedUser();
 
     this.route.params.subscribe((params: { caseId }) => {
       this.outbreakDataService
@@ -64,7 +65,7 @@ export class ViewMovementCaseComponent implements OnInit {
               [caseData, movementData]: [CaseModel, AddressModel[]]
             ) => {
               // case data
-              this.caseData = caseData;
+              this._caseData = caseData;
 
               // initialize page breadcrumbs
               this.initializeBreadcrumbs();
@@ -78,51 +79,70 @@ export class ViewMovementCaseComponent implements OnInit {
 
     // initialize page breadcrumbs
     this.initializeBreadcrumbs();
+
+    // quick actions
+    this.quickActions = {
+      type: V2ActionType.MENU,
+      label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
+      visible: () => CaseModel.canExportMovementMap(this._authUser),
+      menuOptions: [
+        // Export map
+        {
+          label: {
+            get: () => 'LNG_PAGE_VIEW_MOVEMENT_CASE_EXPORT'
+          },
+          action: {
+            click: () => {
+              this.mapMovement.exportMovementMap(EntityType.CASE);
+            }
+          },
+          visible: () => CaseModel.canExportMovementMap(this._authUser)
+        }
+      ]
+    };
   }
 
   /**
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // // reset
-    // this.breadcrumbs = [];
-    //
-    // // case list page
-    // if (CaseModel.canList(this.authUser)) {
-    //   this.breadcrumbs.push(
-    //     new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
-    //   );
-    // }
-    //
-    // // case breadcrumbs
-    // if (this.caseData) {
-    //   // case view page
-    //   if (CaseModel.canView(this.authUser)) {
-    //     this.breadcrumbs.push(
-    //       new BreadcrumbItemModel(
-    //         this.caseData.name,
-    //         `/cases/${this.caseData.id}/view`
-    //       )
-    //     );
-    //   }
-    //
-    //   // current page
-    //   this.breadcrumbs.push(
-    //     new BreadcrumbItemModel(
-    //       'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE',
-    //       '.',
-    //       true,
-    //       {},
-    //       this.caseData
-    //     )
-    //   );
-    // }
-  }
+    // reset
+    this.breadcrumbs = [{
+      label: 'LNG_COMMON_LABEL_HOME',
+      action: {
+        link: DashboardModel.canViewDashboard(this._authUser) ?
+          ['/dashboard'] :
+          ['/account/my-profile']
+      }
+    }];
 
-  /**
-     * Export case movement map
-     */
-  exportCaseMovementMap() {
-    this.mapMovement.exportMovementMap(EntityType.CASE);
+    // case list page
+    if (CaseModel.canList(this._authUser)) {
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_CASES_TITLE',
+        action: {
+          link: ['/cases']
+        }
+      });
+    }
+
+    // case breadcrumbs
+    if (this._caseData) {
+      // case view page
+      if (CaseModel.canView(this._authUser)) {
+        this.breadcrumbs.push({
+          label: this._caseData.name,
+          action: {
+            link: [`/cases/${this._caseData.id}/view`]
+          }
+        });
+      }
+
+      // current page
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE',
+        action: null
+      });
+    }
   }
 }
