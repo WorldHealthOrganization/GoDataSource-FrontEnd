@@ -7,7 +7,6 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { BackupModel } from '../../../../core/models/backup.model';
 import { Constants } from '../../../../core/models/constants';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { SystemBackupDataService } from '../../../../core/services/data/system-backup.data.service';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
@@ -20,22 +19,29 @@ import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
-import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputMultiDropdown, IV2SideDialogConfigInputSingleDropdown, IV2SideDialogConfigInputText, IV2SideDialogResponse, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import {
+  IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigInputKeyValue,
+  IV2SideDialogConfigInputMultiDropdown, IV2SideDialogConfigInputNumber,
+  IV2SideDialogConfigInputSingleDropdown,
+  IV2SideDialogConfigInputText, IV2SideDialogConfigInputTimepicker,
+  IV2SideDialogResponse,
+  V2SideDialogConfigInputType
+} from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
 
 @Component({
   selector: 'app-backups',
   templateUrl: './backups.component.html'
 })
 export class BackupsComponent extends ListComponent<BackupModel> implements OnDestroy {
-  // settings
-  settings: SystemSettingsModel;
   // used to determine when a backup has finished so we can start the restore process...
-  waitForBackupIdToBeReady: string;
+  private _waitForBackupIdToBeReady: string;
 
   /**
-  * Constructor
-  */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     private systemSettingsDataService: SystemSettingsDataService,
@@ -45,20 +51,21 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
     private activatedRoute: ActivatedRoute,
     private dialogV2Service: DialogV2Service
   ) {
+    // parent
     super(listHelperService);
-
-    // default backup settings
-    this.refreshSystemSettings();
   }
 
   /**
-  * Release resources
-  */
+   * Release resources
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
   }
 
+  /**
+   * Initialized
+   */
   initialized(): void {
     // initialize pagination
     this.initPaginator();
@@ -68,8 +75,8 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
   }
 
   /**
-  * Initialize Side Table Columns
-  */
+   * Initialize Side Table Columns
+   */
   protected initializeTableColumns() {
     // default table columns
     this.tableColumns = [
@@ -95,8 +102,12 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
         field: 'modules',
         label: 'LNG_BACKUP_FIELD_LABEL_MODULES',
         format: {
-          type: (item: BackupModel) => {
-            return this.getModulesTranslation(item);
+          type: (backup: BackupModel) => {
+            return backup.modules
+              .map((module) => module && this.activatedRoute.snapshot.data.backupModules && this.activatedRoute.snapshot.data.backupModules.map[module] ?
+                this.i18nService.instant(this.activatedRoute.snapshot.data.backupModules.map[module].label) :
+                ''
+              ).join(', ');
           }
         },
         filter: {
@@ -285,29 +296,30 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
   }
 
   /**
-  * Initialize process data
-  */
+   * Initialize process data
+   */
   protected initializeProcessSelectedData(): void {}
 
   /**
-  * Initialize table infos
-  */
+   * Initialize table infos
+   */
   protected initializeTableInfos(): void {}
 
   /**
-  * Initialize Table Advanced Filters
-  */
+   * Initialize Table Advanced Filters
+   */
   protected initializeTableAdvancedFilters(): void {}
 
   /**
-  * Initialize table quick actions
-  */
+   * Initialize table quick actions
+   */
   protected initializeQuickActions(): void {
     this.quickActions = {
       type: V2ActionType.MENU,
       label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
       visible: (): boolean => {
-        return this.settings && (BackupModel.canSetAutomaticBackupSettings(this.authUser) || BackupModel.canCreate(this.authUser));
+        return BackupModel.canSetAutomaticBackupSettings(this.authUser) ||
+          BackupModel.canCreate(this.authUser);
       },
       menuOptions: [
         {
@@ -342,35 +354,23 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
   }
 
   /**
-  * Initialize table group actions
-  */
+   * Initialize table group actions
+   */
   protected initializeGroupActions(): void {}
 
   /**
-  * Initialize table add action
-  */
+   * Initialize table add action
+   */
   protected initializeAddAction(): void {}
 
   /**
-  * Initialize table grouped data
-  */
+   * Initialize table grouped data
+   */
   protected initializeGroupedData(): void {}
 
   /**
-  * Reload system settings
-  */
-  refreshSystemSettings() {
-    this.settings = undefined;
-    this.systemSettingsDataService
-      .getSystemSettings()
-      .subscribe((settings: SystemSettingsModel) => {
-        this.settings = settings;
-      });
-  }
-
-  /**
-  * Initialize breadcrumbs
-  */
+   * Initialize breadcrumbs
+   */
   protected initializeBreadcrumbs(): void {
     // set breadcrumbs
     this.breadcrumbs = [
@@ -389,15 +389,15 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
   }
 
   /**
-  * Fields retrieved from api to reduce payload size
-  */
+   * Fields retrieved from api to reduce payload size
+   */
   protected refreshListFields(): string[] {
     return [];
   }
 
   /**
-  * Refresh list
-  */
+   * Refresh list
+   */
   refreshList() {
     this.records$ = this.systemBackupDataService
       .getBackupList(this.queryBuilder)
@@ -408,8 +408,8 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
   }
 
   /**
-  * Get total number of items, based on the applied filters
-  */
+   * Get total number of items, based on the applied filters
+   */
   refreshListCount(applyHasMoreLimit?: boolean) {
     // reset
     this.pageCount = undefined;
@@ -445,14 +445,6 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
       .subscribe((response) => {
         this.pageCount = response;
       });
-  }
-
-  /**
-  * Get translation token from language
-  */
-  getModulesTranslation(backup: BackupModel) {
-    return backup.modules.map(module => module && this.activatedRoute.snapshot.data.backupModules && this.activatedRoute.snapshot.data.backupModules.map[module] ?
-      this.i18nService.instant(this.activatedRoute.snapshot.data.backupModules.map[module].label) : '').join(', ');
   }
 
   /**
@@ -512,14 +504,14 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
           placeholder: 'LNG_BACKUP_FIELD_LABEL_DESCRIPTION',
           tooltip: 'LNG_BACKUP_FIELD_LABEL_DESCRIPTION_DESCRIPTION',
           name: 'description',
-          value: this.settings.dataBackup.description
+          value: undefined
         },
         {
           type: V2SideDialogConfigInputType.TEXT,
           placeholder: 'LNG_BACKUP_FIELD_LABEL_LOCATION',
           tooltip: 'LNG_BACKUP_FIELD_LABEL_LOCATION_DESCRIPTION',
           name: 'location',
-          value: this.settings.dataBackup.location,
+          value: undefined,
           validators: {
             required: () => true
           }
@@ -530,7 +522,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
           tooltip: 'LNG_BACKUP_FIELD_LABEL_MODULES_DESCRIPTION',
           name: 'modules',
           options: (this.activatedRoute.snapshot.data.backupModules as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-          values: this.settings.dataBackup.modules,
+          values: undefined,
           validators: {
             required: () => true
           }
@@ -555,135 +547,35 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
       ],
 
       // hide search bar
-      hideInputFilter: true
+      hideInputFilter: true,
+      initialized: (handler) => {
+        // display loading
+        handler.loading.show();
+
+        // retrieve system settings
+        this.systemSettingsDataService
+          .getSystemSettings()
+          .pipe(
+            catchError((err) => {
+              this.toastV2Service.error(err);
+              return throwError(err);
+            }),
+
+            // should be the last pipe
+            takeUntil(this.destroyed$)
+          )
+          .subscribe((settings) => {
+            // set data
+            (handler.data.map.description as IV2SideDialogConfigInputText).value = settings.dataBackup?.description;
+            (handler.data.map.location as IV2SideDialogConfigInputText).value = settings.dataBackup?.location;
+            (handler.data.map.modules as IV2SideDialogConfigInputMultiDropdown).values = settings.dataBackup?.modules;
+
+            // hide loading
+            handler.loading.hide();
+          });
+      }
     });
   }
-
-  // TODO: Restore backup needs to be tested on local environment ⚠️
-  // /**
-  //  * Restore system data to a previous state from a data backup
-  //  */
-  // restoreBackup(backupItemData: BackupModel) {
-  //   // restore backup handler
-  //   const restoreBackupNow = () => {
-  //     this.loading = true;
-  //     this.waitForBackupIdToBeReady = undefined;
-  //     this.systemBackupDataService
-  //       .restoreBackup(backupItemData.id)
-  //       .pipe(
-  //         catchError((err) => {
-  //           this.toastV2Service.error(err);
-  //           return throwError(err);
-  //         })
-  //       )
-  //       .subscribe(() => {
-  //         // display success message
-  //         this.toastV2Service.success('LNG_PAGE_SYSTEM_BACKUPS_BACKUP_RESTORE_SUCCESS_MESSAGE');
-
-  //         // refresh page
-  //         this.loading = false;
-  //         this.needsRefreshList(true);
-  //       });
-  //   };
-
-  //   // start restore process when backup is ready
-  //   const backupCheckForReady = () => {
-  //     setTimeout(
-  //       () => {
-  //         // check if backup is ready
-  //         this.systemBackupDataService
-  //           .getBackup(this.waitForBackupIdToBeReady)
-  //           .pipe(
-  //             catchError((err) => {
-  //               this.toastV2Service.error(err);
-
-  //               // can't continue with the restore
-  //               this.waitForBackupIdToBeReady = undefined;
-  //               this.needsRefreshList(true);
-
-  //               return throwError(err);
-  //             })
-  //           )
-  //           .subscribe((newBackup: BackupModel) => {
-  //             switch (newBackup.status) {
-  //               // backup ready ?
-  //               case Constants.SYSTEM_BACKUP_STATUS.SUCCESS.value:
-  //                 // start restore process
-  //                 restoreBackupNow();
-  //                 break;
-
-  //                 // backup error ?
-  //               case Constants.SYSTEM_BACKUP_STATUS.FAILED.value:
-  //                 this.toastV2Service.error('LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_FAILED_MESSAGE');
-  //                 this.waitForBackupIdToBeReady = undefined;
-  //                 this.needsRefreshList(true);
-  //                 break;
-
-  //                 // backup isn't ready ?
-  //                 // Constants.SYSTEM_BACKUP_STATUS.PENDING.value
-  //               default:
-  //                 backupCheckForReady();
-  //                 break;
-  //             }
-  //           });
-  //       },
-  //       Constants.DEFAULT_FILTER_POOLING_MS_CHECK_AGAIN
-  //     );
-  //   };
-
-  //   // display dialog
-  //   this.dialogService.showConfirm(new DialogConfiguration({
-  //     message: 'LNG_DIALOG_CONFIRM_DELETE_BACKUP_RESTORE',
-  //     yesLabel: 'LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_BACKUP_BACKUP_AND_RESTORE_BUTTON',
-  //     yesCssClass: 'primary dialog-btn-margin-right-10px',
-  //     cancelCssClass: 'danger dialog-btn-margin-right-10px',
-  //     addDefaultButtons: true,
-  //     buttons: [
-  //       new DialogButton({
-  //         cssClass: 'success',
-  //         label: 'LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_BACKUP_RESTORE_BUTTON',
-  //         clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
-  //           dialogHandler.close(new DialogAnswer(DialogAnswerButton.Extra_1));
-  //         }
-  //       })
-  //     ]
-  //   })).subscribe((answer: DialogAnswer) => {
-  //     // Backup & Restore
-  //     if (answer.button === DialogAnswerButton.Yes) {
-  //       // display dialog
-  //       this.initBackupDialog().subscribe((answerBackup: DialogAnswer) => {
-  //         if (answerBackup.button === DialogAnswerButton.Yes) {
-  //           this.systemBackupDataService
-  //             .createBackup(answerBackup.inputValue.value)
-  //             .pipe(
-  //               catchError((err) => {
-  //                 this.toastV2Service.error(err);
-  //                 return throwError(err);
-  //               })
-  //             )
-  //             .subscribe((newBackup: BackupModel) => {
-  //               // display success message
-  //               this.toastV2Service.success('LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_SUCCESS_MESSAGE');
-
-  //               // refresh page
-  //               this.needsRefreshList(true);
-
-  //               // restore data
-  //               // should we wait for backup to be completed before proceeding ?
-  //               this.waitForBackupIdToBeReady = newBackup.id;
-  //               backupCheckForReady();
-  //             });
-  //         } else {
-  //           // cancel - display again the previous dialog
-  //           this.restoreBackup(backupItemData);
-  //         }
-  //       });
-  //     } else if (answer.button === DialogAnswerButton.Extra_1) {
-  //       // restore
-  //       restoreBackupNow();
-  //     }
-  //   });
-  // }
 
   /**
   * Restore system data to a previous state from a data backup
@@ -691,7 +583,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
   restoreBackup(item: BackupModel) {
     // restore backup handler
     const restoreBackupNow = () => {
-      this.waitForBackupIdToBeReady = undefined;
+      this._waitForBackupIdToBeReady = undefined;
 
       // show loading
       const loading = this.dialogV2Service.showLoadingDialog();
@@ -722,13 +614,13 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
         () => {
           // check if backup is ready
           this.systemBackupDataService
-            .getBackup(this.waitForBackupIdToBeReady)
+            .getBackup(this._waitForBackupIdToBeReady)
             .pipe(
               catchError((err) => {
                 this.toastV2Service.error(err);
 
                 // can't continue with the restore
-                this.waitForBackupIdToBeReady = undefined;
+                this._waitForBackupIdToBeReady = undefined;
                 this.needsRefreshList(true);
 
                 return throwError(err);
@@ -745,7 +637,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
                 // backup error ?
                 case Constants.SYSTEM_BACKUP_STATUS.FAILED.value:
                   this.toastV2Service.error('LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_FAILED_MESSAGE');
-                  this.waitForBackupIdToBeReady = undefined;
+                  this._waitForBackupIdToBeReady = undefined;
                   this.needsRefreshList(true);
                   break;
 
@@ -806,53 +698,56 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
       }
 
       // backup & restore
-      if (response.button.type === IV2BottomDialogConfigButtonType.OTHER && response.button.key === 'backupAndRestore') {
+      if (
+        response.button.type === IV2BottomDialogConfigButtonType.OTHER &&
+        response.button.key === 'backupAndRestore'
+      ) {
         this.initBackupDialog().subscribe((answerBackup: IV2SideDialogResponse) => {
-          // yes ?
-          if (answerBackup.button.type === IV2SideDialogConfigButtonType.OTHER) {
-            // backup settings
-            const backupSettings = {
-              description: (answerBackup.data.map.description as IV2SideDialogConfigInputText).value,
-              location: (answerBackup.data.map.location as IV2SideDialogConfigInputText).value,
-              modules: (answerBackup.data.map.modules as IV2SideDialogConfigInputMultiDropdown).values
-            };
+          // cancelled ?
+          if (answerBackup.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+            // cancel - display again the previous dialog
+            this.restoreBackup(item);
+          }
 
-            // show loading
-            const loading = this.dialogV2Service.showLoadingDialog();
+          // backup settings
+          const backupSettings = {
+            description: (answerBackup.data.map.description as IV2SideDialogConfigInputText).value,
+            location: (answerBackup.data.map.location as IV2SideDialogConfigInputText).value,
+            modules: (answerBackup.data.map.modules as IV2SideDialogConfigInputMultiDropdown).values
+          };
 
-            // create backup
-            this.systemBackupDataService
-              .createBackup(backupSettings)
-              .pipe(
-                catchError((err) => {
-                  // show error
-                  this.toastV2Service.error(err);
+          // show loading
+          const loading = this.dialogV2Service.showLoadingDialog();
 
-                  // hide loading
-                  loading.close();
-
-                  // send error down the road
-                  return throwError(err);
-                })
-              ).subscribe((newBackup: BackupModel) => {
-                // display success message
-                this.toastV2Service.success('LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_SUCCESS_MESSAGE');
+          // create backup
+          this.systemBackupDataService
+            .createBackup(backupSettings)
+            .pipe(
+              catchError((err) => {
+                // show error
+                this.toastV2Service.error(err);
 
                 // hide loading
                 loading.close();
 
-                // refresh page
-                this.needsRefreshList(true);
+                // send error down the road
+                return throwError(err);
+              })
+            ).subscribe((newBackup: BackupModel) => {
+              // display success message
+              this.toastV2Service.success('LNG_PAGE_SYSTEM_BACKUPS_CREATE_BACKUP_DIALOG_SUCCESS_MESSAGE');
 
-                // restore data
-                // should we wait for backup to be completed before proceeding ?
-                this.waitForBackupIdToBeReady = newBackup.id;
-                backupCheckForReady();
-              });
-          } else {
-            // cancel - display again the previous dialog
-            this.restoreBackup(item);
-          }
+              // hide loading
+              loading.close();
+
+              // refresh page
+              this.needsRefreshList(true);
+
+              // restore data
+              // should we wait for backup to be completed before proceeding ?
+              this._waitForBackupIdToBeReady = newBackup.id;
+              backupCheckForReady();
+            });
         });
       }
 
@@ -867,9 +762,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
   * Configure automatic backup settings
   */
   configureAutomaticBackupSettings() {
-    // keep the existing configuration
-    const currentSettings = { ...this.settings.dataBackup };
-
+    let currentSettings: SystemSettingsModel;
     this.dialogV2Service
       .showSideDialog({
         // title
@@ -894,24 +787,22 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
             type: V2SideDialogConfigInputType.KEY_VALUE,
             name: 'disabled',
             placeholder: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_DISABLED'),
-            value: this.settings.dataBackup.disabled ? this.i18nService.instant('LNG_COMMON_LABEL_YES') : this.i18nService.instant('LNG_COMMON_LABEL_NO')
+            value: undefined
           },
           {
             type: V2SideDialogConfigInputType.KEY_VALUE,
             name: 'description',
             placeholder: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION'),
-            value: this.settings.dataBackup.description ?
-              this.settings.dataBackup.description :
-              '',
+            value: undefined,
             visible: () => {
-              return !this.settings.dataBackup.disabled;
+              return !currentSettings?.dataBackup?.disabled;
             }
           },
           {
             type: V2SideDialogConfigInputType.KEY_VALUE,
             name: 'location',
             placeholder: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_LOCATION'),
-            value: this.settings.dataBackup.location,
+            value: undefined,
             visible: (data) => {
               return !(data.map.disabled as IV2SideDialogConfigInputSingleDropdown).value;
             }
@@ -920,31 +811,40 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
             type: V2SideDialogConfigInputType.KEY_VALUE,
             name: 'backupInterval',
             placeholder: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_INTERVAL'),
-            value: this.settings.dataBackup.backupInterval !== undefined ?
-              this.settings.dataBackup.backupInterval.toString() :
-              '',
-            visible: (data) => {
-              return !(data.map.disabled as IV2SideDialogConfigInputSingleDropdown).value;
+            value: undefined,
+            visible: () => {
+              return !currentSettings?.dataBackup?.disabled && (
+                !currentSettings?.dataBackup?.backupType ||
+                currentSettings?.dataBackup?.backupType === Constants.SYSTEM_BACKUP_TYPES.N_HOURS.value
+              );
+            }
+          },
+          {
+            type: V2SideDialogConfigInputType.KEY_VALUE,
+            name: 'backupDailyAtTime',
+            placeholder: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_BACKUP_DAILY_AT_TIME'),
+            value: undefined,
+            visible: () => {
+              return !currentSettings?.dataBackup?.disabled &&
+                currentSettings?.dataBackup?.backupType === Constants.SYSTEM_BACKUP_TYPES.DAILY_AT_TIME.value;
             }
           },
           {
             type: V2SideDialogConfigInputType.KEY_VALUE,
             name: 'dataRetentionInterval',
             placeholder: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_RETENTION_INTERVAL'),
-            value: this.settings.dataBackup.dataRetentionInterval !== undefined ?
-              this.settings.dataBackup.dataRetentionInterval.toString() :
-              '',
-            visible: (data) => {
-              return !(data.map.disabled as IV2SideDialogConfigInputSingleDropdown).value;
+            value: undefined,
+            visible: () => {
+              return !currentSettings?.dataBackup?.disabled;
             }
           },
           {
             type: V2SideDialogConfigInputType.KEY_VALUE,
             name: 'modules',
             placeholder: this.i18nService.instant('LNG_AUTOMATIC_BACKUP_FIELD_LABEL_MODULES'),
-            value: this.settings.dataBackup.modules ? this.settings.dataBackup.modules.join(', ') : '',
-            visible: (data) => {
-              return !(data.map.disabled as IV2SideDialogConfigInputSingleDropdown).value;
+            value: undefined,
+            visible: () => {
+              return !currentSettings?.dataBackup?.disabled;
             }
           },
 
@@ -955,7 +855,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
             placeholder: 'LNG_BACKUP_FIELD_LABEL_DISABLED',
             tooltip: 'LNG_BACKUP_FIELD_LABEL_DISABLED_DESCRIPTION',
             options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-            value: this.settings.dataBackup.disabled as unknown as string,
+            value: undefined,
             validators: {
               required: () => true
             }
@@ -967,7 +867,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
             name: 'description',
             placeholder: 'LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION',
             tooltip: 'LNG_AUTOMATIC_BACKUP_FILED_LABEL_DESCRIPTION_DESCRIPTION',
-            value: this.settings.dataBackup.description,
+            value: undefined,
             visible: (data): boolean => {
               return !(data.map.disabled as IV2SideDialogConfigInputSingleDropdown).value;
             }
@@ -982,7 +882,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
             validators: {
               required: () => true
             },
-            value: this.settings.dataBackup.location,
+            value: undefined,
             visible: (data): boolean => {
               return !(data.map.disabled as IV2SideDialogConfigInputSingleDropdown).value;
             }
@@ -998,9 +898,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
             validators: {
               required: () => true
             },
-            value: this.settings.dataBackup.backupType ?
-              this.settings.dataBackup.backupType :
-              Constants.SYSTEM_BACKUP_TYPES.N_HOURS.value,
+            value: undefined,
             visible: (data): boolean => {
               return !(data.map.disabled as IV2SideDialogConfigInputSingleDropdown).value;
             }
@@ -1015,7 +913,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
             validators: {
               required: () => true
             },
-            value: this.settings.dataBackup.backupInterval,
+            value: undefined,
             visible: (data): boolean => {
               return !(data.map.disabled as IV2SideDialogConfigInputSingleDropdown).value &&
                   (data.map.backupType as IV2SideDialogConfigInputSingleDropdown).value === Constants.SYSTEM_BACKUP_TYPES.N_HOURS.value;
@@ -1031,7 +929,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
             validators: {
               required: () => true
             },
-            value: this.settings.dataBackup.backupDailyAtTime,
+            value: undefined,
             visible: (data): boolean => {
               // input visible ?
               return !(data.map.disabled as IV2SideDialogConfigInputSingleDropdown).value &&
@@ -1048,7 +946,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
             validators: {
               required: () => true
             },
-            value: this.settings.dataBackup.dataRetentionInterval,
+            value: undefined,
             visible: (data): boolean => {
               return !(data.map.disabled as IV2SideDialogConfigInputSingleDropdown).value;
             }
@@ -1064,7 +962,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
             validators: {
               required: () => true
             },
-            values: this.settings.dataBackup.modules,
+            values: undefined,
             visible: (data): boolean => {
               return !(data.map.disabled as IV2SideDialogConfigInputSingleDropdown).value;
             }
@@ -1086,7 +984,60 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
             label: 'LNG_COMMON_BUTTON_CANCEL',
             color: 'text'
           }
-        ]
+        ],
+        initialized: (handler) => {
+          // display loading
+          handler.loading.show();
+
+          // retrieve system settings
+          this.systemSettingsDataService
+            .getSystemSettings()
+            .pipe(
+              catchError((err) => {
+                this.toastV2Service.error(err);
+                return throwError(err);
+              }),
+
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            )
+            .subscribe((settings) => {
+              // used for visualization
+              currentSettings = settings;
+
+              // set data - key value
+              (handler.data.map.disabled as IV2SideDialogConfigInputKeyValue).value = settings.dataBackup.disabled ?
+                this.i18nService.instant('LNG_COMMON_LABEL_YES') :
+                this.i18nService.instant('LNG_COMMON_LABEL_NO');
+              (handler.data.map.description as IV2SideDialogConfigInputKeyValue).value = settings.dataBackup.description;
+              (handler.data.map.location as IV2SideDialogConfigInputKeyValue).value = settings.dataBackup.location;
+              (handler.data.map.backupInterval as IV2SideDialogConfigInputKeyValue).value = settings.dataBackup.backupInterval !== undefined ?
+                settings.dataBackup.backupInterval.toString() :
+                '';
+              (handler.data.map.backupDailyAtTime as IV2SideDialogConfigInputKeyValue).value = settings.dataBackup.backupDailyAtTime;
+              (handler.data.map.dataRetentionInterval as IV2SideDialogConfigInputKeyValue).value = settings.dataBackup.dataRetentionInterval !== undefined ?
+                settings.dataBackup.dataRetentionInterval.toString() :
+                '';
+              (handler.data.map.modules as IV2SideDialogConfigInputKeyValue).value = settings.dataBackup.modules?.length > 0 ?
+                settings.dataBackup.modules.join(', ') :
+                '';
+
+              // set data - inputs
+              (handler.data.map.disabled as IV2SideDialogConfigInputSingleDropdown).value = settings.dataBackup.disabled as unknown as string;
+              (handler.data.map.description as IV2SideDialogConfigInputText).value = settings.dataBackup.description;
+              (handler.data.map.location as IV2SideDialogConfigInputText).value = settings.dataBackup.location;
+              (handler.data.map.backupType as IV2SideDialogConfigInputSingleDropdown).value = settings.dataBackup.backupType ?
+                settings.dataBackup.backupType :
+                Constants.SYSTEM_BACKUP_TYPES.N_HOURS.value;
+              (handler.data.map.backupInterval as IV2SideDialogConfigInputNumber).value = settings.dataBackup.backupInterval;
+              (handler.data.map.backupDailyAtTime as IV2SideDialogConfigInputTimepicker).value = settings.dataBackup.backupDailyAtTime;
+              (handler.data.map.dataRetentionInterval as IV2SideDialogConfigInputNumber).value = settings.dataBackup.dataRetentionInterval;
+              (handler.data.map.modules as IV2SideDialogConfigInputMultiDropdown).values = settings.dataBackup.modules;
+
+              // hide loading
+              handler.loading.hide();
+            });
+        }
       })
       .subscribe((response: IV2SideDialogResponse) => {
         // cancelled ?
