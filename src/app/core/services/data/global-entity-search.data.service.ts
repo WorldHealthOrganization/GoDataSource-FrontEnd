@@ -87,8 +87,7 @@ export class GlobalEntitySearchDataService {
     const qb = new RequestQueryBuilder();
     qb.merge(queryBuilder);
     qb.filter.where(this.createSearchValueCondition(globalSearchValue), true);
-
-    const filter = queryBuilder.buildQuery();
+    const filter = qb.buildQuery();
     return this.http.get(`outbreaks/${outbreakId}/people/filtered-count?filter=${filter}`);
   }
 }
