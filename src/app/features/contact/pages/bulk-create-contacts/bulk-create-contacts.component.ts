@@ -30,6 +30,7 @@ import { TeamDataService } from '../../../../core/services/data/team.data.servic
 import { TeamModel } from '../../../../core/models/team.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
 
 @Component({
   selector: 'app-bulk-create-contacts',
@@ -194,7 +195,14 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
    */
   initializeBreadcrumbs() {
     // reset
-    this.breadcrumbs = [];
+    this.breadcrumbs = [{
+      label: 'LNG_COMMON_LABEL_HOME',
+      action: {
+        link: DashboardModel.canViewDashboard(this.authUser) ?
+          ['/dashboard'] :
+          ['/account/my-profile']
+      }
+    }];
 
     // case or event?
     if (this.relatedEntityType === EntityType.CASE) {
