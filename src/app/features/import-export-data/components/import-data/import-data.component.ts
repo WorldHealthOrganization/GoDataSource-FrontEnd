@@ -12,7 +12,7 @@ import { SavedImportMappingService } from '../../../../core/services/data/saved-
 import { ISavedImportMappingModel, SavedImportField, SavedImportMappingModel, SavedImportOption } from '../../../../core/models/saved-import-mapping.model';
 import { Observable, Subscriber, throwError } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
-import { catchError, share } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
@@ -26,7 +26,6 @@ import { Constants } from '../../../../core/models/constants';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ImportResultDataService } from '../../../../core/services/data/import-result.data.service';
-import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ImportResultModel } from '../../../../core/models/import-result.model';
 import { HoverRowAction } from '../../../../shared/components';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
@@ -329,7 +328,6 @@ export class ImportDataComponent
 
   // import results data
   importResultsList$: Observable<ImportResultModel[]>;
-  importResultsListCount$: Observable<IBasicCount>;
 
 
   // Constants / Classes
@@ -3518,17 +3516,6 @@ export class ImportDataComponent
       true,
       false
     );
-
-    // count
-    this.importResultsListCount$ = this.importResultDataService
-      .getImportResultsCount(countQueryBuilder)
-      .pipe(
-        catchError((err) => {
-          this.toastV2Service.error(err);
-          return throwError(err);
-        }),
-        share()
-      );
   }
 
   /**
