@@ -11,6 +11,9 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
+import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
   selector: 'app-import-contact-lab-data',
@@ -18,7 +21,7 @@ import { LabResultModel } from '../../../../core/models/lab-result.model';
 })
 export class ImportContactLabDataComponent implements OnInit, OnDestroy {
   // breadcrumbs
-  // breadcrumbs: BreadcrumbItemModel[] = [];
+  breadcrumbs: IV2Breadcrumb[] = [];
 
   Constants = Constants;
 
@@ -108,37 +111,41 @@ export class ImportContactLabDataComponent implements OnInit, OnDestroy {
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // // reset
-    // this.breadcrumbs = [];
-    //
-    // // add list breadcrumb only if we have permission
-    // if (ContactModel.canList(this.authUser)) {
-    //   this.breadcrumbs.push(
-    //     new BreadcrumbItemModel(
-    //       'LNG_PAGE_LIST_CONTACTS_TITLE',
-    //       '/contacts'
-    //     )
-    //   );
-    // }
-    //
-    // // add list breadcrumb only if we have permission
-    // if (LabResultModel.canList(this.authUser)) {
-    //   this.breadcrumbs.push(
-    //     new BreadcrumbItemModel(
-    //       'LNG_PAGE_LIST_LAB_RESULTS_TITLE',
-    //       '/lab-results'
-    //     )
-    //   );
-    // }
-    //
-    // // import breadcrumb
-    // this.breadcrumbs.push(
-    //   new BreadcrumbItemModel(
-    //     'LNG_PAGE_IMPORT_CONTACT_LAB_DATA_TITLE',
-    //     '.',
-    //     true
-    //   )
-    // );
+    // reset
+    this.breadcrumbs = [{
+      label: 'LNG_COMMON_LABEL_HOME',
+      action: {
+        link: DashboardModel.canViewDashboard(this.authUser) ?
+          ['/dashboard'] :
+          ['/account/my-profile']
+      }
+    }];
+
+    // add list breadcrumb only if we have permission
+    if (ContactModel.canList(this.authUser)) {
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
+        action: {
+          link: ['/contacts']
+        }
+      });
+    }
+
+    // add list breadcrumb only if we have permission
+    if (LabResultModel.canList(this.authUser)) {
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_LAB_RESULTS_TITLE',
+        action: {
+          link: ['/lab-results']
+        }
+      });
+    }
+
+    // current page
+    this.breadcrumbs.push({
+      label: 'LNG_PAGE_IMPORT_CONTACT_LAB_DATA_TITLE',
+      action: null
+    });
   }
 
   /**

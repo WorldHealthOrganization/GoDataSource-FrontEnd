@@ -6,13 +6,17 @@ import { LocationModel } from '../../../../core/models/location.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { CaseModel } from '../../../../core/models/case.model';
 
 @Component({
   selector: 'app-import-hierarchical-locations',
   templateUrl: './import-hierarchical-locations.component.html'
 })
 export class ImportHierarchicalLocationsComponent {
-  // breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs
+  breadcrumbs: IV2Breadcrumb[] = [];
 
   authUser: UserModel;
 
@@ -42,24 +46,41 @@ export class ImportHierarchicalLocationsComponent {
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // // reset
-    // this.breadcrumbs = [];
-    //
-    // // add list breadcrumb only if we have permission
-    // if (LocationModel.canList(this.authUser)) {
-    //   this.breadcrumbs.push(
-    //     new BreadcrumbItemModel('LNG_PAGE_LIST_LOCATIONS_TITLE', '/locations')
-    //   );
-    // }
-    //
-    // // import breadcrumb
-    // this.breadcrumbs.push(
-    //   new BreadcrumbItemModel(
-    //     'LNG_PAGE_IMPORT_HIERARCHICAL_LOCATIONS_TITLE',
-    //     '.',
-    //     true
-    //   )
-    // );
+    // reset
+    this.breadcrumbs = [{
+      label: 'LNG_COMMON_LABEL_HOME',
+      action: {
+        link: DashboardModel.canViewDashboard(this.authUser) ?
+          ['/dashboard'] :
+          ['/account/my-profile']
+      }
+    }];
+
+    // add list breadcrumb only if we have permission
+    if (CaseModel.canList(this.authUser)) {
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_CASES_TITLE',
+        action: {
+          link: ['/cases']
+        }
+      });
+    }
+
+    // add list breadcrumb only if we have permission
+    if (LocationModel.canList(this.authUser)) {
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_LOCATIONS_TITLE',
+        action: {
+          link: ['/locations']
+        }
+      });
+    }
+
+    // current page
+    this.breadcrumbs.push({
+      label: 'LNG_PAGE_IMPORT_HIERARCHICAL_LOCATIONS_TITLE',
+      action: null
+    });
   }
 
   /**
