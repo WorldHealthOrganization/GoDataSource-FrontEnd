@@ -280,6 +280,10 @@ export class Constants {
     COT_BAR_CHART: {
       label: 'LNG_APP_PAGE_COT_BAR_CHART',
       value: 'LNG_APP_PAGE_COT_BAR_CHART'
+    },
+    GANTT_CHART: {
+      label: 'LNG_APP_PAGE_GANTT_CHART',
+      value: 'LNG_APP_PAGE_GANTT_CHART'
     }
   };
 

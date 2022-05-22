@@ -1,61 +1,58 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
-import { AppliedFilterModel, FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
-import * as _ from 'lodash';
 import { DomService } from '../../../../core/services/helper/dom.service';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as FileSaver from 'file-saver';
-import { LoadingDialogModel } from '../../../../shared/components/index';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { GanttChartDelayOnsetDashletComponent } from '../../components/gantt-chart-delay-onset-dashlet/gantt-chart-delay-onset-dashlet.component';
 import { Observable, throwError } from 'rxjs';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { Constants } from '../../../../core/models/constants';
 import { catchError, map } from 'rxjs/operators';
-import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
-import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { GanttChartModel } from '../../../../core/models/gantt-chart.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { SavedFilterData } from '../../../../core/models/saved-filters.model';
+import { IV2LoadingDialogHandler } from '../../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
 
 @Component({
   selector: 'app-gantt-chart',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './gantt-chart.component.html',
-  styleUrls: ['./gantt-chart.component.less']
+  templateUrl: './gantt-chart.component.html'
 })
 export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit {
   // breadcrumbs
-  // breadcrumbs: BreadcrumbItemModel[] = [];
+  breadcrumbs: IV2Breadcrumb[] = [];
 
   // selected outbreak ID
   outbreakId: string;
 
-  // available side filters
-  availableSideFilters: FilterModel[] = [];
-
   globalFilterDate: Moment;
   globalFilterLocationId: string;
-  loadingDialog: LoadingDialogModel;
+  loadingDialog: IV2LoadingDialogHandler;
 
   @ViewChild('ganttChart') private ganttChart: GanttChartDelayOnsetDashletComponent;
+
+  filtersApplied: SavedFilterData;
 
   ganttChartTypes: Observable<any[]>;
   ganttChartType: any;
 
   // constants
   Constants = Constants;
-  GanttChartModel = GanttChartModel;
-
-  // do architecture is x32?
-  x86Architecture: boolean = false;
 
   // authenticated user
-  authUser: UserModel;
+  private _authUser: UserModel;
+
+  // quick actions
+  quickActions: IV2ActionMenuLabel;
 
   /**
      * Constructor
@@ -64,11 +61,10 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
     private domService: DomService,
     private importExportDataService: ImportExportDataService,
     private i18nService: I18nService,
-    private dialogService: DialogService,
     private genericDataService: GenericDataService,
     protected toastV2Service: ToastV2Service,
-    private systemSettingsDataService: SystemSettingsDataService,
-    private authDataService: AuthDataService
+    private authDataService: AuthDataService,
+    private dialogV2Service: DialogV2Service
   ) {
     super();
   }
@@ -78,10 +74,7 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
      */
   ngOnInit() {
     // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
-    // initialize Side Filters
-    this.initializeSideFilters();
+    this._authUser = this.authDataService.getAuthenticatedUser();
 
     // load gantt types
     this.ganttChartTypes = this.genericDataService
@@ -91,9 +84,9 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
           return records.filter((record: LabelValuePair): boolean => {
             switch (record.value) {
               case Constants.GANTT_CHART_TYPES.GANTT_CHART_LAB_TEST.value:
-                return GanttChartModel.canViewDelayOnsetLabTesting(this.authUser);
+                return GanttChartModel.canViewDelayOnsetLabTesting(this._authUser);
               case Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value:
-                return GanttChartModel.canViewDelayOnsetHospitalization(this.authUser);
+                return GanttChartModel.canViewDelayOnsetHospitalization(this._authUser);
               default:
                 // not supported
                 return false;
@@ -102,19 +95,10 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
         })
       );
 
-    // check if platform architecture is x32
-    this.systemSettingsDataService
-      .getAPIVersion()
-      .subscribe((versionData: SystemSettingsVersionModel) => {
-        if (versionData.arch === Constants.PLATFORM_ARCH.X86) {
-          this.x86Architecture = true;
-        }
-      });
-
     // select visible chart accordingly to user rights
-    if (GanttChartModel.canViewDelayOnsetLabTesting(this.authUser)) {
+    if (GanttChartModel.canViewDelayOnsetLabTesting(this._authUser)) {
       this.ganttChartType = Constants.GANTT_CHART_TYPES.GANTT_CHART_LAB_TEST.value;
-    } else if (GanttChartModel.canViewDelayOnsetHospitalization(this.authUser)) {
+    } else if (GanttChartModel.canViewDelayOnsetHospitalization(this._authUser)) {
       this.ganttChartType = Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value;
     } else {
       // NOT SUPPORTED
@@ -122,61 +106,100 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
 
     // initialize breadcrumbs
     this.initializeBreadcrumbs();
+
+    // quick actions
+    this.quickActions = {
+      type: V2ActionType.MENU,
+      label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
+      visible: () => (this.ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_LAB_TEST.value && GanttChartModel.canExportDelayOnsetLabTesting(this._authUser)) ||
+        (this.ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value && GanttChartModel.canExportDelayOnsetHospitalization(this._authUser)),
+      menuOptions: [
+        // Export
+        {
+          label: {
+            get: () => 'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL'
+          },
+          action: {
+            click: () => {
+              this.generateGanttChartReport();
+            }
+          },
+          visible: () => (this.ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_LAB_TEST.value && GanttChartModel.canExportDelayOnsetLabTesting(this._authUser)) ||
+            (this.ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value && GanttChartModel.canExportDelayOnsetHospitalization(this._authUser))
+        },
+
+        // Filter
+        {
+          label: {
+            get: () => 'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'
+          },
+          action: {
+            click: () => {
+              this.dialogV2Service.showAdvancedFiltersDialog(
+                Constants.APP_PAGE.GANTT_CHART.value,
+                [{
+                  type: V2AdvancedFilterType.LOCATION_SINGLE,
+                  field: 'locationId',
+                  label: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION',
+                  filterBy: (_qb, filter) => {
+                    // set filters
+                    this.globalFilterLocationId = filter.value;
+                  }
+                }, {
+                  type: V2AdvancedFilterType.DATE,
+                  field: 'date',
+                  label: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE',
+                  filterBy: (_qb, filter) => {
+                    // set filters
+                    this.globalFilterDate = moment(filter.value);
+                  }
+                }],
+                this.filtersApplied
+              ).subscribe((response) => {
+                // cancelled ?
+                if (!response) {
+                  return;
+                }
+
+                // keep filters to we can show it back
+                this.filtersApplied = response.filtersApplied;
+
+                // reset date ?
+                if (!this.filtersApplied.appliedFilters.find((item) => item.filter.uniqueKey === 'dateLNG_GLOBAL_FILTERS_FIELD_LABEL_DATE')) {
+                  this.globalFilterDate = undefined;
+                }
+
+                // reset location ?
+                if (!this.filtersApplied.appliedFilters.find((item) => item.filter.uniqueKey === 'locationIdLNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION')) {
+                  this.globalFilterLocationId = undefined;
+                }
+              });
+            }
+          }
+        }
+      ]
+    };
   }
 
   /**
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // // reset
-    // this.breadcrumbs = [];
-    //
-    // // set current page title
-    // this.breadcrumbs.push(
-    //   new BreadcrumbItemModel(
-    //     'LNG_PAGE_GANTT_CHART_TITLE',
-    //     '.',
-    //     true
-    //   )
-    // );
-  }
+    // reset
+    this.breadcrumbs = [{
+      label: 'LNG_COMMON_LABEL_HOME',
+      action: {
+        link: DashboardModel.canViewDashboard(this._authUser) ?
+          ['/dashboard'] :
+          ['/account/my-profile']
+      }
+    }];
 
-  /**
-     * Initialize Side Filters
-     */
-  private initializeSideFilters() {
-    // set available side filters
-    this.availableSideFilters = [
-      new FilterModel({
-        fieldName: 'locationId',
-        fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION',
-        type: FilterType.LOCATION,
-        required: true,
-        multipleOptions: false
-      }),
-      new FilterModel({
-        fieldName: 'date',
-        fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE',
-        type: FilterType.DATE,
-        required: true,
-        maxDate: moment()
-      })
-    ];
-  }
-
-  /**
-     * Apply side filters
-     * @param data
-     */
-  applySideFilters(filters: AppliedFilterModel[]) {
-    // retrieve date & location filters
-    // retrieve location filter
-    const dateFilter: AppliedFilterModel = _.find(filters, { filter: { fieldName: 'date' } });
-    const locationFilter: AppliedFilterModel = _.find(filters, { filter: { fieldName: 'locationId' } });
-
-    // set filters
-    this.globalFilterDate = _.isEmpty(dateFilter.value) ? undefined : moment(dateFilter.value);
-    this.globalFilterLocationId = _.isEmpty(locationFilter.value) ? undefined : locationFilter.value;
+    // current page
+    this.breadcrumbs.push({
+      label: 'LNG_PAGE_GANTT_CHART_TITLE',
+      action: null
+    });
   }
 
   /**
@@ -238,7 +261,7 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
      * Display loading dialog
      */
   showLoadingDialog() {
-    this.loadingDialog = this.dialogService.showLoadingDialog();
+    this.loadingDialog = this.dialogV2Service.showLoadingDialog();
   }
 
   /**
