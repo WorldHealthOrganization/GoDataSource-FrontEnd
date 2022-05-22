@@ -137,12 +137,12 @@ export class ViewMovementCaseComponent implements OnInit {
           }
         });
       }
-
-      // current page
-      this.breadcrumbs.push({
-        label: 'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE',
-        action: null
-      });
     }
+
+    // current page
+    this.breadcrumbs.push({
+      label: 'LNG_PAGE_VIEW_MOVEMENT_CASE_TITLE',
+      action: null
+    });
   }
 }

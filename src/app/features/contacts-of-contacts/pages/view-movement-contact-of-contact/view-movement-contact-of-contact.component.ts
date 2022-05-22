@@ -140,12 +140,12 @@ export class ViewMovementContactOfContactComponent implements OnInit {
           }
         });
       }
-
-      // current page
-      this.breadcrumbs.push({
-        label: 'LNG_PAGE_VIEW_MOVEMENT_CONTACT_OF_CONTACT_TITLE',
-        action: null
-      });
     }
+
+    // current page
+    this.breadcrumbs.push({
+      label: 'LNG_PAGE_VIEW_MOVEMENT_CONTACT_OF_CONTACT_TITLE',
+      action: null
+    });
   }
 }
