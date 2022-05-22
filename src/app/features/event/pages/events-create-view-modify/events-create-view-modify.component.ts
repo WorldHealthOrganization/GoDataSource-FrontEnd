@@ -27,6 +27,7 @@ import {
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { AddressModel, AddressType } from '../../../../core/models/address.model';
 
 @Component({
   selector: 'app-events-create-view-modify',
@@ -100,7 +101,11 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
    * Create new item model if needed
    */
   protected createNewItem(): EventModel {
-    return new EventModel();
+    return new EventModel({
+      address: new AddressModel({
+        typeId: AddressType.CURRENT_ADDRESS
+      })
+    });
   }
 
   /**

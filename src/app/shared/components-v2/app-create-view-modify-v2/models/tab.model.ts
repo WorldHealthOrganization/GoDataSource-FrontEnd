@@ -329,6 +329,9 @@ interface ICreateViewModifyV2TabInputAddress {
 
   // optional
   name?: string; // used for single address - event
+  validators?: {
+    required?: () => boolean
+  };
 }
 
 /**

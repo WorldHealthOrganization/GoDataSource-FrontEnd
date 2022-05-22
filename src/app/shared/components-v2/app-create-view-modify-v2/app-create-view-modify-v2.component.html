@@ -709,7 +709,7 @@
                       tooltip="LNG_ADDRESS_FIELD_LABEL_TYPE_DESCRIPTION"
                       [viewOnly]="isView"
                       [options]="input.typeOptions"
-                      required="true"
+                      [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-select-single-v2>
 
                     <!-- Date -->
@@ -747,7 +747,7 @@
                       placeholder="LNG_ADDRESS_FIELD_LABEL_LOCATION"
                       [viewOnly]="isView"
                       useOutbreakLocations="true"
-                      required="true"
+                      [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"
                       (selectedLocationChanged)="addressLocationChanged(input.value.get(parentItemIndex), $event)"></app-form-select-location-single-v2>
 
