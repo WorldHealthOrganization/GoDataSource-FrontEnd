@@ -9,6 +9,13 @@ import * as fromPages from './pages';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { AddressTypeDataResolver } from '../../core/services/resolvers/data/address-type.resolver';
 import { SelectedOutbreakDataResolver } from '../../core/services/resolvers/data/selected-outbreak.resolver';
+import { PersonTypeDataResolver } from '../../core/services/resolvers/data/person-type.resolver';
+import { ClusterDataResolver } from '../../core/services/resolvers/data/cluster.resolver';
+import { ExposureTypeDataResolver } from '../../core/services/resolvers/data/exposure-type.resolver';
+import { ExposureFrequencyDataResolver } from '../../core/services/resolvers/data/exposure-frequency.resolver';
+import { ExposureDurationDataResolver } from '../../core/services/resolvers/data/exposure-duration.resolver';
+import { ContextOfTransmissionDataResolver } from '../../core/services/resolvers/data/context-of-transmission.resolver';
+import { CertaintyLevelDataResolver } from '../../core/services/resolvers/data/certainty-level.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -17,7 +24,15 @@ const createViewModifyFoundation: Route = {
   resolve: {
     user: UserDataResolver,
     addressType: AddressTypeDataResolver,
-    outbreak: SelectedOutbreakDataResolver
+    outbreak: SelectedOutbreakDataResolver,
+    personType: PersonTypeDataResolver,
+    cluster: ClusterDataResolver,
+    certaintyLevel: CertaintyLevelDataResolver,
+    exposureType: ExposureTypeDataResolver,
+    exposureFrequency: ExposureFrequencyDataResolver,
+    exposureDuration: ExposureDurationDataResolver,
+    contextOfTransmission: ContextOfTransmissionDataResolver,
+    yesNoAll: YesNoAllDataResolver
   }
 };
 

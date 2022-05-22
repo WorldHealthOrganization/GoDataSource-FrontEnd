@@ -15,19 +15,24 @@ import {
   CreateViewModifyV2TabInputType,
   ICreateViewModifyV2Buttons,
   ICreateViewModifyV2CreateOrUpdate,
-  ICreateViewModifyV2Tab
+  ICreateViewModifyV2Tab, ICreateViewModifyV2TabTable, ICreateViewModifyV2TabTableRecordsList
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { UserModel } from '../../../../core/models/user.model';
+import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { catchError, takeUntil } from 'rxjs/operators';
 import {
   CreateViewModifyV2ExpandColumnType
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
-import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
+import { RequestFilterGenerator, RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
+import { Constants } from '../../../../core/models/constants';
+import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
+import { ClusterModel } from '../../../../core/models/cluster.model';
+import * as _ from 'lodash';
+import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 
 @Component({
   selector: 'app-events-create-view-modify',
@@ -44,6 +49,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
     protected translateService: TranslateService,
     protected toastV2Service: ToastV2Service,
     protected dialogV2Service: DialogV2Service,
+    protected entityHelperService: EntityHelperService,
     authDataService: AuthDataService,
     renderer2: Renderer2
   ) {
@@ -210,7 +216,11 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
       // tabs
       tabs: [
         // Details
-        this.initializeTabsDetails()
+        this.initializeTabsDetails(),
+
+        // Contacts, exposures ...
+        this.initializeTabsContacts(),
+        this.initializeTabsExposures()
       ],
 
       // create details
@@ -384,6 +394,242 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
         }
       ]
     };
+  }
+
+  /**
+   * Initialize tabs - Contacts
+   */
+  private initializeTabsContacts(): ICreateViewModifyV2TabTable {
+    // create tab
+    const newTab: ICreateViewModifyV2TabTable = {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      label: 'LNG_COMMON_BUTTON_EXPOSURES_FROM',
+      visible: () => this.isView &&
+        EventModel.canListRelationshipContacts(this.authUser),
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST,
+        pageSettingsKey: UserSettings.RELATIONSHIP_FIELDS,
+        advancedFilterType: Constants.APP_PAGE.RELATIONSHIPS.value,
+        tableColumns: this.entityHelperService
+          .retrieveTableColumns({
+            selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
+            selectedOutbreak: () => this.selectedOutbreak,
+            entity: this.itemData,
+            relationshipType: RelationshipType.CONTACT,
+            authUser: this.authUser,
+            personType: this.activatedRoute.snapshot.data.personType,
+            cluster: this.activatedRoute.snapshot.data.cluster,
+            options: {
+              certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              exposureFrequency: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              exposureDuration: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              contextOfTransmission: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+            },
+            refreshList: () => {
+              // reload data
+              const localTab: ICreateViewModifyV2TabTableRecordsList = newTab.definition as ICreateViewModifyV2TabTableRecordsList;
+              localTab.refresh(newTab);
+            }
+          }),
+        advancedFilters: this.entityHelperService.generateAdvancedFilters({
+          options: {
+            certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            exposureFrequency: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            exposureDuration: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            contextOfTransmission: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            cluster: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ClusterModel>).options
+          }
+        }),
+        queryBuilder: new RequestQueryBuilder(),
+        pageIndex: 0,
+        refresh: (tab) => {
+          // refresh data
+          const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
+          localTab.records$ = this.entityHelperService
+            .retrieveRecords(
+              RelationshipType.CONTACT,
+              this.selectedOutbreak,
+              this.itemData,
+              localTab.queryBuilder
+            )
+            .pipe(
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            );
+
+          // count
+          localTab.refreshCount(tab);
+
+          // update ui
+          localTab.updateUI();
+        },
+        refreshCount: (
+          tab,
+          applyHasMoreLimit?: boolean
+        ) => {
+          // reset
+          const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
+          localTab.pageCount = undefined;
+
+          // set apply value
+          if (applyHasMoreLimit !== undefined) {
+            localTab.applyHasMoreLimit = applyHasMoreLimit;
+          }
+
+          // remove paginator from query builder
+          const countQueryBuilder = _.cloneDeep(localTab.queryBuilder);
+          countQueryBuilder.paginator.clear();
+          countQueryBuilder.sort.clear();
+
+          // apply has more limit
+          if (localTab.applyHasMoreLimit) {
+            countQueryBuilder.flag(
+              'applyHasMoreLimit',
+              true
+            );
+          }
+
+          // count
+          this.entityHelperService
+            .retrieveRecordsCount(
+              RelationshipType.CONTACT,
+              this.selectedOutbreak,
+              this.itemData,
+              countQueryBuilder
+            )
+            .pipe(
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            ).subscribe((response) => {
+              localTab.pageCount = response;
+            });
+        }
+      }
+    };
+
+    // finished
+    return newTab;
+  }
+
+  /**
+   * Initialize tabs - Exposures
+   */
+  private initializeTabsExposures(): ICreateViewModifyV2TabTable {
+    // create tab
+    const newTab: ICreateViewModifyV2TabTable = {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      label: 'LNG_COMMON_BUTTON_EXPOSURES_TO',
+      visible: () => this.isView &&
+        EventModel.canListRelationshipExposures(this.authUser),
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST,
+        pageSettingsKey: UserSettings.RELATIONSHIP_FIELDS,
+        advancedFilterType: Constants.APP_PAGE.RELATIONSHIPS.value,
+        tableColumns: this.entityHelperService
+          .retrieveTableColumns({
+            selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
+            selectedOutbreak: () => this.selectedOutbreak,
+            entity: this.itemData,
+            relationshipType: RelationshipType.EXPOSURE,
+            authUser: this.authUser,
+            personType: this.activatedRoute.snapshot.data.personType,
+            cluster: this.activatedRoute.snapshot.data.cluster,
+            options: {
+              certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              exposureFrequency: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              exposureDuration: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              contextOfTransmission: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+            },
+            refreshList: () => {
+              // reload data
+              const localTab: ICreateViewModifyV2TabTableRecordsList = newTab.definition as ICreateViewModifyV2TabTableRecordsList;
+              localTab.refresh(newTab);
+            }
+          }),
+        advancedFilters: this.entityHelperService.generateAdvancedFilters({
+          options: {
+            certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            exposureFrequency: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            exposureDuration: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            contextOfTransmission: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            cluster: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ClusterModel>).options
+          }
+        }),
+        queryBuilder: new RequestQueryBuilder(),
+        pageIndex: 0,
+        refresh: (tab) => {
+          // refresh data
+          const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
+          localTab.records$ = this.entityHelperService
+            .retrieveRecords(
+              RelationshipType.EXPOSURE,
+              this.selectedOutbreak,
+              this.itemData,
+              localTab.queryBuilder
+            )
+            .pipe(
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            );
+
+          // count
+          localTab.refreshCount(tab);
+
+          // update ui
+          localTab.updateUI();
+        },
+        refreshCount: (
+          tab,
+          applyHasMoreLimit?: boolean
+        ) => {
+          // reset
+          const localTab: ICreateViewModifyV2TabTableRecordsList = tab.definition as ICreateViewModifyV2TabTableRecordsList;
+          localTab.pageCount = undefined;
+
+          // set apply value
+          if (applyHasMoreLimit !== undefined) {
+            localTab.applyHasMoreLimit = applyHasMoreLimit;
+          }
+
+          // remove paginator from query builder
+          const countQueryBuilder = _.cloneDeep(localTab.queryBuilder);
+          countQueryBuilder.paginator.clear();
+          countQueryBuilder.sort.clear();
+
+          // apply has more limit
+          if (localTab.applyHasMoreLimit) {
+            countQueryBuilder.flag(
+              'applyHasMoreLimit',
+              true
+            );
+          }
+
+          // count
+          this.entityHelperService
+            .retrieveRecordsCount(
+              RelationshipType.EXPOSURE,
+              this.selectedOutbreak,
+              this.itemData,
+              countQueryBuilder
+            )
+            .pipe(
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            ).subscribe((response) => {
+              localTab.pageCount = response;
+            });
+        }
+      }
+    };
+
+    // finished
+    return newTab;
   }
 
   /**
