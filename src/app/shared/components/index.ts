@@ -37,7 +37,6 @@ import { ListItemLabelComponent } from './list-item-label/list-item-label.compon
 import { FormNgxWigComponent } from './form-ngx-wig/form-ngx-wig.component';
 import { FormVaccinesListComponent } from './form-vaccines-list/form-vaccines-list.component';
 import { HotTableWrapperComponent } from './hot-table-wrapper/hot-table-wrapper.component';
-import { LocationDialogComponent } from './location-dialog/location-dialog.component';
 import { FormContactOfContactQuickComponent } from './form-contact-of-contact-quick/form-contact-of-contact-quick.component';
 import { FancyTooltipComponent } from './fancy-tooltip/fancy-tooltip.component';
 import { PieDonutChartComponent } from './pie-donut-graph/pie-donut-chart.component';
@@ -51,7 +50,6 @@ export * from './counted-items-list/counted-items-list.component';
 export * from './view-cot-node-dialog/view-cot-node-dialog.component';
 export * from './view-cot-edge-dialog/view-cot-edge-dialog.component';
 export * from './hover-row-actions/hover-row-actions.component';
-export * from './location-dialog/location-dialog.component';
 
 // export the list of all components
 export const components: any[] = [
@@ -99,7 +97,6 @@ export const components: any[] = [
   LoadingDialogComponent,
   ViewCotNodeDialogComponent,
   ViewCotEdgeDialogComponent,
-  LocationDialogComponent,
 
   // general
   NumberOfItemsLabelComponent,
