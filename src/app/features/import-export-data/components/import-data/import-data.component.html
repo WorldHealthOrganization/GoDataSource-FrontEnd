@@ -153,13 +153,12 @@
                     <!-- Filter -->
                     <div
                         fxFlex>
-                        <app-form-input
+                        <app-form-input-v2
                             #filterBySourceInput="ngModel"
                             [ngModel]="filterBySourceInputValue"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="triggerFilterVisibleData()"
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+                            (ngModelChange)="triggerFilterVisibleData()">
+                        </app-form-input-v2>
                     </div>
 
                     <!-- Label -->
@@ -176,13 +175,12 @@
                     <!-- Filter -->
                     <div
                         fxFlex>
-                        <app-form-input
+                        <app-form-input-v2
                             #filterByDestinationInput="ngModel"
                             [ngModel]="filterByDestinationInputValue"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="triggerFilterVisibleData()"
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+                            (ngModelChange)="triggerFilterVisibleData()">
+                        </app-form-input-v2>
                     </div>
 
                     <!-- Label -->
@@ -734,15 +732,15 @@
                                                     <div
                                                         fxFlex
                                                         class="import-data-body-row-edit-extra-details-row-location">
-<!--                                                        <app-form-location-dropdown-->
-<!--                                                            name="mapObjectOptionsDestination"-->
-<!--                                                            required="true"-->
-<!--                                                            [ngModel]="mappedOpt.destinationOption"-->
-<!--                                                            [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"-->
-<!--                                                            [useOutbreakLocations]="useOutbreakLocations"-->
-<!--                                                            [disabled]="mappedOpt.readOnly"-->
-<!--                                                            (itemChanged)="mappedOptionsLocationChanged(mappedOpt, $event)">-->
-<!--                                                        </app-form-location-dropdown>-->
+                                                        <app-form-select-location-single-v2
+                                                            name="mapObjectOptionsDestination"
+                                                            required="true"
+                                                            [ngModel]="mappedOpt.destinationOption"
+                                                            [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
+                                                            [useOutbreakLocations]="useOutbreakLocations"
+                                                            [disabled]="mappedOpt.readOnly"
+                                                            (selectedLocationChanged)="mappedOptionsLocationChanged(mappedOpt, $event)">
+                                                        </app-form-select-location-single-v2>
                                                     </div>
                                                 </ng-template>
                                             </div>

@@ -36,6 +36,7 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputText, IV2SideDialogConfigInputToggleCheckbox, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { IV2LoadingDialogHandler } from '../../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
+import { ILocation } from '../../../../shared/forms-v2/core/app-form-location-base-v2';
 
 export enum ImportServerModelNames {
   CASE_LAB_RESULTS = 'labResult',
@@ -808,14 +809,6 @@ export class ImportDataComponent
 
     // initialize pagination
     this.initPaginator();
-
-    // // init visible columns
-    // this.visibleTableColumns = [
-    //   'recordNo',
-    //   'error.message',
-    //   'error.details',
-    //   'data'
-    // ];
   }
 
   /**
@@ -3214,61 +3207,61 @@ export class ImportDataComponent
   /**
      * Mapped field option location changed handler
      */
-  // mappedOptionsLocationChanged(
-  //   mappedOpt: IMappedOption,
-  //   locationAutoItem: LocationAutoItem
-  // ): void {
-  //   // nothing selected ?
-  //   if (!locationAutoItem) {
-  //     // reset value
-  //     mappedOpt.destinationOption = null;
-  //
-  //     // prepare data
-  //     this.validateData();
-  //
-  //     // finished
-  //     return;
-  //   }
-  //
-  //   // cache location if necessary
-  //   if (
-  //     !this.locationCache[locationAutoItem.id] ||
-  //           !this.locationCache[locationAutoItem.id].parentsLoaded
-  //   ) {
-  //     // retrieve parents labels
-  //     let parentNames: string = '';
-  //     let parentLocation = locationAutoItem.parent();
-  //     while (parentLocation) {
-  //       // add name
-  //       parentNames = `${parentLocation.label}${parentNames ? ' => ' + parentNames : ''}`;
-  //
-  //       // next parent
-  //       parentLocation = parentLocation.parent();
-  //     }
-  //
-  //     // cache location
-  //     this.locationCache[locationAutoItem.id] = {
-  //       label: `${parentNames ? parentNames + ' => ' : ''}${locationAutoItem.label}`,
-  //       parentsLoaded: true,
-  //       shortLabel: locationAutoItem.label,
-  //       parentId: locationAutoItem.parent() ?
-  //         locationAutoItem.parent().id :
-  //         null
-  //     };
-  //
-  //     // index it
-  //     this.indexLocation(
-  //       locationAutoItem.label,
-  //       locationAutoItem.id
-  //     );
-  //   }
-  //
-  //   // set option value
-  //   mappedOpt.destinationOption = locationAutoItem.id;
-  //
-  //   // prepare data
-  //   this.validateData();
-  // }
+  mappedOptionsLocationChanged(
+    mappedOpt: IMappedOption,
+    locationAutoItem: ILocation
+  ): void {
+    // nothing selected ?
+    if (!locationAutoItem) {
+      // reset value
+      mappedOpt.destinationOption = null;
+
+      // prepare data
+      this.validateData();
+
+      // finished
+      return;
+    }
+
+    // cache location if necessary
+    if (
+      !this.locationCache[locationAutoItem.id] ||
+            !this.locationCache[locationAutoItem.id].parentsLoaded
+    ) {
+      // retrieve parents labels
+      let parentNames: string = '';
+      let parentLocation = locationAutoItem.parent();
+      while (parentLocation) {
+        // add name
+        parentNames = `${parentLocation.label}${parentNames ? ' => ' + parentNames : ''}`;
+
+        // next parent
+        parentLocation = parentLocation.parent();
+      }
+
+      // cache location
+      this.locationCache[locationAutoItem.id] = {
+        label: `${parentNames ? parentNames + ' => ' : ''}${locationAutoItem.label}`,
+        parentsLoaded: true,
+        shortLabel: locationAutoItem.label,
+        parentId: locationAutoItem.parent() ?
+          locationAutoItem.parent().id :
+          null
+      };
+
+      // index it
+      this.indexLocation(
+        locationAutoItem.label,
+        locationAutoItem.id
+      );
+    }
+
+    // set option value
+    mappedOpt.destinationOption = locationAutoItem.id;
+
+    // prepare data
+    this.validateData();
+  }
 
   /**
      * Determine & retrieve map option height
