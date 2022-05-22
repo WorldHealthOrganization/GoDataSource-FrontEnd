@@ -115,7 +115,7 @@ export class AppFormSelectLocationSingleV2Component
     // update selected list
     this.selectedLocation = this.value && this.locationMap[this.value] ?
       this.locationMap[this.value] :
-      this.selectedLocation;
+      undefined;
 
     // emit event
     if (emitEvent) {

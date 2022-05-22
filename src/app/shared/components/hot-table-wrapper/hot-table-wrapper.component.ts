@@ -16,10 +16,9 @@ import { LocationDataService } from '../../../core/services/data/location.data.s
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { DialogService } from '../../../core/services/helper/dialog.service';
-import { LocationDialogComponent } from '../location-dialog/location-dialog.component';
-import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
 import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
+import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
+import { IV2SideDialogConfigButtonType, V2SideDialogConfigInputType } from '../../components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 
 /**
  * Error message
@@ -92,46 +91,73 @@ class CustomLocationEditor extends Handsontable.default.editors.BaseEditor {
     }
 
     // show dialog
+    let temporaryLocation: LocationModel;
     const wrapper: HotTableWrapperComponent = HotTableWrapperComponent.WRAPPERS[this.hot.rootElement.id];
     this.locationDialogVisible = HotTableWrapperDialogVisibility.Visible;
-    wrapper.dialogService.showCustomDialog(
-      LocationDialogComponent, {
-        ...LocationDialogComponent.DEFAULT_CONFIG,
-        ...{
-          data: {
-            message: 'LNG_FORM_HOT_TABLE_WRAPPER_CHANGE_LOCATION_DIALOG_TITLE',
-            locationId: this.originalValue ?
-              this.originalValue :
-              undefined,
-            required: wrapper.sheetColumns && wrapper.sheetColumns[this.col] && wrapper.sheetColumns[this.col].required,
-            useOutbreakLocations: wrapper.sheetColumns && wrapper.sheetColumns[this.col] && (wrapper.sheetColumns[this.col] as LocationSheetColumn).useOutbreakLocations
-          }
+    wrapper.dialogV2Service.showSideDialog({
+      title: {
+        get: () => 'LNG_FORM_HOT_TABLE_WRAPPER_CHANGE_LOCATION_DIALOG_TITLE'
+      },
+      hideInputFilter: true,
+      inputs: [{
+        type: V2SideDialogConfigInputType.LOCATION_SINGLE,
+        name: 'location',
+        placeholder: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
+        value: this.originalValue ?
+          this.originalValue :
+          undefined,
+        useOutbreakLocations: wrapper.sheetColumns && wrapper.sheetColumns[this.col] && (wrapper.sheetColumns[this.col] as LocationSheetColumn).useOutbreakLocations,
+        clearable: true,
+        validators: {
+          required: () => wrapper.sheetColumns && wrapper.sheetColumns[this.col] && wrapper.sheetColumns[this.col].required
+        },
+        locationChanged: (locationInfo) => {
+          temporaryLocation = locationInfo ?
+            new LocationModel({
+              id: locationInfo.id,
+              name: locationInfo.label
+            }) :
+            undefined;
         }
-      }
-    ).subscribe((answer: DialogAnswer) => {
-      if (answer.button === DialogAnswerButton.Yes) {
-        // check if we need to init location data
-        let selectedLocation: LocationModel;
-        if (
-          (selectedLocation = answer.inputValue.value as LocationModel) &&
-          selectedLocation.id &&
-          !wrapper.cachedLocations[selectedLocation.id]
-        ) {
-          wrapper.cachedLocations[selectedLocation.id] = selectedLocation;
-        }
-
-        // update spreadsheet data
-        this.instance.setDataAtCell(
-          this.row,
-          this.col,
-          selectedLocation ?
-            selectedLocation.id :
-            ''
-        );
-      }
-
+      }],
+      bottomButtons: [{
+        type: IV2SideDialogConfigButtonType.OTHER,
+        label: 'LNG_COMMON_BUTTON_APPLY',
+        color: 'primary'
+      }, {
+        type: IV2SideDialogConfigButtonType.CANCEL,
+        label: 'LNG_COMMON_BUTTON_CANCEL',
+        color: 'text'
+      }]
+    }).subscribe((response) => {
       // dialog not visible anymore
       this.locationDialogVisible = HotTableWrapperDialogVisibility.Not_Visible;
+
+      // cancelled ?
+      if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+        // finished
+        return;
+      }
+
+      // check if we need to init location data
+      if (
+        temporaryLocation &&
+        !wrapper.cachedLocations[temporaryLocation.id]
+      ) {
+        wrapper.cachedLocations[temporaryLocation.id] = temporaryLocation;
+      }
+
+      // update spreadsheet data
+      this.instance.setDataAtCell(
+        this.row,
+        this.col,
+        temporaryLocation ?
+          temporaryLocation.id :
+          ''
+      );
+
+      // close
+      response.handler.hide();
     });
   }
 
@@ -288,7 +314,7 @@ implements OnInit, OnDestroy {
     private i18nService: I18nService,
     private locationDataService: LocationDataService,
     private toastV2Service: ToastV2Service,
-    public dialogService: DialogService
+    public dialogV2Service: DialogV2Service
   ) {}
 
   /**
