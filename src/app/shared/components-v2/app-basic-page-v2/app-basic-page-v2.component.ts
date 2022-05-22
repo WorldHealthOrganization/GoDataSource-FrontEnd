@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit } from '@angular/core';
 import { TopnavComponent } from '../../../core/components/topnav/topnav.component';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
-import { IV2ActionMenuLabel } from '../app-list-table-v2/models/action.model';
+import { IV2ActionIconLabel, IV2ActionMenuLabel } from '../app-list-table-v2/models/action.model';
 
 /**
  * Component
@@ -20,6 +20,9 @@ export class AppBasicPageV2Component implements OnInit, OnDestroy {
 
   // quick actions
   @Input() quickActions: IV2ActionMenuLabel;
+
+  // button
+  @Input() actionButton: IV2ActionIconLabel;
 
   /**
    * Constructor

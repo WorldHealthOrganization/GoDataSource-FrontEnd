@@ -101,6 +101,23 @@
         </mat-menu>
 
       </ng-container>
+
+      <!-- Action button -->
+      <a
+        *ngIf="actionButton && (!actionButton.visible || actionButton.visible(null))"
+        mat-flat-button
+        [routerLink]="actionButton.action.link && (!actionButton.disable || !actionButton.disable(null)) ? actionButton.action.link(null) : undefined"
+        [queryParams]="actionButton.action.linkQueryParams ? actionButton.action.linkQueryParams(null) : undefined"
+        [disabled]="actionButton.disable && actionButton.disable(null)"
+        (click)="actionButton.action.click ? actionButton.action.click(null) : undefined">
+
+        <!-- Icon -->
+        <mat-icon>{{actionButton.icon}}</mat-icon>
+
+        <!-- Label -->
+        <span>{{ actionButton.label | translate }}</span>
+
+      </a>
     </div>
   </div>
 

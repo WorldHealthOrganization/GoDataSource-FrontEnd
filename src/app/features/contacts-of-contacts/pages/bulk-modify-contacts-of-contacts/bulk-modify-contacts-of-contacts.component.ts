@@ -26,6 +26,7 @@ import * as Handsontable from 'handsontable';
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IV2ActionIconLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 
 @Component({
   selector: 'app-bulk-modify-contacts-of-contacts',
@@ -72,11 +73,15 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
   outbreakSubscriber: Subscription;
   queryParamsSubscriber: Subscription;
 
+  // action
+  actionButton: IV2ActionIconLabel;
+
   // authenticated user details
   authUser: UserModel;
 
   // ids of contacts of contacts we want to modify
   contactOfContactIds: string[];
+
   /**
    * Constructor
    */
@@ -135,6 +140,18 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
           this.retrieveContacts();
         });
       });
+
+    // action button
+    this.actionButton = {
+      type: V2ActionType.ICON_LABEL,
+      icon: '',
+      label: 'LNG_COMMON_BUTTON_SAVE',
+      action: {
+        click: () => {
+          this.modifyContactsOfContacts();
+        }
+      }
+    };
 
     // initialize page breadcrumbs
     this.initializeBreadcrumbs();

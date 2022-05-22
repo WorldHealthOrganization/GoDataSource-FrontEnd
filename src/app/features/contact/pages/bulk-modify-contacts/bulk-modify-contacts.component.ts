@@ -29,6 +29,7 @@ import { TeamDataService } from '../../../../core/services/data/team.data.servic
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { IV2ActionIconLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 
 @Component({
   selector: 'app-bulk-modify-contacts',
@@ -82,6 +83,9 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
   // subscribers
   outbreakSubscriber: Subscription;
   queryParamsSubscriber: Subscription;
+
+  // action
+  actionButton: IV2ActionIconLabel;
 
   // authenticated user details
   authUser: UserModel;
@@ -167,6 +171,18 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
           this.retrieveContacts();
         });
       });
+
+    // action button
+    this.actionButton = {
+      type: V2ActionType.ICON_LABEL,
+      icon: '',
+      label: 'LNG_COMMON_BUTTON_SAVE',
+      action: {
+        click: () => {
+          this.modifyContacts();
+        }
+      }
+    };
 
     // initialize page breadcrumbs
     this.initializeBreadcrumbs();

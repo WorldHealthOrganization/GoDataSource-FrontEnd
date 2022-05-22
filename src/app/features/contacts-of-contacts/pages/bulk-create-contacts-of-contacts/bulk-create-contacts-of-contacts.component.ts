@@ -26,6 +26,7 @@ import { ContactsOfContactsDataService } from '../../../../core/services/data/co
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { IV2ActionIconLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 
 @Component({
   selector: 'app-bulk-create-contacts-of-contacts',
@@ -76,6 +77,9 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
   contactOfContactVisualIdModel: {
     mask: string
   };
+
+  // action
+  actionButton: IV2ActionIconLabel;
 
   // subscribers
   outbreakSubscriber: Subscription;
@@ -160,6 +164,18 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
 
         this.retrieveRelatedPerson();
       });
+
+    // action button
+    this.actionButton = {
+      type: V2ActionType.ICON_LABEL,
+      icon: '',
+      label: 'LNG_COMMON_BUTTON_SAVE',
+      action: {
+        click: () => {
+          this.addContactsOfContacts();
+        }
+      }
+    };
   }
 
   /**
