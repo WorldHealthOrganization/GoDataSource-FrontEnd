@@ -116,6 +116,7 @@ import { SyncPackageModuleDataResolver } from './resolvers/data/sync-package-mod
 import { SyncPackageExportTypeDataResolver } from './resolvers/data/sync-package-export-type.resolver';
 import { SyncPackageStatusDataResolver } from './resolvers/data/sync-package-status.resolver';
 import { SavedImportMappingDataResolver } from './resolvers/data/saved-import-mapping.resolver';
+import { GanttChartTypeDataResolver } from './resolvers/data/gantt-chart-type.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -138,6 +139,7 @@ export const services: any[] = [
   ExposureTypeDataResolver,
   FinalFollowUpStatusDataResolver,
   FollowUpGenerationTeamAssignmentAlgorithmDataResolver,
+  GanttChartTypeDataResolver,
   GenderDataResolver,
   InstitutionDataResolver,
   LabNameDataResolver,

@@ -3,14 +3,12 @@
   pageTitle="LNG_PAGE_GANTT_CHART_TITLE"
   [quickActions]="quickActions">
   <!-- dropdown with view types -->
-  <app-form-select
+  <app-form-select-single-v2
       name="ganttChartType"
       [(ngModel)]="ganttChartType"
       required="true"
-      [options]="ganttChartTypes | async"
-      (optionChanged)="updateChartType($event)"
-      [clearable]="false">
-  </app-form-select>
+      [options]="ganttChartTypesOptions">
+  </app-form-select-single-v2>
 
   <!-- gantt chart - lab test -->
   <app-gantt-chart-delay-onset-dashlet

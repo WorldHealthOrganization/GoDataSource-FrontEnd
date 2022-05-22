@@ -5,15 +5,13 @@ import { ImportExportDataService } from '../../../../core/services/data/import-e
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as FileSaver from 'file-saver';
 import { GanttChartDelayOnsetDashletComponent } from '../../components/gantt-chart-delay-onset-dashlet/gantt-chart-delay-onset-dashlet.component';
-import { Observable, throwError } from 'rxjs';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { throwError } from 'rxjs';
 import { Constants } from '../../../../core/models/constants';
-import { catchError, map } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { GanttChartModel } from '../../../../core/models/gantt-chart.model';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
@@ -22,6 +20,9 @@ import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { SavedFilterData } from '../../../../core/models/saved-filters.model';
 import { IV2LoadingDialogHandler } from '../../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
+import { ActivatedRoute } from '@angular/router';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 
 @Component({
   selector: 'app-gantt-chart',
@@ -42,7 +43,7 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
 
   filtersApplied: SavedFilterData;
 
-  ganttChartTypes: Observable<any[]>;
+  ganttChartTypesOptions: ILabelValuePairModel[];
   ganttChartType: any;
 
   // constants
@@ -61,40 +62,36 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
     private domService: DomService,
     private importExportDataService: ImportExportDataService,
     private i18nService: I18nService,
-    private genericDataService: GenericDataService,
-    protected toastV2Service: ToastV2Service,
-    private authDataService: AuthDataService,
-    private dialogV2Service: DialogV2Service
+    private toastV2Service: ToastV2Service,
+    private dialogV2Service: DialogV2Service,
+    authDataService: AuthDataService,
+    activatedRoute: ActivatedRoute
   ) {
+    // parent
     super();
+
+    // get the authenticated user
+    this._authUser = authDataService.getAuthenticatedUser();
+
+    // get data
+    this.ganttChartTypesOptions = (activatedRoute.snapshot.data.ganttChartType as IResolverV2ResponseModel<ILabelValuePairModel>).options
+      .filter((record) => {
+        switch (record.value) {
+          case Constants.GANTT_CHART_TYPES.GANTT_CHART_LAB_TEST.value:
+            return GanttChartModel.canViewDelayOnsetLabTesting(this._authUser);
+          case Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value:
+            return GanttChartModel.canViewDelayOnsetHospitalization(this._authUser);
+          default:
+            // not supported
+            return false;
+        }
+      });
   }
 
   /**
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this._authUser = this.authDataService.getAuthenticatedUser();
-
-    // load gantt types
-    this.ganttChartTypes = this.genericDataService
-      .getGanttChartTypes()
-      .pipe(
-        map((records: LabelValuePair[]) => {
-          return records.filter((record: LabelValuePair): boolean => {
-            switch (record.value) {
-              case Constants.GANTT_CHART_TYPES.GANTT_CHART_LAB_TEST.value:
-                return GanttChartModel.canViewDelayOnsetLabTesting(this._authUser);
-              case Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value:
-                return GanttChartModel.canViewDelayOnsetHospitalization(this._authUser);
-              default:
-                // not supported
-                return false;
-            }
-          });
-        })
-      );
-
     // select visible chart accordingly to user rights
     if (GanttChartModel.canViewDelayOnsetLabTesting(this._authUser)) {
       this.ganttChartType = Constants.GANTT_CHART_TYPES.GANTT_CHART_LAB_TEST.value;
@@ -272,12 +269,5 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
       this.loadingDialog.close();
       this.loadingDialog = null;
     }
-  }
-
-  /**
-     * Switch between gantt types
-     */
-  updateChartType($event) {
-    this.ganttChartType = $event.value;
   }
 }

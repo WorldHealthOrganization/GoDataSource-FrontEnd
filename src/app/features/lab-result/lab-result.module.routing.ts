@@ -20,6 +20,7 @@ import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-
 import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
 import * as fromPages from './pages';
 import { LabPersonTypeDataResolver } from '../../core/services/resolvers/data/lab-person-type.resolver';
+import { GanttChartTypeDataResolver } from '../../core/services/resolvers/data/gantt-chart-type.resolver';
 
 // common base - cases lab results / contacts lab results
 const entityLabResultsFoundation = {
@@ -84,6 +85,9 @@ const routes: Routes = [
           PERMISSION.GANTT_CHART_VIEW_DELAY_ONSET_HOSPITALIZATION
         ]
       })
+    },
+    resolve: {
+      ganttChartType: GanttChartTypeDataResolver
     }
   },
 
