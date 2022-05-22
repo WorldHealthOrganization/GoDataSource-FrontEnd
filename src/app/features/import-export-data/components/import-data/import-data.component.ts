@@ -4,18 +4,15 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { environment } from '../../../../../environments/environment';
 import { IAsyncImportResponse, IMappedOption, IModelArrayProperties, ImportableFileModel, ImportableFilePropertiesModel, ImportableFilePropertyValuesModel, ImportableLabelValuePair, ImportableMapField, ImportDataExtension } from './model';
 import * as _ from 'lodash';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { v4 as uuid } from 'uuid';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { SavedImportMappingService } from '../../../../core/services/data/saved-import-mapping.data.service';
-import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components/dialog/dialog.component';
 import { ISavedImportMappingModel, SavedImportField, SavedImportMappingModel, SavedImportOption } from '../../../../core/models/saved-import-mapping.model';
 import { Observable, Subscriber, throwError } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
-import { MatDialogRef } from '@angular/material/dialog';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 import { HoverRowActionsDirective } from '../../../../shared/directives/hover-row-actions/hover-row-actions.directive';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
@@ -31,8 +28,14 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { ImportResultDataService } from '../../../../core/services/data/import-result.data.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ImportResultModel } from '../../../../core/models/import-result.model';
-import { HoverRowAction, LoadingDialogModel } from '../../../../shared/components';
+import { HoverRowAction } from '../../../../shared/components';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { ActivatedRoute } from '@angular/router';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputText, IV2SideDialogConfigInputToggleCheckbox, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { IV2LoadingDialogHandler } from '../../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
 
 export enum ImportServerModelNames {
   CASE_LAB_RESULTS = 'labResult',
@@ -169,10 +172,10 @@ export class ImportDataComponent
   }
 
   // Saved import mapping
-  @Input() savedImportPage: string;
+  savedImportPage: string;
 
   // List with saved import mappings
-  savedMappingsList$: Observable<SavedImportMappingModel[]>;
+  savedMappings: IResolverV2ResponseModel<SavedImportMappingModel>;
 
   // loaded saved import mapping
   loadedImportMapping: ISavedImportMappingModel = null;
@@ -623,20 +626,27 @@ export class ImportDataComponent
     protected listHelperService: ListHelperService,
     private toastV2Service: ToastV2Service,
     private authDataService: AuthDataService,
-    private dialogService: DialogService,
+    private dialogV2Service: DialogV2Service,
     private i18nService: I18nService,
     private importExportDataService: ImportExportDataService,
     private savedImportMappingService: SavedImportMappingService,
     private domSanitizer: DomSanitizer,
     private locationDataService: LocationDataService,
     private importLogDataService: ImportLogDataService,
-    private importResultDataService: ImportResultDataService
+    private importResultDataService: ImportResultDataService,
+    activatedRoute: ActivatedRoute
   ) {
     // list parent
     super(
       listHelperService,
       true
     );
+
+    // retrieve import mappings if we have any
+    this.savedImportPage = activatedRoute.snapshot.data.savedImportPage;
+    if (this.savedImportPage) {
+      this.savedMappings = activatedRoute.snapshot.data.savedImportMapping;
+    }
 
     // fix mime issue - browser not supporting some of the mimes, empty was provided to mime Type which wasn't allowing user to upload teh files
     if (!(FileLikeObject.prototype as any)._createFromObjectPrev) {
@@ -663,9 +673,6 @@ export class ImportDataComponent
      * Component initialized
      */
   ngOnInit() {
-    // get saved import mapping
-    this.getImportMappings();
-
     // init array levels
     this.possibleSourceDestinationLevels = [];
     for (let level = 0; level < 100; level++) {
@@ -1361,41 +1368,6 @@ export class ImportDataComponent
   }
 
   /**
-     * Get saved import mappings for specific page
-     */
-  getImportMappings(
-    finishedCallback?: () => void
-  ) {
-    // specify for what page we want to get the saved items
-    const qb = new RequestQueryBuilder();
-    qb.filter.where({
-      mappingKey: {
-        eq: this.savedImportPage
-      }
-    });
-
-    // since mappingData could be really big we need to retrieve only what is used by the list followed by retrieving more data if we need it
-    qb.fields(
-      'id',
-      'name',
-      'readOnly',
-
-      // required by API - it should be added by api, but at the moment it doesn't work like this
-      // #TODO - changes on API
-      'userId'
-    );
-
-    // retrieve data
-    this.savedMappingsList$ = this.savedImportMappingService
-      .getImportMappingsList(qb)
-      .pipe(tap(() => {
-        if (finishedCallback) {
-          finishedCallback();
-        }
-      }));
-  }
-
-  /**
      * Add drop-downs for mapping a drop-down type options
      */
   addMapOptionsIfNecessary(
@@ -1501,106 +1473,159 @@ export class ImportDataComponent
   }
 
   /**
-     * Save an import mapping
-     */
+   * Save an import mapping
+   */
   saveImportMapping() {
     // create import mapping
     const createImportMapping = () => {
-      this.dialogService
-        .showInput(
-          new DialogConfiguration({
-            message: 'LNG_DIALOG_SAVE_MAPPING_IMPORTS_TITLE',
-            yesLabel: 'LNG_DIALOG_SAVE_MAPPING_IMPORTS_BUTTON',
-            required: true,
-            fieldsList: [
-              new DialogField({
-                name: 'mappingImportName',
-                placeholder: 'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_NAME',
-                description: 'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_NAME_DESCRIPTION',
-                required: true,
-                fieldType: DialogFieldType.TEXT
-              }),
-              new DialogField({
-                name: 'isPublic',
-                placeholder: 'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_IS_PUBLIC',
-                fieldType: DialogFieldType.BOOLEAN
-              })
-            ]
-          }), true)
-        .subscribe((answer: DialogAnswer) => {
-          if (answer.button === DialogAnswerButton.Yes) {
-            // display loading
-            const loadingDialog = this.dialogService.showLoadingDialog();
-
-            // create import mappings
-            this.savedImportMappingService
-              .createImportMapping(new SavedImportMappingModel({
-                name: answer.inputValue.value.mappingImportName,
-                isPublic: answer.inputValue.value.isPublic,
-                mappingKey: this.savedImportPage,
-                mappingData: this.getMappedImportFieldsForSaving()
-              }))
-              .pipe(
-                catchError((err) => {
-                  // display error
-                  this.toastV2Service.error(err);
-
-                  // hide loading
-                  loadingDialog.close();
-
-                  // throw error down the road
-                  return throwError(err);
-                })
-              )
-              .subscribe((data: SavedImportMappingModel) => {
-                // refresh import mappings
-                this.getImportMappings(() => {
-                  // update loading item
-                  this.loadedImportMapping = {
-                    id: data.id,
-                    name: data.name,
-                    readOnly: data.readOnly
-                  };
-
-                  // hide loading
-                  loadingDialog.close();
-
-                  // display success message
-                  this.toastV2Service.success('LNG_PAGE_IMPORT_DATA_LOAD_SAVED_IMPORT_MAPPING_SUCCESS_MESSAGE');
-                });
-              });
+      this.dialogV2Service
+        .showSideDialog({
+          title: {
+            get: () => 'LNG_DIALOG_SAVE_MAPPING_IMPORTS_TITLE'
+          },
+          hideInputFilter: true,
+          inputs: [{
+            type: V2SideDialogConfigInputType.TEXT,
+            name: 'mappingImportName',
+            placeholder: 'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_NAME',
+            tooltip: 'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_NAME_DESCRIPTION',
+            value: undefined,
+            validators: {
+              required: () => true
+            }
+          }, {
+            type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+            name: 'isPublic',
+            placeholder: 'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_IS_PUBLIC',
+            value: false
+          }],
+          bottomButtons: [{
+            type: IV2SideDialogConfigButtonType.OTHER,
+            label: 'LNG_DIALOG_SAVE_MAPPING_IMPORTS_BUTTON',
+            color: 'primary'
+          }, {
+            type: IV2SideDialogConfigButtonType.CANCEL,
+            label: 'LNG_COMMON_BUTTON_CANCEL',
+            color: 'text'
+          }]
+        })
+        .subscribe((response) => {
+          // cancelled ?
+          if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+            // finished
+            return;
           }
+
+          // hide
+          response.handler.hide();
+
+          // display loading
+          const loadingDialog = this.dialogV2Service.showLoadingDialog();
+
+          // create import mappings
+          this.savedImportMappingService
+            .createImportMapping(new SavedImportMappingModel({
+              name: (response.data.map.mappingImportName as IV2SideDialogConfigInputText).value,
+              isPublic: (response.data.map.isPublic as IV2SideDialogConfigInputToggleCheckbox).value,
+              mappingKey: this.savedImportPage,
+              mappingData: this.getMappedImportFieldsForSaving()
+            }))
+            .pipe(
+              catchError((err) => {
+                // display error
+                this.toastV2Service.error(err);
+
+                // hide loading
+                loadingDialog.close();
+
+                // throw error down the road
+                return throwError(err);
+              })
+            )
+            .subscribe((data: SavedImportMappingModel) => {
+              // add the new import mapping to the list
+              this.savedMappings.map[data.id] = data;
+              this.savedMappings.list.push(data);
+              this.savedMappings.options.push({
+                label: data.name,
+                value: data.id,
+                data
+              });
+
+              // force re-render
+              this.savedMappings.options = [...this.savedMappings.options];
+
+              // update loading item
+              this.loadedImportMapping = {
+                id: data.id,
+                name: data.name,
+                readOnly: data.readOnly
+              };
+
+              // hide loading
+              loadingDialog.close();
+
+              // display success message
+              this.toastV2Service.success('LNG_PAGE_IMPORT_DATA_LOAD_SAVED_IMPORT_MAPPING_SUCCESS_MESSAGE');
+            });
         });
     };
 
     // create / update?
     if (
       this.loadedImportMapping &&
-            this.loadedImportMapping.id && (
+      this.loadedImportMapping.id && (
         !this.loadedImportMapping.readOnly ||
-                SavedImportMappingModel.canModify(this.authDataService.getAuthenticatedUser())
+        SavedImportMappingModel.canModify(this.authDataService.getAuthenticatedUser())
       )
     ) {
-      this.dialogService
-        .showConfirm(new DialogConfiguration({
-          message: 'LNG_DIALOG_SAVE_MAPPINGS_UPDATE_OR_CREATE_TITLE',
-          yesLabel: 'LNG_COMMON_BUTTON_UPDATE',
-          addDefaultButtons: true,
-          buttons: [
-            new DialogButton({
-              clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
-                dialogHandler.close(new DialogAnswer(DialogAnswerButton.Extra_1));
-              },
-              label: 'LNG_COMMON_BUTTON_CREATE'
-            })
+      this.dialogV2Service
+        .showBottomDialog({
+          config: {
+            title: {
+              get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
+            },
+            message: {
+              get: () => 'LNG_DIALOG_SAVE_MAPPINGS_UPDATE_OR_CREATE_TITLE',
+              data: () => ({
+                mapping: this.loadedImportMapping.name
+              })
+            }
+          },
+          bottomButtons: [
+            {
+              type: IV2BottomDialogConfigButtonType.OTHER,
+              label: 'LNG_COMMON_BUTTON_CREATE',
+              key: 'create',
+              color: 'primary'
+            },
+            {
+              type: IV2BottomDialogConfigButtonType.OTHER,
+              label: 'LNG_COMMON_BUTTON_UPDATE',
+              key: 'update',
+              color: 'primary'
+            },
+            {
+              type: IV2BottomDialogConfigButtonType.CANCEL,
+              label: 'LNG_COMMON_BUTTON_CANCEL',
+              color: 'text'
+            }
           ]
-        }), {
-          mapping: this.loadedImportMapping.name
         })
-        .subscribe((answer) => {
-          if (answer.button === DialogAnswerButton.Yes) {
+        .subscribe((response) => {
+          // canceled ?
+          if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+            // finished
+            return;
+          }
+
+          // create ?
+          if (response.button.key === 'create') {
+            createImportMapping();
+          } else {
+            // update
             // display loading
-            const loadingDialog = this.dialogService.showLoadingDialog();
+            const loadingDialog = this.dialogV2Service.showLoadingDialog();
 
             // update
             this.savedImportMappingService
@@ -1622,24 +1647,30 @@ export class ImportDataComponent
                 })
               )
               .subscribe((data: SavedImportMappingModel) => {
-                // refresh import mappings
-                this.getImportMappings(() => {
-                  // update import mapping
-                  this.loadedImportMapping = {
-                    id: data.id,
-                    name: data.name,
-                    readOnly: data.readOnly
-                  };
+                // update mapping list
+                this.savedMappings.map[data.id] = data;
+                const index: number = this.savedMappings.list.findIndex((item) => item.id === data.id);
+                this.savedMappings.list.splice(index, 1, data);
+                const old = this.savedMappings.options.find((item) => item.value === data.id);
+                old.data = data;
+                old.label = data.name;
 
-                  // hide loading
-                  loadingDialog.close();
+                // force re-render
+                this.savedMappings.options = [...this.savedMappings.options];
 
-                  // display message
-                  this.toastV2Service.success('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE');
-                });
+                // update import mapping
+                this.loadedImportMapping = {
+                  id: data.id,
+                  name: data.name,
+                  readOnly: data.readOnly
+                };
+
+                // hide loading
+                loadingDialog.close();
+
+                // display message
+                this.toastV2Service.success('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE');
               });
-          } else if (answer.button === DialogAnswerButton.Extra_1) {
-            createImportMapping();
           }
         });
     } else {
@@ -1668,7 +1699,10 @@ export class ImportDataComponent
   /**
      * Load a saved import mapping
      */
-  loadSavedImportMapping(savedImportMapping: ISavedImportMappingModel) {
+  loadSavedImportMapping(savedImportMappingId: string) {
+    // get import mapping
+    const savedImportMapping: ISavedImportMappingModel = this.savedMappings.map[savedImportMappingId];
+
     // keep loaded import mapping reference
     this.loadedImportMapping = savedImportMapping;
 
@@ -1681,15 +1715,23 @@ export class ImportDataComponent
     }
 
     // ask for confirmation
-    this.dialogService
-      .showConfirm(
-        'LNG_PAGE_IMPORT_DATA_LOAD_SAVED_MAPPING_CONFIRMATION', {
-          name: savedImportMapping.name
+    this.dialogV2Service
+      .showConfirmDialog({
+        config: {
+          title: {
+            get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
+          },
+          message: {
+            get: () => 'LNG_PAGE_IMPORT_DATA_LOAD_SAVED_MAPPING_CONFIRMATION',
+            data: () => ({
+              name: savedImportMapping.name
+            })
+          }
         }
-      )
-      .subscribe((answer: DialogAnswer) => {
-        // Cancel ?
-        if (answer.button !== DialogAnswerButton.Yes) {
+      })
+      .subscribe((response) => {
+        // canceled ?
+        if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
           // deselect
           this.loadedImportMapping = null;
 
@@ -1706,7 +1748,9 @@ export class ImportDataComponent
         }
 
         // retrieve mapping data
-        loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_LABEL_RETRIEVE_MAP_DATA');
+        loadingDialog.message({
+          message: 'LNG_PAGE_IMPORT_DATA_LABEL_RETRIEVE_MAP_DATA'
+        });
         this.savedImportMappingService
           .getImportMapping(this.loadedImportMapping.id)
           .pipe(
@@ -1721,7 +1765,9 @@ export class ImportDataComponent
           )
           .subscribe((importMapping: SavedImportMappingModel) => {
             // map fields
-            loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS');
+            loadingDialog.message({
+              message: 'LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS'
+            });
 
             // wait for message to be displayed
             setTimeout(() => {
@@ -1876,7 +1922,9 @@ export class ImportDataComponent
 
     // display loading
     const loadingDialog = this.createPrepareMapDataLoadingDialog();
-    loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_IMPORTING_VALIDATING');
+    loadingDialog.message({
+      message: 'LNG_PAGE_IMPORT_DATA_IMPORTING_VALIDATING'
+    });
 
     // validate items & import data
     setTimeout(() => {
@@ -1920,7 +1968,9 @@ export class ImportDataComponent
       }
 
       // mapping data
-      loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_IMPORTING_PREPARE');
+      loadingDialog.message({
+        message: 'LNG_PAGE_IMPORT_DATA_IMPORTING_PREPARE'
+      });
       setTimeout(() => {
         // construct import JSON
         const importJSON = {
@@ -1970,7 +2020,9 @@ export class ImportDataComponent
         });
 
         // start import
-        loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_IMPORTING_START_IMPORT');
+        loadingDialog.message({
+          message: 'LNG_PAGE_IMPORT_DATA_IMPORTING_START_IMPORT'
+        });
 
         // import data
         setTimeout(() => {
@@ -2023,15 +2075,16 @@ export class ImportDataComponent
                     )
                     .subscribe((importLogModel) => {
                       // update dialog message
-                      loadingDialog.showMessage(
-                        'LNG_PAGE_IMPORT_DATA_IMPORTING_IMPORT_STATUS', {
+                      loadingDialog.message({
+                        message: 'LNG_PAGE_IMPORT_DATA_IMPORTING_IMPORT_STATUS',
+                        messageData: {
                           processed: importLogModel.processedNo.toLocaleString('en'),
                           total: importLogModel.totalNo.toLocaleString('en'),
                           failed: importLogModel.result && importLogModel.result.details && importLogModel.result.details.failed ?
                             importLogModel.result.details.failed.toLocaleString('en') :
                             '0'
                         }
-                      );
+                      });
 
                       // check if we still need to wait for data to be processed
                       if (importLogModel.status === Constants.SYSTEM_SYNC_LOG_STATUS.IN_PROGRESS.value) {
@@ -2332,51 +2385,66 @@ export class ImportDataComponent
     item: ImportableMapField | IMappedOption,
     index: number
   ): void {
-    this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_IMPORT_FIELD_MAP')
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          // remove item
-          if (item instanceof ImportableMapField) {
+    // ask for confirmation
+    this.dialogV2Service
+      .showConfirmDialog({
+        config: {
+          title: {
+            get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
+          },
+          message: {
+            get: () => 'LNG_DIALOG_CONFIRM_IMPORT_FIELD_MAP'
+          }
+        }
+      })
+      .subscribe((response) => {
+        // canceled ?
+        if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+          // finished
+          return;
+        }
+
+        // remove item
+        if (item instanceof ImportableMapField) {
+          // remove
+          this.mappedFields.splice(index, 1);
+
+          // force re-render
+          this.removeFromListOfVisibleItems(index);
+
+          // clear edit mode if item or parent was removed
+          if (
+            this.elementInEditMode && (
+              item.id === this.elementInEditMode.id ||
+              (this.elementInEditMode as IMappedOption).parentId === item.id
+            )
+          ) {
+            // clear edit mode
+            this.clearElementInEditMode();
+          }
+        } else {
+          // find & remove field option map
+          const parent: ImportableMapField = this.mappedFields.find((mf) => mf.id === item.parentId);
+          if (parent) {
             // remove
-            this.mappedFields.splice(index, 1);
+            parent.mappedOptions.splice(index, 1);
 
             // force re-render
-            this.removeFromListOfVisibleItems(index);
-
-            // clear edit mode if item or parent was removed
-            if (
-              this.elementInEditMode && (
-                item.id === this.elementInEditMode.id ||
-                                (this.elementInEditMode as IMappedOption).parentId === item.id
-              )
-            ) {
-              // clear edit mode
-              this.clearElementInEditMode();
-            }
-          } else {
-            // find & remove field option map
-            const parent: ImportableMapField = this.mappedFields.find((mf) => mf.id === item.parentId);
-            if (parent) {
-              // remove
-              parent.mappedOptions.splice(index, 1);
-
-              // force re-render
-              this.forceRenderField(parent);
-            }
-
-            // clear edit mode if item or parent was removed
-            if (
-              this.elementInEditMode &&
-                            item.id === this.elementInEditMode.id
-            ) {
-              // clear edit mode
-              this.clearElementInEditMode();
-            }
+            this.forceRenderField(parent);
           }
 
-          // prepare data
-          this.validateData();
+          // clear edit mode if item or parent was removed
+          if (
+            this.elementInEditMode &&
+            item.id === this.elementInEditMode.id
+          ) {
+            // clear edit mode
+            this.clearElementInEditMode();
+          }
         }
+
+        // prepare data
+        this.validateData();
       });
   }
 
@@ -2603,17 +2671,15 @@ export class ImportDataComponent
   /**
      * Create loading dialog specific for preparing the map data
      */
-  private createPrepareMapDataLoadingDialog(): LoadingDialogModel {
-    return this.dialogService.showLoadingDialog({
-      widthPx: 400
-    });
+  private createPrepareMapDataLoadingDialog(): IV2LoadingDialogHandler {
+    return this.dialogV2Service.showLoadingDialog();
   }
 
   /**
      * Retrieve distinct values used to map fields
      */
   retrieveDistinctValues(
-    loadingDialog?: LoadingDialogModel,
+    loadingDialog?: IV2LoadingDialogHandler,
     importMapping?: SavedImportMappingModel
   ): void {
     // display loading
@@ -2727,7 +2793,9 @@ export class ImportDataComponent
     }
 
     // initializing message
-    loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_RETRIEVING_UNIQUE_VALUES');
+    loadingDialog.message({
+      message: 'LNG_PAGE_IMPORT_DATA_RETRIEVING_UNIQUE_VALUES'
+    });
 
     // retrieve items
     this.importExportDataService
@@ -2764,13 +2832,14 @@ export class ImportDataComponent
           const key: string = distinctValuesForKeys[index];
 
           // formatting message
-          loadingDialog.showMessage(
-            'LNG_PAGE_IMPORT_DATA_POPULATING_DISTINCT_CACHE', {
+          loadingDialog.message({
+            message: 'LNG_PAGE_IMPORT_DATA_POPULATING_DISTINCT_CACHE',
+            messageData: {
               index: (index + 1).toString(),
               total: distinctValuesForKeys.length.toString(),
               key: key
             }
-          );
+          });
 
           // process
           setTimeout(() => {
@@ -2935,12 +3004,13 @@ export class ImportDataComponent
               }
 
               // formatting message
-              loadingDialog.showMessage(
-                'LNG_PAGE_IMPORT_DATA_MAPPING_RETRIEVING_LOCATIONS', {
+              loadingDialog.message({
+                message: 'LNG_PAGE_IMPORT_DATA_MAPPING_RETRIEVING_LOCATIONS',
+                messageData: {
                   index: (totalSize - locationsToRetrieve.length).toString(),
                   total: totalSize.toString()
                 }
-              );
+              });
 
               // construct location batch
               const batchLocations: string[] = locationsToRetrieve.splice(0, Math.min(locationsToRetrieve.length, batchSize));
@@ -2969,8 +3039,8 @@ export class ImportDataComponent
                   locationData.forEach((location) => {
                     if (
                       location.parentLocationId &&
-                                            !this.locationCache[location.parentLocationId] &&
-                                            !locationsToRetrieve.includes(location.parentLocationId)
+                      !this.locationCache[location.parentLocationId] &&
+                      !locationsToRetrieve.includes(location.parentLocationId)
                     ) {
                       // add to list
                       locationsToRetrieve.push(location.parentLocationId);
@@ -2994,7 +3064,9 @@ export class ImportDataComponent
         // relabel child locations
         const reLabelLocations = (finishedCallback: () => void) => {
           // display message
-          loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_MAPPING_RETRIEVING_RELABEL_LOCATIONS');
+          loadingDialog.message({
+            message: 'LNG_PAGE_IMPORT_DATA_MAPPING_RETRIEVING_RELABEL_LOCATIONS'
+          });
 
           // wait for bindings to have effect
           setTimeout(() => {
@@ -3052,13 +3124,14 @@ export class ImportDataComponent
             const key: string = distinctValuesForKeys[index];
 
             // formatting message
-            loadingDialog.showMessage(
-              'LNG_PAGE_IMPORT_DATA_MAPPING_DATA', {
+            loadingDialog.message({
+              message: 'LNG_PAGE_IMPORT_DATA_MAPPING_DATA',
+              messageData: {
                 index: (index + 1).toString(),
                 total: distinctValuesForKeys.length.toString(),
                 key: key
               }
-            );
+            });
 
             // process
             setTimeout(() => {
@@ -3106,7 +3179,9 @@ export class ImportDataComponent
           0,
           () => {
             // initializing message
-            loadingDialog.showMessage('LNG_PAGE_IMPORT_DATA_RETRIEVING_LOCATIONS');
+            loadingDialog.message({
+              message: 'LNG_PAGE_IMPORT_DATA_RETRIEVING_LOCATIONS'
+            });
 
             // retrieve locations
             setTimeout(() => {
@@ -3467,21 +3542,34 @@ export class ImportDataComponent
      * See error details
      */
   seeErrorDetails(errJson: any): void {
-    this.dialogService
-      .showConfirm(new DialogConfiguration({
-        message: 'LNG_PAGE_IMPORT_DATA_ERROR_DETAILS_DIALOG_TITLE',
-        additionalInfo: `<code><pre>${JSON.stringify(errJson, null, 1)}</pre></code>`,
-        addDefaultButtons: false,
-        buttons: [
-          new DialogButton({
+    this.dialogV2Service
+      .showSideDialog({
+        // title
+        title: {
+          get: () => 'LNG_PAGE_IMPORT_DATA_ERROR_DETAILS_DIALOG_TITLE'
+        },
+
+        // hide search bar
+        hideInputFilter: true,
+
+        // inputs
+        inputs: [
+          {
+            type: V2SideDialogConfigInputType.HTML,
+            name: 'error',
+            placeholder: `<code><pre>${JSON.stringify(errJson, null, 1)}</pre></code>`
+          }
+        ],
+
+        // buttons
+        bottomButtons: [
+          {
+            type: IV2SideDialogConfigButtonType.CANCEL,
             label: 'LNG_COMMON_BUTTON_CLOSE',
-            clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
-              dialogHandler.close();
-            }
-          })
+            color: 'text'
+          }
         ]
-      }))
-      .subscribe();
+      }).subscribe();
   }
 
   /**
@@ -3491,10 +3579,22 @@ export class ImportDataComponent
     file: any,
     save: any
   ): void {
-    this.dialogService
-      .showConfirm(new DialogConfiguration({
-        message: 'LNG_PAGE_IMPORT_DATA_RECORD_DATA_DIALOG_TITLE',
-        additionalInfo: this.domSanitizer.bypassSecurityTrustHtml(`
+    this.dialogV2Service
+      .showSideDialog({
+        // title
+        title: {
+          get: () => 'LNG_PAGE_IMPORT_DATA_RECORD_DATA_DIALOG_TITLE'
+        },
+
+        // hide search bar
+        hideInputFilter: true,
+
+        // inputs
+        inputs: [
+          {
+            type: V2SideDialogConfigInputType.HTML,
+            name: 'message',
+            placeholder: `
                     <div style="display: flex; flex-direction: row; box-sizing: border-box; max-height: 300px; padding-bottom: 5px;">
                         <div style="flex: 1 1 0%; box-sizing: border-box; overflow: auto; font-weight: bold;">
                             ${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_FILE_TITLE')}
@@ -3517,19 +3617,19 @@ export class ImportDataComponent
                             </code>
                         </div>
                     </div>
-                `),
-        maxDialogWidth: '95vw',
-        addDefaultButtons: false,
-        buttons: [
-          new DialogButton({
+                `
+          }
+        ],
+
+        // buttons
+        bottomButtons: [
+          {
+            type: IV2SideDialogConfigButtonType.CANCEL,
             label: 'LNG_COMMON_BUTTON_CLOSE',
-            clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
-              dialogHandler.close();
-            }
-          })
+            color: 'text'
+          }
         ]
-      }))
-      .subscribe();
+      }).subscribe();
   }
 
   /**
@@ -3573,30 +3673,35 @@ export class ImportDataComponent
   showNotMappedFileColumns(): void {
     // create missing columns
     const notUsedFileHeaders = this.getNotMappedFileFields();
-    const notMappedFields: DialogField[] = [];
+    const notMappedFields: V2SideDialogConfigInput[] = [];
     _.each(notUsedFileHeaders, (item) => {
-      notMappedFields.push(new DialogField({
-        name: '_',
-        placeholder: `${notMappedFields.length + 1}. ${item.label}`,
-        fieldType: DialogFieldType.ACTION
-      }));
+      notMappedFields.push({
+        type: V2SideDialogConfigInputType.HTML,
+        name: uuid(),
+        placeholder: `${notMappedFields.length + 1}. ${item.label}`
+      });
     });
 
     // open dialog to choose the split factor
-    this.dialogService.showInput(
-      new DialogConfiguration({
-        message: 'LNG_PAGE_IMPORT_DATA_SHOW_NOT_MAPPED_COLUMNS_TITLE',
-        addDefaultButtons: false,
-        buttons: [
-          new DialogButton({
+    this.dialogV2Service
+      .showSideDialog({
+        // title
+        title: {
+          get: () => 'LNG_PAGE_IMPORT_DATA_SHOW_NOT_MAPPED_COLUMNS_TITLE'
+        },
+
+        // inputs
+        width: '60rem',
+        inputs: notMappedFields,
+
+        // buttons
+        bottomButtons: [
+          {
+            type: IV2SideDialogConfigButtonType.CANCEL,
             label: 'LNG_COMMON_BUTTON_CLOSE',
-            clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
-              dialogHandler.close();
-            }
-          })
-        ],
-        fieldsList: notMappedFields
-      }), true)
-      .subscribe(() => {});
+            color: 'text'
+          }
+        ]
+      }).subscribe();
   }
 }

@@ -1,5 +1,4 @@
-<mat-card
-    class="page-section page-content"
+<div
     fxLayout="column">
 
     <!-- Uploading / Saving data -->
@@ -74,18 +73,18 @@
         </div>
 
         <div fxLayout="row">
-            <app-form-input
+            <app-form-input-v2
                 name="decryptPassword"
                 [(ngModel)]="decryptPassword"
                 [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_DECRYPT_PASSWORD' | translate"
                 tooltip="LNG_PAGE_IMPORT_DATA_LABEL_DECRYPT_PASSWORD_DESTINATION">
-            </app-form-input>
+            </app-form-input-v2>
         </div>
 
         <div fxLayout="row" fxLayoutAlign="end">
             <button
                 mat-raised-button
-                color="accent"
+                color="primary"
                 [disabled]="!uploader || uploader.queue.length < 1"
                 (click)="uploadFile()"
                 type="button">
@@ -101,16 +100,14 @@
         class="import-data-map-fields">
         <div
             fxLayout="row" fxLayoutGap="20px">
-            <app-form-select
+            <app-form-select-single-v2
                 *ngIf="savedImportPage"
                 name="loadImportMapping"
                 [ngModel]="loadedImportMapping?.id"
                 [placeholder]="'LNG_PAGE_IMPORT_DATA_LOAD_SAVED_IMPORT_MAPPING_LABEL' | translate"
-                [options]="savedMappingsList$ | async "
-                (optionChanged)="loadSavedImportMapping($event)"
-                optionLabelKey="name"
-                optionValueKey="id">
-            </app-form-select>
+                [options]="savedMappings?.options"
+                (ngModelChange)="loadSavedImportMapping($event)">
+            </app-form-select-single-v2>
 
             <!-- Number of columns mapped -->
             <div
@@ -247,7 +244,7 @@
                     fxFlex="100px" fxLayoutAlign="start end">
                     <button
                         mat-raised-button
-                        color="accent"
+                        color="primary"
                         type="button"
                         [matTooltip]="'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD' | translate"
                         (click)="addNewFieldMap()">
@@ -779,7 +776,7 @@
                 (click)="saveImportMapping()"
                 type="button"
                 mat-raised-button
-                color="accent">
+                color="primary">
                 {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_SAVE_IMPORT_MAPPING' | translate }}
             </button>
 
@@ -789,7 +786,7 @@
                 (click)="retrieveDistinctValues()"
                 type="button"
                 mat-raised-button
-                color="accent">
+                color="primary">
                 {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_MAP_SUB_OPTIONS' | translate }}
             </button>
 
@@ -797,7 +794,7 @@
             <button
                 *ngIf="!needToMapOptions"
                 mat-raised-button
-                color="accent"
+                color="primary"
                 type="button"
                 (click)="importData()">
                 {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE' | translate }}
@@ -833,7 +830,7 @@
 
                         <!-- Hide / Show details -->
                         <button
-                            mat-raised-button color="accent"
+                            mat-raised-button color="primary"
                             (click)="err.showData = !err.showData">
                             {{ (err.showData ? 'LNG_PAGE_IMPORT_DATA_BUTTON_HIDE_ERR_RECORD_DETAILS' : 'LNG_PAGE_IMPORT_DATA_BUTTON_SHOW_ERR_RECORD_DETAILS') | translate }}
                         </button>
@@ -938,14 +935,14 @@
                             <button
                                 type="button"
                                 mat-raised-button
-                                color="accent"
+                                color="primary"
                                 (click)="resetFiltersToSideFilters()">
                                 {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
                             </button>
                             <button
                                 type="button"
                                 mat-raised-button
-                                color="accent"
+                                color="primary"
                                 (click)="needsRefreshList(true)">
                                 {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
                             </button>
@@ -1025,7 +1022,7 @@
                                         *ngIf="item.error && item.error.details">
                                         <button
                                             mat-raised-button
-                                            color="accent"
+                                            color="primary"
                                             type="button"
                                             (click)="seeErrorDetails(item.error.details)">
                                             {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_SEE_ERROR_DETAILS' | translate }}
@@ -1052,7 +1049,7 @@
                                         *ngIf="item.data && item.data.file && item.data.save">
                                         <button
                                             mat-raised-button
-                                            color="accent"
+                                            color="primary"
                                             type="button"
                                             (click)="seeRecordData(item.data.file, item.data.save)">
                                             {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_SEE_RECORD_DATA' | translate }}
@@ -1101,11 +1098,11 @@
         <div fxLayout="row" fxLayoutAlign="end">
             <button
                 mat-raised-button
-                color="accent"
+                color="primary"
                 type="button"
                 (click)="tryAgain()">
                 {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_TRY_AGAIN' | translate }}
             </button>
         </div>
     </ng-container>
-</mat-card>
+</div>
