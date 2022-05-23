@@ -40,8 +40,8 @@ export class DashboardComponent {
   quickActions: IV2ActionMenuLabel;
 
   // used to filter dashlets
+  globalFilterDate: string | Moment = moment();
   globalFilterLocationId: string = undefined;
-  globalFilterDate: Moment = moment();
   globalFilterClassificationId: string[] = [];
 
   // applied filters
@@ -120,7 +120,9 @@ export class DashboardComponent {
             optional: true,
             clearable: true,
             filterBy: (_qb, filter) => {
-              this.globalFilterLocationId = filter.value;
+              this.globalFilterLocationId = filter.value ?
+                filter.value :
+                undefined;
             }
           },
 
@@ -155,6 +157,9 @@ export class DashboardComponent {
 
         // set data
         this._advancedFiltersApplied = response.filtersApplied;
+
+        // update ui
+        this.detectChanges();
       });
   }
 

@@ -3,6 +3,7 @@ import { DashletValueStatus, IDashletValue } from '../../helperClasses/dashlet-v
 import { ReplaySubject, throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { Moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
   selector: 'app-kpi-dashlet',
@@ -13,6 +14,45 @@ export class AppKpiDashletComponent
 implements OnDestroy {
   // handler for stopping take until
   private _destroyed$: ReplaySubject<boolean> = new ReplaySubject<boolean>();
+
+  // used to filter dashlets - date
+  private _globalFilterDate: string | Moment;
+  @Input() set globalFilterDate(globalFilterDate: string | Moment) {
+    // set data
+    this._globalFilterDate = globalFilterDate;
+
+    // wait to gather all data and refresh
+    this.waitAndRefreshNecessary();
+  }
+  get globalFilterDate(): string | Moment {
+    return this._globalFilterDate;
+  }
+
+  // used to filter dashlets - location
+  private _globalFilterLocationId: string;
+  @Input() set globalFilterLocationId(globalFilterLocationId: string) {
+    // set data
+    this._globalFilterLocationId = globalFilterLocationId;
+
+    // wait to gather all data and refresh
+    this.waitAndRefreshNecessary();
+  }
+  get globalFilterLocationId(): string {
+    return this._globalFilterLocationId;
+  }
+
+  // used to filter dashlets - classification
+  private _globalFilterClassificationId: string[];
+  @Input() set globalFilterClassificationId(globalFilterClassificationId: string[]) {
+    // set data
+    this._globalFilterClassificationId = globalFilterClassificationId;
+
+    // wait to gather all data and refresh
+    this.waitAndRefreshNecessary();
+  }
+  get globalFilterClassificationId(): string[] {
+    return this._globalFilterClassificationId;
+  }
 
   // title
   @Input() title: string;
@@ -43,6 +83,9 @@ implements OnDestroy {
     return this._expanded;
   }
 
+  // timeout
+  private _waitAndRefreshNecessary: any;
+
   // constants
   DashletValueStatus = DashletValueStatus;
 
@@ -69,6 +112,26 @@ implements OnDestroy {
    */
   private detectChanges(): void {
     this.changeDetectorRef.detectChanges();
+  }
+
+  /**
+   * Refresh what is necessary
+   */
+  private waitAndRefreshNecessary(): void {
+    // clear previous
+    if (this._waitAndRefreshNecessary) {
+      clearTimeout(this._waitAndRefreshNecessary);
+      this._waitAndRefreshNecessary = undefined;
+    }
+
+    // wait
+    this._waitAndRefreshNecessary = setTimeout(() => {
+      // reset
+      this._waitAndRefreshNecessary = undefined;
+
+      // trigger update
+      this.refreshNecessary();
+    });
   }
 
   /**
@@ -107,7 +170,14 @@ implements OnDestroy {
       value.status = DashletValueStatus.LOADING;
 
       // load data
-      value.subscription = value.refresh(value.inputValue !== undefined && typeof value.inputValue === 'string' ? parseInt(value.inputValue, 10) : value.inputValue)
+      value.subscription = value.refresh(
+        value.inputValue !== undefined && typeof value.inputValue === 'string' ?
+          parseInt(value.inputValue, 10) :
+          value.inputValue,
+        this.globalFilterDate,
+        this.globalFilterLocationId,
+        this.globalFilterClassificationId
+      )
         .pipe(
           // error
           catchError((err) => {

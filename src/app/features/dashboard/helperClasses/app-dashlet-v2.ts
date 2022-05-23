@@ -2,8 +2,19 @@ import { Subscription } from 'rxjs';
 import { IDashletValue } from './dashlet-value';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
+import { Moment } from '../../../core/helperClasses/x-moment';
+import { Directive, Input } from '@angular/core';
 
+/**
+ * Dashlet
+ */
+@Directive()
 export abstract class AppDashletV2 {
+  // used to filter dashlets
+  @Input() globalFilterDate: string | Moment;
+  @Input() globalFilterLocationId: string;
+  @Input() globalFilterClassificationId: string[];
+
   // title
   title: string;
 
