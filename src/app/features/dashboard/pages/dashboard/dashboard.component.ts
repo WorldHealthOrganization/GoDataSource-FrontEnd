@@ -48,15 +48,6 @@ export class DashboardComponent {
   private _advancedFiltersApplied: SavedFilterData = new SavedFilterData({
     appliedFilterOperator: RequestFilterOperator.AND,
     appliedFilters: [
-      // location
-      new SavedFilterDataAppliedFilter({
-        filter: {
-          uniqueKey: 'locationIdLNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION'
-        },
-        comparator: V2AdvancedFilterComparatorType.LOCATION,
-        value: this.globalFilterLocationId
-      }),
-
       // date
       new SavedFilterDataAppliedFilter({
         filter: {
@@ -64,6 +55,15 @@ export class DashboardComponent {
         },
         comparator: V2AdvancedFilterComparatorType.DATE,
         value: this.globalFilterDate
+      }),
+
+      // location
+      new SavedFilterDataAppliedFilter({
+        filter: {
+          uniqueKey: 'locationIdLNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION'
+        },
+        comparator: V2AdvancedFilterComparatorType.LOCATION,
+        value: this.globalFilterLocationId
       }),
 
       // classification
@@ -102,28 +102,26 @@ export class DashboardComponent {
       .showAdvancedFiltersDialog(
         Constants.APP_PAGE.DASHBOARD.value,
         [
-          // Location
-          {
-            type: V2AdvancedFilterType.LOCATION_SINGLE,
-            field: 'locationId',
-            label: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION'
-            // #TODO
-            // value: this.globalFilterLocationId,
-            // filterBy: (_qb, filter) => {
-            //   console.log(filter);
-            // }
-          },
-
           // Date
           {
             type: V2AdvancedFilterType.DATE,
             field: 'date',
-            label: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE'
-            // #TODO
-            // value: this.globalFilterDate
-            // filterBy: (_qb, filter) => {
-            //   console.log(filter);
-            // }
+            label: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE',
+            filterBy: (_qb, filter) => {
+              this.globalFilterDate = filter.value;
+            }
+          },
+
+          // Location
+          {
+            type: V2AdvancedFilterType.LOCATION_SINGLE,
+            field: 'locationId',
+            label: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION',
+            optional: true,
+            clearable: true,
+            filterBy: (_qb, filter) => {
+              this.globalFilterLocationId = filter.value;
+            }
           },
 
           // Classification
@@ -132,14 +130,13 @@ export class DashboardComponent {
             field: 'classificationId',
             label: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_CLASSIFICATION',
             options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            optional: true,
             allowedComparators: [
               _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
-            ]
-            // #TODO
-            // value: this.globalFilterClassificationId
-            // filterBy: (_qb, filter) => {
-            //   console.log(filter);
-            // }
+            ],
+            filterBy: (_qb, filter) => {
+              this.globalFilterClassificationId = filter.value;
+            }
           }
         ],
         this._advancedFiltersApplied,

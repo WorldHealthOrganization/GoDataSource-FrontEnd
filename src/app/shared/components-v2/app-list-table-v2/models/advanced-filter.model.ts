@@ -271,6 +271,8 @@ interface IV2AdvancedFilterBase {
   // never
   optionsLoad?: never;
   options?: never;
+  optional?: never;
+  clearable?: never;
 }
 
 /**
@@ -311,10 +313,13 @@ interface IV2AdvancedFilterSingleSelectLoader extends Omit<IV2AdvancedFilterSing
 /**
  * Advanced filter - Multiple select
  */
-interface IV2AdvancedFilterMultipleSelect extends Omit<IV2AdvancedFilterBase, 'options'> {
+interface IV2AdvancedFilterMultipleSelect extends Omit<IV2AdvancedFilterBase, 'options' | 'optional'> {
   // required
   type: V2AdvancedFilterType.MULTISELECT;
   options: ILabelValuePairModel[];
+
+  // optional
+  optional?: boolean;
 }
 interface IV2AdvancedFilterMultipleSelectLoader extends Omit<IV2AdvancedFilterMultipleSelect, 'options' | 'optionsLoad'> {
   // required
@@ -361,9 +366,13 @@ export interface IV2AdvancedFilterPhoneNumber extends IV2AdvancedFilterBase {
 /**
  * Advanced filter - location single
  */
-export interface IV2AdvancedFilterSingleLocation extends IV2AdvancedFilterBase {
+export interface IV2AdvancedFilterSingleLocation extends Omit<IV2AdvancedFilterBase, 'optional' | 'clearable'> {
   // required
   type: V2AdvancedFilterType.LOCATION_SINGLE;
+
+  // optional
+  optional?: boolean;
+  clearable?: boolean;
 }
 
 /**

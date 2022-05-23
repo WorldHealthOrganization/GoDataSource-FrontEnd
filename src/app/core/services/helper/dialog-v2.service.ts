@@ -1036,19 +1036,6 @@ export class DialogV2Service {
 
     // set conditions
     appliedFilters.forEach((appliedFilter) => {
-      // there is no point in adding a condition if no value is provided
-      if (
-        (
-          appliedFilter.value === undefined ||
-          appliedFilter.value === null
-        ) && (
-          appliedFilter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE &&
-          appliedFilter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE
-        )
-      ) {
-        return;
-      }
-
       // retrieve filter definition
       const filterDefinition: V2AdvancedFilter = filterOptionsMap[appliedFilter.filterBy.value];
 

@@ -512,7 +512,7 @@
                               [name]="filter.name"
                               placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
                               [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.options"
-                              required="true">
+                              [required]="!input.optionsAsLabelValueMap[filter.filterBy.value].data.optional">
                             </app-form-select-multiple-v2>
 
                             <!-- Number / Age range -->
@@ -563,7 +563,8 @@
                               [name]="filter.name"
                               placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION"
                               useOutbreakLocations="true"
-                              required="true"
+                              [required]="!input.optionsAsLabelValueMap[filter.filterBy.value].data.optional"
+                              [clearable]="!!input.optionsAsLabelValueMap[filter.filterBy.value].data.clearable"
                               (selectedLocationChanged)="filter.comparator.value !== V2AdvancedFilterComparatorType.WITHIN ? undefined : (filter.extraValues.location = $event)">
                             </app-form-select-location-single-v2>
 
