@@ -1,0 +1,102 @@
+<div
+  class="gd-dashlet-kpi">
+
+  <!-- Title and actions -->
+  <div
+    class="gd-dashlet-kpi-top"
+    fxLayout="row">
+
+    <!-- Title -->
+    <div
+      class="gd-dashlet-kpi-top-title"
+      fxFlex>
+      {{title | translate}}
+    </div>
+
+    <!-- Actions -->
+    <div
+      class="gd-dashlet-kpi-top-actions"
+      fxGrow="0">
+
+      <!-- Expanded options -->
+      <ng-container
+        *ngIf="expanded">
+        expanded options
+      </ng-container>
+
+      <!-- Expand / Collapse -->
+      <button
+        type="button"
+        mat-icon-button
+        (click)="expanded = !expanded">
+        <mat-icon>expand_more</mat-icon>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- KPI -->
+  <div
+    *ngIf="expanded"
+    class="gd-dashlet-kpi-bottom">
+
+    <!-- Render value -->
+    <div
+      *ngFor="let value of values"
+      class="gd-dashlet-kpi-bottom-value"
+      fxLayout="row">
+
+      <!-- Left -->
+      <div
+        fxFlex>
+        <!-- Prefix -->
+        <span>{{value.prefix | translate}}</span>
+
+        <!-- Input & Suffix -->
+        <ng-container
+          *ngIf="value.suffix">
+
+          <!-- Input -->
+          <app-form-number-v2
+            [(ngModel)]="value.inputValue"
+            autocomplete="off"
+            (ngModelChange)="reloadValue(value)"></app-form-number-v2>
+
+          <!-- Suffix -->
+          <span>{{value.suffix | translate}}</span>
+
+        </ng-container>
+      </div>
+
+      <!-- Value -->
+      <div
+        fxGrow="0"
+        [ngSwitch]="value.status">
+
+        <!-- Loading -->
+        <div
+          *ngSwitchCase="DashletValueStatus.LOADING">
+          <mat-progress-spinner
+            mode="indeterminate"
+            diameter="16"></mat-progress-spinner>
+        </div>
+
+        <!-- Error -->
+        <div
+          *ngSwitchCase="DashletValueStatus.ERROR">
+          <mat-icon
+            color="warn">error</mat-icon>
+        </div>
+
+        <!-- Value -->
+        <div
+          *ngSwitchCase="DashletValueStatus.LOADED">
+          {{value.value}}
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

@@ -1746,7 +1746,11 @@ export class DialogV2Service {
     advancedFilterType: string,
     advancedFilters: V2AdvancedFilter[],
     advancedFiltersApplied: SavedFilterData,
-    operatorHide?: boolean
+    config?: {
+      operatorHide?: boolean,
+      disableAdd?: boolean,
+      disableReset?: boolean
+    }
   ): Observable<IV2SideDialogAdvancedFiltersResponse | null> {
     return new Observable<IV2SideDialogAdvancedFiltersResponse | null>((observer) => {
       // display filters dialog
@@ -1784,7 +1788,9 @@ export class DialogV2Service {
             filters: [],
             sorts: [],
             operatorValue: RequestFilterOperator.AND,
-            operatorHide
+            operatorHide: config?.operatorHide,
+            disableAdd: config?.disableAdd,
+            disableReset: config?.disableReset
           }
         ],
         bottomButtons: [{

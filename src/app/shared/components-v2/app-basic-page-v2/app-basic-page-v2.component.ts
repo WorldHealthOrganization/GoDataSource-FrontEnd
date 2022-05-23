@@ -126,7 +126,9 @@ export class AppBasicPageV2Component implements OnInit, OnDestroy {
         this.advancedFilterType,
         this.advancedFilters,
         this._advancedFiltersApplied,
-        this.advancedFiltersHideOperator
+        {
+          operatorHide: this.advancedFiltersHideOperator
+        }
       )
       .subscribe((response) => {
         // cancelled ?

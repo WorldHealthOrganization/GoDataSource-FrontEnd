@@ -28,9 +28,14 @@ import { CasesBasedOnContactStatusDashletComponent } from './cases-based-on-cont
 import { C3CombinationStackedBarChartComponent } from './c3-combination-stacked-bar-chart/c3-combination-stacked-bar-chart.component';
 import { C3StackedBarChartComponent } from './c3-stacked-bar-chart/c3-stacked-bar-chart.component';
 import { DashboardCustomMetricDashletComponent } from './dashboard-custom-metric-dashlet/dashboard-custom-metric-dashlet.component';
+import { AppCasesKpiDashletComponent } from './app-cases-kpi-dashlet/app-cases-kpi-dashlet.component';
+import { AppKpiDashletComponent } from './app-kpi-dashlet/app-kpi-dashlet.component';
 
 // export the list of all page components
 export const components: any[] = [
+  AppCasesKpiDashletComponent,
+  AppKpiDashletComponent,
+
   ContactsOnFollowupListDashletComponent,
   CasesDeceasedDashletComponent,
   CasesHospitalisedDashletComponent,

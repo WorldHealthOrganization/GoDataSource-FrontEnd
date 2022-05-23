@@ -284,6 +284,10 @@ export class Constants {
     GANTT_CHART: {
       label: 'LNG_APP_PAGE_GANTT_CHART',
       value: 'LNG_APP_PAGE_GANTT_CHART'
+    },
+    DASHBOARD: {
+      label: 'LNG_APP_PAGE_DASHBOARD',
+      value: 'LNG_APP_PAGE_DASHBOARD'
     }
   };
 
