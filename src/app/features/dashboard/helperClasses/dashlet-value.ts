@@ -1,6 +1,7 @@
 import { Observable } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { Moment } from '../../../core/helperClasses/x-moment';
+import { DashboardDashlet } from '../../../core/enums/dashboard.enum';
 
 /**
  * Dashlet value status
@@ -16,6 +17,7 @@ export enum DashletValueStatus {
  */
 export interface IDashletValue {
   // required
+  name: DashboardDashlet;
   prefix: string;
   refresh: (
     inputValue: number,

@@ -7,6 +7,7 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { MetricCasesWithContactsModel } from '../../../../core/models/metrics/metric-cases-contacts.model';
 import { Constants } from '../../../../core/models/constants';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { DashboardDashlet } from '../../../../core/enums/dashboard.enum';
 
 @Component({
   selector: 'app-cases-kpi-dashlet',
@@ -49,6 +50,7 @@ export class AppCasesKpiDashletComponent
     this.values = [
       // Cases who have died
       {
+        name: DashboardDashlet.CASES_DECEASED,
         prefix: 'LNG_PAGE_DASHBOARD_KPI_CASES_DECEASED_TITLE',
         refresh: (
           _inputValue,
@@ -108,6 +110,7 @@ export class AppCasesKpiDashletComponent
 
       // Cases hospitalised
       {
+        name: DashboardDashlet.CASES_HOSPITALISED,
         prefix: 'LNG_PAGE_DASHBOARD_KPI_CASES_HOSPITALISED_TITLE',
         refresh: () => {
           // filter
@@ -128,6 +131,7 @@ export class AppCasesKpiDashletComponent
 
       // Cases with Less than x Contacts
       {
+        name: DashboardDashlet.CASES_WITH_LESS_THAN_X_CONTACTS,
         prefix: 'LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE_BEFORE_VALUE',
         suffix: 'LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE_AFTER_VALUE',
         inputValue: this.selectedOutbreak.noLessContacts,

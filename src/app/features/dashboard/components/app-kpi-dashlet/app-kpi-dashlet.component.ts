@@ -4,6 +4,9 @@ import { ReplaySubject, throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { Moment } from '../../../../core/helperClasses/x-moment';
+import { UserModel, UserSettings } from '../../../../core/models/user.model';
+import { DashletSettingsModel, UserSettingsDashboardModel } from '../../../../core/models/user-settings-dashboard.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
   selector: 'app-kpi-dashlet',
@@ -59,15 +62,24 @@ implements OnDestroy {
 
   // values
   private _values: IDashletValue[];
+  private _valuesVisibleAndSorted: IDashletValue[];
   @Input() set values(values: IDashletValue[]) {
     // set data
     this._values = values;
 
+    // filter values
+    this._valuesVisibleAndSorted = (this._values || []).filter((value) => this.dashletMap[value.name] === undefined || this.dashletMap[value.name].visible);
+
+    // sort values
+    // this._valuesVisibleAndSorted.sort((a, b) => {
+    //   return a.
+    // });
+
     // refresh
     this.refreshNecessary(false);
   }
-  get values(): IDashletValue[] {
-    return this._values;
+  get valuesVisibleAndSorted(): IDashletValue[] {
+    return this._valuesVisibleAndSorted;
   }
 
   // expanded / collapsed ?
@@ -86,6 +98,12 @@ implements OnDestroy {
   // timeout
   private _waitAndRefreshNecessary: any;
 
+  // authenticated user data
+  private _authUser: UserModel;
+  protected dashletMap: {
+    [key: string]: DashletSettingsModel
+  } = {};
+
   // constants
   DashletValueStatus = DashletValueStatus;
 
@@ -94,8 +112,19 @@ implements OnDestroy {
    */
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
-    private toastV2Service: ToastV2Service
-  ) {}
+    private toastV2Service: ToastV2Service,
+    authDataService: AuthDataService
+  ) {
+    // get the authenticated user
+    this._authUser = authDataService.getAuthenticatedUser();
+
+    // retrieve dashlets settings
+    const dashboardSettings: UserSettingsDashboardModel = this._authUser.getSettings(UserSettings.DASHBOARD);
+    this.dashletMap = {};
+    dashboardSettings.dashlets.forEach((dashlet) => {
+      this.dashletMap[dashlet.name] = dashlet;
+    });
+  }
 
   /**
    * Component destroyed
@@ -140,14 +169,14 @@ implements OnDestroy {
   private refreshNecessary(forceReload: boolean): void {
     // nothing to do ?
     if (
-      !this.values?.length ||
+      !this.valuesVisibleAndSorted?.length ||
       !this.expanded
     ) {
       return;
     }
 
     // go through dashlet values and check if we need to load anything
-    this.values.forEach((value) => {
+    this.valuesVisibleAndSorted.forEach((value) => {
       // nothing to do ?
       if (
         (
