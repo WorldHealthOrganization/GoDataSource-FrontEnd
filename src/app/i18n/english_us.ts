@@ -14,6 +14,7 @@ export const EnglishUsLang = {
     'LNG_LAYOUT_MENU_VERSION_LABEL': 'Go.Data version: {{version}} - build {{build}}',
     'LNG_LAYOUT_MENU_DATA_LABEL': 'DATA',
     'LNG_LAYOUT_MENU_SYSTEM_ADMINISTRATION_LABEL': 'SYSTEM ADMINISTRATION',
+    'LNG_QUESTIONNAIRE_LABEL_FILE_UPLOAD': 'Please upload a file',
     'LNG_COMMON_LABEL_ATTENTION_REQUIRED': 'Attention required',
     'LNG_COMMON_LABEL_ACTIONS': 'Actions',
     'LNG_COMMON_LABEL_HAS_DUPLICATES_TITLE': 'Possible duplicates',
