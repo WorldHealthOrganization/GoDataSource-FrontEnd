@@ -98,7 +98,8 @@
                   mat-flat-button
                   type="button"
                   color="text"
-                  routerLink="/auth/forgot-password">
+                  routerLink="/auth/forgot-password"
+                  tabindex="-1">
                   {{ 'LNG_PAGE_LOGIN_FORGOT_PASSWORD_LABEL' | translate }}
                 </button>
               </div>
@@ -145,6 +146,7 @@
                 <button
                   type="button"
                   mat-icon-button
+                  tabindex="-1"
                   (click)="refreshCaptcha()">
                   <mat-icon>refresh</mat-icon>
                 </button>
