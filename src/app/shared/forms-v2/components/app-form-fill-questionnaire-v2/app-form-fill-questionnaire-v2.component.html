@@ -26,7 +26,7 @@
           <div
             *ngSwitchCase="FlattenType.QUESTION"
             class="gd-form-fill-questionnaire-v2-list-item-question"
-            fxLayout="row" fxLayoutAlign="start center">
+            fxLayout="row" fxLayoutAlign="none center">
 
             <!-- Collapse / Expand -->
             <mat-icon
@@ -74,7 +74,7 @@
           <div
             *ngSwitchCase="FlattenType.ANSWER_MULTI_DATE"
             class="gd-form-fill-questionnaire-v2-list-item-answer-multi-date"
-            fxLayout="row" fxLayoutAlign=" center"
+            fxLayout="row" fxLayoutAlign="none center"
             [style.paddingLeft.px]="item.level * 20">
 
             <!-- Collapse / Expand -->
@@ -132,7 +132,7 @@
             class="gd-form-fill-questionnaire-v2-list-item-answer"
             [class.gd-form-fill-questionnaire-v2-list-item-answer-multiple]="item.parent.data.multiAnswer"
             [class.gd-form-fill-questionnaire-v2-list-item-answer-file]="item.definition.type === FlattenAnswerDrawType.FILE"
-            fxLayout="row" fxLayoutAlign="start center">
+            fxLayout="row" fxLayoutAlign="none center">
 
             <!-- Collapse / Expand -->
             <!-- append padding and remove icon -->
