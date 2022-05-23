@@ -11,8 +11,10 @@ import { AppListTableV2LoadingComponent } from './app-list-table-v2/components/l
 import { AppListTableV2NoDataComponent } from './app-list-table-v2/components/no-data/app-list-table-v2-no-data.component';
 import { AppCreateViewModifyV2Component } from './app-create-view-modify-v2/app-create-view-modify-v2.component';
 import { AppSelectLanguageV2Component } from './app-select-language-v2/app-select-language-v2.component';
+import { AppBasicPageV2Component } from './app-basic-page-v2/app-basic-page-v2.component';
 
 export const components: any[] = [
+  AppBasicPageV2Component,
   AppBottomDialogV2Component,
   AppBreadcrumbV2Component,
   AppCreateViewModifyV2Component,

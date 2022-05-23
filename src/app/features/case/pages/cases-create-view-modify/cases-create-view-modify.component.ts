@@ -141,7 +141,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Create new item model if needed
    */
   protected createNewItem(): CaseModel {
-    return new CaseModel();
+    return new CaseModel({
+      addresses: [new AddressModel({
+        typeId: AddressType.CURRENT_ADDRESS
+      })]
+    });
   }
 
   /**
@@ -616,13 +620,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           inputs: [{
             type: CreateViewModifyV2TabInputType.LIST,
             name: 'addresses',
-            items: this.isCreate ?
-              (
-                this.itemData.addresses = [new AddressModel({
-                  typeId: AddressType.CURRENT_ADDRESS
-                })]
-              ) :
-              this.itemData.addresses,
+            items: this.itemData.addresses,
             itemsChanged: (list) => {
               // update addresses
               this.itemData.addresses = list.items;
@@ -643,6 +641,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                   get: (index: number) => {
                     return this.itemData.addresses[index];
                   }
+                },
+                validators: {
+                  required: () => true
                 }
               }
             }

@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
@@ -27,7 +26,7 @@ export class CreateReferenceDataEntryComponent
   extends CreateConfirmOnChanges
   implements OnInit {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   categoryId: string;
   // new Entry model
@@ -112,40 +111,40 @@ export class CreateReferenceDataEntryComponent
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (ReferenceDataCategoryModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
-      );
-    }
-
-    // add new breadcrumb: Category page
-    if (
-      this.category &&
-            ReferenceDataEntryModel.canList(this.authUser)
-    ) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          this.category.name,
-          `/reference-data/${this.categoryId}`,
-          false,
-          {},
-          this.category
-        )
-      );
-    }
-
-    // add new breadcrumb: page title
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        'LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_TITLE',
-        '.',
-        true
-      )
-    );
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // add list breadcrumb only if we have permission
+    // if (ReferenceDataCategoryModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
+    //   );
+    // }
+    //
+    // // add new breadcrumb: Category page
+    // if (
+    //   this.category &&
+    //         ReferenceDataEntryModel.canList(this.authUser)
+    // ) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel(
+    //       this.category.name,
+    //       `/reference-data/${this.categoryId}`,
+    //       false,
+    //       {},
+    //       this.category
+    //     )
+    //   );
+    // }
+    //
+    // // add new breadcrumb: page title
+    // this.breadcrumbs.push(
+    //   new BreadcrumbItemModel(
+    //     'LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_TITLE',
+    //     '.',
+    //     true
+    //   )
+    // );
   }
 
   /**

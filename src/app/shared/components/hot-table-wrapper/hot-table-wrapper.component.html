@@ -1,66 +1,66 @@
-<!--<hot-table-->
-<!--    #sheetTable-->
-<!--    [hotId]="hotId"-->
-<!--    [colHeaders]="true"-->
-<!--    [data]="data"-->
-<!--    [rowHeaders]="true"-->
-<!--    [manualColumnResize]="true"-->
-<!--    preventOverflow="horizontal"-->
-<!--    [width]="sheetWidth"-->
-<!--    [height]="520"-->
-<!--    [contextMenu]="sheetContextMenu"-->
-<!--    [colWidths]="150"-->
-<!--    [startRows]="startRows"-->
-<!--    [minSpareRows]="minSpareRows"-->
-<!--    [renderAllRows]="true"-->
-<!--    [beforeValidate]="beforeValidateSheet"-->
-<!--    [afterRemoveRow]="afterRemoveRow"-->
-<!--    [afterChange]="afterChangeTrigger()"-->
-<!--    licenseKey="non-commercial-and-evaluation">-->
+<hot-table
+  #sheetTable
+  [hotId]="hotId"
+  [colHeaders]="true"
+  [data]="data"
+  [rowHeaders]="true"
+  [manualColumnResize]="true"
+  preventOverflow="horizontal"
+  [width]="sheetWidth"
+  [height]="520"
+  [contextMenu]="sheetContextMenu"
+  [colWidths]="150"
+  [startRows]="startRows"
+  [minSpareRows]="minSpareRows"
+  [renderAllRows]="true"
+  [beforeValidate]="beforeValidateSheet"
+  [afterRemoveRow]="afterRemoveRow"
+  [afterChange]="afterChangeTrigger()"
+  licenseKey="non-commercial-and-evaluation">
 
-<!--    <ng-container *ngFor="let column of sheetColumns">-->
-<!--        &lt;!&ndash; Text column &ndash;&gt;-->
-<!--        <hot-column-->
-<!--            *ngIf="column.type === SheetCellType.TEXT"-->
-<!--            [title]="(column.title | translate) + (column.required ? ' *' : '')"-->
-<!--            [validator]="column.validationFunc">-->
-<!--        </hot-column>-->
+  <ng-container *ngFor="let column of sheetColumns">
+    <!-- Text column -->
+    <hot-column
+      *ngIf="column.type === SheetCellType.TEXT"
+      [title]="(column.title | translate) + (column.required ? ' *' : '')"
+      [validator]="column.validationFunc">
+    </hot-column>
 
-<!--        &lt;!&ndash; Numeric column &ndash;&gt;-->
-<!--        <hot-column-->
-<!--            *ngIf="column.type === SheetCellType.NUMERIC"-->
-<!--            [title]="(column.title | translate) + (column.required ? ' *' : '')"-->
-<!--            type="numeric"-->
-<!--            [validator]="column.validationFunc">-->
-<!--        </hot-column>-->
+    <!-- Numeric column -->
+    <hot-column
+      *ngIf="column.type === SheetCellType.NUMERIC"
+      [title]="(column.title | translate) + (column.required ? ' *' : '')"
+      type="numeric"
+      [validator]="column.validationFunc">
+    </hot-column>
 
-<!--        &lt;!&ndash; Date column &ndash;&gt;-->
-<!--        <hot-column-->
-<!--            *ngIf="column.type === SheetCellType.DATE"-->
-<!--            [title]="(column.title | translate) + (column.required ? ' *' : '')"-->
-<!--            type="date"-->
-<!--            [dateFormat]="Constants.DEFAULT_DATE_DISPLAY_FORMAT"-->
-<!--            [correctFormat]="true"-->
-<!--            [validator]="column.validationFunc">-->
-<!--        </hot-column>-->
+    <!-- Date column -->
+    <hot-column
+      *ngIf="column.type === SheetCellType.DATE"
+      [title]="(column.title | translate) + (column.required ? ' *' : '')"
+      type="date"
+      [dateFormat]="Constants.DEFAULT_DATE_DISPLAY_FORMAT"
+      [correctFormat]="true"
+      [validator]="column.validationFunc">
+    </hot-column>
 
-<!--        &lt;!&ndash; Dropdown column &ndash;&gt;-->
-<!--        <hot-column-->
-<!--            *ngIf="column.type === SheetCellType.DROPDOWN"-->
-<!--            [title]="(column.title | translate) + (column.required ? ' *' : '')"-->
-<!--            type="dropdown"-->
-<!--            [trimDropdown]="false"-->
-<!--            [source]="column.optionLabels$ | async"-->
-<!--            [validator]="column.validationFunc">-->
-<!--        </hot-column>-->
+    <!-- Dropdown column -->
+    <hot-column
+      *ngIf="column.type === SheetCellType.DROPDOWN"
+      [title]="(column.title | translate) + (column.required ? ' *' : '')"
+      type="dropdown"
+      [trimDropdown]="false"
+      [source]="column.optionLabels$ | async"
+      [validator]="column.validationFunc">
+    </hot-column>
 
-<!--        &lt;!&ndash; Location button column &ndash;&gt;-->
-<!--        <hot-column-->
-<!--            *ngIf="column.type === SheetCellType.LOCATION"-->
-<!--            [title]="(column.title | translate) + (column.required ? ' *' : '')"-->
-<!--            [renderer]="locationRenderer()"-->
-<!--            [editor]="CustomLocationEditor"-->
-<!--            [validator]="column.validationFunc">-->
-<!--        </hot-column>-->
-<!--    </ng-container>-->
-<!--</hot-table>-->
+    <!-- Location button column -->
+    <hot-column
+      *ngIf="column.type === SheetCellType.LOCATION"
+      [title]="(column.title | translate) + (column.required ? ' *' : '')"
+      [renderer]="locationRenderer()"
+      [editor]="CustomLocationEditor"
+      [validator]="column.validationFunc">
+    </hot-column>
+  </ng-container>
+</hot-table>

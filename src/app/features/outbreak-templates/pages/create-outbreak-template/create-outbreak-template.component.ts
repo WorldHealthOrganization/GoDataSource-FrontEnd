@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Observable, throwError } from 'rxjs';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
@@ -26,7 +25,7 @@ export class CreateOutbreakTemplateComponent
   extends CreateConfirmOnChanges
   implements OnInit {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // authenticated user details
   authUser: UserModel;
@@ -81,16 +80,16 @@ export class CreateOutbreakTemplateComponent
      * Initialize breadcrumbs
      */
   private initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (OutbreakTemplateModel.canList(this.authUser)) {
-      this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE', '/outbreak-templates'));
-    }
-
-    // create breadcrumb
-    this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TITLE', '.', true));
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // add list breadcrumb only if we have permission
+    // if (OutbreakTemplateModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE', '/outbreak-templates'));
+    // }
+    //
+    // // create breadcrumb
+    // this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TITLE', '.', true));
   }
 
   /**

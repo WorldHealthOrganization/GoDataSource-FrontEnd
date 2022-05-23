@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-// import { SheetCellValidator } from './sheet-cell-validator';
+import { SheetCellValidator } from './sheet-cell-validator';
 import { SheetCellType } from './sheet-cell-type';
 import { SheetCellValidationType } from './sheet-cell-validation-type';
 import { map } from 'rxjs/operators';
@@ -23,17 +23,17 @@ export abstract class AbstractSheetColumn {
   asyncValidators: SheetColumnAsyncValidator[] = [];
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     // column type (check Handsontable documentation)
     public type: SheetCellType
   ) {
     // get validator by Cell Type
-    // const validationType = SheetCellValidator.CELL_VALIDATION_TYPE[this.type];
-    // if (validationType) {
-    //   this.addValidation(validationType);
-    // }
+    const validationType = SheetCellValidator.CELL_VALIDATION_TYPE[this.type];
+    if (validationType) {
+      this.addValidation(validationType);
+    }
   }
 
   public setTitle(title: string) {
@@ -66,23 +66,23 @@ export abstract class AbstractSheetColumn {
   }
 
   /**
-     * Add an individual validation for cells under this column
-     * @param validationType
-     */
+   * Add an individual validation for cells under this column
+   * @param validationType
+   */
   public addValidation(validationType: SheetCellValidationType) {
     this.validations.push(validationType);
 
     // merge all individual validators into a single validation function that will be passed to 'handsontable'
-    // this.validationFunc = SheetCellValidator.mergeValidations(
-    //   this.validations,
-    //   this
-    // );
+    this.validationFunc = SheetCellValidator.mergeValidations(
+      this.validations,
+      this
+    );
   }
 
   /**
-     * Add async validator
-     * @param {SheetColumnAsyncValidator} callback
-     */
+   * Add async validator
+   * @param {SheetColumnAsyncValidator} callback
+   */
   public addAsyncValidator(callback: SheetColumnAsyncValidator) {
     // add async validator if needed
     if (this.validations.indexOf(SheetCellValidationType.ASYNC_VALIDATION) === -1) {
@@ -157,15 +157,15 @@ export class DropdownSheetColumn extends AbstractSheetColumn {
   public idTranslatesToLabel: boolean = true;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor() {
     super(SheetCellType.DROPDOWN);
   }
 
   /**
-     * Set Options
-     */
+   * Set Options
+   */
   setOptions(
     options$: Observable<LabelValuePair[]>,
     i18nService,
@@ -196,15 +196,15 @@ export class LocationSheetColumn extends AbstractSheetColumn {
   useOutbreakLocations: boolean = false;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor() {
     super(SheetCellType.LOCATION);
   }
 
   /**
-     * Set outbreak locations
-     */
+   * Set outbreak locations
+   */
   setUseOutbreakLocations(useOutbreakLocations: boolean) {
     this.useOutbreakLocations = useOutbreakLocations;
     return this;

@@ -1161,22 +1161,6 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                 }
               },
 
-              // See questionnaire
-              {
-                label: {
-                  get: () => 'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE'
-                },
-                action: {
-                  link: (item: CaseModel): string[] => {
-                    return ['/cases', item.id, 'view-questionnaire'];
-                  }
-                },
-                visible: (item: CaseModel): boolean => {
-                  return !item.deleted &&
-                    CaseModel.canView(this.authUser);
-                }
-              },
-
               // Divider
               {
                 visible: (item: CaseModel): boolean => {

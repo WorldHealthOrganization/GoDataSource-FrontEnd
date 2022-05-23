@@ -7,6 +7,7 @@ import { RequestFilterOperator, RequestQueryBuilder } from '../../../../core/hel
 import { IGeneralAsyncValidatorResponse } from '../../../xt-forms/validators/general-async-validator.directive';
 import { SavedFilterData } from '../../../../core/models/saved-filters.model';
 import { Moment } from '../../../../core/helperClasses/x-moment';
+import { ILocation } from '../../../forms-v2/core/app-form-location-base-v2';
 
 /**
  * Side dialog config
@@ -29,6 +30,7 @@ export enum V2SideDialogConfigInputType {
   NUMBER,
   DROPDOWN_SINGLE,
   DROPDOWN_MULTI,
+  LOCATION_SINGLE,
   TOGGLE,
   TOGGLE_CHECKBOX,
   LINK,
@@ -226,6 +228,22 @@ export interface IV2SideDialogConfigInputMultiDropdown extends IV2SideDialogConf
 }
 
 /**
+ * Side dialog input - location single
+ */
+export interface IV2SideDialogConfigInputSingleLocation extends IV2SideDialogConfigInput {
+  // required
+  type: V2SideDialogConfigInputType.LOCATION_SINGLE;
+  placeholder: string;
+  value: string;
+  useOutbreakLocations: boolean;
+
+  // optional
+  validators?: IV2SideDialogConfigInputValidator;
+  clearable?: boolean;
+  locationChanged?: (location: ILocation) => void;
+}
+
+/**
  * Side dialog input - toggle
  */
 export interface IV2SideDialogConfigInputToggle extends IV2SideDialogConfigInput {
@@ -399,6 +417,10 @@ export interface IV2SideDialogConfigInputFilterList extends IV2SideDialogConfigI
   optionsAsLabelValueMap?: {
     [optionId: string]: ILabelValuePairModel
   };
+  operatorHide?: boolean;
+  disableAdd?: boolean;
+  disableReset?: boolean;
+  disableDelete?: boolean;
 }
 
 /**
@@ -406,7 +428,7 @@ export interface IV2SideDialogConfigInputFilterList extends IV2SideDialogConfigI
  */
 export type V2SideDialogConfigInputFromInput = IV2SideDialogConfigInputCheckbox | IV2SideDialogConfigInputText | IV2SideDialogConfigInputTextarea
 | IV2SideDialogConfigInputTimepicker | IV2SideDialogConfigInputDate | IV2SideDialogConfigInputSingleDropdown | IV2SideDialogConfigInputMultiDropdown
-| IV2SideDialogConfigInputToggle | IV2SideDialogConfigInputToggleCheckbox | IV2SideDialogConfigInputNumber;
+| IV2SideDialogConfigInputSingleLocation | IV2SideDialogConfigInputToggle | IV2SideDialogConfigInputToggleCheckbox | IV2SideDialogConfigInputNumber;
 export type V2SideDialogConfigInput = IV2SideDialogConfigInputDivider | IV2SideDialogConfigInputKeyValue | IV2SideDialogConfigInputHTML
 | V2SideDialogConfigInputFromInput | IV2SideDialogConfigInputLink | IV2SideDialogConfigInputLinkWithAction | IV2SideDialogConfigInputGroup
 | IV2SideDialogConfigInputButton | IV2SideDialogConfigInputRow | IV2SideDialogConfigInputAccordion | IV2SideDialogConfigInputFilterList;

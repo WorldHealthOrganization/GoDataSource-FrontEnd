@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, throwError } from 'rxjs';
 import { NgForm } from '@angular/forms';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { PhoneNumberType, UserModel, UserRoleModel } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
@@ -27,7 +26,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   templateUrl: './modify-user.component.html'
 })
 export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // constants
   UserModel = UserModel;
@@ -115,28 +114,28 @@ export class ModifyUserComponent extends ViewModifyComponent implements OnInit {
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (UserModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '/users')
-      );
-    }
-
-    // view / modify breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        this.viewOnly ?
-          'LNG_PAGE_VIEW_USER_TITLE' :
-          'LNG_PAGE_MODIFY_USER_TITLE',
-        null,
-        true,
-        {},
-        this.user
-      )
-    );
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // add list breadcrumb only if we have permission
+    // if (UserModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '/users')
+    //   );
+    // }
+    //
+    // // view / modify breadcrumb
+    // this.breadcrumbs.push(
+    //   new BreadcrumbItemModel(
+    //     this.viewOnly ?
+    //       'LNG_PAGE_VIEW_USER_TITLE' :
+    //       'LNG_PAGE_MODIFY_USER_TITLE',
+    //     null,
+    //     true,
+    //     {},
+    //     this.user
+    //   )
+    // );
   }
 
   /**

@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { ImportServerModelNames } from '../../components/import-data/import-data.component';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { Constants } from '../../../../core/models/constants';
 import { ImportDataExtension } from '../../components/import-data/model';
@@ -9,13 +8,16 @@ import { LocationModel } from '../../../../core/models/location.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
 
 @Component({
   selector: 'app-import-case-data',
   templateUrl: './import-location-data.component.html'
 })
 export class ImportLocationDataComponent {
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs
+  breadcrumbs: IV2Breadcrumb[] = [];
 
   Constants = Constants;
 
@@ -66,23 +68,30 @@ export class ImportLocationDataComponent {
      */
   initializeBreadcrumbs() {
     // reset
-    this.breadcrumbs = [];
+    this.breadcrumbs = [{
+      label: 'LNG_COMMON_LABEL_HOME',
+      action: {
+        link: DashboardModel.canViewDashboard(this.authUser) ?
+          ['/dashboard'] :
+          ['/account/my-profile']
+      }
+    }];
 
     // add list breadcrumb only if we have permission
     if (LocationModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_LOCATIONS_TITLE', '/locations')
-      );
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_LOCATIONS_TITLE',
+        action: {
+          link: ['/locations']
+        }
+      });
     }
 
-    // import breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        'LNG_PAGE_IMPORT_LOCATION_DATA_TITLE',
-        '.',
-        true
-      )
-    );
+    // current page
+    this.breadcrumbs.push({
+      label: 'LNG_PAGE_IMPORT_LOCATION_DATA_TITLE',
+      action: null
+    });
   }
 
   /**

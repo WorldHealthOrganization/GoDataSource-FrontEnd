@@ -192,6 +192,21 @@
               [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
               (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-select-multiple-v2>
 
+            <!-- Location - single -->
+            <app-form-select-location-single-v2
+              *ngSwitchCase="V2SideDialogConfigInputType.LOCATION_SINGLE"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
+              [(ngModel)]="input.value"
+              [name]="input.name"
+              [placeholder]="input.placeholder"
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
+              [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
+              [useOutbreakLocations]="input.useOutbreakLocations"
+              [clearable]="input.clearable"
+              (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"
+              (selectedLocationChanged)="input.locationChanged ? input.locationChanged($event) : undefined">
+            </app-form-select-location-single-v2>
+
             <!-- Toggle -->
             <app-form-toggle-v2
               *ngSwitchCase="V2SideDialogConfigInputType.TOGGLE"
@@ -361,7 +376,8 @@
             <div
               *ngSwitchCase="V2SideDialogConfigInputType.FILTER_LIST"
               fxLayout="column" fxLayoutGap="1.6rem"
-              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-filter-list {{input.cssClasses}}">
+              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-filter-list {{input.cssClasses}}"
+              [class.gd-app-side-dialog-v2-content-middle-item-input-filter-list-operator-hidden]="!!input.operatorHide">
 
               <!-- Filter & Sort tabs -->
               <mat-tab-group
@@ -373,6 +389,7 @@
 
                   <!-- Operator -->
                   <app-form-toggle-v2
+                    *ngIf="!input.operatorHide"
                     [(ngModel)]="input.operatorValue"
                     [name]="input.name + 'Operator'"
                     [options]="operatorOptions"
@@ -388,6 +405,7 @@
                     <button
                       type="button"
                       mat-flat-button color="primary"
+                      [disabled]="!!input.disableAdd"
                       (click)="addAdvancedFilter(input)">
                       {{'LNG_SIDE_FILTERS_ADD_ANOTHER_FILTER_BUTTON' | translate}}
                     </button>
@@ -396,6 +414,7 @@
                     <button
                       type="button"
                       mat-flat-button color="text"
+                      [disabled]="!!input.disableReset"
                       (click)="resetAdvancedFilter()">
                       {{'LNG_COMMON_BUTTON_RESET_FILTERS' | translate}}
                     </button>
@@ -717,6 +736,7 @@
                         mat-icon-button
                         color="warn"
                         [matTooltip]="'LNG_COMMON_BUTTON_DELETE_FILTERS' | translate"
+                        [disabled]="!!input.disableDelete"
                         (click)="removeAdvancedFilter(input, filter)">
                         <mat-icon>delete</mat-icon>
                       </button>

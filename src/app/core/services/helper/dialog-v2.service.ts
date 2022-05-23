@@ -1123,6 +1123,12 @@ export class DialogV2Service {
             value
           );
         }
+      } else if (filterDefinition.filterBy) {
+        // custom filter
+        filterDefinition.filterBy(
+          qb,
+          appliedFilter
+        );
       } else {
         // filter
         let searchQb: RequestQueryBuilder;
@@ -1739,7 +1745,13 @@ export class DialogV2Service {
   showAdvancedFiltersDialog(
     advancedFilterType: string,
     advancedFilters: V2AdvancedFilter[],
-    advancedFiltersApplied: SavedFilterData
+    advancedFiltersApplied: SavedFilterData,
+    config?: {
+      operatorHide?: boolean,
+      disableAdd?: boolean,
+      disableReset?: boolean,
+      disableDelete?: boolean
+    }
   ): Observable<IV2SideDialogAdvancedFiltersResponse | null> {
     return new Observable<IV2SideDialogAdvancedFiltersResponse | null>((observer) => {
       // display filters dialog
@@ -1776,7 +1788,11 @@ export class DialogV2Service {
             options: [],
             filters: [],
             sorts: [],
-            operatorValue: RequestFilterOperator.AND
+            operatorValue: RequestFilterOperator.AND,
+            operatorHide: config?.operatorHide,
+            disableAdd: config?.disableAdd,
+            disableReset: config?.disableReset,
+            disableDelete: config?.disableDelete
           }
         ],
         bottomButtons: [{

@@ -7,6 +7,7 @@ import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-
 import { UserRoleDataResolver } from '../../core/services/resolvers/data/user-role.resolver';
 import { OutbreakDataResolver } from '../../core/services/resolvers/data/outbreak.resolver';
 import { SecurityQuestionDataResolver } from '../../core/services/resolvers/data/security-question.resolver';
+import { LanguageDataResolver } from '../../core/services/resolvers/data/language.resolver';
 
 // routes
 const routes: Routes = [
@@ -52,7 +53,8 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     resolve: {
       userRole: UserRoleDataResolver,
-      outbreak: OutbreakDataResolver
+      outbreak: OutbreakDataResolver,
+      languages: LanguageDataResolver
     },
     data: {
       action: CreateViewModifyV2Action.VIEW

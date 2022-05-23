@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
@@ -36,7 +35,7 @@ export class CreateLabResultComponent
   extends CreateConfirmOnChanges
   implements OnInit {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   labResultData: LabResultModel = new LabResultModel();
 
@@ -165,67 +164,67 @@ export class CreateLabResultComponent
      * Initialize breadcrumbs
      */
   private initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // entity list
-    if (
-      this.personType === EntityType.CONTACT &&
-            ContactModel.canList(this.authUser)
-    ) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-      );
-    } else if (
-      this.personType === EntityType.CASE &&
-            CaseModel.canList(this.authUser)
-    ) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
-      );
-    }
-
-    // person breadcrumbs
-    if (this.entityData) {
-      // entity view
-      if (
-        this.personType === EntityType.CONTACT &&
-                ContactModel.canView(this.authUser)
-      ) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel(this.entityData.name, `/contacts/${this.entityData.id}/view`)
-        );
-      } else if (
-        this.personType === EntityType.CASE &&
-                CaseModel.canView(this.authUser)
-      ) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel(this.entityData.name, `/cases/${this.entityData.id}/view`)
-        );
-      }
-
-      // lab result list
-      if (
-        this.personType === EntityType.CONTACT &&
-                ContactModel.canListLabResult(this.authUser)
-      ) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE', `/lab-results/contacts/${this.entityData.id}`)
-        );
-      } else if (
-        this.personType === EntityType.CASE &&
-                CaseModel.canListLabResult(this.authUser)
-      ) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE', `/lab-results/cases/${this.entityData.id}`)
-        );
-      }
-    }
-
-    // current page
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel('LNG_PAGE_CREATE_LAB_RESULT_TITLE', '.', true)
-    );
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // entity list
+    // if (
+    //   this.personType === EntityType.CONTACT &&
+    //         ContactModel.canList(this.authUser)
+    // ) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+    //   );
+    // } else if (
+    //   this.personType === EntityType.CASE &&
+    //         CaseModel.canList(this.authUser)
+    // ) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
+    //   );
+    // }
+    //
+    // // person breadcrumbs
+    // if (this.entityData) {
+    //   // entity view
+    //   if (
+    //     this.personType === EntityType.CONTACT &&
+    //             ContactModel.canView(this.authUser)
+    //   ) {
+    //     this.breadcrumbs.push(
+    //       new BreadcrumbItemModel(this.entityData.name, `/contacts/${this.entityData.id}/view`)
+    //     );
+    //   } else if (
+    //     this.personType === EntityType.CASE &&
+    //             CaseModel.canView(this.authUser)
+    //   ) {
+    //     this.breadcrumbs.push(
+    //       new BreadcrumbItemModel(this.entityData.name, `/cases/${this.entityData.id}/view`)
+    //     );
+    //   }
+    //
+    //   // lab result list
+    //   if (
+    //     this.personType === EntityType.CONTACT &&
+    //             ContactModel.canListLabResult(this.authUser)
+    //   ) {
+    //     this.breadcrumbs.push(
+    //       new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE', `/lab-results/contacts/${this.entityData.id}`)
+    //     );
+    //   } else if (
+    //     this.personType === EntityType.CASE &&
+    //             CaseModel.canListLabResult(this.authUser)
+    //   ) {
+    //     this.breadcrumbs.push(
+    //       new BreadcrumbItemModel('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE', `/lab-results/cases/${this.entityData.id}`)
+    //     );
+    //   }
+    // }
+    //
+    // // current page
+    // this.breadcrumbs.push(
+    //   new BreadcrumbItemModel('LNG_PAGE_CREATE_LAB_RESULT_TITLE', '.', true)
+    // );
   }
 
   /**

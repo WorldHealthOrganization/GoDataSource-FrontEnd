@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
@@ -23,7 +22,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 })
 export class ModifyClusterComponent extends ViewModifyComponent implements OnInit {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // constants
   ClusterModel = ClusterModel;
@@ -95,26 +94,26 @@ export class ModifyClusterComponent extends ViewModifyComponent implements OnIni
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (ClusterModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CLUSTERS_TITLE', '/clusters')
-      );
-    }
-
-    // view / modify breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        this.viewOnly ? 'LNG_PAGE_VIEW_CLUSTER_TITLE' : 'LNG_PAGE_MODIFY_CLUSTER_TITLE',
-        '.',
-        true,
-        {},
-        this.clusterData
-      )
-    );
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // add list breadcrumb only if we have permission
+    // if (ClusterModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel('LNG_PAGE_LIST_CLUSTERS_TITLE', '/clusters')
+    //   );
+    // }
+    //
+    // // view / modify breadcrumb
+    // this.breadcrumbs.push(
+    //   new BreadcrumbItemModel(
+    //     this.viewOnly ? 'LNG_PAGE_VIEW_CLUSTER_TITLE' : 'LNG_PAGE_MODIFY_CLUSTER_TITLE',
+    //     '.',
+    //     true,
+    //     {},
+    //     this.clusterData
+    //   )
+    // );
   }
 
   /**

@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
@@ -21,7 +20,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 })
 export class ModifyQuestionnaireContactComponent extends ViewModifyComponent implements OnInit {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // authenticated user
   authUser: UserModel;
@@ -85,42 +84,42 @@ export class ModifyQuestionnaireContactComponent extends ViewModifyComponent imp
      * Initialize breadcrumbs
      */
   private initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (ContactModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-      );
-    }
-
-    // contact
-    if (
-      this.contactData &&
-            this.contactData.id
-    ) {
-      // model bread
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          this.contactData.name,
-          `/contacts/${this.contactData.id}/${this.viewOnly ? 'view' : 'modify'}`
-        )
-      );
-
-      // view / modify breadcrumb
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          this.viewOnly ?
-            'LNG_PAGE_VIEW_CONTACT_TITLE' :
-            'LNG_PAGE_MODIFY_CONTACT_TITLE',
-          '.',
-          true,
-          {},
-          this.contactData
-        )
-      );
-    }
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // add list breadcrumb only if we have permission
+    // if (ContactModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+    //   );
+    // }
+    //
+    // // contact
+    // if (
+    //   this.contactData &&
+    //         this.contactData.id
+    // ) {
+    //   // model bread
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel(
+    //       this.contactData.name,
+    //       `/contacts/${this.contactData.id}/${this.viewOnly ? 'view' : 'modify'}`
+    //     )
+    //   );
+    //
+    //   // view / modify breadcrumb
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel(
+    //       this.viewOnly ?
+    //         'LNG_PAGE_VIEW_CONTACT_TITLE' :
+    //         'LNG_PAGE_MODIFY_CONTACT_TITLE',
+    //       '.',
+    //       true,
+    //       {},
+    //       this.contactData
+    //     )
+    //   );
+    // }
   }
 
   /**

@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { Observable, throwError } from 'rxjs';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
@@ -26,7 +25,7 @@ export class CreateRoleComponent
   extends CreateConfirmOnChanges
   implements OnInit {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // constants
   PermissionModel = PermissionModel;
@@ -117,16 +116,16 @@ export class CreateRoleComponent
      * Initialize breadcrumbs
      */
   private initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (UserRoleModel.canList(this.authUser)) {
-      this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_USER_ROLES_TITLE', '/user-roles'));
-    }
-
-    // create breadcrumb
-    this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_USER_ROLE_TITLE', '.', true));
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // add list breadcrumb only if we have permission
+    // if (UserRoleModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_USER_ROLES_TITLE', '/user-roles'));
+    // }
+    //
+    // // create breadcrumb
+    // this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_USER_ROLE_TITLE', '.', true));
   }
 
   /**

@@ -276,6 +276,18 @@ export class Constants {
     RELATIONSHIPS: {
       label: 'LNG_APP_PAGE_RELATIONSHIPS',
       value: 'LNG_APP_PAGE_RELATIONSHIPS'
+    },
+    COT_BAR_CHART: {
+      label: 'LNG_APP_PAGE_COT_BAR_CHART',
+      value: 'LNG_APP_PAGE_COT_BAR_CHART'
+    },
+    GANTT_CHART: {
+      label: 'LNG_APP_PAGE_GANTT_CHART',
+      value: 'LNG_APP_PAGE_GANTT_CHART'
+    },
+    DASHBOARD: {
+      label: 'LNG_APP_PAGE_DASHBOARD',
+      value: 'LNG_APP_PAGE_DASHBOARD'
     }
   };
 

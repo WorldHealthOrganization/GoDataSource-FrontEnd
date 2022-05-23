@@ -1,6 +1,5 @@
 import * as _ from 'lodash';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
@@ -29,7 +28,7 @@ export class CreateTeamComponent
   extends CreateConfirmOnChanges
   implements OnInit {
   // breadcrumb header
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   teamData: TeamModel = new TeamModel();
 
@@ -77,16 +76,16 @@ export class CreateTeamComponent
      * Initialize breadcrumbs
      */
   private initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (TeamModel.canList(this.authUser)) {
-      this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_TEAMS_TITLE', '/teams'));
-    }
-
-    // create breadcrumb
-    this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_TEAM_TITLE', '.', true));
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // add list breadcrumb only if we have permission
+    // if (TeamModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_TEAMS_TITLE', '/teams'));
+    // }
+    //
+    // // create breadcrumb
+    // this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_TEAM_TITLE', '.', true));
   }
 
   /**

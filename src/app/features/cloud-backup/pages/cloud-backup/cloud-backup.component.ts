@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
@@ -11,10 +10,10 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 })
 
 export class CloudBackupComponent implements OnInit {
-  // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_CLOUD_BACKUP_TITLE', '.')
-  ];
+  // // breadcrumbs
+  // breadcrumbs: BreadcrumbItemModel[] = [
+  //   new BreadcrumbItemModel('LNG_PAGE_CLOUD_BACKUP_TITLE', '.')
+  // ];
 
   cloudBackup: {
     install: string,

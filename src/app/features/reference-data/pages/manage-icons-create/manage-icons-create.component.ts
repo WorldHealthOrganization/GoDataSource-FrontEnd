@@ -1,9 +1,8 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategoryModel } from '../../../../core/models/reference-data.model';
 import { NgForm } from '@angular/forms';
 import { IconModel } from '../../../../core/models/icon.model';
 import { FileItem, FileLikeObject, FileUploader } from 'ng2-file-upload';
@@ -28,7 +27,7 @@ export enum IconExtension {
 })
 export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements OnInit {
   // Breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // Extension mapped to mimes
   private allowedMimeTypes: string[] = [];
@@ -132,53 +131,53 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add reference categories list breadcrumb only if we have permission
-    if (ReferenceDataCategoryModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
-      );
-    }
-
-    // add cluster list breadcrumb only if we have permission
-    if (IconModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_LIST_TITLE',
-          '/reference-data/manage-icons/list',
-          false, {
-            categoryId: this.category ? this.category.id : undefined
-          }
-        )
-      );
-    }
-
-    // add category
-    if (
-      this.category &&
-            ReferenceDataEntryModel.canList(this.authUser)
-    ) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          this.category.name,
-          `/reference-data/${this.category.id}`,
-          false,
-          {},
-          this.category
-        )
-      );
-    }
-
-    // add manage icons breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_TITLE',
-        '',
-        true
-      )
-    );
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // add reference categories list breadcrumb only if we have permission
+    // if (ReferenceDataCategoryModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
+    //   );
+    // }
+    //
+    // // add cluster list breadcrumb only if we have permission
+    // if (IconModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel(
+    //       'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_LIST_TITLE',
+    //       '/reference-data/manage-icons/list',
+    //       false, {
+    //         categoryId: this.category ? this.category.id : undefined
+    //       }
+    //     )
+    //   );
+    // }
+    //
+    // // add category
+    // if (
+    //   this.category &&
+    //         ReferenceDataEntryModel.canList(this.authUser)
+    // ) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel(
+    //       this.category.name,
+    //       `/reference-data/${this.category.id}`,
+    //       false,
+    //       {},
+    //       this.category
+    //     )
+    //   );
+    // }
+    //
+    // // add manage icons breadcrumb
+    // this.breadcrumbs.push(
+    //   new BreadcrumbItemModel(
+    //     'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_TITLE',
+    //     '',
+    //     true
+    //   )
+    // );
   }
 
   /**

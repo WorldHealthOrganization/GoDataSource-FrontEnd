@@ -26,7 +26,7 @@
           <div
             *ngSwitchCase="FlattenType.QUESTION"
             class="gd-form-fill-questionnaire-v2-list-item-question"
-            fxLayout="row" fxLayoutAlign=" center">
+            fxLayout="row" fxLayoutAlign="none center">
 
             <!-- Collapse / Expand -->
             <mat-icon
@@ -74,13 +74,12 @@
           <div
             *ngSwitchCase="FlattenType.ANSWER_MULTI_DATE"
             class="gd-form-fill-questionnaire-v2-list-item-answer-multi-date"
-            fxLayout="row" fxLayoutAlign=" center"
+            fxLayout="row" fxLayoutAlign="none center"
             [style.paddingLeft.px]="item.level * 20">
 
             <!-- Collapse / Expand -->
             <!-- append padding and remove icon -->
             <mat-icon
-              change123
               style="visibility: hidden">expand_more</mat-icon>
 
             <!-- No -->
@@ -133,14 +132,13 @@
             class="gd-form-fill-questionnaire-v2-list-item-answer"
             [class.gd-form-fill-questionnaire-v2-list-item-answer-multiple]="item.parent.data.multiAnswer"
             [class.gd-form-fill-questionnaire-v2-list-item-answer-file]="item.definition.type === FlattenAnswerDrawType.FILE"
-            fxLayout="row" fxLayoutAlign=" center">
+            fxLayout="row" fxLayoutAlign="none center">
 
             <!-- Collapse / Expand -->
             <!-- append padding and remove icon -->
             <mat-icon
-              change123
               style="visibility: hidden">expand_more</mat-icon>
-            
+
             <!-- No -->
             <span
               class="gd-form-fill-questionnaire-v2-list-item-answer-number"
@@ -303,7 +301,7 @@
 
         <!-- Message -->
         <div
-          class="gd-form-fill-questionnaire-v2-empty-text">There are no questions to be filled</div>
+          class="gd-form-fill-questionnaire-v2-empty-text">{{'LNG_QUESTIONNAIRE_LABEL_FILL_NO_QUESTIONS' | translate}}</div>
       </div>
     </ng-template>
   </div>

@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, throwError } from 'rxjs';
 import { NgForm } from '@angular/forms';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
 import { PhoneNumberType, UserModel, UserRoleModel } from '../../../../core/models/user.model';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
@@ -29,7 +28,7 @@ export class CreateUserComponent
   extends CreateConfirmOnChanges
   implements OnInit {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // constants
   OutbreakModel = OutbreakModel;
@@ -86,16 +85,16 @@ export class CreateUserComponent
      * Initialize breadcrumbs
      */
   private initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (UserModel.canList(this.authUser)) {
-      this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '/users'));
-    }
-
-    // create breadcrumb
-    this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_USER_TITLE', '.', true));
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // add list breadcrumb only if we have permission
+    // if (UserModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '/users'));
+    // }
+    //
+    // // create breadcrumb
+    // this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_CREATE_USER_TITLE', '.', true));
   }
 
   /**

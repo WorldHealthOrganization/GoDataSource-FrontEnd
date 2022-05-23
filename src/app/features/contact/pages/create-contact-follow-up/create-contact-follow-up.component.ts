@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { Component, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
+// import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
@@ -31,7 +31,7 @@ export class CreateContactFollowUpComponent
   extends CreateConfirmOnChanges
   implements OnInit {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // selected outbreak
   selectedOutbreak: OutbreakModel;
@@ -130,44 +130,44 @@ export class CreateContactFollowUpComponent
      * Initialize breadcrumbs
      */
   private initializeBreadcrumbs() {
-    // init breadcrumbs
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (ContactModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-      );
-    }
-
-    // create from follow-ups / related follow-ups
-    if (this.contactData) {
-      // contact view
-      if (ContactModel.canView(this.authUser)) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel(this.contactData.name, `/contacts/${this.contactData.id}/view`)
-        );
-      }
-
-      // contact related follow-ups list
-      if (ContactModel.canList(this.authUser)) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', `/contacts/contact-related-follow-ups/${this.contactId}`)
-        );
-      }
-    } else {
-      // list
-      if (FollowUpModel.canList(this.authUser)) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '/contacts/follow-ups')
-        );
-      }
-    }
-
-    // current page breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel('LNG_PAGE_CREATE_FOLLOW_UP_TITLE', '.', true)
-    );
+    // // init breadcrumbs
+    // this.breadcrumbs = [];
+    //
+    // // add list breadcrumb only if we have permission
+    // if (ContactModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+    //   );
+    // }
+    //
+    // // create from follow-ups / related follow-ups
+    // if (this.contactData) {
+    //   // contact view
+    //   if (ContactModel.canView(this.authUser)) {
+    //     this.breadcrumbs.push(
+    //       new BreadcrumbItemModel(this.contactData.name, `/contacts/${this.contactData.id}/view`)
+    //     );
+    //   }
+    //
+    //   // contact related follow-ups list
+    //   if (ContactModel.canList(this.authUser)) {
+    //     this.breadcrumbs.push(
+    //       new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', `/contacts/contact-related-follow-ups/${this.contactId}`)
+    //     );
+    //   }
+    // } else {
+    //   // list
+    //   if (FollowUpModel.canList(this.authUser)) {
+    //     this.breadcrumbs.push(
+    //       new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '/contacts/follow-ups')
+    //     );
+    //   }
+    // }
+    //
+    // // current page breadcrumb
+    // this.breadcrumbs.push(
+    //   new BreadcrumbItemModel('LNG_PAGE_CREATE_FOLLOW_UP_TITLE', '.', true)
+    // );
   }
 
   /**

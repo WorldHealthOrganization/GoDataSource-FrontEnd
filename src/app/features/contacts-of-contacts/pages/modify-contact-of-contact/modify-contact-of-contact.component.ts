@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
@@ -44,7 +43,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 })
 export class ModifyContactOfContactComponent extends ViewModifyComponent implements OnInit {
 
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // authenticated user
   authUser: UserModel;
@@ -481,17 +480,17 @@ export class ModifyContactOfContactComponent extends ViewModifyComponent impleme
      * Create breadcrumbs
      */
   createBreadcrumbs() {
-    this.breadcrumbs = [];
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE', '/contacts-of-contacts'),
-      new BreadcrumbItemModel(
-        this.viewOnly ? 'LNG_PAGE_VIEW_CONTACT_OF_CONTACT_TITLE' : 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TITLE',
-        '.',
-        true,
-        {},
-        this.contactOfContactData
-      )
-    );
+    // this.breadcrumbs = [];
+    // this.breadcrumbs.push(
+    //   new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE', '/contacts-of-contacts'),
+    //   new BreadcrumbItemModel(
+    //     this.viewOnly ? 'LNG_PAGE_VIEW_CONTACT_OF_CONTACT_TITLE' : 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TITLE',
+    //     '.',
+    //     true,
+    //     {},
+    //     this.contactOfContactData
+    //   )
+    // );
   }
 
   /**

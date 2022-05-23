@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { NgForm } from '@angular/forms';
@@ -18,7 +17,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   templateUrl: './modify-system-device.component.html'
 })
 export class ModifySystemDeviceComponent extends ViewModifyComponent implements OnInit {
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // constants
   DeviceModel = DeviceModel;
@@ -68,24 +67,24 @@ export class ModifySystemDeviceComponent extends ViewModifyComponent implements 
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (DeviceModel.canList(this.authUser)) {
-      this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_DEVICES_TITLE', '/system-config/devices'));
-    }
-
-    // view / modify breadcrumb
-    this.breadcrumbs.push(new BreadcrumbItemModel(
-      this.viewOnly ?
-        'LNG_PAGE_VIEW_SYSTEM_DEVICE_TITLE' :
-        'LNG_PAGE_MODIFY_SYSTEM_DEVICE_TITLE',
-      '.',
-      true,
-      {},
-      this.deviceData
-    ));
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // add list breadcrumb only if we have permission
+    // if (DeviceModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_DEVICES_TITLE', '/system-config/devices'));
+    // }
+    //
+    // // view / modify breadcrumb
+    // this.breadcrumbs.push(new BreadcrumbItemModel(
+    //   this.viewOnly ?
+    //     'LNG_PAGE_VIEW_SYSTEM_DEVICE_TITLE' :
+    //     'LNG_PAGE_MODIFY_SYSTEM_DEVICE_TITLE',
+    //   '.',
+    //   true,
+    //   {},
+    //   this.deviceData
+    // ));
   }
 
   /**

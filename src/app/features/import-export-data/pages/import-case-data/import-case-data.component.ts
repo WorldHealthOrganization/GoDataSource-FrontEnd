@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ImportServerModelNames } from '../../components/import-data/import-data.component';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { Constants } from '../../../../core/models/constants';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { QuestionModel } from '../../../../core/models/question.model';
@@ -12,6 +11,8 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { CaseModel } from '../../../../core/models/case.model';
+import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
 
 @Component({
   selector: 'app-import-case-data',
@@ -19,7 +20,7 @@ import { CaseModel } from '../../../../core/models/case.model';
 })
 export class ImportCaseDataComponent implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  breadcrumbs: IV2Breadcrumb[] = [];
 
   outbreakSubscriber: Subscription;
 
@@ -133,26 +134,30 @@ export class ImportCaseDataComponent implements OnInit, OnDestroy {
      */
   initializeBreadcrumbs() {
     // reset
-    this.breadcrumbs = [];
+    this.breadcrumbs = [{
+      label: 'LNG_COMMON_LABEL_HOME',
+      action: {
+        link: DashboardModel.canViewDashboard(this.authUser) ?
+          ['/dashboard'] :
+          ['/account/my-profile']
+      }
+    }];
 
     // add list breadcrumb only if we have permission
     if (CaseModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          'LNG_PAGE_LIST_CASES_TITLE',
-          '/cases'
-        )
-      );
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_CASES_TITLE',
+        action: {
+          link: ['/cases']
+        }
+      });
     }
 
-    // import breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        'LNG_PAGE_IMPORT_CASE_DATA_TITLE',
-        '.',
-        true
-      )
-    );
+    // current page
+    this.breadcrumbs.push({
+      label: 'LNG_PAGE_IMPORT_CASE_DATA_TITLE',
+      action: null
+    });
   }
 
   /**

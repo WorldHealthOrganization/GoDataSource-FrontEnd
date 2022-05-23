@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
@@ -34,7 +33,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 })
 export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges implements OnInit {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // selected outbreak
   selectedOutbreak: OutbreakModel;
@@ -133,27 +132,27 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // contacts list page
-    if (ContactModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-      );
-    }
-
-    // follow-ups list page
-    if (FollowUpModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '/contacts/follow-ups')
-      );
-    }
-
-    // current page
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TITLE', '.', true)
-    );
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // contacts list page
+    // if (ContactModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+    //   );
+    // }
+    //
+    // // follow-ups list page
+    // if (FollowUpModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '/contacts/follow-ups')
+    //   );
+    // }
+    //
+    // // current page
+    // this.breadcrumbs.push(
+    //   new BreadcrumbItemModel('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TITLE', '.', true)
+    // );
   }
 
   /**

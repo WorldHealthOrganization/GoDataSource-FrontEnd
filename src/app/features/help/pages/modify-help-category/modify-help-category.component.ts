@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { NgForm } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
@@ -21,7 +20,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 })
 export class ModifyHelpCategoryComponent extends ViewModifyComponent implements OnInit {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // constants
   HelpCategoryModel = HelpCategoryModel;
@@ -83,26 +82,26 @@ export class ModifyHelpCategoryComponent extends ViewModifyComponent implements 
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (HelpCategoryModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '/help/categories')
-      );
-    }
-
-    // view / modify breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        this.viewOnly ? 'LNG_PAGE_VIEW_HELP_CATEGORY_TITLE' : 'LNG_PAGE_MODIFY_HELP_CATEGORY_TITLE',
-        '.',
-        true,
-        {},
-        this.helpCategoryData
-      )
-    );
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // add list breadcrumb only if we have permission
+    // if (HelpCategoryModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel('LNG_PAGE_LIST_HELP_CATEGORIES_TITLE', '/help/categories')
+    //   );
+    // }
+    //
+    // // view / modify breadcrumb
+    // this.breadcrumbs.push(
+    //   new BreadcrumbItemModel(
+    //     this.viewOnly ? 'LNG_PAGE_VIEW_HELP_CATEGORY_TITLE' : 'LNG_PAGE_MODIFY_HELP_CATEGORY_TITLE',
+    //     '.',
+    //     true,
+    //     {},
+    //     this.helpCategoryData
+    //   )
+    // );
   }
 
   /**
