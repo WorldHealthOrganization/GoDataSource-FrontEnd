@@ -1749,7 +1749,8 @@ export class DialogV2Service {
     config?: {
       operatorHide?: boolean,
       disableAdd?: boolean,
-      disableReset?: boolean
+      disableReset?: boolean,
+      disableDelete?: boolean
     }
   ): Observable<IV2SideDialogAdvancedFiltersResponse | null> {
     return new Observable<IV2SideDialogAdvancedFiltersResponse | null>((observer) => {
@@ -1790,7 +1791,8 @@ export class DialogV2Service {
             operatorValue: RequestFilterOperator.AND,
             operatorHide: config?.operatorHide,
             disableAdd: config?.disableAdd,
-            disableReset: config?.disableReset
+            disableReset: config?.disableReset,
+            disableDelete: config?.disableDelete
           }
         ],
         bottomButtons: [{

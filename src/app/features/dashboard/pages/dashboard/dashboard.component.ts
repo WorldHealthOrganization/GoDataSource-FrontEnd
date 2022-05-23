@@ -7,9 +7,10 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { Constants } from '../../../../core/models/constants';
-import { SavedFilterData } from '../../../../core/models/saved-filters.model';
+import { SavedFilterData, SavedFilterDataAppliedFilter } from '../../../../core/models/saved-filters.model';
 import * as _ from 'lodash';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
+import { RequestFilterOperator } from '../../../../core/helperClasses/request-query-builder';
 
 // interface IKpiGroup {
 //   id: DashboardKpiGroup;
@@ -38,13 +39,43 @@ export class DashboardComponent {
   // quick actions
   quickActions: IV2ActionMenuLabel;
 
-  // applied filters
-  private _advancedFiltersApplied: SavedFilterData;
-
   // used to filter dashlets
-  globalFilterLocationId: string;
+  globalFilterLocationId: string = undefined;
   globalFilterDate: Moment = moment();
   globalFilterClassificationId: string[] = [];
+
+  // applied filters
+  private _advancedFiltersApplied: SavedFilterData = new SavedFilterData({
+    appliedFilterOperator: RequestFilterOperator.AND,
+    appliedFilters: [
+      // location
+      new SavedFilterDataAppliedFilter({
+        filter: {
+          uniqueKey: 'locationIdLNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION'
+        },
+        comparator: V2AdvancedFilterComparatorType.LOCATION,
+        value: this.globalFilterLocationId
+      }),
+
+      // date
+      new SavedFilterDataAppliedFilter({
+        filter: {
+          uniqueKey: 'dateLNG_GLOBAL_FILTERS_FIELD_LABEL_DATE'
+        },
+        comparator: V2AdvancedFilterComparatorType.DATE,
+        value: this.globalFilterDate
+      }),
+
+      // classification
+      new SavedFilterDataAppliedFilter({
+        filter: {
+          uniqueKey: 'classificationIdLNG_GLOBAL_FILTERS_FIELD_LABEL_CLASSIFICATION'
+        },
+        comparator: V2AdvancedFilterComparatorType.NONE,
+        value: this.globalFilterClassificationId
+      })
+    ]
+  });
 
   /**
    * Constructor
@@ -113,7 +144,10 @@ export class DashboardComponent {
         ],
         this._advancedFiltersApplied,
         {
-          operatorHide: true
+          operatorHide: true,
+          disableAdd: true,
+          disableReset: true,
+          disableDelete: true
         }
       )
       .subscribe((response) => {
@@ -125,32 +159,6 @@ export class DashboardComponent {
         // set data
         this._advancedFiltersApplied = response.filtersApplied;
       });
-
-    //     new FilterModel({
-    //       fieldName: 'locationId',
-    //       fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION',
-    //       type: FilterType.LOCATION,
-    //       required: true,
-    //       multipleOptions: false,
-    //       value: this.globalFilterLocationId
-    //     }),
-    //     new FilterModel({
-    //       fieldName: 'date',
-    //       fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE',
-    //       type: FilterType.DATE,
-    //       required: true,
-    //       maxDate: moment(),
-    //       value: this.globalFilterDate
-    //     }),
-    //     new FilterModel({
-    //       fieldName: 'classificationId',
-    //       fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_CLASSIFICATION',
-    //       type: FilterType.MULTISELECT,
-    //       required: true,
-    //       options$: this.caseClassificationsList$,
-    //       value: this.globalFilterClassificationId
-    //     })
-
   }
 
   // kpiGroups: IKpiGroup[] = [

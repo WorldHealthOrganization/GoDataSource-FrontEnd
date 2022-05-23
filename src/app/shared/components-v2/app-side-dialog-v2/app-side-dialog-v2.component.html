@@ -405,6 +405,7 @@
                     <button
                       type="button"
                       mat-flat-button color="primary"
+                      [disabled]="!!input.disableAdd"
                       (click)="addAdvancedFilter(input)">
                       {{'LNG_SIDE_FILTERS_ADD_ANOTHER_FILTER_BUTTON' | translate}}
                     </button>
@@ -413,6 +414,7 @@
                     <button
                       type="button"
                       mat-flat-button color="text"
+                      [disabled]="!!input.disableReset"
                       (click)="resetAdvancedFilter()">
                       {{'LNG_COMMON_BUTTON_RESET_FILTERS' | translate}}
                     </button>
@@ -734,6 +736,7 @@
                         mat-icon-button
                         color="warn"
                         [matTooltip]="'LNG_COMMON_BUTTON_DELETE_FILTERS' | translate"
+                        [disabled]="!!input.disableDelete"
                         (click)="removeAdvancedFilter(input, filter)">
                         <mat-icon>delete</mat-icon>
                       </button>

@@ -420,6 +420,7 @@ export interface IV2SideDialogConfigInputFilterList extends IV2SideDialogConfigI
   operatorHide?: boolean;
   disableAdd?: boolean;
   disableReset?: boolean;
+  disableDelete?: boolean;
 }
 
 /**
