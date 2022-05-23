@@ -11,11 +11,6 @@ import {
 import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 import {
-  LocationGeographicalLevelDataResolver
-} from '../../core/services/resolvers/data/location-geographical-level.resolver';
-import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
-import { OutbreakTemplateDataResolver } from '../../core/services/resolvers/data/outbreak-template.resolver';
-import {
   QuestionnaireAnswerTypeDataResolver
 } from '../../core/services/resolvers/data/questionnaire-answer-type.resolver';
 import {
@@ -31,11 +26,8 @@ const createViewModifyFoundation: Route = {
   canActivate: [AuthGuard],
   resolve: {
     disease: DiseaseDataResolver,
-    geographicalLevel: LocationGeographicalLevelDataResolver,
     followUpGenerationTeamAssignmentAlgorithm: FollowUpGenerationTeamAssignmentAlgorithmDataResolver,
     yesNo: YesNoDataResolver,
-    user: UserDataResolver,
-    outbreakTemplate: OutbreakTemplateDataResolver,
     questionnaireAnswerType: QuestionnaireAnswerTypeDataResolver,
     questionnaireQuestionCategory: QuestionnaireQuestionCategoryDataResolver,
     questionnaireAnswerDisplay: QuestionnaireAnswerDisplayDataResolver
