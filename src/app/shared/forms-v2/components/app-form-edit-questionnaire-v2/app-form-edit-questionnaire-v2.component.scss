@@ -325,11 +325,20 @@
     background-repeat: no-repeat;
     height: 25rem;
     width: 25rem;
+
+    @include breakpoint('xs') {
+      height: 15rem;
+      width: 15rem;
+    }
   }
 
   .gd-form-edit-questionnaire-v2-empty-text {
     color: var(--gd-secondary);
     font-size: 1.6rem;
     margin-top: 2rem;
+
+    @include breakpoint('xs') {
+      font-size: 1.4rem;
+    }
   }
 }
