@@ -5,6 +5,8 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { MetricCasesWithContactsModel } from '../../../../core/models/metrics/metric-cases-contacts.model';
+import { Constants } from '../../../../core/models/constants';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
   selector: 'app-cases-kpi-dashlet',
@@ -48,9 +50,49 @@ export class AppCasesKpiDashletComponent
       // Cases who have died
       {
         prefix: 'LNG_PAGE_DASHBOARD_KPI_CASES_DECEASED_TITLE',
-        refresh: () => {
+        refresh: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
           // filter
           const qb = new RequestQueryBuilder();
+
+          // exclude discarded cases
+          qb.filter.where({
+            classification: {
+              neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+            }
+          });
+
+          // date
+          if (globalFilterDate) {
+            qb.filter.byDateRange(
+              'dateOfOutcome', {
+                endDate: moment(globalFilterDate).endOf('day').format()
+              }
+            );
+          }
+
+          // add location condition
+          if (globalFilterLocationId) {
+            qb.filter.byEquality(
+              'addresses.parentLocationIdFilter',
+              globalFilterLocationId
+            );
+          }
+
+          // classification
+          if (globalFilterClassificationId?.length > 0) {
+            qb.filter.where({
+              and: [{
+                classification: {
+                  inq: globalFilterClassificationId
+                }
+              }]
+            });
+          }
 
           // retrieve deceased cases
           return this.caseDataService

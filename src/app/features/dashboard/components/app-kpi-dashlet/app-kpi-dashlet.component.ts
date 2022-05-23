@@ -64,7 +64,7 @@ implements OnDestroy {
     this._values = values;
 
     // refresh
-    this.refreshNecessary();
+    this.refreshNecessary(false);
   }
   get values(): IDashletValue[] {
     return this._values;
@@ -77,7 +77,7 @@ implements OnDestroy {
     this._expanded = expanded;
 
     // must initialize data ?
-    this.refreshNecessary();
+    this.refreshNecessary(false);
   }
   get expanded(): boolean {
     return this._expanded;
@@ -130,14 +130,14 @@ implements OnDestroy {
       this._waitAndRefreshNecessary = undefined;
 
       // trigger update
-      this.refreshNecessary();
+      this.refreshNecessary(true);
     });
   }
 
   /**
    * Refresh what is necessary
    */
-  private refreshNecessary(): void {
+  private refreshNecessary(forceReload: boolean): void {
     // nothing to do ?
     if (
       !this.values?.length ||
@@ -150,8 +150,12 @@ implements OnDestroy {
     this.values.forEach((value) => {
       // nothing to do ?
       if (
-        value.status === DashletValueStatus.LOADED ||
-        value.status === DashletValueStatus.LOADING || (
+        (
+          !forceReload && (
+            value.status === DashletValueStatus.LOADED ||
+            value.status === DashletValueStatus.LOADING
+          )
+        ) || (
           // invalid value ?
           value.suffix &&
           !value.inputValue
@@ -234,11 +238,11 @@ implements OnDestroy {
       // reset
       value.reload = undefined;
 
-      // change status
+      // force reload
       value.status = undefined;
 
       // refresh
-      this.refreshNecessary();
+      this.refreshNecessary(false);
     }, 500);
   }
 }
