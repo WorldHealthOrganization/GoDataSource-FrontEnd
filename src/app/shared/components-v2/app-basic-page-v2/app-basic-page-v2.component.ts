@@ -1,7 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { TopnavComponent } from '../../../core/components/topnav/topnav.component';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
 import { IV2ActionIconLabel, IV2ActionMenuLabel } from '../app-list-table-v2/models/action.model';
+import { V2AdvancedFilter } from '../app-list-table-v2/models/advanced-filter.model';
+import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
+import { SavedFilterData } from '../../../core/models/saved-filters.model';
+import { IV2SideDialogAdvancedFiltersResponse } from '../app-side-dialog-v2/models/side-dialog-config.model';
 
 /**
  * Component
@@ -24,11 +28,22 @@ export class AppBasicPageV2Component implements OnInit, OnDestroy {
   // button
   @Input() actionButton: IV2ActionIconLabel;
 
+  // advanced filters
+  @Input() advancedFilterType: string;
+  @Input() advancedFilters: V2AdvancedFilter[];
+
+  // applied filters
+  private _advancedFiltersApplied: SavedFilterData;
+
+  // filter by
+  @Output() advancedFilterBy = new EventEmitter<IV2SideDialogAdvancedFiltersResponse>();
+
   /**
    * Constructor
    */
   constructor(
     protected elementRef: ElementRef,
+    protected dialogV2Service: DialogV2Service,
     protected changeDetectorRef: ChangeDetectorRef
   ) {
     // disable select outbreak
@@ -93,5 +108,35 @@ export class AppBasicPageV2Component implements OnInit, OnDestroy {
       // set main table height - mat card
       table.style.height = `calc(100% - ${topHeight}px)`;
     }
+  }
+
+  /**
+   * Show advanced filters
+   */
+  showAdvancedFilters(): void {
+    // no advanced filter type set ?
+    if (!this.advancedFilterType) {
+      throw new Error('Advanced filter type missing...');
+    }
+
+    // show advanced filters dialog
+    this.dialogV2Service
+      .showAdvancedFiltersDialog(
+        this.advancedFilterType,
+        this.advancedFilters,
+        this._advancedFiltersApplied
+      )
+      .subscribe((response) => {
+        // set data
+        this._advancedFiltersApplied = response?.filtersApplied;
+
+        // cancelled ?
+        if (!response) {
+          return;
+        }
+
+        // emit the Request Query Builder
+        this.advancedFilterBy.emit(response);
+      });
   }
 }

@@ -1,7 +1,10 @@
 <app-basic-page-v2
   [breadcrumbs]="breadcrumbs"
   pageTitle="LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE"
-  [quickActions]="quickActions">
+  [quickActions]="quickActions"
+  [advancedFilterType]="Constants.APP_PAGE.COT_BAR_CHART.value"
+  [advancedFilters]="advancedFilters"
+  (advancedFilterBy)="advancedFilterBy($event)">
   <div
     [fxShow]="!loadingData && !noData">
     <!-- Chart details -->

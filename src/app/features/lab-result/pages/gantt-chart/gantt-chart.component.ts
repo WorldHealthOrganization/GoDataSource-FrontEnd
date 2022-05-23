@@ -16,13 +16,13 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { V2AdvancedFilter, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { SavedFilterData } from '../../../../core/models/saved-filters.model';
 import { IV2LoadingDialogHandler } from '../../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
 import { ActivatedRoute } from '@angular/router';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { IV2SideDialogAdvancedFiltersResponse } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 
 @Component({
   selector: 'app-gantt-chart',
@@ -41,8 +41,6 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
 
   @ViewChild('ganttChart') private ganttChart: GanttChartDelayOnsetDashletComponent;
 
-  filtersApplied: SavedFilterData;
-
   ganttChartTypesOptions: ILabelValuePairModel[];
   ganttChartType: any;
 
@@ -54,6 +52,9 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
 
   // quick actions
   quickActions: IV2ActionMenuLabel;
+
+  // advanced filters
+  advancedFilters: V2AdvancedFilter[];
 
   /**
      * Constructor
@@ -123,59 +124,28 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
           },
           visible: () => (this.ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_LAB_TEST.value && GanttChartModel.canExportDelayOnsetLabTesting(this._authUser)) ||
             (this.ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value && GanttChartModel.canExportDelayOnsetHospitalization(this._authUser))
-        },
-
-        // Filter
-        {
-          label: {
-            get: () => 'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'
-          },
-          action: {
-            click: () => {
-              this.dialogV2Service.showAdvancedFiltersDialog(
-                Constants.APP_PAGE.GANTT_CHART.value,
-                [{
-                  type: V2AdvancedFilterType.LOCATION_SINGLE,
-                  field: 'locationId',
-                  label: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION',
-                  filterBy: (_qb, filter) => {
-                    // set filters
-                    this.globalFilterLocationId = filter.value;
-                  }
-                }, {
-                  type: V2AdvancedFilterType.DATE,
-                  field: 'date',
-                  label: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE',
-                  filterBy: (_qb, filter) => {
-                    // set filters
-                    this.globalFilterDate = moment(filter.value);
-                  }
-                }],
-                this.filtersApplied
-              ).subscribe((response) => {
-                // cancelled ?
-                if (!response) {
-                  return;
-                }
-
-                // keep filters to we can show it back
-                this.filtersApplied = response.filtersApplied;
-
-                // reset date ?
-                if (!this.filtersApplied.appliedFilters.find((item) => item.filter.uniqueKey === 'dateLNG_GLOBAL_FILTERS_FIELD_LABEL_DATE')) {
-                  this.globalFilterDate = undefined;
-                }
-
-                // reset location ?
-                if (!this.filtersApplied.appliedFilters.find((item) => item.filter.uniqueKey === 'locationIdLNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION')) {
-                  this.globalFilterLocationId = undefined;
-                }
-              });
-            }
-          }
         }
       ]
     };
+
+    // advanced filters
+    this.advancedFilters = [{
+      type: V2AdvancedFilterType.LOCATION_SINGLE,
+      field: 'locationId',
+      label: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION',
+      filterBy: (_qb, filter) => {
+        // set filters
+        this.globalFilterLocationId = filter.value;
+      }
+    }, {
+      type: V2AdvancedFilterType.DATE,
+      field: 'date',
+      label: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE',
+      filterBy: (_qb, filter) => {
+        // set filters
+        this.globalFilterDate = moment(filter.value);
+      }
+    }];
   }
 
   /**
@@ -268,6 +238,21 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
     if (this.loadingDialog) {
       this.loadingDialog.close();
       this.loadingDialog = null;
+    }
+  }
+
+  /**
+   * Filter
+   */
+  advancedFilterBy(response: IV2SideDialogAdvancedFiltersResponse): void {
+    // reset date ?
+    if (!response.filtersApplied?.appliedFilters.find((item) => item.filter.uniqueKey === 'dateLNG_GLOBAL_FILTERS_FIELD_LABEL_DATE')) {
+      this.globalFilterDate = undefined;
+    }
+
+    // reset location ?
+    if (!response.filtersApplied?.appliedFilters.find((item) => item.filter.uniqueKey === 'locationIdLNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION')) {
+      this.globalFilterLocationId = undefined;
     }
   }
 }

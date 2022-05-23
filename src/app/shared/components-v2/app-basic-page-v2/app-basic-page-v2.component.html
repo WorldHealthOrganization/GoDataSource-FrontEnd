@@ -26,6 +26,33 @@
       fxFlex fxLayoutAlign="end" fxLayoutGap="0.8rem"
       class="gd-basic-top-title-buttons-buttons">
 
+      <!-- Action button -->
+      <a
+        *ngIf="actionButton && (!actionButton.visible || actionButton.visible(null))"
+        mat-flat-button
+        [routerLink]="actionButton.action.link && (!actionButton.disable || !actionButton.disable(null)) ? actionButton.action.link(null) : undefined"
+        [queryParams]="actionButton.action.linkQueryParams ? actionButton.action.linkQueryParams(null) : undefined"
+        [disabled]="actionButton.disable && actionButton.disable(null)"
+        (click)="actionButton.action.click ? actionButton.action.click(null) : undefined">
+
+        <!-- Icon -->
+        <mat-icon>{{actionButton.icon}}</mat-icon>
+
+        <!-- Label -->
+        <span>{{ actionButton.label | translate }}</span>
+      </a>
+
+      <!-- Advanced filters -->
+      <button
+        *ngIf="advancedFilters?.length > 0"
+        type="button"
+        mat-flat-button
+        color="primary"
+        (click)="showAdvancedFilters()">
+        <mat-icon>filter_alt</mat-icon>
+        {{'LNG_SIDE_FILTERS_TITLE' | translate}}
+      </button>
+
       <!-- Quick actions -->
       <ng-container
         *ngIf="quickActions && (!quickActions.visible || quickActions.visible(null))">
@@ -102,22 +129,6 @@
 
       </ng-container>
 
-      <!-- Action button -->
-      <a
-        *ngIf="actionButton && (!actionButton.visible || actionButton.visible(null))"
-        mat-flat-button
-        [routerLink]="actionButton.action.link && (!actionButton.disable || !actionButton.disable(null)) ? actionButton.action.link(null) : undefined"
-        [queryParams]="actionButton.action.linkQueryParams ? actionButton.action.linkQueryParams(null) : undefined"
-        [disabled]="actionButton.disable && actionButton.disable(null)"
-        (click)="actionButton.action.click ? actionButton.action.click(null) : undefined">
-
-        <!-- Icon -->
-        <mat-icon>{{actionButton.icon}}</mat-icon>
-
-        <!-- Label -->
-        <span>{{ actionButton.label | translate }}</span>
-
-      </a>
     </div>
   </div>
 

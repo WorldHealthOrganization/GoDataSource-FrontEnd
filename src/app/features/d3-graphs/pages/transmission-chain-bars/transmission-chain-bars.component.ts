@@ -21,13 +21,13 @@ import { IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { IV2LoadingDialogHandler } from '../../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
 import { Constants } from '../../../../core/models/constants';
-import { SavedFilterData } from '../../../../core/models/saved-filters.model';
-import { V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { V2AdvancedFilter, V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { EntityType } from '../../../../core/models/entity-type';
+import { IV2SideDialogAdvancedFiltersResponse } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 
 @Component({
   selector: 'app-transmission-chain-bars',
@@ -41,6 +41,7 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
 
   // constants
   TransmissionChainModel = TransmissionChainModel;
+  Constants = Constants;
 
   // authenticated user
   authUser: UserModel;
@@ -48,7 +49,6 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
   selectedOutbreak: OutbreakModel;
   outbreakSubscriber: Subscription;
   // query builder for fetching data
-  filtersApplied: SavedFilterData;
   queryBuilder: RequestQueryBuilder = new RequestQueryBuilder();
   // show loading while fetching data and building the graph
   loadingData: boolean = true;
@@ -71,6 +71,9 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
 
   // quick actions
   quickActions: IV2ActionMenuLabel;
+
+  // advanced filters
+  advancedFilters: V2AdvancedFilter[];
 
   /**
      * Constructor
@@ -117,6 +120,7 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
     this.quickActions = {
       type: V2ActionType.MENU,
       label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
+      visible: () => TransmissionChainModel.canExportBarChart(this.authUser),
       menuOptions: [
         // Export map
         {
@@ -129,256 +133,229 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
             }
           },
           visible: () => TransmissionChainModel.canExportBarChart(this.authUser)
-        },
-
-        // Filter
-        {
-          label: {
-            get: () => 'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'
-          },
-          action: {
-            click: () => {
-              this.dialogV2Service.showAdvancedFiltersDialog(
-                Constants.APP_PAGE.COT_BAR_CHART.value,
-                [{
-                  type: V2AdvancedFilterType.RANGE_DATE,
-                  field: 'date',
-                  label: 'LNG_PAGE_TRANSMISSION_CHAIN_BARS_FIELD_LABEL_DATE',
-                  allowedComparators: [
-                    _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.RANGE_DATE], { value: V2AdvancedFilterComparatorType.BETWEEN }),
-                    _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.RANGE_DATE], { value: V2AdvancedFilterComparatorType.BEFORE }),
-                    _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.RANGE_DATE], { value: V2AdvancedFilterComparatorType.AFTER })
-                  ],
-                  filterBy: (
-                    qb,
-                    filter
-                  ) => {
-                    // determine operator & value
-                    const fromValue = filter.value.startDate ? moment(filter.value.startDate).toISOString() : null;
-                    const toValue = filter.value.endDate ? moment(filter.value.endDate).toISOString() : null;
-                    let operator: string;
-                    let valueToCompare: any;
-                    if (filter.comparator.value === V2AdvancedFilterComparatorType.BETWEEN) {
-                      operator = 'between';
-                      valueToCompare = [fromValue, toValue];
-                    } else if (filter.comparator.value === V2AdvancedFilterComparatorType.AFTER) {
-                      operator = 'gte';
-                      valueToCompare = fromValue;
-                    } else {
-                      operator = 'lte';
-                      valueToCompare = toValue;
-                    }
-
-                    // condition
-                    qb.filter
-                      .where({
-                        or: [
-                          {
-                            type: EntityType.CASE,
-                            dateOfOnset: {
-                              [operator]: valueToCompare
-                            }
-                          }, {
-                            type: EntityType.EVENT,
-                            date: {
-                              [operator]: valueToCompare
-                            }
-                          }
-                        ]
-                      });
-                  }
-                }, {
-                  type: V2AdvancedFilterType.LOCATION_SINGLE,
-                  field: 'locationId',
-                  label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
-                  filterBy: (
-                    qb,
-                    filter
-                  ) => {
-                    qb.filter
-                      .where({
-                        or: [
-                          {
-                            type: EntityType.CASE,
-                            'addresses.parentLocationIdFilter': {
-                              inq: [filter.value]
-                            }
-                          }, {
-                            type: EntityType.EVENT,
-                            'address.parentLocationIdFilter': {
-                              inq: [filter.value]
-                            }
-                          }
-                        ]
-                      });
-                  }
-                }, {
-                  type: V2AdvancedFilterType.RANGE_DATE,
-                  field: 'isolationDate',
-                  label: 'LNG_PAGE_TRANSMISSION_CHAIN_BARS_FILTERS_HOSPITALISATION_ISOLATION',
-                  allowedComparators: [
-                    _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.RANGE_DATE], { value: V2AdvancedFilterComparatorType.BETWEEN }),
-                    _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.RANGE_DATE], { value: V2AdvancedFilterComparatorType.BEFORE }),
-                    _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.RANGE_DATE], { value: V2AdvancedFilterComparatorType.AFTER })
-                  ],
-                  filterBy: (
-                    qb,
-                    filter
-                  ) => {
-                    // determine operator & value
-                    const startDate = filter.value.startDate ? moment(filter.value.startDate).toISOString() : null;
-                    const endDate = filter.value.endDate ? moment(filter.value.endDate).toISOString() : null;
-
-                    // must have isolation start date or end date
-                    qb.filter
-                      .where({
-                        'or': [
-                          {
-                            'dateRanges.startDate': {
-                              '$ne': null
-                            }
-                          },
-                          {
-                            'dateRanges.endDate': {
-                              '$ne': null
-                            }
-                          }
-                        ]
-                      });
-
-                    // start date
-                    if (startDate) {
-                      qb.filter
-                        .where({
-                          'or': [
-                            {
-                              'dateRanges.endDate': {
-                                'gte': startDate
-                              }
-                            },
-                            {
-                              'dateRanges.endDate': null
-                            }
-                          ]
-                        });
-                    }
-
-                    if (endDate) {
-                      qb.filter
-                        .where({
-                          'or': [
-                            {
-                              'and': [
-                                {
-                                  'dateOfOnset': {
-                                    'lte': endDate
-                                  }
-                                },
-                                {
-                                  'dateRanges.startDate': null
-                                }
-                              ]
-                            },
-                            {
-                              'and': [
-                                {
-                                  'dateRanges.startDate': {
-                                    'lte': endDate
-                                  }
-                                },
-                                {
-                                  'dateRanges.startDate': {
-                                    '$ne': null
-                                  }
-                                }
-                              ]
-                            }
-                          ]
-                        });
-                    }
-                  }
-                }, {
-                  type: V2AdvancedFilterType.MULTISELECT,
-                  field: 'isolationCenterName',
-                  label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME',
-                  options: (this.activatedRoute.snapshot.data.dateRangeCenter as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                  allowedComparators: [
-                    _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
-                  ],
-                  filterBy: (
-                    qb,
-                    filter
-                  ) => {
-                    qb.filter
-                      .bySelect(
-                        'dateRanges.centerName',
-                        filter.value,
-                        true,
-                        null
-                      );
-                  }
-                }, {
-                  type: V2AdvancedFilterType.MULTISELECT,
-                  field: 'caseClassification',
-                  label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-                  options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                  allowedComparators: [
-                    _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
-                  ],
-                  filterBy: (
-                    qb,
-                    filter
-                  ) => {
-                    qb.filter
-                      .bySelect(
-                        'classification',
-                        filter.value,
-                        true,
-                        null
-                      );
-                  }
-                }, {
-                  type: V2AdvancedFilterType.MULTISELECT,
-                  field: 'caseOutcome',
-                  label: 'LNG_PAGE_TRANSMISSION_CHAIN_BARS_FILTERS_CASE_OUTCOME',
-                  options: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                  allowedComparators: [
-                    _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
-                  ],
-                  filterBy: (
-                    qb,
-                    filter
-                  ) => {
-                    qb.filter
-                      .bySelect(
-                        'outcomeId',
-                        filter.value,
-                        true,
-                        null
-                      );
-                  }
-                }],
-                this.filtersApplied
-              ).subscribe((response) => {
-                // cancelled ?
-                if (!response) {
-                  return;
-                }
-
-                // create custom query builder
-                this.queryBuilder = response.queryBuilder;
-
-                // keep filters to we can show it back
-                this.filtersApplied = response.filtersApplied;
-
-                // rebuild graph
-                this.loadGraph();
-              });
-            }
-          }
         }
       ]
     };
+
+    // advanced filters
+    this.advancedFilters = [{
+      type: V2AdvancedFilterType.RANGE_DATE,
+      field: 'date',
+      label: 'LNG_PAGE_TRANSMISSION_CHAIN_BARS_FIELD_LABEL_DATE',
+      allowedComparators: [
+        _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.RANGE_DATE], { value: V2AdvancedFilterComparatorType.BETWEEN }),
+        _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.RANGE_DATE], { value: V2AdvancedFilterComparatorType.BEFORE }),
+        _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.RANGE_DATE], { value: V2AdvancedFilterComparatorType.AFTER })
+      ],
+      filterBy: (
+        qb,
+        filter
+      ) => {
+        // determine operator & value
+        const fromValue = filter.value.startDate ? moment(filter.value.startDate).toISOString() : null;
+        const toValue = filter.value.endDate ? moment(filter.value.endDate).toISOString() : null;
+        let operator: string;
+        let valueToCompare: any;
+        if (filter.comparator.value === V2AdvancedFilterComparatorType.BETWEEN) {
+          operator = 'between';
+          valueToCompare = [fromValue, toValue];
+        } else if (filter.comparator.value === V2AdvancedFilterComparatorType.AFTER) {
+          operator = 'gte';
+          valueToCompare = fromValue;
+        } else {
+          operator = 'lte';
+          valueToCompare = toValue;
+        }
+
+        // condition
+        qb.filter
+          .where({
+            or: [
+              {
+                type: EntityType.CASE,
+                dateOfOnset: {
+                  [operator]: valueToCompare
+                }
+              }, {
+                type: EntityType.EVENT,
+                date: {
+                  [operator]: valueToCompare
+                }
+              }
+            ]
+          });
+      }
+    }, {
+      type: V2AdvancedFilterType.LOCATION_SINGLE,
+      field: 'locationId',
+      label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
+      filterBy: (
+        qb,
+        filter
+      ) => {
+        qb.filter
+          .where({
+            or: [
+              {
+                type: EntityType.CASE,
+                'addresses.parentLocationIdFilter': {
+                  inq: [filter.value]
+                }
+              }, {
+                type: EntityType.EVENT,
+                'address.parentLocationIdFilter': {
+                  inq: [filter.value]
+                }
+              }
+            ]
+          });
+      }
+    }, {
+      type: V2AdvancedFilterType.RANGE_DATE,
+      field: 'isolationDate',
+      label: 'LNG_PAGE_TRANSMISSION_CHAIN_BARS_FILTERS_HOSPITALISATION_ISOLATION',
+      allowedComparators: [
+        _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.RANGE_DATE], { value: V2AdvancedFilterComparatorType.BETWEEN }),
+        _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.RANGE_DATE], { value: V2AdvancedFilterComparatorType.BEFORE }),
+        _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.RANGE_DATE], { value: V2AdvancedFilterComparatorType.AFTER })
+      ],
+      filterBy: (
+        qb,
+        filter
+      ) => {
+        // determine operator & value
+        const startDate = filter.value.startDate ? moment(filter.value.startDate).toISOString() : null;
+        const endDate = filter.value.endDate ? moment(filter.value.endDate).toISOString() : null;
+
+        // must have isolation start date or end date
+        qb.filter
+          .where({
+            'or': [
+              {
+                'dateRanges.startDate': {
+                  '$ne': null
+                }
+              },
+              {
+                'dateRanges.endDate': {
+                  '$ne': null
+                }
+              }
+            ]
+          });
+
+        // start date
+        if (startDate) {
+          qb.filter
+            .where({
+              'or': [
+                {
+                  'dateRanges.endDate': {
+                    'gte': startDate
+                  }
+                },
+                {
+                  'dateRanges.endDate': null
+                }
+              ]
+            });
+        }
+
+        if (endDate) {
+          qb.filter
+            .where({
+              'or': [
+                {
+                  'and': [
+                    {
+                      'dateOfOnset': {
+                        'lte': endDate
+                      }
+                    },
+                    {
+                      'dateRanges.startDate': null
+                    }
+                  ]
+                },
+                {
+                  'and': [
+                    {
+                      'dateRanges.startDate': {
+                        'lte': endDate
+                      }
+                    },
+                    {
+                      'dateRanges.startDate': {
+                        '$ne': null
+                      }
+                    }
+                  ]
+                }
+              ]
+            });
+        }
+      }
+    }, {
+      type: V2AdvancedFilterType.MULTISELECT,
+      field: 'isolationCenterName',
+      label: 'LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME',
+      options: (this.activatedRoute.snapshot.data.dateRangeCenter as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+      allowedComparators: [
+        _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
+      ],
+      filterBy: (
+        qb,
+        filter
+      ) => {
+        qb.filter
+          .bySelect(
+            'dateRanges.centerName',
+            filter.value,
+            true,
+            null
+          );
+      }
+    }, {
+      type: V2AdvancedFilterType.MULTISELECT,
+      field: 'caseClassification',
+      label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+      options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+      allowedComparators: [
+        _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
+      ],
+      filterBy: (
+        qb,
+        filter
+      ) => {
+        qb.filter
+          .bySelect(
+            'classification',
+            filter.value,
+            true,
+            null
+          );
+      }
+    }, {
+      type: V2AdvancedFilterType.MULTISELECT,
+      field: 'caseOutcome',
+      label: 'LNG_PAGE_TRANSMISSION_CHAIN_BARS_FILTERS_CASE_OUTCOME',
+      options: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+      allowedComparators: [
+        _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
+      ],
+      filterBy: (
+        qb,
+        filter
+      ) => {
+        qb.filter
+          .bySelect(
+            'outcomeId',
+            filter.value,
+            true,
+            null
+          );
+      }
+    }];
   }
 
   /**
@@ -528,5 +505,16 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
             });
         });
     });
+  }
+
+  /**
+   * Filter
+   */
+  advancedFilterBy(response: IV2SideDialogAdvancedFiltersResponse): void {
+    // create custom query builder
+    this.queryBuilder = response.queryBuilder;
+
+    // rebuild graph
+    this.loadGraph();
   }
 }
