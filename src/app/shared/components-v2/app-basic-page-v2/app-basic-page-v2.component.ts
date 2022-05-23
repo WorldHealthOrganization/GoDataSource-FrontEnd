@@ -31,6 +31,7 @@ export class AppBasicPageV2Component implements OnInit, OnDestroy {
   // advanced filters
   @Input() advancedFilterType: string;
   @Input() advancedFilters: V2AdvancedFilter[];
+  @Input() advancedFiltersHideOperator: boolean;
 
   // applied filters
   private _advancedFiltersApplied: SavedFilterData;
@@ -124,16 +125,17 @@ export class AppBasicPageV2Component implements OnInit, OnDestroy {
       .showAdvancedFiltersDialog(
         this.advancedFilterType,
         this.advancedFilters,
-        this._advancedFiltersApplied
+        this._advancedFiltersApplied,
+        this.advancedFiltersHideOperator
       )
       .subscribe((response) => {
-        // set data
-        this._advancedFiltersApplied = response?.filtersApplied;
-
         // cancelled ?
         if (!response) {
           return;
         }
+
+        // set data
+        this._advancedFiltersApplied = response.filtersApplied;
 
         // emit the Request Query Builder
         this.advancedFilterBy.emit(response);

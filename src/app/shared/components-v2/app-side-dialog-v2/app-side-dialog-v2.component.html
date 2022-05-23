@@ -376,7 +376,8 @@
             <div
               *ngSwitchCase="V2SideDialogConfigInputType.FILTER_LIST"
               fxLayout="column" fxLayoutGap="1.6rem"
-              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-filter-list {{input.cssClasses}}">
+              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-filter-list {{input.cssClasses}}"
+              [class.gd-app-side-dialog-v2-content-middle-item-input-filter-list-operator-hidden]="!!input.operatorHide">
 
               <!-- Filter & Sort tabs -->
               <mat-tab-group
@@ -388,6 +389,7 @@
 
                   <!-- Operator -->
                   <app-form-toggle-v2
+                    *ngIf="!input.operatorHide"
                     [(ngModel)]="input.operatorValue"
                     [name]="input.name + 'Operator'"
                     [options]="operatorOptions"

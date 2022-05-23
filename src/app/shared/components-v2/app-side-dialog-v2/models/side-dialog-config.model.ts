@@ -417,6 +417,7 @@ export interface IV2SideDialogConfigInputFilterList extends IV2SideDialogConfigI
   optionsAsLabelValueMap?: {
     [optionId: string]: ILabelValuePairModel
   };
+  operatorHide?: boolean;
 }
 
 /**
