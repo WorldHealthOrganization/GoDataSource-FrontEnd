@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, EventEmitter, forwardRef, Host, HostListener, Input, OnDestroy, Optional, Output, SkipSelf, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, forwardRef, Host, HostListener, Input, OnDestroy, Optional, Output, SkipSelf, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
@@ -153,11 +153,13 @@ interface IFlattenNodeQuestion {
 @Component({
   selector: 'app-form-fill-questionnaire-v2',
   templateUrl: './app-form-fill-questionnaire-v2.component.html',
+  styleUrls: ['./app-form-fill-questionnaire-v2.component.scss'],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
     useExisting: forwardRef(() => AppFormFillQuestionnaireV2Component),
     multi: true
-  }]
+  }],
+  encapsulation: ViewEncapsulation.None
 })
 export class AppFormFillQuestionnaireV2Component
   extends AppFormBaseV2<{
