@@ -26,7 +26,7 @@
           <div
             *ngSwitchCase="FlattenType.QUESTION"
             class="gd-form-fill-questionnaire-v2-list-item-question"
-            fxLayout="row" fxLayoutAlign=" center">
+            fxLayout="row" fxLayoutAlign="center">
 
             <!-- Collapse / Expand -->
             <mat-icon
@@ -80,7 +80,6 @@
             <!-- Collapse / Expand -->
             <!-- append padding and remove icon -->
             <mat-icon
-              change123
               style="visibility: hidden">expand_more</mat-icon>
 
             <!-- No -->
@@ -133,12 +132,11 @@
             class="gd-form-fill-questionnaire-v2-list-item-answer"
             [class.gd-form-fill-questionnaire-v2-list-item-answer-multiple]="item.parent.data.multiAnswer"
             [class.gd-form-fill-questionnaire-v2-list-item-answer-file]="item.definition.type === FlattenAnswerDrawType.FILE"
-            fxLayout="row" fxLayoutAlign=" center">
+            fxLayout="row" fxLayoutAlign="center">
 
             <!-- Collapse / Expand -->
             <!-- append padding and remove icon -->
             <mat-icon
-              change123
               style="visibility: hidden">expand_more</mat-icon>
 
             <!-- No -->
