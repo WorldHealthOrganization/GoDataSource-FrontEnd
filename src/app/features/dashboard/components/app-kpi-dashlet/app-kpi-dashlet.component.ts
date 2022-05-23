@@ -71,9 +71,30 @@ implements OnDestroy {
     this._valuesVisibleAndSorted = (this._values || []).filter((value) => this.dashletMap[value.name] === undefined || this.dashletMap[value.name].visible);
 
     // sort values
-    // this._valuesVisibleAndSorted.sort((a, b) => {
-    //   return a.
-    // });
+    this._valuesVisibleAndSorted.sort((a, b) => {
+      // determine order
+      let aOrder: number = this.dashletMap[a.name]?.order !== undefined ?
+        this.dashletMap[a.name].order :
+        9999;
+
+      // not number ?
+      if (typeof aOrder === 'string') {
+        aOrder = parseInt(aOrder, 10);
+      }
+
+      // determine order
+      let bOrder: number = this.dashletMap[b.name]?.order !== undefined ?
+        this.dashletMap[b.name].order :
+        9999;
+
+      // not number ?
+      if (typeof bOrder === 'string') {
+        bOrder = parseInt(bOrder, 10);
+      }
+
+      // sort
+      return aOrder - bOrder;
+    });
 
     // refresh
     this.refreshNecessary(false);
