@@ -31,6 +31,7 @@ import {
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
 import { IV2LoadingDialogHandler } from '../../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
+import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 
 @Component({
   selector: 'app-backups',
@@ -50,7 +51,8 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
     private toastV2Service: ToastV2Service,
     private i18nService: I18nService,
     private activatedRoute: ActivatedRoute,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private formHelperService: FormHelperService
   ) {
     // parent
     super(listHelperService);
@@ -1067,9 +1069,15 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
 
         // if the automatic backup is off do not change the rest of the settings
         let backupSettings;
-        if (response.data.map.disabled) {
-          backupSettings = { ...currentSettings };
+        if ((response.data.map.disabled as IV2SideDialogConfigInputSingleDropdown).value) {
+          backupSettings = { ...currentSettings.dataBackup };
           backupSettings.disabled = true;
+        } else {
+          const formData = this.formHelperService.getFields(response.handler.form);
+          backupSettings = {
+            ...currentSettings.dataBackup,
+            ...formData
+          };
         }
 
         // change automatic backup settings
