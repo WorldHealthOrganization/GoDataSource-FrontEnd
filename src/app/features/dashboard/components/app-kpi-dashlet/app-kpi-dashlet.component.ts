@@ -173,6 +173,12 @@ implements OnDestroy {
     this._destroyed$.next(true);
     this._destroyed$.complete();
     this._destroyed$ = undefined;
+
+    // clear previous
+    if (this._waitAndRefreshNecessary) {
+      clearTimeout(this._waitAndRefreshNecessary);
+      this._waitAndRefreshNecessary = undefined;
+    }
   }
 
   /**

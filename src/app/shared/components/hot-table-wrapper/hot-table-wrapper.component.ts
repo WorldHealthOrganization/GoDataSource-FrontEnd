@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import * as Handsontable from 'handsontable';
 import * as _ from 'lodash';
 import { SheetCellValidator } from '../../../core/models/sheet/sheet-cell-validator';
@@ -282,6 +282,7 @@ implements OnInit, OnDestroy {
   CustomLocationEditor = CustomLocationEditor;
 
   // local variables
+  setSheetSizesCall: any;
   sheetWidth: string;
   sheetHeight: string;
 
@@ -322,7 +323,7 @@ implements OnInit, OnDestroy {
    */
   ngOnInit() {
     // set spreadsheet width
-    this.setSheetSizes();
+    this.setSheetSize();
 
     // set wrapper
     HotTableWrapperComponent.WRAPPERS[this.hotId] = this;
@@ -334,20 +335,63 @@ implements OnInit, OnDestroy {
   ngOnDestroy() {
     // release wrapper
     delete HotTableWrapperComponent.WRAPPERS[this.hotId];
+
+    // stop previous
+    if (this.setSheetSizesCall) {
+      clearTimeout(this.setSheetSizesCall);
+      this.setSheetSizesCall = undefined;
+    }
   }
 
   /**
-   * Update sheet width based on browser width
-   * Note: It's a hack, but there's no other fix for now, since handsontable is working with pixels only
+   * Update sheet size
    */
-  @HostListener('window:resize')
-  private setSheetSizes() {
-    // determine parent size
-    const basicPage: any = document.querySelector('app-basic-page-v2');
-    if (basicPage) {
-      this.sheetWidth = `calc(${basicPage.offsetWidth}px - var(--gd-basic-page-content-padding-left-right))`;
-      this.sheetHeight = `calc(${basicPage.offsetHeight}px - var(--gd-basic-page-content-padding-top-bottom))`;
+  setSheetSize() {
+    // stop previous
+    if (this.setSheetSizesCall) {
+      clearTimeout(this.setSheetSizesCall);
+      this.setSheetSizesCall = undefined;
     }
+
+    // update sizes
+    const basicPageMatCard: any = document.querySelector('app-basic-page-v2 mat-card');
+    const basicPageHoTable: any = basicPageMatCard.querySelector('hot-table');
+    if (
+      basicPageMatCard &&
+      basicPageHoTable
+    ) {
+      // determine element boundings
+      const boundingMatCard = basicPageMatCard.getBoundingClientRect();
+      const boundingHoTable = basicPageHoTable.getBoundingClientRect();
+      const height: number = basicPageMatCard.offsetHeight - boundingHoTable.top + boundingMatCard.top;
+
+      // update sizes
+      const sheetWidth: string = `calc(${basicPageMatCard.offsetWidth}px - var(--gd-basic-page-content-padding-left-right))`;
+      const sheetHeight: string = `calc(${height}px - var(--gd-basic-page-content-padding-top-bottom))`;
+
+      // render spreadsheet
+      if (
+        this.sheetWidth !== sheetWidth ||
+        this.sheetHeight !== sheetHeight
+      ) {
+        // update
+        this.sheetWidth = sheetWidth;
+        this.sheetHeight = sheetHeight;
+        this.sheetTable.updateHotTable({
+          width: this.sheetWidth,
+          height: this.sheetHeight
+        });
+      }
+    }
+
+    // call again
+    this.setSheetSizesCall = setTimeout(() => {
+      // reset
+      this.setSheetSizesCall = undefined;
+
+      // check and resize
+      this.setSheetSize();
+    }, 200);
   }
 
   /**
