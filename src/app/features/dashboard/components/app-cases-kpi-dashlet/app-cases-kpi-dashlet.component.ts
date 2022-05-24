@@ -16,6 +16,7 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 import { EntityType } from '../../../../core/models/entity-type';
 import { CaseModel } from '../../../../core/models/case.model';
 import { TranslateService } from '@ngx-translate/core';
+import { MetricNewCasesWithContactsModel } from '../../../../core/models/metric-new-cases-contacts.model';
 
 @Component({
   selector: 'app-cases-kpi-dashlet',
@@ -292,7 +293,7 @@ export class AppCasesKpiDashletComponent
           }
 
           // convert noLessContacts to number as the API expects
-          if (inputValue) {
+          if (inputValue !== undefined) {
             // create filter for daysNotSeen
             qb.filter.byEquality(
               'noLessContacts',
@@ -340,6 +341,117 @@ export class AppCasesKpiDashletComponent
             undefined;
         },
         helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE_BEFORE_VALUE_DESCRIPTION')
+      },
+
+      // New cases detected in the previous x days among contacts
+      {
+        name: DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_AMONG_KNOWN_CONTACTS,
+        group: DashboardKpiGroup.CASE,
+        valueColor,
+        prefix: 'LNG_PAGE_DASHBOARD_KPI_CASES_NEW_PREVIOUS_DAYS_CONTACTS_BEFORE_VALUE',
+        suffix: 'LNG_PAGE_DASHBOARD_KPI_CASES_NEW_PREVIOUS_DAYS_CONTACTS_AFTER_VALUE',
+        inputValue: this.selectedOutbreak.noDaysAmongContacts,
+        refresh: (
+          inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          // filter
+          const qb = new RequestQueryBuilder();
+
+          // change the way we build query
+          qb.filter.firstLevelConditions();
+
+          // exclude discarded cases
+          qb.filter.where({
+            classification: {
+              neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+            }
+          });
+
+          // add location condition
+          if (globalFilterLocationId) {
+            qb.filter.byEquality(
+              'addresses.parentLocationIdFilter',
+              globalFilterLocationId
+            );
+          }
+
+          // classification
+          if (globalFilterClassificationId?.length > 0) {
+            qb.filter.where({
+              and: [{
+                classification: {
+                  inq: globalFilterClassificationId
+                }
+              }]
+            });
+          }
+
+          // date
+          if (globalFilterDate) {
+            qb.filter.where({
+              dateOfReporting: {
+                lte: moment(globalFilterDate).toISOString()
+              }
+            });
+          }
+
+          // filter
+          if (inputValue !== undefined) {
+            // add number of days until current day
+            if (globalFilterDate) {
+              inputValue += moment().endOf('day').diff(moment(globalFilterDate).endOf('day'), 'days');
+            }
+
+            // create filter for daysNotSeen
+            qb.filter.byEquality(
+              'noDaysAmongContacts',
+              inputValue
+            );
+          }
+
+          // retrieve cases currently hospitalized
+          return this.relationshipDataService
+            .getCountIdsOfCasesAmongKnownContacts(
+              this.selectedOutbreak.id,
+              qb
+            );
+        },
+        process: (response: MetricNewCasesWithContactsModel) => {
+          return `${response.newCasesAmongKnownContactsCount.toLocaleString('en')}/${response.newCasesCount}`;
+        },
+        hasPermission: () => {
+          return DashboardModel.canViewNewCasesInPreviousXDaysAmongKnownContactsDashlet(this.authUser);
+        },
+        getLink: (
+          inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          return CaseModel.canList(this.authUser) ?
+            {
+              link: ['/cases'],
+              linkQueryParams: {
+                applyListFilter: Constants.APPLY_LIST_FILTER.CASES_PREVIOUS_DAYS_CONTACTS,
+                [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
+                x: inputValue,
+                global: JSON.stringify({
+                  date: globalFilterDate,
+                  locationId: globalFilterLocationId ?
+                    globalFilterLocationId :
+                    undefined,
+                  classificationId: globalFilterClassificationId?.length > 0 ?
+                    globalFilterClassificationId :
+                    undefined
+                })
+              }
+            } :
+            undefined;
+        },
+        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_NEW_PREVIOUS_DAYS_CONTACTS_BEFORE_VALUE_DESCRIPTION')
       }
     ];
 
