@@ -16,6 +16,8 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
+import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
 
 @Component({
   selector: 'app-view-chronology-case',
@@ -25,7 +27,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 })
 export class ViewChronologyCaseComponent implements OnInit {
   // breadcrumbs
-  // breadcrumbs: BreadcrumbItemModel[] = [];
+  breadcrumbs: IV2Breadcrumb[] = [];
 
   caseData: CaseModel = new CaseModel();
   chronologyEntries: ChronologyItem[] = [];
@@ -114,38 +116,42 @@ export class ViewChronologyCaseComponent implements OnInit {
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // // reset
-    // this.breadcrumbs = [];
-    //
-    // // case list page
-    // if (CaseModel.canList(this.authUser)) {
-    //   this.breadcrumbs.push(
-    //     new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
-    //   );
-    // }
-    //
-    // // case breadcrumbs
-    // if (this.caseData) {
-    //   // case view page
-    //   if (CaseModel.canView(this.authUser)) {
-    //     this.breadcrumbs.push(
-    //       new BreadcrumbItemModel(
-    //         this.caseData.name,
-    //         `/cases/${this.caseData.id}/view`
-    //       )
-    //     );
-    //   }
-    //
-    //   // current page
-    //   this.breadcrumbs.push(
-    //     new BreadcrumbItemModel(
-    //       'LNG_PAGE_VIEW_CHRONOLOGY_CASE_TITLE',
-    //       '.',
-    //       true,
-    //       {},
-    //       this.caseData
-    //     )
-    //   );
-    // }
+    // reset
+    this.breadcrumbs = [{
+      label: 'LNG_COMMON_LABEL_HOME',
+      action: {
+        link: DashboardModel.canViewDashboard(this.authUser) ?
+          ['/dashboard'] :
+          ['/account/my-profile']
+      }
+    }];
+
+    // list page
+    if (CaseModel.canList(this.authUser)) {
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_CASES_TITLE',
+        action: {
+          link: ['/cases']
+        }
+      });
+    }
+
+    // view page
+    if (this.caseData) {
+      if (CaseModel.canView(this.authUser)) {
+        this.breadcrumbs.push({
+          label: this.caseData.name,
+          action: {
+            link: [`/cases/${this.caseData.id}/view`]
+          }
+        });
+      }
+
+      // current page
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_VIEW_CHRONOLOGY_CASE_TITLE',
+        action: null
+      });
+    }
   }
 }
