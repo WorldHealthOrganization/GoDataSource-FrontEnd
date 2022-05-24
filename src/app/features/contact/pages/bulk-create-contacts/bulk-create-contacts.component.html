@@ -2,9 +2,12 @@
   [breadcrumbs]="breadcrumbs"
   pageTitle="LNG_PAGE_BULK_ADD_CONTACTS_TITLE"
   [actionButton]="actionButton">
-  <form class="form-section">
-    <div class="form-content">
-      <div fxLayout="column" fxLayoutGap="5px" class="info-container">
+  <form
+    class="form-section">
+    <div
+      class="form-content">
+      <div
+        class="info-container">
         <div>
           {{ 'LNG_PAGE_BULK_ADD_CONTACTS_VISUAL_ID_INFO_LABEL' | translate: contactVisualIdModel }}
         </div>
@@ -19,18 +22,25 @@
             {{ 'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_ERRORS' | translate }}
           </div>
           <div
-            *ngFor="let err of errorMessages">
-            {{ err.message | translate:err.data }}
+            class="bulk-create-contacts-errors-container">
+            <div
+              *ngFor="let err of errorMessages">
+              {{ err.message | translate:err.data }}
+            </div>
           </div>
         </div>
       </ng-container>
 
-      <div class="related-person" fxLayout="row" fxLayoutGap="20px">
-        <div>{{relatedEntityData?.type | translate}}</div>
+      <div
+        class="related-person"
+        fxLayout="row" fxLayoutGap="0.8rem">
+        <span>{{relatedEntityData?.type | translate}}:</span>
         <div>{{relatedEntityData?.name}}</div>
       </div>
 
-      <div class="sheet-wrapper" fxLayout="row" fxLayoutAlign="center">
+      <div
+        class="sheet-wrapper"
+        fxLayout="row" fxLayoutAlign="center">
         <input
           #inputForMakingFormDirty="ngModel"
           type="hidden"

@@ -32,7 +32,7 @@ import { IV2ActionIconLabel, V2ActionType } from '../../../../shared/components-
   selector: 'app-bulk-modify-contacts-of-contacts',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './bulk-modify-contacts-of-contacts.component.html',
-  styleUrls: ['./bulk-modify-contacts-of-contacts.component.less']
+  styleUrls: ['./bulk-modify-contacts-of-contacts.component.scss']
 })
 export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges implements OnInit, OnDestroy {
   // breadcrumbs
