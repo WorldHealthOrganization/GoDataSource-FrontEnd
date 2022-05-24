@@ -14,7 +14,8 @@ app-hover-row-actions {
     }
 
     .record-hover-actions {
-        display: inline-block;
+        align-items: center;
+        display: flex;
         pointer-events: none;
         background-color: transparent;
         z-index: 999;
@@ -43,6 +44,20 @@ app-hover-row-actions {
 
         &.right {
             transform: translateX(-100%);
+        }
+
+        > .mat-tooltip-trigger {
+            + .mat-tooltip-trigger {
+                margin-left: 0.4rem;
+            }
+        }
+
+        .mat-icon-button {
+            font-size: 1.6rem;
+            height: 2.4rem;
+            min-width: 2.4rem;
+            padding: 0.4rem;
+            width: 2.4rem;
         }
     }
 }

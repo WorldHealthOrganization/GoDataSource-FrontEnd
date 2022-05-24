@@ -1,7 +1,5 @@
 app-import-data {
-    @app-import-data-height: 305px;
     .import-data-loading {
-        height: @app-import-data-height;
         text-align: center;
 
         @mat-spinner-width: 64px;
@@ -35,14 +33,43 @@ app-import-data {
     }
 
     .import-data {
-        height: @app-import-data-height;
-
         .import-data-drop-zone {
-            border: dotted 3px lightgray;
-            height: 100px;
+            background-color: rgba(var(--gd-secondary-rgb), 0.1);
+            border: 0.3rem dashed rgba(var(--gd-secondary-rgb), 0.25);
+            border-radius: 0.4rem;
+            color: var(--gd-secondary);
+            cursor: pointer;
+            font-size: 1.6rem;
+            font-style: italic;
+            padding: 1.6rem;
+            transition: all 0.24s ease-in-out 0s;
+
+            .mat-icon {
+                color: rgba(var(--gd-secondary-rgb), 0.25);
+                font-size: 6.4rem;
+                height: 6.4rem;
+                margin-bottom: 0.8rem;
+                transition: all 0.24s ease-in-out 0s;
+                width: 6.4rem;
+            }
+
+            &:hover {
+                background-color: rgba(var(--gd-secondary-rgb), 0.2);
+                border-color: rgba(var(--gd-secondary-rgb), 0.35);
+
+                .mat-icon {
+                    color: rgba(var(--gd-secondary-rgb), 0.5);
+                }
+            }
 
             &.import-data-file-over {
-                border: dotted 3px red;
+                background-color: rgba(var(--gd-primary-rgb), 0.2);
+                border-color: rgba(var(--gd-primary-rgb), 0.35);
+                color: var(--gd-primary);
+
+                .mat-icon {
+                    color: rgba(var(--gd-primary-rgb), 0.5);
+                }
             }
         }
 
@@ -83,27 +110,46 @@ app-import-data {
                 border: @app-import-data-border;
                 font-weight: bold;
                 box-sizing: border-box;
+                transition: all 0.24s ease-in-out 0s;
 
                 &:hover {
                     background-color: @app-import-data-bg-color-hover;
                 }
             }
         }
+
+        .gd-form-input-v2 {
+            min-width: 20rem;
+        }
     }
 
     .import-data-map-fields {
         @hover-index: 1000;
         @hover-bg-color: white;
+
+        .gd-form-select-single-v2 {
+            min-width: 30rem;
+        }
+
+        .import-data-map-fields-counters {
+            @media (max-width: 599px) {
+                padding-bottom: 1.6rem;
+            }
+        }
+
+        .import-data-table {
+            margin: 0 -1.6rem;
+        }
+
         .import-data-header-row {
-            font-weight: bold;
-            font-size: 16px;
-            border-bottom: 1px solid #CCC;
-            margin-bottom: 10px;
-            padding-bottom: 5px;
+            font-weight: 700;
+            border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+            border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+            padding: 0.8rem 1.6rem;
 
             // hack to display it on top of hover actions
             z-index: @hover-index;
-            background: @hover-bg-color;
+            background: rgba(var(--gd-secondary-rgb), 0.1);
 
             // trick to have the same column width no matter of the browser used
             overflow-y: scroll;
@@ -115,11 +161,22 @@ app-import-data {
             .xt-icon-xsmall {
                 font-size: 16px;
             }
+
+            .gd-form-input-v2 {
+                .mat-form-field {
+                    .mat-form-field-wrapper {
+                        .mat-form-field-flex {
+                            background: var(--gd-background);
+                        }
+                    }
+                }
+            }
         }
 
         .import-data-action-buttons {
-            padding-top: 20px;
-            padding-bottom: 20px;
+            border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+            margin: 0 -1.6rem;
+            padding: 1.6rem 1.6rem 0;
 
             // hack to display it on top of hover actions
             z-index: @hover-index;
@@ -133,10 +190,10 @@ app-import-data {
             .import-data-body-row {
                 margin: 0;
                 padding: 0;
-                border-bottom: 1px solid #CCC;
+                border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
 
                 .import-data-body-row-basic {
-                    padding: 0;
+                    padding: 0 1.6rem;
                     margin: 0;
 
                     .import-data-body-row-basic-data {
@@ -148,28 +205,27 @@ app-import-data {
                     }
 
                     .import-data-body-row-basic-validation {
-                        margin-top: 3px;
-                        margin-bottom: 10px;
+                        margin: 0.4rem 0;
                         font-size: 12px;
                         font-weight: bold;
                         //color: @color-error;
 
                         .import-data-body-row-basic-validation-source {
-                            padding-left: 30px;
+                            padding-left: 0;
                         }
 
                         .import-data-body-row-basic-validation-destination {
-                            padding-left: 30px;
+                            padding-left: 0;
 
                             .import-data-body-row-basic-validation-destination-required {
-                                color: darkgray;
+                                color: var(--gd-danger);
                             }
                         }
                     }
                 }
 
                 .import-data-body-row-edit-basic {
-                    padding: 10px 0;
+                    padding: 0.8rem 1.6rem;
 
                     .import-data-body-row-edit-basic-validation-source {
                         font-size: 12px;

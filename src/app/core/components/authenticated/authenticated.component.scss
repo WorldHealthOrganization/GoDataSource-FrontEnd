@@ -144,8 +144,6 @@ mat-sidenav-container {
 
     /* Right side */
     .gd-body-content-right {
-      z-index: auto;
-
       @include breakpoint('gt-md') {
         margin: 0 0 0 var(--gd-menu-width-collapsed) !important;
         @include transition(all 0.24s ease-in-out 0s);

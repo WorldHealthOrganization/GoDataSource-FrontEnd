@@ -1,17 +1,42 @@
 @import 'mixins';
 @import 'font';
 
-/* Select dropdown */
- .cdk-overlay-pane {
-   &.gd-cdk-overlay-pane-dropdown {
-     margin-top: 5rem;
-   }
- }
-
 /* Select */
-.gd-form-select-single-v2 {
-  @include flex(flex);
+app-form-select-vscroll {
   width: 100%;
+
+  /* Old style */
+  --vscroll-mat-option-height: 4.8rem;
+
+  .mat-option-vscroll {
+    // for virtual scroll
+    height: var(--vscroll-mat-option-height) !important;
+    min-height: var(--vscroll-mat-option-height) !important;
+    max-height: var(--vscroll-mat-option-height) !important;
+
+    .label-as-mat-icon {
+      font-family: 'Material Icons';
+      font-style: normal;
+      font-weight: 400;
+      font-size: 24px;
+    }
+  }
+
+  .mat-option-vscroll-selected {
+    visibility: hidden;
+    position: absolute;
+  }
+
+  .mat-select-virtual-scroll-viewport {
+    height: 192px;
+    overflow-x: hidden;
+  }
+
+
+  /* New style */
+  > .form-element {
+    @include flex(flex);
+  }
 
   .mat-form-field {
     font-family: $gd-font-family;
@@ -116,7 +141,7 @@
 
                 .mat-select-value-text {
                   mat-select-trigger {
-                    > img {
+                    >img {
                       display: inline-block;
                       height: 2rem;
                       margin-right: 0.4rem;
@@ -199,7 +224,7 @@
             height: 2.4rem;
             width: 2.4rem;
 
-            + .mat-icon-button {
+            +.mat-icon-button {
               margin-left: 0.4rem;
             }
           }
@@ -326,22 +351,6 @@
             }
           }
         }
-      }
-    }
-  }
-
-  .gd-form-select-single-v2-viewonly {
-    .gd-form-select-single-v2-viewonly-label {
-      color: var(--gd-secondary);
-      white-space: nowrap;
-    }
-
-    .gd-form-select-single-v2-viewonly-value {
-      img {
-        display: inline-block;
-        height: 2rem;
-        margin-right: 0.4rem;
-        vertical-align: text-bottom;
       }
     }
   }
