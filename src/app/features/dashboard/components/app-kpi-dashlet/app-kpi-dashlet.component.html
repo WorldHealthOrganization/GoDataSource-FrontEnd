@@ -68,17 +68,44 @@
         fxGrow="0">
 
         <!-- Sort -->
-        <mat-icon
+        <button
           cdkDragHandle
+          type="button"
+          mat-icon-button
+          color="text"
           [matTooltip]="'LNG_COMMON_BUTTON_DRAG' | translate"
           (mousedown)="notInvalidDragZone();"
-          (click)="$event.stopPropagation();">drag_indicator</mat-icon>
+          (click)="$event.stopPropagation();">
+          <mat-icon>drag_indicator</mat-icon>
+        </button>
 
         <!-- Hide -->
-        <mat-icon
-          cdkDragHandle
+        <button
+          type="button"
+          mat-icon-button
+          color="text"
           [matTooltip]="'LNG_COMMON_BUTTON_HIDE' | translate"
-          (click)="hide(value); $event.stopPropagation();">visibility_off</mat-icon>
+          (click)="hide(value); $event.stopPropagation();">
+          <mat-icon>visibility_off</mat-icon>
+        </button>
+
+        <!-- View data -->
+        <a
+          *ngIf="value.link; else linkPadding"
+          type="button"
+          mat-icon-button
+          color="text"
+          [matTooltip]="'LNG_COMMON_BUTTON_VIEW_DATA' | translate"
+          [routerLink]="value.link"
+          [queryParams]="value.linkQueryParams"
+          (click)="$event.stopPropagation()">
+          <mat-icon>visibility</mat-icon>
+        </a>
+        <ng-template
+          #linkPadding>
+          <span
+            class="gd-dashlet-kpi-bottom-value-link-padding"></span>
+        </ng-template>
 
       </div>
 

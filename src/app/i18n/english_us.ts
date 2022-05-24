@@ -36,6 +36,7 @@ export const EnglishUsLang = {
     'LNG_COMMON_LABEL_HEADER_FILTER_SHOW': 'Show header filters',
     'LNG_COMMON_LABEL_HEADER_FILTER_HIDE': 'Hide header filters',
     'LNG_COMMON_BUTTON_HIDE': 'Hide',
+    'LNG_COMMON_BUTTON_VIEW_DATA': 'View data',
     'LNG_DIALOG_CONFIRM_UNSAVED_DATA_TITLE': 'Unsaved data',
     'LNG_MULTIPLE_SNACKBAR_BUTTON_CLOSE_ALL': 'Clear all',
     'LNG_SIDE_FILTERS_LOAD_FILTER_READONLY_LABEL': 'Readonly ({{name}})',

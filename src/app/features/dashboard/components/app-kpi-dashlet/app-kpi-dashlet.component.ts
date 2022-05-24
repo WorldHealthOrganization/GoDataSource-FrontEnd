@@ -241,11 +241,27 @@ implements OnDestroy {
       // update status
       value.status = DashletValueStatus.LOADING;
 
+      // update link data
+      const inputValue: number = value.inputValue !== undefined && typeof value.inputValue === 'string' ?
+        parseInt(value.inputValue, 10) :
+        value.inputValue;
+      const linkDetails = value.getLink(
+        inputValue,
+        this.globalFilterDate,
+        this.globalFilterLocationId,
+        this.globalFilterClassificationId
+      );
+      if (linkDetails) {
+        value.link = linkDetails.link;
+        value.linkQueryParams = linkDetails.linkQueryParams;
+      } else {
+        value.link = undefined;
+        value.linkQueryParams = undefined;
+      }
+
       // load data
       value.subscription = value.refresh(
-        value.inputValue !== undefined && typeof value.inputValue === 'string' ?
-          parseInt(value.inputValue, 10) :
-          value.inputValue,
+        inputValue,
         this.globalFilterDate,
         this.globalFilterLocationId,
         this.globalFilterClassificationId

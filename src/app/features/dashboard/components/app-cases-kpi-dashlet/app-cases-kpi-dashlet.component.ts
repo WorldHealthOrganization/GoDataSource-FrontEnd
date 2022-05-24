@@ -14,6 +14,7 @@ import { ActivatedRoute } from '@angular/router';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { EntityType } from '../../../../core/models/entity-type';
+import { CaseModel } from '../../../../core/models/case.model';
 
 @Component({
   selector: 'app-cases-kpi-dashlet',
@@ -122,6 +123,27 @@ export class AppCasesKpiDashletComponent
         },
         hasPermission: () => {
           return DashboardModel.canViewCaseDeceasedDashlet(this.authUser);
+        },
+        getLink: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          return CaseModel.canList(this.authUser) ?
+            {
+              link: ['/cases'],
+              linkQueryParams: {
+                applyListFilter: Constants.APPLY_LIST_FILTER.CASES_DECEASED,
+                [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
+                global: JSON.stringify({
+                  date: globalFilterDate,
+                  locationId: globalFilterLocationId,
+                  classificationId: globalFilterClassificationId
+                })
+              }
+            } :
+            undefined;
         }
       },
 
@@ -148,6 +170,14 @@ export class AppCasesKpiDashletComponent
         },
         hasPermission: () => {
           return DashboardModel.canViewCaseHospitalizedDashlet(this.authUser);
+        },
+        getLink: (
+          _inputValue,
+          _globalFilterDate,
+          _globalFilterLocationId,
+          _globalFilterClassificationId
+        ) => {
+          return undefined;
         }
       },
 
@@ -187,6 +217,14 @@ export class AppCasesKpiDashletComponent
         },
         hasPermission: () => {
           return DashboardModel.canViewCaseWithLessThanXCotactsDashlet(this.authUser);
+        },
+        getLink: (
+          _inputValue,
+          _globalFilterDate,
+          _globalFilterLocationId,
+          _globalFilterClassificationId
+        ) => {
+          return undefined;
         }
       }
     ];
