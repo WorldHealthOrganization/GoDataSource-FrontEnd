@@ -724,6 +724,9 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
           if (answerBackup.button.type === IV2SideDialogConfigButtonType.CANCEL) {
             // cancel - display again the previous dialog
             this.restoreBackup(item);
+
+            // finished
+            return;
           }
 
           // backup settings
