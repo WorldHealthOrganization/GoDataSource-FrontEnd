@@ -245,12 +245,51 @@ export class AppCasesKpiDashletComponent
         prefix: 'LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE_BEFORE_VALUE',
         suffix: 'LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE_AFTER_VALUE',
         inputValue: this.selectedOutbreak.noLessContacts,
-        refresh: (inputValue) => {
+        refresh: (
+          inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
           // filter
           const qb = new RequestQueryBuilder();
 
           // change the way we build query
           qb.filter.firstLevelConditions();
+
+          // date
+          if (globalFilterDate) {
+            qb.filter.byDateRange(
+              'contactDate', {
+                endDate: moment(globalFilterDate).endOf('day').format()
+              }
+            );
+          }
+
+          // exclude discarded cases
+          qb.include('people').queryBuilder.filter.where({
+            classification: {
+              neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+            }
+          });
+
+          // location
+          if (globalFilterLocationId) {
+            qb.include('people').queryBuilder.filter
+              .byEquality('addresses.parentLocationIdFilter', globalFilterLocationId);
+          }
+
+          // classification
+          if (globalFilterClassificationId?.length > 0) {
+            qb.include('people').queryBuilder.filter
+              .where({
+                and: [{
+                  classification: {
+                    inq: globalFilterClassificationId
+                  }
+                }]
+              });
+          }
 
           // convert noLessContacts to number as the API expects
           if (inputValue) {
@@ -275,14 +314,32 @@ export class AppCasesKpiDashletComponent
           return DashboardModel.canViewCaseWithLessThanXCotactsDashlet(this.authUser);
         },
         getLink: (
-          _inputValue,
-          _globalFilterDate,
-          _globalFilterLocationId,
-          _globalFilterClassificationId
+          inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
         ) => {
-          return undefined;
+          return CaseModel.canList(this.authUser) ?
+            {
+              link: ['/cases'],
+              linkQueryParams: {
+                applyListFilter: Constants.APPLY_LIST_FILTER.CASES_LESS_CONTACTS,
+                [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
+                x: inputValue,
+                global: JSON.stringify({
+                  date: globalFilterDate,
+                  locationId: globalFilterLocationId ?
+                    globalFilterLocationId :
+                    undefined,
+                  classificationId: globalFilterClassificationId?.length > 0 ?
+                    globalFilterClassificationId :
+                    undefined
+                })
+              }
+            } :
+            undefined;
         },
-        helpTooltip: undefined
+        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE_BEFORE_VALUE_DESCRIPTION')
       }
     ];
 

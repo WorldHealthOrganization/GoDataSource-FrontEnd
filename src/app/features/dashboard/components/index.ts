@@ -2,7 +2,6 @@
 import { ContactsOnFollowupListDashletComponent } from './contacts-on-followup-list-dashlet/contacts-on-followup-list-dashlet.component';
 import { ContactsPerCaseMeanDashletComponent } from './contacts-per-case-mean-dashlet/contacts-per-case-mean-dashlet.component';
 import { ContactsPerCaseMedianDashletComponent } from './contacts-per-case-median-dashlet/contacts-per-case-median-dashlet.component';
-import { CasesLessContactsDashletComponent } from './cases-less-contacts-dashlet/cases-less-contacts-dashlet.component';
 import { ContactsLostToFollowUpDashletComponent } from './contacts-lost-to-follow-up-dashlet/contacts-lost-to-follow-up-dashlet.component';
 import { NewCasesPreviousDaysTransmissionChainsDashletComponent } from './new-cases-previous-days-transmission-chains-dashlet/new-cases-previous-days-transmission-chains-dashlet.component';
 import { IndependentTransmissionChainsDashletComponent } from './independent-transmission-chains-dashlet/independent-transmission-chains-dashlet.component';
@@ -37,7 +36,6 @@ export const components: any[] = [
   ContactsOnFollowupListDashletComponent,
   ContactsPerCaseMeanDashletComponent,
   ContactsPerCaseMedianDashletComponent,
-  CasesLessContactsDashletComponent,
   ContactsLostToFollowUpDashletComponent,
   NewCasesPreviousDaysTransmissionChainsDashletComponent,
   CasesPendingLabResultsDashletComponent,

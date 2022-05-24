@@ -447,18 +447,6 @@
 <!--                            <div fxLayout="row wrap">-->
 <!--                                <ng-container *ngFor="let dashlet of group.dashlets">-->
 <!--                                    <ng-container *ngIf="group.permissions[dashlet] && group.permissions[dashlet].hasAccess(authUser)">-->
-<!--                                        &lt;!&ndash; Cases with Less than x Contacts &ndash;&gt;-->
-<!--                                        <app-cases-less-contacts-dashlet-->
-<!--                                            *ngIf="dashlet === DashboardDashlet.CASES_WITH_LESS_THAN_X_CONTACTS &&-->
-<!--                                                isDashletVisible(dashlet)"-->
-<!--                                            (hide)="hideDashlet(dashlet)"-->
-<!--                                            (moveBefore)="moveDashletBefore(dashlet)"-->
-<!--                                            (moveAfter)="moveDashletAfter(dashlet)"-->
-<!--                                            [globalFilterDate]="globalFilterDate"-->
-<!--                                            [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                                            [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                                        </app-cases-less-contacts-dashlet>-->
-
 <!--                                        &lt;!&ndash; New cases detected in the previous x days among contacts &ndash;&gt;-->
 <!--                                        <app-new-cases-previous-days-contacts-dashlet-->
 <!--                                            *ngIf="dashlet === DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_AMONG_KNOWN_CONTACTS &&-->
