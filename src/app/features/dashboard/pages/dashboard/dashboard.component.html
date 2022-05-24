@@ -129,6 +129,12 @@
       [globalFilterLocationId]="globalFilterLocationId"
       [globalFilterClassificationId]="globalFilterClassificationId"></app-cases-kpi-dashlet>
 
+    <!-- Contacts KPI -->
+    <app-contacts-kpi-dashlet
+      [globalFilterDate]="globalFilterDate"
+      [globalFilterLocationId]="globalFilterLocationId"
+      [globalFilterClassificationId]="globalFilterClassificationId"></app-contacts-kpi-dashlet>
+
   </div>
 </div>
 
@@ -447,18 +453,6 @@
 <!--                            <div fxLayout="row wrap">-->
 <!--                                <ng-container *ngFor="let dashlet of group.dashlets">-->
 <!--                                    <ng-container *ngIf="group.permissions[dashlet] && group.permissions[dashlet].hasAccess(authUser)">-->
-<!--                                        &lt;!&ndash; Contacts per case mean &ndash;&gt;-->
-<!--                                        <app-contacts-per-case-mean-dashlet-->
-<!--                                            *ngIf="dashlet === DashboardDashlet.CONTACTS_PER_CASE_MEAN &&-->
-<!--                                                isDashletVisible(dashlet)"-->
-<!--                                            (hide)="hideDashlet(dashlet)"-->
-<!--                                            (moveBefore)="moveDashletBefore(dashlet)"-->
-<!--                                            (moveAfter)="moveDashletAfter(dashlet)"-->
-<!--                                            [globalFilterDate]="globalFilterDate"-->
-<!--                                            [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                                            [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                                        </app-contacts-per-case-mean-dashlet>-->
-
 <!--                                        &lt;!&ndash; Contacts per case median &ndash;&gt;-->
 <!--                                        <app-contacts-per-case-median-dashlet-->
 <!--                                            *ngIf="dashlet === DashboardDashlet.CONTACTS_PER_CASE_MEDIAN &&-->

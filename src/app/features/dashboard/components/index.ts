@@ -1,6 +1,5 @@
 // import each component
 import { ContactsOnFollowupListDashletComponent } from './contacts-on-followup-list-dashlet/contacts-on-followup-list-dashlet.component';
-import { ContactsPerCaseMeanDashletComponent } from './contacts-per-case-mean-dashlet/contacts-per-case-mean-dashlet.component';
 import { ContactsPerCaseMedianDashletComponent } from './contacts-per-case-median-dashlet/contacts-per-case-median-dashlet.component';
 import { ContactsLostToFollowUpDashletComponent } from './contacts-lost-to-follow-up-dashlet/contacts-lost-to-follow-up-dashlet.component';
 import { IndependentTransmissionChainsDashletComponent } from './independent-transmission-chains-dashlet/independent-transmission-chains-dashlet.component';
@@ -23,14 +22,15 @@ import { C3StackedBarChartComponent } from './c3-stacked-bar-chart/c3-stacked-ba
 import { DashboardCustomMetricDashletComponent } from './dashboard-custom-metric-dashlet/dashboard-custom-metric-dashlet.component';
 import { AppCasesKpiDashletComponent } from './app-cases-kpi-dashlet/app-cases-kpi-dashlet.component';
 import { AppKpiDashletComponent } from './app-kpi-dashlet/app-kpi-dashlet.component';
+import { AppContactsKpiDashletComponent } from './app-contacts-kpi-dashlet/app-contacts-kpi-dashlet.component';
 
 // export the list of all page components
 export const components: any[] = [
   AppCasesKpiDashletComponent,
+  AppContactsKpiDashletComponent,
   AppKpiDashletComponent,
 
   ContactsOnFollowupListDashletComponent,
-  ContactsPerCaseMeanDashletComponent,
   ContactsPerCaseMedianDashletComponent,
   ContactsLostToFollowUpDashletComponent,
   IndependentTransmissionChainsDashletComponent,
