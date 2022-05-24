@@ -1,0 +1,85 @@
+@import 'mixins';
+
+app-world-map {
+  @include flex(flex);
+  @include flex_direction(column);
+  height: 100%;
+  position: relative;
+
+  .app-world-map-container {
+    background-color: var(--gd-background);
+    height: 100%;
+    width: 100%;
+
+    &.full-screen-map {
+      height: 100vh !important;
+      left: 0;
+      position: fixed;
+      top: 0;
+      width: 100vw !important;
+      z-index: 1100;
+    }
+
+    .world-map-full-screen {
+      background-color: var(--gd-background);
+      padding: 0 1.6rem;
+      position: absolute;
+      right: 0;
+      z-index: 9999;
+    }
+
+    #worldMap {
+      height: 100%;
+      width: 100%;
+    }
+  }
+
+  .app-world-map-disclaimer {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    width: 100%;
+
+    .app-world-map-disclaimer-button {
+      margin: 0 0 0.8rem 0.8rem;
+    }
+
+    .app-world-map-disclaimer-content {
+      background: rgba(var(--gd-text-rgb), 0.75);
+      color: var(--gd-background);
+      padding: 1.6rem;
+
+      .app-world-map-disclaimer-text {
+        margin-bottom: 1.6rem;
+      }
+
+      .app-world-map-disclaimer-header {
+        font-weight: 700;
+      }
+
+      .app-world-map-disclaimer-no-wrap {
+        white-space: nowrap;
+      }
+    }
+  }
+
+  .world-map-loading {
+    text-align: center;
+
+    mat-spinner {
+      bottom: 0;
+      display: inline-block;
+      height: 3.2rem !important;
+      margin: auto;
+      position: absolute;
+      top: 0;
+      vertical-align: middle;
+      width: 3.2rem !important;
+
+      svg {
+        height: 3.2rem !important;
+        width: 3.2rem !important;
+      }
+    }
+  }
+}

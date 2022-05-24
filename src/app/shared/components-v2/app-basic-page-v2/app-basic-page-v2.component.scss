@@ -1,0 +1,42 @@
+@import 'mixins';
+@import 'font';
+
+/* Page top section */
+.gd-basic-top {
+  .gd-basic-top-title-buttons {
+    padding-bottom: 2.4rem;
+  
+    /* Page title */
+    .gd-basic-top-title-buttons-title {
+      color: var(--gd-primary);
+      font-family: $gd-font-family;
+      font-size: 2.4rem;
+      font-weight: 500;
+      line-height: $gd-line-height;
+    }
+  
+    /* Page top buttons */
+    .gd-basic-top-title-buttons-buttons {
+      .gd-basic-top-title-buttons-buttons-quick {
+        .mat-icon {
+          @include transition(all 0.24s ease-in-out 0s);
+        }
+  
+        &.gd-basic-top-title-buttons-buttons-quick-expanded {
+          .mat-icon {
+            @include rotate(180deg);
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Page content section */
+.gd-basic-content {
+  padding: 1.6rem;
+
+  @include breakpoint('xs') {
+    overflow-y: auto;
+  }
+}

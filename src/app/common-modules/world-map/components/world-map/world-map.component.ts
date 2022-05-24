@@ -200,12 +200,12 @@ class WorldMapClusterLine {
   selector: 'app-world-map',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './world-map.component.html',
-  styleUrls: ['./world-map.component.less']
+  styleUrls: ['./world-map.component.scss']
 })
 export class WorldMapComponent implements OnInit, OnDestroy {
   // Map fill size ( Default w: 100%, h: 400px )
   private _width: string = '100%';
-  private _height: string = '400px';
+  private _height: string = '100%';
   @Input() set width(width: string) {
     // set value
     this._width = width;

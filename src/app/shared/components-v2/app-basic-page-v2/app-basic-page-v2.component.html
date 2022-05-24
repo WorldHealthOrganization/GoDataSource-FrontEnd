@@ -23,7 +23,7 @@
 
     <!-- Buttons -->
     <div
-      fxFlex fxLayoutAlign="end" fxLayoutGap="0.8rem"
+      fxFlex fxLayoutAlign="end start" fxLayoutGap="0.8rem"
       class="gd-basic-top-title-buttons-buttons">
 
       <!-- Action button -->
@@ -36,7 +36,8 @@
         (click)="actionButton.action.click ? actionButton.action.click(null) : undefined">
 
         <!-- Icon -->
-        <mat-icon>{{actionButton.icon}}</mat-icon>
+        <mat-icon
+          *ngIf="actionButton.icon">{{actionButton.icon}}</mat-icon>
 
         <!-- Label -->
         <span>{{ actionButton.label | translate }}</span>
