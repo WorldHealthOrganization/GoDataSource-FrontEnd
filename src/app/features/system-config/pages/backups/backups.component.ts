@@ -235,7 +235,9 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
                             get: () => 'LNG_COMMON_LABEL_DELETE',
                             data: () => (
                               {
-                                name: item.description
+                                name: item.description ?
+                                  item.description :
+                                  '-'
                               }
                             )
                           },
