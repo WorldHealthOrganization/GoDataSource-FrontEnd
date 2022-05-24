@@ -453,18 +453,6 @@
 <!--                            <div fxLayout="row wrap">-->
 <!--                                <ng-container *ngFor="let dashlet of group.dashlets">-->
 <!--                                    <ng-container *ngIf="group.permissions[dashlet] && group.permissions[dashlet].hasAccess(authUser)">-->
-<!--                                        &lt;!&ndash; Contacts with successful follow-ups &ndash;&gt;-->
-<!--                                        <app-contacts-with-successful-follow-ups-dashlet-->
-<!--                                            *ngIf="dashlet === DashboardDashlet.CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP &&-->
-<!--                                                isDashletVisible(dashlet)"-->
-<!--                                            (hide)="hideDashlet(dashlet)"-->
-<!--                                            (moveBefore)="moveDashletBefore(dashlet)"-->
-<!--                                            (moveAfter)="moveDashletAfter(dashlet)"-->
-<!--                                            [globalFilterDate]="globalFilterDate"-->
-<!--                                            [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                                            [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                                        </app-contacts-with-successful-follow-ups-dashlet>-->
-
 <!--                                        &lt;!&ndash; number of independent chains of transmission &ndash;&gt;-->
 <!--                                        <app-independent-transmission-chains-dashlet-->
 <!--                                            *ngIf="dashlet === DashboardDashlet.INDEPENDENT_TRANSMISSION_CHAINS &&-->

@@ -2,7 +2,6 @@
 import { IndependentTransmissionChainsDashletComponent } from './independent-transmission-chains-dashlet/independent-transmission-chains-dashlet.component';
 import { NumberOfActiveChainsOfTransmissionComponent } from './number-of-active-chains-of-transmission/number-of-active-chains-of-transmission.component';
 import { NewChainsOfTransmissionFromRegisteredContactsDashletComponent } from './new-chains-of-transmission-from-registered-contacts-dashlet/new-chains-of-transmission-from-registered-contacts-dashlet.component';
-import { ContactsWithSuccessfulFollowUpsDashletComponent } from './contacts-with-successful-follow-ups-dashlet/contacts-with-successful-follow-ups-dashlet.component';
 import { HistogramTransmissionChainsSizeDashletComponent } from './histogram-transmission-chains-size-dashlet/histogram-transmission-chains-size-dashlet.component';
 import { EpiCurveDashletComponent } from './epi-curve-dashlet/epi-curve-dashlet.component';
 import { CaseSummaryDashletComponent } from './case-summary-dashlet/case-summary-dashlet.component';
@@ -28,7 +27,6 @@ export const components: any[] = [
   IndependentTransmissionChainsDashletComponent,
   NumberOfActiveChainsOfTransmissionComponent,
   NewChainsOfTransmissionFromRegisteredContactsDashletComponent,
-  ContactsWithSuccessfulFollowUpsDashletComponent,
   HistogramTransmissionChainsSizeDashletComponent,
   EpiCurveDashletComponent,
   EpiCurveOutcomeDashletComponent,

@@ -24,6 +24,7 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { MetricContactsSeenEachDays } from '../../../../core/models/metrics/metric-contacts-seen-each-days.model';
+import { MetricContactsWithSuccessfulFollowUp } from '../../../../core/models/metrics/metric.contacts-with-success-follow-up.model';
 
 @Component({
   selector: 'app-contacts-kpi-dashlet',
@@ -688,6 +689,65 @@ export class AppContactsKpiDashletComponent
             undefined;
         },
         helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_SEEN_EACH_DAY_DESCRIPTION')
+      },
+
+      // Contacts with successful follow-ups
+      {
+        name: DashboardDashlet.CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP,
+        group: DashboardKpiGroup.CONTACT,
+        valueColor,
+        prefix: 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP',
+        prefixData: () => ({
+          date: this.globalFilterDate ?
+            moment(this.globalFilterDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            '-'
+        }),
+        refresh: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          // retrieve data
+          return this.listFilterDataService
+            .filterContactsWithSuccessfulFollowup(
+              moment(globalFilterDate),
+              globalFilterLocationId,
+              globalFilterClassificationId
+            );
+        },
+        process: (response: MetricContactsWithSuccessfulFollowUp) => {
+          return `${response.contactsWithSuccessfulFollowupsCount.toLocaleString('en')}/${response.totalContactsWithFollowupsCount.toLocaleString('en')}`;
+        },
+        hasPermission: () => {
+          return DashboardModel.canViewContactsWithSuccessfulFollowUpsDashlet(this.authUser);
+        },
+        getLink: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          return ContactModel.canList(this.authUser) ?
+            {
+              link: ['/contacts'],
+              linkQueryParams: {
+                applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWED_UP,
+                [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
+                global: JSON.stringify({
+                  date: globalFilterDate,
+                  locationId: globalFilterLocationId ?
+                    globalFilterLocationId :
+                    undefined,
+                  classificationId: globalFilterClassificationId?.length > 0 ?
+                    globalFilterClassificationId :
+                    undefined
+                })
+              }
+            } :
+            undefined;
+        },
+        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP_DESCRIPTION')
       }
     ];
 
