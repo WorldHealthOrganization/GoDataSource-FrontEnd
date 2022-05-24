@@ -17,6 +17,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { CaseModel } from '../../../../core/models/case.model';
 import { TranslateService } from '@ngx-translate/core';
 import { MetricNewCasesWithContactsModel } from '../../../../core/models/metric-new-cases-contacts.model';
+import { MetricCasesTransmissionChainsModel } from '../../../../core/models/metrics/metric-cases-transmission-chains.model';
 
 @Component({
   selector: 'app-cases-kpi-dashlet',
@@ -420,7 +421,7 @@ export class AppCasesKpiDashletComponent
             );
         },
         process: (response: MetricNewCasesWithContactsModel) => {
-          return `${response.newCasesAmongKnownContactsCount.toLocaleString('en')}/${response.newCasesCount}`;
+          return `${response.newCasesAmongKnownContactsCount.toLocaleString('en')}/${response.newCasesCount.toLocaleString('en')}`;
         },
         hasPermission: () => {
           return DashboardModel.canViewNewCasesInPreviousXDaysAmongKnownContactsDashlet(this.authUser);
@@ -543,6 +544,116 @@ export class AppCasesKpiDashletComponent
             undefined;
         },
         helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_REFUSING_TREATMENT_TITLE_DESCRIPTION')
+      },
+
+      // New cases in previous x days in known transmission chains
+      {
+        name: DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_OUTSIDE_THE_TRANSMISSION_CHAINS,
+        group: DashboardKpiGroup.CASE,
+        valueColor,
+        prefix: 'LNG_PAGE_DASHBOARD_KPI_NEW_CASES_PREVIOUS_DAYS_TRANSMISSION_CHAINS_BEFORE_VALUE',
+        suffix: 'LNG_PAGE_DASHBOARD_KPI_NEW_CASES_PREVIOUS_DAYS_TRANSMISSION_CHAINS_AFTER_VALUE',
+        inputValue: this.selectedOutbreak.noDaysInChains,
+        refresh: (
+          inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          // filter
+          const qb = new RequestQueryBuilder();
+
+          // change the way we build query
+          qb.filter.firstLevelConditions();
+
+          // convert
+          if (inputValue !== undefined) {
+            // add number of days until current day
+            if (globalFilterDate) {
+              inputValue += moment().endOf('day').diff(moment(globalFilterDate).endOf('day'), 'days');
+            }
+
+            // create filter
+            qb.filter.byEquality(
+              'noDaysInChains',
+              inputValue
+            );
+          }
+
+          // date
+          if (globalFilterDate) {
+            qb.filter.where({
+              contactDate: {
+                lte: moment(globalFilterDate).toISOString()
+              }
+            });
+          }
+
+          // exclude discarded cases
+          qb.include('people').queryBuilder.filter.where({
+            classification: {
+              neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+            }
+          });
+
+          // location
+          if (globalFilterLocationId) {
+            qb.include('people').queryBuilder.filter
+              .byEquality('addresses.parentLocationIdFilter', globalFilterLocationId);
+          }
+
+          // classification
+          if (globalFilterClassificationId?.length > 0) {
+            qb.include('people').queryBuilder.filter
+              .where({
+                and: [{
+                  classification: {
+                    inq: globalFilterClassificationId
+                  }
+                }]
+              });
+          }
+
+          // retrieve cases currently hospitalized
+          return this.relationshipDataService
+            .getCountOfCasesInTheTransmissionChains(
+              this.selectedOutbreak.id,
+              qb
+            );
+        },
+        process: (response: MetricCasesTransmissionChainsModel) => {
+          return `${response.newCases.toLocaleString('en')}/${response.total.toLocaleString('en')}`;
+        },
+        hasPermission: () => {
+          return DashboardModel.canViewNewCasesFromKnownCOTDashlet(this.authUser);
+        },
+        getLink: (
+          inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          return CaseModel.canList(this.authUser) ?
+            {
+              link: ['/cases'],
+              linkQueryParams: {
+                applyListFilter: Constants.APPLY_LIST_FILTER.CASES_PREVIOUS_DAYS_CONTACTS,
+                [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
+                x: inputValue,
+                global: JSON.stringify({
+                  date: globalFilterDate,
+                  locationId: globalFilterLocationId ?
+                    globalFilterLocationId :
+                    undefined,
+                  classificationId: globalFilterClassificationId?.length > 0 ?
+                    globalFilterClassificationId :
+                    undefined
+                })
+              }
+            } :
+            undefined;
+        },
+        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_NEW_CASES_PREVIOUS_DAYS_TRANSMISSION_CHAINS_BEFORE_VALUE_DESCRIPTION')
       }
     ];
 
