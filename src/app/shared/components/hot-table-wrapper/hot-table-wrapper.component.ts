@@ -367,7 +367,7 @@ implements OnInit, OnDestroy {
 
       // update sizes
       const sheetWidth: string = `calc(${basicPageMatCard.offsetWidth}px - var(--gd-basic-page-content-padding-left-right))`;
-      const sheetHeight: string = `calc(${height}px - var(--gd-basic-page-content-padding-top-bottom))`;
+      const sheetHeight: string = `calc(${height}px - var(--gd-basic-page-content-padding-bottom))`;
 
       // render spreadsheet
       if (
