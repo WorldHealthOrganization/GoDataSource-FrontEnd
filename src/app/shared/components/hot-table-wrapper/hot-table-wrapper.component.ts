@@ -215,7 +215,7 @@ class CustomLocationEditor extends Handsontable.default.editors.BaseEditor {
   selector: 'app-hot-table-wrapper',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './hot-table-wrapper.component.html',
-  styleUrls: ['./hot-table-wrapper.component.less']
+  styleUrls: ['./hot-table-wrapper.component.scss']
 })
 export class HotTableWrapperComponent
 implements OnInit, OnDestroy {
