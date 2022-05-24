@@ -117,7 +117,7 @@ export class AppCasesKpiDashletComponent
             });
           }
 
-          // retrieve deceased cases
+          // retrieve data
           return this.caseDataService
             .getDeceasedCasesCount(
               this.selectedOutbreak.id,

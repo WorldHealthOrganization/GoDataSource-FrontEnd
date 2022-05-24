@@ -122,7 +122,7 @@ export class AppContactsKpiDashletComponent
               });
           }
 
-          // retrieve deceased cases
+          // retrieve data
           return this.relationshipDataService
             .getMetricsOfContactsPerCase(
               this.selectedOutbreak.id,
@@ -193,7 +193,7 @@ export class AppContactsKpiDashletComponent
               });
           }
 
-          // retrieve deceased cases
+          // retrieve data
           return this.relationshipDataService
             .getMetricsOfContactsPerCase(
               this.selectedOutbreak.id,
@@ -269,7 +269,7 @@ export class AppContactsKpiDashletComponent
               );
           }
 
-          // retrieve deceased cases
+          // retrieve data
           return this.followUpsDataService
             .getCountIdsOfContactsOnTheFollowUpList(
               this.selectedOutbreak.id,
@@ -353,7 +353,7 @@ export class AppContactsKpiDashletComponent
             );
           }
 
-          // retrieve deceased cases
+          // retrieve data
           return this.followUpsDataService
             .getNumberOfContactsWhoAreLostToFollowUp(
               this.selectedOutbreak.id,
@@ -454,7 +454,7 @@ export class AppContactsKpiDashletComponent
             );
           }
 
-          // retrieve deceased cases
+          // retrieve data
           return this.followUpsDataService
             .getCountIdsOfContactsNotSeen(
               this.selectedOutbreak.id,
@@ -585,7 +585,7 @@ export class AppContactsKpiDashletComponent
             });
           }
 
-          // retrieve deceased cases
+          // retrieve data
           return forkJoin([
             this.caseDataService.getCasesCount(
               this.selectedOutbreak.id,
