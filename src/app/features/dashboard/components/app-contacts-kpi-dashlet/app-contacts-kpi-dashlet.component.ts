@@ -129,6 +129,77 @@ export class AppContactsKpiDashletComponent
           _globalFilterClassificationId
         ) => undefined,
         helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_PER_CASE_MEAN_TITLE_DESCRIPTION')
+      },
+
+      // Contacts per case median
+      {
+        name: DashboardDashlet.CONTACTS_PER_CASE_MEDIAN,
+        group: DashboardKpiGroup.CONTACT,
+        valueColor,
+        prefix: 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_PER_CASE_MEDIAN_TITLE',
+        refresh: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          // filter
+          const qb = new RequestQueryBuilder();
+
+          // date
+          if (globalFilterDate) {
+            qb.filter.byDateRange(
+              'contactDate', {
+                endDate: moment(globalFilterDate).endOf('day').format()
+              }
+            );
+          }
+
+          // exclude discarded cases
+          qb.include('people').queryBuilder.filter.where({
+            classification: {
+              neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+            }
+          });
+
+          // location
+          if (globalFilterLocationId) {
+            qb.include('people').queryBuilder.filter
+              .byEquality('addresses.parentLocationIdFilter', globalFilterLocationId);
+          }
+
+          // classification
+          if (globalFilterClassificationId?.length > 0) {
+            qb.include('people').queryBuilder.filter
+              .where({
+                and: [{
+                  classification: {
+                    inq: globalFilterClassificationId
+                  }
+                }]
+              });
+          }
+
+          // retrieve deceased cases
+          return this.relationshipDataService
+            .getMetricsOfContactsPerCase(
+              this.selectedOutbreak.id,
+              qb
+            );
+        },
+        process: (response: MetricContactsPerCaseModel) => {
+          return Math.round(response.medianNoContactsPerCase).toLocaleString('en');
+        },
+        hasPermission: () => {
+          return DashboardModel.canViewContactsPerCaseMedianDashlet(this.authUser);
+        },
+        getLink: (
+          _inputValue,
+          _globalFilterDate,
+          _globalFilterLocationId,
+          _globalFilterClassificationId
+        ) => undefined,
+        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_PER_CASE_MEDIAN_TITLE_DESCRIPTION')
       }
     ];
 

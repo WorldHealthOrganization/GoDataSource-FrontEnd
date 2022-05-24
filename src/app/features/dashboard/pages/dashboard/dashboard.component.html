@@ -453,18 +453,6 @@
 <!--                            <div fxLayout="row wrap">-->
 <!--                                <ng-container *ngFor="let dashlet of group.dashlets">-->
 <!--                                    <ng-container *ngIf="group.permissions[dashlet] && group.permissions[dashlet].hasAccess(authUser)">-->
-<!--                                        &lt;!&ndash; Contacts per case median &ndash;&gt;-->
-<!--                                        <app-contacts-per-case-median-dashlet-->
-<!--                                            *ngIf="dashlet === DashboardDashlet.CONTACTS_PER_CASE_MEDIAN &&-->
-<!--                                                isDashletVisible(dashlet)"-->
-<!--                                            (hide)="hideDashlet(dashlet)"-->
-<!--                                            (moveBefore)="moveDashletBefore(dashlet)"-->
-<!--                                            (moveAfter)="moveDashletAfter(dashlet)"-->
-<!--                                            [globalFilterDate]="globalFilterDate"-->
-<!--                                            [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                                            [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                                        </app-contacts-per-case-median-dashlet>-->
-
 <!--                                        &lt;!&ndash; Contacts on the follow-up list &ndash;&gt;-->
 <!--                                        <app-contacts-on-followup-list-dashlet-->
 <!--                                            *ngIf="dashlet === DashboardDashlet.CONTACTS_ON_THE_FOLLOW_UP_LIST &&-->

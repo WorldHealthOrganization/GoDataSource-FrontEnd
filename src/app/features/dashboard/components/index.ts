@@ -1,6 +1,5 @@
 // import each component
 import { ContactsOnFollowupListDashletComponent } from './contacts-on-followup-list-dashlet/contacts-on-followup-list-dashlet.component';
-import { ContactsPerCaseMedianDashletComponent } from './contacts-per-case-median-dashlet/contacts-per-case-median-dashlet.component';
 import { ContactsLostToFollowUpDashletComponent } from './contacts-lost-to-follow-up-dashlet/contacts-lost-to-follow-up-dashlet.component';
 import { IndependentTransmissionChainsDashletComponent } from './independent-transmission-chains-dashlet/independent-transmission-chains-dashlet.component';
 import { NumberOfActiveChainsOfTransmissionComponent } from './number-of-active-chains-of-transmission/number-of-active-chains-of-transmission.component';
@@ -31,7 +30,6 @@ export const components: any[] = [
   AppKpiDashletComponent,
 
   ContactsOnFollowupListDashletComponent,
-  ContactsPerCaseMedianDashletComponent,
   ContactsLostToFollowUpDashletComponent,
   IndependentTransmissionChainsDashletComponent,
   NumberOfActiveChainsOfTransmissionComponent,
