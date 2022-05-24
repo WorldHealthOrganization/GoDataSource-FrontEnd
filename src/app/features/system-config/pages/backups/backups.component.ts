@@ -147,10 +147,12 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
         label: 'LNG_BACKUP_FIELD_LABEL_DURATION'
       },
       {
-        field: 'user',
+        field: 'userId',
         label: 'LNG_BACKUP_FIELD_LABEL_USER',
         format: {
-          type: 'createdByUser.name'
+          type: (item) => item.userId && this.activatedRoute.snapshot.data.user.map[item.userId] ?
+            this.activatedRoute.snapshot.data.user.map[item.userId].name :
+            ''
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
