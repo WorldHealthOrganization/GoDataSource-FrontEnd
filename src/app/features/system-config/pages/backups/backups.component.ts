@@ -678,13 +678,17 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
         title: {
           get: () => 'LNG_COMMON_LABEL_RESTORE',
           data: () => ({
-            name: item.description
+            name: item.description ?
+              item.description :
+              '-'
           })
         },
         message: {
           get: () => 'LNG_DIALOG_CONFIRM_DELETE_BACKUP_RESTORE',
           data: () => ({
-            name: item.description
+            name: item.description ?
+              item.description :
+              '-'
           })
         }
       },
