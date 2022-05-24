@@ -447,18 +447,6 @@
 <!--                            <div fxLayout="row wrap">-->
 <!--                                <ng-container *ngFor="let dashlet of group.dashlets">-->
 <!--                                    <ng-container *ngIf="group.permissions[dashlet] && group.permissions[dashlet].hasAccess(authUser)">-->
-<!--                                        &lt;!&ndash; Suspect Cases where the lab result is pending &ndash;&gt;-->
-<!--                                        <app-cases-pending-lab-results-dashlet-->
-<!--                                            *ngIf="dashlet === DashboardDashlet.SUSPECT_CASES_WITH_PENDING_LAB_RESULT &&-->
-<!--                                                isDashletVisible(dashlet)"-->
-<!--                                            (hide)="hideDashlet(dashlet)"-->
-<!--                                            (moveBefore)="moveDashletBefore(dashlet)"-->
-<!--                                            (moveAfter)="moveDashletAfter(dashlet)"-->
-<!--                                            [globalFilterDate]="globalFilterDate"-->
-<!--                                            [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                                            [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                                        </app-cases-pending-lab-results-dashlet>-->
-
 <!--                                        &lt;!&ndash; Number of cases who are not identified though known contact list &ndash;&gt;-->
 <!--                                        <app-cases-not-identified-through-contacts-dashlet-->
 <!--                                            *ngIf="dashlet === DashboardDashlet.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS &&-->
