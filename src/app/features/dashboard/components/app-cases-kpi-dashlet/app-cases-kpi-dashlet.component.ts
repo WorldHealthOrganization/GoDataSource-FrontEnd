@@ -15,6 +15,7 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { CaseModel } from '../../../../core/models/case.model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-cases-kpi-dashlet',
@@ -31,6 +32,7 @@ export class AppCasesKpiDashletComponent
     private caseDataService: CaseDataService,
     private relationshipDataService: RelationshipDataService,
     private activatedRoute: ActivatedRoute,
+    private translateService: TranslateService,
     authDataService: AuthDataService,
     outbreakDataService: OutbreakDataService
   ) {
@@ -138,13 +140,18 @@ export class AppCasesKpiDashletComponent
                 [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
                 global: JSON.stringify({
                   date: globalFilterDate,
-                  locationId: globalFilterLocationId,
-                  classificationId: globalFilterClassificationId
+                  locationId: globalFilterLocationId ?
+                    globalFilterLocationId :
+                    undefined,
+                  classificationId: globalFilterClassificationId?.length > 0 ?
+                    globalFilterClassificationId :
+                    undefined
                 })
               }
             } :
             undefined;
-        }
+        },
+        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_DECEASED_TITLE_DESCRIPTION')
       },
 
       // Cases hospitalised
@@ -178,7 +185,8 @@ export class AppCasesKpiDashletComponent
           _globalFilterClassificationId
         ) => {
           return undefined;
-        }
+        },
+        helpTooltip: ''
       },
 
       // Cases with Less than x Contacts
@@ -225,7 +233,8 @@ export class AppCasesKpiDashletComponent
           _globalFilterClassificationId
         ) => {
           return undefined;
-        }
+        },
+        helpTooltip: undefined
       }
     ];
 

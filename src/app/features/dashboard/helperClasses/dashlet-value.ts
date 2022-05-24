@@ -42,6 +42,7 @@ export interface IDashletValue {
     // optional
     linkQueryParams?: Params;
   };
+  helpTooltip: string;
 
   // optional
   suffix?: string;
