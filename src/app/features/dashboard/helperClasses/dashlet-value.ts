@@ -45,6 +45,9 @@ export interface IDashletValue {
   helpTooltip: string;
 
   // optional
+  prefixData?: () => {
+    [prop: string]: string
+  };
   suffix?: string;
   value?: string;
   status?: DashletValueStatus;

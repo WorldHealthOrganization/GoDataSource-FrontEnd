@@ -141,7 +141,7 @@
       <div
         fxFlex>
         <!-- Prefix -->
-        <span>{{value.prefix | translate}}</span>
+        <span>{{value.prefix | translate:(value.prefixData ? value.prefixData() : undefined)}}</span>
 
         <!-- Input & Suffix -->
         <ng-container

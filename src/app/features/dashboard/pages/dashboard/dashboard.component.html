@@ -129,6 +129,12 @@
       [globalFilterLocationId]="globalFilterLocationId"
       [globalFilterClassificationId]="globalFilterClassificationId"></app-cases-kpi-dashlet>
 
+    <!-- Contacts KPI -->
+    <app-contacts-kpi-dashlet
+      [globalFilterDate]="globalFilterDate"
+      [globalFilterLocationId]="globalFilterLocationId"
+      [globalFilterClassificationId]="globalFilterClassificationId"></app-contacts-kpi-dashlet>
+
   </div>
 </div>
 
@@ -447,90 +453,6 @@
 <!--                            <div fxLayout="row wrap">-->
 <!--                                <ng-container *ngFor="let dashlet of group.dashlets">-->
 <!--                                    <ng-container *ngIf="group.permissions[dashlet] && group.permissions[dashlet].hasAccess(authUser)">-->
-<!--                                        &lt;!&ndash; Cases refusing to be transferred to a treatment unit &ndash;&gt;-->
-<!--                                        <app-cases-refusing-treatment-dashlet-->
-<!--                                            *ngIf="dashlet === DashboardDashlet.SUSPECT_CASES_REFUSING_TO_BE_TRANSFERRED_TO_A_TREATMENT_UNIT &&-->
-<!--                                                isDashletVisible(dashlet)"-->
-<!--                                            (hide)="hideDashlet(dashlet)"-->
-<!--                                            (moveBefore)="moveDashletBefore(dashlet)"-->
-<!--                                            (moveAfter)="moveDashletAfter(dashlet)"-->
-<!--                                            [globalFilterDate]="globalFilterDate"-->
-<!--                                            [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                                            [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                                        </app-cases-refusing-treatment-dashlet>-->
-
-<!--                                        &lt;!&ndash; New cases in previous x days in known transmission chains &ndash;&gt;-->
-<!--                                        <app-new-cases-previous-days-transmission-chains-dashlet-->
-<!--                                            *ngIf="dashlet === DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_OUTSIDE_THE_TRANSMISSION_CHAINS &&-->
-<!--                                                isDashletVisible(dashlet)"-->
-<!--                                            (hide)="hideDashlet(dashlet)"-->
-<!--                                            (moveBefore)="moveDashletBefore(dashlet)"-->
-<!--                                            (moveAfter)="moveDashletAfter(dashlet)"-->
-<!--                                            [globalFilterDate]="globalFilterDate"-->
-<!--                                            [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                                            [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                                        </app-new-cases-previous-days-transmission-chains-dashlet>-->
-
-<!--                                        &lt;!&ndash; Suspect Cases where the lab result is pending &ndash;&gt;-->
-<!--                                        <app-cases-pending-lab-results-dashlet-->
-<!--                                            *ngIf="dashlet === DashboardDashlet.SUSPECT_CASES_WITH_PENDING_LAB_RESULT &&-->
-<!--                                                isDashletVisible(dashlet)"-->
-<!--                                            (hide)="hideDashlet(dashlet)"-->
-<!--                                            (moveBefore)="moveDashletBefore(dashlet)"-->
-<!--                                            (moveAfter)="moveDashletAfter(dashlet)"-->
-<!--                                            [globalFilterDate]="globalFilterDate"-->
-<!--                                            [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                                            [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                                        </app-cases-pending-lab-results-dashlet>-->
-
-<!--                                        &lt;!&ndash; Number of cases who are not identified though known contact list &ndash;&gt;-->
-<!--                                        <app-cases-not-identified-through-contacts-dashlet-->
-<!--                                            *ngIf="dashlet === DashboardDashlet.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS &&-->
-<!--                                                isDashletVisible(dashlet)"-->
-<!--                                            (hide)="hideDashlet(dashlet)"-->
-<!--                                            (moveBefore)="moveDashletBefore(dashlet)"-->
-<!--                                            (moveAfter)="moveDashletAfter(dashlet)"-->
-<!--                                            [globalFilterDate]="globalFilterDate"-->
-<!--                                            [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                                            [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                                        </app-cases-not-identified-through-contacts-dashlet>-->
-
-<!--                                        &lt;!&ndash; Contacts per case mean &ndash;&gt;-->
-<!--                                        <app-contacts-per-case-mean-dashlet-->
-<!--                                            *ngIf="dashlet === DashboardDashlet.CONTACTS_PER_CASE_MEAN &&-->
-<!--                                                isDashletVisible(dashlet)"-->
-<!--                                            (hide)="hideDashlet(dashlet)"-->
-<!--                                            (moveBefore)="moveDashletBefore(dashlet)"-->
-<!--                                            (moveAfter)="moveDashletAfter(dashlet)"-->
-<!--                                            [globalFilterDate]="globalFilterDate"-->
-<!--                                            [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                                            [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                                        </app-contacts-per-case-mean-dashlet>-->
-
-<!--                                        &lt;!&ndash; Contacts per case median &ndash;&gt;-->
-<!--                                        <app-contacts-per-case-median-dashlet-->
-<!--                                            *ngIf="dashlet === DashboardDashlet.CONTACTS_PER_CASE_MEDIAN &&-->
-<!--                                                isDashletVisible(dashlet)"-->
-<!--                                            (hide)="hideDashlet(dashlet)"-->
-<!--                                            (moveBefore)="moveDashletBefore(dashlet)"-->
-<!--                                            (moveAfter)="moveDashletAfter(dashlet)"-->
-<!--                                            [globalFilterDate]="globalFilterDate"-->
-<!--                                            [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                                            [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                                        </app-contacts-per-case-median-dashlet>-->
-
-<!--                                        &lt;!&ndash; Contacts on the follow-up list &ndash;&gt;-->
-<!--                                        <app-contacts-on-followup-list-dashlet-->
-<!--                                            *ngIf="dashlet === DashboardDashlet.CONTACTS_ON_THE_FOLLOW_UP_LIST &&-->
-<!--                                                isDashletVisible(dashlet)"-->
-<!--                                            (hide)="hideDashlet(dashlet)"-->
-<!--                                            (moveBefore)="moveDashletBefore(dashlet)"-->
-<!--                                            (moveAfter)="moveDashletAfter(dashlet)"-->
-<!--                                            [globalFilterDate]="globalFilterDate"-->
-<!--                                            [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                                            [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                                        </app-contacts-on-followup-list-dashlet>-->
-
 <!--                                        &lt;!&ndash; Contacts Lost to follow-up &ndash;&gt;-->
 <!--                                        <app-contacts-lost-to-follow-up-dashlet-->
 <!--                                            *ngIf="dashlet === DashboardDashlet.CONTACTS_LOST_TO_FOLLOW_UP &&-->

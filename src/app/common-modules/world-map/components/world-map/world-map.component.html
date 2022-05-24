@@ -3,12 +3,12 @@
   class="app-world-map-container"
   [class.full-screen-map]="fullScreenMode">
   <!--Full screen map-->
-  <app-form-slide-toggle
+  <app-form-toggle-checkbox-v2
     class="world-map-full-screen"
     [(ngModel)]="fullScreenMode"
-    [label]="'LNG_PAGE_WORLD_MAP_FULL_SCREEN_LABEL' | translate"
-    (optionChanged)="fullScreenToggleTrigger()">
-  </app-form-slide-toggle>
+    [placeholder]="'LNG_PAGE_WORLD_MAP_FULL_SCREEN_LABEL' | translate"
+    (ngModelChange)="fullScreenToggleTrigger()">
+  </app-form-toggle-checkbox-v2>
 
   <!-- Draw map -->
   <div id="worldMap"></div>
@@ -50,30 +50,6 @@
     <div
       class="app-world-map-disclaimer-text">
       {{ 'LNG_PAGE_WORLD_MAP_DISCLAIMER_TEXT' | translate }}
-    </div>
-
-    <!-- Data Source -->
-    <div fxLayout="row" fxLayoutGap="2rem">
-      <div
-        fxFlex fxGrow="0"
-        class="app-world-map-disclaimer-header app-world-map-disclaimer-no-wrap">
-        {{ 'LNG_PAGE_WORLD_MAP_DISCLAIMER_DATA_SOURCE_LABEL' | translate }}
-      </div>
-      <div fxFlex>
-        {{ 'LNG_PAGE_WORLD_MAP_DISCLAIMER_DATA_SOURCE_TEXT' | translate }}
-      </div>
-    </div>
-
-    <!-- Map Production -->
-    <div fxLayout="row" fxLayoutGap="2rem">
-      <div
-        fxFlex fxGrow="0"
-        class="app-world-map-disclaimer-header app-world-map-disclaimer-no-wrap">
-        {{ 'LNG_PAGE_WORLD_MAP_DISCLAIMER_MAP_PRODUCTION_LABEL' | translate }}
-      </div>
-      <div fxFlex>
-        {{ 'LNG_PAGE_WORLD_MAP_DISCLAIMER_MAP_PRODUCTION_TEXT' | translate }}
-      </div>
     </div>
 
     <!-- WHO Organization -->
