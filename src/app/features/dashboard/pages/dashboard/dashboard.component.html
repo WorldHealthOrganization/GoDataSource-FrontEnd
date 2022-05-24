@@ -453,18 +453,6 @@
 <!--                            <div fxLayout="row wrap">-->
 <!--                                <ng-container *ngFor="let dashlet of group.dashlets">-->
 <!--                                    <ng-container *ngIf="group.permissions[dashlet] && group.permissions[dashlet].hasAccess(authUser)">-->
-<!--                                        &lt;!&ndash; Contacts Not Seen &ndash;&gt;-->
-<!--                                        <app-contacts-not-seen-dashlet-->
-<!--                                            *ngIf="dashlet === DashboardDashlet.CONTACTS_NOT_SEEN_IN_X_DAYS &&-->
-<!--                                                isDashletVisible(dashlet)"-->
-<!--                                            (hide)="hideDashlet(dashlet)"-->
-<!--                                            (moveBefore)="moveDashletBefore(dashlet)"-->
-<!--                                            (moveAfter)="moveDashletAfter(dashlet)"-->
-<!--                                            [globalFilterDate]="globalFilterDate"-->
-<!--                                            [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                                            [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                                        </app-contacts-not-seen-dashlet>-->
-
 <!--                                        &lt;!&ndash; Number of contacts becoming cases in period & location &ndash;&gt;-->
 <!--                                        <app-contacts-become-cases-dashlet-->
 <!--                                            *ngIf="dashlet === DashboardDashlet.CONTACTS_BECOMING_CASES_IN_TIME_AND_SPACE &&-->

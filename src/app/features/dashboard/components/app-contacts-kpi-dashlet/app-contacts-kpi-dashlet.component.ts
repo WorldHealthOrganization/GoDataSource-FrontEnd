@@ -17,7 +17,6 @@ import { MetricContactsPerCaseModel } from '../../../../core/models/metrics/metr
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { MetricContactsModel } from '../../../../core/models/metrics/metric-contacts.model';
 import { ContactModel } from '../../../../core/models/contact.model';
-import * as _ from 'lodash';
 import { MetricContactsLostToFollowUpModel } from '../../../../core/models/metrics/metric-contacts-lost-to-follow-up.model';
 
 @Component({
@@ -385,6 +384,108 @@ export class AppContactsKpiDashletComponent
             undefined;
         },
         helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_LOST_TO_FOLLOW_UP_DESCRIPTION')
+      },
+
+      // Contacts Not Seen
+      {
+        name: DashboardDashlet.CONTACTS_NOT_SEEN_IN_X_DAYS,
+        group: DashboardKpiGroup.CONTACT,
+        valueColor,
+        prefix: 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_NOT_SEEN_TITLE_BEFORE_VALUE',
+        suffix: 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_NOT_SEEN_TITLE_AFTER_VALUE',
+        inputValue: this.selectedOutbreak.noDaysNotSeen,
+        refresh: (
+          inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          // filter
+          const qb = new RequestQueryBuilder();
+
+          // change the way we build query
+          qb.filter.firstLevelConditions();
+
+          // convert
+          if (inputValue !== undefined) {
+            // add number of days until current day
+            if (globalFilterDate) {
+              inputValue += moment().endOf('day').diff(moment(globalFilterDate).endOf('day'), 'days');
+            }
+
+            // create filter
+            qb.filter.byEquality(
+              'noDaysNotSeen',
+              inputValue
+            );
+          }
+
+          // date
+          if (globalFilterDate) {
+            qb.filter.where({
+              date: {
+                lte: moment(globalFilterDate).toISOString()
+              }
+            });
+          }
+
+          // location
+          if (globalFilterLocationId) {
+            qb.include('contact').queryBuilder.filter
+              .byEquality('addresses.parentLocationIdFilter', globalFilterLocationId);
+          }
+
+          // classification
+          // !!! must be on first level and not under $and
+          if (globalFilterClassificationId?.length > 0) {
+            qb.filter.bySelect(
+              'classification',
+              globalFilterClassificationId,
+              false,
+              null
+            );
+          }
+
+          // retrieve deceased cases
+          return this.followUpsDataService
+            .getCountIdsOfContactsNotSeen(
+              this.selectedOutbreak.id,
+              qb
+            );
+        },
+        process: (response: MetricContactsModel) => {
+          return response.contactsCount.toLocaleString('en');
+        },
+        hasPermission: () => {
+          return DashboardModel.canViewContactsLostToFollowUpsDashlet(this.authUser);
+        },
+        getLink: (
+          inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          return ContactModel.canList(this.authUser) ?
+            {
+              link: ['/contacts'],
+              linkQueryParams: {
+                applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_NOT_SEEN,
+                [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
+                x: inputValue,
+                global: JSON.stringify({
+                  date: globalFilterDate,
+                  locationId: globalFilterLocationId ?
+                    globalFilterLocationId :
+                    undefined,
+                  classificationId: globalFilterClassificationId?.length > 0 ?
+                    globalFilterClassificationId :
+                    undefined
+                })
+              }
+            } :
+            undefined;
+        },
+        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_NOT_SEEN_TITLE_BEFORE_VALUE_DESCRIPTION')
       }
     ];
 
