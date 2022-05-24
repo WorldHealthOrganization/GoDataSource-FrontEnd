@@ -18,6 +18,10 @@ import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.
 import { MetricContactsModel } from '../../../../core/models/metrics/metric-contacts.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { MetricContactsLostToFollowUpModel } from '../../../../core/models/metrics/metric-contacts-lost-to-follow-up.model';
+import { forkJoin } from 'rxjs';
+import { CaseDataService } from '../../../../core/services/data/case.data.service';
+import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { CaseModel } from '../../../../core/models/case.model';
 
 @Component({
   selector: 'app-contacts-kpi-dashlet',
@@ -35,6 +39,7 @@ export class AppContactsKpiDashletComponent
     private translateService: TranslateService,
     private relationshipDataService: RelationshipDataService,
     private followUpsDataService: FollowUpsDataService,
+    private caseDataService: CaseDataService,
     authDataService: AuthDataService,
     outbreakDataService: OutbreakDataService
   ) {
@@ -486,6 +491,141 @@ export class AppContactsKpiDashletComponent
             undefined;
         },
         helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_NOT_SEEN_TITLE_BEFORE_VALUE_DESCRIPTION')
+      },
+
+      // Number of contacts becoming cases in period & location
+      {
+        name: DashboardDashlet.CONTACTS_BECOMING_CASES_IN_TIME_AND_SPACE,
+        group: DashboardKpiGroup.CONTACT,
+        valueColor,
+        prefix: 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE',
+        refresh: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          // filter
+          const qb = new RequestQueryBuilder();
+
+          // change the way we build query
+          qb.filter.firstLevelConditions();
+
+          // exclude discarded cases
+          qb.filter.where({
+            classification: {
+              neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+            }
+          });
+
+          // add location condition
+          if (globalFilterLocationId) {
+            qb.filter.byEquality(
+              'addresses.parentLocationIdFilter',
+              globalFilterLocationId
+            );
+          }
+
+          // classification
+          if (globalFilterClassificationId?.length > 0) {
+            qb.filter.where({
+              and: [{
+                classification: {
+                  inq: globalFilterClassificationId
+                }
+              }]
+            });
+          }
+
+          // date
+          if (globalFilterDate) {
+            qb.filter.byBoolean(
+              'wasContact',
+              true
+            );
+            qb.filter.byDateRange(
+              'dateBecomeCase', {
+                endDate: moment(globalFilterDate).endOf('day').format()
+              }
+            );
+          }
+
+          // filter
+          const qbAll = new RequestQueryBuilder();
+
+          // change the way we build query
+          qbAll.filter.firstLevelConditions();
+
+          // exclude discarded cases
+          qbAll.filter.where({
+            classification: {
+              neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+            }
+          });
+
+          // add location condition
+          if (globalFilterLocationId) {
+            qbAll.filter.byEquality(
+              'addresses.parentLocationIdFilter',
+              globalFilterLocationId
+            );
+          }
+
+          // classification
+          if (globalFilterClassificationId?.length > 0) {
+            qbAll.filter.where({
+              and: [{
+                classification: {
+                  inq: globalFilterClassificationId
+                }
+              }]
+            });
+          }
+
+          // retrieve deceased cases
+          return forkJoin([
+            this.caseDataService.getCasesCount(
+              this.selectedOutbreak.id,
+              qb
+            ),
+            this.caseDataService.getCasesCount(
+              this.selectedOutbreak.id,
+              qbAll
+            )
+          ]);
+        },
+        process: ([qbCountResult, countResult]: [IBasicCount, IBasicCount]) => {
+          return `${qbCountResult.count.toLocaleString('en')}/${countResult.count}`;
+        },
+        hasPermission: () => {
+          return DashboardModel.canViewContactsBecomeCasesDashlet(this.authUser);
+        },
+        getLink: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          return CaseModel.canList(this.authUser) ?
+            {
+              link: ['/cases'],
+              linkQueryParams: {
+                applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_BECOME_CASES,
+                [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
+                global: JSON.stringify({
+                  date: globalFilterDate,
+                  locationId: globalFilterLocationId ?
+                    globalFilterLocationId :
+                    undefined,
+                  classificationId: globalFilterClassificationId?.length > 0 ?
+                    globalFilterClassificationId :
+                    undefined
+                })
+              }
+            } :
+            undefined;
+        },
+        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_DESCRIPTION')
       }
     ];
 
