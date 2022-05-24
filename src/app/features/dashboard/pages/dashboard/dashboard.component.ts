@@ -12,18 +12,6 @@ import * as _ from 'lodash';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { RequestFilterOperator } from '../../../../core/helperClasses/request-query-builder';
 
-// interface IKpiGroup {
-//   id: DashboardKpiGroup;
-//   title: string;
-//   dashlets: DashboardDashlet[];
-//   hasAccess: (user: UserModel) => boolean;
-//   permissions: {
-//     [dashboardDashlet: string]: {
-//       hasAccess: (user: UserModel) => boolean
-//     }
-//   };
-// }
-
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -163,6 +151,17 @@ export class DashboardComponent {
       });
   }
 
+  // interface IKpiGroup {
+//   id: DashboardKpiGroup;
+//   title: string;
+//   dashlets: DashboardDashlet[];
+//   hasAccess: (user: UserModel) => boolean;
+//   permissions: {
+//     [dashboardDashlet: string]: {
+//       hasAccess: (user: UserModel) => boolean
+//     }
+//   };
+// }
   // kpiGroups: IKpiGroup[] = [
   //   // Cases KPIs
   //   {
