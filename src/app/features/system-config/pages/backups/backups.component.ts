@@ -22,9 +22,11 @@ import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2
 import {
   IV2SideDialogConfigButtonType,
   IV2SideDialogConfigInputKeyValue,
-  IV2SideDialogConfigInputMultiDropdown, IV2SideDialogConfigInputNumber,
+  IV2SideDialogConfigInputMultiDropdown,
+  IV2SideDialogConfigInputNumber,
   IV2SideDialogConfigInputSingleDropdown,
-  IV2SideDialogConfigInputText, IV2SideDialogConfigInputTimepicker,
+  IV2SideDialogConfigInputText,
+  IV2SideDialogConfigInputTimepicker,
   IV2SideDialogResponse,
   V2SideDialogConfigInputType
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
@@ -86,6 +88,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
       {
         field: 'description',
         label: 'LNG_BACKUP_FIELD_LABEL_DESCRIPTION',
+        pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
