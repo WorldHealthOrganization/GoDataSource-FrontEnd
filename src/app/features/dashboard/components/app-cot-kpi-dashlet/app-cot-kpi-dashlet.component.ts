@@ -286,6 +286,87 @@ export class AppCotKpiDashletComponent
             undefined;
         },
         helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_ACTIVE_CHAINS_DESCRIPTION')
+      },
+
+      // Number of new chains of transmission from registered contacts who have became cases
+      {
+        name: DashboardDashlet.TRANSMISSION_CHAINS_FROM_CONTACTS_WHO_BECAME_CASES,
+        group: DashboardKpiGroup.TRANSMISSION_CHAIN,
+        valueColor,
+        prefix: 'LNG_PAGE_DASHBOARD_KPI_NEW_CHAINS_OF_TRANSMISSION_FROM_REGISTERED_CONTACTS_WHO_BECAME_CASES',
+        refresh: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          // filter
+          const qb = new RequestQueryBuilder();
+
+          // date
+          if (globalFilterDate) {
+            qb.filter.byDateRange(
+              'contactDate', {
+                endDate: moment(globalFilterDate).endOf('day').format()
+              }
+            );
+          }
+
+          // location
+          if (globalFilterLocationId) {
+            qb.addChildQueryBuilder('case').filter
+              .byEquality('addresses.parentLocationIdFilter', globalFilterLocationId);
+          }
+
+          // classification
+          if (globalFilterClassificationId?.length > 0) {
+            // person
+            qb.addChildQueryBuilder('case').filter.where({
+              classification: {
+                inq: globalFilterClassificationId
+              }
+            });
+          }
+
+          // retrieve data
+          return this.transmissionChainDataService
+            .getCountNewChainsOfTransmissionFromRegContactsWhoBecameCase(
+              this.selectedOutbreak.id,
+              qb
+            );
+        },
+        process: (response: MetricIndependentTransmissionChainsModel) => {
+          return response.length.toLocaleString('en');
+        },
+        hasPermission: () => {
+          return DashboardModel.canViewNewChainsFromContactsWhoBecameCasesDashlet(this.authUser);
+        },
+        getLink: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          return TransmissionChainModel.canList(this.authUser) ?
+            {
+              link: ['/transmission-chains/list'],
+              linkQueryParams: {
+                applyListFilter: Constants.APPLY_LIST_FILTER.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES,
+                [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
+                global: JSON.stringify({
+                  date: globalFilterDate,
+                  locationId: globalFilterLocationId ?
+                    globalFilterLocationId :
+                    undefined,
+                  classificationId: globalFilterClassificationId?.length > 0 ?
+                    globalFilterClassificationId :
+                    undefined
+                })
+              }
+            } :
+            undefined;
+        },
+        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_NEW_CHAINS_OF_TRANSMISSION_FROM_REGISTERED_CONTACTS_WHO_BECAME_CASES_DESCRIPTION')
       }
     ];
 

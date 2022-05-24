@@ -1,5 +1,4 @@
 // import each component
-import { NewChainsOfTransmissionFromRegisteredContactsDashletComponent } from './new-chains-of-transmission-from-registered-contacts-dashlet/new-chains-of-transmission-from-registered-contacts-dashlet.component';
 import { HistogramTransmissionChainsSizeDashletComponent } from './histogram-transmission-chains-size-dashlet/histogram-transmission-chains-size-dashlet.component';
 import { EpiCurveDashletComponent } from './epi-curve-dashlet/epi-curve-dashlet.component';
 import { CaseSummaryDashletComponent } from './case-summary-dashlet/case-summary-dashlet.component';
@@ -24,7 +23,6 @@ export const components: any[] = [
   AppCotKpiDashletComponent,
   AppKpiDashletComponent,
 
-  NewChainsOfTransmissionFromRegisteredContactsDashletComponent,
   HistogramTransmissionChainsSizeDashletComponent,
   EpiCurveDashletComponent,
   EpiCurveOutcomeDashletComponent,
