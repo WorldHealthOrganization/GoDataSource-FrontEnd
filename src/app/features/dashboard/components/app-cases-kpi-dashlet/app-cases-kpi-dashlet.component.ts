@@ -160,15 +160,46 @@ export class AppCasesKpiDashletComponent
         group: DashboardKpiGroup.CASE,
         valueColor,
         prefix: 'LNG_PAGE_DASHBOARD_KPI_CASES_HOSPITALISED_TITLE',
-        refresh: () => {
+        refresh: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
           // filter
           const qb = new RequestQueryBuilder();
+
+          // exclude discarded cases
+          qb.filter.where({
+            classification: {
+              neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+            }
+          });
+
+          // add location condition
+          if (globalFilterLocationId) {
+            qb.filter.byEquality(
+              'addresses.parentLocationIdFilter',
+              globalFilterLocationId
+            );
+          }
+
+          // classification
+          if (globalFilterClassificationId?.length > 0) {
+            qb.filter.where({
+              and: [{
+                classification: {
+                  inq: globalFilterClassificationId
+                }
+              }]
+            });
+          }
 
           // retrieve cases currently hospitalized
           return this.caseDataService
             .getHospitalisedCasesCount(
               this.selectedOutbreak.id,
-              undefined,
+              globalFilterDate,
               qb
             );
         },
@@ -180,13 +211,30 @@ export class AppCasesKpiDashletComponent
         },
         getLink: (
           _inputValue,
-          _globalFilterDate,
-          _globalFilterLocationId,
-          _globalFilterClassificationId
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
         ) => {
-          return undefined;
+          return CaseModel.canList(this.authUser) ?
+            {
+              link: ['/cases'],
+              linkQueryParams: {
+                applyListFilter: Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED,
+                [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
+                global: JSON.stringify({
+                  date: globalFilterDate,
+                  locationId: globalFilterLocationId ?
+                    globalFilterLocationId :
+                    undefined,
+                  classificationId: globalFilterClassificationId?.length > 0 ?
+                    globalFilterClassificationId :
+                    undefined
+                })
+              }
+            } :
+            undefined;
         },
-        helpTooltip: ''
+        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_HOSPITALISED_TITLE_DESCRIPTION')
       },
 
       // Cases with Less than x Contacts
