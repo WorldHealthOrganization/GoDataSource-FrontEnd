@@ -38,6 +38,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   styleUrls: ['./contact-range-follow-ups-list.component.less']
 })
 export class ContactRangeFollowUpsListComponent
+  // #TODO - remove list component paginator ?
   extends ListComponent<any>
   implements OnInit, OnDestroy {
 
