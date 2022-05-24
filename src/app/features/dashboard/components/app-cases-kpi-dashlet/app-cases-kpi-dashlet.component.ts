@@ -10,6 +10,10 @@ import { moment } from '../../../../core/helperClasses/x-moment';
 import { DashboardDashlet, DashboardKpiGroup } from '../../../../core/enums/dashboard.enum';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { ActivatedRoute } from '@angular/router';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
   selector: 'app-cases-kpi-dashlet',
@@ -25,6 +29,7 @@ export class AppCasesKpiDashletComponent
     private changeDetectorRef: ChangeDetectorRef,
     private caseDataService: CaseDataService,
     private relationshipDataService: RelationshipDataService,
+    private activatedRoute: ActivatedRoute,
     authDataService: AuthDataService,
     outbreakDataService: OutbreakDataService
   ) {
@@ -53,11 +58,13 @@ export class AppCasesKpiDashletComponent
    */
   protected initializeDashlet(): void {
     // set values
+    const valueColor: string = (this.activatedRoute.snapshot.data.personType as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[EntityType.CASE].getColorCode();
     this.values = [
       // Cases who have died
       {
         name: DashboardDashlet.CASES_DECEASED,
         group: DashboardKpiGroup.CASE,
+        valueColor,
         prefix: 'LNG_PAGE_DASHBOARD_KPI_CASES_DECEASED_TITLE',
         refresh: (
           _inputValue,
@@ -122,6 +129,7 @@ export class AppCasesKpiDashletComponent
       {
         name: DashboardDashlet.CASES_HOSPITALISED,
         group: DashboardKpiGroup.CASE,
+        valueColor,
         prefix: 'LNG_PAGE_DASHBOARD_KPI_CASES_HOSPITALISED_TITLE',
         refresh: () => {
           // filter
@@ -147,6 +155,7 @@ export class AppCasesKpiDashletComponent
       {
         name: DashboardDashlet.CASES_WITH_LESS_THAN_X_CONTACTS,
         group: DashboardKpiGroup.CASE,
+        valueColor,
         prefix: 'LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE_BEFORE_VALUE',
         suffix: 'LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE_AFTER_VALUE',
         inputValue: this.selectedOutbreak.noLessContacts,

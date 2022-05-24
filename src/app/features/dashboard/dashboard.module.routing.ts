@@ -4,6 +4,7 @@ import * as fromPages from './pages';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { DashboardModel } from '../../core/models/dashboard.model';
 import { ClassificationDataResolver } from '../../core/services/resolvers/data/classification.resolver';
+import { PersonTypeDataResolver } from '../../core/services/resolvers/data/person-type.resolver';
 
 const routes: Routes = [
   // Dashboard page
@@ -15,7 +16,8 @@ const routes: Routes = [
       permissions: DashboardModel.canViewDashboard
     },
     resolve: {
-      classification: ClassificationDataResolver
+      classification: ClassificationDataResolver,
+      personType: PersonTypeDataResolver
     }
   }
 ];

@@ -28,6 +28,7 @@ export interface IDashletValue {
   ) => Observable<any>;
   process: (observerResponse: any) => string;
   hasPermission: () => boolean;
+  valueColor: string;
 
   // optional
   suffix?: string;

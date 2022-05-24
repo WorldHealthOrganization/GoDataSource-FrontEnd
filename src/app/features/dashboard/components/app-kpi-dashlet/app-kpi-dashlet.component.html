@@ -126,7 +126,8 @@
 
         <!-- Value -->
         <div
-          *ngSwitchCase="DashletValueStatus.LOADED">
+          *ngSwitchCase="DashletValueStatus.LOADED"
+          [style.color]="value.valueColor">
           {{value.value}}
         </div>
       </div>
