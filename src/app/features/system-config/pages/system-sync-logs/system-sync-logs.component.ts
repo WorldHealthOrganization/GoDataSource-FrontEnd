@@ -762,7 +762,7 @@ export class SystemSyncLogsComponent
         queryBuilder: this.queryBuilder,
         allow: {
           types: [ExportDataExtension.ZIP],
-          encrypt: true
+          encrypt: false
         },
         inputs: {
           append: [
@@ -809,6 +809,13 @@ export class SystemSyncLogsComponent
               visible: (data): boolean => {
                 return !_.isEmpty((data.map['filter[where][exportType]'] as IV2SideDialogConfigInputSingleDropdown).value);
               }
+            },
+            {
+              type: V2SideDialogConfigInputType.TEXT,
+              placeholder: 'LNG_SYNC_PACKAGE_FIELD_LABEL_ENCRYPTION_PASSWORD',
+              tooltip: 'LNG_SYNC_PACKAGE_FIELD_LABEL_ENCRYPTION_PASSWORD_DESCRIPTION',
+              name: 'password',
+              value: undefined
             }
           ]
         }
