@@ -108,7 +108,7 @@ implements OnDestroy {
 
     // determine hidden no
     this.hiddenValues = {
-      count: this._values.length - this._valuesVisibleAndSorted.length
+      count: (this._values ? this._values.length : 0) - this._valuesVisibleAndSorted.length
     };
 
     // refresh
