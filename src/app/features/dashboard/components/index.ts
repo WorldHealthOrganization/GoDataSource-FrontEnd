@@ -6,7 +6,6 @@ import { ContactsLostToFollowUpDashletComponent } from './contacts-lost-to-follo
 import { NewCasesPreviousDaysTransmissionChainsDashletComponent } from './new-cases-previous-days-transmission-chains-dashlet/new-cases-previous-days-transmission-chains-dashlet.component';
 import { IndependentTransmissionChainsDashletComponent } from './independent-transmission-chains-dashlet/independent-transmission-chains-dashlet.component';
 import { CasesPendingLabResultsDashletComponent } from './cases-pending-lab-results-dashlet/cases-pending-lab-results-dashlet.component';
-import { CasesRefusingTreatmentDashletComponent } from './cases-refusing-treatment-dashlet/cases-refusing-treatment-dashlet.component';
 import { NumberOfActiveChainsOfTransmissionComponent } from './number-of-active-chains-of-transmission/number-of-active-chains-of-transmission.component';
 import { ContactsBecomeCasesDashletComponent } from './contacts-become-cases-dashlet/contacts-become-cases-dashlet.component';
 import { NewChainsOfTransmissionFromRegisteredContactsDashletComponent } from './new-chains-of-transmission-from-registered-contacts-dashlet/new-chains-of-transmission-from-registered-contacts-dashlet.component';
@@ -39,7 +38,6 @@ export const components: any[] = [
   ContactsLostToFollowUpDashletComponent,
   NewCasesPreviousDaysTransmissionChainsDashletComponent,
   CasesPendingLabResultsDashletComponent,
-  CasesRefusingTreatmentDashletComponent,
   IndependentTransmissionChainsDashletComponent,
   NumberOfActiveChainsOfTransmissionComponent,
   ContactsBecomeCasesDashletComponent,

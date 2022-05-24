@@ -452,6 +452,97 @@ export class AppCasesKpiDashletComponent
             undefined;
         },
         helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_NEW_PREVIOUS_DAYS_CONTACTS_BEFORE_VALUE_DESCRIPTION')
+      },
+
+      // Cases refusing to be transferred to a treatment unit
+      {
+        name: DashboardDashlet.SUSPECT_CASES_REFUSING_TO_BE_TRANSFERRED_TO_A_TREATMENT_UNIT,
+        group: DashboardKpiGroup.CASE,
+        valueColor,
+        prefix: 'LNG_PAGE_DASHBOARD_KPI_CASES_REFUSING_TREATMENT_TITLE',
+        refresh: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          // filter
+          const qb = new RequestQueryBuilder();
+
+          // exclude discarded cases
+          qb.filter.where({
+            classification: {
+              neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+            }
+          });
+
+          // add location condition
+          if (globalFilterLocationId) {
+            qb.filter.byEquality(
+              'addresses.parentLocationIdFilter',
+              globalFilterLocationId
+            );
+          }
+
+          // classification
+          if (globalFilterClassificationId?.length > 0) {
+            qb.filter.where({
+              and: [{
+                classification: {
+                  inq: globalFilterClassificationId
+                }
+              }]
+            });
+          }
+
+          // date
+          if (globalFilterDate) {
+            qb.filter.where({
+              dateOfReporting: {
+                lte: moment(globalFilterDate).endOf('day').format()
+              }
+            });
+          }
+
+          // retrieve cases currently hospitalized
+          return this.caseDataService
+            .getCasesRefusingTreatmentCount(
+              this.selectedOutbreak.id,
+              qb
+            );
+        },
+        process: (response: { count: number }) => {
+          return response.count.toLocaleString('en');
+        },
+        hasPermission: () => {
+          return DashboardModel.canViewCasesRefusingTreatmentDashlet(this.authUser);
+        },
+        getLink: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          return CaseModel.canList(this.authUser) ?
+            {
+              link: ['/cases'],
+              linkQueryParams: {
+                applyListFilter: Constants.APPLY_LIST_FILTER.CASES_REFUSING_TREATMENT,
+                [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
+                global: JSON.stringify({
+                  date: globalFilterDate,
+                  locationId: globalFilterLocationId ?
+                    globalFilterLocationId :
+                    undefined,
+                  classificationId: globalFilterClassificationId?.length > 0 ?
+                    globalFilterClassificationId :
+                    undefined
+                })
+              }
+            } :
+            undefined;
+        },
+        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_REFUSING_TREATMENT_TITLE_DESCRIPTION')
       }
     ];
 
