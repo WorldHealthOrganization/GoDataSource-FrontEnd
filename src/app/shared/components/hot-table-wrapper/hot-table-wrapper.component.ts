@@ -232,7 +232,6 @@ implements OnInit, OnDestroy {
   hotId: string = `hotWrapper_${HotTableWrapperComponent._hotId++}`;
 
   // input
-  @Input() widthReduction: number = 0;
   @Input() startRows: number = 1;
   @Input() minSpareRows: number = 0;
   @Input() sheetContextMenu: any;
@@ -283,7 +282,8 @@ implements OnInit, OnDestroy {
   CustomLocationEditor = CustomLocationEditor;
 
   // local variables
-  sheetWidth: number = window.innerWidth - this.widthReduction;
+  sheetWidth: string;
+  sheetHeight: string;
 
   // callbacks
   afterChangeCallback: (
@@ -322,7 +322,7 @@ implements OnInit, OnDestroy {
    */
   ngOnInit() {
     // set spreadsheet width
-    this.setSheetWidth();
+    this.setSheetSizes();
 
     // set wrapper
     HotTableWrapperComponent.WRAPPERS[this.hotId] = this;
@@ -341,8 +341,13 @@ implements OnInit, OnDestroy {
    * Note: It's a hack, but there's no other fix for now, since handsontable is working with pixels only
    */
   @HostListener('window:resize')
-  private setSheetWidth() {
-    this.sheetWidth = window.innerWidth - this.widthReduction;
+  private setSheetSizes() {
+    // determine parent size
+    const basicPage: any = document.querySelector('app-basic-page-v2');
+    if (basicPage) {
+      this.sheetWidth = `calc(${basicPage.offsetWidth}px - var(--gd-basic-page-content-padding-left-right))`;
+      this.sheetHeight = `calc(${basicPage.offsetHeight}px - var(--gd-basic-page-content-padding-top-bottom))`;
+    }
   }
 
   /**
