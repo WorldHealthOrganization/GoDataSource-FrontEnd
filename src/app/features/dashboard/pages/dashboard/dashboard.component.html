@@ -135,6 +135,12 @@
       [globalFilterLocationId]="globalFilterLocationId"
       [globalFilterClassificationId]="globalFilterClassificationId"></app-contacts-kpi-dashlet>
 
+    <!-- COT KPI -->
+    <app-cot-kpi-dashlet
+      [globalFilterDate]="globalFilterDate"
+      [globalFilterLocationId]="globalFilterLocationId"
+      [globalFilterClassificationId]="globalFilterClassificationId"></app-cot-kpi-dashlet>
+
   </div>
 </div>
 
@@ -453,18 +459,6 @@
 <!--                            <div fxLayout="row wrap">-->
 <!--                                <ng-container *ngFor="let dashlet of group.dashlets">-->
 <!--                                    <ng-container *ngIf="group.permissions[dashlet] && group.permissions[dashlet].hasAccess(authUser)">-->
-<!--                                        &lt;!&ndash; number of independent chains of transmission &ndash;&gt;-->
-<!--                                        <app-independent-transmission-chains-dashlet-->
-<!--                                            *ngIf="dashlet === DashboardDashlet.INDEPENDENT_TRANSMISSION_CHAINS &&-->
-<!--                                                isDashletVisible(dashlet)"-->
-<!--                                            (hide)="hideDashlet(dashlet)"-->
-<!--                                            (moveBefore)="moveDashletBefore(dashlet)"-->
-<!--                                            (moveAfter)="moveDashletAfter(dashlet)"-->
-<!--                                            [globalFilterDate]="globalFilterDate"-->
-<!--                                            [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                                            [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                                        </app-independent-transmission-chains-dashlet>-->
-
 <!--                                        &lt;!&ndash; Number of active chains of transmission &ndash;&gt;-->
 <!--                                        <app-number-of-active-chains-of-transmission-dashlet-->
 <!--                                            *ngIf="dashlet === DashboardDashlet.ACTIVE_TRANSMISSION_CHAINS &&-->

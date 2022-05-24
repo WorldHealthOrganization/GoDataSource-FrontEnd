@@ -1,5 +1,4 @@
 // import each component
-import { IndependentTransmissionChainsDashletComponent } from './independent-transmission-chains-dashlet/independent-transmission-chains-dashlet.component';
 import { NumberOfActiveChainsOfTransmissionComponent } from './number-of-active-chains-of-transmission/number-of-active-chains-of-transmission.component';
 import { NewChainsOfTransmissionFromRegisteredContactsDashletComponent } from './new-chains-of-transmission-from-registered-contacts-dashlet/new-chains-of-transmission-from-registered-contacts-dashlet.component';
 import { HistogramTransmissionChainsSizeDashletComponent } from './histogram-transmission-chains-size-dashlet/histogram-transmission-chains-size-dashlet.component';
@@ -17,14 +16,15 @@ import { DashboardCustomMetricDashletComponent } from './dashboard-custom-metric
 import { AppCasesKpiDashletComponent } from './app-cases-kpi-dashlet/app-cases-kpi-dashlet.component';
 import { AppKpiDashletComponent } from './app-kpi-dashlet/app-kpi-dashlet.component';
 import { AppContactsKpiDashletComponent } from './app-contacts-kpi-dashlet/app-contacts-kpi-dashlet.component';
+import { AppCotKpiDashletComponent } from './app-cot-kpi-dashlet/app-cot-kpi-dashlet.component';
 
 // export the list of all page components
 export const components: any[] = [
   AppCasesKpiDashletComponent,
   AppContactsKpiDashletComponent,
+  AppCotKpiDashletComponent,
   AppKpiDashletComponent,
 
-  IndependentTransmissionChainsDashletComponent,
   NumberOfActiveChainsOfTransmissionComponent,
   NewChainsOfTransmissionFromRegisteredContactsDashletComponent,
   HistogramTransmissionChainsSizeDashletComponent,
