@@ -154,6 +154,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
             this.activatedRoute.snapshot.data.user.map[item.userId].name :
             ''
         },
+        sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
           options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
