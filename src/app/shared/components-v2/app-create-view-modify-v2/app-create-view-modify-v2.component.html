@@ -1394,7 +1394,7 @@
           <ng-template
             #viewModify>
             <mat-tab-group
-              (selectedIndexChange)="visitTab(tabData.tabs[$event])">
+              (selectedIndexChange)="visitTab($event)">
               <ng-container
                 *ngFor="let tab of tabData.tabs">
                 <mat-tab

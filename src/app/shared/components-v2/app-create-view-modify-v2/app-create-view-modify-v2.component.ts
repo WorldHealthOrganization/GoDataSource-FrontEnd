@@ -879,7 +879,11 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   /**
    * Visit tab
    */
-  visitTab(tab: ICreateViewModifyV2Tab | ICreateViewModifyV2TabTable): void {
+  visitTab(visibleTabIndex: number): void {
+    // determine tab
+    const visibleTabs = this.tabData.tabs.filter((tab) => !tab.visible || tab.visible());
+    const tab: ICreateViewModifyV2Tab | ICreateViewModifyV2TabTable = visibleTabs[visibleTabIndex];
+
     // trigger tab changed
     this.selectedTab = tab;
 
