@@ -316,15 +316,15 @@ implements OnInit, OnDestroy {
     private locationDataService: LocationDataService,
     private toastV2Service: ToastV2Service,
     public dialogV2Service: DialogV2Service
-  ) {}
+  ) {
+    // set spreadsheet width
+    this.setSheetSize();
+  }
 
   /**
    * Component initialized
    */
   ngOnInit() {
-    // set spreadsheet width
-    this.setSheetSize();
-
     // set wrapper
     HotTableWrapperComponent.WRAPPERS[this.hotId] = this;
   }
@@ -355,7 +355,7 @@ implements OnInit, OnDestroy {
 
     // update sizes
     const basicPageMatCard: any = document.querySelector('app-basic-page-v2 mat-card');
-    const basicPageHoTable: any = basicPageMatCard.querySelector('hot-table');
+    const basicPageHoTable: any = basicPageMatCard?.querySelector('hot-table');
     if (
       basicPageMatCard &&
       basicPageHoTable
