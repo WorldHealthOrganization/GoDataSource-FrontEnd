@@ -14,6 +14,9 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { TranslateService } from '@ngx-translate/core';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { MetricContactsPerCaseModel } from '../../../../core/models/metrics/metric-contacts-per-case.model';
+import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
+import { MetricContactsModel } from '../../../../core/models/metrics/metric-contacts.model';
+import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
   selector: 'app-contacts-kpi-dashlet',
@@ -30,6 +33,7 @@ export class AppContactsKpiDashletComponent
     private activatedRoute: ActivatedRoute,
     private translateService: TranslateService,
     private relationshipDataService: RelationshipDataService,
+    private followUpsDataService: FollowUpsDataService,
     authDataService: AuthDataService,
     outbreakDataService: OutbreakDataService
   ) {
@@ -200,6 +204,101 @@ export class AppContactsKpiDashletComponent
           _globalFilterClassificationId
         ) => undefined,
         helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_PER_CASE_MEDIAN_TITLE_DESCRIPTION')
+      },
+
+      // Contacts on the follow-up list
+      {
+        name: DashboardDashlet.CONTACTS_ON_THE_FOLLOW_UP_LIST,
+        group: DashboardKpiGroup.CONTACT,
+        valueColor,
+        prefix: 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_FOLLOWUP_LIST_TITLE',
+        prefixData: () => ({
+          date: this.globalFilterDate ?
+            moment(this.globalFilterDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            '-'
+        }),
+        refresh: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          // filter
+          const qb = new RequestQueryBuilder();
+
+          // change the way we build query
+          qb.filter.firstLevelConditions();
+
+          // add location condition
+          if (globalFilterLocationId) {
+            qb.filter.byEquality(
+              'addresses.parentLocationIdFilter',
+              globalFilterLocationId
+            );
+          }
+
+          // classification
+          // !!! must be on first level and not under $and
+          if (globalFilterClassificationId?.length > 0) {
+            qb.filter.bySelect(
+              'classification',
+              globalFilterClassificationId,
+              false,
+              null
+            );
+          }
+
+          // date
+          if (globalFilterDate) {
+            qb.filter
+              .byEquality(
+                'startDate',
+                moment(globalFilterDate).startOf('day').toISOString()
+              ).byEquality(
+                'endDate',
+                moment(globalFilterDate).endOf('day').toISOString()
+              );
+          }
+
+          // retrieve deceased cases
+          return this.followUpsDataService
+            .getCountIdsOfContactsOnTheFollowUpList(
+              this.selectedOutbreak.id,
+              qb
+            );
+        },
+        process: (response: MetricContactsModel) => {
+          return response.contactsCount.toLocaleString('en');
+        },
+        hasPermission: () => {
+          return DashboardModel.canViewContactsFromFollowUpsDashlet(this.authUser);
+        },
+        getLink: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          return ContactModel.canList(this.authUser) ?
+            {
+              link: ['/contacts'],
+              linkQueryParams: {
+                applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWUP_LIST,
+                [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
+                global: JSON.stringify({
+                  date: globalFilterDate,
+                  locationId: globalFilterLocationId ?
+                    globalFilterLocationId :
+                    undefined,
+                  classificationId: globalFilterClassificationId?.length > 0 ?
+                    globalFilterClassificationId :
+                    undefined
+                })
+              }
+            } :
+            undefined;
+        },
+        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_FOLLOWUP_LIST_TITLE_DESCRIPTION')
       }
     ];
 
