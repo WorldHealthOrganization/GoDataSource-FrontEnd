@@ -447,18 +447,6 @@
 <!--                            <div fxLayout="row wrap">-->
 <!--                                <ng-container *ngFor="let dashlet of group.dashlets">-->
 <!--                                    <ng-container *ngIf="group.permissions[dashlet] && group.permissions[dashlet].hasAccess(authUser)">-->
-<!--                                        &lt;!&ndash; Cases hospitalised &ndash;&gt;-->
-<!--                                        <app-cases-hospitalised-dashlet-->
-<!--                                            *ngIf="dashlet === DashboardDashlet.CASES_HOSPITALISED &&-->
-<!--                                                isDashletVisible(dashlet)"-->
-<!--                                            (hide)="hideDashlet(dashlet)"-->
-<!--                                            (moveBefore)="moveDashletBefore(dashlet)"-->
-<!--                                            (moveAfter)="moveDashletAfter(dashlet)"-->
-<!--                                            [globalFilterDate]="globalFilterDate"-->
-<!--                                            [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                                            [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                                        </app-cases-hospitalised-dashlet>-->
-
 <!--                                        &lt;!&ndash; Cases with Less than x Contacts &ndash;&gt;-->
 <!--                                        <app-cases-less-contacts-dashlet-->
 <!--                                            *ngIf="dashlet === DashboardDashlet.CASES_WITH_LESS_THAN_X_CONTACTS &&-->
