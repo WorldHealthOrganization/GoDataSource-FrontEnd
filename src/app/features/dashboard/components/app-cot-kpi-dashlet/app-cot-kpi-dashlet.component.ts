@@ -11,7 +11,6 @@ import { TransmissionChainDataService } from '../../../../core/services/data/tra
 import { MetricIndependentTransmissionChainsModel } from '../../../../core/models/metrics/metric-independent-transmission-chains.model';
 import { Constants } from '../../../../core/models/constants';
 import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
-import * as _ from 'lodash';
 
 @Component({
   selector: 'app-cot-kpi-dashlet',

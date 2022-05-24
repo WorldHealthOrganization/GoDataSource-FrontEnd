@@ -11,6 +11,8 @@ import { SavedFilterData, SavedFilterDataAppliedFilter } from '../../../../core/
 import * as _ from 'lodash';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { RequestFilterOperator } from '../../../../core/helperClasses/request-query-builder';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -65,14 +67,57 @@ export class DashboardComponent {
     ]
   });
 
+  // visible dashlets
+  visibleDashlets: {
+    KPICases: boolean,
+    KPIContacts: boolean,
+    KPICOT: boolean
+  } = {
+      KPICases: false,
+      KPIContacts: false,
+      KPICOT: false
+    };
+
   /**
    * Constructor
    */
   constructor(
-    protected changeDetectorRef: ChangeDetectorRef,
-    protected dialogV2Service: DialogV2Service,
-    protected activatedRoute: ActivatedRoute
-  ) {}
+    private changeDetectorRef: ChangeDetectorRef,
+    private dialogV2Service: DialogV2Service,
+    private activatedRoute: ActivatedRoute,
+    authDataService: AuthDataService
+  ) {
+    // authenticated user
+    const authUser = authDataService.getAuthenticatedUser();
+
+    // determine visible dashlets
+    this.visibleDashlets = {
+      // KPI - cases
+      KPICases: DashboardModel.canViewCaseDeceasedDashlet(authUser) ||
+        DashboardModel.canViewCaseHospitalizedDashlet(authUser) ||
+        DashboardModel.canViewCaseWithLessThanXCotactsDashlet(authUser) ||
+        DashboardModel.canViewNewCasesInPreviousXDaysAmongKnownContactsDashlet(authUser) ||
+        DashboardModel.canViewCasesRefusingTreatmentDashlet(authUser) ||
+        DashboardModel.canViewNewCasesFromKnownCOTDashlet(authUser) ||
+        DashboardModel.canViewCasesWithPendingLabResultsDashlet(authUser) ||
+        DashboardModel.canViewCasesNotIdentifiedThroughContactsDashlet(authUser),
+
+      // KPI - contacts
+      KPIContacts: DashboardModel.canViewContactsPerCaseMeanDashlet(authUser) ||
+        DashboardModel.canViewContactsPerCaseMedianDashlet(authUser) ||
+        DashboardModel.canViewContactsFromFollowUpsDashlet(authUser) ||
+        DashboardModel.canViewContactsLostToFollowUpsDashlet(authUser) ||
+        DashboardModel.canViewContactsNotSeenInXDaysDashlet(authUser) ||
+        DashboardModel.canViewContactsBecomeCasesDashlet(authUser) ||
+        DashboardModel.canViewContactsSeenDashlet(authUser) ||
+        DashboardModel.canViewContactsWithSuccessfulFollowUpsDashlet(authUser),
+
+      // KPI - COT
+      KPICOT: DashboardModel.canViewIndependentCOTDashlet(authUser) ||
+        DashboardModel.canViewContactsNotSeenInXDaysDashlet(authUser) ||
+        DashboardModel.canViewContactsBecomeCasesDashlet(authUser)
+    };
+  }
 
   /**
    * Refresh template

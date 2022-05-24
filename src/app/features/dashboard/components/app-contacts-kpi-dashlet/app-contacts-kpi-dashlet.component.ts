@@ -466,7 +466,7 @@ export class AppContactsKpiDashletComponent
           return response.contactsCount.toLocaleString('en');
         },
         hasPermission: () => {
-          return DashboardModel.canViewContactsLostToFollowUpsDashlet(this.authUser);
+          return DashboardModel.canViewContactsNotSeenInXDaysDashlet(this.authUser);
         },
         getLink: (
           inputValue,
