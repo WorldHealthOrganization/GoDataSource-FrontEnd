@@ -1,3 +1,4 @@
+<!-- #TODO -->
 <!--
 <app-topnav>
     <ng-container dynamic-section>
@@ -35,136 +36,155 @@
 </app-topnav>
 -->
 
+<!-- #TODO -->
 <!--Total number of records from the list-->
 <!--<app-total-number-of-records-->
 <!--    [value]="followUpsGroupedByContactCount$ | async">-->
 <!--</app-total-number-of-records>-->
 
-<mat-card
-    class="page-section page-content"
-    fxLayout="column">
+<!-- #TODO -->
+<!--<div class="filters" fxLayout="column" fxLayoutGap="10px">-->
+<!--  <div>-->
+<!--    <button-->
+<!--      mat-raised-button-->
+<!--      (click)="toggleFilters()">-->
+<!--      {{ toggleFiltersButtonLabel | translate }}-->
+<!--    </button>-->
+<!--  </div>-->
+<!--  <div-->
+<!--    *ngIf="filtersVisible"-->
+<!--    fxLayout="column" fxLayoutGap="20px">-->
 
-    <div class="filters" fxLayout="column" fxLayoutGap="10px">
-        <div>
-            <button
-                mat-raised-button
-                (click)="toggleFilters()">
-                {{ toggleFiltersButtonLabel | translate }}
-            </button>
-        </div>
+<!--    <div fxLayout="row" fxLayoutAlign="start end" fxLayoutGap="20px">-->
+<!--      <div-->
+<!--        fxFlex fxLayout="row" fxLayoutGap="20px">-->
+<!--        <app-form-input-->
+<!--          name="contactName"-->
+<!--          [(ngModel)]="filters.contactName"-->
+<!--          [placeholder]="'LNG_CONTACT_FIELD_LABEL_NAME' | translate">-->
+<!--        </app-form-input>-->
 
-        <div
-            *ngIf="filtersVisible"
-            fxLayout="column" fxLayoutGap="20px">
+<!--        <app-form-input-->
+<!--          name="visualId"-->
+<!--          [(ngModel)]="filters.visualId"-->
+<!--          [placeholder]="'LNG_CONTACT_FIELD_LABEL_VISUAL_ID' | translate">-->
+<!--        </app-form-input>-->
+<!--      </div>-->
 
-            <div fxLayout="row" fxLayoutAlign="start end" fxLayoutGap="20px">
-                <div
-                    fxFlex fxLayout="row" fxLayoutGap="20px">
-                    <app-form-input
-                        name="contactName"
-                        [(ngModel)]="filters.contactName"
-                        [placeholder]="'LNG_CONTACT_FIELD_LABEL_NAME' | translate">
-                    </app-form-input>
+<!--      <div-->
+<!--        fxFlex fxLayout="row" fxLayoutGap="20px">-->
+<!--        &lt;!&ndash; #TODO &ndash;&gt;-->
+<!--        &lt;!&ndash;                    <app-form-location-dropdown&ndash;&gt;-->
+<!--        &lt;!&ndash;                        fxFlex&ndash;&gt;-->
+<!--        &lt;!&ndash;                        name="locationIds"&ndash;&gt;-->
+<!--        &lt;!&ndash;                        [placeholder]="'LNG_CONTACT_FIELD_LABEL_ADDRESS_LOCATION' | translate"&ndash;&gt;-->
+<!--        &lt;!&ndash;                        multiple="true"&ndash;&gt;-->
+<!--        &lt;!&ndash;                        [useOutbreakLocations]="true"&ndash;&gt;-->
+<!--        &lt;!&ndash;                        [(ngModel)]="filters.locationIds">&ndash;&gt;-->
+<!--        &lt;!&ndash;                    </app-form-location-dropdown>&ndash;&gt;-->
 
-                    <app-form-input
-                        name="visualId"
-                        [(ngModel)]="filters.visualId"
-                        [placeholder]="'LNG_CONTACT_FIELD_LABEL_VISUAL_ID' | translate">
-                    </app-form-input>
-                </div>
+<!--        <app-form-select-->
+<!--          name="teamIdFilter"-->
+<!--          [(ngModel)]="filters.teamIds"-->
+<!--          [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_TEAM' | translate"-->
+<!--          [options]="teamsList$ | async"-->
+<!--          optionLabelKey="name"-->
+<!--          optionValueKey="id"-->
+<!--          [multiple]="true">-->
+<!--        </app-form-select>-->
+<!--      </div>-->
 
-                <div
-                    fxFlex fxLayout="row" fxLayoutGap="20px">
-<!--                    <app-form-location-dropdown-->
-<!--                        fxFlex-->
-<!--                        name="locationIds"-->
-<!--                        [placeholder]="'LNG_CONTACT_FIELD_LABEL_ADDRESS_LOCATION' | translate"-->
-<!--                        multiple="true"-->
-<!--                        [useOutbreakLocations]="true"-->
-<!--                        [(ngModel)]="filters.locationIds">-->
-<!--                    </app-form-location-dropdown>-->
+<!--    </div>-->
 
-                    <app-form-select
-                        name="teamIdFilter"
-                        [(ngModel)]="filters.teamIds"
-                        [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_TEAM' | translate"
-                        [options]="teamsList$ | async"
-                        optionLabelKey="name"
-                        optionValueKey="id"
-                        [multiple]="true">
-                    </app-form-select>
-                </div>
+<!--    <div fxLayout="row" fxLayoutAlign="start end" fxLayoutGap="20px">-->
+<!--      <div fxFlex fxLayout="column" fxLayoutGap="10px">-->
+<!--        <div>{{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT' | translate }}</div>-->
 
-            </div>
+<!--        <div fxLayout="row">-->
+<!--          <app-form-daterange-->
+<!--            name="dateOfLastContact"-->
+<!--            [ngModel]="filters.dateOfLastContact"-->
+<!--            (changed)="filters.dateOfLastContact = $event">-->
+<!--          </app-form-daterange>-->
+<!--        </div>-->
+<!--      </div>-->
 
-            <div fxLayout="row" fxLayoutAlign="start end" fxLayoutGap="20px">
-                <div fxFlex fxLayout="column" fxLayoutGap="10px">
-                    <div>{{ 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT' | translate }}</div>
+<!--      <div fxFlex fxLayout="column" fxLayoutGap="10px">-->
+<!--        <div>{{ 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_DATE_END_FOLLOW_UP' | translate }}</div>-->
 
-                    <div fxLayout="row">
-                        <app-form-daterange
-                            name="dateOfLastContact"
-                            [ngModel]="filters.dateOfLastContact"
-                            (changed)="filters.dateOfLastContact = $event">
-                        </app-form-daterange>
-                    </div>
-                </div>
+<!--        <div fxLayout="row">-->
+<!--          <app-form-daterange-->
+<!--            name="dateOfTheEndOfTheFollowUp"-->
+<!--            [ngModel]="filters.dateOfTheEndOfTheFollowUp"-->
+<!--            (changed)="filters.dateOfTheEndOfTheFollowUp = $event">-->
+<!--          </app-form-daterange>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
 
-                <div fxFlex fxLayout="column" fxLayoutGap="10px">
-                    <div>{{ 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_DATE_END_FOLLOW_UP' | translate }}</div>
+<!--    &lt;!&ndash; Missed follow-ups &ndash;&gt;-->
+<!--    <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">-->
+<!--      &lt;!&ndash; Enable missed follow-ups filter &ndash;&gt;-->
+<!--      <div-->
+<!--        fxFlex>-->
+<!--        <mat-slide-toggle-->
+<!--          labelPosition="before"-->
+<!--          [(ngModel)]="filters.displayMissedFollowUps">-->
+<!--          {{ 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_LABEL_SHOW_MISSED_FOLLOW_UPS' | translate }}-->
+<!--        </mat-slide-toggle>-->
+<!--      </div>-->
 
-                    <div fxLayout="row">
-                        <app-form-daterange
-                            name="dateOfTheEndOfTheFollowUp"
-                            [ngModel]="filters.dateOfTheEndOfTheFollowUp"
-                            (changed)="filters.dateOfTheEndOfTheFollowUp = $event">
-                        </app-form-daterange>
-                    </div>
-                </div>
-            </div>
+<!--      &lt;!&ndash; Number of days &ndash;&gt;-->
+<!--      <app-form-input-->
+<!--        [(ngModel)]="filters.displayMissedFollowUpsNoDays"-->
+<!--        [placeholder]="'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_LABEL_SHOW_MISSED_FOLLOW_UPS_NO_DAYS' | translate"-->
+<!--        type="number"-->
+<!--        [disabled]="!filters.displayMissedFollowUps">-->
+<!--      </app-form-input>-->
 
-            <!-- Missed follow-ups -->
-            <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">
-                <!-- Enable missed follow-ups filter -->
-                <div
-                    fxFlex>
-                    <mat-slide-toggle
-                        labelPosition="before"
-                        [(ngModel)]="filters.displayMissedFollowUps">
-                        {{ 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_LABEL_SHOW_MISSED_FOLLOW_UPS' | translate }}
-                    </mat-slide-toggle>
-                </div>
+<!--      <div fxFlex>&lt;!&ndash; placeholder &ndash;&gt;</div>-->
+<!--      <div fxFlex>&lt;!&ndash; placeholder &ndash;&gt;</div>-->
+<!--    </div>-->
 
-                <!-- Number of days -->
-                <app-form-input
-                    [(ngModel)]="filters.displayMissedFollowUpsNoDays"
-                    [placeholder]="'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_LABEL_SHOW_MISSED_FOLLOW_UPS_NO_DAYS' | translate"
-                    type="number"
-                    [disabled]="!filters.displayMissedFollowUps">
-                </app-form-input>
+<!--    &lt;!&ndash; Action buttons &ndash;&gt;-->
+<!--    <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="10px">-->
+<!--      <button-->
+<!--        mat-raised-button-->
+<!--        (click)="resetFilters()">-->
+<!--        {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}-->
+<!--      </button>-->
 
-                <div fxFlex><!-- placeholder --></div>
-                <div fxFlex><!-- placeholder --></div>
-            </div>
+<!--      <button-->
+<!--        mat-raised-button-->
+<!--        color="accent"-->
+<!--        (click)="applyFilters()">-->
+<!--        {{ 'LNG_COMMON_BUTTON_APPLY_FILTERS' | translate }}-->
+<!--      </button>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
 
-            <!-- Action buttons -->
-            <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="10px">
-                <button
-                    mat-raised-button
-                    (click)="resetFilters()">
-                    {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
-                </button>
+<!-- #TODO -->
+<!-- Filters -->
+<!--<div>-->
+<!--  &lt;!&ndash; Date range filter &ndash;&gt;-->
+<!--  <app-form-date-range-slider-->
+<!--    *ngIf="selectedOutbreak"-->
+<!--    name="dateRangeFilter"-->
+<!--    [ngModel]="sliderDateFilterValue"-->
+<!--    [minDate]="slideFilterData.minDate"-->
+<!--    [maxDate]="slideFilterData.maxDate"-->
+<!--    [maxRange]="slideFilterData.maxRange"-->
+<!--    [label]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"-->
+<!--    tooltip="LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION"-->
+<!--    (optionChanged)="filterByDateRange($event)">-->
+<!--  </app-form-date-range-slider>-->
+<!--</div>-->
 
-                <button
-                    mat-raised-button
-                    color="accent"
-                    (click)="applyFilters()">
-                    {{ 'LNG_COMMON_BUTTON_APPLY_FILTERS' | translate }}
-                </button>
-            </div>
-        </div>
-    </div>
 
+<app-basic-page-v2
+  [breadcrumbs]="breadcrumbs"
+  pageTitle="LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE">
     <div fxLayout="column" fxLayoutGap="5px">
         <div>
             {{ 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_NO_DATA_LABEL' | translate }}
@@ -175,22 +195,6 @@
         <div>
             {{ 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_QUESTIONNAIRE_ALERT_LABEL' | translate }}
         </div>
-    </div>
-
-    <!-- Filters -->
-    <div>
-        <!-- Date range filter -->
-        <app-form-date-range-slider
-            *ngIf="selectedOutbreak"
-            name="dateRangeFilter"
-            [ngModel]="sliderDateFilterValue"
-            [minDate]="slideFilterData.minDate"
-            [maxDate]="slideFilterData.maxDate"
-            [maxRange]="slideFilterData.maxRange"
-            [label]="'LNG_FOLLOW_UP_FIELD_LABEL_DATE' | translate"
-            tooltip="LNG_FOLLOW_UP_FIELD_LABEL_DATE_DESCRIPTION"
-            (optionChanged)="filterByDateRange($event)">
-        </app-form-date-range-slider>
     </div>
 
     <!-- Loading data -->
@@ -365,6 +369,7 @@
         </div>
     </div>
 
+<!-- #TODO -->
 <!--    &lt;!&ndash; Pages (need to be hidden and not ngIf, otherwise it makes a new duplicate request) &ndash;&gt;-->
 <!--    <app-mat-paginator-extended-->
 <!--        [hidden]="refreshingList || isEmptyList"-->
@@ -374,4 +379,4 @@
 <!--        [pageSizeOptions]="[]"-->
 <!--        (page)="changePage($event)">-->
 <!--    </app-mat-paginator-extended>-->
-</mat-card>
+</app-basic-page-v2>
