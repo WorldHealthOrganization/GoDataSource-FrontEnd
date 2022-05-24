@@ -3,6 +3,7 @@
   &:not(.gd-cdk-overlay-pane-main-menu) {
     .mat-menu-panel {
       max-height: 50vh;
+      min-height: 0;
 
       .mat-menu-content:not(:empty) {
         padding: 0;

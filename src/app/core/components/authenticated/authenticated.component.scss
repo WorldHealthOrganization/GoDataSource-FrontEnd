@@ -10,7 +10,7 @@ mat-sidenav-container {
   &.gd-body-content {
     background-color: transparent;
     color: var(--gd-text);
-    height: 100vh; /* Old Value - Fallback for browsers that do not support Custom Properties */
+    height: 100vh; /* Fallback for browsers which cannot support Custom Properties */
     height: calc(var(--vh, 1vh) * 100);
     margin: 0;
     overflow: hidden;
@@ -144,6 +144,8 @@ mat-sidenav-container {
 
     /* Right side */
     .gd-body-content-right {
+      z-index: auto;
+
       @include breakpoint('gt-md') {
         margin: 0 0 0 var(--gd-menu-width-collapsed) !important;
         @include transition(all 0.24s ease-in-out 0s);
@@ -171,7 +173,7 @@ mat-sidenav-container {
       .gd-body-content-right-bottom {
         background: rgba(var(--gd-secondary-rgb), 0.1);
         color: var(--gd-text);
-        height: calc(100vh - var(--gd-top-bar-height)); /* Old Value - Fallback for browsers that do not support Custom Properties */
+        height: calc(100vh - var(--gd-top-bar-height)); /* Fallback for browsers which cannot support Custom Properties */
         height: calc((var(--vh, 1vh) * 100) - var(--gd-top-bar-height));
         padding: 1.2rem 4rem 4rem;
         overflow-x: hidden;

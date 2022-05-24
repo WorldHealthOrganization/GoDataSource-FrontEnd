@@ -351,6 +351,7 @@
             @include flex_align_items(center);
             @include flex(flex);
             @include flex_direction(row);
+            text-transform: uppercase;
 
             span {
               height: 2rem;

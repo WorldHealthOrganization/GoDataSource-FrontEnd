@@ -2,7 +2,7 @@
 
 .gd-login {
   // height: 100vh;
-  height: 100vh; /* Old Value - Fallback for browsers that do not support Custom Properties */
+  height: 100vh; /* Fallback for browsers which cannot support Custom Properties */
   height: calc(var(--vh, 1vh) * 100);
   overflow: hidden;
 
@@ -137,6 +137,21 @@
 
         .gd-login-right-middle-form-forgot-button {
           text-align: right;
+        }
+
+        .gd-login-right-middle-form-captcha {
+          margin-top: 1.6rem;
+
+          .gd-form-input-v2 {
+            position: relative;
+            top: 0.8rem;
+          }
+
+          @include breakpoint('xxs') {
+            > * {
+              width: 100%;
+            }
+          }
         }
 
         .gd-login-right-middle-form-login-button {

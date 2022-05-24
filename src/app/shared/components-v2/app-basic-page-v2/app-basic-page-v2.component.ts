@@ -13,6 +13,7 @@ import { IV2SideDialogAdvancedFiltersResponse } from '../app-side-dialog-v2/mode
 @Component({
   selector: 'app-basic-page-v2',
   templateUrl: './app-basic-page-v2.component.html',
+  styleUrls: ['./app-basic-page-v2.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppBasicPageV2Component implements OnInit, OnDestroy {

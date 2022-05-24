@@ -134,11 +134,14 @@
 
           <!-- Captcha -->
           <div
-            *ngIf="displayCaptcha">
+            *ngIf="displayCaptcha"
+            class="gd-login-right-middle-form-captcha"
+            fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-between center">
 
             <!-- Captcha SVG -->
             <div
-              *ngIf="captchaData$ | async as captchaData; else loadingCaptcha">
+              *ngIf="captchaData$ | async as captchaData; else loadingCaptcha"
+              fxLayout="row" fxLayoutAlign="start center" fxLayoutAlign.xs="center center">
                 <!-- SVG -->
                 <div [innerHTML]="captchaData"></div>
 

@@ -12,11 +12,11 @@ import { moment } from '../../../../core/helperClasses/x-moment';
   selector: 'app-world-map-movement',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './world-map-movement.component.html',
-  styleUrls: ['./world-map-movement.component.less']
+  styleUrls: ['./world-map-movement.component.scss']
 })
 export class WorldMapMovementComponent {
   @Input() width: string = '100%';
-  @Input() height: string = '400px';
+  @Input() height: string = '100%';
 
   @ViewChild(WorldMapComponent) worldMapComponent: WorldMapComponent;
 
