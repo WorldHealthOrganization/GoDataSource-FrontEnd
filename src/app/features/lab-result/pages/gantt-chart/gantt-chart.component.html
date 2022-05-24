@@ -8,26 +8,26 @@
   (advancedFilterBy)="advancedFilterBy($event)">
   <!-- dropdown with view types -->
   <app-form-select-single-v2
-      name="ganttChartType"
-      [(ngModel)]="ganttChartType"
-      required="true"
-      [options]="ganttChartTypesOptions">
+    name="ganttChartType"
+    [(ngModel)]="ganttChartType"
+    required="true"
+    [options]="ganttChartTypesOptions">
   </app-form-select-single-v2>
 
   <!-- gantt chart - lab test -->
   <app-gantt-chart-delay-onset-dashlet
-      *ngIf="ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_LAB_TEST.value"
-      #ganttChart
-      [globalFilterDate]="globalFilterDate"
-      [globalFilterLocationId]="globalFilterLocationId">
+    *ngIf="ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_LAB_TEST.value"
+    #ganttChart
+    [globalFilterDate]="globalFilterDate"
+    [globalFilterLocationId]="globalFilterLocationId">
   </app-gantt-chart-delay-onset-dashlet>
 
   <!-- gantt chart - hospitalization -->
   <app-gantt-chart-delay-onset-hospitalization-dashlet
-      *ngIf="ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value"
-      #ganttChart
-      [globalFilterDate]="globalFilterDate"
-      [globalFilterLocationId]="globalFilterLocationId">
+    *ngIf="ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value"
+    #ganttChart
+    [globalFilterDate]="globalFilterDate"
+    [globalFilterLocationId]="globalFilterLocationId">
   </app-gantt-chart-delay-onset-hospitalization-dashlet>
 
   <canvas id="tempCanvas" style="display: none;"></canvas>

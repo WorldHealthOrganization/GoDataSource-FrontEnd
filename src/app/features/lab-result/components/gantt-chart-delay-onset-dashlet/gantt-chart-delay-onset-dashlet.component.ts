@@ -20,7 +20,7 @@ import { IGanttDataInterface } from '../../interfaces/gantt-data.interface';
   selector: 'app-gantt-chart-delay-onset-dashlet',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './gantt-chart-delay-onset-dashlet.component.html',
-  styleUrls: ['./gantt-chart-delay-onset-dashlet.component.less']
+  styleUrls: ['./gantt-chart-delay-onset-dashlet.component.scss']
 })
 export class GanttChartDelayOnsetDashletComponent implements OnInit, OnDestroy {
   // delay needed to display entries who doesn't have a delay between dates

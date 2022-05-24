@@ -11,7 +11,7 @@
   <!-- Title & buttons -->
   <div
     *ngIf="pageTitle"
-    fxLayout="row"
+    fxLayout="row" fxLayout.lt-md="column"
     class="gd-basic-top-title-buttons">
 
     <!-- Title -->
@@ -23,7 +23,7 @@
 
     <!-- Buttons -->
     <div
-      fxFlex fxLayoutAlign="end start" fxLayoutGap="0.8rem"
+      fxFlex fxLayoutAlign="end" fxLayoutGap="0.8rem"
       class="gd-basic-top-title-buttons-buttons">
 
       <!-- Action button -->

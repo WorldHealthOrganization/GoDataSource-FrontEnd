@@ -3,9 +3,13 @@
 
 /* Page top section */
 .gd-basic-top {
+  padding-bottom: 2.4rem;
+
+  @include breakpoint('xs') {
+    padding-bottom: 1.6rem;
+  }
+
   .gd-basic-top-title-buttons {
-    padding-bottom: 2.4rem;
-  
     /* Page title */
     .gd-basic-top-title-buttons-title {
       color: var(--gd-primary);
@@ -17,6 +21,10 @@
   
     /* Page top buttons */
     .gd-basic-top-title-buttons-buttons {
+      @include breakpoint('xs') {
+        margin-top: 1.6rem;
+      }
+
       .gd-basic-top-title-buttons-buttons-quick {
         .mat-icon {
           @include transition(all 0.24s ease-in-out 0s);
@@ -37,6 +45,6 @@
   padding: 1.6rem;
 
   @include breakpoint('xs') {
-    overflow-y: auto;
+    height: auto !important;
   }
 }
