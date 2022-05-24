@@ -133,6 +133,13 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     // parent
     super.onDestroy();
 
+    // cancel previous timout that will trigger request
+    if (this._duplicateCheckingTimeout) {
+      // clear timeout
+      clearTimeout(this._duplicateCheckingTimeout);
+      this._duplicateCheckingTimeout = undefined;
+    }
+
     // remove global notifications
     this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
   }

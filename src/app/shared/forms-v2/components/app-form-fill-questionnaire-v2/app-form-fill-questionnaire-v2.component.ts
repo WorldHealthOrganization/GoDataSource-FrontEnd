@@ -269,6 +269,12 @@ export class AppFormFillQuestionnaireV2Component
     // parent
     super.onDestroy();
 
+    // stop previous timeout
+    if (this._nonFlatToFlatWait) {
+      clearTimeout(this._nonFlatToFlatWait);
+      this._nonFlatToFlatWait = undefined;
+    }
+
     // unsubscribe other requests
     this.destroyed$.next(true);
     this.destroyed$.complete();

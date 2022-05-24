@@ -1,4 +1,4 @@
-import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, HostBinding, Output, EventEmitter, ViewChild } from '@angular/core';
+import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, HostBinding, Output, EventEmitter, ViewChild, OnDestroy } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer } from '@angular/forms';
 import { ElementBase } from '../../core/index';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -16,7 +16,7 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
   }]
 })
 export class FormSelectVscrollComponent
-  extends ElementBase<string | number> {
+  extends ElementBase<string | number> implements OnDestroy {
 
   // enable form element
   @HostBinding('class.form-element-host') isFormElement = true;
@@ -88,6 +88,13 @@ export class FormSelectVscrollComponent
       validators,
       asyncValidators
     );
+  }
+
+  /**
+   * Component destroyed
+   */
+  ngOnDestroy(): void {
+    this.clearFilterTimeoutCall();
   }
 
   /**
