@@ -422,15 +422,7 @@ export class SystemSyncLogsComponent
   * Fields retrieved from api to reduce payload size
   */
   protected refreshListFields(): string[] {
-    return [
-      'id',
-      'actionCompletionDate',
-      'actionStartDate',
-      'outbreakIDs',
-      'status',
-      'syncClientId',
-      'informationStartDate'
-    ];
+    return [];
   }
 
   /**
