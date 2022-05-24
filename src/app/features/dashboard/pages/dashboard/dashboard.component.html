@@ -447,18 +447,6 @@
 <!--                            <div fxLayout="row wrap">-->
 <!--                                <ng-container *ngFor="let dashlet of group.dashlets">-->
 <!--                                    <ng-container *ngIf="group.permissions[dashlet] && group.permissions[dashlet].hasAccess(authUser)">-->
-<!--                                        &lt;!&ndash; Number of cases who are not identified though known contact list &ndash;&gt;-->
-<!--                                        <app-cases-not-identified-through-contacts-dashlet-->
-<!--                                            *ngIf="dashlet === DashboardDashlet.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS &&-->
-<!--                                                isDashletVisible(dashlet)"-->
-<!--                                            (hide)="hideDashlet(dashlet)"-->
-<!--                                            (moveBefore)="moveDashletBefore(dashlet)"-->
-<!--                                            (moveAfter)="moveDashletAfter(dashlet)"-->
-<!--                                            [globalFilterDate]="globalFilterDate"-->
-<!--                                            [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                                            [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                                        </app-cases-not-identified-through-contacts-dashlet>-->
-
 <!--                                        &lt;!&ndash; Contacts per case mean &ndash;&gt;-->
 <!--                                        <app-contacts-per-case-mean-dashlet-->
 <!--                                            *ngIf="dashlet === DashboardDashlet.CONTACTS_PER_CASE_MEAN &&-->

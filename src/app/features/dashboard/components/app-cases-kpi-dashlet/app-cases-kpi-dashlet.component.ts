@@ -18,6 +18,7 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { TranslateService } from '@ngx-translate/core';
 import { MetricNewCasesWithContactsModel } from '../../../../core/models/metric-new-cases-contacts.model';
 import { MetricCasesTransmissionChainsModel } from '../../../../core/models/metrics/metric-cases-transmission-chains.model';
+import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 
 @Component({
   selector: 'app-cases-kpi-dashlet',
@@ -35,6 +36,7 @@ export class AppCasesKpiDashletComponent
     private relationshipDataService: RelationshipDataService,
     private activatedRoute: ActivatedRoute,
     private translateService: TranslateService,
+    private listFilterDataService: ListFilterDataService,
     authDataService: AuthDataService,
     outbreakDataService: OutbreakDataService
   ) {
@@ -745,6 +747,93 @@ export class AppCasesKpiDashletComponent
             undefined;
         },
         helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_PENDING_LAB_RESULT_DESCRIPTION')
+      },
+
+      // Number of cases who are not identified though known contact list
+      {
+        name: DashboardDashlet.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS,
+        group: DashboardKpiGroup.CASE,
+        valueColor,
+        prefix: 'LNG_PAGE_DASHBOARD_KPI_CASES_NOT_IDENTIFIED_THROUGH_CONTACTS',
+        refresh: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          // filter
+          const qb = new RequestQueryBuilder();
+
+          // merge other conditions
+          qb.merge(this.listFilterDataService.filterCasesNotIdentifiedThroughContacts());
+
+          // add location condition
+          if (globalFilterLocationId) {
+            qb.filter.byEquality(
+              'addresses.parentLocationIdFilter',
+              globalFilterLocationId
+            );
+          }
+
+          // classification
+          if (globalFilterClassificationId?.length > 0) {
+            qb.filter.where({
+              and: [{
+                classification: {
+                  inq: globalFilterClassificationId
+                }
+              }]
+            });
+          }
+
+          // date
+          if (globalFilterDate) {
+            qb.filter.where({
+              dateOfReporting: {
+                lte: moment(globalFilterDate).endOf('day').format()
+              }
+            });
+          }
+
+          // retrieve cases currently hospitalized
+          return this.caseDataService
+            .getCasesCount(
+              this.selectedOutbreak.id,
+              qb
+            );
+        },
+        process: (response: { count: number }) => {
+          return response.count.toLocaleString('en');
+        },
+        hasPermission: () => {
+          return DashboardModel.canViewCasesNotIdentifiedThroughContactsDashlet(this.authUser);
+        },
+        getLink: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          return CaseModel.canList(this.authUser) ?
+            {
+              link: ['/cases'],
+              linkQueryParams: {
+                applyListFilter: Constants.APPLY_LIST_FILTER.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS,
+                [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
+                global: JSON.stringify({
+                  date: globalFilterDate,
+                  locationId: globalFilterLocationId ?
+                    globalFilterLocationId :
+                    undefined,
+                  classificationId: globalFilterClassificationId?.length > 0 ?
+                    globalFilterClassificationId :
+                    undefined
+                })
+              }
+            } :
+            undefined;
+        },
+        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CASES_NOT_IDENTIFIED_THROUGH_CONTACTS_DESCRIPTION')
       }
     ];
 
