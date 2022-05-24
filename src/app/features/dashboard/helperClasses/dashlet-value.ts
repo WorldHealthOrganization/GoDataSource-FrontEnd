@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { Moment } from '../../../core/helperClasses/x-moment';
-import { DashboardDashlet } from '../../../core/enums/dashboard.enum';
+import { DashboardDashlet, DashboardKpiGroup } from '../../../core/enums/dashboard.enum';
 
 /**
  * Dashlet value status
@@ -18,6 +18,7 @@ export enum DashletValueStatus {
 export interface IDashletValue {
   // required
   name: DashboardDashlet;
+  group: DashboardKpiGroup;
   prefix: string;
   refresh: (
     inputValue: number,
@@ -26,6 +27,7 @@ export interface IDashletValue {
     globalClassifications: string[]
   ) => Observable<any>;
   process: (observerResponse: any) => string;
+  hasPermission: () => boolean;
 
   // optional
   suffix?: string;

@@ -4,6 +4,8 @@ import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 import { Moment } from '../../../core/helperClasses/x-moment';
 import { Directive, Input } from '@angular/core';
+import { AuthDataService } from '../../../core/services/data/auth.data.service';
+import { UserModel } from '../../../core/models/user.model';
 
 /**
  * Dashlet
@@ -25,12 +27,19 @@ export abstract class AppDashletV2 {
   protected selectedOutbreak: OutbreakModel;
   private _selectedOutbreakSubscription: Subscription;
 
+  // authenticated user
+  protected authUser: UserModel;
+
   /**
    * Initialize
    */
   constructor(
+    authDataService: AuthDataService,
     outbreakDataService: OutbreakDataService
   ) {
+    // get user
+    this.authUser = authDataService.getAuthenticatedUser();
+
     // listen for outbreak selection
     this._selectedOutbreakSubscription = outbreakDataService
       .getSelectedOutbreakSubject()

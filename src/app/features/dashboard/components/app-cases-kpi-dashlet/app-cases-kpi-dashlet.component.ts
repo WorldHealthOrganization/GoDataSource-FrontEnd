@@ -7,7 +7,9 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { MetricCasesWithContactsModel } from '../../../../core/models/metrics/metric-cases-contacts.model';
 import { Constants } from '../../../../core/models/constants';
 import { moment } from '../../../../core/helperClasses/x-moment';
-import { DashboardDashlet } from '../../../../core/enums/dashboard.enum';
+import { DashboardDashlet, DashboardKpiGroup } from '../../../../core/enums/dashboard.enum';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
 
 @Component({
   selector: 'app-cases-kpi-dashlet',
@@ -23,9 +25,13 @@ export class AppCasesKpiDashletComponent
     private changeDetectorRef: ChangeDetectorRef,
     private caseDataService: CaseDataService,
     private relationshipDataService: RelationshipDataService,
+    authDataService: AuthDataService,
     outbreakDataService: OutbreakDataService
   ) {
-    super(outbreakDataService);
+    super(
+      authDataService,
+      outbreakDataService
+    );
   }
 
   /**
@@ -51,6 +57,7 @@ export class AppCasesKpiDashletComponent
       // Cases who have died
       {
         name: DashboardDashlet.CASES_DECEASED,
+        group: DashboardKpiGroup.CASE,
         prefix: 'LNG_PAGE_DASHBOARD_KPI_CASES_DECEASED_TITLE',
         refresh: (
           _inputValue,
@@ -105,12 +112,16 @@ export class AppCasesKpiDashletComponent
         },
         process: (response: { count: number }) => {
           return response.count.toLocaleString('en');
+        },
+        hasPermission: () => {
+          return DashboardModel.canViewCaseDeceasedDashlet(this.authUser);
         }
       },
 
       // Cases hospitalised
       {
         name: DashboardDashlet.CASES_HOSPITALISED,
+        group: DashboardKpiGroup.CASE,
         prefix: 'LNG_PAGE_DASHBOARD_KPI_CASES_HOSPITALISED_TITLE',
         refresh: () => {
           // filter
@@ -126,12 +137,16 @@ export class AppCasesKpiDashletComponent
         },
         process: (response: { count: number }) => {
           return response.count.toLocaleString('en');
+        },
+        hasPermission: () => {
+          return DashboardModel.canViewCaseHospitalizedDashlet(this.authUser);
         }
       },
 
       // Cases with Less than x Contacts
       {
         name: DashboardDashlet.CASES_WITH_LESS_THAN_X_CONTACTS,
+        group: DashboardKpiGroup.CASE,
         prefix: 'LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE_BEFORE_VALUE',
         suffix: 'LNG_PAGE_DASHBOARD_KPI_CASES_LESS_CONTACTS_TITLE_AFTER_VALUE',
         inputValue: this.selectedOutbreak.noLessContacts,
@@ -160,6 +175,9 @@ export class AppCasesKpiDashletComponent
         },
         process: (response: MetricCasesWithContactsModel) => {
           return response.casesCount.toLocaleString('en');
+        },
+        hasPermission: () => {
+          return DashboardModel.canViewCaseWithLessThanXCotactsDashlet(this.authUser);
         }
       }
     ];

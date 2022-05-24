@@ -7,6 +7,7 @@ import { Moment } from '../../../../core/helperClasses/x-moment';
 import { UserModel, UserSettings } from '../../../../core/models/user.model';
 import { DashletSettingsModel, UserSettingsDashboardModel } from '../../../../core/models/user-settings-dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-kpi-dashlet',
@@ -58,9 +59,12 @@ implements OnDestroy {
   }
 
   // title
-  @Input() title: string;
+  @Input() pageTitle: string;
 
   // values
+  hiddenValues: {
+    count: number
+  };
   private _values: IDashletValue[];
   private _valuesVisibleAndSorted: IDashletValue[];
   @Input() set values(values: IDashletValue[]) {
@@ -68,7 +72,13 @@ implements OnDestroy {
     this._values = values;
 
     // filter values
-    this._valuesVisibleAndSorted = (this._values || []).filter((value) => this.dashletMap[value.name] === undefined || this.dashletMap[value.name].visible);
+    this._valuesVisibleAndSorted = (this._values || []).filter((value) => {
+      return value.hasPermission() && (
+        this.dashletMap[value.name] === undefined ||
+        this.dashletMap[value.name].visible === undefined ||
+        this.dashletMap[value.name].visible
+      );
+    });
 
     // sort values
     this._valuesVisibleAndSorted.sort((a, b) => {
@@ -95,6 +105,11 @@ implements OnDestroy {
       // sort
       return aOrder - bOrder;
     });
+
+    // determine hidden no
+    this.hiddenValues = {
+      count: this._values.length - this._valuesVisibleAndSorted.length
+    };
 
     // refresh
     this.refreshNecessary(false);
@@ -125,6 +140,9 @@ implements OnDestroy {
     [key: string]: DashletSettingsModel
   } = {};
 
+  // invalid drag zone
+  private _isInvalidDragEvent: boolean = true;
+
   // constants
   DashletValueStatus = DashletValueStatus;
 
@@ -134,7 +152,7 @@ implements OnDestroy {
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
     private toastV2Service: ToastV2Service,
-    authDataService: AuthDataService
+    private authDataService: AuthDataService
   ) {
     // get the authenticated user
     this._authUser = authDataService.getAuthenticatedUser();
@@ -294,5 +312,169 @@ implements OnDestroy {
       // refresh
       this.refreshNecessary(false);
     }, 500);
+  }
+
+  /**
+   * Started the drag from a zone that isn't allowed
+   */
+  notInvalidDragZone(): void {
+    this._isInvalidDragEvent = false;
+  }
+
+  /**
+   * Drop item
+   */
+  dropItem(event: CdkDragDrop<any[]>): void {
+    // stop ?
+    if (this._isInvalidDragEvent) {
+      return;
+    }
+
+    // disable drag
+    this._isInvalidDragEvent = true;
+    moveItemInArray(
+      this.valuesVisibleAndSorted,
+      event.previousIndex,
+      event.currentIndex
+    );
+
+    // update order
+    this.valuesVisibleAndSorted.forEach((value, valueIndex) => {
+      // update
+      if (!this.dashletMap[value.name]) {
+        this.dashletMap[value.name] = new DashletSettingsModel({
+          name: value.name,
+          order: valueIndex,
+          visible: true,
+          kpiGroup: value.group
+        });
+      } else {
+        this.dashletMap[value.name].order = valueIndex;
+      }
+    });
+
+    // update
+    this.updateUserSettings();
+
+    // update ui
+    this.detectChanges();
+  }
+
+  /**
+   * Drag started
+   */
+  dragStarted(): void {
+    // stop ?
+    if (this._isInvalidDragEvent) {
+      document.dispatchEvent(new Event('mouseup'));
+    }
+  }
+
+  /**
+   * Hide
+   */
+  hide(value: IDashletValue): void {
+    // update visibility
+    this.valuesVisibleAndSorted.forEach((childValue, valueIndex) => {
+      // update
+      if (!this.dashletMap[childValue.name]) {
+        this.dashletMap[childValue.name] = new DashletSettingsModel({
+          name: childValue.name,
+          order: valueIndex,
+          visible: childValue.name !== value.name,
+          kpiGroup: childValue.group
+        });
+      } else if (childValue.name === value.name) {
+        this.dashletMap[childValue.name].visible = false;
+      }
+    });
+
+    // update visible items
+    this.values = this._values;
+
+    // update
+    this.updateUserSettings();
+
+    // update ui
+    this.detectChanges();
+  }
+
+  /**
+   * Update user settings
+   */
+  private updateUserSettings(): void {
+    // get user settings
+    const dashboardSettings: UserSettingsDashboardModel = this._authUser.getSettings(UserSettings.DASHBOARD);
+    const localDashletMap: {
+      [key: string]: DashletSettingsModel
+    } = {};
+    dashboardSettings.dashlets.forEach((dashlet) => {
+      localDashletMap[dashlet.name] = dashlet;
+    });
+
+    // check for missing dashlets & update order
+    Object.keys(this.dashletMap).forEach((dashletName) => {
+      // get updated dashlet
+      const newDashlet = this.dashletMap[dashletName];
+
+      // missing ?
+      if (!localDashletMap[newDashlet.name]) {
+        dashboardSettings.dashlets.push(newDashlet);
+      } else {
+        localDashletMap[newDashlet.name].visible = newDashlet.visible;
+        localDashletMap[newDashlet.name].order = newDashlet.order;
+      }
+    });
+
+    // send update request
+    this.authDataService
+      .updateSettingsForCurrentUser({
+        [UserSettings.DASHBOARD]: dashboardSettings
+      })
+      .pipe(
+        // error
+        catchError((err) => {
+          // error
+          this.toastV2Service.error(err);
+
+          // send it further
+          return throwError(err);
+        })
+
+        // should be the last pipe
+        // - no take until needed so we don't stop it if we leave the page
+        // takeUntil(this._destroyed$)
+      )
+      .subscribe();
+  }
+
+  /**
+   * Show all dashlets
+   */
+  showAll(): void {
+    // update visibility
+    this._values.forEach((childValue, valueIndex) => {
+      // update
+      if (!this.dashletMap[childValue.name]) {
+        this.dashletMap[childValue.name] = new DashletSettingsModel({
+          name: childValue.name,
+          order: valueIndex,
+          visible: true,
+          kpiGroup: childValue.group
+        });
+      } else {
+        this.dashletMap[childValue.name].visible = true;
+        this.dashletMap[childValue.name].order = valueIndex;
+      }
+    });
+
+    // update visible items
+    this.values = this._values;
+
+    // update
+    this.updateUserSettings();
+
+    // update ui
+    this.detectChanges();
   }
 }

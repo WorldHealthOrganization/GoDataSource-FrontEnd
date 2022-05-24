@@ -10,7 +10,7 @@
     <div
       class="gd-dashlet-kpi-top-title"
       fxFlex>
-      {{title | translate}}
+      {{pageTitle | translate}}
     </div>
 
     <!-- Actions -->
@@ -21,7 +21,22 @@
       <!-- Expanded options -->
       <ng-container
         *ngIf="expanded">
-        expanded options
+
+        <!-- Hidden items -->
+        <span
+          *ngIf="hiddenValues?.count > 0">
+
+          <!-- Message -->
+          <span>{{'LNG_PAGE_DASHBOARD_KPI_HIDDEN_NO' | translate:hiddenValues}}</span>
+
+          <!-- Show button -->
+          (<button
+            type="button"
+            mat-flat-button
+            color="text"
+            (click)="showAll()">{{'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_SHOW_ALL' | translate}}</button>)
+        </span>
+
       </ng-container>
 
       <!-- Expand / Collapse -->
@@ -38,13 +53,34 @@
   <!-- KPI -->
   <div
     *ngIf="expanded"
-    class="gd-dashlet-kpi-bottom">
+    class="gd-dashlet-kpi-bottom gd-dashlet-kpi-bottom-{{pageTitle}}"
+    cdkDropList [cdkDropListData]="valuesVisibleAndSorted" (cdkDropListDropped)="dropItem($event)">
 
     <!-- Render value -->
     <div
       *ngFor="let value of valuesVisibleAndSorted"
       class="gd-dashlet-kpi-bottom-value"
-      fxLayout="row">
+      fxLayout="row"
+      cdkDrag cdkDragLockAxis="y" [cdkDragData]="value" cdkDragBoundary=".gd-dashlet-kpi-bottom-{{pageTitle}}" (cdkDragStarted)="dragStarted()" cdkDragPreviewContainer="parent">
+
+      <!-- Hover icons -->
+      <div
+        fxGrow="0">
+
+        <!-- Sort -->
+        <mat-icon
+          cdkDragHandle
+          [matTooltip]="'LNG_COMMON_BUTTON_DRAG' | translate"
+          (mousedown)="notInvalidDragZone();"
+          (click)="$event.stopPropagation();">drag_indicator</mat-icon>
+
+        <!-- Hide -->
+        <mat-icon
+          cdkDragHandle
+          [matTooltip]="'LNG_COMMON_BUTTON_HIDE' | translate"
+          (click)="hide(value); $event.stopPropagation();">visibility_off</mat-icon>
+
+      </div>
 
       <!-- Left -->
       <div
