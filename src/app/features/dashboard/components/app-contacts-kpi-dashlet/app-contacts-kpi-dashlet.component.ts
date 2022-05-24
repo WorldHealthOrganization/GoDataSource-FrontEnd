@@ -22,6 +22,8 @@ import { forkJoin } from 'rxjs';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { CaseModel } from '../../../../core/models/case.model';
+import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
+import { MetricContactsSeenEachDays } from '../../../../core/models/metrics/metric-contacts-seen-each-days.model';
 
 @Component({
   selector: 'app-contacts-kpi-dashlet',
@@ -40,6 +42,7 @@ export class AppContactsKpiDashletComponent
     private relationshipDataService: RelationshipDataService,
     private followUpsDataService: FollowUpsDataService,
     private caseDataService: CaseDataService,
+    private listFilterDataService: ListFilterDataService,
     authDataService: AuthDataService,
     outbreakDataService: OutbreakDataService
   ) {
@@ -626,6 +629,65 @@ export class AppContactsKpiDashletComponent
             undefined;
         },
         helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE_DESCRIPTION')
+      },
+
+      // Contacts seen each day
+      {
+        name: DashboardDashlet.CONTACTS_SEEN_EACH_DAY,
+        group: DashboardKpiGroup.CONTACT,
+        valueColor,
+        prefix: 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_SEEN_EACH_DAY',
+        prefixData: () => ({
+          date: this.globalFilterDate ?
+            moment(this.globalFilterDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            '-'
+        }),
+        refresh: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          // retrieve data
+          return this.listFilterDataService
+            .filterContactsSeen(
+              moment(globalFilterDate),
+              globalFilterLocationId,
+              globalFilterClassificationId
+            );
+        },
+        process: (response: MetricContactsSeenEachDays) => {
+          return response.contactsSeenCount.toLocaleString('en');
+        },
+        hasPermission: () => {
+          return DashboardModel.canViewContactsSeenDashlet(this.authUser);
+        },
+        getLink: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          return ContactModel.canList(this.authUser) ?
+            {
+              link: ['/contacts'],
+              linkQueryParams: {
+                applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_SEEN,
+                [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
+                global: JSON.stringify({
+                  date: globalFilterDate,
+                  locationId: globalFilterLocationId ?
+                    globalFilterLocationId :
+                    undefined,
+                  classificationId: globalFilterClassificationId?.length > 0 ?
+                    globalFilterClassificationId :
+                    undefined
+                })
+              }
+            } :
+            undefined;
+        },
+        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_SEEN_EACH_DAY_DESCRIPTION')
       }
     ];
 
