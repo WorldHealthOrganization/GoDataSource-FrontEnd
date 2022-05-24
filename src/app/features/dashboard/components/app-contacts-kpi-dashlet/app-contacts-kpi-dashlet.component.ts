@@ -17,6 +17,8 @@ import { MetricContactsPerCaseModel } from '../../../../core/models/metrics/metr
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { MetricContactsModel } from '../../../../core/models/metrics/metric-contacts.model';
 import { ContactModel } from '../../../../core/models/contact.model';
+import * as _ from 'lodash';
+import { MetricContactsLostToFollowUpModel } from '../../../../core/models/metrics/metric-contacts-lost-to-follow-up.model';
 
 @Component({
   selector: 'app-contacts-kpi-dashlet',
@@ -299,6 +301,90 @@ export class AppContactsKpiDashletComponent
             undefined;
         },
         helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_FOLLOWUP_LIST_TITLE_DESCRIPTION')
+      },
+
+      // Contacts Lost to follow-up
+      {
+        name: DashboardDashlet.CONTACTS_LOST_TO_FOLLOW_UP,
+        group: DashboardKpiGroup.CONTACT,
+        valueColor,
+        prefix: 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_LOST_TO_FOLLOW_UP',
+        refresh: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          // filter
+          const qb = new RequestQueryBuilder();
+
+          // change the way we build query
+          qb.filter.firstLevelConditions();
+
+          // date
+          if (globalFilterDate) {
+            qb.filter.where({
+              dateOfReporting: {
+                lte: moment(globalFilterDate).toISOString()
+              }
+            });
+          }
+
+          // location
+          if (globalFilterLocationId) {
+            qb.filter.byEquality('addresses.parentLocationIdFilter', globalFilterLocationId);
+          }
+
+          // classification
+          // !!! must be on first level and not under $and
+          if (globalFilterClassificationId?.length > 0) {
+            qb.filter.bySelect(
+              'classification',
+              globalFilterClassificationId,
+              false,
+              null
+            );
+          }
+
+          // retrieve deceased cases
+          return this.followUpsDataService
+            .getNumberOfContactsWhoAreLostToFollowUp(
+              this.selectedOutbreak.id,
+              qb
+            );
+        },
+        process: (response: MetricContactsLostToFollowUpModel) => {
+          return response.contactsCount.toLocaleString('en');
+        },
+        hasPermission: () => {
+          return DashboardModel.canViewContactsLostToFollowUpsDashlet(this.authUser);
+        },
+        getLink: (
+          _inputValue,
+          globalFilterDate,
+          globalFilterLocationId,
+          globalFilterClassificationId
+        ) => {
+          return ContactModel.canList(this.authUser) ?
+            {
+              link: ['/contacts'],
+              linkQueryParams: {
+                applyListFilter: Constants.APPLY_LIST_FILTER.CONTACTS_LOST_TO_FOLLOW_UP,
+                [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true,
+                global: JSON.stringify({
+                  date: globalFilterDate,
+                  locationId: globalFilterLocationId ?
+                    globalFilterLocationId :
+                    undefined,
+                  classificationId: globalFilterClassificationId?.length > 0 ?
+                    globalFilterClassificationId :
+                    undefined
+                })
+              }
+            } :
+            undefined;
+        },
+        helpTooltip: this.translateService.instant('LNG_PAGE_DASHBOARD_KPI_CONTACTS_LOST_TO_FOLLOW_UP_DESCRIPTION')
       }
     ];
 

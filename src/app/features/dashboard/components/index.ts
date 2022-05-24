@@ -1,5 +1,4 @@
 // import each component
-import { ContactsLostToFollowUpDashletComponent } from './contacts-lost-to-follow-up-dashlet/contacts-lost-to-follow-up-dashlet.component';
 import { IndependentTransmissionChainsDashletComponent } from './independent-transmission-chains-dashlet/independent-transmission-chains-dashlet.component';
 import { NumberOfActiveChainsOfTransmissionComponent } from './number-of-active-chains-of-transmission/number-of-active-chains-of-transmission.component';
 import { ContactsBecomeCasesDashletComponent } from './contacts-become-cases-dashlet/contacts-become-cases-dashlet.component';
@@ -28,7 +27,6 @@ export const components: any[] = [
   AppContactsKpiDashletComponent,
   AppKpiDashletComponent,
 
-  ContactsLostToFollowUpDashletComponent,
   IndependentTransmissionChainsDashletComponent,
   NumberOfActiveChainsOfTransmissionComponent,
   ContactsBecomeCasesDashletComponent,

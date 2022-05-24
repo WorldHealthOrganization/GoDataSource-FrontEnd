@@ -453,18 +453,6 @@
 <!--                            <div fxLayout="row wrap">-->
 <!--                                <ng-container *ngFor="let dashlet of group.dashlets">-->
 <!--                                    <ng-container *ngIf="group.permissions[dashlet] && group.permissions[dashlet].hasAccess(authUser)">-->
-<!--                                        &lt;!&ndash; Contacts Lost to follow-up &ndash;&gt;-->
-<!--                                        <app-contacts-lost-to-follow-up-dashlet-->
-<!--                                            *ngIf="dashlet === DashboardDashlet.CONTACTS_LOST_TO_FOLLOW_UP &&-->
-<!--                                                isDashletVisible(dashlet)"-->
-<!--                                            (hide)="hideDashlet(dashlet)"-->
-<!--                                            (moveBefore)="moveDashletBefore(dashlet)"-->
-<!--                                            (moveAfter)="moveDashletAfter(dashlet)"-->
-<!--                                            [globalFilterDate]="globalFilterDate"-->
-<!--                                            [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                                            [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                                        </app-contacts-lost-to-follow-up-dashlet>-->
-
 <!--                                        &lt;!&ndash; Contacts Not Seen &ndash;&gt;-->
 <!--                                        <app-contacts-not-seen-dashlet-->
 <!--                                            *ngIf="dashlet === DashboardDashlet.CONTACTS_NOT_SEEN_IN_X_DAYS &&-->
