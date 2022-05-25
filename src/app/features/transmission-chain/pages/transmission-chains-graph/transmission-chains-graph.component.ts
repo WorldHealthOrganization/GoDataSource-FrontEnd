@@ -28,8 +28,6 @@ import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 import * as _ from 'lodash';
 import { catchError, switchMap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
-import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
@@ -92,8 +90,6 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   newRelationship = new RelationshipModel();
   // new contact model
   newContact = new ContactModel();
-  // do architecture is x32?
-  x86Architecture: boolean = false;
 
   // provide constants to template
   Constants = Constants;
@@ -117,8 +113,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     private relationshipDataService: RelationshipDataService,
     private contactDataService: ContactDataService,
     private contactsOfContactsDataService: ContactsOfContactsDataService,
-    private domService: DomService,
-    private systemSettingsDataService: SystemSettingsDataService
+    private domService: DomService
   ) {}
 
   /**
@@ -169,15 +164,6 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
       .getSelectedOutbreakSubject()
       .subscribe((selectedOutbreak: OutbreakModel) => {
         this.selectedOutbreak = selectedOutbreak;
-      });
-
-    // check if platform architecture is x32
-    this.systemSettingsDataService
-      .getAPIVersion()
-      .subscribe((versionData: SystemSettingsVersionModel) => {
-        if (versionData.arch === Constants.PLATFORM_ARCH.X86) {
-          this.x86Architecture = true;
-        }
       });
   }
 
