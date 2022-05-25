@@ -12,7 +12,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Observable, throwError } from 'rxjs';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import {
-  CreateViewModifyV2ActionType,
+  CreateViewModifyV2ActionType, CreateViewModifyV2MenuType,
   CreateViewModifyV2TabInputType,
   ICreateViewModifyV2Buttons,
   ICreateViewModifyV2CreateOrUpdate,
@@ -27,6 +27,8 @@ import {
   CreateViewModifyV2ExpandColumnType
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 
 /**
  * Component
@@ -46,17 +48,19 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
     private activatedRoute: ActivatedRoute,
     private translateService: TranslateService,
     private i18nService: I18nService,
+    private dialogV2Service: DialogV2Service,
+    private router: Router,
     authDataService: AuthDataService,
     toastV2Service: ToastV2Service,
     renderer2: Renderer2,
-    router: Router
+    redirectService: RedirectService
   ) {
     super(
-      activatedRoute,
-      authDataService,
       toastV2Service,
       renderer2,
-      router,
+      redirectService,
+      activatedRoute,
+      authDataService,
       true
     );
   }
@@ -695,6 +699,26 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
         link: {
           link: () => ['/outbreak-templates']
         }
+      },
+      quickActions: {
+        options: [
+          // Record details
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_COMMON_LABEL_DETAILS',
+            action: {
+              click: () => {
+                // show record details dialog
+                this.dialogV2Service.showRecordDetailsDialog(
+                  'LNG_COMMON_LABEL_DETAILS',
+                  this.itemData,
+                  this.activatedRoute.snapshot.data.user
+                );
+              }
+            },
+            visible: () => !this.isCreate
+          }
+        ]
       }
     };
   }

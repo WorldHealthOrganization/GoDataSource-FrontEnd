@@ -20,7 +20,9 @@ import {
   QuestionnaireAnswerDisplayDataResolver
 } from '../../core/services/resolvers/data/questionnaire-answer-display.resolver';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
+import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 
+// conf
 const createViewModifyFoundation: Route = {
   component: fromPages.OutbreakTemplateCreateViewModifyComponent,
   canActivate: [AuthGuard],
@@ -30,10 +32,12 @@ const createViewModifyFoundation: Route = {
     yesNo: YesNoDataResolver,
     questionnaireAnswerType: QuestionnaireAnswerTypeDataResolver,
     questionnaireQuestionCategory: QuestionnaireQuestionCategoryDataResolver,
-    questionnaireAnswerDisplay: QuestionnaireAnswerDisplayDataResolver
+    questionnaireAnswerDisplay: QuestionnaireAnswerDisplayDataResolver,
+    user: UserDataResolver
   }
 };
 
+// routes
 const routes: Routes = [
   // outbreak templates list
   {
