@@ -1,7 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
-import * as _ from 'lodash';
-import { throwError } from 'rxjs';
-import { catchError, takeUntil } from 'rxjs/operators';
+import { takeUntil, tap } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -12,7 +10,6 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ExportDataExtension, ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 
@@ -30,8 +27,7 @@ export class ReferenceDataCategoriesListComponent
     protected listHelperService: ListHelperService,
     private referenceDataDataService: ReferenceDataDataService,
     private i18nService: I18nService,
-    private dialogV2Service: DialogV2Service,
-    private toastV2Service: ToastV2Service
+    private dialogV2Service: DialogV2Service
   ) {
     super(
       listHelperService,
@@ -255,20 +251,25 @@ export class ReferenceDataCategoriesListComponent
    * Fields retrieved from api to reduce payload size
    */
   protected refreshListFields(): string[] {
-    return [
-      'id',
-      'categoryId'
-    ];
+    return [];
   }
 
   /**
    * Re(load) the Reference Data Categories list
    */
-  refreshList() {
+  refreshList(): void {
     // load reference data
     this.records$ = this.referenceDataDataService
       .getReferenceData()
       .pipe(
+        // update page count
+        tap((entities) => {
+          this.pageCount = {
+            count: entities.length,
+            hasMore: false
+          };
+        }),
+
         // should be the last pipe
         takeUntil(this.destroyed$)
       );
@@ -277,41 +278,5 @@ export class ReferenceDataCategoriesListComponent
   /**
   * Get total number of items, based on the applied filters
   */
-  refreshListCount(applyHasMoreLimit?: boolean) {
-    // reset
-    this.pageCount = undefined;
-
-    // set apply value
-    if (applyHasMoreLimit !== undefined) {
-      this.applyHasMoreLimit = applyHasMoreLimit;
-    }
-
-    // remove paginator from query builder
-    const countQueryBuilder = _.cloneDeep(this.queryBuilder);
-    countQueryBuilder.paginator.clear();
-    countQueryBuilder.sort.clear();
-
-    // apply has more limit
-    if (this.applyHasMoreLimit) {
-      countQueryBuilder.flag(
-        'applyHasMoreLimit',
-        true
-      );
-    }
-
-    this.referenceDataDataService
-      .getReferenceDataItemsCount(countQueryBuilder)
-      .pipe(
-        catchError((err) => {
-          this.toastV2Service.error(err);
-          return throwError(err);
-        }),
-
-        // should be the last pipe
-        takeUntil(this.destroyed$)
-      )
-      .subscribe((response) => {
-        this.pageCount = response;
-      });
-  }
+  refreshListCount() {}
 }
