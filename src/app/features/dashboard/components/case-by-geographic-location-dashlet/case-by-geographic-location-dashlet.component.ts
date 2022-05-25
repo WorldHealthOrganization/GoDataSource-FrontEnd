@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
@@ -8,7 +8,7 @@ import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { Router } from '@angular/router';
 import { Constants } from '../../../../core/models/constants';
-import { Moment } from '../../../../core/helperClasses/x-moment';
+import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { PieDonutChartData } from '../../../../shared/components/pie-donut-graph/pie-donut-chart.component';
@@ -26,12 +26,12 @@ implements OnInit, OnDestroy {
   data: PieDonutChartData[] = [];
 
   // Global filters => Date
-  private _globalFilterDate: Moment;
-  @Input() set globalFilterDate(globalFilterDate: Moment) {
+  private _globalFilterDate: Moment | string;
+  @Input() set globalFilterDate(globalFilterDate: Moment | string) {
     this._globalFilterDate = globalFilterDate;
     this.refreshDataCaller.call();
   }
-  get globalFilterDate(): Moment {
+  get globalFilterDate(): Moment | string {
     return this._globalFilterDate;
   }
 
@@ -54,6 +54,9 @@ implements OnInit, OnDestroy {
   get globalFilterClassificationId(): string[] {
     return this._globalFilterClassificationId;
   }
+
+  // detect changes
+  @Output() detectChanges = new EventEmitter<void>();
 
   // outbreak
   outbreakId: string;
@@ -137,7 +140,7 @@ implements OnInit, OnDestroy {
 
     // construct redirect global filter
     const global: {
-      date?: Moment,
+      date?: Moment | string,
       locationId?: string,
       classificationId?: string[]
     } = {};
@@ -187,7 +190,7 @@ implements OnInit, OnDestroy {
       if (this.globalFilterDate) {
         qb.filter.byDateRange(
           'dateOfReporting', {
-            endDate: this.globalFilterDate.endOf('day').format()
+            endDate: moment(this.globalFilterDate).endOf('day').format()
           }
         );
       }
@@ -219,6 +222,7 @@ implements OnInit, OnDestroy {
 
       // retrieve data
       this.displayLoading = true;
+      this.detectChanges.emit();
       this.previousSubscriber = this.caseDataService
         .getCasesPerLocation(this.outbreakId, qb)
         .subscribe((locationsMetric) => {
@@ -227,6 +231,8 @@ implements OnInit, OnDestroy {
           (locationsMetric.locations || []).forEach((locationMetric) => {
             // no need to handle this one ?
             if (locationMetric.casesCount < 1) {
+              this.displayLoading = false;
+              this.detectChanges.emit();
               return;
             }
 
@@ -244,6 +250,7 @@ implements OnInit, OnDestroy {
 
           // finished
           this.displayLoading = false;
+          this.detectChanges.emit();
         });
     }
   }

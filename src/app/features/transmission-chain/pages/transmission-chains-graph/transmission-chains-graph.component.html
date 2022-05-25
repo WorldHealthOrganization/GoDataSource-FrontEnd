@@ -23,7 +23,6 @@
 
                     <button
                         *ngIf="TransmissionChainModel.canExportGraphs(authUser)"
-                        [disabled]="x86Architecture"
                         mat-menu-item
                         (click)="exportVisualizedMapOrGraph()">
                         {{ buttonText | translate}}

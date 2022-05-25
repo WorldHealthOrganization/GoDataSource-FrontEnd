@@ -70,10 +70,16 @@ export class DashboardComponent {
 
   // visible dashlets
   visibleDashlets: {
+    CaseSummary: boolean,
+    CasesPerLocation: boolean,
+    Hospitalized: boolean,
     KPICases: boolean,
     KPIContacts: boolean,
     KPICOT: boolean
   } = {
+      CaseSummary: false,
+      CasesPerLocation: false,
+      Hospitalized: false,
       KPICases: false,
       KPIContacts: false,
       KPICOT: false
@@ -93,6 +99,11 @@ export class DashboardComponent {
 
     // determine visible dashlets
     this.visibleDashlets = {
+      // Old Dashlets
+      CaseSummary: DashboardModel.canViewCaseSummaryDashlet(authUser),
+      CasesPerLocation: DashboardModel.canViewCasePerLocationLevelDashlet(authUser),
+      Hospitalized: DashboardModel.canViewCaseHospitalizedPieChartDashlet(authUser),
+
       // KPI - cases
       KPICases: DashboardModel.canViewCaseDeceasedDashlet(authUser) ||
         DashboardModel.canViewCaseHospitalizedDashlet(authUser) ||
@@ -197,227 +208,6 @@ export class DashboardComponent {
       });
   }
 
-  // interface IKpiGroup {
-//   id: DashboardKpiGroup;
-//   title: string;
-//   dashlets: DashboardDashlet[];
-//   hasAccess: (user: UserModel) => boolean;
-//   permissions: {
-//     [dashboardDashlet: string]: {
-//       hasAccess: (user: UserModel) => boolean
-//     }
-//   };
-// }
-  // kpiGroups: IKpiGroup[] = [
-  //   // Cases KPIs
-  //   {
-  //     id: DashboardKpiGroup.CASE,
-  //     title: 'LNG_PAGE_DASHBOARD_CASES_KPI_TITLE',
-  //     dashlets: [
-  //       DashboardDashlet.CASES_DECEASED,
-  //       DashboardDashlet.CASES_HOSPITALISED,
-  //       DashboardDashlet.CASES_WITH_LESS_THAN_X_CONTACTS,
-  //       DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_AMONG_KNOWN_CONTACTS,
-  //       DashboardDashlet.SUSPECT_CASES_REFUSING_TO_BE_TRANSFERRED_TO_A_TREATMENT_UNIT,
-  //       DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_OUTSIDE_THE_TRANSMISSION_CHAINS,
-  //       DashboardDashlet.SUSPECT_CASES_WITH_PENDING_LAB_RESULT,
-  //       DashboardDashlet.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS
-  //     ],
-  //     hasAccess: (user: UserModel): boolean => {
-  //       // can we check fo group permissions ?
-  //       if (
-  //         !this.kpiGroupsMap ||
-  //                   !this.kpiGroupsMap[DashboardKpiGroup.CASE]
-  //       ) {
-  //         return false;
-  //       }
-  //
-  //       // check that we have at least one group permission
-  //       const group: IKpiGroup = this.kpiGroupsMap[DashboardKpiGroup.CASE];
-  //       for (const dashletKey in group.permissions) {
-  //         if (group.permissions[dashletKey].hasAccess(user)) {
-  //           return true;
-  //         }
-  //       }
-  //
-  //       // we don't have rights in this group
-  //       return false;
-  //     },
-  //     permissions: {
-  //       [DashboardDashlet.CASES_DECEASED]: {
-  //         hasAccess: (user: UserModel): boolean => {
-  //           return DashboardModel.canViewCaseDeceasedDashlet(user);
-  //         }
-  //       },
-  //       [DashboardDashlet.CASES_HOSPITALISED]: {
-  //         hasAccess: (user: UserModel): boolean => {
-  //           return DashboardModel.canViewCaseHospitalizedDashlet(user);
-  //         }
-  //       },
-  //       [DashboardDashlet.CASES_WITH_LESS_THAN_X_CONTACTS]: {
-  //         hasAccess: (user: UserModel): boolean => {
-  //           return DashboardModel.canViewCaseWithLessThanXCotactsDashlet(user);
-  //         }
-  //       },
-  //       [DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_AMONG_KNOWN_CONTACTS]: {
-  //         hasAccess: (user: UserModel): boolean => {
-  //           return DashboardModel.canViewNewCasesInPreviousXDaysAmongKnownContactsDashlet(user);
-  //         }
-  //       },
-  //       [DashboardDashlet.SUSPECT_CASES_REFUSING_TO_BE_TRANSFERRED_TO_A_TREATMENT_UNIT]: {
-  //         hasAccess: (user: UserModel): boolean => {
-  //           return DashboardModel.canViewCasesRefusingTreatmentDashlet(user);
-  //         }
-  //       },
-  //       [DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_OUTSIDE_THE_TRANSMISSION_CHAINS]: {
-  //         hasAccess: (user: UserModel): boolean => {
-  //           return DashboardModel.canViewNewCasesFromKnownCOTDashlet(user);
-  //         }
-  //       },
-  //       [DashboardDashlet.SUSPECT_CASES_WITH_PENDING_LAB_RESULT]: {
-  //         hasAccess: (user: UserModel): boolean => {
-  //           return DashboardModel.canViewCasesWithPendingLabResultsDashlet(user);
-  //         }
-  //       },
-  //       [DashboardDashlet.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS]: {
-  //         hasAccess: (user: UserModel): boolean => {
-  //           return DashboardModel.canViewCasesNotIdentifiedThroughContactsDashlet(user);
-  //         }
-  //       }
-  //     }
-  //   },
-  //   // Contacts KPIs
-  //   {
-  //     id: DashboardKpiGroup.CONTACT,
-  //     title: 'LNG_PAGE_DASHBOARD_CONTACTS_KPI_TITLE',
-  //     dashlets: [
-  //       DashboardDashlet.CONTACTS_PER_CASE_MEAN,
-  //       DashboardDashlet.CONTACTS_PER_CASE_MEDIAN,
-  //       DashboardDashlet.CONTACTS_ON_THE_FOLLOW_UP_LIST,
-  //       DashboardDashlet.CONTACTS_LOST_TO_FOLLOW_UP,
-  //       DashboardDashlet.CONTACTS_NOT_SEEN_IN_X_DAYS,
-  //       DashboardDashlet.CONTACTS_BECOMING_CASES_IN_TIME_AND_SPACE,
-  //       DashboardDashlet.CONTACTS_SEEN_EACH_DAY,
-  //       DashboardDashlet.CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP
-  //     ],
-  //     hasAccess: (user: UserModel): boolean => {
-  //       // can we check fo group permissions ?
-  //       if (
-  //         !this.kpiGroupsMap ||
-  //                   !this.kpiGroupsMap[DashboardKpiGroup.CONTACT]
-  //       ) {
-  //         return false;
-  //       }
-  //
-  //       // check that we have at least one group permission
-  //       const group: IKpiGroup = this.kpiGroupsMap[DashboardKpiGroup.CONTACT];
-  //       for (const dashletKey in group.permissions) {
-  //         if (group.permissions[dashletKey].hasAccess(user)) {
-  //           return true;
-  //         }
-  //       }
-  //
-  //       // we don't have rights in this group
-  //       return false;
-  //     },
-  //     permissions: {
-  //       [DashboardDashlet.CONTACTS_PER_CASE_MEAN]: {
-  //         hasAccess: (user: UserModel): boolean => {
-  //           return DashboardModel.canViewContactsPerCaseMeanDashlet(user);
-  //         }
-  //       },
-  //       [DashboardDashlet.CONTACTS_PER_CASE_MEDIAN]: {
-  //         hasAccess: (user: UserModel): boolean => {
-  //           return DashboardModel.canViewContactsPerCaseMedianDashlet(user);
-  //         }
-  //       },
-  //       [DashboardDashlet.CONTACTS_ON_THE_FOLLOW_UP_LIST]: {
-  //         hasAccess: (user: UserModel): boolean => {
-  //           return DashboardModel.canViewContactsFromFollowUpsDashlet(user);
-  //         }
-  //       },
-  //       [DashboardDashlet.CONTACTS_LOST_TO_FOLLOW_UP]: {
-  //         hasAccess: (user: UserModel): boolean => {
-  //           return DashboardModel.canViewContactsLostToFollowUpsDashlet(user);
-  //         }
-  //       },
-  //       [DashboardDashlet.CONTACTS_NOT_SEEN_IN_X_DAYS]: {
-  //         hasAccess: (user: UserModel): boolean => {
-  //           return DashboardModel.canViewContactsNotSeenInXDaysDashlet(user);
-  //         }
-  //       },
-  //       [DashboardDashlet.CONTACTS_BECOMING_CASES_IN_TIME_AND_SPACE]: {
-  //         hasAccess: (user: UserModel): boolean => {
-  //           return DashboardModel.canViewContactsBecomeCasesDashlet(user);
-  //         }
-  //       },
-  //       [DashboardDashlet.CONTACTS_SEEN_EACH_DAY]: {
-  //         hasAccess: (user: UserModel): boolean => {
-  //           return DashboardModel.canViewContactsSeenDashlet(user);
-  //         }
-  //       },
-  //       [DashboardDashlet.CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP]: {
-  //         hasAccess: (user: UserModel): boolean => {
-  //           return DashboardModel.canViewContactsWithSuccessfulFollowUpsDashlet(user);
-  //         }
-  //       }
-  //     }
-  //   },
-  //   // Transmission Chains KPIs
-  //   {
-  //     id: DashboardKpiGroup.TRANSMISSION_CHAIN,
-  //     title: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_KPI_TITLE',
-  //     dashlets: [
-  //       DashboardDashlet.INDEPENDENT_TRANSMISSION_CHAINS,
-  //       DashboardDashlet.ACTIVE_TRANSMISSION_CHAINS,
-  //       DashboardDashlet.TRANSMISSION_CHAINS_FROM_CONTACTS_WHO_BECAME_CASES
-  //     ],
-  //     hasAccess: (user: UserModel): boolean => {
-  //       // can we check fo group permissions ?
-  //       if (
-  //         !this.kpiGroupsMap ||
-  //                   !this.kpiGroupsMap[DashboardKpiGroup.TRANSMISSION_CHAIN]
-  //       ) {
-  //         return false;
-  //       }
-  //
-  //       // check that we have at least one group permission
-  //       const group: IKpiGroup = this.kpiGroupsMap[DashboardKpiGroup.TRANSMISSION_CHAIN];
-  //       for (const dashletKey in group.permissions) {
-  //         if (group.permissions[dashletKey].hasAccess(user)) {
-  //           return true;
-  //         }
-  //       }
-  //
-  //       // we don't have rights in this group
-  //       return false;
-  //     },
-  //     permissions: {
-  //       [DashboardDashlet.INDEPENDENT_TRANSMISSION_CHAINS]: {
-  //         hasAccess: (user: UserModel): boolean => {
-  //           return DashboardModel.canViewIndependentCOTDashlet(user);
-  //         }
-  //       },
-  //       [DashboardDashlet.ACTIVE_TRANSMISSION_CHAINS]: {
-  //         hasAccess: (user: UserModel): boolean => {
-  //           return DashboardModel.canViewActiveCOTDashlet(user);
-  //         }
-  //       },
-  //       [DashboardDashlet.TRANSMISSION_CHAINS_FROM_CONTACTS_WHO_BECAME_CASES]: {
-  //         hasAccess: (user: UserModel): boolean => {
-  //           return DashboardModel.canViewNewChainsFromContactsWhoBecameCasesDashlet(user);
-  //         }
-  //       }
-  //     }
-  //   }
-  // ];
-  // kpiGroupsMap: {
-  //   [id: string]: IKpiGroup
-  // } = {};
-  //
-  // // authenticated user
-  // authUser: UserModel;
-  //
   // // provide constants to template
   // DashboardDashlet = DashboardDashlet;
   // DashboardModel = DashboardModel;
@@ -426,8 +216,6 @@ export class DashboardComponent {
   //
   // // flag if there aren't any outbreaks in the system
   // noOutbreaksInSystem: boolean = false;
-  // // do architecture is x32?
-  // x86Architecture: boolean = false;
   //
   // // constants
   // ExportDataExtension = ExportDataExtension;
@@ -516,15 +304,6 @@ export class DashboardComponent {
   //         this.selectedOutbreak = selectedOutbreak;
   //         this.casesByClassificationAndLocationReportUrl = `/outbreaks/${this.selectedOutbreak.id}/cases/per-classification-per-location-level-report/download/`;
   //         this.contactsFollowupSuccessRateReportUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/per-location-level-tracing-report/download/`;
-  //       }
-  //     });
-  //
-  //   // check if platform architecture is x32
-  //   this.systemSettingsDataService
-  //     .getAPIVersion()
-  //     .subscribe((versionData: SystemSettingsVersionModel) => {
-  //       if (versionData.arch === Constants.PLATFORM_ARCH.X86) {
-  //         this.x86Architecture = true;
   //       }
   //     });
   //

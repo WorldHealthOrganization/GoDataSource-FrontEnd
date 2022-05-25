@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
@@ -9,7 +9,7 @@ import { Subscriber, Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { Constants } from '../../../../core/models/constants';
 import { Router } from '@angular/router';
-import { Moment } from '../../../../core/helperClasses/x-moment';
+import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { CaseModel } from '../../../../core/models/case.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
@@ -23,17 +23,16 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 })
 export class CaseSummaryDashletComponent
 implements OnInit, OnDestroy {
-
   // data
   data: PieDonutChartData[] = [];
 
   // Global filters => Date
-  private _globalFilterDate: Moment;
-  @Input() set globalFilterDate(globalFilterDate: Moment) {
+  private _globalFilterDate: Moment | string;
+  @Input() set globalFilterDate(globalFilterDate: Moment | string) {
     this._globalFilterDate = globalFilterDate;
     this.refreshDataCaller.call();
   }
-  get globalFilterDate(): Moment {
+  get globalFilterDate(): Moment | string {
     return this._globalFilterDate;
   }
 
@@ -56,6 +55,9 @@ implements OnInit, OnDestroy {
   get globalFilterClassificationId(): string[] {
     return this._globalFilterClassificationId;
   }
+
+  // detect changes
+  @Output() detectChanges = new EventEmitter<void>();
 
   // outbreak
   outbreakId: string;
@@ -148,7 +150,7 @@ implements OnInit, OnDestroy {
 
     // construct redirect global filter
     const global: {
-      date?: Moment,
+      date?: Moment | string,
       locationId?: string
     } = {};
 
@@ -192,7 +194,7 @@ implements OnInit, OnDestroy {
       if (this.globalFilterDate) {
         qb.filter.byDateRange(
           'dateOfReporting', {
-            endDate: this.globalFilterDate.endOf('day').format()
+            endDate: moment(this.globalFilterDate).endOf('day').format()
           }
         );
       }
@@ -224,6 +226,7 @@ implements OnInit, OnDestroy {
 
       // retrieve data
       this.displayLoading = true;
+      this.detectChanges.emit();
       this.previousSubscriber = this.caseDataService
         .getCasesGroupedByClassification(this.outbreakId, qb)
         .subscribe((groupedCases) => {
@@ -231,7 +234,7 @@ implements OnInit, OnDestroy {
           this.data = [];
           if (
             groupedCases &&
-                        groupedCases.classification
+            groupedCases.classification
           ) {
             _.each(
               groupedCases.classification,
@@ -255,6 +258,7 @@ implements OnInit, OnDestroy {
           if (this.data.length < 1) {
             // finished
             this.displayLoading = false;
+            this.detectChanges.emit();
             return;
           }
 
@@ -285,6 +289,7 @@ implements OnInit, OnDestroy {
 
               // finished
               this.displayLoading = false;
+              this.detectChanges.emit();
             });
         });
     }
