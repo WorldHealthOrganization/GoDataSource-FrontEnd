@@ -151,7 +151,7 @@ export class ContactRangeFollowUpsListComponent
     this.teamsList$ = this.teamDataService.getTeamsList().pipe(share());
 
     // add page title
-    this.exportRangeFollowUpsFileName = this.i18nService.instant('LNG_PAGE_LIST_RANGE_FOLLOW_UPS_TITLE') +
+    this.exportRangeFollowUpsFileName = this.i18nService.instant('LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL') +
             ' - ' +
             moment().format('YYYY-MM-DD');
 
@@ -294,7 +294,7 @@ export class ContactRangeFollowUpsListComponent
     //   // current page breadcrumb
     //   this.breadcrumbs.push(
     //     new BreadcrumbItemModel(
-    //       'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_TITLE',
+    //       'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL',
     //       '.',
     //       true
     //     )
