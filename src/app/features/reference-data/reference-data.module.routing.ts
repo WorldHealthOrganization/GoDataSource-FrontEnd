@@ -6,6 +6,7 @@ import { PERMISSION } from '../../core/models/permission.model';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
+import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 
 const routes: Routes = [
   // Reference Data Categories List
@@ -31,6 +32,10 @@ const routes: Routes = [
       permissions: [
         PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_LIST
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      user: UserDataResolver
     }
   },
   // Create new Reference Data entry
