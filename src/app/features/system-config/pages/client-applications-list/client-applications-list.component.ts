@@ -73,7 +73,8 @@ export class ClientApplicationsListComponent
     this.tableColumns = [
       {
         field: 'name',
-        label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_NAME'
+        label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_NAME',
+        pinned: IV2ColumnPinned.LEFT
       },
       // TODO: Needs show/hide feature
       {
@@ -89,7 +90,7 @@ export class ClientApplicationsListComponent
       }
     ];
 
-    // // outbreaks
+    // outbreaks
     if (OutbreakModel.canList(this.authUser)) {
       this.tableColumns.push(
         {
@@ -135,8 +136,7 @@ export class ClientApplicationsListComponent
           // Download client application config file
           {
             type: V2ActionType.ICON,
-            // TODO: Icon doesn't look right
-            icon: 'fileCopy',
+            icon: 'file_download',
             iconTooltip: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE',
             action: {
               click: (item: SystemClientApplicationModel) => {
@@ -151,8 +151,7 @@ export class ClientApplicationsListComponent
           // Disable client application
           {
             type: V2ActionType.ICON,
-            // TODO: Icon doesn't look right
-            icon: 'visibilityOf',
+            icon: 'visibility_off',
             iconTooltip: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DISABLE',
             action: {
               click: (item: SystemClientApplicationModel) => {
