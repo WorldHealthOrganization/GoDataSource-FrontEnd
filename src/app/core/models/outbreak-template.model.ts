@@ -6,13 +6,15 @@ import { PERMISSION } from './permission.model';
 import { Constants } from './constants';
 import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { BaseModel } from './base.model';
 
 export class OutbreakTemplateModel
-implements
-        IPermissionBasic,
-        IPermissionQuestionnaire,
-        IPermissionOutbreakTemplate,
-        IPermissionCloneable {
+  extends BaseModel
+  implements
+    IPermissionBasic,
+    IPermissionQuestionnaire,
+    IPermissionOutbreakTemplate,
+    IPermissionCloneable {
   id: string;
   name: string;
   description: string;
@@ -136,6 +138,8 @@ implements
      * Constructor
      */
   constructor(data = null) {
+    super(data);
+
     this.id = _.get(data, 'id');
     this.name = _.get(data, 'name');
     this.description = _.get(data, 'description');
