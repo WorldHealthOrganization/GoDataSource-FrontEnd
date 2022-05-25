@@ -112,11 +112,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     redirectService: RedirectService
   ) {
     super(
-      activatedRoute,
-      authDataService,
       toastV2Service,
       renderer2,
-      redirectService
+      redirectService,
+      activatedRoute,
+      authDataService
     );
 
     // do we need to use custom id ?

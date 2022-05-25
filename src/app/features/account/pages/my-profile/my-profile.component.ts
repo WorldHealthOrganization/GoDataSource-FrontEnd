@@ -38,11 +38,11 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
     redirectService: RedirectService
   ) {
     super(
-      activatedRoute,
-      authDataService,
       toastV2Service,
       renderer2,
-      redirectService
+      redirectService,
+      activatedRoute,
+      authDataService
     );
   }
 

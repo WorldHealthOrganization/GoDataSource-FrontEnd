@@ -38,11 +38,11 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
   ) {
     // parent
     super(
-      activatedRoute,
-      authDataService,
       toastV2Service,
       renderer2,
-      redirectService
+      redirectService,
+      activatedRoute,
+      authDataService
     );
 
     // display you must change password ?

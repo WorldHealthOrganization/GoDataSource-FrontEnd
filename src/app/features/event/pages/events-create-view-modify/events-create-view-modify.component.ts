@@ -56,11 +56,11 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
     redirectService: RedirectService
   ) {
     super(
-      activatedRoute,
-      authDataService,
       toastV2Service,
       renderer2,
-      redirectService
+      redirectService,
+      activatedRoute,
+      authDataService
     );
   }
 

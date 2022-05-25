@@ -66,11 +66,11 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     redirectService: RedirectService
   ) {
     super(
-      activatedRoute,
-      authDataService,
       toastV2Service,
       renderer2,
       redirectService,
+      activatedRoute,
+      authDataService,
       true
     );
   }

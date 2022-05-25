@@ -39,11 +39,11 @@ export class SetSecurityQuestionsComponent extends CreateViewModifyComponent<Use
   ) {
     // parent
     super(
-      activatedRoute,
-      authDataService,
       toastV2Service,
       renderer2,
-      redirectService
+      redirectService,
+      activatedRoute,
+      authDataService
     );
   }
 
