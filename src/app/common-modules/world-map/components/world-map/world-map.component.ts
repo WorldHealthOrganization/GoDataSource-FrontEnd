@@ -36,6 +36,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { applyStyle } from 'ol-mapbox-style';
 import RenderFeature from 'ol/render/Feature';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { AuthenticatedComponent } from '../../../../core/components/authenticated/authenticated.component';
 
 /**
  * Point used for rendering purposes
@@ -81,8 +82,8 @@ export class WorldMapMarker {
   data: any;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(data: {
     // required
     point: WorldMapPoint,
@@ -527,14 +528,17 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Component destroyed
-     */
+   * Component destroyed
+   */
   ngOnDestroy() {
     // outbreak subscriber
     if (this.outbreakSubscriber) {
       this.outbreakSubscriber.unsubscribe();
       this.outbreakSubscriber = null;
     }
+
+    // not full screen anymore
+    AuthenticatedComponent.FULL_SCREEN = false;
   }
 
   /**
@@ -1317,14 +1321,17 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Trigger map update and full screen toggle
-     */
+   * Trigger map update and full screen toggle
+   */
   fullScreenToggleTrigger() {
     // update map size
     this.updateMapSize();
 
     // emit value to parent component
     this.fullScreenToggle.emit(this.fullScreenMode);
+
+    // toggle full screen class
+    AuthenticatedComponent.FULL_SCREEN = this.fullScreenMode;
   }
 
   /**
