@@ -8,7 +8,7 @@ import { moment } from '../../../core/helperClasses/x-moment';
   selector: 'app-chronology',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './chronology.component.html',
-  styleUrls: ['./chronology.component.less']
+  styleUrls: ['./chronology.component.scss']
 })
 export class ChronologyComponent {
   private _entries: ChronologyItem[] = [];
