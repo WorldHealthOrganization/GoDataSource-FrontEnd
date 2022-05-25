@@ -78,8 +78,13 @@ export class ClientApplicationsListComponent
       },
       // TODO: Needs show/hide feature
       {
-        field: 'credentials.clientSecret',
-        label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CREDENTIALS'
+        field: 'credentials',
+        label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CREDENTIALS',
+        format: {
+          type: (item: SystemClientApplicationModel) => {
+            return `${item.credentials.clientId}/${item.credentials.clientSecret}`;
+          }
+        }
       },
       {
         field: 'active',
