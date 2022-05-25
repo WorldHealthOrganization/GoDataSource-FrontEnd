@@ -7,9 +7,10 @@
     <div
         *ngIf="loadingData; else dataLoaded"
         fxFlex fxLayoutAlign="center center">
-        <mat-spinner
-            [diameter]="32">
-        </mat-spinner>
+        <mat-progress-spinner
+          mode="indeterminate"
+          [diameter]="32">
+        </mat-progress-spinner>
     </div>
 
     <!-- Data loaded -->
