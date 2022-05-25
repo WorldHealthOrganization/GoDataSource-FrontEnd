@@ -1,14 +1,12 @@
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Observable, throwError } from 'rxjs';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import {
@@ -29,6 +27,7 @@ import {
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { QuestionModel } from '../../../../core/models/question.model';
 
 /**
  * Component
@@ -38,12 +37,10 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
   templateUrl: './outbreak-template-create-view-modify.component.html'
 })
 export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyComponent<OutbreakTemplateModel> implements OnDestroy {
-
   /**
    * Constructor
    */
   constructor(
-    private outbreakDataService: OutbreakDataService,
     private outbreakTemplateDataService: OutbreakTemplateDataService,
     private activatedRoute: ActivatedRoute,
     private translateService: TranslateService,
@@ -71,28 +68,6 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
   ngOnDestroy(): void {
     // parent
     super.onDestroy();
-  }
-
-  /**
-   * Refresh expand list
-   */
-  refreshExpandList(data): void {
-    // append / remove search
-    if (data.searchBy) {
-      data.queryBuilder.filter.where({
-        name: RequestFilterGenerator.textContains(
-          data.searchBy
-        )
-      });
-    }
-
-    // retrieve data
-    this.expandListRecords$ = this.outbreakTemplateDataService
-      .getOutbreakTemplatesList(data.queryBuilder)
-      .pipe(
-        // should be the last pipe
-        takeUntil(this.destroyed$)
-      );
   }
 
   /**
@@ -158,7 +133,7 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
     ];
 
     // case list page
-    if (OutbreakModel.canList(this.authUser)) {
+    if (OutbreakTemplateModel.canList(this.authUser)) {
       this.breadcrumbs.push({
         label: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE',
         action: {
@@ -205,11 +180,11 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
         // Details
         this.initializeTabsDetails(),
 
+        // Questionnaires
         this.initializeTabsQuestionnaireCase(),
         this.initializeTabsQuestionnaireContact(),
-        this.initializeTabsFollowUpForm(),
-        this.initializeTabsLabResultsForm()
-
+        this.initializeTabsQuestionnaireFollowUp(),
+        this.initializeTabsQuestionnaireLabResult()
       ],
 
       // create details
@@ -237,40 +212,6 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
         ]);
       }
     };
-  }
-
-  /**
-   * Initialize expand list column renderer fields
-   */
-  protected initializeExpandListColumnRenderer(): void {
-    this.expandListColumnRenderer = {
-      type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: OutbreakTemplateModel) => item.name,
-      link: (item: OutbreakTemplateModel) => ['/outbreak-templates', item.id, 'view']
-    };
-  }
-
-  /**
-   * Initialize expand list query fields
-   */
-  protected initializeExpandListQueryFields(): void {
-    this.expandListQueryFields = [
-      'id',
-      'name'
-    ];
-  }
-
-  /**
-   * Initialize expand list advanced filters
-   */
-  protected initializeExpandListAdvancedFilters(): void {
-    this.expandListAdvancedFilters = OutbreakTemplateModel.generateAdvancedFilters({
-      options: {
-        disease: (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        followUpGenerationTeamAssignmentAlgorithm: (this.activatedRoute.snapshot.data.followUpGenerationTeamAssignmentAlgorithm as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
-      }
-    });
   }
 
   /**
@@ -304,8 +245,8 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
               validators: {
                 required: () => true,
                 async: new Observable((observer) => {
-                  this.outbreakDataService
-                    .checkOutbreakNameUniquenessValidity(
+                  this.outbreakTemplateDataService
+                    .checkOutbreakTemplateNameUniquenessValidity(
                       this.itemData.name,
                       this.isCreate ?
                         undefined :
@@ -349,12 +290,56 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
                   this.itemData.description = value;
                 }
               }
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'applyGeographicRestrictions',
+              placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_APPLY_GEOGRAPHIC_RESTRICTIONS',
+              description: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_APPLY_GEOGRAPHIC_RESTRICTIONS_DESCRIPTION',
+              value: {
+                get: () => this.itemData.applyGeographicRestrictions,
+                set: (value) => {
+                  this.itemData.applyGeographicRestrictions = value;
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'isContactLabResultsActive',
+              placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_LAB_RESULTS_ACTIVE',
+              description: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_LAB_RESULTS_ACTIVE_DESCRIPTION',
+              value: {
+                get: () => this.itemData.isContactLabResultsActive,
+                set: (value) => {
+                  this.itemData.isContactLabResultsActive = value;
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'isDateOfOnsetRequired',
+              placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED',
+              description: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED_DESCRIPTION',
+              value: {
+                get: () => this.itemData.isDateOfOnsetRequired,
+                set: (value) => {
+                  this.itemData.isDateOfOnsetRequired = value;
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'isContactsOfContactsActive',
+              placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_OF_CONTACT_ACTIVE',
+              description: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_OF_CONTACT_ACTIVE_DESCRIPTION',
+              value: {
+                get: () => this.itemData.isContactsOfContactsActive,
+                set: (value) => {
+                  this.itemData.isContactsOfContactsActive = value;
+                }
+              }
             }
           ]
         },
         {
           type: CreateViewModifyV2TabInputType.SECTION,
-          label: '',
+          label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOW_UP',
           inputs: [
             {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
@@ -394,24 +379,6 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
                 }
               }
             }, {
-              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-              name: 'applyGeographicRestrictions',
-              placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_APPLY_GEOGRAPHIC_RESTRICTIONS',
-              description: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_APPLY_GEOGRAPHIC_RESTRICTIONS_DESCRIPTION',
-              value: {
-                get: () => this.itemData.applyGeographicRestrictions,
-                set: (value) => {
-                  this.itemData.applyGeographicRestrictions = value;
-                }
-              }
-            }
-          ]
-        },
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: '',
-          inputs: [
-            {
               type: CreateViewModifyV2TabInputType.NUMBER,
               name: 'periodOfFollowup',
               placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DURATION_FOLLOWUP_DAYS',
@@ -457,6 +424,24 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
                 })
               }
             }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'generateFollowUpsDateOfLastContact',
+              placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT',
+              description: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT_DESCRIPTION',
+              value: {
+                get: () => this.itemData.generateFollowUpsDateOfLastContact,
+                set: (value) => {
+                  this.itemData.generateFollowUpsDateOfLastContact = value;
+                }
+              }
+            }
+          ]
+        },
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_REPORT',
+          inputs: [
+            {
               type: CreateViewModifyV2TabInputType.NUMBER,
               name: 'noDaysAmongContacts',
               placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DAYS_AMONG_KNOWN_CONTACTS',
@@ -537,39 +522,6 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
                   this.itemData.noDaysNewContacts = value;
                 }
               }
-            }, {
-              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-              name: 'isContactLabResultsActive',
-              placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_LAB_RESULTS_ACTIVE',
-              description: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_LAB_RESULTS_ACTIVE_DESCRIPTION',
-              value: {
-                get: () => this.itemData.isContactLabResultsActive,
-                set: (value) => {
-                  this.itemData.isContactLabResultsActive = value;
-                }
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-              name: 'isDateOfOnsetRequired',
-              placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED',
-              description: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED_DESCRIPTION',
-              value: {
-                get: () => this.itemData.isDateOfOnsetRequired,
-                set: (value) => {
-                  this.itemData.isDateOfOnsetRequired = value;
-                }
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-              name: 'isContactsOfContactsActive',
-              placeholder: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_OF_CONTACT_ACTIVE',
-              description: () => 'LNG_OUTBREAK_TEMPLATE_FIELD_IS_CONTACT_OF_CONTACT_ACTIVE_DESCRIPTION',
-              value: {
-                get: () => this.itemData.isContactsOfContactsActive,
-                set: (value) => {
-                  this.itemData.isContactsOfContactsActive = value;
-                }
-              }
             }
           ]
         }
@@ -596,7 +548,7 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
       },
       visible: () => this.isView ?
         true :
-        OutbreakModel.canModifyCaseQuestionnaire(this.authUser)
+        OutbreakTemplateModel.canModifyCaseQuestionnaire(this.authUser)
     };
   }
 
@@ -626,7 +578,7 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
   /**
    * Initialize tabs - Follow Up Questionnaire
    */
-  private initializeTabsFollowUpForm(): ICreateViewModifyV2TabTable {
+  private initializeTabsQuestionnaireFollowUp(): ICreateViewModifyV2TabTable {
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       label: 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE',
@@ -649,7 +601,7 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
   /**
    * Initialize tabs - Lab Results Questionnaire
    */
-  private initializeTabsLabResultsForm(): ICreateViewModifyV2TabTable {
+  private initializeTabsQuestionnaireLabResult(): ICreateViewModifyV2TabTable {
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       label: 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE',
@@ -733,6 +685,30 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
       finished
     ) => {
 
+      // sanitize questionnaire - case
+      // - remove fields used by ui (e.g. collapsed...)
+      if (data.caseInvestigationTemplate) {
+        data.caseInvestigationTemplate = (data.caseInvestigationTemplate || []).map((question) => new QuestionModel(question));
+      }
+
+      // sanitize questionnaire - contact
+      // - remove fields used by ui (e.g. collapsed...)
+      if (data.contactInvestigationTemplate) {
+        data.contactInvestigationTemplate = (data.contactInvestigationTemplate || []).map((question) => new QuestionModel(question));
+      }
+
+      // sanitize questionnaire - follow-up
+      // - remove fields used by ui (e.g. collapsed...)
+      if (data.contactFollowUpTemplate) {
+        data.contactFollowUpTemplate = (data.contactFollowUpTemplate || []).map((question) => new QuestionModel(question));
+      }
+
+      // sanitize questionnaire - lab result
+      // - remove fields used by ui (e.g. collapsed...)
+      if (data.labResultsTemplate) {
+        data.labResultsTemplate = (data.labResultsTemplate || []).map((question) => new QuestionModel(question));
+      }
+
       // create / modify
       (
         type === CreateViewModifyV2ActionType.CREATE ?
@@ -750,13 +726,6 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
           return throwError(err);
         })
       ).subscribe((outbreakTemplate) => {
-        // display message
-        this.toastV2Service.success(
-          type === CreateViewModifyV2ActionType.CREATE ?
-            'LNG_PAGE_CREATE_OUTBREAK_TEMPLATES_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON' :
-            'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE'
-        );
-
         // no need to update language ?
         if (
           !data.caseInvestigationTemplate &&
@@ -764,6 +733,13 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
           !data.contactFollowUpTemplate &&
           !data.labResultsTemplate
         ) {
+          // display message
+          this.toastV2Service.success(
+            type === CreateViewModifyV2ActionType.CREATE ?
+              'LNG_PAGE_CREATE_OUTBREAK_TEMPLATES_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON' :
+              'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE'
+          );
+
           // hide loading & redirect
           finished(undefined, outbreakTemplate);
 
@@ -786,10 +762,73 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
             })
           )
           .subscribe(() => {
+            // display message
+            this.toastV2Service.success(
+              type === CreateViewModifyV2ActionType.CREATE ?
+                'LNG_PAGE_CREATE_OUTBREAK_TEMPLATES_ACTION_CREATE_OUTBREAK_SUCCESS_MESSAGE_BUTTON' :
+                'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_MODIFY_OUTBREAK_SUCCESS_MESSAGE'
+            );
+
             // hide loading & redirect
             finished(undefined, outbreakTemplate);
           });
       });
     };
+  }
+
+  /**
+   * Initialize expand list column renderer fields
+   */
+  protected initializeExpandListColumnRenderer(): void {
+    this.expandListColumnRenderer = {
+      type: CreateViewModifyV2ExpandColumnType.TEXT,
+      get: (item: OutbreakTemplateModel) => item.name,
+      link: (item: OutbreakTemplateModel) => ['/outbreak-templates', item.id, 'view']
+    };
+  }
+
+  /**
+   * Initialize expand list query fields
+   */
+  protected initializeExpandListQueryFields(): void {
+    this.expandListQueryFields = [
+      'id',
+      'name'
+    ];
+  }
+
+  /**
+   * Initialize expand list advanced filters
+   */
+  protected initializeExpandListAdvancedFilters(): void {
+    this.expandListAdvancedFilters = OutbreakTemplateModel.generateAdvancedFilters({
+      options: {
+        disease: (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        followUpGenerationTeamAssignmentAlgorithm: (this.activatedRoute.snapshot.data.followUpGenerationTeamAssignmentAlgorithm as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
+      }
+    });
+  }
+
+  /**
+   * Refresh expand list
+   */
+  refreshExpandList(data): void {
+    // append / remove search
+    if (data.searchBy) {
+      data.queryBuilder.filter.where({
+        name: RequestFilterGenerator.textContains(
+          data.searchBy
+        )
+      });
+    }
+
+    // retrieve data
+    this.expandListRecords$ = this.outbreakTemplateDataService
+      .getOutbreakTemplatesList(data.queryBuilder)
+      .pipe(
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
   }
 }
