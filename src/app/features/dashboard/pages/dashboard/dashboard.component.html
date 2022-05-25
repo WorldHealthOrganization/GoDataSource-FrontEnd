@@ -8,7 +8,8 @@
     <!-- Breadcrumbs -->
     <app-breadcrumb-v2
       *ngIf="breadcrumbs"
-      [breadcrumbs]="breadcrumbs"></app-breadcrumb-v2>
+      [breadcrumbs]="breadcrumbs"
+      (detectChanges)="detectChanges()"></app-breadcrumb-v2>
 
     <!-- Title & buttons -->
     <div
