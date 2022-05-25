@@ -701,7 +701,9 @@ export class AppFormEditQuestionnaireV2Component
     if (!this.viewOnly) {
       bottomButtons.push({
         type: IV2SideDialogConfigButtonType.OTHER,
-        label: 'LNG_COMMON_BUTTON_CHANGE',
+        label: modifyQuestion ?
+          'LNG_COMMON_BUTTON_UPDATE' :
+          'LNG_COMMON_BUTTON_ADD',
         color: 'primary',
         key: 'apply',
         disabled: (_data, handler): boolean => {
@@ -1017,7 +1019,9 @@ export class AppFormEditQuestionnaireV2Component
     if (!this.viewOnly) {
       bottomButtons.push({
         type: IV2SideDialogConfigButtonType.OTHER,
-        label: 'LNG_COMMON_BUTTON_CHANGE',
+        label: modifyAnswer ?
+          'LNG_COMMON_BUTTON_UPDATE' :
+          'LNG_COMMON_BUTTON_ADD',
         color: 'primary',
         key: 'apply',
         disabled: (_data, handler): boolean => {

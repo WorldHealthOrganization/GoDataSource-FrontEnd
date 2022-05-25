@@ -104,6 +104,7 @@
               [name]="input.name"
               [placeholder]="input.placeholder"
               [tooltip]="input.tooltip"
+              autocomplete="off"
               [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
               [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
               app-general-async-validator
@@ -149,6 +150,7 @@
               [name]="input.name"
               [placeholder]="input.placeholder"
               [tooltip]="input.tooltip"
+              autocomplete="off"
               [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
               [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
               (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-date-v2>
@@ -161,6 +163,7 @@
               [name]="input.name"
               [placeholder]="input.placeholder"
               [tooltip]="input.tooltip"
+              autocomplete="off"
               [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
               [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
               (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-number-v2>

@@ -16,7 +16,7 @@ import {
   IV2ColumnBasicFormat,
   IV2ColumnButton,
   IV2ColumnColor,
-  IV2ColumnIconMaterial,
+  IV2ColumnIconMaterial, IV2ColumnIconURL,
   IV2ColumnLinkList,
   IV2ColumnPinned,
   IV2ColumnStatus,
@@ -55,6 +55,7 @@ import { SavedFilterData } from '../../../core/models/saved-filters.model';
 import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model';
 import { IV2ProcessSelectedData } from './models/process-data.model';
 import { HighlightSearchPipe } from '../../pipes/highlight-search/highlight-search';
+import { AppListTableV2ObfuscateComponent } from './components/obfuscate/app-list-table-v2-obfuscate.component';
 
 /**
  * Component
@@ -69,6 +70,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   // static
   private static readonly STANDARD_COLUMN_MAX_DEFAULT_WIDTH: number = 400;
   private static readonly STANDARD_SELECT_COLUMN_WIDTH: number = 42;
+  private static readonly STANDARD_OBFUSCATED_COLUMN_WIDTH: number = 400;
   private static readonly STANDARD_SHAPE_SIZE: number = 12;
   private static readonly STANDARD_SHAPE_GAP: number = 6;
   private static readonly STANDARD_SHAPE_PADDING: number = 14;
@@ -938,6 +940,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
           // COLOR & ICON
           case V2ColumnFormat.COLOR:
+          case V2ColumnFormat.ICON_URL:
           case V2ColumnFormat.ICON_MATERIAL:
             return fieldValue;
 
@@ -1026,8 +1029,13 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    * Custom renderer
    */
   private handleCellRenderer(column: IV2Column): any {
-    // link ?
+    // obfuscate ?
     const basicColumn: IV2ColumnBasic = column as IV2ColumnBasic;
+    if (basicColumn.format?.obfuscated) {
+      return AppListTableV2ObfuscateComponent;
+    }
+
+    // link ?
     if (basicColumn.link) {
       return (params: ValueFormatterParams) => {
         // determine value
@@ -1068,11 +1076,28 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         };
       }
 
-      // icon ?
-      const iconColumn: IV2ColumnIconMaterial = column as IV2ColumnIconMaterial;
+      // URL icon ?
+      const URLIconColumn: IV2ColumnIconURL = column as IV2ColumnIconURL;
       if (
-        iconColumn.format &&
-        iconColumn.format.type === V2ColumnFormat.ICON_MATERIAL
+        URLIconColumn.format &&
+        URLIconColumn.format.type === V2ColumnFormat.ICON_URL
+      ) {
+        return (params: ValueFormatterParams) => {
+          // determine value
+          const value: string = this.formatValue(params);
+
+          // create color display
+          return value ?
+            `<img class="gd-list-table-icon-url" src="${value}" alt="${URLIconColumn.noIconLabel}" />` :
+            this.translateService.instant(URLIconColumn.noIconLabel);
+        };
+      }
+
+      // material icon ?
+      const materialIconColumn: IV2ColumnIconMaterial = column as IV2ColumnIconMaterial;
+      if (
+        materialIconColumn.format &&
+        materialIconColumn.format.type === V2ColumnFormat.ICON_MATERIAL
       ) {
         return (params: ValueFormatterParams) => {
           // determine value
@@ -1081,7 +1106,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           // create color display
           return value ?
             `<span class="gd-list-table-icon-material"><span class="material-icons">${value}</span></span>` :
-            this.translateService.instant(iconColumn.noIconLabel);
+            this.translateService.instant(materialIconColumn.noIconLabel);
         };
       }
 
@@ -1236,6 +1261,11 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         this._agTable.columnApi.setColumnWidth(
           column,
           AppListTableV2Component.STANDARD_SELECT_COLUMN_WIDTH
+        );
+      } else if ((colDef.columnDefinition as IV2ColumnBasic).format?.obfuscated) {
+        this._agTable.columnApi.setColumnWidth(
+          column,
+          AppListTableV2Component.STANDARD_OBFUSCATED_COLUMN_WIDTH
         );
       }
     });

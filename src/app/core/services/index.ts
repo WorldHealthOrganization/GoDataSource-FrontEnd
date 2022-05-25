@@ -117,6 +117,7 @@ import { SyncPackageExportTypeDataResolver } from './resolvers/data/sync-package
 import { SyncPackageStatusDataResolver } from './resolvers/data/sync-package-status.resolver';
 import { SavedImportMappingDataResolver } from './resolvers/data/saved-import-mapping.resolver';
 import { GanttChartTypeDataResolver } from './resolvers/data/gantt-chart-type.resolver';
+import { ReferenceDataCategoryDataResolver } from './resolvers/data/reference-data-category.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -166,6 +167,7 @@ export const services: any[] = [
   QuestionnaireAnswerDisplayDataResolver,
   QuestionnaireAnswerTypeDataResolver,
   QuestionnaireQuestionCategoryDataResolver,
+  ReferenceDataCategoryDataResolver,
   RelationshipPersonDataResolver,
   RiskDataResolver,
   SavedImportMappingDataResolver,

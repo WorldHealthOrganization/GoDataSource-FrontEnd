@@ -29,6 +29,7 @@ export interface IV2ColumnBasicFormat extends IV2ColumnBasicFormatType {
   // optional
   field?: string;
   value?: (item: any) => any;
+  obfuscated?: boolean;
 }
 
 /**
@@ -64,6 +65,7 @@ export enum V2ColumnFormat {
   ACTIONS,
   STATUS,
   COLOR,
+  ICON_URL,
   ICON_MATERIAL,
   LINK_LIST
 }
@@ -126,7 +128,18 @@ export interface IV2ColumnColor extends Omit<IV2ColumnBasic, 'format' | 'highlig
 }
 
 /**
- * Color material icon
+ * URL icon
+ */
+export interface IV2ColumnIconURL extends Omit<IV2ColumnBasic, 'format' | 'highlight'> {
+  // required
+  format: Omit<IV2ColumnBasicFormat, 'type'> & {
+    type: V2ColumnFormat.ICON_URL
+  };
+  noIconLabel: string;
+}
+
+/**
+ * Material icon
  */
 export interface IV2ColumnIconMaterial extends Omit<IV2ColumnBasic, 'format' | 'highlight'> {
   // required
@@ -281,8 +294,8 @@ export interface IV2ColumnLinkList {
 /**
  * Column
  */
-export type IV2Column = IV2ColumnBasic | IV2ColumnButton | IV2ColumnAge | IV2ColumnDate | IV2ColumnDatetime | IV2ColumnBoolean | IV2ColumnColor | IV2ColumnIconMaterial
-| IV2ColumnAction | IV2ColumnStatus | IV2ColumnLinkList;
+export type IV2Column = IV2ColumnBasic | IV2ColumnButton | IV2ColumnAge | IV2ColumnDate | IV2ColumnDatetime | IV2ColumnBoolean | IV2ColumnColor
+| IV2ColumnIconURL | IV2ColumnIconMaterial | IV2ColumnAction | IV2ColumnStatus | IV2ColumnLinkList;
 
 /**
  * Filter handler

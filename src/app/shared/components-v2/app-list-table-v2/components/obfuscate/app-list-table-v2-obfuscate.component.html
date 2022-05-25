@@ -1,0 +1,22 @@
+<div
+  class="gd-list-table-cell-obfuscate"
+  fxLayout="row">
+
+  <!-- Value -->
+  <div
+    fxFlex>
+    {{notObfuscated ? value : '***'}}
+  </div>
+
+  <!-- Hide / Show -->
+  <div
+    fxGrow="0">
+    <button
+      type="button"
+      mat-icon-button
+      (click)="notObfuscated = !notObfuscated">
+      <mat-icon>{{notObfuscated ? 'visibility_off' : 'visibility'}}</mat-icon>
+    </button>
+  </div>
+
+</div>

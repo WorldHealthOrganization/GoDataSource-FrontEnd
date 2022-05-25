@@ -55,6 +55,7 @@ import { ClusterModel } from '../../../../core/models/cluster.model';
 import { EntityLabResultService } from '../../../../core/services/helper/entity-lab-result-helper.service';
 import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
 import { TeamModel } from '../../../../core/models/team.model';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
 
 /**
  * Component
@@ -107,14 +108,15 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     protected entityLabResultService: EntityLabResultService,
     protected entityFollowUpHelperService: EntityFollowUpHelperService,
     authDataService: AuthDataService,
-    renderer2: Renderer2
+    renderer2: Renderer2,
+    redirectService: RedirectService
   ) {
     super(
-      activatedRoute,
-      authDataService,
       toastV2Service,
       renderer2,
-      router
+      redirectService,
+      activatedRoute,
+      authDataService
     );
 
     // do we need to use custom id ?

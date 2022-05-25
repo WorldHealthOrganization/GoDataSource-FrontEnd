@@ -3,7 +3,7 @@ import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/mode
 import { OutbreakModel } from '../models/outbreak.model';
 import { UserModel } from '../models/user.model';
 import { ICreateViewModifyV2 } from '../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { Directive, Renderer2 } from '@angular/core';
 import { TopnavComponent } from '../components/topnav/topnav.component';
 import { AuthDataService } from '../services/data/auth.data.service';
@@ -15,6 +15,7 @@ import { Constants } from '../models/constants';
 import { V2AdvancedFilter } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { CreateViewModifyV2ExpandColumn } from '../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { ICreateViewModifyV2Refresh } from '../../shared/components-v2/app-create-view-modify-v2/models/refresh.model';
+import { RedirectService } from '../services/helper/redirect.service';
 
 @Directive()
 export abstract class CreateViewModifyComponent<T>
@@ -90,11 +91,11 @@ export abstract class CreateViewModifyComponent<T>
    * Constructor
    */
   protected constructor(
-    activatedRoute: ActivatedRoute,
-    authDataService: AuthDataService,
     protected toastV2Service: ToastV2Service,
     protected renderer2: Renderer2,
-    protected router: Router,
+    protected redirectService: RedirectService,
+    activatedRoute: ActivatedRoute,
+    authDataService: AuthDataService,
     dontDisableOutbreakSelect?: boolean
   ) {
     // initialize parent
@@ -256,7 +257,7 @@ export abstract class CreateViewModifyComponent<T>
         event.stopImmediatePropagation();
 
         // redirect
-        this.router.navigate([event.target.parentElement.getAttribute('href')]);
+        this.redirectService.to([event.target.parentElement.getAttribute('href')]);
       }
     );
   }

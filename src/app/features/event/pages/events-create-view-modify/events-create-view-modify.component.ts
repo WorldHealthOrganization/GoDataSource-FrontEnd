@@ -33,6 +33,7 @@ import { RelationshipType } from '../../../../core/enums/relationship-type.enum'
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import * as _ from 'lodash';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
 
 @Component({
   selector: 'app-events-create-view-modify',
@@ -51,14 +52,15 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
     protected dialogV2Service: DialogV2Service,
     protected entityHelperService: EntityHelperService,
     authDataService: AuthDataService,
-    renderer2: Renderer2
+    renderer2: Renderer2,
+    redirectService: RedirectService
   ) {
     super(
-      activatedRoute,
-      authDataService,
       toastV2Service,
       renderer2,
-      router
+      redirectService,
+      activatedRoute,
+      authDataService
     );
   }
 

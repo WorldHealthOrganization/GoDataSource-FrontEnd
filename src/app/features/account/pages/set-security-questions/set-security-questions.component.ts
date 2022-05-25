@@ -11,6 +11,7 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 import { SecurityQuestionModel } from '../../../../core/models/securityQuestion.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { catchError } from 'rxjs/operators';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
 
 @Component({
   selector: 'app-set-security-questions',
@@ -28,20 +29,21 @@ export class SetSecurityQuestionsComponent extends CreateViewModifyComponent<Use
    * Constructor
    */
   constructor(
-    toastV2Service: ToastV2Service,
-    renderer2: Renderer2,
-    router: Router,
     protected activatedRoute: ActivatedRoute,
     protected authDataService: AuthDataService,
-    private userDataService: UserDataService
+    protected userDataService: UserDataService,
+    protected router: Router,
+    toastV2Service: ToastV2Service,
+    renderer2: Renderer2,
+    redirectService: RedirectService
   ) {
     // parent
     super(
-      activatedRoute,
-      authDataService,
       toastV2Service,
       renderer2,
-      router
+      redirectService,
+      activatedRoute,
+      authDataService
     );
   }
 

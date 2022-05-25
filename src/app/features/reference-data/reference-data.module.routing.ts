@@ -5,6 +5,9 @@ import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-
 import { PERMISSION } from '../../core/models/permission.model';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
+import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
+import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+import { ReferenceDataCategoryDataResolver } from '../../core/services/resolvers/data/reference-data-category.resolver';
 
 const routes: Routes = [
   // Reference Data Categories List
@@ -16,6 +19,9 @@ const routes: Routes = [
       permissions: [
         PERMISSION.REFERENCE_DATA_LIST
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver
     }
   },
   // View Reference Data Category Entries List
@@ -27,6 +33,11 @@ const routes: Routes = [
       permissions: [
         PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_LIST
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      user: UserDataResolver,
+      category: ReferenceDataCategoryDataResolver
     }
   },
   // Create new Reference Data entry

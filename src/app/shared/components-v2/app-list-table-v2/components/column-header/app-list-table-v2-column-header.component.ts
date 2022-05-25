@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { IHeaderAngularComp } from '@ag-grid-community/angular';
-import { IAfterGuiAttachedParams, IHeaderParams } from '@ag-grid-community/core';
+import { IHeaderParams } from '@ag-grid-community/core';
 import { IExtendedColDef } from '../../models/extended-column.model';
 import { RequestSortDirection } from '../../../../../core/helperClasses/request-query-builder';
 import { V2FilterType } from '../../models/filter.model';
@@ -8,7 +8,6 @@ import { ActivatedRoute } from '@angular/router';
 import { ILabelValuePairModel } from '../../../../forms-v2/core/label-value-pair.model';
 import { IResolverV2ResponseModel } from '../../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2Column } from '../../models/column.model';
-import * as _ from 'lodash';
 
 /**
  * Component
@@ -23,7 +22,7 @@ export class AppListTableV2ColumnHeaderComponent implements IHeaderAngularComp {
   // column
   extendedColDef: IExtendedColDef;
 
-  // sort by
+  // component
   component: {
     columnSortBy: (
       component: AppListTableV2ColumnHeaderComponent,
@@ -69,13 +68,6 @@ export class AppListTableV2ColumnHeaderComponent implements IHeaderAngularComp {
 
     // finished
     return true;
-  }
-
-  /**
-   * After GUI attached
-   */
-  afterGuiAttached?(_params?: IAfterGuiAttachedParams): void {
-    // ignore for now
   }
 
   /**

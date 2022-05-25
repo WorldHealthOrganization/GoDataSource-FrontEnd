@@ -151,7 +151,7 @@ export class ContactRangeFollowUpsListComponent
     this.teamsList$ = this.teamDataService.getTeamsList().pipe(share());
 
     // add page title
-    this.exportRangeFollowUpsFileName = this.i18nService.instant('LNG_PAGE_LIST_RANGE_FOLLOW_UPS_TITLE') +
+    this.exportRangeFollowUpsFileName = this.i18nService.instant('LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL') +
             ' - ' +
             moment().format('YYYY-MM-DD');
 
@@ -275,36 +275,30 @@ export class ContactRangeFollowUpsListComponent
   protected initializeGroupedData(): void {}
 
   /**
-     * Initialize breadcrumbs
-     */
-  // private initializeBreadcrumbs() {
-  //   // init breadcrumbs
-  //   this.breadcrumbs = [];
-  //
-  //   // contacts breadcrumb
-  //   if (ContactModel.canList(this.authUser)) {
-  //     this.breadcrumbs.push(
-  //       new BreadcrumbItemModel(
-  //         'LNG_PAGE_LIST_CONTACTS_TITLE',
-  //         '/contacts'
-  //       )
-  //     );
-  //   }
-  //
-  //   // current page breadcrumb
-  //   this.breadcrumbs.push(
-  //     new BreadcrumbItemModel(
-  //       'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_TITLE',
-  //       '.',
-  //       true
-  //     )
-  //   );
-  // }
-
-  /**
    * Initialize breadcrumbs
    */
   protected initializeBreadcrumbs(): void {
+    //   // init breadcrumbs
+    //   this.breadcrumbs = [];
+    //
+    //   // contacts breadcrumb
+    //   if (ContactModel.canList(this.authUser)) {
+    //     this.breadcrumbs.push(
+    //       new BreadcrumbItemModel(
+    //         'LNG_PAGE_LIST_CONTACTS_TITLE',
+    //         '/contacts'
+    //       )
+    //     );
+    //   }
+    //
+    //   // current page breadcrumb
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel(
+    //       'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL',
+    //       '.',
+    //       true
+    //     )
+    //   );
   }
 
   /**

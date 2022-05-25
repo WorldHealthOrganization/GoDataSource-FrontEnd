@@ -13,6 +13,7 @@ import { PasswordChangeModel } from '../../../../core/models/password-change.mod
 import { catchError } from 'rxjs/operators';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
 
 @Component({
   selector: 'app-change-password',
@@ -30,17 +31,18 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
     protected toastV2Service: ToastV2Service,
     protected authDataService: AuthDataService,
     protected dialogV2Service: DialogV2Service,
-    router: Router,
+    protected router: Router,
+    redirectService: RedirectService,
     activatedRoute: ActivatedRoute,
     renderer2: Renderer2
   ) {
     // parent
     super(
-      activatedRoute,
-      authDataService,
       toastV2Service,
       renderer2,
-      router
+      redirectService,
+      activatedRoute,
+      authDataService
     );
 
     // display you must change password ?

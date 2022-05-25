@@ -418,7 +418,12 @@ export class DialogV2Service {
 
           // format data that is sent to export
           const formData = this.formHelperService.getFields(response.handler.form);
-          const extension: string = (response.data.map.fileType as IV2SideDialogConfigInputSingleDropdown).value;
+          let extension: string = (response.data.map.fileType as IV2SideDialogConfigInputSingleDropdown).value;
+
+          // for qr we need to replace it with png
+          extension = extension === ExportDataExtension.QR ?
+            'png' :
+            extension;
 
           // do not send the checkbox all value to api
           delete formData.fieldsGroupAll;

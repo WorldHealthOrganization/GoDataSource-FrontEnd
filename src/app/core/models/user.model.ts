@@ -31,6 +31,7 @@ export enum UserSettings {
   SYNC_UPSTREAM_SERVERS_FIELDS = 'syncUpstreamServersFields',
   SYNC_CLIENT_APPLICATIONS_FIELDS = 'syncClientApplicationsFields',
   SYNC_LOGS_FIELDS = 'syncLogsFields',
+  REF_DATA_CAT_FIELDS = 'refDataCategoriesFields',
   REF_DATA_CAT_ENTRIES_FIELDS = 'refDataCatEntriesFields',
   SHARE_RELATIONSHIPS = 'shareRelationships',
   USER_ROLE_FIELDS = 'userRoleFields',
