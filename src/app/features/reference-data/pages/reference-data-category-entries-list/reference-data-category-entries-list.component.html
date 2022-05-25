@@ -26,36 +26,3 @@
   (resetHeaderFilters)="resetFiltersToSideFilters()"
   (advancedFilterBy)="applySideFilters($event)">
 </app-list-table-v2>
-
-
-<!-- TODO: To be deleted after Order column implemnet -->
-<!-- <mat-card class="page-section page-content">
-    <mat-table #table [dataSource]="categoryEntries">
-
-        <!~~ Order ~~>
-        <ng-container matColumnDef="order">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div class="column-header">{{'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER' | translate}}</div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item">
-                <app-form-input
-                    *ngIf="ReferenceDataEntryModel.canModify(authUser)"
-                    name="order"
-                    [ngModel]="item.order"
-                    [placeholder]="'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER' | translate"
-                    tooltip="LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER_DESCRIPTION"
-                    type="number"
-                    (optionChanged)="changeRefEntryOrder(item, $event)">
-                </app-form-input>
-                <div
-                    *ngIf="!ReferenceDataEntryModel.canModify(authUser)">
-                    {{ item.order }}
-                </div>
-            </mat-cell>
-        </ng-container>
-
-    </mat-table>
-</mat-card> -->

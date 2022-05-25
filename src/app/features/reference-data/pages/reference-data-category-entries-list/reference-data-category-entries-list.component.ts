@@ -1,6 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import * as _ from 'lodash';
 import { throwError } from 'rxjs';
 import { catchError, map, takeUntil, tap } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -99,7 +98,6 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
       {
         field: 'order',
         label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER'
-        // TODO: Needs editable NUMBER column
       },
       {
         field: 'active',
@@ -410,38 +408,4 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
    * Get total number of items
    */
   refreshListCount() {}
-
-  // TODO: To be deleted after Order column implemnet
-  /**
-   * Change Reference entry item order value
-   */
-  changeRefEntryOrder(
-    refEntry: ReferenceDataEntryModel,
-    order: any
-  ) {
-    // convert string to number
-    order = order && _.isString(order) ? parseFloat(order) : order;
-
-    // modify reference entry item
-    this.referenceDataDataService
-      .modifyEntry(
-        refEntry.id, {
-          order: order ? order : null
-        }
-      )
-      .pipe(
-        catchError((err) => {
-          this.toastV2Service.error(err);
-          return throwError(err);
-        })
-      )
-      .subscribe(() => {
-        // update loaded ref data
-        refEntry.order = order ? order : null;
-
-        // show success ?
-        // this might not be the best idea...maybe we can replace / remove it
-        this.toastV2Service.success('LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_CHANGE_ORDER_SUCCESS_MESSAGE');
-      });
-  }
 }
