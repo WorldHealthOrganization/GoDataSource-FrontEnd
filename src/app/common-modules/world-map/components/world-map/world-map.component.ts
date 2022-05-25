@@ -36,6 +36,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { applyStyle } from 'ol-mapbox-style';
 import RenderFeature from 'ol/render/Feature';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { AuthenticatedComponent } from '../../../../core/components/authenticated/authenticated.component';
 
 /**
  * Point used for rendering purposes
@@ -81,8 +82,8 @@ export class WorldMapMarker {
   data: any;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(data: {
     // required
     point: WorldMapPoint,
@@ -200,12 +201,12 @@ class WorldMapClusterLine {
   selector: 'app-world-map',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './world-map.component.html',
-  styleUrls: ['./world-map.component.less']
+  styleUrls: ['./world-map.component.scss']
 })
 export class WorldMapComponent implements OnInit, OnDestroy {
   // Map fill size ( Default w: 100%, h: 400px )
   private _width: string = '100%';
-  private _height: string = '400px';
+  private _height: string = '100%';
   @Input() set width(width: string) {
     // set value
     this._width = width;
@@ -527,14 +528,17 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Component destroyed
-     */
+   * Component destroyed
+   */
   ngOnDestroy() {
     // outbreak subscriber
     if (this.outbreakSubscriber) {
       this.outbreakSubscriber.unsubscribe();
       this.outbreakSubscriber = null;
     }
+
+    // not full screen anymore
+    AuthenticatedComponent.FULL_SCREEN = false;
   }
 
   /**
@@ -1317,14 +1321,17 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Trigger map update and full screen toggle
-     */
+   * Trigger map update and full screen toggle
+   */
   fullScreenToggleTrigger() {
     // update map size
     this.updateMapSize();
 
     // emit value to parent component
     this.fullScreenToggle.emit(this.fullScreenMode);
+
+    // toggle full screen class
+    AuthenticatedComponent.FULL_SCREEN = this.fullScreenMode;
   }
 
   /**

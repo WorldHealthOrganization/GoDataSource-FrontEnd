@@ -37,7 +37,7 @@ import { IV2ActionIconLabel, V2ActionType } from '../../../../shared/components-
   selector: 'app-bulk-create-contacts',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './bulk-create-contacts.component.html',
-  styleUrls: ['./bulk-create-contacts.component.less']
+  styleUrls: ['./bulk-create-contacts.component.scss']
 })
 export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements OnInit, OnDestroy {
   // breadcrumbs

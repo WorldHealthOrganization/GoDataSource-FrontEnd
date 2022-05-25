@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import * as Handsontable from 'handsontable';
 import * as _ from 'lodash';
 import { SheetCellValidator } from '../../../core/models/sheet/sheet-cell-validator';
@@ -215,7 +215,7 @@ class CustomLocationEditor extends Handsontable.default.editors.BaseEditor {
   selector: 'app-hot-table-wrapper',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './hot-table-wrapper.component.html',
-  styleUrls: ['./hot-table-wrapper.component.less']
+  styleUrls: ['./hot-table-wrapper.component.scss']
 })
 export class HotTableWrapperComponent
 implements OnInit, OnDestroy {
@@ -232,7 +232,6 @@ implements OnInit, OnDestroy {
   hotId: string = `hotWrapper_${HotTableWrapperComponent._hotId++}`;
 
   // input
-  @Input() widthReduction: number = 0;
   @Input() startRows: number = 1;
   @Input() minSpareRows: number = 0;
   @Input() sheetContextMenu: any;
@@ -283,7 +282,9 @@ implements OnInit, OnDestroy {
   CustomLocationEditor = CustomLocationEditor;
 
   // local variables
-  sheetWidth: number = window.innerWidth - this.widthReduction;
+  setSheetSizesCall: any;
+  sheetWidth: string;
+  sheetHeight: string;
 
   // callbacks
   afterChangeCallback: (
@@ -315,15 +316,15 @@ implements OnInit, OnDestroy {
     private locationDataService: LocationDataService,
     private toastV2Service: ToastV2Service,
     public dialogV2Service: DialogV2Service
-  ) {}
+  ) {
+    // set spreadsheet width
+    this.setSheetSize();
+  }
 
   /**
    * Component initialized
    */
   ngOnInit() {
-    // set spreadsheet width
-    this.setSheetWidth();
-
     // set wrapper
     HotTableWrapperComponent.WRAPPERS[this.hotId] = this;
   }
@@ -334,15 +335,63 @@ implements OnInit, OnDestroy {
   ngOnDestroy() {
     // release wrapper
     delete HotTableWrapperComponent.WRAPPERS[this.hotId];
+
+    // stop previous
+    if (this.setSheetSizesCall) {
+      clearTimeout(this.setSheetSizesCall);
+      this.setSheetSizesCall = undefined;
+    }
   }
 
   /**
-   * Update sheet width based on browser width
-   * Note: It's a hack, but there's no other fix for now, since handsontable is working with pixels only
+   * Update sheet size
    */
-  @HostListener('window:resize')
-  private setSheetWidth() {
-    this.sheetWidth = window.innerWidth - this.widthReduction;
+  setSheetSize() {
+    // stop previous
+    if (this.setSheetSizesCall) {
+      clearTimeout(this.setSheetSizesCall);
+      this.setSheetSizesCall = undefined;
+    }
+
+    // update sizes
+    const basicPageMatCard: any = document.querySelector('app-basic-page-v2 mat-card');
+    const basicPageHoTable: any = basicPageMatCard?.querySelector('hot-table');
+    if (
+      basicPageMatCard &&
+      basicPageHoTable
+    ) {
+      // determine element boundings
+      const boundingMatCard = basicPageMatCard.getBoundingClientRect();
+      const boundingHoTable = basicPageHoTable.getBoundingClientRect();
+      const height: number = basicPageMatCard.offsetHeight - boundingHoTable.top + boundingMatCard.top;
+
+      // update sizes
+      const sheetWidth: string = `calc(${basicPageMatCard.offsetWidth}px - var(--gd-basic-page-content-padding-left-right))`;
+      const sheetHeight: string = `calc(${height}px - var(--gd-basic-page-content-padding-bottom))`;
+
+      // render spreadsheet
+      if (
+        this.sheetWidth !== sheetWidth ||
+        this.sheetHeight !== sheetHeight
+      ) {
+        // update
+        this.sheetWidth = sheetWidth;
+        this.sheetHeight = sheetHeight;
+        this.sheetTable.updateHotTable({
+          width: this.sheetWidth,
+          height: this.sheetHeight
+        });
+      }
+    }
+
+    // call again
+    this.setSheetSizesCall = setTimeout(() => {
+      // reset
+      this.setSheetSizesCall = undefined;
+
+      // check and resize
+      this.setSheetSize();
+    }, 200);
   }
 
   /**

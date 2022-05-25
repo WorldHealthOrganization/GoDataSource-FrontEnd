@@ -246,7 +246,8 @@
             <!-- Group -->
             <div
               *ngSwitchCase="V2SideDialogConfigInputType.GROUP"
-              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-group {{input.cssClasses}}">
+              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-group {{input.cssClasses}}"
+              fxFlex>
               <!-- Items -->
               <ng-template
                 *ngFor="let groupItem of input.inputs"
@@ -405,6 +406,7 @@
                     <button
                       type="button"
                       mat-flat-button color="primary"
+                      [disabled]="!!input.disableAdd"
                       (click)="addAdvancedFilter(input)">
                       {{'LNG_SIDE_FILTERS_ADD_ANOTHER_FILTER_BUTTON' | translate}}
                     </button>
@@ -413,6 +415,7 @@
                     <button
                       type="button"
                       mat-flat-button color="text"
+                      [disabled]="!!input.disableReset"
                       (click)="resetAdvancedFilter()">
                       {{'LNG_COMMON_BUTTON_RESET_FILTERS' | translate}}
                     </button>
@@ -510,7 +513,7 @@
                               [name]="filter.name"
                               placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
                               [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.options"
-                              required="true">
+                              [required]="!input.optionsAsLabelValueMap[filter.filterBy.value].data.optional">
                             </app-form-select-multiple-v2>
 
                             <!-- Number / Age range -->
@@ -561,7 +564,8 @@
                               [name]="filter.name"
                               placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION"
                               useOutbreakLocations="true"
-                              required="true"
+                              [required]="!input.optionsAsLabelValueMap[filter.filterBy.value].data.optional"
+                              [clearable]="!!input.optionsAsLabelValueMap[filter.filterBy.value].data.clearable"
                               (selectedLocationChanged)="filter.comparator.value !== V2AdvancedFilterComparatorType.WITHIN ? undefined : (filter.extraValues.location = $event)">
                             </app-form-select-location-single-v2>
 
@@ -734,6 +738,7 @@
                         mat-icon-button
                         color="warn"
                         [matTooltip]="'LNG_COMMON_BUTTON_DELETE_FILTERS' | translate"
+                        [disabled]="!!input.disableDelete"
                         (click)="removeAdvancedFilter(input, filter)">
                         <mat-icon>delete</mat-icon>
                       </button>

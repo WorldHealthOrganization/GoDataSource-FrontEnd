@@ -11,50 +11,44 @@
         #cdkViewport
         [minBufferPx]="1024"
         [maxBufferPx]="1024"
-
-        change123
-        [itemSize]="60"
-        style="height: 500px">
+        [itemSize]="viewOnly ? 45 : 60">
         <!-- Item -->
         <div
           *cdkVirtualFor="let item of flattenedQuestions; templateCacheSize: 0"
           class="gd-form-fill-questionnaire-v2-list-item"
+          [class.gd-form-fill-questionnaire-v2-list-item-inactive]="item.data?.inactive || item.oneParentIsInactive"
+          [class.gd-form-fill-questionnaire-v2-list-item-markup]="item.data?.answerType === Constants.ANSWER_TYPES.MARKUP.value"
           [ngSwitch]="item.type"
-
-          change123
           [style.paddingLeft.px]="item.level * 20"
-          style="height: 60px">
+          [style.height]="viewOnly ? '4.5rem' : '6rem'">
 
           <!-- Question -->
           <div
             *ngSwitchCase="FlattenType.QUESTION"
             class="gd-form-fill-questionnaire-v2-list-item-question"
-            [class.gd-form-fill-questionnaire-v2-list-item-question-inactive]="item.data.inactive || item.oneParentIsInactive"
-            [class.gd-form-fill-questionnaire-v2-list-item-question-markup]="item.data.answerType === Constants.ANSWER_TYPES.MARKUP.value"
-            [class.gd-form-fill-questionnaire-v2-list-item-question-multiple]="item.data.multiAnswer"
-
-            change123
-            fxLayout="row">
+            fxLayout="row" fxLayoutAlign="none center">
 
             <!-- Collapse / Expand -->
             <mat-icon
-              change123
               [style.visibility]="item.canCollapseOrExpand ? 'visible' : 'hidden'"
               (click)="expandCollapse(item)">{{item.data.collapsed ? 'expand_more' : 'expand_less'}}</mat-icon>
 
             <!-- Label -->
             <div
-              change123
+              class="gd-form-fill-questionnaire-v2-list-item-question-content"
               fxFlex>
               <!-- Number -->
-              <span>{{item.no}}</span>
+              <span
+                class="gd-form-fill-questionnaire-v2-list-item-question-content-number">{{item.no}}.</span>
 
               <!-- Label -->
-              <span>{{item.data.text}}</span>
+              <span
+                class="gd-form-fill-questionnaire-v2-list-item-question-content-title">{{item.data.text}}</span>
 
               <!-- Required ? -->
               <span
-                *ngIf="item.data.required && item.data.answerType === Constants.ANSWER_TYPES.FILE_UPLOAD.value">*</span>
+                *ngIf="item.data.required && item.data.answerType === Constants.ANSWER_TYPES.FILE_UPLOAD.value"
+                class="gd-form-fill-questionnaire-v2-list-item-question-content-required">*</span>
             </div>
 
             <!-- Buttons -->
@@ -80,23 +74,21 @@
           <div
             *ngSwitchCase="FlattenType.ANSWER_MULTI_DATE"
             class="gd-form-fill-questionnaire-v2-list-item-answer-multi-date"
-            [class.gd-form-fill-questionnaire-v2-list-item-answer-multi-date-inactive]="item.oneParentIsInactive"
-
-            change123
-            fxLayout="row">
+            fxLayout="row" fxLayoutAlign="none center"
+            [style.paddingLeft.px]="item.level * 20">
 
             <!-- Collapse / Expand -->
             <!-- append padding and remove icon -->
             <mat-icon
-              change123
               style="visibility: hidden">expand_more</mat-icon>
 
             <!-- No -->
-            <span>{{item.no}}</span>
+            <span
+              class="gd-form-fill-questionnaire-v2-list-item-answer-number">{{item.no}}.</span>
 
             <!-- Date -->
             <div
-              change123
+              class="gd-form-fill-questionnaire-v2-list-item-answer-multi-date-content"
               fxFlex>
               <app-form-date-v2
                 [(ngModel)]="value[item.parent.data.variable][item.index].date"
@@ -124,6 +116,7 @@
               <button
                 type="button"
                 mat-icon-button
+                color="warn"
                 [matTooltip]="'LNG_QUESTIONNAIRE_BUTTON_REMOVE' | translate"
                 (click)="removeMultiAnswer(item)">
                 <mat-icon>delete</mat-icon>
@@ -137,18 +130,19 @@
           <div
             *ngSwitchCase="FlattenType.ANSWER"
             class="gd-form-fill-questionnaire-v2-list-item-answer"
-            [class.gd-form-fill-questionnaire-v2-list-item-answer-inactive]="item.oneParentIsInactive"
             [class.gd-form-fill-questionnaire-v2-list-item-answer-multiple]="item.parent.data.multiAnswer"
             [class.gd-form-fill-questionnaire-v2-list-item-answer-file]="item.definition.type === FlattenAnswerDrawType.FILE"
-
-            change123
-            fxLayout="row">
+            fxLayout="row" fxLayoutAlign="none center">
 
             <!-- Collapse / Expand -->
             <!-- append padding and remove icon -->
             <mat-icon
-              change123
               style="visibility: hidden">expand_more</mat-icon>
+
+            <!-- No -->
+            <span
+              class="gd-form-fill-questionnaire-v2-list-item-answer-number"
+              style="visibility: hidden">{{item.parent.no}}.</span>
 
             <!-- Render answer accordingly to question type -->
             <ng-container
@@ -215,7 +209,7 @@
                 <!-- Wait to retrieve attachment data -->
                 <mat-progress-spinner
                   *ngIf="item.uploading || (value[item.parent.data.variable][item.index].value && !loadedAttachments[value[item.parent.data.variable][item.index].value].loaded); else finishedProcessing"
-                  diameter="32"
+                  diameter="24"
                   mode="indeterminate"></mat-progress-spinner>
 
                 <!-- Data processed -->
@@ -233,7 +227,8 @@
                   <!-- No file attachment ? -->
                   <ng-container
                     *ngIf="!value[item.parent.data.variable][item.index].value || !loadedAttachments[value[item.parent.data.variable][item.index].value].attachment; else displayAttachment">
-                    —
+                    <span
+                      class="gd-form-fill-questionnaire-v2-list-item-answer-file-name gd-form-fill-questionnaire-v2-list-item-answer-file-name-no-file">{{viewOnly ? '—' : ('LNG_QUESTIONNAIRE_LABEL_FILE_UPLOAD' | translate)}}</span>
                   </ng-container>
 
                   <!-- Attachment info -->
@@ -241,7 +236,8 @@
                     #displayAttachment>
 
                     <!-- Name -->
-                    <span>{{loadedAttachments[value[item.parent.data.variable][item.index].value].attachment.name}}</span>
+                    <span
+                      class="gd-form-fill-questionnaire-v2-list-item-answer-file-name">{{loadedAttachments[value[item.parent.data.variable][item.index].value].attachment.name}}</span>
 
                     <!-- Download -->
                     <button
@@ -295,8 +291,17 @@
     <!-- No questions image -->
     <ng-template
       #noQuestions>
-      <div>
-        empty list image....
+      <div
+        fxLayout="column" fxLayoutAlign="center center"
+        class="gd-form-fill-questionnaire-v2-empty">
+
+        <!-- Image -->
+        <div
+          class="gd-form-fill-questionnaire-v2-empty-image"></div>
+
+        <!-- Message -->
+        <div
+          class="gd-form-fill-questionnaire-v2-empty-text">{{'LNG_QUESTIONNAIRE_LABEL_FILL_NO_QUESTIONS' | translate}}</div>
       </div>
     </ng-template>
   </div>
@@ -304,7 +309,8 @@
   <!-- Legend -->
   <div
     *ngIf="flattenedQuestions?.length > 0 && !viewOnly"
-    class="gd-form-fill-questionnaire-v2-legend">
+    class="gd-form-fill-questionnaire-v2-legend"
+    fxLayout="row" fxLayoutAlign="start center">
 
     <!-- Header -->
     <div
@@ -314,31 +320,32 @@
 
     <!-- Items -->
     <div
-      class="gd-form-fill-questionnaire-v2-legend-items">
+      class="gd-form-fill-questionnaire-v2-legend-items"
+      fxLayout="row wrap" fxLayoutAlign="start center">
       <!-- Add multiple answers -->
       <div
-        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        class="gd-form-fill-questionnaire-v2-legend-items-item">
         <mat-icon>playlist_add</mat-icon>
         <span>{{'LNG_QUESTIONNAIRE_BUTTON_ADD_MULTI_ANSWER' | translate}}</span>
       </div>
 
       <!-- Delete multiple answer -->
       <div
-        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        class="gd-form-fill-questionnaire-v2-legend-items-item">
         <mat-icon>delete</mat-icon>
         <span>{{'LNG_QUESTIONNAIRE_BUTTON_REMOVE' | translate}}</span>
       </div>
 
       <!-- Download file -->
       <div
-        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        class="gd-form-fill-questionnaire-v2-legend-items-item">
         <mat-icon>file_download</mat-icon>
         <span>{{'LNG_QUESTIONNAIRE_BUTTON_DOWNLOAD' | translate}}</span>
       </div>
 
       <!-- Upload file -->
       <div
-        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        class="gd-form-fill-questionnaire-v2-legend-items-item">
         <mat-icon>file_upload</mat-icon>
         <span>{{'LNG_QUESTIONNAIRE_BUTTON_BROWSE' | translate}}</span>
       </div>

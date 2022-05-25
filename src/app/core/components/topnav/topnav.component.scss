@@ -91,6 +91,18 @@
         background-color: rgba(var(--gd-danger-rgb), 0.15);
         color: var(--gd-danger);
       }
+
+      .mat-button-wrapper {
+        @include breakpoint('xs') {
+          gap: 0;
+        }
+
+        > div {
+          @include breakpoint('xs') {
+            display: none;
+          }
+        }
+      }
     }
   }
 

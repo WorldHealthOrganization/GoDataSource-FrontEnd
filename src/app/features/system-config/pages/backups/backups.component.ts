@@ -22,15 +22,18 @@ import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2
 import {
   IV2SideDialogConfigButtonType,
   IV2SideDialogConfigInputKeyValue,
-  IV2SideDialogConfigInputMultiDropdown, IV2SideDialogConfigInputNumber,
+  IV2SideDialogConfigInputMultiDropdown,
+  IV2SideDialogConfigInputNumber,
   IV2SideDialogConfigInputSingleDropdown,
-  IV2SideDialogConfigInputText, IV2SideDialogConfigInputTimepicker,
+  IV2SideDialogConfigInputText,
+  IV2SideDialogConfigInputTimepicker,
   IV2SideDialogResponse,
   V2SideDialogConfigInputType
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
 import { IV2LoadingDialogHandler } from '../../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
+import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 
 @Component({
   selector: 'app-backups',
@@ -50,7 +53,8 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
     private toastV2Service: ToastV2Service,
     private i18nService: I18nService,
     private activatedRoute: ActivatedRoute,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private formHelperService: FormHelperService
   ) {
     // parent
     super(listHelperService);
@@ -84,6 +88,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
       {
         field: 'description',
         label: 'LNG_BACKUP_FIELD_LABEL_DESCRIPTION',
+        pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
@@ -145,11 +150,14 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
         label: 'LNG_BACKUP_FIELD_LABEL_DURATION'
       },
       {
-        field: 'user',
+        field: 'userId',
         label: 'LNG_BACKUP_FIELD_LABEL_USER',
         format: {
-          type: 'createdByUser.name'
+          type: (item) => item.userId && this.activatedRoute.snapshot.data.user.map[item.userId] ?
+            this.activatedRoute.snapshot.data.user.map[item.userId].name :
+            ''
         },
+        sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
           options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
@@ -230,7 +238,9 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
                             get: () => 'LNG_COMMON_LABEL_DELETE',
                             data: () => (
                               {
-                                name: item.description
+                                name: item.description ?
+                                  item.description :
+                                  '-'
                               }
                             )
                           },
@@ -671,13 +681,17 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
         title: {
           get: () => 'LNG_COMMON_LABEL_RESTORE',
           data: () => ({
-            name: item.description
+            name: item.description ?
+              item.description :
+              '-'
           })
         },
         message: {
           get: () => 'LNG_DIALOG_CONFIRM_DELETE_BACKUP_RESTORE',
           data: () => ({
-            name: item.description
+            name: item.description ?
+              item.description :
+              '-'
           })
         }
       },
@@ -719,6 +733,9 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
           if (answerBackup.button.type === IV2SideDialogConfigButtonType.CANCEL) {
             // cancel - display again the previous dialog
             this.restoreBackup(item);
+
+            // finished
+            return;
           }
 
           // backup settings
@@ -1067,9 +1084,15 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
 
         // if the automatic backup is off do not change the rest of the settings
         let backupSettings;
-        if (response.data.map.disabled) {
-          backupSettings = { ...currentSettings };
+        if ((response.data.map.disabled as IV2SideDialogConfigInputSingleDropdown).value) {
+          backupSettings = { ...currentSettings.dataBackup };
           backupSettings.disabled = true;
+        } else {
+          const formData = this.formHelperService.getFields(response.handler.form);
+          backupSettings = {
+            ...currentSettings.dataBackup,
+            ...formData
+          };
         }
 
         // change automatic backup settings

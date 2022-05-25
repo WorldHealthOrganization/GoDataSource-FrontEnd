@@ -35,6 +35,7 @@
           *cdkVirtualFor="let item of flattenedQuestions; templateCacheSize: 0"
           class="gd-form-edit-questionnaire-v2-item"
           [class.gd-form-edit-questionnaire-v2-item-inactive]="item.data.inactive || item.oneParentIsInactive"
+          [class.gd-form-edit-questionnaire-v2-item-markup]="item.data.answerType === Constants.ANSWER_TYPES.MARKUP.value"
           cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".gd-form-edit-questionnaire-v2-list-{{name}}" [cdkDragData]="item" [cdkDragDisabled]="viewOnly" (cdkDragStarted)="dragStarted($event)"
           [ngSwitch]="item.type"
           [style.paddingLeft.px]="item.level * 20"
@@ -47,8 +48,7 @@
           <div
             *ngSwitchCase="FlattenType.QUESTION"
             class="gd-form-edit-questionnaire-v2-item-question"
-            [class.gd-form-edit-questionnaire-v2-item-question-markup]="item.data.answerType === Constants.ANSWER_TYPES.MARKUP.value"
-            fxLayout="row" fxLayoutAlign=" center">
+            fxLayout="row" fxLayoutAlign="none center">
 
             <!-- Collapse / Expand -->
             <mat-icon
@@ -71,7 +71,8 @@
               fxFlex>
 
               <!-- Number -->
-              <span>{{item.no}}</span>
+              <span
+                class="gd-form-edit-questionnaire-v2-item-question-content-number">{{item.no}}.</span>
 
               <!-- Label -->
               <span
@@ -149,7 +150,7 @@
           <div
             *ngSwitchCase="FlattenType.ANSWER"
             class="gd-form-edit-questionnaire-v2-item-answer"
-            fxLayout="row" fxLayoutAlign=" center">
+            fxLayout="row" fxLayoutAlign="none center">
 
             <!-- Collapse / Expand -->
             <mat-icon
@@ -233,8 +234,17 @@
     <!-- No questions image -->
     <ng-template
       #noQuestions>
-      <div>
-        empty list image....
+      <div
+        fxLayout="column" fxLayoutAlign="center center"
+        class="gd-form-edit-questionnaire-v2-empty">
+
+        <!-- Image -->
+        <div
+          class="gd-form-edit-questionnaire-v2-empty-image"></div>
+
+        <!-- Message -->
+        <div
+          class="gd-form-edit-questionnaire-v2-empty-text">{{'LNG_QUESTIONNAIRE_LABEL_EDIT_NO_QUESTIONS' | translate}}</div>
       </div>
     </ng-template>
   </div>

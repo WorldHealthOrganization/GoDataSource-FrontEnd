@@ -11,7 +11,7 @@
   <!-- Title & buttons -->
   <div
     *ngIf="pageTitle"
-    fxLayout="row"
+    fxLayout="row" fxLayout.lt-md="column"
     class="gd-basic-top-title-buttons">
 
     <!-- Title -->
@@ -36,7 +36,8 @@
         (click)="actionButton.action.click ? actionButton.action.click(null) : undefined">
 
         <!-- Icon -->
-        <mat-icon>{{actionButton.icon}}</mat-icon>
+        <mat-icon
+          *ngIf="actionButton.icon">{{actionButton.icon}}</mat-icon>
 
         <!-- Label -->
         <span>{{ actionButton.label | translate }}</span>

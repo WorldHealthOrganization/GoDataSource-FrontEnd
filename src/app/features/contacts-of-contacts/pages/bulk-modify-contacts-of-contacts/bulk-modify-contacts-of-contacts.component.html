@@ -2,8 +2,11 @@
   [breadcrumbs]="breadcrumbs"
   pageTitle="LNG_PAGE_BULK_ADD_CONTACTS_TITLE"
   [actionButton]="actionButton">
-  <form class="form-section">
-    <div class="form-content">
+  <form
+    class="form-section">
+    <div
+      class="form-content">
+      
       <ng-container
         *ngIf="errorMessages && errorMessages.length > 0">
         <div
@@ -13,13 +16,18 @@
             {{ 'LNG_PAGE_BULK_MODIFY_CONTACTS_OF_CONTACTS_LABEL_ERRORS' | translate }}
           </div>
           <div
-            *ngFor="let err of errorMessages">
-            {{ err.message | translate:err.data }}
+            class="bulk-modify-contacts-of-contacts-errors-container">
+            <div
+              *ngFor="let err of errorMessages">
+              {{ err.message | translate:err.data }}
+            </div>
           </div>
         </div>
       </ng-container>
 
-      <div class="sheet-wrapper" fxLayout="row" fxLayoutAlign="center">
+      <div
+        class="sheet-wrapper"
+        fxLayout="row" fxLayoutAlign="center">
         <input
           #inputForMakingFormDirty="ngModel"
           type="hidden"
@@ -33,8 +41,7 @@
           [sheetColumns]="sheetColumns"
           (afterBecameDirty)="afterBecameDirty()"
           [startRows]="1"
-          [minSpareRows]="0"
-          widthReduction="320">
+          [minSpareRows]="0">
         </app-hot-table-wrapper>
       </div>
     </div>

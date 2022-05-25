@@ -25,7 +25,7 @@
     <!-- Select / Upload file -->
     <div
         *ngIf="!displayLoading && !importableObject"
-        fxLayout="column" fxLayoutGap="12px"
+        fxLayout="column" fxLayoutGap="1.6rem"
         class="import-data">
         <div fxLayout="column">
             <input
@@ -37,13 +37,14 @@
                 [accept]="allowedExtensions"/>
 
             <div
-                fxLayout="row" fxLayoutAlign="center center"
+                fxLayout="column" fxLayoutAlign="center center"
                 class="import-data-drop-zone"
                 [class.import-data-file-over]="hasFileOver"
                 ng2FileDrop
                 [uploader]="uploader"
                 (fileOver)="hoverDropZone($event)"
                 (click)="importDataBtn.click()">
+                <mat-icon>upload_file</mat-icon>
                 {{ 'LNG_PAGE_IMPORT_DATA_LABEL_DRAG_AND_DROP_FILE_HERE' | translate:translationData }}
             </div>
         </div>
@@ -72,18 +73,17 @@
             </div>
         </div>
 
-        <div fxLayout="row">
+        <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-between start">
             <app-form-input-v2
                 name="decryptPassword"
                 [(ngModel)]="decryptPassword"
                 [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_DECRYPT_PASSWORD' | translate"
-                tooltip="LNG_PAGE_IMPORT_DATA_LABEL_DECRYPT_PASSWORD_DESTINATION">
+                tooltip="LNG_PAGE_IMPORT_DATA_LABEL_DECRYPT_PASSWORD_DESTINATION"
+                autocomplete="off">
             </app-form-input-v2>
-        </div>
 
-        <div fxLayout="row" fxLayoutAlign="end">
             <button
-                mat-raised-button
+                mat-flat-button
                 color="primary"
                 [disabled]="!uploader || uploader.queue.length < 1"
                 (click)="uploadFile()"
@@ -99,7 +99,7 @@
         fxLayout="column"
         class="import-data-map-fields">
         <div
-            fxLayout="row" fxLayoutGap="20px">
+            fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-between start" fxLayoutGap="1.6rem" fxLayoutGap.xs="0">
             <app-form-select-single-v2
                 *ngIf="savedImportPage"
                 name="loadImportMapping"
@@ -111,7 +111,8 @@
 
             <!-- Number of columns mapped -->
             <div
-                fxFlex fxLayoutAlign="end center">
+                class="import-data-map-fields-counters"
+                fxLayout="row" fxLayout.xs="column" fxLayoutAlign="end center" fxLayoutAlign.xs="end start">
                 <span>
                     {{ 'LNG_PAGE_IMPORT_DATA_NO_FILE_COLUMN_MAPPED' | translate:notMappedTransData}}
                 </span>
@@ -128,6 +129,7 @@
         <!-- Mapped Data -->
         <div
             #mappedDataTable
+            class="import-data-table"
             fxLayout="column">
 
             <!-- Hover question effects / actions -->
@@ -241,7 +243,7 @@
                 <div
                     fxFlex="100px" fxLayoutAlign="start end">
                     <button
-                        mat-raised-button
+                        mat-flat-button
                         color="primary"
                         type="button"
                         [matTooltip]="'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD' | translate"
@@ -773,7 +775,7 @@
                 *ngIf="savedImportPage"
                 (click)="saveImportMapping()"
                 type="button"
-                mat-raised-button
+                mat-flat-button
                 color="primary">
                 {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_SAVE_IMPORT_MAPPING' | translate }}
             </button>
@@ -783,7 +785,7 @@
                 *ngIf="needToMapOptions"
                 (click)="retrieveDistinctValues()"
                 type="button"
-                mat-raised-button
+                mat-flat-button
                 color="primary">
                 {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_MAP_SUB_OPTIONS' | translate }}
             </button>
@@ -791,7 +793,7 @@
             <!-- Import -->
             <button
                 *ngIf="!needToMapOptions"
-                mat-raised-button
+                mat-flat-button
                 color="primary"
                 type="button"
                 (click)="importData()">
@@ -1048,7 +1050,7 @@
         <!-- #TODO - to be removed since this one is kinda useless -->
         <div fxLayout="row" fxLayoutAlign="end">
             <button
-                mat-raised-button
+                mat-flat-button
                 color="primary"
                 type="button"
                 (click)="tryAgain()">

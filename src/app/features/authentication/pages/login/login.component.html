@@ -98,7 +98,8 @@
                   mat-flat-button
                   type="button"
                   color="text"
-                  routerLink="/auth/forgot-password">
+                  routerLink="/auth/forgot-password"
+                  tabindex="-1">
                   {{ 'LNG_PAGE_LOGIN_FORGOT_PASSWORD_LABEL' | translate }}
                 </button>
               </div>
@@ -133,11 +134,14 @@
 
           <!-- Captcha -->
           <div
-            *ngIf="displayCaptcha">
+            *ngIf="displayCaptcha"
+            class="gd-login-right-middle-form-captcha"
+            fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-between center">
 
             <!-- Captcha SVG -->
             <div
-              *ngIf="captchaData$ | async as captchaData; else loadingCaptcha">
+              *ngIf="captchaData$ | async as captchaData; else loadingCaptcha"
+              fxLayout="row" fxLayoutAlign="start center" fxLayoutAlign.xs="center center">
                 <!-- SVG -->
                 <div [innerHTML]="captchaData"></div>
 
@@ -145,6 +149,7 @@
                 <button
                   type="button"
                   mat-icon-button
+                  tabindex="-1"
                   (click)="refreshCaptcha()">
                   <mat-icon>refresh</mat-icon>
                 </button>

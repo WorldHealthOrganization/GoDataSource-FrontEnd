@@ -19,7 +19,7 @@ import { IGanttDataInterface } from '../../interfaces/gantt-data.interface';
   selector: 'app-gantt-chart-delay-onset-hospitalization-dashlet',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './gantt-chart-delay-onset-hospitalization-dashlet.component.html',
-  styleUrls: ['./gantt-chart-delay-onset-hospitalization-dashlet.component.less']
+  styleUrls: ['./gantt-chart-delay-onset-hospitalization-dashlet.component.scss']
 })
 export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnInit, OnDestroy {
   // delay needed to display entries who doesn't have a delay between dates

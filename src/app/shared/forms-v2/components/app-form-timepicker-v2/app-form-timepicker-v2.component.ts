@@ -5,7 +5,7 @@ import {
   Host, Input,
   OnDestroy,
   Optional,
-  SkipSelf
+  SkipSelf, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
@@ -15,11 +15,13 @@ import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 @Component({
   selector: 'app-form-timepicker-v2',
   templateUrl: './app-form-timepicker-v2.component.html',
+  styleUrls: ['./app-form-timepicker-v2.component.scss'],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
     useExisting: forwardRef(() => AppFormTimepickerV2Component),
     multi: true
   }],
+  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppFormTimepickerV2Component

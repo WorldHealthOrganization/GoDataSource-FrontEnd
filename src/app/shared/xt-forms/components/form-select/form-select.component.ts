@@ -147,6 +147,9 @@ export class FormSelectComponent
       this.languageSubscription.unsubscribe();
       this.languageSubscription = null;
     }
+
+    // stop
+    this.clearFilterTimeoutCall();
   }
 
   /**

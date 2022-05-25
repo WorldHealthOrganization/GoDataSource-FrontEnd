@@ -310,11 +310,18 @@
 
                   + .mat-tab-body-active {
                     .gd-app-side-dialog-v2-content-middle-item-input-filter-list-container {
-                      height: calc(100vh - 31.7rem); /* Old Value - Fallback for browsers that do not support Custom Properties */
+                      height: calc(100vh - 31.7rem); /* Fallback for browsers which cannot support Custom Properties */
                       height: calc((var(--vh, 1vh) * 100) - 31.7rem);
                     }
                   }
                 }
+              }
+            }
+
+            &.gd-app-side-dialog-v2-content-middle-item-input-filter-list-operator-hidden {
+              .gd-app-side-dialog-v2-content-middle-item-input-filter-list-container {
+                height: calc(100vh - 31.7rem); /* Fallback for browsers which cannot support Custom Properties */
+                height: calc((var(--vh, 1vh) * 100) - 31.7rem);
               }
             }
 
@@ -342,7 +349,7 @@
 
             /* Filters - scrollable container with all filters */
             .gd-app-side-dialog-v2-content-middle-item-input-filter-list-container {
-              height: calc(100vh - 37.6rem); /* Old Value - Fallback for browsers that do not support Custom Properties */
+              height: calc(100vh - 37.6rem); /* Fallback for browsers which cannot support Custom Properties */
               height: calc((var(--vh, 1vh) * 100) - 37.6rem);
               margin: 0 -1.6rem;
               overflow-y: overlay;
@@ -567,10 +574,6 @@
               position: absolute;
               width: calc(100% + 3.2rem);
             }
-          }
-
-          .gd-app-side-dialog-v2-content-middle-item-input-group {
-            width: 100%;
           }
         }
 

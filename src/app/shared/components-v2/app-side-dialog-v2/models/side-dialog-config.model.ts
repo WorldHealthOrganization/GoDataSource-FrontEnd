@@ -418,6 +418,9 @@ export interface IV2SideDialogConfigInputFilterList extends IV2SideDialogConfigI
     [optionId: string]: ILabelValuePairModel
   };
   operatorHide?: boolean;
+  disableAdd?: boolean;
+  disableReset?: boolean;
+  disableDelete?: boolean;
 }
 
 /**

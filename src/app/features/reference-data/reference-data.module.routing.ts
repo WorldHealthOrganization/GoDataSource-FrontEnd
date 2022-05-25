@@ -18,6 +18,9 @@ const routes: Routes = [
       permissions: [
         PERMISSION.REFERENCE_DATA_LIST
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver
     }
   },
   // View Reference Data Category Entries List

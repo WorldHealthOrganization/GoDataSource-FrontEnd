@@ -39,6 +39,12 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
   static REFRESH_IF_USER_WAS_ACTIVE_IN_THE_LAST_SECONDS = 20;
   static REFRESH_DISABLE_SECONDS = 7;
 
+  // full screen ?
+  static FULL_SCREEN: boolean = false;
+  get fullScreen(): boolean {
+    return AuthenticatedComponent.FULL_SCREEN;
+  }
+
   // Side Nav
   @ViewChild('sideDialog', { static: true }) sideDialog: AppSideDialogV2Component;
 
