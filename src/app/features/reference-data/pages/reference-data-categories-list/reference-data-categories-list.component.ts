@@ -62,7 +62,8 @@ export class ReferenceDataCategoriesListComponent
     this.tableColumns = [
       {
         field: 'name',
-        label: 'LNG_REFERENCE_DATA_CATEGORY_FIELD_LABEL_CATEGORY_NAME'
+        label: 'LNG_REFERENCE_DATA_CATEGORY_FIELD_LABEL_CATEGORY_NAME',
+        pinned: IV2ColumnPinned.LEFT
       },
       {
         field: 'entries',
