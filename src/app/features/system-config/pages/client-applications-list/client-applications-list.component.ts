@@ -2,7 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
 import { Observable, Subscriber, throwError } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError, map, takeUntil, tap } from 'rxjs/operators';
 import { environment } from '../../../../../environments/environment';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { moment } from '../../../../core/helperClasses/x-moment';
@@ -12,17 +12,16 @@ import { SystemClientApplicationModel } from '../../../../core/models/system-cli
 import { SystemSettingsModel } from '../../../../core/models/system-settings.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
+import { ExportDataExtension, ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { DialogField, DialogFieldType } from '../../../../shared/components';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2SideDialogConfigInputText, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Component({
   selector: 'app-client-applications-list',
@@ -38,7 +37,6 @@ export class ClientApplicationsListComponent
     protected listHelperService: ListHelperService,
     private systemSettingsDataService: SystemSettingsDataService,
     private toastV2Service: ToastV2Service,
-    private dialogService: DialogService,
     private i18nService: I18nService,
     private activatedRoute: ActivatedRoute,
     private dialogV2Service: DialogV2Service
@@ -76,7 +74,6 @@ export class ClientApplicationsListComponent
         label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_NAME',
         pinned: IV2ColumnPinned.LEFT
       },
-      // TODO: Needs show/hide feature
       {
         field: 'credentials',
         label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CREDENTIALS',
@@ -465,95 +462,8 @@ export class ClientApplicationsListComponent
       });
   }
 
-  // TODO: To be deleted, method left for inspiration
   /**
    * Download Configuration File
-   * @param clientApplication
-   */
-  downloadConfFileOLD(clientApplication: SystemClientApplicationModel) {
-    // construct api url if necessary
-    let apiUrl: string = environment.apiUrl;
-    apiUrl = apiUrl.indexOf('http://') === 0 || apiUrl.indexOf('https://') === 0 ?
-      apiUrl : (
-        (apiUrl.indexOf('/') === 0 ? '' : '/') +
-                window.location.origin +
-                apiUrl
-      );
-
-    // define api async check
-    let apiURL: string;
-    const apiObserver = new Observable((subscriber: Subscriber<boolean>) => {
-      if (
-        _.isString(apiURL) &&
-                apiURL.includes('localhost')
-      ) {
-        subscriber.next(false);
-        subscriber.complete();
-      } else {
-        this.systemSettingsDataService
-          .getAPIVersion(apiURL)
-          .pipe(
-            catchError((err) => {
-              subscriber.next(false);
-              subscriber.complete();
-              return throwError(err);
-            })
-          )
-          .subscribe((versionData: any) => {
-            if (_.get(versionData, 'version')) {
-              subscriber.next(true);
-              subscriber.complete();
-            } else {
-              subscriber.next(false);
-              subscriber.complete();
-            }
-          });
-      }
-    });
-
-    // display export dialog
-    this.dialogService.showExportDialog({
-      message: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_DIALOG_TITLE',
-      url: 'system-settings/generate-file',
-      fileName: this.i18nService.instant('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_FILE_NAME') +
-                ' - ' +
-                moment().format('YYYY-MM-DD'),
-      fileType: ExportDataExtension.QR,
-      allowedExportTypesKey: 'type',
-      extraAPIData: {
-        data: {
-          clientId: clientApplication.credentials.clientId,
-          clientSecret: clientApplication.credentials.clientSecret
-        }
-      },
-      isPOST: true,
-      extraDialogFields: [
-        new DialogField({
-          name: 'data[url]',
-          placeholder: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_DIALOG_URL_LABEL',
-          required: true,
-          value: apiUrl,
-          fieldType: DialogFieldType.URL,
-          urlAsyncErrorMsg: 'LNG_FORM_VALIDATION_ERROR_FIELD_URL',
-          urlAsyncValidator: (url: string): Observable<boolean> => {
-            apiURL = url;
-            return apiObserver;
-          }
-        })
-      ],
-      fileExtension: 'png'
-      // exportStart: () => {
-      //   this.showLoadingDialog();
-      // },
-      // exportFinished: () => {
-      //   this.closeLoadingDialog();
-      // }
-    });
-  }
-
-  /**
-   * Download Configuration File
-   * @param clientApplication
    */
   downloadConfFile(clientApplication: SystemClientApplicationModel) {
     // construct api url if necessary
@@ -567,29 +477,42 @@ export class ClientApplicationsListComponent
 
     // define api async check
     let apiURL: string;
-    const apiObserver = new Observable((subscriber: Subscriber<boolean>) => {
+    const apiObserver = new Observable((subscriber: Subscriber<boolean | IGeneralAsyncValidatorResponse>) => {
       if (
         _.isString(apiURL) &&
         apiURL.includes('localhost')
       ) {
-        subscriber.next(false);
+        subscriber.next({
+          isValid: false,
+          errMsg: 'LNG_FORM_VALIDATION_ERROR_FIELD_URL'
+        });
         subscriber.complete();
       } else {
         this.systemSettingsDataService
           .getAPIVersion(apiURL)
           .pipe(
+            // throw error
             catchError((err) => {
-              subscriber.next(false);
+              subscriber.next({
+                isValid: false,
+                errMsg: 'LNG_FORM_VALIDATION_ERROR_FIELD_URL'
+              });
               subscriber.complete();
               return throwError(err);
-            })
+            }),
+
+            // should be the last pipe
+            takeUntil(this.destroyed$)
           )
           .subscribe((versionData: any) => {
             if (_.get(versionData, 'version')) {
               subscriber.next(true);
               subscriber.complete();
             } else {
-              subscriber.next(false);
+              subscriber.next({
+                isValid: false,
+                errMsg: 'LNG_FORM_VALIDATION_ERROR_FIELD_URL'
+              });
               subscriber.complete();
             }
           });
@@ -608,9 +531,6 @@ export class ClientApplicationsListComponent
         fileName: this.i18nService.instant('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE_FILE_NAME') +
           ' - ' +
           moment().format('YYYY-MM-DD'),
-        // TODO: Next properties are missing in new design
-        // fileExtension: 'png'
-        // urlAsyncErrorMsg: 'LNG_FORM_VALIDATION_ERROR_FIELD_URL',
         allow: {
           types: [
             ExportDataExtension.QR
@@ -631,7 +551,7 @@ export class ClientApplicationsListComponent
               value: apiUrl,
               validators: {
                 required: () => true,
-                async: (data): Observable<boolean> => {
+                async: (data) => {
                   apiURL = (data.map['data[url]'] as IV2SideDialogConfigInputText).value;
                   return apiObserver;
                 }
