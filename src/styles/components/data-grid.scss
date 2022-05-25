@@ -359,6 +359,30 @@
               width: 2rem;
             }
           }
+
+          .gd-list-table-icon-url {
+            height: 2.4rem;
+            width: auto;
+          }
+
+          .gd-list-table-cell-obfuscate {
+            .gd-list-table-cell-obfuscate-value {
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+
+            .mat-icon-button {
+              font-size: 1.6rem;
+              height: 2.4rem;
+              min-width: 2.4rem;
+              padding: 0.4rem;
+              width: 2.4rem;
+
+              .mat-icon {
+                font-size: 1.6rem;
+              }
+            }
+          }
         }
       }
 
