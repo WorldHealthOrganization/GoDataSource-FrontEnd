@@ -81,6 +81,7 @@ export class ClientApplicationsListComponent
         field: 'credentials',
         label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_CREDENTIALS',
         format: {
+          obfuscated: true,
           type: (item: SystemClientApplicationModel) => {
             return `${item.credentials.clientId}/${item.credentials.clientSecret}`;
           }

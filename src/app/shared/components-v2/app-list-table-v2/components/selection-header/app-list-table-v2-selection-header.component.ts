@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
 import { IHeaderAngularComp } from '@ag-grid-community/angular';
-import { IAfterGuiAttachedParams, IHeaderParams } from '@ag-grid-community/core';
+import { IHeaderParams } from '@ag-grid-community/core';
 import { IV2ColumnAction } from '../../models/column.model';
 import { IExtendedColDef } from '../../models/extended-column.model';
 import { IV2ActionMenuIcon } from '../../models/action.model';
@@ -41,13 +41,6 @@ export class AppListTableV2SelectionHeaderComponent implements IHeaderAngularCom
 
     // ignore for now
     return true;
-  }
-
-  /**
-   * After GUI attached
-   */
-  afterGuiAttached?(_params?: IAfterGuiAttachedParams): void {
-    // ignore for now
   }
 
   /**

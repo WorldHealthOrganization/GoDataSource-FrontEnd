@@ -29,6 +29,7 @@ export interface IV2ColumnBasicFormat extends IV2ColumnBasicFormatType {
   // optional
   field?: string;
   value?: (item: any) => any;
+  obfuscated?: boolean;
 }
 
 /**

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
-import { IAfterGuiAttachedParams, ICellRendererParams } from '@ag-grid-community/core';
+import { ICellRendererParams } from '@ag-grid-community/core';
 import { IExtendedColDef } from '../../models/extended-column.model';
 import { IV2ColumnAction } from '../../models/column.model';
 import { V2Action, V2ActionType } from '../../models/action.model';
@@ -31,13 +31,6 @@ export class AppListTableV2ActionsComponent implements ICellRendererAngularComp 
   refresh(_params: ICellRendererParams): boolean {
     // ignore for now
     return true;
-  }
-
-  /**
-   * After GUI attached
-   */
-  afterGuiAttached?(_params?: IAfterGuiAttachedParams): void {
-    // ignore for now
   }
 
   /**

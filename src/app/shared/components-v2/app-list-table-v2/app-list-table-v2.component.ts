@@ -55,6 +55,7 @@ import { SavedFilterData } from '../../../core/models/saved-filters.model';
 import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model';
 import { IV2ProcessSelectedData } from './models/process-data.model';
 import { HighlightSearchPipe } from '../../pipes/highlight-search/highlight-search';
+import { AppListTableV2ObfuscateComponent } from './components/obfuscate/app-list-table-v2-obfuscate.component';
 
 /**
  * Component
@@ -69,6 +70,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   // static
   private static readonly STANDARD_COLUMN_MAX_DEFAULT_WIDTH: number = 400;
   private static readonly STANDARD_SELECT_COLUMN_WIDTH: number = 42;
+  private static readonly STANDARD_OBFUSCATED_COLUMN_WIDTH: number = 400;
   private static readonly STANDARD_SHAPE_SIZE: number = 12;
   private static readonly STANDARD_SHAPE_GAP: number = 6;
   private static readonly STANDARD_SHAPE_PADDING: number = 14;
@@ -1027,8 +1029,13 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    * Custom renderer
    */
   private handleCellRenderer(column: IV2Column): any {
-    // link ?
+    // obfuscate ?
     const basicColumn: IV2ColumnBasic = column as IV2ColumnBasic;
+    if (basicColumn.format?.obfuscated) {
+      return AppListTableV2ObfuscateComponent;
+    }
+
+    // link ?
     if (basicColumn.link) {
       return (params: ValueFormatterParams) => {
         // determine value
@@ -1254,6 +1261,11 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         this._agTable.columnApi.setColumnWidth(
           column,
           AppListTableV2Component.STANDARD_SELECT_COLUMN_WIDTH
+        );
+      } else if ((colDef.columnDefinition as IV2ColumnBasic).format?.obfuscated) {
+        this._agTable.columnApi.setColumnWidth(
+          column,
+          AppListTableV2Component.STANDARD_OBFUSCATED_COLUMN_WIDTH
         );
       }
     });

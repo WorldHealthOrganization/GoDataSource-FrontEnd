@@ -12,6 +12,7 @@ import { AppListTableV2NoDataComponent } from './app-list-table-v2/components/no
 import { AppCreateViewModifyV2Component } from './app-create-view-modify-v2/app-create-view-modify-v2.component';
 import { AppSelectLanguageV2Component } from './app-select-language-v2/app-select-language-v2.component';
 import { AppBasicPageV2Component } from './app-basic-page-v2/app-basic-page-v2.component';
+import { AppListTableV2ObfuscateComponent } from './app-list-table-v2/components/obfuscate/app-list-table-v2-obfuscate.component';
 
 export const components: any[] = [
   AppBasicPageV2Component,
@@ -24,6 +25,7 @@ export const components: any[] = [
   AppListTableV2ColumnHeaderComponent,
   AppListTableV2LoadingComponent,
   AppListTableV2NoDataComponent,
+  AppListTableV2ObfuscateComponent,
   AppListTableV2SelectionHeaderComponent,
   AppLoadingDialogV2Component,
   AppSelectLanguageV2Component,
