@@ -5,7 +5,7 @@ import { throwError } from 'rxjs';
 import { catchError, map, takeUntil, tap } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
@@ -20,8 +20,8 @@ import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v
   templateUrl: './reference-data-category-entries-list.component.html'
 })
 export class ReferenceDataCategoryEntriesListComponent extends ListComponent<ReferenceDataEntryModel> implements OnDestroy {
-  categoryId: ReferenceDataCategory;
-  category: ReferenceDataCategoryModel;
+  // category
+  private _category: ReferenceDataCategoryModel;
 
   /**
    * Constructor
@@ -38,19 +38,8 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
       true
     );
 
-    // retrieve categoryId
-    this.categoryId = this.activatedRoute.snapshot.params.categoryId;
-
-    // retrieve Reference Data Category info
-    this.referenceDataDataService
-      .getReferenceDataByCategory(this.categoryId)
-      .subscribe((category: ReferenceDataCategoryModel) => {
-        // set data
-        this.category = category;
-
-        // update breadcrumbs
-        this.initializeBreadcrumbs();
-      });
+    // retrieve category
+    this._category = this.activatedRoute.snapshot.data.category;
   }
 
   /**
@@ -80,7 +69,8 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
     this.tableColumns = [
       {
         field: 'value',
-        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE'
+        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE',
+        pinned: IV2ColumnPinned.LEFT
       },
       {
         field: 'code',
@@ -95,7 +85,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
         label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON',
         noIconLabel: 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_LABEL_NO_ICON',
         format: {
-          type: V2ColumnFormat.ICON_MATERIAL
+          type: V2ColumnFormat.ICON_URL
         }
       },
       {
@@ -362,14 +352,12 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
     }
 
     // view / modify breadcrumb
-    if (this.category) {
-      this.breadcrumbs.push(
-        {
-          label: this.category.name,
-          action: null
-        }
-      );
-    }
+    this.breadcrumbs.push(
+      {
+        label: this._category.name,
+        action: null
+      }
+    );
   }
 
 
@@ -398,26 +386,24 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
    * Re(load) the Reference Data Categories list
    */
   refreshList() {
-    if (this.categoryId) {
-      this.records$ = this.referenceDataDataService
-        .getReferenceDataByCategory(this.categoryId)
-        .pipe(
-          map((category: ReferenceDataCategoryModel) => {
-            return category.entries;
-          }),
+    this.records$ = this.referenceDataDataService
+      .getReferenceDataByCategory(this._category.id)
+      .pipe(
+        map((category: ReferenceDataCategoryModel) => {
+          return category.entries;
+        }),
 
-          // update page count
-          tap((entries: ReferenceDataEntryModel[]) => {
-            this.pageCount = {
-              count: entries.length,
-              hasMore: false
-            };
-          }),
+        // update page count
+        tap((entries: ReferenceDataEntryModel[]) => {
+          this.pageCount = {
+            count: entries.length,
+            hasMore: false
+          };
+        }),
 
-          // should be the last pipe
-          takeUntil(this.destroyed$)
-        );
-    }
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
   }
 
   /**

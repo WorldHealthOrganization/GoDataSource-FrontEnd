@@ -16,7 +16,7 @@ import {
   IV2ColumnBasicFormat,
   IV2ColumnButton,
   IV2ColumnColor,
-  IV2ColumnIconMaterial,
+  IV2ColumnIconMaterial, IV2ColumnIconURL,
   IV2ColumnLinkList,
   IV2ColumnPinned,
   IV2ColumnStatus,
@@ -938,6 +938,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
           // COLOR & ICON
           case V2ColumnFormat.COLOR:
+          case V2ColumnFormat.ICON_URL:
           case V2ColumnFormat.ICON_MATERIAL:
             return fieldValue;
 
@@ -1068,11 +1069,28 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         };
       }
 
-      // icon ?
-      const iconColumn: IV2ColumnIconMaterial = column as IV2ColumnIconMaterial;
+      // URL icon ?
+      const URLIconColumn: IV2ColumnIconURL = column as IV2ColumnIconURL;
       if (
-        iconColumn.format &&
-        iconColumn.format.type === V2ColumnFormat.ICON_MATERIAL
+        URLIconColumn.format &&
+        URLIconColumn.format.type === V2ColumnFormat.ICON_URL
+      ) {
+        return (params: ValueFormatterParams) => {
+          // determine value
+          const value: string = this.formatValue(params);
+
+          // create color display
+          return value ?
+            `<img class="gd-list-table-icon-url" src="${value}" alt="${URLIconColumn.noIconLabel}" />` :
+            this.translateService.instant(URLIconColumn.noIconLabel);
+        };
+      }
+
+      // material icon ?
+      const materialIconColumn: IV2ColumnIconMaterial = column as IV2ColumnIconMaterial;
+      if (
+        materialIconColumn.format &&
+        materialIconColumn.format.type === V2ColumnFormat.ICON_MATERIAL
       ) {
         return (params: ValueFormatterParams) => {
           // determine value
@@ -1081,7 +1099,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           // create color display
           return value ?
             `<span class="gd-list-table-icon-material"><span class="material-icons">${value}</span></span>` :
-            this.translateService.instant(iconColumn.noIconLabel);
+            this.translateService.instant(materialIconColumn.noIconLabel);
         };
       }
 
