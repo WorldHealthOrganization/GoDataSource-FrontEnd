@@ -1,0 +1,39 @@
+@import 'mixins';
+@import 'font';
+
+/* KPI Dashlet */
+.gd-dashlet-kpi {
+  background-color: var(--gd-background);
+  @include border-radius(0.4rem);
+  @include box-shadow(0 0.2rem 0.1rem -0.1rem rgb(0, 0, 0, 0.2),
+                      0 0.1rem 0.1rem 0 rgb(0, 0, 0, 0.14),
+                      0 0.1rem 0.3rem 0 rgb(0, 0, 0, 0.12));
+
+  .gd-dashlet-kpi-top {
+    padding: 0.8rem 1.6rem;
+
+    .gd-dashlet-kpi-top-title {
+      color: var(--gd-primary);
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    .gd-dashlet-kpi-top-actions {
+      .mat-icon-button {
+        font-size: 2rem;
+        height: 2.4rem;
+        min-width: 2.4rem;
+        padding: 0.4rem;
+        width: 2.4rem;
+
+        .mat-icon {
+          font-size: 1.6rem;
+        }
+      }
+    }
+  }
+
+  .gd-dashlet-kpi-bottom {
+    .gd-dashlet-kpi-bottom-value {}
+  }
+}

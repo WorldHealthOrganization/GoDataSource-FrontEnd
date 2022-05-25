@@ -17,6 +17,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent {
