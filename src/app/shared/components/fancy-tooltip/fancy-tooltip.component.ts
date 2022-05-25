@@ -29,12 +29,6 @@ export class FancyTooltipComponent implements OnDestroy {
     return this._tooltip;
   }
 
-  // tooltip icon
-  @Input() tooltipIcon: string = 'help';
-
-  // tooltip icon classes
-  @Input() tooltipIconClasses: string = '';
-
   // language subscription
   private languageSubscription: Subscription;
 

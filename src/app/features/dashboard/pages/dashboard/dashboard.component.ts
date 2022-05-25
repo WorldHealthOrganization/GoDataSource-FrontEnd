@@ -69,10 +69,16 @@ export class DashboardComponent {
 
   // visible dashlets
   visibleDashlets: {
+    CaseSummary: boolean,
+    CasesPerLocation: boolean,
+    Hospitalized: boolean,
     KPICases: boolean,
     KPIContacts: boolean,
     KPICOT: boolean
   } = {
+      CaseSummary: false,
+      CasesPerLocation: false,
+      Hospitalized: false,
       KPICases: false,
       KPIContacts: false,
       KPICOT: false
@@ -92,6 +98,11 @@ export class DashboardComponent {
 
     // determine visible dashlets
     this.visibleDashlets = {
+      // Old Dashlets
+      CaseSummary: DashboardModel.canViewCaseSummaryDashlet(authUser),
+      CasesPerLocation: DashboardModel.canViewCasePerLocationLevelDashlet(authUser),
+      Hospitalized: DashboardModel.canViewCaseHospitalizedPieChartDashlet(authUser),
+
       // KPI - cases
       KPICases: DashboardModel.canViewCaseDeceasedDashlet(authUser) ||
         DashboardModel.canViewCaseHospitalizedDashlet(authUser) ||

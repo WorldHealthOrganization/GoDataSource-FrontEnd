@@ -123,6 +123,32 @@
   <!-- Bottom -->
   <div
     class="gd-dashboard-bottom">
+    <!-- Summary -->
+    <app-case-summary-dashlet
+      *ngIf="visibleDashlets.CaseSummary"
+      [globalFilterDate]="globalFilterDate"
+      [globalFilterLocationId]="globalFilterLocationId"
+      [globalFilterClassificationId]="globalFilterClassificationId"
+      (detectChanges)="detectChanges()">
+    </app-case-summary-dashlet>
+
+    <!-- Location -->
+    <app-case-by-geographic-location-dashlet
+      *ngIf="visibleDashlets.CasesPerLocation"
+      [globalFilterDate]="globalFilterDate"
+      [globalFilterLocationId]="globalFilterLocationId"
+      [globalFilterClassificationId]="globalFilterClassificationId"
+      (detectChanges)="detectChanges()">
+    </app-case-by-geographic-location-dashlet>
+
+    <!-- Hospitalized -->
+    <app-cases-hospitalized-pie-chart-dashlet
+      *ngIf="visibleDashlets.Hospitalized"
+      [globalFilterDate]="globalFilterDate"
+      [globalFilterLocationId]="globalFilterLocationId"
+      [globalFilterClassificationId]="globalFilterClassificationId"
+      (detectChanges)="detectChanges()">
+    </app-cases-hospitalized-pie-chart-dashlet>
 
     <!-- Cases KPI -->
     <app-cases-kpi-dashlet
@@ -260,47 +286,6 @@
 <!--                    <div-->
 <!--                        fxLayout="row"-->
 <!--                        fxLayoutGap="10px">-->
-<!--                        &lt;!&ndash; Summary &ndash;&gt;-->
-<!--                        <div-->
-<!--                            *ngIf="DashboardModel.canViewCaseSummaryDashlet(authUser)"-->
-<!--                            fxFlex="33">-->
-<!--                            <mat-card-->
-<!--                                class="dashboard-gauge">-->
-<!--                                <app-case-summary-dashlet-->
-<!--                                    [globalFilterDate]="globalFilterDate"-->
-<!--                                    [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                                    [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                                </app-case-summary-dashlet>-->
-<!--                            </mat-card>-->
-<!--                        </div>-->
-
-<!--                        &lt;!&ndash; Location &ndash;&gt;-->
-<!--                        <div-->
-<!--                            *ngIf="DashboardModel.canViewCasePerLocationLevelDashlet(authUser)"-->
-<!--                            fxFlex="33">-->
-<!--                            <mat-card-->
-<!--                                class="dashboard-gauge">-->
-<!--                                <app-case-by-geographic-location-dashlet-->
-<!--                                    [globalFilterDate]="globalFilterDate"-->
-<!--                                    [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                                    [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                                </app-case-by-geographic-location-dashlet>-->
-<!--                            </mat-card>-->
-<!--                        </div>-->
-
-<!--                        &lt;!&ndash; Hospitalized &ndash;&gt;-->
-<!--                        <div-->
-<!--                            *ngIf="DashboardModel.canViewCaseHospitalizedPieChartDashlet(authUser)"-->
-<!--                            fxFlex="33">-->
-<!--                            <mat-card-->
-<!--                                class="dashboard-gauge">-->
-<!--                                <app-cases-hospitalized-pie-chart-dashlet-->
-<!--                                    [globalFilterDate]="globalFilterDate"-->
-<!--                                    [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                                    [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                                </app-cases-hospitalized-pie-chart-dashlet>-->
-<!--                            </mat-card>-->
-<!--                        </div>-->
 <!--                    </div>-->
 <!--                </ng-template>-->
 <!--            </mat-expansion-panel>-->
