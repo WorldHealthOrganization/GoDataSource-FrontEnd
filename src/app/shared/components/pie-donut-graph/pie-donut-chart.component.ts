@@ -2,6 +2,10 @@ import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, 
 import { v4 as uuid } from 'uuid';
 import * as d3 from 'd3';
 import { Selection } from 'd3-selection';
+import { Observable, throwError } from 'rxjs';
+import { Subscription } from 'rxjs/internal/Subscription';
+import { catchError } from 'rxjs/operators';
+import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 
 /**
  * Arc
@@ -38,8 +42,8 @@ export class PieDonutChartData {
   checked: boolean = true;
 
   /**
-     * Assign colors to data
-     */
+   * Assign colors to data
+   */
   static assignColorDomain(data: PieDonutChartData[]): void {
     // colors map
     const colors: string[] = [
@@ -66,8 +70,8 @@ export class PieDonutChartData {
   }
 
   /**
-     * Create data object
-     */
+   * Create data object
+   */
   constructor(data: {
     // data
     key: string,
@@ -123,22 +127,28 @@ implements OnInit, OnDestroy {
     return this._chartContainer;
   }
 
-  // loading graph data ?
-  private _loadingData: boolean = false;
-  @Input() set loadingData(loadingData: boolean) {
-    // set data
-    this._loadingData = loadingData;
+  // detect changes
+  @Output() detectChanges = new EventEmitter<void>();
 
-    // redraw
-    this.redrawGraph(false);
-  }
-  get loadingData(): boolean {
-    return this._loadingData;
+  // loading graph data ?
+  loadingData: boolean = true;
+
+  // get data
+  private _retrievedData: boolean;
+  private _getDataSubscription: Subscription;
+  private _getData$: Observable<PieDonutChartData[]>;
+  @Input() set getData$(getData$: Observable<PieDonutChartData[]>) {
+    // set data
+    this._getData$ = getData$;
+    this._retrievedData = false;
+
+    // retrieve data if expanded
+    this.retrieveData();
   }
 
   // display data
   private _data: PieDonutChartData[] = [];
-  @Input() set data(data: PieDonutChartData[]) {
+  set data(data: PieDonutChartData[]) {
     // validate data
     (data || []).forEach((item) => {
       if (!(item instanceof PieDonutChartData)) {
@@ -300,6 +310,26 @@ implements OnInit, OnDestroy {
       }
     };
 
+  // expanded / collapsed ?
+  private _expanded: boolean = false;
+  set expanded(expanded: boolean) {
+    // set data
+    this._expanded = expanded;
+
+    // retrieve data if expanded and data not retrieved
+    this.retrieveData();
+  }
+  get expanded(): boolean {
+    return this._expanded;
+  }
+
+  /**
+   * Constructor
+   */
+  constructor(
+    private toastV2Service: ToastV2Service
+  ) {}
+
   /**
      * Component initialized
      */
@@ -314,6 +344,12 @@ implements OnInit, OnDestroy {
   ngOnDestroy() {
     // stop size checker
     this.releasePeriodicChecks();
+
+    // release retrieve data
+    if (this._getDataSubscription) {
+      this._getDataSubscription.unsubscribe();
+      this._getDataSubscription = undefined;
+    }
   }
 
   /**
@@ -347,8 +383,8 @@ implements OnInit, OnDestroy {
     // no size to determine ?
     if (
       !this.chartContainer ||
-            !this.chartContainer.nativeElement ||
-            this.loadingData
+      !this.chartContainer.nativeElement ||
+      this.loadingData
     ) {
       return;
     }
@@ -381,7 +417,7 @@ implements OnInit, OnDestroy {
     // or still waiting for data ?
     if (
       !this.chartContainer ||
-            this.loadingData
+      this.loadingData
     ) {
       return;
     }
@@ -988,8 +1024,8 @@ implements OnInit, OnDestroy {
   }
 
   /**
-     * Find arc item
-     */
+   * Find arc item
+   */
   private findArcFromChartDataItem(item: PieDonutChartData): IArcsWithExtraDetails {
     // no graph data ?
     if (
@@ -1005,8 +1041,8 @@ implements OnInit, OnDestroy {
   }
 
   /**
-     * Find and select graph arc
-     */
+   * Find and select graph arc
+   */
   findAndSelectArc(item: PieDonutChartData): void {
     // find arc item
     const arc: IArcsWithExtraDetails = this.findArcFromChartDataItem(item);
@@ -1024,15 +1060,15 @@ implements OnInit, OnDestroy {
   }
 
   /**
-     * Find and deselect graph arc
-     */
+   * Find and deselect graph arc
+   */
   findAndDeselectArc(): void {
     this.mouseOut();
   }
 
   /**
-     * Check / uncheck item
-     */
+   * Check / uncheck item
+   */
   checkUncheckItem(
     item: PieDonutChartData,
     checkedValue: boolean
@@ -1047,5 +1083,48 @@ implements OnInit, OnDestroy {
 
     // show / hide chart arcs
     this.redrawGraph(true);
+  }
+
+  /**
+   * No need to retrieve ?
+   */
+  retrieveData(): void {
+    // not expanded ?
+    if (
+      !this.expanded ||
+      !this._getData$ ||
+      this._retrievedData
+    ) {
+      return;
+    }
+
+    // release previous retrieve data if in progress
+    if (this._getDataSubscription) {
+      this._getDataSubscription.unsubscribe();
+      this._getDataSubscription = undefined;
+    }
+
+    // retrieve data
+    this._retrievedData = true;
+    this.loadingData = true;
+    this.detectChanges.emit();
+    this._getDataSubscription = this._getData$
+      .pipe(catchError((err) => {
+        // show error
+        this.toastV2Service.error(err);
+
+        // send error down the road
+        return throwError(err);
+      }))
+      .subscribe((data) => {
+        // update data
+        this.data = data ?
+          data :
+          [];
+
+        // update progress
+        this.loadingData = false;
+        this.detectChanges.emit();
+      });
   }
 }
