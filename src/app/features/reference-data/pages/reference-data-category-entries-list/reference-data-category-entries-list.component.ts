@@ -20,7 +20,7 @@ import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v
 })
 export class ReferenceDataCategoryEntriesListComponent extends ListComponent<ReferenceDataEntryModel> implements OnDestroy {
   // category
-  private _category: ReferenceDataCategoryModel;
+  category: ReferenceDataCategoryModel;
 
   /**
    * Constructor
@@ -38,7 +38,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
     );
 
     // retrieve category
-    this._category = this.activatedRoute.snapshot.data.category;
+    this.category = this.activatedRoute.snapshot.data.category;
   }
 
   /**
@@ -352,7 +352,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
     // view / modify breadcrumb
     this.breadcrumbs.push(
       {
-        label: this._category.name,
+        label: this.category.name,
         action: null
       }
     );
@@ -385,7 +385,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
    */
   refreshList() {
     this.records$ = this.referenceDataDataService
-      .getReferenceDataByCategory(this._category.id)
+      .getReferenceDataByCategory(this.category.id)
       .pipe(
         map((category: ReferenceDataCategoryModel) => {
           return category.entries;

@@ -1,5 +1,5 @@
 <app-list-table-v2
-  pageTitle="LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE"
+  [pageTitle]="category.name"
   [records$]="records$"
   [processSelectedData]="processSelectedData"
   [columns]="tableColumns"
