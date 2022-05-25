@@ -1,39 +1,37 @@
 @import 'mixins';
 @import 'font';
 
-/* Select */
+/* Old style */
+.mat-option-vscroll {
+  --vscroll-mat-option-height: 4.8rem;
+
+  // for virtual scroll
+  height: var(--vscroll-mat-option-height) !important;
+  min-height: var(--vscroll-mat-option-height) !important;
+  max-height: var(--vscroll-mat-option-height) !important;
+
+  .label-as-mat-icon {
+    font-family: 'Material Icons';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 2.4rem;
+  }
+}
+
+.mat-option-vscroll-selected {
+  visibility: hidden;
+  position: absolute;
+}
+
+.mat-select-virtual-scroll-viewport {
+  height: 20rem;
+  overflow-x: hidden;
+}
+
+/* New style */
 app-form-select-vscroll {
   width: 100%;
 
-  /* Old style */
-  --vscroll-mat-option-height: 4.8rem;
-
-  .mat-option-vscroll {
-    // for virtual scroll
-    height: var(--vscroll-mat-option-height) !important;
-    min-height: var(--vscroll-mat-option-height) !important;
-    max-height: var(--vscroll-mat-option-height) !important;
-
-    .label-as-mat-icon {
-      font-family: 'Material Icons';
-      font-style: normal;
-      font-weight: 400;
-      font-size: 24px;
-    }
-  }
-
-  .mat-option-vscroll-selected {
-    visibility: hidden;
-    position: absolute;
-  }
-
-  .mat-select-virtual-scroll-viewport {
-    height: 192px;
-    overflow-x: hidden;
-  }
-
-
-  /* New style */
   > .form-element {
     @include flex(flex);
   }

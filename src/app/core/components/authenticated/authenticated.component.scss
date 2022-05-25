@@ -181,6 +181,10 @@ mat-sidenav-container {
           padding: 1.2rem 2rem 2rem;
         }
       }
+
+      &.gd-body-content-right-fullscreen {
+        z-index: auto;
+      }
     }
   }
 }
