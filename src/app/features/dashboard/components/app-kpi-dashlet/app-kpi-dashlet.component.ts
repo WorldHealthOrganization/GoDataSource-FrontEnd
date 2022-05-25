@@ -120,7 +120,7 @@ implements OnDestroy {
 
   // expanded / collapsed ?
   private _expanded: boolean = false;
-  @Input() set expanded(expanded: boolean) {
+  set expanded(expanded: boolean) {
     // set data
     this._expanded = expanded;
 
