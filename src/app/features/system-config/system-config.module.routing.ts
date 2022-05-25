@@ -76,6 +76,10 @@ const routes: Routes = [
           permissions: [
             PERMISSION.CLIENT_APPLICATION_LIST
           ]
+        },
+        resolve: {
+          yesNoAll: YesNoAllDataResolver,
+          outbreak: OutbreakDataResolver
         }
       },
       {
