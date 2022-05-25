@@ -7,13 +7,15 @@ import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time
 import { Observable, Subscriber, Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { Constants } from '../../../../core/models/constants';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { CaseModel } from '../../../../core/models/case.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { PieDonutChartData } from '../../../../shared/components/pie-donut-graph/pie-donut-chart.component';
 import { map } from 'rxjs/operators';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 
 @Component({
   selector: 'app-case-summary-dashlet',
@@ -81,7 +83,8 @@ implements OnInit, OnDestroy {
     private outbreakDataService: OutbreakDataService,
     private caseDataService: CaseDataService,
     private router: Router,
-    private authDataService: AuthDataService
+    private authDataService: AuthDataService,
+    private activatedRoute: ActivatedRoute
   ) {}
 
   /**
@@ -211,6 +214,7 @@ implements OnInit, OnDestroy {
           groupedCases &&
           groupedCases.classification
         ) {
+          const classification = this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>;
           _.each(
             groupedCases.classification,
             (
@@ -221,7 +225,9 @@ implements OnInit, OnDestroy {
             ) => {
               data.push(new PieDonutChartData({
                 key: classificationKey,
-                color: null,
+                color: classification.map[classificationKey] ?
+                  classification.map[classificationKey].getColorCode() :
+                  Constants.DEFAULT_COLOR_REF_DATA,
                 label: classificationKey,
                 value: classificationData.count
               }));
