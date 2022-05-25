@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { TopnavComponent } from '../../../core/components/topnav/topnav.component';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
 import { IV2ActionIconLabel, IV2ActionMenuLabel } from '../app-list-table-v2/models/action.model';
@@ -14,6 +14,7 @@ import { IV2SideDialogAdvancedFiltersResponse } from '../app-side-dialog-v2/mode
   selector: 'app-basic-page-v2',
   templateUrl: './app-basic-page-v2.component.html',
   styleUrls: ['./app-basic-page-v2.component.scss'],
+  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppBasicPageV2Component implements OnInit, OnDestroy {

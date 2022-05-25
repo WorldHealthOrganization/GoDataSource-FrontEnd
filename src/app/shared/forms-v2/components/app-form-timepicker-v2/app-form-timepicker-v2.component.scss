@@ -1,23 +1,16 @@
 @import 'mixins';
 @import 'font';
 
-/* Select dropdown */
- .cdk-overlay-pane {
-   &.gd-cdk-overlay-pane-dropdown {
-     margin-top: 5rem;
-   }
- }
-
-/* Select */
-.gd-form-select-single-v2 {
+/* Timepicker */
+.gd-form-timepicker-v2 {
   @include flex(flex);
   width: 100%;
 
   .mat-form-field {
+    width: 100%;
     font-family: $gd-font-family;
     font-size: $gd-font-size;
     line-height: $gd-line-height;
-    width: 100%;
 
     .mat-form-field-wrapper {
       margin: 0;
@@ -27,7 +20,7 @@
         margin-top: 0;
         padding: 0 1.6rem;
 
-        /* Select borders */
+        /* Timepicker input borders */
         .mat-form-field-outline {
           color: var(--gd-secondary);
           top: 0;
@@ -51,7 +44,7 @@
           }
         }
 
-        /* Select borders on focus */
+        /* Timepicker input borders on focus */
         .mat-form-field-outline-thick {
           color: var(--gd-primary);
 
@@ -74,7 +67,7 @@
           }
         }
 
-        /* Select prefix */
+        /* Timepicker input prefix */
         .mat-form-field-prefix {
           left: -0.4rem;
           top: 0.5rem;
@@ -93,82 +86,27 @@
           }
         }
 
-        /* Select middle */
+        /* Timepicker input middle */
         .mat-form-field-infix {
           border-top: 0 none;
           @include flex(flex);
           padding: 0.8rem 0;
           width: 10rem;
 
-          .mat-select {
-            font-family: $gd-font-family;
-            font-size: $gd-font-size;
-            height: 2.4rem;
+          input {
             line-height: 2.4rem;
             margin-top: 0;
+          }
 
-            /* Select arrow trigger */
-            .mat-select-trigger {
-              height: 2.4rem;
-
-              .mat-select-value {
-                color: var(--gd-text);
-
-                .mat-select-value-text {
-                  mat-select-trigger {
-                    > img {
-                      display: inline-block;
-                      height: 2rem;
-                      margin-right: 0.4rem;
-                      vertical-align: text-bottom;
-                    }
-                  }
-
-                  .gd-form-select-single-v2-panel-with-icon {
-                    .mat-icon {
-                      color: var(--gd-primary);
-                      font-size: 2.4rem;
-                      height: 2.4rem;
-                      margin-right: 0.8rem;
-                      vertical-align: middle;
-                      width: 2.4rem;
-                    }
-                  }
-                }
-              }
-
-              .mat-select-arrow-wrapper {
-                position: relative;
-                top: 0;
-                @include transform(none);
-
-                .mat-select-arrow {
-                  color: var(--gd-secondary);
-                  @include transition(all 0.24s ease-in-out 0s);
-                }
-              }
-            }
-
-            &[aria-expanded="true"] {
-              .mat-select-trigger {
-                .mat-select-arrow-wrapper {
-                  .mat-select-arrow {
-                    @include rotate(180deg);
-                  }
-                }
-              }
-            }
+          .mat-input-element {
+            caret-color: var(--gd-text);
           }
 
           .mat-form-field-label-wrapper {
             .mat-form-field-label {
               color: var(--gd-secondary);
               line-height: 2.4rem;
-              margin-top: 0;
-
-              &.mat-form-field-empty {
-                margin-top: -0.6rem;
-              }
+              margin-top: -0.7rem;
 
               .mat-placeholder-required {
                 color: var(--gd-danger);
@@ -177,7 +115,7 @@
           }
         }
 
-        /* Select suffix */
+        /* Timepicker input suffix */
         .mat-form-field-suffix {
           @include flex(flex);
           @include flex_align_items(center);
@@ -189,7 +127,8 @@
 
           .mat-icon {
             color: rgba(var(--gd-text-rgb), 0.75);
-            font-size: 2rem;
+            font-size: 1.6rem;
+            height: 1.6rem;
             line-height: 1;
             text-align: center;
           }
@@ -197,6 +136,8 @@
           .mat-icon-button {
             font-size: 1.6rem;
             height: 2.4rem;
+            min-width: 0;
+            padding: 0;
             width: 2.4rem;
 
             + .mat-icon-button {
@@ -206,7 +147,7 @@
         }
       }
 
-      /* Form input error */
+      /* Timepicker input error */
       .mat-form-field-subscript-wrapper {
         font-size: 1.2rem;
         line-height: 1;
@@ -222,16 +163,16 @@
       }
     }
 
-    /* Select focused */
+    /* Timepicker input focused */
     &:focus,
-    &.mat-focused {
+    &.mat-focused,
+    &.mat-form-field-should-float {
       .mat-form-field-wrapper {
         .mat-form-field-flex {
           .mat-form-field-infix {
             .mat-form-field-label-wrapper {
               .mat-form-field-label {
                 color: var(--gd-primary);
-                margin-top: -0.7rem;
                 transform: translateY(-1.6rem) scale(0.75);
                 width: 100%;
               }
@@ -241,7 +182,7 @@
       }
     }
 
-    /* Select disabled */
+    /* Timepicker input disabled */
     &.mat-form-field-disabled {
       .mat-form-field-wrapper {
         .mat-form-field-flex {
@@ -256,35 +197,15 @@
               color: var(--gd-secondary);
             }
           }
-
+  
           .mat-form-field-infix {
-            .mat-select {
-              .mat-select-trigger {
-                .mat-select-value {
-                  color: var(--gd-secondary);
-
-                  .mat-select-value-text {
-                    .mat-icon {
-                      color: var(--gd-secondary);
-                    }
-                  }
-                }
-
-                .mat-select-arrow-wrapper {
-                  .mat-select-arrow {
-                    color: var(--gd-secondary);
-                  }
-                }
-              }
-            }
-
             .mat-form-field-label-wrapper {
               .mat-form-field-label {
                 color: var(--gd-secondary);
               }
             }
           }
-
+  
           .mat-form-field-suffix {
             .mat-icon {
               color: var(--gd-secondary);
@@ -294,7 +215,7 @@
       }
     }
 
-    /* Select invalid */
+    /* Timepicker input invalid */
     &.mat-form-field-invalid {
       .mat-form-field-wrapper {
         .mat-form-field-flex {
@@ -305,20 +226,6 @@
           }
 
           .mat-form-field-infix {
-            .mat-select {
-              .mat-select-trigger {
-                .mat-select-value {
-                  color: var(--gd-danger);
-                }
-
-                .mat-select-arrow-wrapper {
-                  .mat-select-arrow {
-                    color: var(--gd-danger);
-                  }
-                }
-              }
-            }
-
             .mat-form-field-label-wrapper {
               .mat-form-field-label {
                 color: var(--gd-danger);
@@ -329,20 +236,12 @@
       }
     }
   }
+}
 
-  .gd-form-select-single-v2-viewonly {
-    .gd-form-select-single-v2-viewonly-label {
-      color: var(--gd-secondary);
-      white-space: nowrap;
-    }
-
-    .gd-form-select-single-v2-viewonly-value {
-      img {
-        display: inline-block;
-        height: 2rem;
-        margin-right: 0.4rem;
-        vertical-align: text-bottom;
-      }
-    }
-  }
+/* Timepicker Clock */
+.timepicker.gd-form-timepicker-v2-panel {
+  --button-color: #2F7977;
+  --dial-background-color: #2F7977;
+  --dial-editable-active-color: #2F7977;
+  --clock-hand-color: #2F7977;
 }

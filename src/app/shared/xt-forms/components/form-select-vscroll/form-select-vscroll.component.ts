@@ -8,7 +8,7 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
   selector: 'app-form-select-vscroll',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './form-select-vscroll.component.html',
-  styleUrls: ['./form-select-vscroll.component.less'],
+  styleUrls: ['./form-select-vscroll.component.scss'],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
     useExisting: FormSelectVscrollComponent,
