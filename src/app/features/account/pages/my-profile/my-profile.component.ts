@@ -1,5 +1,5 @@
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { UserModel, UserRoleModel } from '../../../../core/models/user.model';
 import { Observable, throwError } from 'rxjs';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -16,6 +16,7 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { LanguageModel } from '../../../../core/models/language.model';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
 
 @Component({
   selector: 'app-my-profile',
@@ -26,7 +27,6 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
    * Constructor
    */
   constructor(
-    protected router: Router,
     protected activatedRoute: ActivatedRoute,
     protected toastV2Service: ToastV2Service,
     protected userDataService: UserDataService,
@@ -34,14 +34,15 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
     protected i18nService: I18nService,
     protected dialogV2Service: DialogV2Service,
     authDataService: AuthDataService,
-    renderer2: Renderer2
+    renderer2: Renderer2,
+    redirectService: RedirectService
   ) {
     super(
       activatedRoute,
       authDataService,
       toastV2Service,
       renderer2,
-      router
+      redirectService
     );
   }
 

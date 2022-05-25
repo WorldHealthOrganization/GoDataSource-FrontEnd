@@ -32,6 +32,7 @@ import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { QuestionModel } from '../../../../core/models/question.model';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
 
 /**
  * Component
@@ -53,22 +54,23 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
    * Constructor
    */
   constructor(
-    private outbreakDataService: OutbreakDataService,
-    private activatedRoute: ActivatedRoute,
-    private translateService: TranslateService,
-    private i18nService: I18nService,
-    private dialogV2Service: DialogV2Service,
+    protected outbreakDataService: OutbreakDataService,
+    protected activatedRoute: ActivatedRoute,
+    protected translateService: TranslateService,
+    protected i18nService: I18nService,
+    protected dialogV2Service: DialogV2Service,
+    protected router: Router,
     authDataService: AuthDataService,
     toastV2Service: ToastV2Service,
     renderer2: Renderer2,
-    router: Router
+    redirectService: RedirectService
   ) {
     super(
       activatedRoute,
       authDataService,
       toastV2Service,
       renderer2,
-      router,
+      redirectService,
       true
     );
   }
