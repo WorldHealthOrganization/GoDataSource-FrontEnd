@@ -19,6 +19,12 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { TranslateService } from '@ngx-translate/core';
 import * as momentOriginal from 'moment';
+import { DomService } from '../../../../core/services/helper/dom.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
+import * as FileSaver from 'file-saver';
 
 @Component({
   selector: 'app-dashboard',
@@ -112,6 +118,9 @@ export class DashboardComponent implements OnDestroy {
     private activatedRoute: ActivatedRoute,
     private outbreakDataService: OutbreakDataService,
     private translateService: TranslateService,
+    private domService: DomService,
+    private toastV2Service: ToastV2Service,
+    private importExportDataService: ImportExportDataService,
     authDataService: AuthDataService
   ) {
     // authenticated user
@@ -195,7 +204,13 @@ export class DashboardComponent implements OnDestroy {
     this.quickActions = {
       type: V2ActionType.MENU,
       label: 'LNG_PAGE_DASHBOARD_REPORTS_BUTTON_LABEL',
-      visible: () => !!this._selectedOutbreak?.id,
+      visible: () => !!this._selectedOutbreak?.id && (
+        DashboardModel.canExportCaseClassificationPerLocationReport(this._authUser) ||
+        DashboardModel.canExportContactFollowUpSuccessRateReport(this._authUser) ||
+        DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(this._authUser) ||
+        DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(this._authUser) ||
+        DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(this._authUser)
+      ),
       menuOptions: [
         // Export case classification per location report
         {
@@ -325,6 +340,45 @@ export class DashboardComponent implements OnDestroy {
             }
           },
           visible: () => DashboardModel.canExportContactFollowUpSuccessRateReport(this._authUser)
+        },
+
+        // Export EPI - Classification
+        {
+          label: {
+            get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_CLASSIFICATION_TITLE'
+          },
+          action: {
+            click: () => {
+              this.getEpiCurveDashlet('app-epi-curve-dashlet svg');
+            }
+          },
+          visible: () => DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(this._authUser)
+        },
+
+        // Export EPI - Outcome
+        {
+          label: {
+            get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE'
+          },
+          action: {
+            click: () => {
+              this.getEpiCurveDashlet('app-epi-curve-outcome-dashlet svg');
+            }
+          },
+          visible: () => DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(this._authUser)
+        },
+
+        // Export EPI - Reporting Classification
+        {
+          label: {
+            get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORTING_TITLE'
+          },
+          action: {
+            click: () => {
+              this.getEpiCurveDashlet('app-epi-curve-reporting-dashlet svg');
+            }
+          },
+          visible: () => DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(this._authUser)
         }
       ]
     };
@@ -398,6 +452,53 @@ export class DashboardComponent implements OnDestroy {
         // update ui
         this.detectChanges();
       });
+  }
+
+  /**
+   * Get Epi curve dashlet
+   */
+  private getEpiCurveDashlet(selector: string) {
+    const loading = this.dialogV2Service.showLoadingDialog();
+    this.domService
+      .getPNGBase64(selector, '#tempCanvas')
+      .subscribe((pngBase64) => {
+        // object not found ?
+        if (!pngBase64) {
+          this.toastV2Service.notice('LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG');
+          loading.close();
+          return;
+        }
+
+        // export
+        this.importExportDataService
+          .exportImageToPdf({ image: pngBase64, responseType: 'blob', splitFactor: 1 })
+          .pipe(
+            catchError((err) => {
+              this.toastV2Service.error(err);
+              loading.close();
+              return throwError(err);
+            })
+          )
+          .subscribe((blob) => {
+            this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL');
+            loading.close();
+          });
+      });
+  }
+
+  /**
+   * Download File
+   */
+  private downloadFile(
+    blob,
+    fileNameToken,
+    extension: string = 'pdf'
+  ) {
+    const fileName = this.translateService.instant(fileNameToken);
+    FileSaver.saveAs(
+      blob,
+      `${fileName}.${extension}`
+    );
   }
 
   // // provide constants to template
@@ -651,53 +752,6 @@ export class DashboardComponent implements OnDestroy {
   //   this.persistUserDashboardSettings().subscribe();
   // }
   //
-  // /**
-  //    * generate EPI curve report - image will be exported as pdf
-  //    */
-  // generateEpiCurveReport() {
-  //   this.showLoadingDialog();
-  //   switch (this.epiCurveViewType) {
-  //     case Constants.EPI_CURVE_TYPES.CLASSIFICATION.value:
-  //       this.getEpiCurveDashlet('app-epi-curve-dashlet svg');
-  //       break;
-  //     case Constants.EPI_CURVE_TYPES.OUTCOME.value:
-  //       this.getEpiCurveDashlet('app-epi-curve-outcome-dashlet svg');
-  //       break;
-  //     case Constants.EPI_CURVE_TYPES.REPORTING.value:
-  //       this.getEpiCurveDashlet('app-epi-curve-reporting-dashlet svg');
-  //       break;
-  //   }
-  // }
-  //
-  // /**
-  //    * Get Epi curve dashlet
-  //    */
-  // private getEpiCurveDashlet(selector: string) {
-  //   this.domService
-  //     .getPNGBase64(selector, '#tempCanvas')
-  //     .subscribe((pngBase64) => {
-  //       // object not found ?
-  //       if (!pngBase64) {
-  //         this.toastV2Service.error('LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG');
-  //         this.closeLoadingDialog();
-  //         return;
-  //       }
-  //
-  //       // export
-  //       this.importExportDataService
-  //         .exportImageToPdf({ image: pngBase64, responseType: 'blob', splitFactor: 1 })
-  //         .pipe(
-  //           catchError((err) => {
-  //             this.toastV2Service.error(err);
-  //             this.closeLoadingDialog();
-  //             return throwError(err);
-  //           })
-  //         )
-  //         .subscribe((blob) => {
-  //           this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL');
-  //         });
-  //     });
-  // }
   //
   // /**
   //    * Generate KPIs report
@@ -740,23 +794,6 @@ export class DashboardComponent implements OnDestroy {
   //   });
   // }
   //
-  // /**
-  //    * Download File
-  //    * @param blob
-  //    * @param fileNameToken
-  //    */
-  // private downloadFile(
-  //   blob,
-  //   fileNameToken,
-  //   extension: string = 'pdf'
-  // ) {
-  //   const fileName = this.i18nService.instant(fileNameToken);
-  //   FileSaver.saveAs(
-  //     blob,
-  //     `${fileName}.${extension}`
-  //   );
-  //   this.closeLoadingDialog();
-  // }
   //
   // /**
   //    * Apply side filters

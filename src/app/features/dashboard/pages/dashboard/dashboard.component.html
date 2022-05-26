@@ -114,6 +114,11 @@
 
   </div>
 
+  <!-- Canvas -->
+  <canvas
+    style="display: none;"
+    id="tempCanvas"></canvas>
+
   <!-- Bottom -->
   <div
     class="gd-dashboard-bottom">
@@ -259,20 +264,6 @@
 
 <!--                      <mat-menu #quickActionsMenu="matMenu">-->
 
-
-
-
-<!--                          <button-->
-<!--                              *ngIf="DashboardModel.canExportEpiCurve(authUser) && (-->
-<!--                                  DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(authUser) ||-->
-<!--                                  DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(authUser) ||-->
-<!--                                  DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(authUser)-->
-<!--                              )"-->
-<!--                              mat-menu-item-->
-<!--                              (click)="generateEpiCurveReport()">-->
-<!--                              {{'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL' | translate}}-->
-<!--                          </button>-->
-
 <!--                          <button-->
 <!--                              *ngIf="DashboardModel.canExportKpi(authUser) && hasKpiAccess()"-->
 <!--                              mat-menu-item-->
@@ -304,10 +295,6 @@
 <!--        <div-->
 <!--            class="page-content"-->
 <!--            fxLayout="column">-->
-
-
-<!--            <canvas id="tempCanvas"></canvas>-->
-
 <!--        </div>-->
 <!--    </ng-container>-->
 
