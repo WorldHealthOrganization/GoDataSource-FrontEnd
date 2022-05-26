@@ -53,6 +53,7 @@
   /* Epi Curve Dashlet - Expanded */
   &.gd-dashlet-epi-curve-expanded {
     height: 100%;
+    overflow-x: auto;
 
     .gd-dashlet-epi-curve-top {
       .gd-dashlet-epi-curve-top-actions {

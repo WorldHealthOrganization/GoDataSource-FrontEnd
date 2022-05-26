@@ -56,6 +56,7 @@
 
       /* KPI Dashlet - Value - Left */
       .gd-dashlet-kpi-bottom-value-left {
+        overflow: hidden;
         width: calc(100% - 5rem);
 
         /* KPI Dashlet - Value - Left - Text */

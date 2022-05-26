@@ -47,8 +47,7 @@
     padding: 0.8rem 1.6rem 1.6rem;
 
     .app-pie-donut-chart-main-left {
-      max-width: 30rem;
-      width: 100%;
+      width: calc(100% - 26.6rem);
 
       .app-pie-donut-chart-main-left-legend {
         .app-pie-donut-chart-main-left-legend-items {
