@@ -1,6 +1,5 @@
 import * as _ from 'lodash';
 import { SystemUpstreamServerCredentialsModel } from './system-upstream-server-credentials.model';
-import { OutbreakModel } from './outbreak.model';
 import { v4 as uuid } from 'uuid';
 import { IPermissionBasic, IPermissionClientApplication } from './permission.interface';
 import { UserModel } from './user.model';
@@ -16,7 +15,6 @@ implements
   active: boolean;
 
   outbreakIDs: string[];
-  outbreaks: OutbreakModel[];
 
   /**
      * Static Permissions - IPermissionBasic
