@@ -1,0 +1,109 @@
+@import 'mixins';
+
+/* Pie Donut Chart */
+.app-pie-donut-chart-main {
+  background-color: var(--gd-background);
+  @include border-radius(0.4rem);
+  @include box-shadow(0 0.2rem 0.1rem -0.1rem rgb(0, 0, 0, 0.2),
+                      0 0.1rem 0.1rem 0 rgb(0, 0, 0, 0.14),
+                      0 0.1rem 0.3rem 0 rgb(0, 0, 0, 0.12));
+
+  .app-pie-donut-chart-main-top {
+    padding: 0.8rem 1.6rem;
+
+    .app-pie-donut-chart-main-top-title {
+      color: var(--gd-primary);
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    .app-pie-donut-chart-main-top-actions {
+      .mat-icon-button {
+        font-size: 2rem;
+        height: 2.4rem;
+        min-width: 2.4rem;
+        padding: 0.4rem;
+        width: 2.4rem;
+
+        .mat-icon {
+          font-size: 1.6rem;
+          @include transition(all 0.24s ease-in-out 0s);
+        }
+      }
+    }
+  }
+
+  .app-pie-donut-chart-main-no-data {
+    font-size: 1.6rem;
+    font-weight: bold;
+  }
+
+  .app-pie-donut-chart-main-bottom {
+    padding: 0.8rem 1.6rem 1.6rem;
+
+    .app-pie-donut-chart-main-left {
+      max-width: 30rem;
+      width: 100%;
+
+      .app-pie-donut-chart-main-left-legend {
+        .app-pie-donut-chart-main-left-legend-items {
+          border: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+          @include border-radius(0.4rem);
+          height: 100%;
+          max-height: 30rem;
+          overflow-x: hidden;
+          overflow-y: auto;
+          padding: 0.8rem;
+  
+          .app-pie-donut-chart-main-left-legend-items-item {
+            color: var(--gd-secondary);
+            cursor: pointer;
+  
+            .app-pie-donut-chart-main-left-legend-items-item-check {
+              display: inline-block;
+              height: 1.6rem;
+              width: 1.6rem;
+            }
+  
+            .app-pie-donut-chart-main-left-legend-items-item-text {
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            }
+  
+            &.app-pie-donut-chart-main-left-legend-items-item-selected {
+              color: var(--gd-primary);
+            }
+          }
+        }
+      }
+    }
+
+    .app-pie-donut-chart-main-graph {
+      height: 30rem;
+      overflow: hidden;
+
+      .app-pie-donut-chart-main-graph-pie {
+        display: block;
+        height: 100%;
+        width: 100%;
+      }
+
+      .app-pie-donut-chart-main-graph-total {
+        font-weight: 700;
+      }
+    }
+  }
+
+  &.gd-app-pie-donut-chart-main-expanded {
+    .app-pie-donut-chart-main-top {
+      .app-pie-donut-chart-main-top-actions {
+        .mat-icon-button {
+          .mat-icon {
+            @include rotate(180deg);
+          }
+        }
+      }
+    }
+  }
+}

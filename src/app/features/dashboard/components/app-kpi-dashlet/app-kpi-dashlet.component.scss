@@ -1,5 +1,4 @@
 @import 'mixins';
-@import 'font';
 
 /* KPI Dashlet */
 .gd-dashlet-kpi {
@@ -9,15 +8,18 @@
                       0 0.1rem 0.1rem 0 rgb(0, 0, 0, 0.14),
                       0 0.1rem 0.3rem 0 rgb(0, 0, 0, 0.12));
 
+  /* KPI Dashlet - Top */
   .gd-dashlet-kpi-top {
     padding: 0.8rem 1.6rem;
 
+    /* KPI Dashlet - Top - Title */
     .gd-dashlet-kpi-top-title {
       color: var(--gd-primary);
       font-size: 1.6rem;
       font-weight: 700;
     }
 
+    /* KPI Dashlet - Top - Actions */
     .gd-dashlet-kpi-top-actions {
       .gd-dashlet-kpi-top-actions-counter {
         color: var(--gd-secondary);
@@ -43,16 +45,34 @@
     }
   }
 
+  /* KPI Dashlet - Bottom */
   .gd-dashlet-kpi-bottom {
     padding: 0.8rem 1.6rem 1.6rem;
 
+    /* KPI Dashlet - Value */
     .gd-dashlet-kpi-bottom-value {
       border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
       padding: 0.8rem 0;
 
+      /* KPI Dashlet - Value - Left */
       .gd-dashlet-kpi-bottom-value-left {
         width: 100%;
 
+        /* KPI Dashlet - Value - Left - Text */
+        .gd-dashlet-kpi-bottom-value-left-text {
+          @include flex_align_items(center);
+          @include flex(flex);
+          @include flex_direction(row);
+          overflow: hidden;
+  
+          > span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+        }
+
+        /* KPI Dashlet - Value - Left - Actions */
         .mat-icon-button {
           color: rgba(var(--gd-secondary-rgb), 0.5);
           font-size: 2rem;
@@ -80,21 +100,9 @@
             visibility: hidden;
           }
         }
-  
-        .gd-dashlet-kpi-bottom-value-left-text {
-          @include flex_align_items(center);
-          @include flex(flex);
-          @include flex_direction(row);
-          overflow: hidden;
-  
-          > span {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-          }
-        }
       }
 
+      /* KPI Dashlet - Value - Right */
       .gd-dashlet-kpi-bottom-value-right {
         font-size: 1.6rem;
         font-weight: 700;
@@ -113,6 +121,7 @@
     }
   }
 
+  /* KPI Dashlet - Expanded */
   &.gd-dashlet-kpi-expanded {
     .gd-dashlet-kpi-top {
       .gd-dashlet-kpi-top-actions {
