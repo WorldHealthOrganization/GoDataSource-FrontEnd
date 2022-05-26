@@ -33,6 +33,7 @@ import { TopnavComponent } from '../../../../core/components/topnav/topnav.compo
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
 
 @Component({
   selector: 'app-cases-list',
@@ -483,7 +484,16 @@ export class MarkedNotDuplicatesListComponent
    */
   protected initializeBreadcrumbs(): void {
     // initialise breadcrumbs array
-    this.breadcrumbs = [];
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
+        }
+      }
+    ];
 
     // add list / view / modify record breadcrumbs
     if (this.recordType === EntityType.CASE) {
