@@ -9,7 +9,7 @@ import { Constants } from '../../../../core/models/constants';
 import { SavedFilterData, SavedFilterDataAppliedFilter } from '../../../../core/models/saved-filters.model';
 import * as _ from 'lodash';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
-import { RequestFilterOperator } from '../../../../core/helperClasses/request-query-builder';
+import { RequestFilterOperator, RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
@@ -204,6 +204,39 @@ export class DashboardComponent implements OnDestroy {
           },
           action: {
             click: () => {
+              // initialization
+              const qb = new RequestQueryBuilder();
+
+              // date
+              if (this.globalFilterDate) {
+                qb.filter.byDateRange(
+                  'dateOfReporting', {
+                    endDate: moment(this.globalFilterDate).endOf('day').format()
+                  }
+                );
+              }
+
+              // location
+              if (this.globalFilterLocationId) {
+                qb.filter.byEquality(
+                  'addresses.parentLocationIdFilter',
+                  this.globalFilterLocationId
+                );
+              }
+
+              // classification
+              // since we display all classifications in the exported file, it would be strange to filter them by classification
+              // so there is nothing to filter here
+              // if (this.globalFilterClassificationId) {
+              //     qb.filter.bySelect(
+              //         'classification',
+              //         this.globalFilterClassificationId,
+              //         false,
+              //         null
+              //     );
+              // }
+
+              // export
               this.dialogV2Service.showExportData({
                 title: {
                   get: () => 'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL'
@@ -213,6 +246,7 @@ export class DashboardComponent implements OnDestroy {
                   async: false,
                   method: ExportDataMethod.GET,
                   fileName: `${this.translateService.instant('LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL')} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`,
+                  queryBuilder: qb,
                   allow: {
                     types: [
                       ExportDataExtension.PDF
@@ -223,6 +257,74 @@ export class DashboardComponent implements OnDestroy {
             }
           },
           visible: () => DashboardModel.canExportCaseClassificationPerLocationReport(this._authUser)
+        },
+
+        // Export contact follow-up success rate
+        {
+          label: {
+            get: () => 'LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL'
+          },
+          action: {
+            click: () => {
+              // initialization
+              const qb = new RequestQueryBuilder();
+
+              // date filters
+              if (this.globalFilterDate) {
+                // pdf report
+                qb.filter.flag(
+                  'dateOfFollowUp',
+                  moment(this.globalFilterDate).startOf('day').format()
+                );
+
+                // same as list view
+                qb.filter.byDateRange(
+                  'dateOfReporting', {
+                    endDate: moment(this.globalFilterDate).endOf('day').format()
+                  }
+                );
+              }
+
+              // location
+              if (this.globalFilterLocationId) {
+                qb.filter.byEquality(
+                  'addresses.parentLocationIdFilter',
+                  this.globalFilterLocationId
+                );
+              }
+
+              // classification
+              // there is no need to filter by classification since this api filters contacts and not cases...
+              // if (this.globalFilterClassificationId) {
+              //     qb.filter.bySelect(
+              //         'classification',
+              //         this.globalFilterClassificationId,
+              //         false,
+              //         null
+              //     );
+              // }
+
+              // export
+              this.dialogV2Service.showExportData({
+                title: {
+                  get: () => 'LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL'
+                },
+                export: {
+                  url: `/outbreaks/${this._selectedOutbreak.id}/contacts/per-location-level-tracing-report/download/`,
+                  async: false,
+                  method: ExportDataMethod.GET,
+                  fileName: `${this.translateService.instant('LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL')} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`,
+                  queryBuilder: qb,
+                  allow: {
+                    types: [
+                      ExportDataExtension.PDF
+                    ]
+                  }
+                }
+              });
+            }
+          },
+          visible: () => DashboardModel.canExportContactFollowUpSuccessRateReport(this._authUser)
         }
       ]
     };
@@ -690,91 +792,7 @@ export class DashboardComponent implements OnDestroy {
   //   }
   // }
   //
-  // /**
-  //    * Cases by classification and location qb
-  //    */
-  // qbCaseByClassification(): RequestQueryBuilder {
-  //   // initialization
-  //   const qb = new RequestQueryBuilder();
   //
-  //   // date
-  //   if (this.globalFilterDate) {
-  //     qb.filter.byDateRange(
-  //       'dateOfReporting', {
-  //         endDate: this.globalFilterDate.endOf('day').format()
-  //       }
-  //     );
-  //   }
-  //
-  //   // location
-  //   if (this.globalFilterLocationId) {
-  //     qb.filter.byEquality(
-  //       'addresses.parentLocationIdFilter',
-  //       this.globalFilterLocationId
-  //     );
-  //   }
-  //
-  //   // classification
-  //   // since we display all classifications in the exported file, it would be strange to filter them by classification
-  //   // so there is nothing to filter here
-  //   // if (this.globalFilterClassificationId) {
-  //   //     qb.filter.bySelect(
-  //   //         'classification',
-  //   //         this.globalFilterClassificationId,
-  //   //         false,
-  //   //         null
-  //   //     );
-  //   // }
-  //
-  //   // finished
-  //   return qb;
-  // }
-  //
-  // /**
-  //    * Contacts follow up success rate
-  //    */
-  // qbContactsFollowUpSuccessRate(): RequestQueryBuilder {
-  //   // initialization
-  //   const qb = new RequestQueryBuilder();
-  //
-  //   // date filters
-  //   if (this.globalFilterDate) {
-  //     // pdf report
-  //     qb.filter.flag(
-  //       'dateOfFollowUp',
-  //       this.globalFilterDate.startOf('day').format()
-  //     );
-  //
-  //     // same as list view
-  //     qb.filter.byDateRange(
-  //       'dateOfReporting', {
-  //         endDate: this.globalFilterDate.endOf('day').format()
-  //       }
-  //     );
-  //   }
-  //
-  //   // location
-  //   if (this.globalFilterLocationId) {
-  //     qb.filter.byEquality(
-  //       'addresses.parentLocationIdFilter',
-  //       this.globalFilterLocationId
-  //     );
-  //   }
-  //
-  //   // classification
-  //   // there is no need to filter by classification since this api filters contacts and not cases...
-  //   // if (this.globalFilterClassificationId) {
-  //   //     qb.filter.bySelect(
-  //   //         'classification',
-  //   //         this.globalFilterClassificationId,
-  //   //         false,
-  //   //         null
-  //   //     );
-  //   // }
-  //
-  //   // finished
-  //   return qb;
-  // }
   //
   // /**
   //    * Check if we have kpi group access
