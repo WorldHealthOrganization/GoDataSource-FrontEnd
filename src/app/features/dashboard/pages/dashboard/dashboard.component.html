@@ -150,6 +150,15 @@
       (detectChanges)="detectChanges()">
     </app-cases-hospitalized-pie-chart-dashlet>
 
+    <!-- Histogram - chains of transmission size -->
+    <app-histogram-transmission-chains-size-dashlet
+      *ngIf="visibleDashlets.COTHistogram"
+      [globalFilterDate]="globalFilterDate"
+      [globalFilterLocationId]="globalFilterLocationId"
+      [globalFilterClassificationId]="globalFilterClassificationId"
+      (detectChanges)="detectChanges()">
+    </app-histogram-transmission-chains-size-dashlet>
+
     <!-- KPI -->
     <div
       class="gd-dashboard-bottom-kpi">
@@ -280,27 +289,6 @@
 <!--        <div-->
 <!--            class="page-content"-->
 <!--            fxLayout="column">-->
-<!--            &lt;!&ndash; Histogram - chains of transmission &ndash;&gt;-->
-<!--            <mat-expansion-panel-->
-<!--                *ngIf="DashboardModel.canViewCotSizeHistogramDashlet(authUser)">-->
-<!--                &lt;!&ndash; Header &ndash;&gt;-->
-<!--                <mat-expansion-panel-header>-->
-<!--                    <div class="other-kpi-header">-->
-<!--                        {{'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_TITLE' | translate}}-->
-<!--                    </div>-->
-<!--                </mat-expansion-panel-header>-->
-
-<!--                &lt;!&ndash; Dashlets &ndash;&gt;-->
-<!--                <ng-template matExpansionPanelContent>-->
-<!--                    &lt;!&ndash; histogram - chains of transmission size &ndash;&gt;-->
-<!--                    <app-histogram-transmission-chains-size-dashlet-->
-<!--                        [globalFilterDate]="globalFilterDate"-->
-<!--                        [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                        [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                    </app-histogram-transmission-chains-size-dashlet>-->
-<!--                </ng-template>-->
-<!--            </mat-expansion-panel>-->
-
 <!--            &lt;!&ndash; Epidemiological Curve &ndash;&gt;-->
 <!--            <mat-expansion-panel-->
 <!--                *ngIf="DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(authUser) ||-->

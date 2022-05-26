@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -10,7 +10,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { Subscriber, Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { Moment } from '../../../../core/helperClasses/x-moment';
+import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
@@ -26,13 +26,16 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
   histogramResults: any = [];
   caseRefDataColor: string = '';
 
+  // detect changes
+  @Output() detectChanges = new EventEmitter<void>();
+
   // Global filters => Date
-  private _globalFilterDate: Moment;
-  @Input() set globalFilterDate(globalFilterDate: Moment) {
+  private _globalFilterDate: Moment | string;
+  @Input() set globalFilterDate(globalFilterDate: Moment | string) {
     this._globalFilterDate = globalFilterDate;
     this.refreshDataCaller.call();
   }
-  get globalFilterDate(): Moment {
+  get globalFilterDate(): Moment | string {
     return this._globalFilterDate;
   }
 
@@ -56,6 +59,20 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
     return this._globalFilterClassificationId;
   }
 
+  // expanded / collapsed ?
+  private _retrievedData: boolean;
+  private _expanded: boolean = false;
+  set expanded(expanded: boolean) {
+    // set data
+    this._expanded = expanded;
+
+    // retrieve data if expanded and data not retrieved
+    this.refreshData();
+  }
+  get expanded(): boolean {
+    return this._expanded;
+  }
+
   // outbreak
   outbreakId: string;
 
@@ -74,6 +91,7 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
      * Global Filters changed
      */
   protected refreshDataCaller = new DebounceTimeCaller(new Subscriber<void>(() => {
+    this._retrievedData = false;
     this.refreshData();
   }), 100);
 
@@ -200,7 +218,7 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
 
     // construct global filter
     const global: {
-      date?: Moment,
+      date?: Moment | string,
       locationId?: string,
       classificationId?: string[]
     } = {};
@@ -237,6 +255,15 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
      * Refresh Data
      */
   refreshData() {
+    // not expanded ?
+    if (
+      !this.expanded ||
+      this._retrievedData
+    ) {
+      return;
+    }
+
+    // retrieve data
     if (this.outbreakId) {
       // release previous subscriber
       if (this.previousSubscriber) {
@@ -254,7 +281,7 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
       if (this.globalFilterDate) {
         qb.filter.byEquality(
           'endDate',
-          this.globalFilterDate.toISOString()
+          moment(this.globalFilterDate).toISOString()
         );
       }
 
@@ -308,7 +335,9 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
       }
 
       // get chain data and convert to array of size and number
+      this._retrievedData = true;
       this.displayLoading = true;
+      this.detectChanges.emit();
       this.previousSubscriber = this.transmissionChainDataService
         .getCountIndependentTransmissionChains(
           this.outbreakId,
@@ -317,6 +346,7 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
         .subscribe((response) => {
           this.setHistogramResults(response.chains ? response.chains : []);
           this.displayLoading = false;
+          this.detectChanges.emit();
         });
     }
   }
