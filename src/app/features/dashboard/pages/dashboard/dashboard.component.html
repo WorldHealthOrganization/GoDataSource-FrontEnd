@@ -346,45 +346,6 @@
 <!--                </ng-template>-->
 <!--            </mat-expansion-panel>-->
 
-<!--            &lt;!&ndash; KPIs &ndash;&gt;-->
-<!--            <div #kpiSection>-->
-<!--                <ng-container-->
-<!--                    *ngFor="let group of kpiGroups">-->
-<!--                    <mat-expansion-panel-->
-<!--                        *ngIf="group.hasAccess(authUser)"-->
-<!--                        #kpiSectionGroup>-->
-<!--                        &lt;!&ndash; Header &ndash;&gt;-->
-<!--                        <mat-expansion-panel-header>-->
-<!--                            &lt;!&ndash; KPIs section header &ndash;&gt;-->
-<!--                            <div class="dashlet-kpi-header dashlet-kpi-header-100" fxLayout="row" fxLayoutAlign="space-between center">-->
-<!--                                <div>-->
-<!--                                    {{group.title | translate}}-->
-<!--                                </div>-->
-
-<!--                                <div>-->
-<!--                                    <button-->
-<!--                                        mat-icon-button-->
-<!--                                        [disableRipple]="true"-->
-<!--                                        (click)="$event.stopPropagation()"-->
-<!--                                        [matMenuTriggerFor]="actionsMenu">-->
-<!--                                        <span class="xt-icon">menu</span>-->
-<!--                                    </button>-->
-
-<!--                                    <mat-menu #actionsMenu="matMenu">-->
-<!--                                        <button-->
-<!--                                            type="button"-->
-<!--                                            class="dashboard-kpi-menu-item"-->
-<!--                                            mat-menu-item-->
-<!--                                            (click)="showAllDashlets(group.id)">-->
-<!--                                            {{'LNG_PAGE_DASHBOARD_KPI_SECTION_MENU_SHOW_ALL_LABEL' | translate}}-->
-<!--                                        </button>-->
-<!--                                    </mat-menu>-->
-<!--                                </div>-->
-<!--                            </div>-->
-<!--                        </mat-expansion-panel-header>-->
-<!--                </ng-container>-->
-<!--            </div>-->
-
 <!--            <canvas id="tempCanvas"></canvas>-->
 
 <!--        </div>-->
