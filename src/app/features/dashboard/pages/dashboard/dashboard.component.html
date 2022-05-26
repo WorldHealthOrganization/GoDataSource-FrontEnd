@@ -5,12 +5,6 @@
   <div
     class="gd-dashboard-top">
 
-    <!-- Breadcrumbs -->
-    <app-breadcrumb-v2
-      *ngIf="breadcrumbs"
-      [breadcrumbs]="breadcrumbs"
-      (detectChanges)="detectChanges()"></app-breadcrumb-v2>
-
     <!-- Title & buttons -->
     <div
       fxLayout="row"
@@ -243,8 +237,6 @@
 <!--      <app-topnav>-->
 <!--          <ng-container dynamic-section>-->
 <!--              <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">-->
-<!--                  <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>-->
-
 <!--                  <div-->
 <!--                      *ngIf="!!selectedOutbreak?.id"-->
 <!--                      class="topnav-actions">-->
@@ -266,18 +258,7 @@
 <!--                      </button>-->
 
 <!--                      <mat-menu #quickActionsMenu="matMenu">-->
-<!--                          <app-export-button-->
-<!--                              *ngIf="DashboardModel.canExportCaseClassificationPerLocationReport(authUser)"-->
-<!--                              [menuItem]="true"-->
-<!--                              [fileType]="ExportDataExtension.PDF"-->
-<!--                              [label]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate"-->
-<!--                              [message]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate"-->
-<!--                              [url]="casesByClassificationAndLocationReportUrl"-->
-<!--                              [fileName]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate"-->
-<!--                              (exportStart)="showLoadingDialog()"-->
-<!--                              (exportFinished)="closeLoadingDialog()"-->
-<!--                              [queryBuilder]="qbCaseByClassification()">-->
-<!--                          </app-export-button>-->
+
 
 <!--                          <app-export-button-->
 <!--                              *ngIf="DashboardModel.canExportContactFollowUpSuccessRateReport(authUser)"-->

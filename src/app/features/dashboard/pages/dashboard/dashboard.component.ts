@@ -1,6 +1,5 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/core';
-import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
-import { IV2ActionMenuLabel } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
+import { IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { ActivatedRoute } from '@angular/router';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
@@ -13,19 +12,20 @@ import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { RequestFilterOperator } from '../../../../core/helperClasses/request-query-builder';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserModel } from '../../../../core/models/user.model';
+import { ExportDataExtension, ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { Subscription } from 'rxjs/internal/Subscription';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { TranslateService } from '@ngx-translate/core';
+import * as momentOriginal from 'moment';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DashboardComponent {
-  // breadcrumbs
-  breadcrumbs: IV2Breadcrumb[] = [{
-    label: 'LNG_PAGE_DASHBOARD_TITLE',
-    action: null
-  }];
-
+export class DashboardComponent implements OnDestroy {
   // quick actions
   quickActions: IV2ActionMenuLabel;
 
@@ -67,6 +67,13 @@ export class DashboardComponent {
     ]
   });
 
+  // authenticated user details
+  private _authUser: UserModel;
+
+  // selected outbreak
+  private _outbreakSubscriber: Subscription;
+  private _selectedOutbreak: OutbreakModel;
+
   // visible dashlets
   visibleDashlets: {
     CaseSummary: boolean,
@@ -103,49 +110,74 @@ export class DashboardComponent {
     private changeDetectorRef: ChangeDetectorRef,
     private dialogV2Service: DialogV2Service,
     private activatedRoute: ActivatedRoute,
+    private outbreakDataService: OutbreakDataService,
+    private translateService: TranslateService,
     authDataService: AuthDataService
   ) {
     // authenticated user
-    const authUser = authDataService.getAuthenticatedUser();
+    this._authUser = authDataService.getAuthenticatedUser();
 
     // determine visible dashlets
     this.visibleDashlets = {
       // Old Dashlets
-      CaseSummary: DashboardModel.canViewCaseSummaryDashlet(authUser),
-      CasesPerLocation: DashboardModel.canViewCasePerLocationLevelDashlet(authUser),
-      Hospitalized: DashboardModel.canViewCaseHospitalizedPieChartDashlet(authUser),
-      COTHistogram: DashboardModel.canViewCotSizeHistogramDashlet(authUser),
-      EPICurveClassification: DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(authUser),
-      EPICurveOutcome: DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(authUser),
-      EPICurveReporting: DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(authUser),
-      FollowUpOverview: DashboardModel.canViewContactFollowUpReportDashlet(authUser),
-      ContactStatus: DashboardModel.canViewContactStatusReportDashlet(authUser),
+      CaseSummary: DashboardModel.canViewCaseSummaryDashlet(this._authUser),
+      CasesPerLocation: DashboardModel.canViewCasePerLocationLevelDashlet(this._authUser),
+      Hospitalized: DashboardModel.canViewCaseHospitalizedPieChartDashlet(this._authUser),
+      COTHistogram: DashboardModel.canViewCotSizeHistogramDashlet(this._authUser),
+      EPICurveClassification: DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(this._authUser),
+      EPICurveOutcome: DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(this._authUser),
+      EPICurveReporting: DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(this._authUser),
+      FollowUpOverview: DashboardModel.canViewContactFollowUpReportDashlet(this._authUser),
+      ContactStatus: DashboardModel.canViewContactStatusReportDashlet(this._authUser),
 
       // KPI - cases
-      KPICases: DashboardModel.canViewCaseDeceasedDashlet(authUser) ||
-        DashboardModel.canViewCaseHospitalizedDashlet(authUser) ||
-        DashboardModel.canViewCaseWithLessThanXCotactsDashlet(authUser) ||
-        DashboardModel.canViewNewCasesInPreviousXDaysAmongKnownContactsDashlet(authUser) ||
-        DashboardModel.canViewCasesRefusingTreatmentDashlet(authUser) ||
-        DashboardModel.canViewNewCasesFromKnownCOTDashlet(authUser) ||
-        DashboardModel.canViewCasesWithPendingLabResultsDashlet(authUser) ||
-        DashboardModel.canViewCasesNotIdentifiedThroughContactsDashlet(authUser),
+      KPICases: DashboardModel.canViewCaseDeceasedDashlet(this._authUser) ||
+        DashboardModel.canViewCaseHospitalizedDashlet(this._authUser) ||
+        DashboardModel.canViewCaseWithLessThanXCotactsDashlet(this._authUser) ||
+        DashboardModel.canViewNewCasesInPreviousXDaysAmongKnownContactsDashlet(this._authUser) ||
+        DashboardModel.canViewCasesRefusingTreatmentDashlet(this._authUser) ||
+        DashboardModel.canViewNewCasesFromKnownCOTDashlet(this._authUser) ||
+        DashboardModel.canViewCasesWithPendingLabResultsDashlet(this._authUser) ||
+        DashboardModel.canViewCasesNotIdentifiedThroughContactsDashlet(this._authUser),
 
       // KPI - contacts
-      KPIContacts: DashboardModel.canViewContactsPerCaseMeanDashlet(authUser) ||
-        DashboardModel.canViewContactsPerCaseMedianDashlet(authUser) ||
-        DashboardModel.canViewContactsFromFollowUpsDashlet(authUser) ||
-        DashboardModel.canViewContactsLostToFollowUpsDashlet(authUser) ||
-        DashboardModel.canViewContactsNotSeenInXDaysDashlet(authUser) ||
-        DashboardModel.canViewContactsBecomeCasesDashlet(authUser) ||
-        DashboardModel.canViewContactsSeenDashlet(authUser) ||
-        DashboardModel.canViewContactsWithSuccessfulFollowUpsDashlet(authUser),
+      KPIContacts: DashboardModel.canViewContactsPerCaseMeanDashlet(this._authUser) ||
+        DashboardModel.canViewContactsPerCaseMedianDashlet(this._authUser) ||
+        DashboardModel.canViewContactsFromFollowUpsDashlet(this._authUser) ||
+        DashboardModel.canViewContactsLostToFollowUpsDashlet(this._authUser) ||
+        DashboardModel.canViewContactsNotSeenInXDaysDashlet(this._authUser) ||
+        DashboardModel.canViewContactsBecomeCasesDashlet(this._authUser) ||
+        DashboardModel.canViewContactsSeenDashlet(this._authUser) ||
+        DashboardModel.canViewContactsWithSuccessfulFollowUpsDashlet(this._authUser),
 
       // KPI - COT
-      KPICOT: DashboardModel.canViewIndependentCOTDashlet(authUser) ||
-        DashboardModel.canViewContactsNotSeenInXDaysDashlet(authUser) ||
-        DashboardModel.canViewContactsBecomeCasesDashlet(authUser)
+      KPICOT: DashboardModel.canViewIndependentCOTDashlet(this._authUser) ||
+        DashboardModel.canViewContactsNotSeenInXDaysDashlet(this._authUser) ||
+        DashboardModel.canViewContactsBecomeCasesDashlet(this._authUser)
     };
+
+    // subscribe to outbreak changes
+    this._outbreakSubscriber = this.outbreakDataService
+      .getSelectedOutbreakSubject()
+      .subscribe((selectedOutbreak: OutbreakModel) => {
+        if (selectedOutbreak?.id) {
+          this._selectedOutbreak = selectedOutbreak;
+        }
+      });
+
+    // initialize quick actions
+    this.initializeQuickActions();
+  }
+
+  /**
+   * Release resources
+   */
+  ngOnDestroy(): void {
+    // outbreak
+    if (this._outbreakSubscriber) {
+      this._outbreakSubscriber.unsubscribe();
+      this._outbreakSubscriber = undefined;
+    }
   }
 
   /**
@@ -153,6 +185,56 @@ export class DashboardComponent {
    */
   detectChanges(): void {
     this.changeDetectorRef.detectChanges();
+  }
+
+  /**
+   * Initialize quick actions
+   */
+  initializeQuickActions(): void {
+    // initialize quick actions
+    this.quickActions = {
+      type: V2ActionType.MENU,
+      label: 'LNG_PAGE_DASHBOARD_REPORTS_BUTTON_LABEL',
+      visible: () => !!this._selectedOutbreak?.id,
+      menuOptions: [
+        // Export case classification per location report
+        {
+          label: {
+            get: () => 'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL'
+          },
+          action: {
+            click: () => {
+              this.dialogV2Service.showExportData({
+                title: {
+                  get: () => 'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL'
+                },
+                // initialized: (handler) => {
+                //   handler.buttons.click(ExportButtonKey.EXPORT);
+                // },
+                export: {
+                  url: `/outbreaks/${this._selectedOutbreak.id}/cases/per-classification-per-location-level-report/download/`,
+                  async: false,
+                  method: ExportDataMethod.GET,
+                  fileName: `${this.translateService.instant('LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL')} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`,
+                  allow: {
+                    types: [
+                      ExportDataExtension.PDF
+                    ]
+                  }
+                }
+              });
+            }
+          },
+          visible: () => DashboardModel.canExportCaseClassificationPerLocationReport(this._authUser)
+        }
+        //   <!--                              [fileType]="ExportDataExtension.PDF"-->
+        //   <!--                              [label]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate"-->
+        //   <!--                              [message]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate"-->
+        //   <!--                              [url]="casesByClassificationAndLocationReportUrl"-->
+        //   <!--                              [fileName]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate"-->
+        //   <!--                              [queryBuilder]="qbCaseByClassification()">-->
+      ]
+    };
   }
 
   /**
