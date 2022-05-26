@@ -12,7 +12,7 @@
     <!-- Title -->
     <div
       fxFlex
-      class="app-pie-donut-chart-main-left-title">
+      class="app-pie-donut-chart-main-top-title">
       <span>
         {{ graphTitle | translate }}
       </span>
@@ -46,9 +46,8 @@
       *ngIf="loadingData; else dataLoaded"
       fxFlex fxLayoutAlign="center center">
       <mat-progress-spinner
-        mode="indeterminate"
-        [diameter]="32">
-      </mat-progress-spinner>
+        diameter="24"
+        mode="indeterminate"></mat-progress-spinner>
     </div>
 
     <!-- Data loaded -->

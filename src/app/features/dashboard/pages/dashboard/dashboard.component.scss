@@ -42,5 +42,14 @@
     }
   }
 
-  .gd-dashboard-bottom {}
+  .gd-dashboard-bottom {
+    .gd-dashboard-bottom-row {
+      margin-right: -1.6rem;
+
+      > * {
+        max-width: calc(33.3333% - 1.6rem);
+        width: 100%;
+      }
+    }
+  }
 }

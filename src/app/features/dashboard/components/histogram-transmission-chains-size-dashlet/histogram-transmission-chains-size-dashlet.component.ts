@@ -20,7 +20,7 @@ import { Constants } from '../../../../core/models/constants';
   selector: 'app-histogram-transmission-chains-size-dashlet',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './histogram-transmission-chains-size-dashlet.component.html',
-  styleUrls: ['./histogram-transmission-chains-size-dashlet.component.less']
+  styleUrls: ['./histogram-transmission-chains-size-dashlet.component.scss']
 })
 export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, OnDestroy {
   histogramResults: any = [];

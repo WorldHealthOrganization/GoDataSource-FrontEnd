@@ -120,7 +120,7 @@
 
           <!-- View data -->
           <a
-            *ngIf="value.link; else linkPadding"
+            *ngIf="value.link"
             mat-icon-button
             color="text"
             [matTooltip]="'LNG_COMMON_BUTTON_VIEW_DATA' | translate"
@@ -129,15 +129,10 @@
             (click)="$event.stopPropagation()">
             <mat-icon>visibility</mat-icon>
           </a>
-          <ng-template
-            #linkPadding>
-            <span
-              class="gd-dashlet-kpi-bottom-value-icon-padding"></span>
-          </ng-template>
 
           <!-- Help -->
           <ng-container
-            *ngIf="value.helpTooltip; else helpPadding">
+            *ngIf="value.helpTooltip">
             <button
               type="button"
               mat-icon-button
@@ -158,11 +153,6 @@
               </div>
             </popper-content>
           </ng-container>
-          <ng-template
-            #helpPadding>
-            <span
-              class="gd-dashlet-kpi-bottom-value-icon-padding"></span>
-          </ng-template>
 
         </div>
       </div>

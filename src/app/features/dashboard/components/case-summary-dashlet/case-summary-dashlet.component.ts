@@ -19,8 +19,7 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 
 @Component({
   selector: 'app-case-summary-dashlet',
-  templateUrl: './case-summary-dashlet.component.html',
-  styleUrls: ['./case-summary-dashlet.component.less']
+  templateUrl: './case-summary-dashlet.component.html'
 })
 export class CaseSummaryDashletComponent
 implements OnInit, OnDestroy {

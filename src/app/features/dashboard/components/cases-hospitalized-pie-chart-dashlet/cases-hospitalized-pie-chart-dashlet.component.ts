@@ -18,8 +18,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 
 @Component({
   selector: 'app-cases-hospitalized-pie-chart-dashlet',
-  templateUrl: './cases-hospitalized-pie-chart-dashlet.component.html',
-  styleUrls: ['./cases-hospitalized-pie-chart-dashlet.component.less']
+  templateUrl: './cases-hospitalized-pie-chart-dashlet.component.html'
 })
 export class CasesHospitalizedPieChartDashletComponent
 implements OnInit, OnDestroy {

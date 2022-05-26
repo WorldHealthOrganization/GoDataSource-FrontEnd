@@ -56,18 +56,15 @@
 
       /* KPI Dashlet - Value - Left */
       .gd-dashlet-kpi-bottom-value-left {
-        width: 100%;
+        width: calc(100% - 5rem);
 
         /* KPI Dashlet - Value - Left - Text */
         .gd-dashlet-kpi-bottom-value-left-text {
           @include flex_align_items(center);
           @include flex(flex);
           @include flex_direction(row);
-          overflow: hidden;
-  
+
           > span {
-            overflow: hidden;
-            text-overflow: ellipsis;
             white-space: nowrap;
           }
         }
@@ -106,10 +103,23 @@
       .gd-dashlet-kpi-bottom-value-right {
         font-size: 1.6rem;
         font-weight: 700;
+        min-width: 5rem;
+        text-align: right;
       }
 
       &:hover {
         .gd-dashlet-kpi-bottom-value-left {
+          .gd-dashlet-kpi-bottom-value-left-text {
+            overflow: hidden;
+
+            > span {
+              &:last-child {
+                overflow: hidden;
+                text-overflow: ellipsis;
+              }
+            }
+          }
+
           .gd-dashlet-kpi-bottom-value-left-actions {
             .mat-icon-button {
               @include opacity(1);
@@ -123,6 +133,8 @@
 
   /* KPI Dashlet - Expanded */
   &.gd-dashlet-kpi-expanded {
+    height: 100%;
+
     .gd-dashlet-kpi-top {
       .gd-dashlet-kpi-top-actions {
         .mat-icon-button {
