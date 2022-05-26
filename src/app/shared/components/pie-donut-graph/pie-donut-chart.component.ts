@@ -988,7 +988,7 @@ implements OnInit, OnDestroy {
     // nothing to draw ?
     if (
       !this.data ||
-            this.data.length < 1
+      this.data.length < 1
     ) {
       return;
     }
@@ -1009,6 +1009,9 @@ implements OnInit, OnDestroy {
         this._graph.rendered.totalNo += item.value;
         this._graph.rendered.total = this._graph.rendered.totalNo.toLocaleString('en');
       });
+
+      // update total
+      this.detectChanges.emit();
     });
 
     // nothing to draw ?
