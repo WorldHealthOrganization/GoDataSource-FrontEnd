@@ -199,6 +199,7 @@ export class ReferenceDataCategoriesListComponent
                       ExportDataExtension.PDF
                     ],
                     dbColumns: true,
+                    dbValues: true,
                     jsonReplaceUndefinedWithNull: true
                   }
                 }

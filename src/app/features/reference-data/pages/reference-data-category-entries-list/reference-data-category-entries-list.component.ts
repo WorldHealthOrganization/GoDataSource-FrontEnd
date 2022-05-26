@@ -15,7 +15,6 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import * as _ from 'lodash';
 import { TranslateService } from '@ngx-translate/core';
-import { CaseModel } from '../../../../core/models/case.model';
 import { IconModel } from '../../../../core/models/icon.model';
 
 @Component({
@@ -330,7 +329,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
             })
           },
           visible: (): boolean => {
-            return CaseModel.canListOnsetBeforePrimaryReport(this.authUser);
+            return IconModel.canList(this.authUser);
           }
         }
       ]
