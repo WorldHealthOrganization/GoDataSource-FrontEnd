@@ -1,6 +1,10 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserModel } from '../../../../core/models/user.model';
 
 @Component({
   selector: 'app-cloud-backup',
@@ -10,23 +14,28 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 })
 
 export class CloudBackupComponent implements OnInit {
-  // // breadcrumbs
-  // breadcrumbs: BreadcrumbItemModel[] = [
-  //   new BreadcrumbItemModel('LNG_PAGE_CLOUD_BACKUP_TITLE', '.')
-  // ];
+  // breadcrumbs
+  breadcrumbs: IV2Breadcrumb[] = [];
 
   cloudBackup: {
     install: string,
     backUp: string
   };
 
+  // authenticated user
+  private _authUser: UserModel;
+
   /**
      * Constructor
      */
   constructor(
     private systemSettingsDataService: SystemSettingsDataService,
-    private toastV2Service: ToastV2Service
-  ) {}
+    private toastV2Service: ToastV2Service,
+    authDataService: AuthDataService
+  ) {
+    // get the authenticated user
+    this._authUser = authDataService.getAuthenticatedUser();
+  }
 
   /**
      * Component initialized
@@ -37,6 +46,30 @@ export class CloudBackupComponent implements OnInit {
       .subscribe((cloudBackup) => {
         this.cloudBackup = cloudBackup;
       });
+
+    // initialize page breadcrumbs
+    this.initializeBreadcrumbs();
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs() {
+    // reset
+    this.breadcrumbs = [{
+      label: 'LNG_COMMON_LABEL_HOME',
+      action: {
+        link: DashboardModel.canViewDashboard(this._authUser) ?
+          ['/dashboard'] :
+          ['/account/my-profile']
+      }
+    }];
+
+    // current page
+    this.breadcrumbs.push({
+      label: 'LNG_LAYOUT_MENU_ITEM_CLOUD_BACKUP_LABEL',
+      action: null
+    });
   }
 
   /**

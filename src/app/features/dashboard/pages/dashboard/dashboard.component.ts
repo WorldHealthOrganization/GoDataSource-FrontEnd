@@ -73,6 +73,7 @@ export class DashboardComponent {
     CaseSummary: boolean,
     CasesPerLocation: boolean,
     Hospitalized: boolean,
+    COTHistogram: boolean,
     KPICases: boolean,
     KPIContacts: boolean,
     KPICOT: boolean
@@ -80,6 +81,7 @@ export class DashboardComponent {
       CaseSummary: false,
       CasesPerLocation: false,
       Hospitalized: false,
+      COTHistogram: false,
       KPICases: false,
       KPIContacts: false,
       KPICOT: false
@@ -103,6 +105,7 @@ export class DashboardComponent {
       CaseSummary: DashboardModel.canViewCaseSummaryDashlet(authUser),
       CasesPerLocation: DashboardModel.canViewCasePerLocationLevelDashlet(authUser),
       Hospitalized: DashboardModel.canViewCaseHospitalizedPieChartDashlet(authUser),
+      COTHistogram: DashboardModel.canViewCotSizeHistogramDashlet(authUser),
 
       // KPI - cases
       KPICases: DashboardModel.canViewCaseDeceasedDashlet(authUser) ||
