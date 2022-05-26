@@ -19,6 +19,15 @@
     }
 
     .gd-dashlet-kpi-top-actions {
+      .gd-dashlet-kpi-top-actions-counter {
+        color: var(--gd-secondary);
+
+        .mat-flat-button {
+          min-width: 0;
+          padding: 0.4rem;
+        }
+      }
+
       .mat-icon-button {
         font-size: 2rem;
         height: 2.4rem;
@@ -28,12 +37,91 @@
 
         .mat-icon {
           font-size: 1.6rem;
+          @include transition(all 0.24s ease-in-out 0s);
         }
       }
     }
   }
 
   .gd-dashlet-kpi-bottom {
-    .gd-dashlet-kpi-bottom-value {}
+    padding: 0.8rem 1.6rem 1.6rem;
+
+    .gd-dashlet-kpi-bottom-value {
+      border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+      padding: 0.8rem 0;
+
+      .gd-dashlet-kpi-bottom-value-left {
+        width: 100%;
+
+        .mat-icon-button {
+          color: rgba(var(--gd-secondary-rgb), 0.5);
+          font-size: 2rem;
+          height: 2.4rem;
+          min-width: 2.4rem;
+          padding: 0.4rem;
+          @include transition(color 0.24s ease-in-out 0s);
+          width: 2.4rem;
+
+          &:hover {
+            color: var(--gd-secondary);
+          }
+
+          .mat-icon {
+            font-size: 2rem;
+          }
+        }
+
+        .gd-dashlet-kpi-bottom-value-left-actions {
+          padding: 0 0.8rem;
+          white-space: nowrap;
+
+          .mat-icon-button {
+            @include opacity(0);
+            visibility: hidden;
+          }
+        }
+  
+        .gd-dashlet-kpi-bottom-value-left-text {
+          @include flex_align_items(center);
+          @include flex(flex);
+          @include flex_direction(row);
+          overflow: hidden;
+  
+          > span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+        }
+      }
+
+      .gd-dashlet-kpi-bottom-value-right {
+        font-size: 1.6rem;
+        font-weight: 700;
+      }
+
+      &:hover {
+        .gd-dashlet-kpi-bottom-value-left {
+          .gd-dashlet-kpi-bottom-value-left-actions {
+            .mat-icon-button {
+              @include opacity(1);
+              visibility: visible;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  &.gd-dashlet-kpi-expanded {
+    .gd-dashlet-kpi-top {
+      .gd-dashlet-kpi-top-actions {
+        .mat-icon-button {
+          .mat-icon {
+            @include rotate(180deg);
+          }
+        }
+      }
+    }
   }
 }

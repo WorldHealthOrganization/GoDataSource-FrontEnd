@@ -12,6 +12,10 @@
     font-size: $gd-font-size;
     line-height: $gd-line-height;
 
+    .gd-dashlet-kpi-bottom-value-left-text & {
+      margin: 0 0.8rem;
+    }
+
     .mat-form-field-wrapper {
       margin: 0;
       padding-bottom: 0;
@@ -19,6 +23,10 @@
       .mat-form-field-flex {
         margin-top: 0;
         padding: 0 1.6rem;
+
+        .gd-dashlet-kpi-bottom-value-left-text & {
+          padding: 0 0.8rem;
+        }
 
         /* Input number borders */
         .mat-form-field-outline {
@@ -93,9 +101,18 @@
           padding: 0.8rem 0;
           width: 10rem;
 
+          .gd-dashlet-kpi-bottom-value-left-text & {
+            padding: 0.4rem 0;
+            width: 5rem;
+          }
+
           input {
             line-height: 2.4rem;
             margin-top: 0;
+
+            .gd-dashlet-kpi-bottom-value-left-text & {
+              line-height: $gd-line-height;
+            }
           }
 
           .mat-input-element {
@@ -125,6 +142,10 @@
         padding: 0;
         position: static;
         top: 0;
+
+        .gd-dashlet-kpi-bottom-value-left-text & {
+          min-height: 0;
+        }
 
         .mat-error {
           color: var(--gd-danger);
