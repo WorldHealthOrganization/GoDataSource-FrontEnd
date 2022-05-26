@@ -49,6 +49,9 @@ const routes: Routes = [
           permissions: [
             PERMISSION.UPSTREAM_SERVER_LIST
           ]
+        },
+        resolve: {
+          yesNoAll: YesNoAllDataResolver
         }
       },
       {

@@ -1,9 +1,9 @@
 <app-pie-donut-chart
-    [data]="data"
-    [loadingData]="displayLoading"
-    (clickItem)="onDoughnutPress($event)"
-    graphTitle="LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_TITLE"
-    description="LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_TITLE_DESCRIPTION"
-    graphTotal="LNG_PAGE_DASHBOARD_PIE_CHART_TOTAL_LABEL"
-    noDataLabel="LNG_PAGE_DASHLET_HOSPITALIZATION_SUMMARY_NO_DATA_LABEL">
+  graphTitle="LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_TITLE"
+  description="LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_TITLE_DESCRIPTION"
+  graphTotal="LNG_PAGE_DASHBOARD_PIE_CHART_TOTAL_LABEL"
+  noDataLabel="LNG_PAGE_DASHLET_HOSPITALIZATION_SUMMARY_NO_DATA_LABEL"
+  [getData$]="getData$"
+  (clickItem)="onDoughnutPress($event)"
+  (detectChanges)="detectChanges.emit()">
 </app-pie-donut-chart>

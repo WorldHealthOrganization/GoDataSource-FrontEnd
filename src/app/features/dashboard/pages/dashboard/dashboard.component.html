@@ -155,21 +155,24 @@
       *ngIf="visibleDashlets.KPICases"
       [globalFilterDate]="globalFilterDate"
       [globalFilterLocationId]="globalFilterLocationId"
-      [globalFilterClassificationId]="globalFilterClassificationId"></app-cases-kpi-dashlet>
+      [globalFilterClassificationId]="globalFilterClassificationId">
+    </app-cases-kpi-dashlet>
 
     <!-- Contacts KPI -->
     <app-contacts-kpi-dashlet
       *ngIf="visibleDashlets.KPIContacts"
       [globalFilterDate]="globalFilterDate"
       [globalFilterLocationId]="globalFilterLocationId"
-      [globalFilterClassificationId]="globalFilterClassificationId"></app-contacts-kpi-dashlet>
+      [globalFilterClassificationId]="globalFilterClassificationId">
+    </app-contacts-kpi-dashlet>
 
     <!-- COT KPI -->
     <app-cot-kpi-dashlet
       *ngIf="visibleDashlets.KPICOT"
       [globalFilterDate]="globalFilterDate"
       [globalFilterLocationId]="globalFilterLocationId"
-      [globalFilterClassificationId]="globalFilterClassificationId"></app-cot-kpi-dashlet>
+      [globalFilterClassificationId]="globalFilterClassificationId">
+    </app-cot-kpi-dashlet>
 
   </div>
 </div>
@@ -271,25 +274,6 @@
 <!--        <div-->
 <!--            class="page-content"-->
 <!--            fxLayout="column">-->
-<!--            &lt;!&ndash; Pie Charts &ndash;&gt;-->
-<!--            <mat-expansion-panel-->
-<!--                *ngIf="DashboardModel.canViewCaseSummaryDashlet(authUser) || DashboardModel.canViewCasePerLocationLevelDashlet(authUser) || DashboardModel.canViewCaseHospitalizedPieChartDashlet(authUser)">-->
-<!--                &lt;!&ndash; Header &ndash;&gt;-->
-<!--                <mat-expansion-panel-header>-->
-<!--                    <div class="other-kpi-header">-->
-<!--                        {{'LNG_PAGE_DASHBOARD_PIE_CHARTS_TITLE' | translate}}-->
-<!--                    </div>-->
-<!--                </mat-expansion-panel-header>-->
-
-<!--                &lt;!&ndash; Dashlets &ndash;&gt;-->
-<!--                <ng-template matExpansionPanelContent>-->
-<!--                    <div-->
-<!--                        fxLayout="row"-->
-<!--                        fxLayoutGap="10px">-->
-<!--                    </div>-->
-<!--                </ng-template>-->
-<!--            </mat-expansion-panel>-->
-
 <!--            &lt;!&ndash; Histogram - chains of transmission &ndash;&gt;-->
 <!--            <mat-expansion-panel-->
 <!--                *ngIf="DashboardModel.canViewCotSizeHistogramDashlet(authUser)">-->

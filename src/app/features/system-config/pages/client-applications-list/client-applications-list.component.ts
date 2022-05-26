@@ -80,7 +80,7 @@ export class ClientApplicationsListComponent
         format: {
           obfuscated: true,
           type: (item: SystemClientApplicationModel) => {
-            return `${item.credentials.clientId}/${item.credentials.clientSecret}`;
+            return `${item.credentials?.clientId}/${item.credentials?.clientSecret}`;
           }
         }
       },
@@ -188,7 +188,7 @@ export class ClientApplicationsListComponent
             type: V2ActionType.MENU,
             icon: 'more_horiz',
             menuOptions: [
-              // Delete Case
+              // Delete
               {
                 label: {
                   get: () => 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DELETE'
@@ -376,29 +376,9 @@ export class ClientApplicationsListComponent
   refreshList() {
     this.records$ = this.systemSettingsDataService.getSystemSettings()
       .pipe(
+        // map data
         map((systemSettings: SystemSettingsModel) => {
-          // get settings
-          let clientApplications = _.get(systemSettings, 'clientApplications');
-          clientApplications = clientApplications ? clientApplications : [];
-
-          return _.map(
-            clientApplications,
-            (item: SystemClientApplicationModel) => {
-              // set outbreak
-              item.outbreaks = _.transform(
-                item.outbreakIDs,
-                (result, outbreakID: string) => {
-                  // outbreak not deleted ?
-                  if (this.activatedRoute.snapshot.data.outbreak && this.activatedRoute.snapshot.data.outbreak.map[outbreakID]) {
-                    result.push(this.activatedRoute.snapshot.data.outbreak.map[outbreakID]);
-                  }
-                },
-                []
-              );
-
-              // finished
-              return item;
-            });
+          return systemSettings.clientApplications;
         }),
 
         // set count

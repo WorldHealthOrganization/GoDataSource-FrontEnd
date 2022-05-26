@@ -793,7 +793,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
             type: V2ActionType.MENU,
             icon: 'more_horiz',
             menuOptions: [
-              // Delete Case
+              // Delete
               {
                 label: {
                   get: () => 'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE'
@@ -871,7 +871,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                       // show loading
                       const loading = this.dialogV2Service.showLoadingDialog();
 
-                      // delete case
+                      // delete
                       this.caseDataService
                         .deleteCase(
                           this.selectedOutbreak.id,

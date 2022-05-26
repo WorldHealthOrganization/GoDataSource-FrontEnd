@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { throwError } from 'rxjs';
-import { catchError, map, takeUntil, tap } from 'rxjs/operators';
+import { catchError, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -13,6 +13,9 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import * as _ from 'lodash';
+import { TranslateService } from '@ngx-translate/core';
+import { IconModel } from '../../../../core/models/icon.model';
 
 @Component({
   selector: 'app-reference-data-category-entries-list',
@@ -30,7 +33,8 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
     private referenceDataDataService: ReferenceDataDataService,
     private toastV2Service: ToastV2Service,
     private activatedRoute: ActivatedRoute,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private translateService: TranslateService
   ) {
     super(
       listHelperService,
@@ -230,7 +234,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
                         title: {
                           get: () => 'LNG_COMMON_LABEL_DELETE',
                           data: () => ({
-                            name: `${ item.value }`
+                            name: `${ this.translateService.instant(item.value) }`
                           })
                         },
                         message: {
@@ -305,7 +309,32 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
   /**
    * Initialize table quick actions
    */
-  protected initializeQuickActions(): void {}
+  protected initializeQuickActions(): void {
+    this.quickActions = {
+      type: V2ActionType.MENU,
+      label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
+      visible: (): boolean => {
+        return IconModel.canList(this.authUser);
+      },
+      menuOptions: [
+        // Manage Icons
+        {
+          label: {
+            get: () => 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_MANAGE_ICONS_BUTTON'
+          },
+          action: {
+            link: () => ['/reference-data', 'manage-icons', 'list'],
+            linkQueryParams: () => ({
+              categoryId: this.category.id
+            })
+          },
+          visible: (): boolean => {
+            return IconModel.canList(this.authUser);
+          }
+        }
+      ]
+    };
+  }
 
   /**
    * Initialize table group actions
@@ -315,7 +344,19 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
   /**
    * Initialize table add action
    */
-  protected initializeAddAction(): void {}
+  protected initializeAddAction(): void {
+    this.addAction = {
+      type: V2ActionType.ICON_LABEL,
+      label: 'LNG_COMMON_BUTTON_ADD',
+      icon: 'add_circle_outline',
+      action: {
+        link: (): string[] => ['/reference-data', this.category.id, 'create']
+      },
+      visible: (): boolean => {
+        return ReferenceDataEntryModel.canCreate(this.authUser);
+      }
+    };
+  }
 
   /**
    * Initialize table grouped data
@@ -365,6 +406,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
   protected refreshListFields(): string[] {
     return [
       'id',
+      'categoryId',
       'value',
       'code',
       'description',
@@ -384,21 +426,16 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
    * Re(load) the Reference Data Categories list
    */
   refreshList() {
+    // add category id to request
+    this.queryBuilder.filter.byEquality(
+      'categoryId',
+      this.category.id
+    );
+
+    // retrieve records
     this.records$ = this.referenceDataDataService
-      .getReferenceDataByCategory(this.category.id)
+      .getEntries(this.queryBuilder)
       .pipe(
-        map((category: ReferenceDataCategoryModel) => {
-          return category.entries;
-        }),
-
-        // update page count
-        tap((entries: ReferenceDataEntryModel[]) => {
-          this.pageCount = {
-            count: entries.length,
-            hasMore: false
-          };
-        }),
-
         // should be the last pipe
         takeUntil(this.destroyed$)
       );
@@ -407,5 +444,49 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
   /**
    * Get total number of items
    */
-  refreshListCount() {}
+  refreshListCount(applyHasMoreLimit?: boolean) {
+    // reset
+    this.pageCount = undefined;
+
+    // set apply value
+    if (applyHasMoreLimit !== undefined) {
+      this.applyHasMoreLimit = applyHasMoreLimit;
+    }
+
+    // remove paginator from query builder
+    const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+    countQueryBuilder.paginator.clear();
+    countQueryBuilder.sort.clear();
+
+    // add category id to request
+    countQueryBuilder.filter.byEquality(
+      'categoryId',
+      this.category.id
+    );
+
+    // apply has more limit
+    if (this.applyHasMoreLimit) {
+      countQueryBuilder.flag(
+        'applyHasMoreLimit',
+        true
+      );
+    }
+
+    // count
+    this.referenceDataDataService
+      .getReferenceDataItemsCount(countQueryBuilder)
+      .pipe(
+        // error
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        }),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      )
+      .subscribe((response) => {
+        this.pageCount = response;
+      });
+  }
 }

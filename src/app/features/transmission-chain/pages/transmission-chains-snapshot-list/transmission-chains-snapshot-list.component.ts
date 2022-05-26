@@ -282,7 +282,7 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent<CotSn
       .showConfirm('LNG_DIALOG_CONFIRM_DELETE_COT_SNAPSHOT')
       .subscribe((answer: DialogAnswer) => {
         if (answer.button === DialogAnswerButton.Yes) {
-          // delete case
+          // delete
           this.transmissionChainDataService
             .deleteSnapshot(
               this.selectedOutbreak.id,

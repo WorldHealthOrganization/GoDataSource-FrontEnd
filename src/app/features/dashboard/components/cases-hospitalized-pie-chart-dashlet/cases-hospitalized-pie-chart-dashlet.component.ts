@@ -2,10 +2,10 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
-import { Subscription, Subscriber, throwError } from 'rxjs';
+import { Subscription, Subscriber, throwError, Observable } from 'rxjs';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { Constants } from '../../../../core/models/constants';
 import { Router } from '@angular/router';
 import * as _ from 'lodash';
@@ -23,9 +23,8 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 })
 export class CasesHospitalizedPieChartDashletComponent
 implements OnInit, OnDestroy {
-
   // data
-  data: PieDonutChartData[] = [];
+  getData$: Observable<PieDonutChartData[]>;
 
   // Global filters => Date
   private _globalFilterDate: Moment | string;
@@ -61,17 +60,13 @@ implements OnInit, OnDestroy {
   @Output() detectChanges = new EventEmitter<void>();
 
   // outbreak
-  outbreakId: string;
+  private _outbreakId: string;
 
   // subscribers
-  outbreakSubscriber: Subscription;
-  previousSubscriber: Subscription;
-
-  // loading data
-  displayLoading: boolean = true;
+  private _outbreakSubscriber: Subscription;
 
   // authenticated user
-  authUser: UserModel;
+  private _authUser: UserModel;
 
   /**
      * Global Filters changed
@@ -96,14 +91,14 @@ implements OnInit, OnDestroy {
      */
   ngOnInit() {
     // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
+    this._authUser = this.authDataService.getAuthenticatedUser();
 
     // outbreak
-    this.outbreakSubscriber = this.outbreakDataService
+    this._outbreakSubscriber = this.outbreakDataService
       .getSelectedOutbreakSubject()
       .subscribe((selectedOutbreak: OutbreakModel) => {
         if (selectedOutbreak) {
-          this.outbreakId = selectedOutbreak.id;
+          this._outbreakId = selectedOutbreak.id;
           this.refreshDataCaller.call();
         }
       });
@@ -114,15 +109,9 @@ implements OnInit, OnDestroy {
      */
   ngOnDestroy() {
     // outbreak subscriber
-    if (this.outbreakSubscriber) {
-      this.outbreakSubscriber.unsubscribe();
-      this.outbreakSubscriber = null;
-    }
-
-    // release previous subscriber
-    if (this.previousSubscriber) {
-      this.previousSubscriber.unsubscribe();
-      this.previousSubscriber = null;
+    if (this._outbreakSubscriber) {
+      this._outbreakSubscriber.unsubscribe();
+      this._outbreakSubscriber = null;
     }
 
     // debounce caller
@@ -137,7 +126,7 @@ implements OnInit, OnDestroy {
      */
   onDoughnutPress(item: PieDonutChartData) {
     // we need case list permission to redirect
-    if (!CaseModel.canList(this.authUser)) {
+    if (!CaseModel.canList(this._authUser)) {
       return;
     }
 
@@ -178,102 +167,96 @@ implements OnInit, OnDestroy {
      * Refresh Data
      */
   refreshData() {
-    if (this.outbreakId) {
-      // release previous subscriber
-      if (this.previousSubscriber) {
-        this.previousSubscriber.unsubscribe();
-        this.previousSubscriber = null;
-      }
-
-      // construct query builder
-      const qb = new RequestQueryBuilder();
-
-      // date
-      if (this.globalFilterDate) {
-        qb.filter.byDateRange(
-          'dateOfReporting', {
-            endDate: moment(this.globalFilterDate).endOf('day').format()
-          }
-        );
-      }
-
-      // location
-      if (this.globalFilterLocationId) {
-        qb.filter.byEquality(
-          'addresses.parentLocationIdFilter',
-          this.globalFilterLocationId
-        );
-      }
-
-      // exclude discarded cases
-      qb.filter.where({
-        classification: {
-          neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
-        }
-      });
-
-      // classification
-      if (!_.isEmpty(this.globalFilterClassificationId)) {
-        qb.filter.bySelect(
-          'classification',
-          this.globalFilterClassificationId,
-          false,
-          null
-        );
-      }
-
-      // retrieve data
-      this.displayLoading = true;
-
-      // determine hospitalized & isolated for a specific date
-      qb.flag(
-        'date',
-        this.globalFilterDate
-      );
-
-      // make teh request to count hospitalized, isolated ...
-      this.detectChanges.emit();
-      this.previousSubscriber = this.caseDataService
-        .getCasesHospitalized(
-          this.outbreakId,
-          qb
-        )
-        .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            return throwError(err);
-          })
-        )
-        .subscribe((data) => {
-          // create data
-          this.data = [
-            new PieDonutChartData({
-              key: Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED,
-              color: null,
-              label: 'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_HOSPITALIZED_LABEL',
-              value: data.hospitalized
-            }),
-            new PieDonutChartData({
-              key: Constants.APPLY_LIST_FILTER.CASES_ISOLATED,
-              color: null,
-              label: 'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_ISOLATED_LABEL',
-              value: data.isolated
-            }),
-            new PieDonutChartData({
-              key: Constants.APPLY_LIST_FILTER.CASES_NOT_HOSPITALISED,
-              color: null,
-              label: 'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_NOT_HOSPITALIZED_LABEL',
-              value: data.notHospitalized
-            })
-          ];
-
-          // assign colors
-          PieDonutChartData.assignColorDomain(this.data);
-
-          // finished
-          this.displayLoading = false;
-          this.detectChanges.emit();
-        });
+    if (!this._outbreakId) {
+      return;
     }
+
+    // construct query builder
+    const qb = new RequestQueryBuilder();
+
+    // date
+    if (this.globalFilterDate) {
+      qb.filter.byDateRange(
+        'dateOfReporting', {
+          endDate: moment(this.globalFilterDate).endOf('day').format()
+        }
+      );
+    }
+
+    // location
+    if (this.globalFilterLocationId) {
+      qb.filter.byEquality(
+        'addresses.parentLocationIdFilter',
+        this.globalFilterLocationId
+      );
+    }
+
+    // exclude discarded cases
+    qb.filter.where({
+      classification: {
+        neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
+      }
+    });
+
+    // classification
+    if (!_.isEmpty(this.globalFilterClassificationId)) {
+      qb.filter.bySelect(
+        'classification',
+        this.globalFilterClassificationId,
+        false,
+        null
+      );
+    }
+
+    // determine hospitalized & isolated for a specific date
+    qb.flag(
+      'date',
+      this.globalFilterDate
+    );
+
+    // make teh request to count hospitalized, isolated ...
+    this.getData$ = this.caseDataService
+      .getCasesHospitalized(
+        this._outbreakId,
+        qb
+      )
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        })
+      )
+      .pipe(map((response) => {
+        // create data
+        const data: PieDonutChartData[] = [
+          new PieDonutChartData({
+            key: Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED,
+            color: null,
+            label: 'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_HOSPITALIZED_LABEL',
+            value: response.hospitalized
+          }),
+          new PieDonutChartData({
+            key: Constants.APPLY_LIST_FILTER.CASES_ISOLATED,
+            color: null,
+            label: 'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_ISOLATED_LABEL',
+            value: response.isolated
+          }),
+          new PieDonutChartData({
+            key: Constants.APPLY_LIST_FILTER.CASES_NOT_HOSPITALISED,
+            color: null,
+            label: 'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_NOT_HOSPITALIZED_LABEL',
+            value: response.notHospitalized
+          })
+        ];
+
+        // assign colors
+        PieDonutChartData.assignColorDomain(data);
+
+        // finished
+        return data;
+      }));
+
+    // update ui
+    this.detectChanges.emit();
   }
 }
