@@ -155,21 +155,24 @@
       *ngIf="visibleDashlets.KPICases"
       [globalFilterDate]="globalFilterDate"
       [globalFilterLocationId]="globalFilterLocationId"
-      [globalFilterClassificationId]="globalFilterClassificationId"></app-cases-kpi-dashlet>
+      [globalFilterClassificationId]="globalFilterClassificationId">
+    </app-cases-kpi-dashlet>
 
     <!-- Contacts KPI -->
     <app-contacts-kpi-dashlet
       *ngIf="visibleDashlets.KPIContacts"
       [globalFilterDate]="globalFilterDate"
       [globalFilterLocationId]="globalFilterLocationId"
-      [globalFilterClassificationId]="globalFilterClassificationId"></app-contacts-kpi-dashlet>
+      [globalFilterClassificationId]="globalFilterClassificationId">
+    </app-contacts-kpi-dashlet>
 
     <!-- COT KPI -->
     <app-cot-kpi-dashlet
       *ngIf="visibleDashlets.KPICOT"
       [globalFilterDate]="globalFilterDate"
       [globalFilterLocationId]="globalFilterLocationId"
-      [globalFilterClassificationId]="globalFilterClassificationId"></app-cot-kpi-dashlet>
+      [globalFilterClassificationId]="globalFilterClassificationId">
+    </app-cot-kpi-dashlet>
 
   </div>
 </div>
