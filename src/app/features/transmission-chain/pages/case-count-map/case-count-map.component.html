@@ -27,57 +27,56 @@
 </app-topnav>
 -->
 
-<mat-card
-    class="page-section page-content"
-    fxLayout="column"
+<div
+  class="app-case-count-map-filters"
+  fxLayout="column"
 >
-    <div
-        class="app-case-count-map-filters"
-        fxLayout="column"
-    >
-        <!-- panel toggle -->
-        <div fxLayout="row" fxLayoutAlign="space-between center">
-            <!-- settings toggle -->
-            <button
-                mat-raised-button
-                (click)="showSettings = !showSettings">
-                {{ 'LNG_PAGE_CASE_COUNT_MAP_BUTTON_CONFIGURE_SETTINGS' | translate }}
-            </button>
-        </div>
+  <!-- panel toggle -->
+  <div fxLayout="row" fxLayoutAlign="space-between center">
+    <!-- settings toggle -->
+    <button
+      mat-raised-button
+      (click)="showSettings = !showSettings">
+      {{ 'LNG_PAGE_CASE_COUNT_MAP_BUTTON_CONFIGURE_SETTINGS' | translate }}
+    </button>
+  </div>
 
-        <!-- settings panel -->
-        <div
-            *ngIf="showSettings"
-            fxLayout="column">
-            <!-- Filters -->
-            <app-transmission-chain-filters
-                titleName="LNG_PAGE_CASE_COUNT_MAP_FILTERS_TITLE"
-                [filters]="filters"
-                [clusterOptions]="false">
-            </app-transmission-chain-filters>
+  <!-- settings panel -->
+  <div
+    *ngIf="showSettings"
+    fxLayout="column">
+    <!-- Filters -->
+    <app-transmission-chain-filters
+      titleName="LNG_PAGE_CASE_COUNT_MAP_FILTERS_TITLE"
+      [filters]="filters"
+      [clusterOptions]="false">
+    </app-transmission-chain-filters>
 
-            <!-- Buttons -->
-            <div fxLayout="row" fxFlexAlign="end" fxLayoutGap="10px">
-                <!-- Reset filters -->
-                <button
-                    fxFlex="150px"
-                    mat-raised-button
-                    (click)="resetFilters()">
-                    {{ 'LNG_PAGE_CASE_COUNT_MAP_BUTTON_RESET_FILTERS' | translate }}
-                </button>
+    <!-- Buttons -->
+    <div fxLayout="row" fxFlexAlign="end" fxLayoutGap="10px">
+      <!-- Reset filters -->
+      <button
+        fxFlex="150px"
+        mat-raised-button
+        (click)="resetFilters()">
+        {{ 'LNG_PAGE_CASE_COUNT_MAP_BUTTON_RESET_FILTERS' | translate }}
+      </button>
 
-                <!-- Apply filters -->
-                <button
-                    fxFlex="150px"
-                    mat-raised-button
-                    color="accent"
-                    (click)="reloadCases()">
-                    {{ 'LNG_PAGE_CASE_COUNT_MAP_BUTTON_APPLY_SETTINGS' | translate }}
-                </button>
-            </div>
-        </div>
+      <!-- Apply filters -->
+      <button
+        fxFlex="150px"
+        mat-raised-button
+        color="accent"
+        (click)="reloadCases()">
+        {{ 'LNG_PAGE_CASE_COUNT_MAP_BUTTON_APPLY_SETTINGS' | translate }}
+      </button>
     </div>
+  </div>
+</div>
 
+<app-basic-page-v2
+  [breadcrumbs]="breadcrumbs"
+  pageTitle="LNG_PAGE_CASE_COUNT_TITLE">
     <div fxLayout="row" fxLayoutGap="20px">
         <div fxFlex="200px">
             {{ 'LNG_PAGE_CASE_COUNT_MAP_DISTANCE_LABEL' | translate }} ( {{ clusterDistance }} )
@@ -110,4 +109,4 @@
         *ngIf="firstLoaded && !displayLoading && markers.length < 1">
         {{ 'LNG_PAGE_CASE_COUNT_MAP_NO_DATA' | translate }}
     </div>
-</mat-card>
+</app-basic-page-v2>
