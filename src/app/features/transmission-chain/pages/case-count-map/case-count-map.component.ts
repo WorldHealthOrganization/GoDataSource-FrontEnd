@@ -15,6 +15,8 @@ import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { catchError } from 'rxjs/operators';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
 
 @Component({
   selector: 'app-case-count-map',
@@ -23,9 +25,8 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   styleUrls: ['./case-count-map.component.less']
 })
 export class CaseCountMapComponent implements OnInit, OnDestroy {
-  // breadcrumbs: BreadcrumbItemModel[] = [
-  //   new BreadcrumbItemModel('LNG_PAGE_CASE_COUNT_TITLE', '', true)
-  // ];
+  // breadcrumbs
+  breadcrumbs: IV2Breadcrumb[] = [];
 
   // outbreak
   outbreakId: string;
@@ -95,6 +96,26 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
       this.outbreakSubscriber.unsubscribe();
       this.outbreakSubscriber = null;
     }
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
+    // set breadcrumbs
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
+        }
+      }, {
+        label: 'LNG_PAGE_CASE_COUNT_TITLE',
+        action: null
+      }
+    ];
   }
 
   /**
