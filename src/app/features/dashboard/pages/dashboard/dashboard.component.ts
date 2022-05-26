@@ -77,6 +77,7 @@ export class DashboardComponent {
     EPICurveClassification: boolean,
     EPICurveOutcome: boolean,
     EPICurveReporting: boolean,
+    FollowUpOverview: boolean,
     KPICases: boolean,
     KPIContacts: boolean,
     KPICOT: boolean
@@ -88,6 +89,7 @@ export class DashboardComponent {
       EPICurveClassification: false,
       EPICurveOutcome: false,
       EPICurveReporting: false,
+      FollowUpOverview: false,
       KPICases: false,
       KPIContacts: false,
       KPICOT: false
@@ -115,6 +117,7 @@ export class DashboardComponent {
       EPICurveClassification: DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(authUser),
       EPICurveOutcome: DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(authUser),
       EPICurveReporting: DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(authUser),
+      FollowUpOverview: DashboardModel.canViewContactFollowUpReportDashlet(authUser),
 
       // KPI - cases
       KPICases: DashboardModel.canViewCaseDeceasedDashlet(authUser) ||

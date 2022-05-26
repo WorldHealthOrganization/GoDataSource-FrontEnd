@@ -192,6 +192,15 @@
       (detectChanges)="detectChanges()">
     </app-epi-curve-reporting-dashlet>
 
+    <!-- Contact follow-up overview -->
+    <app-contact-follow-up-overview-dashlet
+      *ngIf="visibleDashlets.FollowUpOverview"
+      [globalFilterDate]="globalFilterDate"
+      [globalFilterLocationId]="globalFilterLocationId"
+      [globalFilterClassificationId]="globalFilterClassificationId"
+      (detectChanges)="detectChanges()">
+    </app-contact-follow-up-overview-dashlet>
+
     <!-- KPI -->
     <div
       class="gd-dashboard-bottom-row"
@@ -323,27 +332,6 @@
 <!--        <div-->
 <!--            class="page-content"-->
 <!--            fxLayout="column">-->
-<!--            &lt;!&ndash; Contact follow-up overview &ndash;&gt;-->
-<!--            <mat-expansion-panel-->
-<!--                *ngIf="DashboardModel.canViewContactFollowUpReportDashlet(authUser)">-->
-<!--                &lt;!&ndash; Header &ndash;&gt;-->
-<!--                <mat-expansion-panel-header>-->
-<!--                    <div class="other-kpi-header">-->
-<!--                        {{'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_TITLE' | translate}}-->
-<!--                    </div>-->
-<!--                </mat-expansion-panel-header>-->
-
-<!--                &lt;!&ndash; Dashlets &ndash;&gt;-->
-<!--                <ng-template matExpansionPanelContent>-->
-<!--                    &lt;!&ndash; Contact follow-up overview c3 chart &ndash;&gt;-->
-<!--                    <app-contact-follow-up-overview-dashlet-->
-<!--                        [globalFilterDate]="globalFilterDate"-->
-<!--                        [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                        [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                    </app-contact-follow-up-overview-dashlet>-->
-<!--                </ng-template>-->
-<!--            </mat-expansion-panel>-->
-
 <!--            &lt;!&ndash; Cases based on contact status &ndash;&gt;-->
 <!--            <mat-expansion-panel-->
 <!--                *ngIf="DashboardModel.canViewContactStatusReportDashlet(authUser)">-->

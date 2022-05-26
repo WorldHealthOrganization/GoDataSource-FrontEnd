@@ -1,39 +1,72 @@
-<!-- Chart -->
+<!-- Title / Description -->
 <div
-    [fxShow]="!displayLoading && chartData?.length > 0">
-    <app-c3-combination-stacked-bar-chart
-        chartId="c3FollowedUpReport"
-        [chartData]="chartData"
-        [chartDataColumns]="chartDataColumns"
-        [lineData]="lineData"
-        [chartDataCategories]="chartDataCategories"
-        tooltip="LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_TITLE_DESCRIPTION"
-        [showLabels]="showLabels"
-        [xLabel]="'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_X_AXIS_LABEL' | translate"
-        [yLabel]="'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_Y_AXIS_LABEL' | translate"
-        [y2Label]="'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_Y2_AXIS_LABEL' | translate"
-        [colorPattern]="colorPattern"
-        [y2Max]="100"
-        [y2Min]="0"
-        [initialZoomRanges]="dashletZoomRanges">
-    </app-c3-combination-stacked-bar-chart>
+  fxGrow="0" fxLayout="row" fxLayoutGap="10px">
+
+  <!-- Title -->
+  <div
+    fxFlex>
+    <span>
+      {{ 'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_TITLE' | translate }}
+    </span>
+  </div>
+
+  <!-- Description -->
+  <div
+    fxGrow="0">
+    <!-- Tooltip -->
+    <app-fancy-tooltip
+      tooltip="LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_TITLE_DESCRIPTION">
+    </app-fancy-tooltip>
+
+    <!-- Expand / Collapse -->
+    <button
+      type="button"
+      mat-icon-button
+      (click)="expanded = !expanded">
+      <mat-icon>expand_more</mat-icon>
+    </button>
+  </div>
 </div>
 
-<!-- No data -->
+<!-- Expanded -->
 <ng-container
-    *ngIf="!displayLoading && chartData?.length < 1">
-    <div
-        fxFlex fxLayout="column" fxFlexAlign="center"
-        class="dashlet-no-data">
-        <div>
-            {{ 'LNG_PAGE_DASHLET_CASES_COUNT_OVER_TIME_NO_DATA_LABEL' | translate }}
-        </div>
-    </div>
-</ng-container>
+  *ngIf="expanded || expandedOnce">
+  <!-- Chart -->
+  <div
+      [fxShow]="expanded && !displayLoading && chartData?.length > 0">
+      <app-c3-combination-stacked-bar-chart
+          chartId="c3FollowedUpReport"
+          [chartData]="chartData"
+          [chartDataColumns]="chartDataColumns"
+          [lineData]="lineData"
+          [chartDataCategories]="chartDataCategories"
+          [showLabels]="showLabels"
+          [xLabel]="'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_X_AXIS_LABEL' | translate"
+          [yLabel]="'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_Y_AXIS_LABEL' | translate"
+          [y2Label]="'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_Y2_AXIS_LABEL' | translate"
+          [colorPattern]="colorPattern"
+          [y2Max]="100"
+          [y2Min]="0"
+          [initialZoomRanges]="dashletZoomRanges">
+      </app-c3-combination-stacked-bar-chart>
+  </div>
 
-<!-- Loading data -->
-<div
-    *ngIf="displayLoading"
-    class="dashlet-loading">
-    <mat-spinner></mat-spinner>
-</div>
+  <!-- No data -->
+  <ng-container
+      *ngIf="!displayLoading && chartData?.length < 1">
+      <div
+          fxFlex fxLayout="column" fxFlexAlign="center"
+          class="dashlet-no-data">
+          <div>
+              {{ 'LNG_PAGE_DASHLET_CASES_COUNT_OVER_TIME_NO_DATA_LABEL' | translate }}
+          </div>
+      </div>
+  </ng-container>
+
+  <!-- Loading data -->
+  <div
+      *ngIf="displayLoading"
+      class="dashlet-loading">
+      <mat-spinner></mat-spinner>
+  </div>
+</ng-container>
