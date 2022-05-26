@@ -64,4 +64,15 @@
       }
     }
   }
+
+  .gd-dashlet-contact-followup-loading {
+    padding-bottom: 0.8rem;
+  }
+
+  .gd-dashlet-contact-followup-no-data {
+    color: var(--gd-secondary);
+    font-style: italic;
+    padding-bottom: 0.8rem;
+    text-align: center;
+  }
 }

@@ -1,98 +1,115 @@
-<!-- Title / Description -->
 <div
-  fxGrow="0" fxLayout="row" fxLayoutGap="10px">
+  class="gd-dashlet-epi-curve-outcome"
+  [class.gd-dashlet-epi-curve-outcome-expanded]="expanded"
+  fxLayout="column">
 
-  <!-- Title -->
+  <!-- Title / Description -->
   <div
-    fxFlex>
-    <span>
-      {{ 'LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE' | translate }}
-    </span>
+    class="gd-dashlet-epi-curve-outcome-top"
+    fxLayout="row" fxLayoutAlign="none center">
+
+    <!-- Title -->
+    <div
+      class="gd-dashlet-epi-curve-outcome-top-title"
+      fxFlex>
+      <span>
+        {{ 'LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE' | translate }}
+      </span>
+    </div>
+
+    <!-- Description -->
+    <div
+      class="gd-dashlet-epi-curve-outcome-top-actions"
+      fxGrow="0" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="0.8rem">
+      <!-- Tooltip -->
+      <app-fancy-tooltip
+        tooltip="LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE_DESCRIPTION">
+      </app-fancy-tooltip>
+
+      <!-- Expand / Collapse -->
+      <button
+        type="button"
+        mat-icon-button
+        (click)="expanded = !expanded">
+        <mat-icon>expand_more</mat-icon>
+      </button>
+    </div>
   </div>
 
-  <!-- Description -->
-  <div
-    fxGrow="0">
-    <!-- Tooltip -->
-    <app-fancy-tooltip
-      tooltip="LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE_DESCRIPTION">
-    </app-fancy-tooltip>
-
-    <!-- Expand / Collapse -->
-    <button
-      type="button"
-      mat-icon-button
-      (click)="expanded = !expanded">
-      <mat-icon>expand_more</mat-icon>
-    </button>
-  </div>
-</div>
-
-<!-- Expanded -->
-<ng-container
+  <!-- Expanded -->
+  <ng-container
   *ngIf="expanded">
-  <!-- Chart -->
-  <div
+    <!-- Chart -->
+    <div
+      class="gd-dashlet-epi-curve-outcome-bottom"
       [fxShow]="!displayLoading && chartData?.length > 0">
       <app-c3-stacked-bar-chart
-          [chartData]="chartData"
-          [chartDataColumns]="chartDataColumns"
-          [chartDataCategories]="chartDataCategories"
-          [showLabels]="false"
-          [xLabel]="'LNG_PAGE_DASHBOARD_EPI_CURVE_DATE_OF_ONSET_LABEL' | translate"
-          [yLabel]="'LNG_PAGE_DASHBOARD_EPI_CURVE_NO_CASES_LABEL' | translate"
-          [colorPattern]="colorPattern">
+        [chartData]="chartData"
+        [chartDataColumns]="chartDataColumns"
+        [chartDataCategories]="chartDataCategories"
+        [showLabels]="false"
+        [xLabel]="'LNG_PAGE_DASHBOARD_EPI_CURVE_DATE_OF_ONSET_LABEL' | translate"
+        [yLabel]="'LNG_PAGE_DASHBOARD_EPI_CURVE_NO_CASES_LABEL' | translate"
+        [colorPattern]="colorPattern">
       </app-c3-stacked-bar-chart>
 
-      <div fxLayout="row" fxLayoutAlign="center" fxLayoutGap="10px">
-          <button
-              mat-raised-button
-              *ngIf="viewType !== Constants.EPI_CURVE_VIEW_TYPE.MONTH.value"
-              (click)="changeView(Constants.EPI_CURVE_VIEW_TYPE.MONTH.value)">
-              {{Constants.EPI_CURVE_VIEW_TYPE.MONTH.label | translate}}
-          </button>
-          <button
-              mat-raised-button
-              *ngIf="viewType !== Constants.EPI_CURVE_VIEW_TYPE.WEEK.value"
-              (click)="changeView(Constants.EPI_CURVE_VIEW_TYPE.WEEK.value)">
-              {{Constants.EPI_CURVE_VIEW_TYPE.WEEK.label | translate}}
-          </button>
-          <button
-              mat-raised-button
-              *ngIf="viewType !== Constants.EPI_CURVE_VIEW_TYPE.DAY.value"
-              (click)="changeView(Constants.EPI_CURVE_VIEW_TYPE.DAY.value)">
-              {{Constants.EPI_CURVE_VIEW_TYPE.DAY.label | translate}}
-          </button>
+      <div
+        fxLayout="row" fxLayoutAlign="center start" fxLayoutGap="1.6rem">
+        <button
+          mat-flat-button
+          color="secondary"
+          *ngIf="viewType !== Constants.EPI_CURVE_VIEW_TYPE.MONTH.value"
+          (click)="changeView(Constants.EPI_CURVE_VIEW_TYPE.MONTH.value)">
+          {{Constants.EPI_CURVE_VIEW_TYPE.MONTH.label | translate}}
+        </button>
+        <button
+          mat-flat-button
+          color="secondary"
+          *ngIf="viewType !== Constants.EPI_CURVE_VIEW_TYPE.WEEK.value"
+          (click)="changeView(Constants.EPI_CURVE_VIEW_TYPE.WEEK.value)">
+          {{Constants.EPI_CURVE_VIEW_TYPE.WEEK.label | translate}}
+        </button>
+        <button
+          mat-flat-button
+          color="secondary"
+          *ngIf="viewType !== Constants.EPI_CURVE_VIEW_TYPE.DAY.value"
+          (click)="changeView(Constants.EPI_CURVE_VIEW_TYPE.DAY.value)">
+          {{Constants.EPI_CURVE_VIEW_TYPE.DAY.label | translate}}
+        </button>
 
-          <div
-              *ngIf="viewType === Constants.EPI_CURVE_VIEW_TYPE.WEEK.value"
-              class="week-type">
-              <app-form-select-single-v2
-                name="epiCurveWeekViewType"
-                [(ngModel)]="epiCurveWeekViewType"
-                [options]="epiCurveWeekTypesOptions"
-                (ngModelChange)="changeWeekView()">
-              </app-form-select-single-v2>
-          </div>
+        <div
+          *ngIf="viewType === Constants.EPI_CURVE_VIEW_TYPE.WEEK.value"
+          class="week-type">
+          <app-form-select-single-v2
+            name="epiCurveWeekViewType"
+            [(ngModel)]="epiCurveWeekViewType"
+            [options]="epiCurveWeekTypesOptions"
+            (ngModelChange)="changeWeekView()">
+          </app-form-select-single-v2>
+        </div>
       </div>
-  </div>
+    </div>
 
-  <!-- No data -->
-  <ng-container
+    <!-- No data -->
+    <ng-container
       *ngIf="!displayLoading && chartData?.length < 1">
       <div
-          fxFlex fxLayout="column" fxFlexAlign="center"
-          class="dashlet-no-data">
-          <div>
-              {{ 'LNG_PAGE_DASHLET_CASES_COUNT_OVER_TIME_NO_DATA_LABEL' | translate }}
-          </div>
+        class="gd-dashlet-epi-curve-outcome-no-data"
+        fxFlex fxFlexAlign="center center">
+        <div>
+          {{ 'LNG_PAGE_DASHLET_CASES_COUNT_OVER_TIME_NO_DATA_LABEL' | translate }}
+        </div>
       </div>
-  </ng-container>
+    </ng-container>
 
-  <!-- Loading data -->
-  <div
+    <!-- Loading data -->
+    <div
       *ngIf="displayLoading"
-      class="dashlet-loading">
-      <mat-spinner></mat-spinner>
-  </div>
-</ng-container>
+      class="gd-dashlet-epi-curve-outcome-loading"
+      fxFlex fxLayoutAlign="center center">
+      <mat-progress-spinner
+        diameter="24"
+        mode="indeterminate"></mat-progress-spinner>
+    </div>
+  </ng-container>
+</div>

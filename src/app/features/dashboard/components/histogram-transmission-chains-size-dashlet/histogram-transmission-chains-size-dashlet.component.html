@@ -76,7 +76,7 @@
     <ng-container
       *ngIf="!displayLoading && histogramResults?.length < 1">
       <div
-        class="dashlet-no-data"
+        class="gd-dashlet-histogram-no-data"
         fxFlex fxFlexAlign="center center">
         <div>
           {{ 'LNG_PAGE_DASHLET_SIZE_OF_CHAINS_OF_TRANSMISSION_NO_DATA_LABEL' | translate }}
@@ -87,6 +87,7 @@
     <!-- Loading data -->
     <div
       *ngIf="displayLoading"
+      class="gd-dashlet-histogram-loading"
       fxFlex fxLayoutAlign="center center">
       <mat-progress-spinner
         diameter="24"

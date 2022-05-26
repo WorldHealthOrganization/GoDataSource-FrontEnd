@@ -1,27 +1,27 @@
 @import 'mixins';
 
-/* Histogram Dashlet */
-.gd-dashlet-histogram {
+/* Epi Curve Outcome Dashlet */
+.gd-dashlet-epi-curve-outcome {
   background-color: var(--gd-background);
   @include border-radius(0.4rem);
   @include box-shadow(0 0.2rem 0.1rem -0.1rem rgb(0, 0, 0, 0.2),
                       0 0.1rem 0.1rem 0 rgb(0, 0, 0, 0.14),
                       0 0.1rem 0.3rem 0 rgb(0, 0, 0, 0.12));
 
-  /* Histogram Dashlet - Top */
-  .gd-dashlet-histogram-top {
+  /* Epi Curve Outcome Dashlet - Top */
+  .gd-dashlet-epi-curve-outcome-top {
     padding: 0.8rem 1.6rem;
 
-    /* Histogram Dashlet - Top - Title */
-    .gd-dashlet-histogram-top-title {
+    /* Epi Curve Outcome Dashlet - Top - Title */
+    .gd-dashlet-epi-curve-outcome-top-title {
       color: var(--gd-primary);
       font-size: 1.6rem;
       font-weight: 700;
     }
 
-    /* Histogram Dashlet - Top - Actions */
-    .gd-dashlet-histogram-top-actions {
-      .gd-dashlet-histogram-top-actions-counter {
+    /* Epi Curve Outcome Dashlet - Top - Actions */
+    .gd-dashlet-epi-curve-outcome-top-actions {
+      .gd-dashlet-epi-curve-outcome-top-actions-counter {
         color: var(--gd-secondary);
 
         .mat-flat-button {
@@ -45,17 +45,17 @@
     }
   }
 
-  /* Histogram Dashlet - Bottom */
-  .gd-dashlet-histogram-bottom {
+  /* Epi Curve Outcome Dashlet - Bottom */
+  .gd-dashlet-epi-curve-outcome-bottom {
     padding: 0.8rem 1.6rem 1.6rem;
   }
 
-  /* Histogram Dashlet - Expanded */
-  &.gd-dashlet-histogram-expanded {
+  /* Epi Curve Outcome Dashlet - Expanded */
+  &.gd-dashlet-epi-curve-outcome-expanded {
     height: 100%;
 
-    .gd-dashlet-histogram-top {
-      .gd-dashlet-histogram-top-actions {
+    .gd-dashlet-epi-curve-outcome-top {
+      .gd-dashlet-epi-curve-outcome-top-actions {
         .mat-icon-button {
           .mat-icon {
             @include rotate(180deg);
@@ -65,11 +65,11 @@
     }
   }
 
-  .gd-dashlet-histogram-loading {
+  .gd-dashlet-epi-curve-outcome-loading {
     padding-bottom: 0.8rem;
   }
 
-  .gd-dashlet-histogram-no-data {
+  .gd-dashlet-epi-curve-outcome-no-data {
     color: var(--gd-secondary);
     font-style: italic;
     padding-bottom: 0.8rem;

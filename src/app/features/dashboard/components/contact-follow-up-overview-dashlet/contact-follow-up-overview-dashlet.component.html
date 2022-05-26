@@ -64,7 +64,7 @@
     <ng-container
       *ngIf="!displayLoading && chartData?.length < 1">
       <div
-        class="dashlet-no-data"
+        class="gd-dashlet-contact-followup-no-data"
         fxFlex fxFlexAlign="center center">
         <div>
           {{ 'LNG_PAGE_DASHLET_CASES_COUNT_OVER_TIME_NO_DATA_LABEL' | translate }}
@@ -75,6 +75,7 @@
     <!-- Loading data -->
     <div
       *ngIf="displayLoading"
+      class="gd-dashlet-contact-followup-loading"
       fxFlex fxLayoutAlign="center center">
       <mat-progress-spinner
         diameter="24"

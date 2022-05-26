@@ -20,7 +20,7 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
   selector: 'app-epi-curve-outcome-dashlet',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './epi-curve-outcome-dashlet.component.html',
-  styleUrls: ['./epi-curve-outcome-dashlet.component.less']
+  styleUrls: ['./epi-curve-outcome-dashlet.component.scss']
 })
 export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
   // detect changes

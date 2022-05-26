@@ -33,9 +33,14 @@
     }
   }
 
+  .app-pie-donut-chart-main-loading {
+    padding-bottom: 0.8rem;
+  }
+
   .app-pie-donut-chart-main-no-data {
-    font-size: 1.6rem;
-    font-weight: bold;
+    color: var(--gd-secondary);
+    font-style: italic;
+    padding-bottom: 0.8rem;
   }
 
   .app-pie-donut-chart-main-bottom {
