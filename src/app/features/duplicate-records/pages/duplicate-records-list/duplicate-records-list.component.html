@@ -1,29 +1,12 @@
-<!--
-<app-topnav>
-    <ng-container dynamic-section>
-        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
-            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
-        </div>
-    </ng-container>
-</app-topnav>
--->
-
-<!-- Total number of records from the list -->
+<!--&lt;!&ndash; Total number of records from the list &ndash;&gt;-->
 <!--<app-total-number-of-records-->
 <!--    [value]="duplicatesListCount$ | async">-->
 <!--</app-total-number-of-records>-->
 
-<mat-card class="page-section page-content">
-    <div class="reset-filters">
-        <button
-            type="button"
-            mat-raised-button
-            color="accent"
-            (click)="needsRefreshList(true)">
-            {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
-        </button>
-    </div>
-
+<app-basic-page-v2
+  [breadcrumbs]="breadcrumbs"
+  pageTitle="LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE"
+  [actionButton]="actionButton">
     <!-- Loading data data -->
     <div
         *ngIf="!duplicatesList"
@@ -225,13 +208,12 @@
 <!--        {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}-->
 <!--    </div>-->
 
-<!--    &lt;!&ndash; Pages (need to be hidden and not ngIf, otherwise it makes a new duplicate request) &ndash;&gt;-->
-<!--    <app-mat-paginator-extended-->
-<!--        [hidden]="refreshingList || isEmptyList"-->
-<!--        [pageIndex]="pageIndex"-->
-<!--        [countData]="duplicatesListCount$ | async"-->
-<!--        [pageSize]="pageSize"-->
-<!--        [pageSizeOptions]="[]"-->
-<!--        (page)="changePage($event)">-->
-<!--    </app-mat-paginator-extended>-->
-</mat-card>
+    <!-- Pages (need to be hidden and not ngIf, otherwise it makes a new duplicate request) -->
+    <app-mat-paginator-extended
+        [pageIndex]="pageIndex"
+        [countData]="duplicatesListCount$ | async"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[]"
+        (page)="changePage($event)">
+    </app-mat-paginator-extended>
+</app-basic-page-v2>

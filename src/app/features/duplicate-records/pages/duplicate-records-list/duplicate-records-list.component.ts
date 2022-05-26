@@ -20,6 +20,9 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { IV2ActionIconLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 
 @Component({
   selector: 'app-duplicate-records-list',
@@ -29,9 +32,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 })
 export class DuplicateRecordsListComponent extends ListComponent<any> implements OnInit, OnDestroy {
   // breadcrumbs
-  // breadcrumbs: BreadcrumbItemModel[] = [
-  //   new BreadcrumbItemModel('LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE', '.', true)
-  // ];
+  breadcrumbs: IV2Breadcrumb[] = [];
 
   outbreakSubscriber: Subscription;
 
@@ -58,6 +59,9 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
     'address'
   ];
 
+  // action
+  actionButton: IV2ActionIconLabel;
+
   /**
      * Constructor
      */
@@ -67,7 +71,20 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
     private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService
   ) {
+    // parent
     super(listHelperService);
+
+    // action button
+    this.actionButton = {
+      type: V2ActionType.ICON_LABEL,
+      icon: '',
+      label: 'LNG_COMMON_BUTTON_REFRESH_LIST',
+      action: {
+        click: () => {
+          this.needsRefreshList(true);
+        }
+      }
+    };
   }
 
   /**
@@ -145,6 +162,20 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
    * Initialize breadcrumbs
    */
   initializeBreadcrumbs(): void {
+    // set breadcrumbs
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
+        }
+      }, {
+        label: 'LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE',
+        action: null
+      }
+    ];
   }
 
   /**
@@ -158,6 +189,11 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
    * Re(load) the list
    */
   refreshList() {
+    // check
+    if (!this.selectedOutbreak?.id) {
+      return;
+    }
+
     // retrieve the list
     this.duplicatesList = null;
     this.outbreakDataService
@@ -177,21 +213,24 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
      * Get total number of items, based on the applied filters
      */
   refreshListCount() {
-    if (this.selectedOutbreak) {
-      // remove paginator from query builder
-      const countQueryBuilder = _.cloneDeep(this.queryBuilder);
-      countQueryBuilder.paginator.clear();
-      countQueryBuilder.sort.clear();
-      this.duplicatesListCount$ = this.outbreakDataService
-        .getPeoplePossibleDuplicatesCount(this.selectedOutbreak.id, countQueryBuilder)
-        .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            return throwError(err);
-          }),
-          share()
-        );
+    // check
+    if (!this.selectedOutbreak?.id) {
+      return;
     }
+
+    // remove paginator from query builder
+    const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+    countQueryBuilder.paginator.clear();
+    countQueryBuilder.sort.clear();
+    this.duplicatesListCount$ = this.outbreakDataService
+      .getPeoplePossibleDuplicatesCount(this.selectedOutbreak.id, countQueryBuilder)
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        }),
+        share()
+      );
   }
 
   /**
