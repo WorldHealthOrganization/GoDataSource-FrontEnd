@@ -73,6 +73,9 @@ export class DashboardComponent {
     CasesPerLocation: boolean,
     Hospitalized: boolean,
     COTHistogram: boolean,
+    EPICurveClassification: boolean,
+    EPICurveOutcome: boolean,
+    EPICurveReporting: boolean,
     KPICases: boolean,
     KPIContacts: boolean,
     KPICOT: boolean
@@ -81,6 +84,9 @@ export class DashboardComponent {
       CasesPerLocation: false,
       Hospitalized: false,
       COTHistogram: false,
+      EPICurveClassification: false,
+      EPICurveOutcome: false,
+      EPICurveReporting: false,
       KPICases: false,
       KPIContacts: false,
       KPICOT: false
@@ -105,6 +111,9 @@ export class DashboardComponent {
       CasesPerLocation: DashboardModel.canViewCasePerLocationLevelDashlet(authUser),
       Hospitalized: DashboardModel.canViewCaseHospitalizedPieChartDashlet(authUser),
       COTHistogram: DashboardModel.canViewCotSizeHistogramDashlet(authUser),
+      EPICurveClassification: DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(authUser),
+      EPICurveOutcome: DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(authUser),
+      EPICurveReporting: DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(authUser),
 
       // KPI - cases
       KPICases: DashboardModel.canViewCaseDeceasedDashlet(authUser) ||
@@ -308,26 +317,6 @@ export class DashboardComponent {
   //         this.contactsFollowupSuccessRateReportUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/per-location-level-tracing-report/download/`;
   //       }
   //     });
-  //
-  //   // load epi curves types
-  //   this.epiCurveViewTypes$ = this.genericDataService
-  //     .getEpiCurvesTypes()
-  //     .pipe(map((data: LabelValuePair[]) => {
-  //       // keep only those types to which we have access
-  //       return data.filter((item: LabelValuePair): boolean => {
-  //         switch (item.value) {
-  //           case Constants.EPI_CURVE_TYPES.CLASSIFICATION.value:
-  //             return DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(this.authUser);
-  //           case Constants.EPI_CURVE_TYPES.OUTCOME.value:
-  //             return DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(this.authUser);
-  //           case Constants.EPI_CURVE_TYPES.REPORTING.value:
-  //             return DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(this.authUser);
-  //           default:
-  //             // NOT SUPPORTED
-  //             return false;
-  //         }
-  //       });
-  //     }));
   //
   //   // set default epi curve
   //   if (DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(this.authUser)) {

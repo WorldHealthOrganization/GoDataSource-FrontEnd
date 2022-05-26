@@ -118,6 +118,7 @@ import { SyncPackageStatusDataResolver } from './resolvers/data/sync-package-sta
 import { SavedImportMappingDataResolver } from './resolvers/data/saved-import-mapping.resolver';
 import { GanttChartTypeDataResolver } from './resolvers/data/gantt-chart-type.resolver';
 import { ReferenceDataCategoryDataResolver } from './resolvers/data/reference-data-category.resolver';
+import { EpiCurveWeekTypesDataResolver } from './resolvers/data/epi-curve-week-types.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -135,6 +136,7 @@ export const services: any[] = [
   DateRangeCenterDataResolver,
   DiseaseDataResolver,
   DocumentTypeDataResolver,
+  EpiCurveWeekTypesDataResolver,
   ExposureDurationDataResolver,
   ExposureFrequencyDataResolver,
   ExposureTypeDataResolver,
