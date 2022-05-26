@@ -150,29 +150,35 @@
       (detectChanges)="detectChanges()">
     </app-cases-hospitalized-pie-chart-dashlet>
 
-    <!-- Cases KPI -->
-    <app-cases-kpi-dashlet
-      *ngIf="visibleDashlets.KPICases"
-      [globalFilterDate]="globalFilterDate"
-      [globalFilterLocationId]="globalFilterLocationId"
-      [globalFilterClassificationId]="globalFilterClassificationId">
-    </app-cases-kpi-dashlet>
+    <!-- KPI -->
+    <div
+      class="gd-dashboard-bottom-kpi">
 
-    <!-- Contacts KPI -->
-    <app-contacts-kpi-dashlet
-      *ngIf="visibleDashlets.KPIContacts"
-      [globalFilterDate]="globalFilterDate"
-      [globalFilterLocationId]="globalFilterLocationId"
-      [globalFilterClassificationId]="globalFilterClassificationId">
-    </app-contacts-kpi-dashlet>
+      <!-- Cases KPI -->
+      <app-cases-kpi-dashlet
+        *ngIf="visibleDashlets.KPICases"
+        [globalFilterDate]="globalFilterDate"
+        [globalFilterLocationId]="globalFilterLocationId"
+        [globalFilterClassificationId]="globalFilterClassificationId">
+      </app-cases-kpi-dashlet>
 
-    <!-- COT KPI -->
-    <app-cot-kpi-dashlet
-      *ngIf="visibleDashlets.KPICOT"
-      [globalFilterDate]="globalFilterDate"
-      [globalFilterLocationId]="globalFilterLocationId"
-      [globalFilterClassificationId]="globalFilterClassificationId">
-    </app-cot-kpi-dashlet>
+      <!-- Contacts KPI -->
+      <app-contacts-kpi-dashlet
+        *ngIf="visibleDashlets.KPIContacts"
+        [globalFilterDate]="globalFilterDate"
+        [globalFilterLocationId]="globalFilterLocationId"
+        [globalFilterClassificationId]="globalFilterClassificationId">
+      </app-contacts-kpi-dashlet>
+
+      <!-- COT KPI -->
+      <app-cot-kpi-dashlet
+        *ngIf="visibleDashlets.KPICOT"
+        [globalFilterDate]="globalFilterDate"
+        [globalFilterLocationId]="globalFilterLocationId"
+        [globalFilterClassificationId]="globalFilterClassificationId">
+      </app-cot-kpi-dashlet>
+
+    </div>
 
   </div>
 </div>
