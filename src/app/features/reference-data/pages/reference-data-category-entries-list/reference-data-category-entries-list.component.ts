@@ -318,7 +318,19 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
   /**
    * Initialize table add action
    */
-  protected initializeAddAction(): void {}
+  protected initializeAddAction(): void {
+    this.addAction = {
+      type: V2ActionType.ICON_LABEL,
+      label: 'LNG_COMMON_BUTTON_ADD',
+      icon: 'add_circle_outline',
+      action: {
+        link: (): string[] => ['/reference-data', this.category.id, 'create']
+      },
+      visible: (): boolean => {
+        return ReferenceDataEntryModel.canCreate(this.authUser);
+      }
+    };
+  }
 
   /**
    * Initialize table grouped data
@@ -368,6 +380,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
   protected refreshListFields(): string[] {
     return [
       'id',
+      'categoryId',
       'value',
       'code',
       'description',
