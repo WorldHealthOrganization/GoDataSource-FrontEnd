@@ -15,6 +15,8 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import * as _ from 'lodash';
 import { TranslateService } from '@ngx-translate/core';
+import { CaseModel } from '../../../../core/models/case.model';
+import { IconModel } from '../../../../core/models/icon.model';
 
 @Component({
   selector: 'app-reference-data-category-entries-list',
@@ -308,7 +310,32 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
   /**
    * Initialize table quick actions
    */
-  protected initializeQuickActions(): void {}
+  protected initializeQuickActions(): void {
+    this.quickActions = {
+      type: V2ActionType.MENU,
+      label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
+      visible: (): boolean => {
+        return IconModel.canList(this.authUser);
+      },
+      menuOptions: [
+        // Manage Icons
+        {
+          label: {
+            get: () => 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_MANAGE_ICONS_BUTTON'
+          },
+          action: {
+            link: () => ['/reference-data', 'manage-icons', 'list'],
+            linkQueryParams: () => ({
+              categoryId: this.category.id
+            })
+          },
+          visible: (): boolean => {
+            return CaseModel.canListOnsetBeforePrimaryReport(this.authUser);
+          }
+        }
+      ]
+    };
+  }
 
   /**
    * Initialize table group actions
