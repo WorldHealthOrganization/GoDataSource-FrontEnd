@@ -91,6 +91,9 @@ const routes: Routes = [
       permissions: [
         PERMISSION.ICON_LIST
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver
     }
   },
   // Manage Icons - Create
