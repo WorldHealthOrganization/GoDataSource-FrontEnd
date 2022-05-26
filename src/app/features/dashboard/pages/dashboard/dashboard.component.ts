@@ -208,9 +208,6 @@ export class DashboardComponent implements OnDestroy {
                 title: {
                   get: () => 'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL'
                 },
-                // initialized: (handler) => {
-                //   handler.buttons.click(ExportButtonKey.EXPORT);
-                // },
                 export: {
                   url: `/outbreaks/${this._selectedOutbreak.id}/cases/per-classification-per-location-level-report/download/`,
                   async: false,
@@ -227,12 +224,6 @@ export class DashboardComponent implements OnDestroy {
           },
           visible: () => DashboardModel.canExportCaseClassificationPerLocationReport(this._authUser)
         }
-        //   <!--                              [fileType]="ExportDataExtension.PDF"-->
-        //   <!--                              [label]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate"-->
-        //   <!--                              [message]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate"-->
-        //   <!--                              [url]="casesByClassificationAndLocationReportUrl"-->
-        //   <!--                              [fileName]="'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL' | translate"-->
-        //   <!--                              [queryBuilder]="qbCaseByClassification()">-->
       ]
     };
   }
