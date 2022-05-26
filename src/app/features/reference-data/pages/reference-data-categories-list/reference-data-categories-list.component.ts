@@ -1,7 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { takeUntil, tap } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IconModel } from '../../../../core/models/icon.model';
 import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -12,6 +11,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { ExportDataExtension, ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-reference-data-categories-list',
