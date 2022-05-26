@@ -14,6 +14,7 @@ import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import * as _ from 'lodash';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-reference-data-category-entries-list',
@@ -31,7 +32,8 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
     private referenceDataDataService: ReferenceDataDataService,
     private toastV2Service: ToastV2Service,
     private activatedRoute: ActivatedRoute,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private translateService: TranslateService
   ) {
     super(
       listHelperService,
@@ -231,7 +233,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
                         title: {
                           get: () => 'LNG_COMMON_LABEL_DELETE',
                           data: () => ({
-                            name: `${ item.value }`
+                            name: `${ this.translateService.instant(item.value) }`
                           })
                         },
                         message: {
