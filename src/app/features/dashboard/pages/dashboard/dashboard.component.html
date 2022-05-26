@@ -195,6 +195,15 @@
       (detectChanges)="detectChanges()">
     </app-contact-follow-up-overview-dashlet>
 
+    <!-- Cases based on contact status -->
+    <app-cases-based-on-contact-status-dashlet
+      *ngIf="visibleDashlets.ContactStatus"
+      [globalFilterDate]="globalFilterDate"
+      [globalFilterLocationId]="globalFilterLocationId"
+      [globalFilterClassificationId]="globalFilterClassificationId"
+      (detectChanges)="detectChanges()">
+    </app-cases-based-on-contact-status-dashlet>
+
     <!-- KPI -->
     <div
       class="gd-dashboard-bottom-kpi">
@@ -325,26 +334,7 @@
 <!--        <div-->
 <!--            class="page-content"-->
 <!--            fxLayout="column">-->
-<!--            &lt;!&ndash; Cases based on contact status &ndash;&gt;-->
-<!--            <mat-expansion-panel-->
-<!--                *ngIf="DashboardModel.canViewContactStatusReportDashlet(authUser)">-->
-<!--                &lt;!&ndash; Header &ndash;&gt;-->
-<!--                <mat-expansion-panel-header>-->
-<!--                    <div class="other-kpi-header">-->
-<!--                        {{'LNG_PAGE_DASHBOARD_CASES_CONTACT_STATUS_REPORT_TITLE' | translate}}-->
-<!--                    </div>-->
-<!--                </mat-expansion-panel-header>-->
 
-<!--                &lt;!&ndash; Dashlets &ndash;&gt;-->
-<!--                <ng-template matExpansionPanelContent>-->
-<!--                    &lt;!&ndash; Cases based on contact status c3 chart &ndash;&gt;-->
-<!--                    <app-cases-based-on-contact-status-dashlet-->
-<!--                        [globalFilterDate]="globalFilterDate"-->
-<!--                        [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                        [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                    </app-cases-based-on-contact-status-dashlet>-->
-<!--                </ng-template>-->
-<!--            </mat-expansion-panel>-->
 
 <!--            <canvas id="tempCanvas"></canvas>-->
 

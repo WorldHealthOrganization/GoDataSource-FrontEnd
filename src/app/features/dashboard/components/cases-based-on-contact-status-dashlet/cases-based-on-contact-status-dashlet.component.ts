@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Constants } from '../../../../core/models/constants';
@@ -18,6 +18,9 @@ import { moment, Moment } from '../../../../core/helperClasses/x-moment';
   styleUrls: ['./cases-based-on-contact-status-dashlet.component.less']
 })
 export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDestroy {
+  // detect changes
+  @Output() detectChanges = new EventEmitter<void>();
+
   chartData: any = [];
   chartDataCategories: any = [];
   chartDataColumns: any = [];
@@ -28,12 +31,12 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
   Constants = Constants;
 
   // Global filters => Date
-  private _globalFilterDate: Moment;
-  @Input() set globalFilterDate(globalFilterDate: Moment) {
+  private _globalFilterDate: Moment | string;
+  @Input() set globalFilterDate(globalFilterDate: Moment | string) {
     this._globalFilterDate = globalFilterDate;
     this.refreshDataCaller.call();
   }
-  get globalFilterDate(): Moment {
+  get globalFilterDate(): Moment | string {
     return this._globalFilterDate;
   }
 
@@ -57,6 +60,26 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
     return this._globalFilterClassificationId;
   }
 
+  // expanded / collapsed ?
+  expandedOnce: boolean = false;
+  private _retrievedData: boolean;
+  private _expanded: boolean = false;
+  set expanded(expanded: boolean) {
+    // set data
+    this._expanded = expanded;
+
+    // set expanded once
+    if (this._expanded) {
+      this.expandedOnce = true;
+    }
+
+    // retrieve data if expanded and data not retrieved
+    this.refreshData();
+  }
+  get expanded(): boolean {
+    return this._expanded;
+  }
+
   // outbreak
   outbreakId: string;
   outbreak: OutbreakModel;
@@ -72,6 +95,7 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
      * Global Filters changed
      */
   protected refreshDataCaller = new DebounceTimeCaller(new Subscriber<void>(() => {
+    this._retrievedData = false;
     this.refreshData();
   }), 100);
 
@@ -199,6 +223,14 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
      * Refresh Data
      */
   refreshData() {
+    // not expanded ?
+    if (
+      !this.expanded ||
+      this._retrievedData
+    ) {
+      return;
+    }
+
     if (this.outbreakId) {
       // release previous subscriber
       if (this.previousSubscriber) {
@@ -215,7 +247,7 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
       // date
       let endDate: string = moment().endOf('day').toISOString();
       if (this.globalFilterDate) {
-        endDate = this.globalFilterDate.clone().endOf('day').toISOString();
+        endDate = moment(this.globalFilterDate).clone().endOf('day').toISOString();
       }
 
       // location
@@ -256,7 +288,9 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
       }
 
       // get data - start Date will be set to start of outbreak
+      this._retrievedData = true;
       this.displayLoading = true;
+      this.detectChanges.emit();
       this.previousSubscriber = this.caseDataService
         .getCasesBasedOnContactStatusReport(this.outbreakId, qb)
         .subscribe((results) => {
@@ -269,6 +303,7 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
 
           // finished
           this.displayLoading = false;
+          this.detectChanges.emit();
         });
     }
   }
