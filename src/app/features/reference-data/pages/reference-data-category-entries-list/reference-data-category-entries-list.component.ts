@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { throwError } from 'rxjs';
-import { catchError, map, takeUntil, tap } from 'rxjs/operators';
+import { catchError, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -13,6 +13,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'app-reference-data-category-entries-list',
@@ -384,21 +385,16 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
    * Re(load) the Reference Data Categories list
    */
   refreshList() {
+    // add category id to request
+    this.queryBuilder.filter.byEquality(
+      'categoryId',
+      this.category.id
+    );
+
+    // retrieve records
     this.records$ = this.referenceDataDataService
-      .getReferenceDataByCategory(this.category.id)
+      .getEntries(this.queryBuilder)
       .pipe(
-        map((category: ReferenceDataCategoryModel) => {
-          return category.entries;
-        }),
-
-        // update page count
-        tap((entries: ReferenceDataEntryModel[]) => {
-          this.pageCount = {
-            count: entries.length,
-            hasMore: false
-          };
-        }),
-
         // should be the last pipe
         takeUntil(this.destroyed$)
       );
@@ -407,5 +403,49 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
   /**
    * Get total number of items
    */
-  refreshListCount() {}
+  refreshListCount(applyHasMoreLimit?: boolean) {
+    // reset
+    this.pageCount = undefined;
+
+    // set apply value
+    if (applyHasMoreLimit !== undefined) {
+      this.applyHasMoreLimit = applyHasMoreLimit;
+    }
+
+    // remove paginator from query builder
+    const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+    countQueryBuilder.paginator.clear();
+    countQueryBuilder.sort.clear();
+
+    // add category id to request
+    countQueryBuilder.filter.byEquality(
+      'categoryId',
+      this.category.id
+    );
+
+    // apply has more limit
+    if (this.applyHasMoreLimit) {
+      countQueryBuilder.flag(
+        'applyHasMoreLimit',
+        true
+      );
+    }
+
+    // count
+    this.referenceDataDataService
+      .getReferenceDataItemsCount(countQueryBuilder)
+      .pipe(
+        // error
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        }),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      )
+      .subscribe((response) => {
+        this.pageCount = response;
+      });
+  }
 }
