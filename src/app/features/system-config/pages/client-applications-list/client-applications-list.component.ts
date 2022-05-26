@@ -80,7 +80,7 @@ export class ClientApplicationsListComponent
         format: {
           obfuscated: true,
           type: (item: SystemClientApplicationModel) => {
-            return `${item.credentials.clientId}/${item.credentials.clientSecret}`;
+            return `${item.credentials?.clientId}/${item.credentials?.clientSecret}`;
           }
         }
       },
@@ -188,7 +188,7 @@ export class ClientApplicationsListComponent
             type: V2ActionType.MENU,
             icon: 'more_horiz',
             menuOptions: [
-              // Delete Case
+              // Delete
               {
                 label: {
                   get: () => 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DELETE'

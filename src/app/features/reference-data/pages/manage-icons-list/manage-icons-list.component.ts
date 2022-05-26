@@ -250,7 +250,7 @@ export class ManageIconsListComponent extends ListComponent<IconModel> implement
     this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_ICON', icon)
       .subscribe((answer: DialogAnswer) => {
         if (answer.button === DialogAnswerButton.Yes) {
-          // delete case
+          // delete
           this.iconDataService
             .deleteIcon(icon.id)
             .pipe(

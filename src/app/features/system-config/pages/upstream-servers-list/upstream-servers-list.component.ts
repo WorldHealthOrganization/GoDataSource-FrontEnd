@@ -74,10 +74,9 @@ export class UpstreamServersListComponent extends ListComponent<SystemUpstreamSe
         field: 'credentials',
         label: 'LNG_UPSTREAM_SERVER_FIELD_LABEL_CREDENTIALS',
         format: {
+          obfuscated: true,
           type: (item: SystemUpstreamServerModel) => {
-            return item.credentials ?
-              item.credentials.clientId + ' / ' + item.credentials.clientSecret :
-              '';
+            return `${item.credentials?.clientId}/${item.credentials?.clientSecret}`;
           }
         }
       },
@@ -122,8 +121,7 @@ export class UpstreamServersListComponent extends ListComponent<SystemUpstreamSe
           // Start sync
           {
             type: V2ActionType.ICON,
-            // TODO: Icon doesn't look right
-            icon: 'swapVertical',
+            icon: 'sync',
             iconTooltip: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_START_SYNC',
             action: {
               click: (item: SystemUpstreamServerModel) => {
@@ -138,8 +136,7 @@ export class UpstreamServersListComponent extends ListComponent<SystemUpstreamSe
           // Disable sync
           {
             type: V2ActionType.ICON,
-            // TODO: Icon doesn't look right
-            icon: 'visibilityOf',
+            icon: 'sync_disabled',
             iconTooltip: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DISABLE_SYNC',
             action: {
               click: (item: SystemUpstreamServerModel) => {
@@ -155,7 +152,7 @@ export class UpstreamServersListComponent extends ListComponent<SystemUpstreamSe
           // Enable sync
           {
             type: V2ActionType.ICON,
-            icon: 'visibility',
+            icon: 'alarm_on',
             iconTooltip: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_ENABLE_SYNC',
             action: {
               click: (item: SystemUpstreamServerModel) => {
@@ -173,7 +170,7 @@ export class UpstreamServersListComponent extends ListComponent<SystemUpstreamSe
             type: V2ActionType.MENU,
             icon: 'more_horiz',
             menuOptions: [
-              // Delete Case
+              // Delete
               {
                 label: {
                   get: () => 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DELETE_SERVER'
@@ -237,13 +234,13 @@ export class UpstreamServersListComponent extends ListComponent<SystemUpstreamSe
 
                       // filter upstream servers
                       const upstreamServers = systemSettings.upstreamServers.filter((server: SystemUpstreamServerModel) => {
-                        return server.id !== item.id;
+                        return server.url !== item.url;
                       });
 
                       // save upstream servers
                       this.systemSettingsDataService
                         .modifySystemSettings({
-                          upstreamServers: upstreamServers
+                          upstreamServers
                         })
                         .pipe(
                           catchError((err) => {
