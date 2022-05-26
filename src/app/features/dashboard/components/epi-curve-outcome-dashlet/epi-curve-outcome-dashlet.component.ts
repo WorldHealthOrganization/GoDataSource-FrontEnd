@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
@@ -7,12 +7,14 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
-import { Subscription, Subscriber, Observable } from 'rxjs';
+import { Subscription, Subscriber } from 'rxjs';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { MetricCasesCountStratifiedOutcome } from '../../../../core/models/metrics/metric-cases-count-stratified-outcome.model';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { ActivatedRoute } from '@angular/router';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 
 @Component({
   selector: 'app-epi-curve-outcome-dashlet',
@@ -21,6 +23,9 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
   styleUrls: ['./epi-curve-outcome-dashlet.component.less']
 })
 export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
+  // detect changes
+  @Output() detectChanges = new EventEmitter<void>();
+
   chartData: any = [];
   chartDataCategories: any = [];
   chartDataColumns: any = [];
@@ -34,15 +39,27 @@ export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
   // constants
   Constants = Constants;
 
-  epiCurveWeekViewTypes$: Observable<any[]>;
+  // expanded / collapsed ?
+  private _retrievedData: boolean;
+  private _expanded: boolean = false;
+  set expanded(expanded: boolean) {
+    // set data
+    this._expanded = expanded;
+
+    // retrieve data if expanded and data not retrieved
+    this.refreshData();
+  }
+  get expanded(): boolean {
+    return this._expanded;
+  }
 
   // Global filters => Date
-  private _globalFilterDate: Moment;
-  @Input() set globalFilterDate(globalFilterDate: Moment) {
+  private _globalFilterDate: Moment | string;
+  @Input() set globalFilterDate(globalFilterDate: Moment | string) {
     this._globalFilterDate = globalFilterDate;
     this.refreshDataCaller.call();
   }
-  get globalFilterDate(): Moment {
+  get globalFilterDate(): Moment | string {
     return this._globalFilterDate;
   }
 
@@ -81,8 +98,12 @@ export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
      * Global Filters changed
      */
   protected refreshDataCaller = new DebounceTimeCaller(new Subscriber<void>(() => {
+    this._retrievedData = false;
     this.refreshData();
   }), 100);
+
+  // options
+  epiCurveWeekTypesOptions: ILabelValuePairModel[];
 
   /**
      * Constructor
@@ -92,8 +113,10 @@ export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
     private outbreakDataService: OutbreakDataService,
     private referenceDataDataService: ReferenceDataDataService,
     private i18nService: I18nService,
-    private genericDataService: GenericDataService
-  ) {}
+    activatedRoute: ActivatedRoute
+  ) {
+    this.epiCurveWeekTypesOptions = (activatedRoute.snapshot.data.epiCurveWeekTypes as IResolverV2ResponseModel<ILabelValuePairModel>).options;
+  }
 
   /**
      * Component initialized
@@ -128,9 +151,6 @@ export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
             }
           });
       });
-
-    // load epi curves week types
-    this.epiCurveWeekViewTypes$ = this.genericDataService.getEpiCurvesWeekTypes();
   }
 
   /**
@@ -233,9 +253,17 @@ export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
      * Refresh Data
      */
   refreshData() {
+    // not expanded ?
+    if (
+      !this.expanded ||
+      this._retrievedData
+    ) {
+      return;
+    }
+
     if (
       this.outbreakId &&
-            !_.isEmpty(this.mapOutcomes)
+      !_.isEmpty(this.mapOutcomes)
     ) {
       // release previous subscriber
       if (this.previousSubscriber) {
@@ -253,7 +281,7 @@ export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
       if (this.globalFilterDate) {
         qb.filter.byEquality(
           'endDate',
-          this.globalFilterDate.clone().endOf('day').toISOString()
+          moment(this.globalFilterDate).clone().endOf('day').toISOString()
         );
       } else {
         qb.filter.byEquality(
@@ -300,7 +328,9 @@ export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
       }
 
       // get data
+      this._retrievedData = true;
       this.displayLoading = true;
+      this.detectChanges.emit();
       this.previousSubscriber = this.caseDataService
         .getCasesStratifiedByOutcomeOverTime(this.outbreakId, qb)
         .subscribe((results) => {
@@ -313,6 +343,7 @@ export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
 
           // finished
           this.displayLoading = false;
+          this.detectChanges.emit();
         });
     }
   }

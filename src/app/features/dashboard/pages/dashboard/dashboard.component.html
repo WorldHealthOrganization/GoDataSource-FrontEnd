@@ -165,6 +165,33 @@
       (detectChanges)="detectChanges()">
     </app-histogram-transmission-chains-size-dashlet>
 
+    <!-- Epidemiological Curve - CLASSIFICATION -->
+    <app-epi-curve-dashlet
+      *ngIf="visibleDashlets.EPICurveClassification"
+      [globalFilterDate]="globalFilterDate"
+      [globalFilterLocationId]="globalFilterLocationId"
+      [globalFilterClassificationId]="globalFilterClassificationId"
+      (detectChanges)="detectChanges()">
+    </app-epi-curve-dashlet>
+
+    <!-- Epidemiological Curve - OUTCOME -->
+    <app-epi-curve-outcome-dashlet
+      *ngIf="visibleDashlets.EPICurveOutcome"
+      [globalFilterDate]="globalFilterDate"
+      [globalFilterLocationId]="globalFilterLocationId"
+      [globalFilterClassificationId]="globalFilterClassificationId"
+      (detectChanges)="detectChanges()">
+    </app-epi-curve-outcome-dashlet>
+
+    <!-- Epidemiological Curve - REPORTING CLASSIFICATION -->
+    <app-epi-curve-reporting-dashlet
+      *ngIf="visibleDashlets.EPICurveReporting"
+      [globalFilterDate]="globalFilterDate"
+      [globalFilterLocationId]="globalFilterLocationId"
+      [globalFilterClassificationId]="globalFilterClassificationId"
+      (detectChanges)="detectChanges()">
+    </app-epi-curve-reporting-dashlet>
+
     <!-- KPI -->
     <div
       class="gd-dashboard-bottom-row"
@@ -296,56 +323,6 @@
 <!--        <div-->
 <!--            class="page-content"-->
 <!--            fxLayout="column">-->
-<!--            &lt;!&ndash; Epidemiological Curve &ndash;&gt;-->
-<!--            <mat-expansion-panel-->
-<!--                *ngIf="DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(authUser) ||-->
-<!--                    DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(authUser) ||-->
-<!--                    DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(authUser)">-->
-<!--                &lt;!&ndash; Header &ndash;&gt;-->
-<!--                <mat-expansion-panel-header>-->
-<!--                    <div class="other-kpi-header">-->
-<!--                        {{'LNG_PAGE_DASHBOARD_EPI_CURVE_TITLE' | translate}}-->
-<!--                    </div>-->
-<!--                </mat-expansion-panel-header>-->
-
-<!--                &lt;!&ndash; Dashlets &ndash;&gt;-->
-<!--                <ng-template matExpansionPanelContent>-->
-<!--                    &lt;!&ndash; dropdown with view types &ndash;&gt;-->
-<!--                    <app-form-select-->
-<!--                        name="epiCurveViewType"-->
-<!--                        tooltip="LNG_PAGE_DASHBOARD_EPI_CURVE_TITLE_DESCRIPTION"-->
-<!--                        [(ngModel)]="epiCurveViewType"-->
-<!--                        required="true"-->
-<!--                        [options]="epiCurveViewTypes$ | async"-->
-<!--                        [clearable]="false">-->
-<!--                    </app-form-select>-->
-
-<!--                    &lt;!&ndash; epi curve &ndash;&gt;-->
-<!--                    <app-epi-curve-dashlet-->
-<!--                        *ngIf="epiCurveViewType === Constants.EPI_CURVE_TYPES.CLASSIFICATION.value && DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(authUser)"-->
-<!--                        [globalFilterDate]="globalFilterDate"-->
-<!--                        [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                        [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                    </app-epi-curve-dashlet>-->
-
-<!--                    &lt;!&ndash; epi curve outcome &ndash;&gt;-->
-<!--                    <app-epi-curve-outcome-dashlet-->
-<!--                        *ngIf="epiCurveViewType === Constants.EPI_CURVE_TYPES.OUTCOME.value && DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(authUser)"-->
-<!--                        [globalFilterDate]="globalFilterDate"-->
-<!--                        [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                        [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                    </app-epi-curve-outcome-dashlet>-->
-
-<!--                    &lt;!&ndash; epi curve reporting &ndash;&gt;-->
-<!--                    <app-epi-curve-reporting-dashlet-->
-<!--                        *ngIf="epiCurveViewType === Constants.EPI_CURVE_TYPES.REPORTING.value && DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(authUser)"-->
-<!--                        [globalFilterDate]="globalFilterDate"-->
-<!--                        [globalFilterLocationId]="globalFilterLocationId"-->
-<!--                        [globalFilterClassificationId]="globalFilterClassificationId">-->
-<!--                    </app-epi-curve-reporting-dashlet>-->
-<!--                </ng-template>-->
-<!--            </mat-expansion-panel>-->
-
 <!--            &lt;!&ndash; Contact follow-up overview &ndash;&gt;-->
 <!--            <mat-expansion-panel-->
 <!--                *ngIf="DashboardModel.canViewContactFollowUpReportDashlet(authUser)">-->

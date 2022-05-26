@@ -5,6 +5,7 @@ import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { DashboardModel } from '../../core/models/dashboard.model';
 import { ClassificationDataResolver } from '../../core/services/resolvers/data/classification.resolver';
 import { PersonTypeDataResolver } from '../../core/services/resolvers/data/person-type.resolver';
+import { EpiCurveWeekTypesDataResolver } from '../../core/services/resolvers/data/epi-curve-week-types.resolver';
 
 const routes: Routes = [
   // Dashboard page
@@ -17,7 +18,8 @@ const routes: Routes = [
     },
     resolve: {
       classification: ClassificationDataResolver,
-      personType: PersonTypeDataResolver
+      personType: PersonTypeDataResolver,
+      epiCurveWeekTypes: EpiCurveWeekTypesDataResolver
     }
   }
 ];
