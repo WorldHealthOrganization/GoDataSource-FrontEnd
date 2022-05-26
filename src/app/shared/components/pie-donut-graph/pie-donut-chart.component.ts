@@ -539,7 +539,7 @@ implements OnInit, OnDestroy {
     // same item already selected ?
     if (
       this._graph.selectedArc &&
-            item.details.id === this._graph.selectedArc.details.id
+      item.details.id === this._graph.selectedArc.details.id
     ) {
       return;
     }
@@ -620,6 +620,9 @@ implements OnInit, OnDestroy {
         });
       }
     }
+
+    // update ui
+    this.detectChanges.emit();
   }
 
   /**
