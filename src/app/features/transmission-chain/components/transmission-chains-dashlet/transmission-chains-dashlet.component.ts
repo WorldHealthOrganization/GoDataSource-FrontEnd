@@ -895,7 +895,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             ],
             bottomButtons: [{
               type: IV2SideDialogConfigButtonType.OTHER,
-              label: '....',
+              label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_LOAD_SNAPSHOT',
               color: 'primary'
             }, {
               type: IV2SideDialogConfigButtonType.CANCEL,
@@ -909,7 +909,25 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
               return;
             }
 
-            // #TODO
+            // update
+            this.showEvents = (response.data.map.showEvents as IV2SideDialogConfigInputToggleCheckbox).value;
+            this.showContacts = (response.data.map.showContacts as IV2SideDialogConfigInputToggleCheckbox).value;
+            this.showContactsOfContacts = (response.data.map.includeContactsOfContacts as IV2SideDialogConfigInputToggleCheckbox).value;
+            this.showLabResultsSeqData = (response.data.map.showLabResultsSeqData as IV2SideDialogConfigInputToggleCheckbox).value;
+            this.colorCriteria.nodeLabelCriteria = (response.data.map.nodeLabelCriteria as IV2SideDialogConfigInputSingleDropdown).value;
+            this.colorCriteria.nodeNameColorCriteria = (response.data.map.nodeNameColorCriteria as IV2SideDialogConfigInputSingleDropdown).value;
+            this.colorCriteria.nodeColorCriteria = (response.data.map.nodeColorCriteria as IV2SideDialogConfigInputSingleDropdown).value;
+            this.colorCriteria.nodeIconCriteria = (response.data.map.nodeIconCriteria as IV2SideDialogConfigInputSingleDropdown).value;
+            this.colorCriteria.nodeShapeCriteria = (response.data.map.nodeShapeCriteria as IV2SideDialogConfigInputSingleDropdown).value;
+            this.colorCriteria.edgeLabelCriteria = (response.data.map.edgeLabelCriteria as IV2SideDialogConfigInputSingleDropdown).value;
+            this.colorCriteria.edgeIconCriteria = (response.data.map.edgeIconCriteria as IV2SideDialogConfigInputSingleDropdown).value;
+            this.colorCriteria.edgeColorCriteria = (response.data.map.edgeColorCriteria as IV2SideDialogConfigInputSingleDropdown).value;
+
+            // close
+            response.handler.hide();
+
+            // load chain
+            this.loadChainsOfTransmission();
           });
         }
       },
