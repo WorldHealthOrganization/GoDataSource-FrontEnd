@@ -43,6 +43,8 @@ import { CotSnapshotModel } from '../../../../core/models/cot-snapshot.model';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { AuthenticatedComponent } from '../../../../core/components/authenticated/authenticated.component';
+import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
 
 @Component({
   selector: 'app-transmission-chains-dashlet',
@@ -52,6 +54,9 @@ import { AuthenticatedComponent } from '../../../../core/components/authenticate
 })
 export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   static wheelSensitivity: number = 0.3;
+
+  // breadcrumbs
+  breadcrumbs: IV2Breadcrumb[] = [];
 
   @Input() sizeOfChainsFilter: string | number = null;
   @Input() snapshotId: string = null;
@@ -710,6 +715,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             });
         });
       });
+
+    // update breadcrumbs
+    this.initializeBreadcrumbs();
   }
 
   /**
@@ -730,6 +738,27 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
     // release cyto
     this.destroyCytoscape();
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs() {
+    // reset
+    this.breadcrumbs = [{
+      label: 'LNG_COMMON_LABEL_HOME',
+      action: {
+        link: DashboardModel.canViewDashboard(this.authUser) ?
+          ['/dashboard'] :
+          ['/account/my-profile']
+      }
+    }];
+
+    // current page
+    this.breadcrumbs.push({
+      label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE',
+      action: null
+    });
   }
 
   /**

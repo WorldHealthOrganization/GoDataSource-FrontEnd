@@ -49,11 +49,6 @@ enum NodeAction {
   styleUrls: ['./transmission-chains-graph.component.less']
 })
 export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
-  // // breadcrumbs
-  // breadcrumbs: BreadcrumbItemModel[] = [
-  //   new BreadcrumbItemModel('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE', null, true)
-  // ];
-
   @ViewChild(TransmissionChainsDashletComponent, { static: true }) cotDashletChild;
 
   outbreakSubscriber: Subscription;
