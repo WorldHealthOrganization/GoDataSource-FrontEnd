@@ -4,6 +4,7 @@ import * as fromPages from './pages';
 import { VersionDataResolver } from '../../core/services/resolvers/data/version.resolver';
 import { LanguageDataResolver } from '../../core/services/resolvers/data/language.resolver';
 import { CaptchaDataFor } from '../../core/services/data/captcha.data.service';
+import { SecurityQuestionDataResolver } from '../../core/services/resolvers/data/security-question.resolver';
 
 const routes: Routes = [
   {
@@ -34,11 +35,20 @@ const routes: Routes = [
   },
   {
     path: 'reset-password',
-    component: fromPages.ResetPasswordComponent
+    component: fromPages.ResetPasswordComponent,
+    resolve: {
+      version: VersionDataResolver,
+      languages: LanguageDataResolver
+    }
   },
   {
     path: 'reset-password-questions',
-    component: fromPages.ResetPasswordQuestionsComponent
+    component: fromPages.ResetPasswordQuestionsComponent,
+    resolve: {
+      version: VersionDataResolver,
+      languages: LanguageDataResolver,
+      securityQuestions: SecurityQuestionDataResolver
+    }
   }
 ];
 
