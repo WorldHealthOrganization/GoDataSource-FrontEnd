@@ -42,6 +42,7 @@ import { ClusterModel } from '../../../../core/models/cluster.model';
 import { CotSnapshotModel } from '../../../../core/models/cot-snapshot.model';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { AuthenticatedComponent } from '../../../../core/components/authenticated/authenticated.component';
 
 @Component({
   selector: 'app-transmission-chains-dashlet',
@@ -721,6 +722,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       this.outbreakSubscriber = null;
     }
 
+    // not full screen anymore
+    AuthenticatedComponent.FULL_SCREEN = false;
+
     // stop any update snapshot request we might have pending
     this.stopUpdateSnapshotsInProgress();
 
@@ -1261,7 +1265,13 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      * @param {boolean} fullScreenToggle
      */
   onFullScreenToggle(fullScreenToggle: boolean) {
+    // update full screen
     this.fullScreen = fullScreenToggle;
+
+    // toggle full screen class
+    AuthenticatedComponent.FULL_SCREEN = this.fullScreen;
+
+    // edit mode
     if (this.fullScreen) {
       this.editMode = false;
       this.toggleEditMode();
