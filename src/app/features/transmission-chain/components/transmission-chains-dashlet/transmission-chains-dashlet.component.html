@@ -1,15 +1,4 @@
 <div class="chain-settings">
-    <div
-        class="chain-settings-buttons">
-        <!-- See snapshot -->
-        <button
-            *ngIf="!showGraphConfiguration && selectedSnapshot && chainGroup && chainGroupId === selectedSnapshot"
-            mat-raised-button
-            (click)="showGraphConfigurationHideFilters()">
-            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_GRAPH' | translate }}
-        </button>
-    </div>
-
     <!-- Graph configuration -->
     <div
         *ngIf="showGraphConfiguration && selectedSnapshot && chainGroup && chainGroupId === selectedSnapshot"
@@ -201,6 +190,7 @@
 
 <!-- cytoscape element -->
 <app-basic-page-v2
+  #basicPage
   [breadcrumbs]="breadcrumbs"
   pageTitle="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE"
   [actionButton]="actionButton"

@@ -52,6 +52,7 @@ import {
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { V2AdvancedFilter, V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { AppBasicPageV2Component } from '../../../../shared/components-v2/app-basic-page-v2/app-basic-page-v2.component';
 
 @Component({
   selector: 'app-transmission-chains-dashlet',
@@ -61,6 +62,9 @@ import { V2AdvancedFilter, V2AdvancedFilterComparatorOptions, V2AdvancedFilterCo
 })
 export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   static wheelSensitivity: number = 0.3;
+
+  // basic page component
+  @ViewChild('basicPage') basicPage: AppBasicPageV2Component;
 
   // breadcrumbs
   breadcrumbs: IV2Breadcrumb[] = [];
@@ -789,6 +793,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         click: () => {
           // #TODO
         }
+      },
+      visible: () => {
+        return !this.showGraphConfiguration && this.selectedSnapshot && this.chainGroup && this.chainGroupId === this.selectedSnapshot;
       }
     };
 
@@ -1835,6 +1842,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
       // render
       this.renderGraph();
+
+      // update
+      this.basicPage.detectChanges();
     });
   }
 
