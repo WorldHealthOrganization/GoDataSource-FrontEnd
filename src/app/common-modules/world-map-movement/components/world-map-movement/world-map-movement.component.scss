@@ -2,8 +2,7 @@
 
 app-world-map-movement {
   @include flex(flex);
-  height: calc(100% + 3.2rem);
-  margin: -1.6rem !important;
+  height: 100%;
 
   @include breakpoint('xs') {
     height: auto;

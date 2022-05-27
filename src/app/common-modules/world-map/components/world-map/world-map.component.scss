@@ -12,11 +12,11 @@ app-world-map {
     width: 100%;
 
     &.full-screen-map {
-      height: 100vh !important;
+      height: 100vh;
       left: 0;
       position: fixed;
       top: 0;
-      width: 100vw !important;
+      width: 100vw;
       z-index: 1100;
     }
 
@@ -58,26 +58,6 @@ app-world-map {
 
       .app-world-map-disclaimer-no-wrap {
         white-space: nowrap;
-      }
-    }
-  }
-
-  .world-map-loading {
-    text-align: center;
-
-    mat-spinner {
-      bottom: 0;
-      display: inline-block;
-      height: 3.2rem !important;
-      margin: auto;
-      position: absolute;
-      top: 0;
-      vertical-align: middle;
-      width: 3.2rem !important;
-
-      svg {
-        height: 3.2rem !important;
-        width: 3.2rem !important;
       }
     }
   }

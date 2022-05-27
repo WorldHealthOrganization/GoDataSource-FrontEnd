@@ -98,7 +98,7 @@ export class PieDonutChartData {
 @Component({
   selector: 'app-pie-donut-chart',
   templateUrl: './pie-donut-chart.component.html',
-  styleUrls: ['./pie-donut-chart.component.less']
+  styleUrls: ['./pie-donut-chart.component.scss']
 })
 export class PieDonutChartComponent
 implements OnInit, OnDestroy {
@@ -539,7 +539,7 @@ implements OnInit, OnDestroy {
     // same item already selected ?
     if (
       this._graph.selectedArc &&
-            item.details.id === this._graph.selectedArc.details.id
+      item.details.id === this._graph.selectedArc.details.id
     ) {
       return;
     }
@@ -620,6 +620,9 @@ implements OnInit, OnDestroy {
         });
       }
     }
+
+    // update ui
+    this.detectChanges.emit();
   }
 
   /**
@@ -988,7 +991,7 @@ implements OnInit, OnDestroy {
     // nothing to draw ?
     if (
       !this.data ||
-            this.data.length < 1
+      this.data.length < 1
     ) {
       return;
     }
@@ -1009,6 +1012,9 @@ implements OnInit, OnDestroy {
         this._graph.rendered.totalNo += item.value;
         this._graph.rendered.total = this._graph.rendered.totalNo.toLocaleString('en');
       });
+
+      // update total
+      this.detectChanges.emit();
     });
 
     // nothing to draw ?

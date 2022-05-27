@@ -1,5 +1,6 @@
-import { Component, Input, OnChanges, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import * as c3 from 'c3';
+import { v4 as uuid } from 'uuid';
 
 @Component({
   selector: 'app-c3-stacked-bar-chart',
@@ -8,6 +9,8 @@ import * as c3 from 'c3';
   styleUrls: ['./c3-stacked-bar-chart.component.less']
 })
 export class C3StackedBarChartComponent implements OnInit, OnChanges, OnDestroy {
+  // chart id generator
+  chartId: string = `chart${uuid()}`;
 
   @Input() chartData;
   @Input() chartDataColumns;
@@ -42,6 +45,13 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
   }
 
   /**
+   * Constructor
+   */
+  constructor(
+    private elementRef: ElementRef
+  ) {}
+
+  /**
      * generate the chart
      */
   render() {
@@ -50,7 +60,7 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
 
     // create chart
     this.chart = c3.generate({
-      bindto: '#chart',
+      bindto: `#${this.chartId}`,
       onrendered: () => {
         this.configureNumberOfTicks(this.chartDataCategories.length);
       },
@@ -140,17 +150,17 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
      * @param {number} elementsDisplayedNo
      */
   configureNumberOfTicks(elementsDisplayedNo: number) {
-    const elements: any = document.getElementsByClassName('c3-axis-x');
+    const elements: any = this.elementRef.nativeElement.getElementsByClassName('c3-axis-x');
     if (
       !elements ||
-            elements.length < 1
+      elements.length < 1
     ) {
       return;
     }
     const element: any = elements[0];
     if (
       !element ||
-            !element.classList
+      !element.classList
     ) {
       return;
     }

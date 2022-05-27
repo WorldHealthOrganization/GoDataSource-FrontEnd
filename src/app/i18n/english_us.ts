@@ -51,6 +51,9 @@ export const EnglishUsLang = {
     'LNG_COMMON_BUTTON_DELETE_SORTS': 'Remove sort',
     'LNG_COMMON_BUTTON_DELETE_SORTS_MSG': 'Are you sure you want to remove this sort?',
     'LNG_COMMON_BUTTON_APPLY': 'Apply',
+    'LNG_PAGE_DASHBOARD_EPI_CURVE_CLASSIFICATION_TITLE_DESCRIPTION': 'Shows the number of cases over time stratified by classification',
+    'LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE_DESCRIPTION': 'Shows the number of cases over time stratified by outcome',
+    'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORTING_TITLE_DESCRIPTION': 'Shows the number of cases over reporting time stratified by classification',
     'LNG_SIDE_FILTERS_SECTION_FILTER_TITLE': 'Filter',
     'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_TITLE': 'As per current date',
     'LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_STARTED': 'Follow Up Period Not Started Yet',
@@ -115,5 +118,7 @@ export const EnglishUsLang = {
     // LNG_LAYOUT_MENU_ITEM_VERSION_LABEL
     // LNG_PAGE_SET_SECURITY_QUESTIONS_DESCRIPTION_ALREADY_SET
     // LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_EXISTING_CONFIGURATION_INFO_DISABLE
+    // LNG_PAGE_DASHBOARD_EPI_CURVE_TITLE
+    // LNG_PAGE_DASHBOARD_EPI_CURVE_TITLE_DESCRIPTION
   }
 };

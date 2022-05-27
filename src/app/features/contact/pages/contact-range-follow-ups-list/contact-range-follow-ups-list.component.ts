@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
@@ -30,6 +30,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { CaseModel } from '../../../../core/models/case.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { AppBasicPageV2Component } from '../../../../shared/components-v2/app-basic-page-v2/app-basic-page-v2.component';
 
 @Component({
   selector: 'app-contact-range-follow-ups-list',
@@ -41,6 +42,9 @@ export class ContactRangeFollowUpsListComponent
   // #TODO - remove list component paginator ?
   extends ListComponent<any>
   implements OnInit, OnDestroy {
+
+  // basic page component
+  @ViewChild('basicPage', { static: true }) basicPage: AppBasicPageV2Component;
 
   // breadcrumbs
   // breadcrumbs: BreadcrumbItemModel[] = [];
@@ -218,6 +222,9 @@ export class ContactRangeFollowUpsListComponent
 
     // initialize breadcrumbs
     this.initializeBreadcrumbs();
+
+    // update ui size
+    this.basicPage.detectChanges();
   }
 
   /**
@@ -327,6 +334,14 @@ export class ContactRangeFollowUpsListComponent
         'contact.visualId',
         RequestSortDirection.ASC
       );
+
+    // #TODO - must remove, added only for test purposes
+    this.queryBuilder.filter.byDateRange(
+      'date', {
+        startDate: '2019-01-01',
+        endDate: '2019-02-28'
+      }
+    );
 
     // retrieve the list of Follow Ups
     this.displayLoading = true;

@@ -4,7 +4,6 @@ import { FormAddressListComponent } from './form-address-list/form-address-list.
 import { FormDocumentComponent } from './form-document/form-document.component';
 import { FormDocumentListComponent } from './form-document-list/form-document-list.component';
 import { FormRangeComponent } from './form-range/form-range.component';
-import { NotAuthTemplateComponent } from './not-auth-template/not-auth-template.component';
 import { DialogComponent } from './dialog/dialog.component';
 import { FormRelationshipComponent } from './form-relationship/form-relationship.component';
 import { SideFiltersComponent } from './side-filters/side-filters.component';
@@ -55,9 +54,6 @@ export * from './hover-row-actions/hover-row-actions.component';
 export const components: any[] = [
   // main layout
   SideFiltersComponent,
-
-  // authentication - #TODO - this needs to be refactored & removed
-  NotAuthTemplateComponent,
 
   // inputs
   FormAddressComponent,

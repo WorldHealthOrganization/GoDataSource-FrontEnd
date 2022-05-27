@@ -1,10 +1,11 @@
 <div
-  class="gd-dashlet-kpi">
+  class="gd-dashlet-kpi"
+  [class.gd-dashlet-kpi-expanded]="expanded">
 
   <!-- Title and actions -->
   <div
     class="gd-dashlet-kpi-top"
-    fxLayout="row">
+    fxLayout="row" fxLayoutAlign="none center">
 
     <!-- Title -->
     <div
@@ -16,7 +17,7 @@
     <!-- Actions -->
     <div
       class="gd-dashlet-kpi-top-actions"
-      fxGrow="0">
+      fxGrow="0" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="0.8rem">
 
       <!-- Expanded options -->
       <ng-container
@@ -24,6 +25,7 @@
 
         <!-- Hidden items -->
         <span
+          class="gd-dashlet-kpi-top-actions-counter"
           *ngIf="hiddenValues?.count > 0">
 
           <!-- Message -->
@@ -60,12 +62,13 @@
     <div
       *ngFor="let value of valuesVisibleAndSorted"
       class="gd-dashlet-kpi-bottom-value"
-      fxLayout="row"
+      fxLayout="row" fxLayoutAlign="space-between center"
       cdkDrag cdkDragLockAxis="y" [cdkDragData]="value" cdkDragBoundary=".gd-dashlet-kpi-bottom-{{pageTitle}}" (cdkDragStarted)="dragStarted()" cdkDragPreviewContainer="parent">
 
-      <!-- Hover icons -->
+      <!-- Left -->
       <div
-        fxGrow="0">
+        class="gd-dashlet-kpi-bottom-value-left"
+        fxLayout="row">
 
         <!-- Sort -->
         <button
@@ -79,89 +82,85 @@
           <mat-icon>drag_indicator</mat-icon>
         </button>
 
-        <!-- Hide -->
-        <button
-          type="button"
-          mat-icon-button
-          color="text"
-          [matTooltip]="'LNG_COMMON_BUTTON_HIDE' | translate"
-          (click)="hide(value); $event.stopPropagation();">
-          <mat-icon>visibility_off</mat-icon>
-        </button>
+        <div
+          class="gd-dashlet-kpi-bottom-value-left-text">
+          <!-- Prefix -->
+          <span>{{value.prefix | translate:(value.prefixData ? value.prefixData() : undefined)}}</span>
 
-        <!-- View data -->
-        <a
-          *ngIf="value.link; else linkPadding"
-          mat-icon-button
-          color="text"
-          [matTooltip]="'LNG_COMMON_BUTTON_VIEW_DATA' | translate"
-          [routerLink]="value.link"
-          [queryParams]="value.linkQueryParams"
-          (click)="$event.stopPropagation()">
-          <mat-icon>visibility</mat-icon>
-        </a>
-        <ng-template
-          #linkPadding>
-          <span
-            class="gd-dashlet-kpi-bottom-value-icon-padding"></span>
-        </ng-template>
+          <!-- Input & Suffix -->
+          <ng-container
+            *ngIf="value.suffix">
 
-        <!-- Help -->
-        <ng-container
-          *ngIf="value.helpTooltip; else helpPadding">
+            <!-- Input -->
+            <app-form-number-v2
+              [(ngModel)]="value.inputValue"
+              autocomplete="off"
+              (ngModelChange)="reloadValue(value)"></app-form-number-v2>
+
+            <!-- Suffix -->
+            <span>{{value.suffix | translate}}</span>
+
+          </ng-container>
+        </div>
+
+        <!-- Hover icons -->
+        <div
+          class="gd-dashlet-kpi-bottom-value-left-actions"
+          fxGrow="0">
+
+          <!-- Hide -->
           <button
             type="button"
             mat-icon-button
             color="text"
-            [popper]="popperContent"
-            popperTrigger="hover"
-            popperApplyClass="gd-form-input-v2-tooltip"
-            popperPreventOverflow="true"
-            popperPositionFixed="true"
-            popperAppendTo="body"
-            (click)="$event.stopPropagation()">
-            <mat-icon>help</mat-icon>
+            [matTooltip]="'LNG_COMMON_BUTTON_HIDE' | translate"
+            (click)="hide(value); $event.stopPropagation();">
+            <mat-icon>visibility_off</mat-icon>
           </button>
-          <popper-content
-            #popperContent>
-            <div
-              [innerHtml]="value.helpTooltip | safeHtml">
-            </div>
-          </popper-content>
-        </ng-container>
-        <ng-template
-          #helpPadding>
-          <span
-            class="gd-dashlet-kpi-bottom-value-icon-padding"></span>
-        </ng-template>
 
-      </div>
+          <!-- View data -->
+          <a
+            *ngIf="value.link"
+            mat-icon-button
+            color="text"
+            [matTooltip]="'LNG_COMMON_BUTTON_VIEW_DATA' | translate"
+            [routerLink]="value.link"
+            [queryParams]="value.linkQueryParams"
+            (click)="$event.stopPropagation()">
+            <mat-icon>visibility</mat-icon>
+          </a>
 
-      <!-- Left -->
-      <div
-        fxFlex>
-        <!-- Prefix -->
-        <span>{{value.prefix | translate:(value.prefixData ? value.prefixData() : undefined)}}</span>
+          <!-- Help -->
+          <ng-container
+            *ngIf="value.helpTooltip">
+            <button
+              type="button"
+              mat-icon-button
+              color="text"
+              [popper]="popperContent"
+              popperTrigger="hover"
+              popperApplyClass="gd-form-input-v2-tooltip"
+              popperPreventOverflow="true"
+              popperPositionFixed="true"
+              popperAppendTo="body"
+              (click)="$event.stopPropagation()">
+              <mat-icon>help</mat-icon>
+            </button>
+            <popper-content
+              #popperContent>
+              <div
+                [innerHtml]="value.helpTooltip | safeHtml">
+              </div>
+            </popper-content>
+          </ng-container>
 
-        <!-- Input & Suffix -->
-        <ng-container
-          *ngIf="value.suffix">
-
-          <!-- Input -->
-          <app-form-number-v2
-            [(ngModel)]="value.inputValue"
-            autocomplete="off"
-            (ngModelChange)="reloadValue(value)"></app-form-number-v2>
-
-          <!-- Suffix -->
-          <span>{{value.suffix | translate}}</span>
-
-        </ng-container>
+        </div>
       </div>
 
       <!-- Value -->
       <div
-        fxGrow="0"
+        class="gd-dashlet-kpi-bottom-value-right"
+        fxGrow="0" fxLayout="row" fxLayoutAlign="end center"
         [ngSwitch]="value.status">
 
         <!-- Loading -->
