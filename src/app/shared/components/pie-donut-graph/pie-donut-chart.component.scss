@@ -47,7 +47,13 @@
     padding: 0.8rem 1.6rem 1.6rem;
 
     .app-pie-donut-chart-main-left {
+      max-width: 50rem;
       width: calc(100% - 26.6rem);
+
+      @include breakpoint('xxs') {
+        max-width: 100%;
+        width: 100%;
+      }
 
       .app-pie-donut-chart-main-left-legend {
         .app-pie-donut-chart-main-left-legend-items {
@@ -87,10 +93,18 @@
       height: 30rem;
       overflow: hidden;
 
+      @include breakpoint('xxs') {
+        overflow: unset;
+      }
+
       .app-pie-donut-chart-main-graph-pie {
         display: block;
         height: 100%;
         width: 100%;
+
+        @include breakpoint('xxs') {
+          height: 30rem;
+        }
       }
 
       .app-pie-donut-chart-main-graph-total {

@@ -7,8 +7,8 @@
 
     <!-- Title & buttons -->
     <div
-      fxLayout="row"
-      class="gd-dashboard-top-title-buttons">
+      class="gd-dashboard-top-title-buttons"
+      fxLayout="row" fxLayout.lt-md="column">
 
       <!-- Title -->
       <div
@@ -126,7 +126,7 @@
     
     <div
       class="gd-dashboard-bottom-row"
-      fxLayout="row" fxLayoutAlign="start stretch" fxLayoutGap="1.6rem">
+      fxLayout="row" fxLayout.lt-lg="column" fxLayoutAlign="start stretch" fxLayoutAlign.lt-lg="start start" fxLayoutGap="1.6rem">
       <!-- Summary -->
       <app-case-summary-dashlet
         *ngIf="visibleDashlets.CaseSummary"
@@ -212,7 +212,7 @@
     <!-- KPI -->
     <div
       class="gd-dashboard-bottom-row"
-      fxLayout="row" fxLayoutAlign="start stretch" fxLayoutGap="1.6rem">
+      fxLayout="row" fxLayout.lt-lg="column" fxLayoutAlign="start stretch" fxLayoutAlign.lt-lg="start start" fxLayoutGap="1.6rem">
 
       <!-- Cases KPI -->
       <app-cases-kpi-dashlet

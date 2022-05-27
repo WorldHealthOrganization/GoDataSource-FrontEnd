@@ -46,9 +46,30 @@
     .gd-dashboard-bottom-row {
       margin-right: -1.6rem;
 
+      @include breakpoint('lt-lg') {
+        margin-right: 0;
+      }
+
+      /* Fix for angular flex-layout */
+      @media screen and (min-width: 1280px) and (max-width: 1599px) {
+        @include flex_align_items(flex-start !important);
+        @include flex_direction(column !important);
+        @include flex_justify(start !important);
+        margin-bottom: 0 !important;
+      }
+
       > * {
         max-width: calc(33.3333% - 1.6rem);
         width: 100%;
+
+        @include breakpoint('lt-lg') {
+          max-width: 100%;
+        }
+
+        /* Fix for angular flex-layout */
+        @media screen and (min-width: 1280px) and (max-width: 1599px) {
+          margin-bottom: 1.6rem;
+        }
       }
     }
   }
