@@ -58,7 +58,7 @@ import { AppBasicPageV2Component } from '../../../../shared/components-v2/app-ba
   selector: 'app-transmission-chains-dashlet',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './transmission-chains-dashlet.component.html',
-  styleUrls: ['./transmission-chains-dashlet.component.less']
+  styleUrls: ['./transmission-chains-dashlet.component.scss']
 })
 export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   static wheelSensitivity: number = 0.3;

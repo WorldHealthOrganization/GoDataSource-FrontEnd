@@ -159,11 +159,11 @@
   <!-- Load snapshot -->
   <div
     *ngIf="!showFilters"
-    fxLayout="row" fxLayoutGap="1.6rem">
+    class="chains-of-transmission-top-bar"
+    fxLayout="row" fxLayoutAlign="none start" fxLayoutGap="1.6rem">
     <!-- Snapshots -->
     <app-form-select-single-v2
       *ngIf="showSnapshots"
-      fxFlex
       name="snapshotsList"
       [(ngModel)]="selectedSnapshot"
       [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOTS' | translate"
@@ -174,7 +174,6 @@
 
     <!-- dropdown with view types -->
     <app-form-select-single-v2
-      fxFlex
       name="chainView"
       [(ngModel)]="transmissionChainViewType"
       [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_CHART' | translate"
@@ -187,7 +186,6 @@
     <!-- Page size -->
     <app-form-number-v2
       *ngIf="showSnapshots"
-      fxFlex
       name="pageSize"
       [(ngModel)]="pageSize"
       [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE_SIZE' | translate"
@@ -198,7 +196,6 @@
     <!-- Fast / Slow render -->
     <app-form-toggle-v2
       *ngIf="transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value"
-      fxFlex
       name="chainColaRenderMethod"
       [(ngModel)]="renderMethod"
       [options]="renderMethodOptions"
@@ -208,7 +205,7 @@
     <!-- Apply filters -->
     <button
       *ngIf="mustLoadChain && selectedSnapshot && transmissionChainViewType && pageSize > 0 && snapshotOptionsMap[selectedSnapshot] && !snapshotOptionsMap[selectedSnapshot].option.disabled"
-      mat-raised-button
+      mat-flat-button
       color="primary"
       (click)="loadChainsOfTransmission()">
       {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_LOAD_SNAPSHOT' | translate }}
@@ -221,7 +218,6 @@
       <!-- Pages -->
       <app-form-select-vscroll
         *ngIf="!mustLoadChain && chainGroupId && chainGroupId === selectedSnapshot && chainPages && chainPages.length > 0"
-        fxFlex
         name="chainPagesList"
         [(ngModel)]="selectedChainPageIndex"
         [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE' | translate"
@@ -235,8 +231,7 @@
 
       <!-- Nothing to display ? -->
       <div
-        *ngIf="!mustLoadChain && chainGroupId && chainGroupId === selectedSnapshot && chainPages && chainPages.length < 1"
-        fxFlex>
+        *ngIf="!mustLoadChain && chainGroupId && chainGroupId === selectedSnapshot && chainPages && chainPages.length < 1">
         {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NOTHING_TO_DISPLAY' | translate }}
       </div>
     </ng-container>
@@ -425,7 +420,7 @@
           <!-- Toggles -->
           <div
               *ngIf="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0"
-              class="graph-actions {{ fullScreen ? 'graph-actions-full-screen' : '' }} {{ transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value ? 'graph-actions-geo-map' : '' }}" fxLayout="row" fxLayoutGap="30px">
+              class="graph-actions {{ fullScreen ? 'graph-actions-full-screen' : '' }} {{ transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value ? 'graph-actions-geo-map' : '' }}" fxLayout="row" fxLayoutGap="1.6rem">
 
               <!-- Toggle Edit mode -->
               <app-form-toggle-checkbox-v2
@@ -461,6 +456,7 @@
           </div>
 
           <div
+            class="graph-inner-container"
               [fxShow]="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value">
               <!-- zoom in / out buttons -->
               <div
