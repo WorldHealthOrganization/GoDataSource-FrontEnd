@@ -119,6 +119,13 @@ import { SavedImportMappingDataResolver } from './resolvers/data/saved-import-ma
 import { GanttChartTypeDataResolver } from './resolvers/data/gantt-chart-type.resolver';
 import { ReferenceDataCategoryDataResolver } from './resolvers/data/reference-data-category.resolver';
 import { EpiCurveWeekTypesDataResolver } from './resolvers/data/epi-curve-week-types.resolver';
+import { CotNodeLabelDataResolver } from './resolvers/data/cot-node-label.resolver';
+import { CotNodeColorDataResolver } from './resolvers/data/cot-node-color.resolver';
+import { CotNodeIconDataResolver } from './resolvers/data/cot-node-icon.resolver';
+import { CotNodeShapeDataResolver } from './resolvers/data/cot-node-shape.resolver';
+import { CotEdgeLabelDataResolver } from './resolvers/data/cot-edge-label.resolver';
+import { CotEdgeIconDataResolver } from './resolvers/data/cot-edge-icon.resolver';
+import { CotEdgeColorDataResolver } from './resolvers/data/cot-edge-color.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -131,6 +138,13 @@ export const services: any[] = [
   ClassificationDataResolver,
   ClusterDataResolver,
   ContextOfTransmissionDataResolver,
+  CotEdgeColorDataResolver,
+  CotEdgeIconDataResolver,
+  CotEdgeLabelDataResolver,
+  CotNodeColorDataResolver,
+  CotNodeIconDataResolver,
+  CotNodeLabelDataResolver,
+  CotNodeShapeDataResolver,
   CountryDataResolver,
   DailyFollowUpStatusDataResolver,
   DateRangeCenterDataResolver,
