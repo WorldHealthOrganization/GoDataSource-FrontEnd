@@ -19,7 +19,7 @@ import { ElementBase } from '../../core/index';
   selector: 'app-form-checkbox',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './form-checkbox.component.html',
-  styleUrls: ['./form-checkbox.component.less'],
+  styleUrls: ['./form-checkbox.component.scss'],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
     useExisting: FormCheckboxComponent,
