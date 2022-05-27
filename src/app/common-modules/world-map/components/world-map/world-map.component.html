@@ -18,9 +18,10 @@
 <div
   *ngIf="displayLoading || layers.length < 1 || layersLoading"
   class="world-map-loading"
-  [style.width]="width"
-  [style.height]="height">
-  <mat-spinner></mat-spinner>
+  fxFlex fxLayoutAlign="center center">
+  <mat-progress-spinner
+    diameter="32"
+    mode="indeterminate"></mat-progress-spinner>
 </div>
 
 <!-- Disclaimer -->

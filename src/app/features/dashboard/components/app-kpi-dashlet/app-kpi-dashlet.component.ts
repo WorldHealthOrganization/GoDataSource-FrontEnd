@@ -12,6 +12,7 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 @Component({
   selector: 'app-kpi-dashlet',
   templateUrl: './app-kpi-dashlet.component.html',
+  styleUrls: ['./app-kpi-dashlet.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppKpiDashletComponent

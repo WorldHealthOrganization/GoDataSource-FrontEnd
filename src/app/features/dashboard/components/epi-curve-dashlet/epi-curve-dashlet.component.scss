@@ -1,0 +1,82 @@
+@import 'mixins';
+
+/* Epi Curve Dashlet */
+.gd-dashlet-epi-curve {
+  background-color: var(--gd-background);
+  @include border-radius(0.4rem);
+  @include box-shadow(0 0.2rem 0.1rem -0.1rem rgb(0, 0, 0, 0.2),
+                      0 0.1rem 0.1rem 0 rgb(0, 0, 0, 0.14),
+                      0 0.1rem 0.3rem 0 rgb(0, 0, 0, 0.12));
+
+  /* Epi Curve Dashlet - Top */
+  .gd-dashlet-epi-curve-top {
+    padding: 0.8rem 1.6rem;
+
+    /* Epi Curve Dashlet - Top - Title */
+    .gd-dashlet-epi-curve-top-title {
+      color: var(--gd-primary);
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    /* Epi Curve Dashlet - Top - Actions */
+    .gd-dashlet-epi-curve-top-actions {
+      .gd-dashlet-epi-curve-top-actions-counter {
+        color: var(--gd-secondary);
+
+        .mat-flat-button {
+          min-width: 0;
+          padding: 0.4rem;
+        }
+      }
+
+      .mat-icon-button {
+        font-size: 2rem;
+        height: 2.4rem;
+        min-width: 2.4rem;
+        padding: 0.4rem;
+        width: 2.4rem;
+
+        .mat-icon {
+          font-size: 1.6rem;
+          @include transition(all 0.24s ease-in-out 0s);
+        }
+      }
+    }
+  }
+
+  /* Epi Curve Dashlet - Bottom */
+  .gd-dashlet-epi-curve-bottom {
+    padding: 0.8rem 1.6rem 1.6rem;
+  }
+
+  /* Epi Curve Dashlet - Expanded */
+  &.gd-dashlet-epi-curve-expanded {
+    height: 100%;
+
+    .gd-dashlet-epi-curve-top {
+      .gd-dashlet-epi-curve-top-actions {
+        .mat-icon-button {
+          .mat-icon {
+            @include rotate(180deg);
+          }
+        }
+      }
+    }
+
+    .gd-dashlet-epi-curve-bottom {
+      overflow-x: auto;
+    }
+  }
+
+  .gd-dashlet-epi-curve-loading {
+    padding-bottom: 0.8rem;
+  }
+
+  .gd-dashlet-epi-curve-no-data {
+    color: var(--gd-secondary);
+    font-style: italic;
+    padding-bottom: 0.8rem;
+    text-align: center;
+  }
+}

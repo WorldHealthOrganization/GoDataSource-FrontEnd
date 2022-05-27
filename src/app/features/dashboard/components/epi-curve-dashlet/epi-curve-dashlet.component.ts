@@ -20,7 +20,7 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
   selector: 'app-epi-curve-dashlet',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './epi-curve-dashlet.component.html',
-  styleUrls: ['./epi-curve-dashlet.component.less']
+  styleUrls: ['./epi-curve-dashlet.component.scss']
 })
 export class EpiCurveDashletComponent implements OnInit, OnDestroy {
   // detect changes

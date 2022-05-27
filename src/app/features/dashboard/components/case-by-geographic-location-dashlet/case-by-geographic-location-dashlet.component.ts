@@ -17,8 +17,7 @@ import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-case-by-geographic-location-dashlet',
-  templateUrl: './case-by-geographic-location-dashlet.component.html',
-  styleUrls: ['./case-by-geographic-location-dashlet.component.less']
+  templateUrl: './case-by-geographic-location-dashlet.component.html'
 })
 export class CasesByGeographicLocationDashletComponent
 implements OnInit, OnDestroy {

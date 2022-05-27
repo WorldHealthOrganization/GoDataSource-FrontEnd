@@ -15,7 +15,7 @@ import { moment, Moment } from '../../../../core/helperClasses/x-moment';
   selector: 'app-cases-based-on-contact-status-dashlet',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './cases-based-on-contact-status-dashlet.component.html',
-  styleUrls: ['./cases-based-on-contact-status-dashlet.component.less']
+  styleUrls: ['./cases-based-on-contact-status-dashlet.component.scss']
 })
 export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDestroy {
   // detect changes

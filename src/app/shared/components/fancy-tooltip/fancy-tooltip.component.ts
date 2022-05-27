@@ -5,7 +5,8 @@ import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
   selector: 'app-fancy-tooltip',
-  templateUrl: './fancy-tooltip.component.html'
+  templateUrl: './fancy-tooltip.component.html',
+  styleUrls: ['./fancy-tooltip.component.scss']
 })
 export class FancyTooltipComponent implements OnDestroy {
   // tooltip

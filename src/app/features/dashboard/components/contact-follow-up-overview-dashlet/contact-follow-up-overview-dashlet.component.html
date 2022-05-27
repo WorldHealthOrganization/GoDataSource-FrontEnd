@@ -1,72 +1,85 @@
-<!-- Title / Description -->
 <div
-  fxGrow="0" fxLayout="row" fxLayoutGap="10px">
-
-  <!-- Title -->
+  class="gd-dashlet-contact-followup"
+  [class.gd-dashlet-contact-followup-expanded]="expanded"
+  fxLayout="column">
+  
+  <!-- Title / Description -->
   <div
-    fxFlex>
-    <span>
-      {{ 'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_TITLE' | translate }}
-    </span>
+    class="gd-dashlet-contact-followup-top"
+    fxLayout="row" fxLayoutAlign="none center">
+
+    <!-- Title -->
+    <div
+      class="gd-dashlet-contact-followup-top-title"
+      fxFlex>
+      <span>
+        {{ 'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_TITLE' | translate }}
+      </span>
+    </div>
+
+    <!-- Description -->
+    <div
+      class="gd-dashlet-contact-followup-top-actions"
+      fxGrow="0" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="0.8rem">
+      <!-- Tooltip -->
+      <app-fancy-tooltip
+        tooltip="LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_TITLE_DESCRIPTION">
+      </app-fancy-tooltip>
+
+      <!-- Expand / Collapse -->
+      <button
+        type="button"
+        mat-icon-button
+        (click)="expanded = !expanded">
+        <mat-icon>expand_more</mat-icon>
+      </button>
+    </div>
   </div>
 
-  <!-- Description -->
-  <div
-    fxGrow="0">
-    <!-- Tooltip -->
-    <app-fancy-tooltip
-      tooltip="LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_TITLE_DESCRIPTION">
-    </app-fancy-tooltip>
-
-    <!-- Expand / Collapse -->
-    <button
-      type="button"
-      mat-icon-button
-      (click)="expanded = !expanded">
-      <mat-icon>expand_more</mat-icon>
-    </button>
-  </div>
-</div>
-
-<!-- Expanded -->
-<ng-container
+  <!-- Expanded -->
+  <ng-container
   *ngIf="expanded || expandedOnce">
-  <!-- Chart -->
-  <div
+    <!-- Chart -->
+    <div
+      class="gd-dashlet-contact-followup-bottom"
       [fxShow]="expanded && !displayLoading && chartData?.length > 0">
       <app-c3-combination-stacked-bar-chart
-          chartId="c3FollowedUpReport"
-          [chartData]="chartData"
-          [chartDataColumns]="chartDataColumns"
-          [lineData]="lineData"
-          [chartDataCategories]="chartDataCategories"
-          [showLabels]="showLabels"
-          [xLabel]="'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_X_AXIS_LABEL' | translate"
-          [yLabel]="'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_Y_AXIS_LABEL' | translate"
-          [y2Label]="'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_Y2_AXIS_LABEL' | translate"
-          [colorPattern]="colorPattern"
-          [y2Max]="100"
-          [y2Min]="0"
-          [initialZoomRanges]="dashletZoomRanges">
+        chartId="c3FollowedUpReport"
+        [chartData]="chartData"
+        [chartDataColumns]="chartDataColumns"
+        [lineData]="lineData"
+        [chartDataCategories]="chartDataCategories"
+        [showLabels]="showLabels"
+        [xLabel]="'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_X_AXIS_LABEL' | translate"
+        [yLabel]="'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_Y_AXIS_LABEL' | translate"
+        [y2Label]="'LNG_PAGE_DASHBOARD_CONTACT_FOLLOW_UP_REPORT_Y2_AXIS_LABEL' | translate"
+        [colorPattern]="colorPattern"
+        [y2Max]="100"
+        [y2Min]="0"
+        [initialZoomRanges]="dashletZoomRanges">
       </app-c3-combination-stacked-bar-chart>
-  </div>
+    </div>
 
-  <!-- No data -->
-  <ng-container
+    <!-- No data -->
+    <ng-container
       *ngIf="!displayLoading && chartData?.length < 1">
       <div
-          fxFlex fxLayout="column" fxFlexAlign="center"
-          class="dashlet-no-data">
-          <div>
-              {{ 'LNG_PAGE_DASHLET_CASES_COUNT_OVER_TIME_NO_DATA_LABEL' | translate }}
-          </div>
+        class="gd-dashlet-contact-followup-no-data"
+        fxFlex fxFlexAlign="center center">
+        <div>
+          {{ 'LNG_PAGE_DASHLET_CASES_COUNT_OVER_TIME_NO_DATA_LABEL' | translate }}
+        </div>
       </div>
-  </ng-container>
+    </ng-container>
 
-  <!-- Loading data -->
-  <div
+    <!-- Loading data -->
+    <div
       *ngIf="displayLoading"
-      class="dashlet-loading">
-      <mat-spinner></mat-spinner>
-  </div>
-</ng-container>
+      class="gd-dashlet-contact-followup-loading"
+      fxFlex fxLayoutAlign="center center">
+      <mat-progress-spinner
+        diameter="24"
+        mode="indeterminate"></mat-progress-spinner>
+    </div>
+    </ng-container>
+</div>

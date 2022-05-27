@@ -98,7 +98,7 @@ export class PieDonutChartData {
 @Component({
   selector: 'app-pie-donut-chart',
   templateUrl: './pie-donut-chart.component.html',
-  styleUrls: ['./pie-donut-chart.component.less']
+  styleUrls: ['./pie-donut-chart.component.scss']
 })
 export class PieDonutChartComponent
 implements OnInit, OnDestroy {

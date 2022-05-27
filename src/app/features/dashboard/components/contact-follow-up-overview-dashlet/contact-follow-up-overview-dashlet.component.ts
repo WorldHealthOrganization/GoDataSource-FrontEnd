@@ -16,7 +16,7 @@ import { FormatFunction } from 'c3';
   selector: 'app-contact-follow-up-overview-dashlet',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './contact-follow-up-overview-dashlet.component.html',
-  styleUrls: ['./contact-follow-up-overview-dashlet.component.less']
+  styleUrls: ['./contact-follow-up-overview-dashlet.component.scss']
 })
 export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestroy {
   // detect changes

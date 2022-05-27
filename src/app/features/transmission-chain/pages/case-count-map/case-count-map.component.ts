@@ -22,7 +22,7 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
   selector: 'app-case-count-map',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './case-count-map.component.html',
-  styleUrls: ['./case-count-map.component.less']
+  styleUrls: ['./case-count-map.component.scss']
 })
 export class CaseCountMapComponent implements OnInit, OnDestroy {
   // breadcrumbs
