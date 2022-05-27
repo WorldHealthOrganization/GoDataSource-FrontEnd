@@ -52,7 +52,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   static wheelSensitivity: number = 0.3;
 
-  @Input() sizeOfChainsFilter: string = null;
+  @Input() sizeOfChainsFilter: string | number = null;
   @Input() snapshotId: string = null;
   @Input() showPersonContacts: boolean = false;
   @Input() showPersonContactsOfContacts: boolean = false;
@@ -830,7 +830,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         if (this.sizeOfChainsFilter) {
           requestQueryBuilder.filter.byEquality(
             'size',
-            _.parseInt(this.sizeOfChainsFilter)
+            typeof this.sizeOfChainsFilter === 'string' ?
+              _.parseInt(this.sizeOfChainsFilter) :
+              this.sizeOfChainsFilter
           );
         }
 

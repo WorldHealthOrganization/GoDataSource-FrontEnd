@@ -63,7 +63,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   // selected outbreak
   selectedOutbreak: OutbreakModel;
   // filter used for size of chains
-  sizeOfChainsFilter: number = null;
+  sizeOfChainsFilter: string | number = null;
   // person Id - to filter the chain
   personId: string = null;
   // snapshot Id, showPersonContacts, showPersonContactsOfContacts - to filter the chains

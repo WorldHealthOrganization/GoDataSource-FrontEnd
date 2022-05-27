@@ -35,21 +35,23 @@
 </app-topnav>
 -->
 
-<mat-card class="page-section page-content">
-    <!-- Chains of transmission -->
-    <app-transmission-chains-dashlet
-        [sizeOfChainsFilter]="sizeOfChainsFilter"
-        [snapshotId]="snapshotId"
-        [showPersonContacts]="showPersonContacts"
-        [showPersonContactsOfContacts]="showPersonContactsOfContacts"
-        [personId]="personId"
-        [selectedEntityType]="selectedEntityType"
-        (nodeTapped)="onNodeTap($event)"
-        (edgeTapped)="onEdgeTap($event)"
-        (changeEditMode)="onEditModeChange($event)">
-    </app-transmission-chains-dashlet>
-</mat-card>
+<!-- Chains of transmission -->
+<app-transmission-chains-dashlet
+    [sizeOfChainsFilter]="sizeOfChainsFilter"
+    [snapshotId]="snapshotId"
+    [showPersonContacts]="showPersonContacts"
+    [showPersonContactsOfContacts]="showPersonContactsOfContacts"
+    [personId]="personId"
+    [selectedEntityType]="selectedEntityType"
+    (nodeTapped)="onNodeTap($event)"
+    (edgeTapped)="onEdgeTap($event)"
+    (changeEditMode)="onEditModeChange($event)">
+</app-transmission-chains-dashlet>
 
+
+
+
+<!-- Edit Mode -->
 <div
     fxLayout="row wrap" fxLayoutGap="20px"
     class="page-content selected-node-details">
