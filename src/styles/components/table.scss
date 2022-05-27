@@ -1,0 +1,41 @@
+/* Table */
+.mat-table {
+  background-color: rgba(var(--gd-secondary-rgb), 0.02);
+  color: var(--gd-text);
+  font-family: $gd-font-family;
+
+  mat-header-row {
+    background-color: rgba(var(--gd-secondary-rgb), 0.15);
+    border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+    min-height: 0;
+
+    .mat-header-cell {
+      color: var(--gd-text);
+      font-size: $gd-font-size;
+      font-weight: 700;
+    }
+  }
+
+  mat-row,
+  mat-header-row,
+  mat-footer-row,
+  th.mat-header-cell,
+  td.mat-cell,
+  td.mat-footer-cell {
+    border-bottom-color: rgba(var(--gd-secondary-rgb), 0.25);
+  }
+
+  mat-header-cell,
+  mat-cell,
+  mat-footer-cell {
+    padding: 0.8rem;
+
+    @include breakpoint('lt-md') {
+      min-width: 12rem;
+    }
+
+    &:first-of-type {
+      padding-left: 1.6rem;
+    }
+  }
+}

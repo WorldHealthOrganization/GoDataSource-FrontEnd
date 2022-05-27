@@ -1,0 +1,80 @@
+@import 'mixins';
+
+app-duplicate-records-list {
+  .duplicate-records-loading {
+    @include flex(flex);
+    @include flex_align_items(center);
+    @include flex_justify(center);
+    height: 100%;
+    width: 100%;
+  }
+
+  .duplicate-records-tables {
+    position: relative;
+
+    @include breakpoint('lt-md') {
+      overflow-x: auto;
+    }
+
+    &:first-of-type {
+      .mat-table {
+        mat-header-row {
+          border-top-color: transparent;
+        }
+      }
+    }
+
+    &:last-of-type {
+      .mat-table {
+        mat-row {
+          &:last-of-type {
+            border-bottom-color: transparent;
+          }
+        }
+      }
+    }
+
+    &:not(:last-of-type) {
+      margin-bottom: 5rem;
+    }
+
+    .duplicate-records-label-none,
+    .duplicate-records-label-not-applicable {
+      color: rgba(var(--gd-secondary-rgb), 0.75);
+      font-style: italic;
+    }
+
+    .duplicate-records-tables-merge {
+      position: absolute;
+      right: 0.8rem;
+      top: 0.2rem;
+
+      @include breakpoint('lt-md') {
+        background-color: rgba(var(--gd-secondary-rgb), 0.05);
+        border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+        padding: 0.8rem 1.6rem;
+        position: static;
+      }
+    }
+  }
+
+  .gd-duplicate-records-pagination {
+    background-color: var(--gd-background);
+    border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+    bottom: 0;
+    @include flex(flex);
+    @include flex_justify(flex-end);
+    padding: 0.8rem 1.6rem;
+    position: sticky;
+
+    @include breakpoint('xxs') {
+      @include flex_justify(center);
+    }
+
+    .mat-paginator-container {
+      @include breakpoint('xxs') {
+        @include flex_justify(center);
+      }
+    }
+  }
+}

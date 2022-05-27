@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, ViewEncapsulation } from '@angular/core';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 import { determineRenderMode, RenderMode } from '../../../../core/enums/render-mode.enum';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -13,7 +13,9 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 
 @Component({
   selector: 'app-reset-password',
-  templateUrl: './reset-password.component.html'
+  templateUrl: './reset-password.component.html',
+  styleUrls: ['./reset-password.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class ResetPasswordComponent {
   // render mode

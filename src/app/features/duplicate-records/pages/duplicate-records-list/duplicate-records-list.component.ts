@@ -28,7 +28,7 @@ import { IV2ActionIconLabel, V2ActionType } from '../../../../shared/components-
   selector: 'app-duplicate-records-list',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './duplicate-records-list.component.html',
-  styleUrls: ['./duplicate-records-list.component.less']
+  styleUrls: ['./duplicate-records-list.component.scss']
 })
 export class DuplicateRecordsListComponent extends ListComponent<any> implements OnInit, OnDestroy {
   // breadcrumbs

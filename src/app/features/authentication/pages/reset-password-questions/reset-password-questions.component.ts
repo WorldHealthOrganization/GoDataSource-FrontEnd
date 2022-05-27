@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, ViewEncapsulation } from '@angular/core';
 import { determineRenderMode, RenderMode } from '../../../../core/enums/render-mode.enum';
 import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -18,7 +18,9 @@ import { UserDataService } from '../../../../core/services/data/user.data.servic
 
 @Component({
   selector: 'app-reset-password-questions',
-  templateUrl: './reset-password-questions.component.html'
+  templateUrl: './reset-password-questions.component.html',
+  styleUrls: ['./reset-password-questions.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class ResetPasswordQuestionsComponent {
   // render mode

@@ -10,7 +10,7 @@ import { UserModel } from '../../../../core/models/user.model';
   selector: 'app-cloud-backup',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './cloud-backup.component.html',
-  styleUrls: ['./cloud-backup.component.less']
+  styleUrls: ['./cloud-backup.component.scss']
 })
 
 export class CloudBackupComponent implements OnInit {
