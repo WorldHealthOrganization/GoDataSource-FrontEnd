@@ -335,6 +335,14 @@ export class ContactRangeFollowUpsListComponent
         RequestSortDirection.ASC
       );
 
+    // #TODO - must remove, added only for test purposes
+    this.queryBuilder.filter.byDateRange(
+      'date', {
+        startDate: '2019-01-01',
+        endDate: '2019-02-28'
+      }
+    );
+
     // retrieve the list of Follow Ups
     this.displayLoading = true;
     this.followUpsGroupedByContact = [];
