@@ -33,6 +33,7 @@ export class AppBasicPageV2Component implements OnInit, OnDestroy {
   // advanced filters
   @Input() advancedFilterType: string;
   @Input() advancedFilters: V2AdvancedFilter[];
+  @Input() advancedFiltersVisible: boolean;
   @Input() advancedFiltersHideOperator: boolean;
 
   // applied filters

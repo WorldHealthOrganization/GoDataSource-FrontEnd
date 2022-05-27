@@ -45,7 +45,7 @@
 
       <!-- Advanced filters -->
       <button
-        *ngIf="advancedFilters?.length > 0"
+        *ngIf="advancedFilters?.length > 0 && (advancedFiltersVisible === undefined || advancedFiltersVisible)"
         type="button"
         mat-flat-button
         color="primary"

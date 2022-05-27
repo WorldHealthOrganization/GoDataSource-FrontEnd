@@ -197,6 +197,7 @@
   [quickActions]="quickActions"
   [advancedFilterType]="Constants.APP_PAGE.COT_GRAPH.value"
   [advancedFilters]="advancedFilters"
+  [advancedFiltersVisible]="!showGraphConfiguration && selectedSnapshot && chainGroup && chainGroupId === selectedSnapshot"
   advancedFiltersHideOperator="true"
   (advancedFilterBy)="loadChainsOfTransmission()">
 
