@@ -18,24 +18,6 @@
         </button>
     </div>
 
-    <!-- Generate new graph -->
-    <div
-        *ngIf="showFilters && selectedOutbreak?.id === authUser?.activeOutbreakId"
-        fxLayout="column"
-        class="settings-container">
-
-        <div fxLayout="row" fxFlexAlign="end" fxLayoutGap="10px">
-            <!-- Apply filters -->
-            <button
-                fxFlex="150px"
-                mat-raised-button
-                color="accent"
-                (click)="generateChainsOfTransmission()">
-                {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_APPLY_SETTINGS' | translate }}
-            </button>
-        </div>
-    </div>
-
     <!-- Graph configuration -->
     <div
         *ngIf="showGraphConfiguration && selectedSnapshot && chainGroup && chainGroupId === selectedSnapshot"

@@ -9,6 +9,7 @@ import { SavedFilterData } from '../../../../core/models/saved-filters.model';
 import { Moment } from '../../../../core/helperClasses/x-moment';
 import { ILocation } from '../../../forms-v2/core/app-form-location-base-v2';
 import { IV2NumberRange } from '../../../forms-v2/components/app-form-number-range-v2/models/number.model';
+import { IV2DateRange } from '../../../forms-v2/components/app-form-date-range-v2/models/date.model';
 
 /**
  * Side dialog config
@@ -28,6 +29,7 @@ export enum V2SideDialogConfigInputType {
   TEXTAREA,
   TIMEPICKER,
   DATE,
+  DATE_RANGE,
   NUMBER,
   NUMBER_RANGE,
   DROPDOWN_SINGLE,
@@ -298,6 +300,18 @@ export interface IV2SideDialogConfigInputNumber extends IV2SideDialogConfigInput
 }
 
 /**
+ * Side dialog input - date range
+ */
+export interface IV2SideDialogConfigInputDateRange extends IV2SideDialogConfigInputBase {
+  // required
+  type: V2SideDialogConfigInputType.DATE_RANGE;
+  value: IV2DateRange;
+
+  // never
+  placeholder?: never;
+}
+
+/**
  * Side dialog input - number range
  */
 export interface IV2SideDialogConfigInputNumberRange extends IV2SideDialogConfigInputBase {
@@ -459,9 +473,10 @@ export type V2SideDialogConfigInputFromInput = IV2SideDialogConfigInputCheckbox 
 | IV2SideDialogConfigInputTimepicker | IV2SideDialogConfigInputDate | IV2SideDialogConfigInputSingleDropdown | IV2SideDialogConfigInputMultiDropdown
 | IV2SideDialogConfigInputSingleLocation | IV2SideDialogConfigInputMultipleLocation | IV2SideDialogConfigInputToggle | IV2SideDialogConfigInputToggleCheckbox
 | IV2SideDialogConfigInputNumber;
-export type V2SideDialogConfigInput = IV2SideDialogConfigInputDivider | IV2SideDialogConfigInputNumberRange | IV2SideDialogConfigInputKeyValue | IV2SideDialogConfigInputHTML
-| V2SideDialogConfigInputFromInput | IV2SideDialogConfigInputLink | IV2SideDialogConfigInputLinkWithAction | IV2SideDialogConfigInputGroup
-| IV2SideDialogConfigInputButton | IV2SideDialogConfigInputRow | IV2SideDialogConfigInputAccordion | IV2SideDialogConfigInputFilterList;
+export type V2SideDialogConfigInput = IV2SideDialogConfigInputDivider | IV2SideDialogConfigInputDateRange | IV2SideDialogConfigInputNumberRange
+| IV2SideDialogConfigInputKeyValue | IV2SideDialogConfigInputHTML | V2SideDialogConfigInputFromInput | IV2SideDialogConfigInputLink
+| IV2SideDialogConfigInputLinkWithAction | IV2SideDialogConfigInputGroup | IV2SideDialogConfigInputButton | IV2SideDialogConfigInputRow
+| IV2SideDialogConfigInputAccordion | IV2SideDialogConfigInputFilterList;
 
 /**
  * Side dialog inputs map

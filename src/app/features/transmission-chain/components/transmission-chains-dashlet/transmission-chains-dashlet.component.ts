@@ -45,7 +45,7 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import {
-  IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigButtonType, IV2SideDialogConfigInputDate, IV2SideDialogConfigInputDateRange, IV2SideDialogConfigInputMultiDropdown, IV2SideDialogConfigInputMultipleLocation, IV2SideDialogConfigInputNumberRange,
   IV2SideDialogConfigInputText,
   IV2SideDialogConfigInputToggleCheckbox,
   V2SideDialogConfigInputType
@@ -831,6 +831,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                       type: V2SideDialogConfigInputType.NUMBER_RANGE,
                       name: 'age',
                       value: this.filters.age
+                    }, {
+                      type: V2SideDialogConfigInputType.DATE_RANGE,
+                      name: 'date',
+                      value: this.filters.date
                     }
                   ],
                   bottomButtons: [{
@@ -850,7 +854,30 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                     return;
                   }
 
-                  // #TODO - create snapshot
+                  // update filters
+                  this.filters.showEvents = (response.data.map.showEvents as IV2SideDialogConfigInputToggleCheckbox).value;
+                  this.filters.showContacts = (response.data.map.showContacts as IV2SideDialogConfigInputToggleCheckbox).value;
+                  this.filters.includeContactsOfContacts = (response.data.map.includeContactsOfContacts as IV2SideDialogConfigInputToggleCheckbox).value;
+                  const date = (response.data.map.dateGlobalFilter as IV2SideDialogConfigInputDate).value;
+                  this.dateGlobalFilter = typeof date === 'string' ?
+                    date :
+                    (date ? date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : undefined);
+                  this.filters.classificationId = (response.data.map.classificationId as IV2SideDialogConfigInputMultiDropdown).values;
+                  this.filters.occupation = (response.data.map.occupation as IV2SideDialogConfigInputMultiDropdown).values;
+                  this.filters.outcomeId = (response.data.map.outcomeId as IV2SideDialogConfigInputMultiDropdown).values;
+                  this.filters.firstName = (response.data.map.firstName as IV2SideDialogConfigInputText).value;
+                  this.filters.lastName = (response.data.map.lastName as IV2SideDialogConfigInputText).value;
+                  this.filters.gender = (response.data.map.gender as IV2SideDialogConfigInputMultiDropdown).values;
+                  this.filters.locationIds = (response.data.map.locationIds as IV2SideDialogConfigInputMultipleLocation).values;
+                  this.filters.clusterIds = (response.data.map.clusterIds as IV2SideDialogConfigInputMultiDropdown).values;
+                  this.filters.age = (response.data.map.age as IV2SideDialogConfigInputNumberRange).value;
+                  this.filters.date = (response.data.map.date as IV2SideDialogConfigInputDateRange).value;
+
+                  // close
+                  response.handler.hide();
+
+                  // generate graph
+                  this.generateChainsOfTransmission();
                 });
             }
           },
@@ -923,6 +950,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           get: () => 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_APPLY_SETTINGS'
         },
         hideInputFilter: true,
+        width: '50rem',
         inputs: [{
           type: V2SideDialogConfigInputType.TEXT,
           name: 'snapshotName',
@@ -935,7 +963,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         bottomButtons: [{
           type: IV2SideDialogConfigButtonType.OTHER,
           label: 'LNG_COMMON_BUTTON_CREATE',
-          color: 'primary'
+          color: 'primary',
+          disabled: (_data, handler): boolean => {
+            return !handler.form || handler.form.invalid;
+          }
         }, {
           type: IV2SideDialogConfigButtonType.CANCEL,
           label: 'LNG_COMMON_BUTTON_CANCEL',
@@ -948,6 +979,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           // finished
           return;
         }
+
+        // close
+        response.handler.hide();
 
         // close settings panel
         this.showFilters = false;

@@ -155,6 +155,16 @@
               [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
               (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-date-v2>
 
+            <!-- Date Range -->
+            <app-form-date-range-v2
+              *ngSwitchCase="V2SideDialogConfigInputType.DATE_RANGE"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
+              [(ngModel)]="input.value"
+              [name]="input.name"
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
+              [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
+              (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-date-range-v2>
+
             <!-- Number -->
             <app-form-number-v2
               *ngSwitchCase="V2SideDialogConfigInputType.NUMBER"

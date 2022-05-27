@@ -5,13 +5,13 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import * as _ from 'lodash';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { Moment } from '../../../../core/helperClasses/x-moment';
 import { map, share } from 'rxjs/operators';
 import { Constants } from '../../../../core/models/constants';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { IV2NumberRange } from '../../../../shared/forms-v2/components/app-form-number-range-v2/models/number.model';
+import { IV2DateRange } from '../../../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
 
 export class TransmissionChainFilters {
   classificationId: string[];
@@ -23,7 +23,7 @@ export class TransmissionChainFilters {
   locationIds: string[];
   clusterIds: string[];
   age: IV2NumberRange;
-  date: Moment;
+  date: IV2DateRange;
   includeContactsOfContacts: boolean;
 
   showContacts?: boolean;
@@ -43,7 +43,7 @@ export class TransmissionChainFilters {
     locationIds?: string[],
     clusterIds?: string[],
     age?: IV2NumberRange,
-    date?: Moment,
+    date?: IV2DateRange,
     includeContactsOfContacts?: boolean
   } = {}) {
     // assign properties
