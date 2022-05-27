@@ -4,51 +4,6 @@
         *ngIf="showGraphConfiguration && selectedSnapshot && chainGroup && chainGroupId === selectedSnapshot"
         class="settings-container">
 
-        <div
-            fxLayout="row" fxLayoutGap="10px">
-            <!-- entity type filter - events -->
-            <app-form-checkbox
-                fxFlex fxGrow="0"
-                name="showEvents"
-                [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_EVENTS_LABEL' | translate"
-                [(ngModel)]="showEvents">
-            </app-form-checkbox>
-
-            <!-- entity type filter - contacts -->
-            <app-form-checkbox
-                *ngIf="!snapshotOptionsMap || !selectedSnapshot || !snapshotOptionsMap[selectedSnapshot] || snapshotOptionsMap[selectedSnapshot].snapshot.showContacts"
-                fxFlex fxGrow="0"
-                name="showContacts"
-                [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_LABEL' | translate"
-                [(ngModel)]="showContacts"
-                (optionChanged)="updateShowContactsOfContactValue($event)">
-            </app-form-checkbox>
-
-            <!-- This checkbox is valid only if 'showContacts' is already enabled -->
-            <app-form-checkbox
-                *ngIf="!snapshotOptionsMap || !selectedSnapshot || !snapshotOptionsMap[selectedSnapshot] || snapshotOptionsMap[selectedSnapshot].snapshot.showContactsOfContacts"
-                fxFlex fxGrow="0"
-                name="includeContactsOfContacts"
-                [disabled]="!showContacts"
-                [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_OF_CONTACTS' | translate"
-                [(ngModel)]="showContactsOfContacts">
-            </app-form-checkbox>
-
-            <!-- Show lab results -->
-            <app-form-checkbox
-                fxFlex fxGrow="0"
-                name="showLabResultsSeqData"
-                [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_LAB_RESULTS_SEQUENCE_DATA' | translate"
-                [(ngModel)]="showLabResultsSeqData">
-            </app-form-checkbox>
-
-            <!-- Empty space since all others are with fxGrow=0 -->
-            <div
-                fxFlex>
-                <!-- Placeholder -->
-            </div>
-        </div>
-
         <!-- Node Settings -->
         <mat-card fxLayout="column" fxLayoutGap="10px">
             <div class="settings-container-title">

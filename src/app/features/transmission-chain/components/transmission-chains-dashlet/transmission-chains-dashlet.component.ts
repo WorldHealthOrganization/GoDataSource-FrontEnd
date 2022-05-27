@@ -791,7 +791,70 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_GRAPH',
       action: {
         click: () => {
-          // #TODO
+          this.dialogV2Service.showSideDialog({
+            title: {
+              get: () => 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_GRAPH'
+            },
+            hideInputFilter: true,
+            width: '50rem',
+            inputs: [
+              {
+                type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+                name: 'showEvents',
+                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_EVENTS_LABEL',
+                value: this.showEvents
+              }, {
+                type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+                name: 'showContacts',
+                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_LABEL',
+                value: this.showContacts,
+                change: (data) => {
+                  // nothing to do ?
+                  const checked = (data.map.showContacts as IV2SideDialogConfigInputToggleCheckbox).value;
+                  if (!checked) {
+                    (data.map.includeContactsOfContacts as IV2SideDialogConfigInputToggleCheckbox).value = false;
+                  }
+                },
+                visible: () => {
+                  return !this.snapshotOptionsMap || !this.selectedSnapshot || !this.snapshotOptionsMap[this.selectedSnapshot] || !this.snapshotOptionsMap[this.selectedSnapshot].snapshot.showContacts;
+                }
+              }, {
+                type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+                name: 'includeContactsOfContacts',
+                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_OF_CONTACTS',
+                value: this.showContactsOfContacts,
+                disabled: (data) => {
+                  return !(data.map.showContacts as IV2SideDialogConfigInputToggleCheckbox).value;
+                },
+                visible: () => {
+                  return !this.snapshotOptionsMap || !this.selectedSnapshot || !this.snapshotOptionsMap[this.selectedSnapshot] || !this.snapshotOptionsMap[this.selectedSnapshot].snapshot.showContactsOfContacts;
+                }
+              }, {
+                type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+                name: 'showLabResultsSeqData',
+                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_LAB_RESULTS_SEQUENCE_DATA',
+                value: this.showLabResultsSeqData
+              }, {
+                type: V2SideDialogConfigInputType.DIVIDER,
+                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SETTINGS_TITLE'
+              }
+            ],
+            bottomButtons: [{
+              type: IV2SideDialogConfigButtonType.OTHER,
+              label: '....',
+              color: 'primary'
+            }, {
+              type: IV2SideDialogConfigButtonType.CANCEL,
+              label: 'LNG_COMMON_BUTTON_CANCEL',
+              color: 'text'
+            }]
+          }).subscribe((response) => {
+            // cancelled ?
+            if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+              // finished
+              return;
+            }
+          });
         }
       },
       visible: () => {
@@ -1511,17 +1574,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       this.colorCriteria.edgeIconCriteria = Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.NONE.value;
     } else if (field === 'icon' && $event !== Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.NONE.value) {
       this.colorCriteria.edgeLabelCriteria = Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value;
-    }
-  }
-
-  /**
-     * Update showContactsOfContacts value if showContacts is disabled because
-     * user can't see contactsOfContacts without Contacts
-     * @param value
-     */
-  updateShowContactsOfContactValue(value: boolean): void {
-    if (value === false) {
-      this.filters.includeContactsOfContacts = false;
     }
   }
 
