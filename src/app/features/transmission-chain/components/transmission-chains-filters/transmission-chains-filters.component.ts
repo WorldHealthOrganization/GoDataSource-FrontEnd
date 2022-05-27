@@ -1,5 +1,4 @@
 import { Component, HostBinding, Input, OnInit, ViewEncapsulation } from '@angular/core';
-import { AgeModel } from '../../../../core/models/age.model';
 import { Observable } from 'rxjs';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
@@ -12,6 +11,7 @@ import { Constants } from '../../../../core/models/constants';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { IV2NumberRange } from '../../../../shared/forms-v2/components/app-form-number-range-v2/models/number.model';
 
 export class TransmissionChainFilters {
   classificationId: string[];
@@ -22,7 +22,7 @@ export class TransmissionChainFilters {
   gender: string[];
   locationIds: string[];
   clusterIds: string[];
-  age: AgeModel;
+  age: IV2NumberRange;
   date: Moment;
   includeContactsOfContacts: boolean;
 
@@ -42,7 +42,7 @@ export class TransmissionChainFilters {
     gender?: string[],
     locationIds?: string[],
     clusterIds?: string[],
-    age?: AgeModel,
+    age?: IV2NumberRange,
     date?: Moment,
     includeContactsOfContacts?: boolean
   } = {}) {

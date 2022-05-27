@@ -827,6 +827,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                       placeholder: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
                       options: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ClusterModel>).options,
                       values: this.filters.clusterIds
+                    }, {
+                      type: V2SideDialogConfigInputType.NUMBER_RANGE,
+                      name: 'age',
+                      value: this.filters.age
                     }
                   ],
                   bottomButtons: [{
