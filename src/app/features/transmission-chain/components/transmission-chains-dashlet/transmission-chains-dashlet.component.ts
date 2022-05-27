@@ -51,6 +51,7 @@ import {
   V2SideDialogConfigInputType
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { V2AdvancedFilter, V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 
 @Component({
   selector: 'app-transmission-chains-dashlet',
@@ -246,9 +247,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     }
   } = {};
   selectedSnapshot: string;
-
-  // lab sequence results
-  labSequenceResultOptions: LabelValuePair[] = [];
 
   // cytoscape-graph.component data
   style: any;
@@ -490,6 +488,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   // quick actions
   quickActions: IV2ActionMenuLabel;
 
+  // advanced filters
+  advancedFilters: V2AdvancedFilter[];
+
   /**
      * Constructor
      */
@@ -726,6 +727,55 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
     // update breadcrumbs
     this.initializeBreadcrumbs();
+
+    // advanced filters
+    this.advancedFilters = [{
+      type: V2AdvancedFilterType.TEXT,
+      field: 'firstName',
+      label: 'LNG_PAGE_GRAPH_SNAPSHOT_FILTER_FIRST_NAME_LABEL',
+      allowedComparators: [
+        _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.TEXT], { value: V2AdvancedFilterComparatorType.CONTAINS_TEXT })
+      ],
+      filterBy: (
+        _qb,
+        filter
+      ) => {
+        this.snapshotFilters.firstName = filter.value ?
+          filter.value :
+          undefined;
+      }
+    }, {
+      type: V2AdvancedFilterType.TEXT,
+      field: 'lastName',
+      label: 'LNG_PAGE_GRAPH_SNAPSHOT_FILTER_LAST_NAME_LABEL',
+      allowedComparators: [
+        _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.TEXT], { value: V2AdvancedFilterComparatorType.CONTAINS_TEXT })
+      ],
+      filterBy: (
+        _qb,
+        filter
+      ) => {
+        this.snapshotFilters.lastName = filter.value ?
+          filter.value :
+          undefined;
+      }
+    }, {
+      type: V2AdvancedFilterType.MULTISELECT,
+      field: 'labSeqResult',
+      label: 'LNG_PAGE_GRAPH_SNAPSHOT_FILTER_LAB_SEQ_RESULT_LABEL',
+      options: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+      allowedComparators: [
+        _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
+      ],
+      filterBy: (
+        _qb,
+        filter
+      ) => {
+        this.snapshotFilters.labSeqResult = filter.value ?
+          filter.value :
+          undefined;
+      }
+    }];
 
     // quick actions
     this.quickActions = {
@@ -1377,19 +1427,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             tap((results) => {
               // set data
               this.referenceDataEntries[refDataCategory] = results;
-
-              // initialize options for filters
-              if (
-                refDataCategory === ReferenceDataCategory.LAB_SEQUENCE_RESULT &&
-                                this.referenceDataEntries[refDataCategory] &&
-                                this.referenceDataEntries[refDataCategory].entries &&
-                                this.referenceDataEntries[refDataCategory].entries.length > 0
-              ) {
-                this.labSequenceResultOptions = this.referenceDataEntries[refDataCategory].entries.map((item) => new LabelValuePair(
-                  item.value,
-                  item.value
-                ));
-              }
             })
           );
       }
@@ -2697,8 +2734,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     // do we have required data ?
     if (
       !this.selectedOutbreak ||
-            !this.selectedOutbreak.id ||
-            !this.selectedSnapshot
+      !this.selectedOutbreak.id ||
+      !this.selectedSnapshot
     ) {
       return;
     }
@@ -2723,7 +2760,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       // must update pages ?
       if (
         this.chainPageSize !== this.pageSize ||
-                !_.isEqual(this.snapshotFilters, originalSnapshotFiltersClone)
+        !_.isEqual(this.snapshotFilters, originalSnapshotFiltersClone)
       ) {
         this.chainPageSize = this.pageSize;
         this.chainPages = this.transmissionChainDataService.getChainOfTransmissionPages(

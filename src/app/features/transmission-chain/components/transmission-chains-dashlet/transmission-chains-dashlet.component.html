@@ -206,39 +206,6 @@
         </mat-card>
     </div>
 
-    <!-- Snapshot filters -->
-    <div
-        *ngIf="showSnapshotFilters"
-        class="settings-container">
-        <mat-card fxLayout="column">
-            <div
-                fxLayout="row" fxLayoutGap="20px">
-                <!-- first name -->
-                <app-form-input
-                    name="snapshotFirstName"
-                    [(ngModel)]="snapshotFilters.firstName"
-                    [placeholder]="'LNG_PAGE_GRAPH_SNAPSHOT_FILTER_FIRST_NAME_LABEL' | translate">
-                </app-form-input>
-
-                <!-- last name -->
-                <app-form-input
-                    name="snapshotLastName"
-                    [(ngModel)]="snapshotFilters.lastName"
-                    [placeholder]="'LNG_PAGE_GRAPH_SNAPSHOT_FILTER_LAST_NAME_LABEL' | translate">
-                </app-form-input>
-
-                <!-- Lab sequence result -->
-                <app-form-select
-                    name="snapshotLabSeqResult"
-                    [(ngModel)]="snapshotFilters.labSeqResult"
-                    [placeholder]="'LNG_PAGE_GRAPH_SNAPSHOT_FILTER_LAB_SEQ_RESULT_LABEL' | translate"
-                    [options]="labSequenceResultOptions"
-                    [multiple]="true">
-                </app-form-select>
-            </div>
-        </mat-card>
-    </div>
-
     <!-- Load snapshot -->
     <div
         *ngIf="!showFilters"
@@ -345,7 +312,11 @@
 <app-basic-page-v2
   [breadcrumbs]="breadcrumbs"
   pageTitle="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE"
-  [quickActions]="quickActions">
+  [quickActions]="quickActions"
+  [advancedFilterType]="Constants.APP_PAGE.COT_GRAPH.value"
+  [advancedFilters]="advancedFilters"
+  advancedFiltersHideOperator="true"
+  (advancedFilterBy)="loadChainsOfTransmission()">
   <div
       *ngIf="chainGroup &&
           !mustLoadChain &&

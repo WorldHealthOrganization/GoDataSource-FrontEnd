@@ -10,6 +10,7 @@ import { OccupationDataResolver } from '../../core/services/resolvers/data/occup
 import { OutcomeDataResolver } from '../../core/services/resolvers/data/outcome.resolver';
 import { GenderDataResolver } from '../../core/services/resolvers/data/gender.resolver';
 import { ClusterDataResolver } from '../../core/services/resolvers/data/cluster.resolver';
+import { LabSequenceResultDataResolver } from '../../core/services/resolvers/data/lab-sequence-result.resolver';
 
 const routes: Routes = [
   // Transmission Chains Graph
@@ -34,7 +35,8 @@ const routes: Routes = [
       occupation: OccupationDataResolver,
       outcome: OutcomeDataResolver,
       gender: GenderDataResolver,
-      cluster: ClusterDataResolver
+      cluster: ClusterDataResolver,
+      labSequenceResult: LabSequenceResultDataResolver
     }
   },
   // Transmission Chains List

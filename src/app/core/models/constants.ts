@@ -288,6 +288,10 @@ export class Constants {
     DASHBOARD: {
       label: 'LNG_APP_PAGE_DASHBOARD',
       value: 'LNG_APP_PAGE_DASHBOARD'
+    },
+    COT_GRAPH: {
+      label: 'LNG_APP_PAGE_COT_GRAPH',
+      value: 'LNG_APP_PAGE_COT_GRAPH'
     }
   };
 
