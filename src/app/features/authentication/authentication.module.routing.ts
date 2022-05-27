@@ -35,7 +35,11 @@ const routes: Routes = [
   },
   {
     path: 'reset-password',
-    component: fromPages.ResetPasswordComponent
+    component: fromPages.ResetPasswordComponent,
+    resolve: {
+      version: VersionDataResolver,
+      languages: LanguageDataResolver
+    }
   },
   {
     path: 'reset-password-questions',
