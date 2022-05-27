@@ -14,7 +14,6 @@ import { UserModel } from '../../../../core/models/user.model';
 import { SafeHtml } from '@angular/platform-browser';
 import { CaptchaDataFor, CaptchaDataService } from '../../../../core/services/data/captcha.data.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
-import * as _ from 'lodash';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 
 @Component({
