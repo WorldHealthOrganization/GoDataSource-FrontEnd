@@ -11,6 +11,10 @@ import { OutcomeDataResolver } from '../../core/services/resolvers/data/outcome.
 import { GenderDataResolver } from '../../core/services/resolvers/data/gender.resolver';
 import { ClusterDataResolver } from '../../core/services/resolvers/data/cluster.resolver';
 import { LabSequenceResultDataResolver } from '../../core/services/resolvers/data/lab-sequence-result.resolver';
+import { CotNodeLabelDataResolver } from '../../core/services/resolvers/data/cot-node-label.resolver';
+import { CotNodeColorDataResolver } from '../../core/services/resolvers/data/cot-node-color.resolver';
+import { CotNodeIconDataResolver } from '../../core/services/resolvers/data/cot-node-icon.resolver';
+import { CotNodeShapeDataResolver } from '../../core/services/resolvers/data/cot-node-shape.resolver';
 
 const routes: Routes = [
   // Transmission Chains Graph
@@ -36,7 +40,11 @@ const routes: Routes = [
       outcome: OutcomeDataResolver,
       gender: GenderDataResolver,
       cluster: ClusterDataResolver,
-      labSequenceResult: LabSequenceResultDataResolver
+      labSequenceResult: LabSequenceResultDataResolver,
+      cotNodeLabel: CotNodeLabelDataResolver,
+      cotNodeColor: CotNodeColorDataResolver,
+      cotNodeIcon: CotNodeIconDataResolver,
+      cotNodeShape: CotNodeShapeDataResolver
     }
   },
   // Transmission Chains List

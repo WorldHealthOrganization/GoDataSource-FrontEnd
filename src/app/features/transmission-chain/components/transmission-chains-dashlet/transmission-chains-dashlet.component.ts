@@ -53,6 +53,7 @@ import {
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { V2AdvancedFilter, V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { AppBasicPageV2Component } from '../../../../shared/components-v2/app-basic-page-v2/app-basic-page-v2.component';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
   selector: 'app-transmission-chains-dashlet',
@@ -121,10 +122,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   personName: string = '';
   dateGlobalFilter: string = moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
 
-  nodeColorCriteriaOptions$: Observable<any[]>;
-  nodeIconCriteriaOptions$: Observable<any[]>;
-  nodeShapeCriteriaOptions$: Observable<any[]>;
-  nodeLabelCriteriaOptions$: Observable<any[]>;
   edgeColorCriteriaOptions$: Observable<any[]>;
   edgeLabelCriteriaOptions$: Observable<any[]>;
   edgeIconCriteriaOptions$: Observable<any[]>;
@@ -195,17 +192,26 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   };
 
   // default color criteria
-  colorCriteria: any = {
-    nodeLabelCriteria: Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.NAME.value,
-    nodeColorCriteria: Constants.TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS.TYPE.value,
-    nodeNameColorCriteria: Constants.TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS.CLASSIFICATION.value,
-    edgeColorCriteria: Constants.TRANSMISSION_CHAIN_EDGE_COLOR_CRITERIA_OPTIONS.CERTAINITY_LEVEL.value,
-    edgeLabelCriteria: Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value,
-    edgeIconCriteria: Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.NONE.value,
-    nodeIconCriteria: Constants.TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS.NONE.value,
-    nodeShapeCriteria: Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.NONE.value
-  };
-    // default legend
+  colorCriteria: {
+    nodeLabelCriteria: string,
+    nodeColorCriteria: string,
+    nodeNameColorCriteria: string,
+    edgeColorCriteria: string,
+    edgeLabelCriteria: string,
+    edgeIconCriteria: string,
+    nodeIconCriteria: string,
+    nodeShapeCriteria: string
+  } = {
+      nodeLabelCriteria: Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.NAME.value,
+      nodeColorCriteria: Constants.TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS.TYPE.value,
+      nodeNameColorCriteria: Constants.TRANSMISSION_CHAIN_NODE_COLOR_CRITERIA_OPTIONS.CLASSIFICATION.value,
+      edgeColorCriteria: Constants.TRANSMISSION_CHAIN_EDGE_COLOR_CRITERIA_OPTIONS.CERTAINITY_LEVEL.value,
+      edgeLabelCriteria: Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value,
+      edgeIconCriteria: Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.NONE.value,
+      nodeIconCriteria: Constants.TRANSMISSION_CHAIN_NODE_ICON_CRITERIA_OPTIONS.NONE.value,
+      nodeShapeCriteria: Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.NONE.value
+    };
+  // default legend
   legend: any = {
     nodeColorField: 'type',
     nodeNameColorField: 'classification',
@@ -534,13 +540,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     this.filters.showEvents = true;
 
     // color criteria
-    this.nodeColorCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeColorCriteriaOptions();
     this.edgeColorCriteriaOptions$ = this.genericDataService.getTransmissionChainEdgeColorCriteriaOptions();
     this.edgeLabelCriteriaOptions$ = this.genericDataService.getTransmissionChainEdgeLabelCriteriaOptions();
     this.edgeIconCriteriaOptions$ = this.genericDataService.getTransmissionChainEdgeIconCriteriaOptions();
-    this.nodeIconCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeIconCriteriaOptions();
-    this.nodeShapeCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeShapeCriteriaOptions();
-    this.nodeLabelCriteriaOptions$ = this.genericDataService.getTransmissionChainNodeLabelCriteriaOptions();
 
     // load view types
     this.genericDataService
@@ -837,6 +839,36 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
               }, {
                 type: V2SideDialogConfigInputType.DIVIDER,
                 placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SETTINGS_TITLE'
+              }, {
+                type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+                name: 'nodeLabelCriteria',
+                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_TITLE',
+                options: (this.activatedRoute.snapshot.data.cotNodeLabel as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+                value: this.colorCriteria.nodeLabelCriteria
+              }, {
+                type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+                name: 'nodeNameColorCriteria',
+                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE',
+                options: (this.activatedRoute.snapshot.data.cotNodeColor as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+                value: this.colorCriteria.nodeNameColorCriteria
+              }, {
+                type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+                name: 'nodeColorCriteria',
+                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE',
+                options: (this.activatedRoute.snapshot.data.cotNodeColor as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+                value: this.colorCriteria.nodeColorCriteria
+              }, {
+                type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+                name: 'nodeIconCriteria',
+                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_ICON_TITLE',
+                options: (this.activatedRoute.snapshot.data.cotNodeIcon as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+                value: this.colorCriteria.nodeIconCriteria
+              }, {
+                type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+                name: 'nodeShapeCriteria',
+                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SHAPE_TITLE',
+                options: (this.activatedRoute.snapshot.data.cotNodeShape as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+                value: this.colorCriteria.nodeShapeCriteria
               }
             ],
             bottomButtons: [{
