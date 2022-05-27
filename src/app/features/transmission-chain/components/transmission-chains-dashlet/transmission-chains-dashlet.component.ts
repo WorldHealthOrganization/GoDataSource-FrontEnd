@@ -1,17 +1,15 @@
 import * as _ from 'lodash';
-import { Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { IConvertChainToGraphElements, TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
 import { GraphNodeModel } from '../../../../core/models/graph-node.model';
 import { Constants } from '../../../../core/models/constants';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { forkJoin, Observable, Subscription, throwError } from 'rxjs';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
-import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -24,7 +22,7 @@ import { ITransmissionChainGroupPageModel, TransmissionChainGroupModel, Transmis
 import { TransmissionChainFilters } from '../transmission-chains-filters/transmission-chains-filters.component';
 import { catchError, tap } from 'rxjs/operators';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
-import { WorldMapMarker, WorldMapPath, WorldMapMarkerLayer, WorldMapPoint, WorldMapMarkerType, WorldMapComponent, WorldMapPathType } from '../../../../common-modules/world-map/components/world-map/world-map.component';
+import { WorldMapComponent, WorldMapMarker, WorldMapMarkerLayer, WorldMapMarkerType, WorldMapPath, WorldMapPathType, WorldMapPoint } from '../../../../common-modules/world-map/components/world-map/world-map.component';
 import { UserModel } from '../../../../core/models/user.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -32,7 +30,6 @@ import * as cytoscape from 'cytoscape';
 import * as cola from 'cytoscape-cola';
 import * as dagre from 'cytoscape-dagre';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
-import { DialogAnswerButton, DialogConfiguration, DialogField, LoadingDialogModel, ViewCotEdgeDialogComponent, ViewCotNodeDialogComponent } from '../../../../shared/components';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { EventModel } from '../../../../core/models/event.model';
@@ -45,6 +42,9 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { AuthenticatedComponent } from '../../../../core/components/authenticated/authenticated.component';
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputText, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 
 @Component({
   selector: 'app-transmission-chains-dashlet',
@@ -481,6 +481,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     labSeqResult?: string[]
   } = {};
 
+  // quick actions
+  quickActions: IV2ActionMenuLabel;
+
   /**
      * Constructor
      */
@@ -489,10 +492,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     private transmissionChainDataService: TransmissionChainDataService,
     private entityDataService: EntityDataService,
     private toastV2Service: ToastV2Service,
-    private dialogService: DialogService,
+    private dialogV2Service: DialogV2Service,
     private referenceDataDataService: ReferenceDataDataService,
     private genericDataService: GenericDataService,
-    private relationshipDataService: RelationshipDataService,
     private i18nService: I18nService,
     private locationDataService: LocationDataService,
     private clusterDataService: ClusterDataService,
@@ -623,7 +625,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         // wait for data to bind
         setTimeout(() => {
           // loading data
-          const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+          const loadingDialog = this.dialogV2Service.showLoadingDialog();
           this.outbreakSubscriber = this.outbreakDataService
             .getSelectedOutbreakSubject()
             .subscribe((selectedOutbreak: OutbreakModel) => {
@@ -718,6 +720,27 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
     // update breadcrumbs
     this.initializeBreadcrumbs();
+
+    // quick actions
+    this.quickActions = {
+      type: V2ActionType.MENU,
+      label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
+      // visible: () => CaseModel.canExportMovementMap(this._authUser),
+      menuOptions: [
+        // Export map
+        {
+          label: {
+            get: () => 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_SETTINGS'
+          },
+          action: {
+            click: () => {
+              // #TODO
+            }
+          }
+          // visible: () => CaseModel.canExportMovementMap(this._authUser)
+        }
+      ]
+    };
   }
 
   /**
@@ -768,30 +791,42 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     // if there is no outbreak then we can't continue
     if (
       !this.selectedOutbreak ||
-            !this.selectedOutbreak.id ||
-            !this.transmissionChainViewType
+      !this.selectedOutbreak.id ||
+      !this.transmissionChainViewType
     ) {
       return;
     }
 
     // snapshot settings
-    this.dialogService
-      .showInput(
-        new DialogConfiguration({
-          message: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_APPLY_SETTINGS',
-          yesLabel: 'LNG_COMMON_BUTTON_CREATE',
-          required: true,
-          fieldsList: [new DialogField({
-            name: 'snapshotName',
-            placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_NAME',
-            required: true,
-            type: 'text'
-          })]
-        }),
-        true
-      )
-      .subscribe((answer) => {
-        if (answer.button !== DialogAnswerButton.Yes) {
+    this.dialogV2Service
+      .showSideDialog({
+        title: {
+          get: () => 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_APPLY_SETTINGS'
+        },
+        hideInputFilter: true,
+        inputs: [{
+          type: V2SideDialogConfigInputType.TEXT,
+          name: 'snapshotName',
+          placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_NAME',
+          value: undefined,
+          validators: {
+            required: () => true
+          }
+        }],
+        bottomButtons: [{
+          type: IV2SideDialogConfigButtonType.OTHER,
+          label: 'LNG_COMMON_BUTTON_CREATE',
+          color: 'primary'
+        }, {
+          type: IV2SideDialogConfigButtonType.CANCEL,
+          label: 'LNG_COMMON_BUTTON_CANCEL',
+          color: 'text'
+        }]
+      })
+      .subscribe((response) => {
+        // cancelled ?
+        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+          // finished
           return;
         }
 
@@ -801,7 +836,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.showSnapshotFilters = false;
 
         // snapshot name
-        const snapshotName: string = answer.inputValue.value.snapshotName;
+        const snapshotName: string = (response.data.map.snapshotName as IV2SideDialogConfigInputText).value;
 
         // create queryBuilder for filters
         const requestQueryBuilder = new RequestQueryBuilder();
@@ -932,7 +967,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         }
 
         // display loading
-        const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+        const loadingDialog = this.dialogV2Service.showLoadingDialog();
 
         // get chain data and convert to graph nodes
         this.transmissionChainDataService
@@ -1332,7 +1367,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     this.destroyCytoscape();
 
     // display loading
-    const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+    const loadingDialog = this.dialogV2Service.showLoadingDialog();
     setTimeout(() => {
       // initialize the cytoscape object
       this.cy = cytoscape(Object.assign(
@@ -1966,36 +2001,38 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             caseClassificationToColorMap[(entity.model as CaseModel).classification] :
             Constants.DEFAULT_COLOR_CHAINS,
           data: entity,
-          selected: (_mapComponent: WorldMapComponent, mark: WorldMapMarker) => {
+          selected: (_mapComponent: WorldMapComponent, _mark: WorldMapMarker) => {
             // display entity information ( case / contact / event )
-            const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
-            const localEntity: EntityModel = mark.data;
-            this.entityDataService
-              .getEntity(localEntity.type, this.selectedOutbreak.id, localEntity.model.id)
-              .pipe(
-                catchError((err) => {
-                  this.toastV2Service.error(err);
-                  loadingDialog.close();
-                  return throwError(err);
-                })
-              )
-              .subscribe((entityData: CaseModel | EventModel | ContactModel) => {
-                // hide loading dialog
-                loadingDialog.close();
-
-                // show node information
-                this.dialogService.showCustomDialog(
-                  ViewCotNodeDialogComponent,
-                  {
-                    ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
-                    ...{
-                      data: {
-                        entity: entityData
-                      }
-                    }
-                  }
-                );
-              });
+            // #TODO
+            this.dialogV2Service.showLoadingDialog();
+            // const loadingDialog = this.dialogV2Service.showLoadingDialog();
+            // const localEntity: EntityModel = mark.data;
+            // this.entityDataService
+            //   .getEntity(localEntity.type, this.selectedOutbreak.id, localEntity.model.id)
+            //   .pipe(
+            //     catchError((err) => {
+            //       this.toastV2Service.error(err);
+            //       loadingDialog.close();
+            //       return throwError(err);
+            //     })
+            //   )
+            //   .subscribe((_entityData: CaseModel | EventModel | ContactModel) => {
+            //     // hide loading dialog
+            //     loadingDialog.close();
+            //
+            //     // show node information
+            //     this.dialogService.showCustomDialog(
+            //       ViewCotNodeDialogComponent,
+            //       {
+            //         ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
+            //         ...{
+            //           data: {
+            //             entity: entityData
+            //           }
+            //         }
+            //       }
+            //     );
+            //   });
           }
         });
 
@@ -2100,41 +2137,43 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             lineWidth: 5,
             offsetX: -(markerCircleRadius * 2 + 3),
             data: relationship,
-            selected: (_mapComponent: WorldMapComponent, path: WorldMapPath) => {
+            selected: (_mapComponent: WorldMapComponent, _path: WorldMapPath) => {
               // display relationship information
-              const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
-              const localRelationship: RelationshipModel = path.data;
-              this.relationshipDataService
-                .getEntityRelationship(
-                  this.selectedOutbreak.id,
-                  localRelationship.sourcePerson.type,
-                  localRelationship.sourcePerson.id,
-                  localRelationship.id
-                )
-                .pipe(
-                  catchError((err) => {
-                    this.toastV2Service.error(err);
-                    loadingDialog.close();
-                    return throwError(err);
-                  })
-                )
-                .subscribe((relationshipData) => {
-                  // hide loading dialog
-                  loadingDialog.close();
-
-                  // show edge information
-                  this.dialogService.showCustomDialog(
-                    ViewCotEdgeDialogComponent,
-                    {
-                      ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
-                      ...{
-                        data: {
-                          relationship: relationshipData
-                        }
-                      }
-                    }
-                  );
-                });
+              // #TODO
+              this.dialogV2Service.showLoadingDialog();
+              // const loadingDialog = this.dialogV2Service.showLoadingDialog();
+              // const localRelationship: RelationshipModel = path.data;
+              // this.relationshipDataService
+              //   .getEntityRelationship(
+              //     this.selectedOutbreak.id,
+              //     localRelationship.sourcePerson.type,
+              //     localRelationship.sourcePerson.id,
+              //     localRelationship.id
+              //   )
+              //   .pipe(
+              //     catchError((err) => {
+              //       this.toastV2Service.error(err);
+              //       loadingDialog.close();
+              //       return throwError(err);
+              //     })
+              //   )
+              //   .subscribe((_relationshipData) => {
+              //     // hide loading dialog
+              //     loadingDialog.close();
+              //
+              //     // show edge information
+              //     this.dialogService.showCustomDialog(
+              //       ViewCotEdgeDialogComponent,
+              //       {
+              //         ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
+              //         ...{
+              //           data: {
+              //             relationship: relationshipData
+              //           }
+              //         }
+              //       }
+              //     );
+              //   });
             }
           }));
         }
@@ -2552,9 +2591,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     }
 
     // retrieve chain of transmission
-    const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog({
-      widthPx: 200
-    });
+    const loadingDialog = this.dialogV2Service.showLoadingDialog();
     this.chainGroup = undefined;
     this.chainPages = undefined;
     this.selectedChainPageIndex = null;
@@ -2568,14 +2605,17 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           progress: string
         ): void => {
           if (progress) {
-            loadingDialog.showMessage(
-              'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_DOWNLOAD_PROGRESS', {
+            loadingDialog.message({
+              message: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_DOWNLOAD_PROGRESS',
+              messageData: {
                 name: snapshotData.name,
                 progress: progress.toString()
               }
-            );
+            });
           } else {
-            loadingDialog.showMessage('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_DOWNLOAD_FINISHED');
+            loadingDialog.message({
+              message: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_DOWNLOAD_FINISHED'
+            });
           }
         }
       )
@@ -2703,7 +2743,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      */
   changedPage(): void {
     // show loading
-    const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
+    const loadingDialog = this.dialogV2Service.showLoadingDialog();
 
     // update view
     this.updateView();

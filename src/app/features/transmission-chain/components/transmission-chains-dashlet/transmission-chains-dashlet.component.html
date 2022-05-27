@@ -429,7 +429,8 @@
 <!-- cytoscape element -->
 <app-basic-page-v2
   [breadcrumbs]="breadcrumbs"
-  pageTitle="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE">
+  pageTitle="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE"
+  [quickActions]="quickActions">
   <div
       *ngIf="chainGroup &&
           !mustLoadChain &&
