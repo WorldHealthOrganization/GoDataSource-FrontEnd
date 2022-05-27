@@ -58,6 +58,7 @@ app-contact-range-follow-ups-list {
         top: 0;
   
         .follow-up-range-date-header {
+          background-color: #F5F5F6;
           border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
           border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
           @include flex(flex);
