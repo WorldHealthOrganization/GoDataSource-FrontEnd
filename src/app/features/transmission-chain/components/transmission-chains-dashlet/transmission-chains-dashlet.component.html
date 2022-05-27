@@ -14,11 +14,11 @@
   <!-- Load snapshot -->
   <div
     *ngIf="!showFilters"
-    fxLayout="row" fxLayoutGap="1.6rem">
+    class="chains-of-transmission-top-bar"
+    fxLayout="row" fxLayoutAlign="none start" fxLayoutGap="1.6rem">
     <!-- Snapshots -->
     <app-form-select-single-v2
-      *ngIf="showSnapshots"
-      fxFlex
+      [disabled]="!showSnapshots"
       name="snapshotsList"
       [(ngModel)]="selectedSnapshot"
       [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOTS' | translate"
@@ -29,7 +29,6 @@
 
     <!-- dropdown with view types -->
     <app-form-select-single-v2
-      fxFlex
       name="chainView"
       [(ngModel)]="transmissionChainViewType"
       [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_CHART' | translate"
@@ -41,8 +40,7 @@
 
     <!-- Page size -->
     <app-form-number-v2
-      *ngIf="showSnapshots"
-      fxFlex
+      [disabled]="!showSnapshots"
       name="pageSize"
       [(ngModel)]="pageSize"
       [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE_SIZE' | translate"
@@ -52,31 +50,16 @@
 
     <!-- Fast / Slow render -->
     <app-form-toggle-v2
-      *ngIf="transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value"
-      fxFlex
+      [disabled]="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value"
       name="chainColaRenderMethod"
       [(ngModel)]="renderMethod"
       [options]="renderMethodOptions"
       (ngModelChange)="mustLoadChain = true">
     </app-form-toggle-v2>
 
-    <!-- Apply filters -->
-    <button
-      *ngIf="mustLoadChain && selectedSnapshot && transmissionChainViewType && pageSize > 0 && snapshotOptionsMap[selectedSnapshot] && !snapshotOptionsMap[selectedSnapshot].option.disabled"
-      mat-raised-button
-      color="primary"
-      (click)="loadChainsOfTransmission()">
-      {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_LOAD_SNAPSHOT' | translate }}
-    </button>
-
-    <!-- Show snapshot -->
-    <ng-container
-      *ngIf="showSnapshots">
-
-      <!-- Pages -->
-      <app-form-select-vscroll
-        *ngIf="!mustLoadChain && chainGroupId && chainGroupId === selectedSnapshot && chainPages && chainPages.length > 0"
-        fxFlex
+    <!-- Pages -->
+    <app-form-select-vscroll
+        *ngIf="showSnapshots && !mustLoadChain && chainGroupId && chainGroupId === selectedSnapshot && chainPages && chainPages.length > 0; else showButton"
         name="chainPagesList"
         [(ngModel)]="selectedChainPageIndex"
         [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE' | translate"
@@ -86,15 +69,25 @@
         optionLabelKey="pageLabel"
         optionValueKey="pageIndex"
         (ngModelChange)="changedPage()">
-      </app-form-select-vscroll>
+    </app-form-select-vscroll>
 
-      <!-- Nothing to display ? -->
-      <div
-        *ngIf="!mustLoadChain && chainGroupId && chainGroupId === selectedSnapshot && chainPages && chainPages.length < 1"
-        fxFlex>
-        {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NOTHING_TO_DISPLAY' | translate }}
-      </div>
-    </ng-container>
+    <!-- Apply filters -->
+    <ng-template
+        #showButton>
+        <button
+            [disabled]="!(mustLoadChain && selectedSnapshot && transmissionChainViewType && pageSize > 0 && snapshotOptionsMap[selectedSnapshot] && !snapshotOptionsMap[selectedSnapshot].option.disabled)"
+            mat-flat-button
+            color="primary"
+            (click)="loadChainsOfTransmission()">
+            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_LOAD_SNAPSHOT' | translate }}
+        </button>
+    </ng-template>
+  </div>
+
+  <!-- Nothing to display ? -->
+  <div
+    *ngIf="showSnapshots && !mustLoadChain && chainGroupId && chainGroupId === selectedSnapshot && chainPages && chainPages.length < 1">
+    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NOTHING_TO_DISPLAY' | translate }}
   </div>
 
   <!-- Graph -->
@@ -280,7 +273,7 @@
           <!-- Toggles -->
           <div
               *ngIf="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0"
-              class="graph-actions {{ fullScreen ? 'graph-actions-full-screen' : '' }} {{ transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value ? 'graph-actions-geo-map' : '' }}" fxLayout="row" fxLayoutGap="30px">
+              class="graph-actions {{ fullScreen ? 'graph-actions-full-screen' : '' }} {{ transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value ? 'graph-actions-geo-map' : '' }}" fxLayout="row" fxLayoutGap="1.6rem">
 
               <!-- Toggle Edit mode -->
               <app-form-toggle-checkbox-v2
@@ -316,6 +309,7 @@
           </div>
 
           <div
+            class="graph-inner-container"
               [fxShow]="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value">
               <!-- zoom in / out buttons -->
               <div
@@ -346,6 +340,7 @@
 
           <!-- Geospatial map -->
           <div
+              class="geospatial-map-container"
               *ngIf="transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value">
               <!-- Geospatial map -->
               <app-world-map
@@ -376,42 +371,46 @@
           </div>
       </div>
 
-      <div *ngIf="showCaseNodesWithoutDates()"
-           class="entities-no-dates">
-          <a target="_blank"
-             routerLink="/cases"
-             [queryParams]="{applyListFilter: getCasesListFilter(), caseIds: graphElements.caseNodesWithoutDates}">
-              {{graphElements.caseNodesWithoutDates.length}}
-              {{ getCasesWithoutDatesTitle() | translate}}
-          </a>
+      <div
+        class="timeline-info-buttons"
+        fxLayout="row" fxLayoutAlign="none center" fxLayoutGap="1.6rem">
+        <button *ngIf="( transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+            || transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
+            || transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value)"
+            mat-flat-button
+            color="secondary"
+            [ngClass]="{'full-screen-bottomed-item': fullScreen}"
+            (click)="switchTimelineView(timelineViewType === 'horizontal' ? 'vertical' : 'horizontal')">
+            {{ ( timelineViewType === 'horizontal' ? 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_VERTICAL' : 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_HORIZONTAL' )| translate }}
+        </button>
+        <div *ngIf="showCaseNodesWithoutDates()"
+                class="entities-no-dates">
+            <a target="_blank"
+                routerLink="/cases"
+                [queryParams]="{applyListFilter: getCasesListFilter(), caseIds: graphElements.caseNodesWithoutDates}">
+                {{graphElements.caseNodesWithoutDates.length}}
+                {{ getCasesWithoutDatesTitle() | translate}}
+            </a>
+        </div>
+        <div *ngIf="showContactNodesWithoutDates()"
+                class="entities-no-dates">
+            <a target="_blank"
+                routerLink="/contacts"
+                [queryParams]="{applyListFilter: getContactsListFilter(), contactIds: graphElements.caseNodesWithoutDates}">
+                {{graphElements.contactNodesWithoutDates.length}}
+                {{ getContactsWithoutDatesTitle() | translate}}
+            </a>
+        </div>
+        <div *ngIf="showEventNodesWithoutDates()"
+                class="entities-no-dates">
+            <a target="_blank"
+                routerLink="/events"
+                [queryParams]="{applyListFilter: getEventsListFilter(), eventIds: graphElements.eventNodesWithoutDates}">
+                {{graphElements.eventNodesWithoutDates.length}}
+                {{ getEventsWithoutDatesTitle() | translate}}
+            </a>
+        </div>
       </div>
-      <div *ngIf="showContactNodesWithoutDates()"
-           class="entities-no-dates">
-          <a target="_blank"
-             routerLink="/contacts"
-             [queryParams]="{applyListFilter: getContactsListFilter(), contactIds: graphElements.caseNodesWithoutDates}">
-              {{graphElements.contactNodesWithoutDates.length}}
-              {{ getContactsWithoutDatesTitle() | translate}}
-          </a>
-      </div>
-      <div *ngIf="showEventNodesWithoutDates()"
-           class="entities-no-dates">
-          <a target="_blank"
-             routerLink="/events"
-             [queryParams]="{applyListFilter: getEventsListFilter(), eventIds: graphElements.eventNodesWithoutDates}">
-              {{graphElements.eventNodesWithoutDates.length}}
-              {{ getEventsWithoutDatesTitle() | translate}}
-          </a>
-      </div>
-
-      <button *ngIf="( transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
-          || transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
-          || transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value)"
-          mat-raised-button
-          [ngClass]="{'full-screen-bottomed-item': fullScreen}"
-          (click)="switchTimelineView(timelineViewType === 'horizontal' ? 'vertical' : 'horizontal')">
-          {{ ( timelineViewType === 'horizontal' ? 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_VERTICAL' : 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_HORIZONTAL' )| translate }}
-      </button>
   </div>
 
   <div *ngIf="sizeOfChainsFilter && !chainGroup &&

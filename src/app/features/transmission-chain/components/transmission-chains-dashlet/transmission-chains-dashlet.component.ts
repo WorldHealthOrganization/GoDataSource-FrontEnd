@@ -59,7 +59,7 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
   selector: 'app-transmission-chains-dashlet',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './transmission-chains-dashlet.component.html',
-  styleUrls: ['./transmission-chains-dashlet.component.less']
+  styleUrls: ['./transmission-chains-dashlet.component.scss']
 })
 export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   static wheelSensitivity: number = 0.3;

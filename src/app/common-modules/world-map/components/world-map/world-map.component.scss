@@ -12,7 +12,8 @@ app-world-map {
     width: 100%;
 
     &.full-screen-map {
-      height: 100vh;
+      height: 100vh; /* Fallback for browsers which cannot support Custom Properties */
+      height: calc(var(--vh, 1vh) * 100);
       left: 0;
       position: fixed;
       top: 0;
