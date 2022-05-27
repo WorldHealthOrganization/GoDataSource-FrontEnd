@@ -36,7 +36,7 @@ import { AppBasicPageV2Component } from '../../../../shared/components-v2/app-ba
   selector: 'app-contact-range-follow-ups-list',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './contact-range-follow-ups-list.component.html',
-  styleUrls: ['./contact-range-follow-ups-list.component.less']
+  styleUrls: ['./contact-range-follow-ups-list.component.scss']
 })
 export class ContactRangeFollowUpsListComponent
   // #TODO - remove list component paginator ?

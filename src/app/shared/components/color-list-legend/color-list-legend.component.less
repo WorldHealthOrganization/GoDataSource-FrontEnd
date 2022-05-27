@@ -1,5 +1,15 @@
 app-color-list-legend {
     .colors-legend-container {
+        @media only screen and (max-width: 599px) {
+            flex-direction: column !important;
+        }
+
+        > div {
+            @media only screen and (max-width: 599px) {
+                flex-wrap: wrap !important;
+            }
+        }
+
         .color-legend-title {
             margin-left: 20px;
             font-weight: bold;
@@ -7,7 +17,7 @@ app-color-list-legend {
         }
 
         .color-container{
-            margin: 0 20px;
+            margin: 0 0.8rem;
             display: flex;
         }
 
