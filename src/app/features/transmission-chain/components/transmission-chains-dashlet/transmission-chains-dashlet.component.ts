@@ -44,7 +44,13 @@ import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputText, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import {
+  IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigInputText,
+  IV2SideDialogConfigInputToggleCheckbox,
+  V2SideDialogConfigInputType
+} from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 
 @Component({
   selector: 'app-transmission-chains-dashlet',
@@ -498,7 +504,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     private i18nService: I18nService,
     private locationDataService: LocationDataService,
     private clusterDataService: ClusterDataService,
-    protected route: ActivatedRoute,
+    protected activatedRoute: ActivatedRoute,
     private authDataService: AuthDataService
   ) {}
 
@@ -574,7 +580,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       });
 
     // check if we have global filters set
-    this.route.queryParams.subscribe((queryParams: any) => {
+    this.activatedRoute.queryParams.subscribe((queryParams: any) => {
       // do we need to decode global filters ?
       const global: {
         date?: Moment,
@@ -725,7 +731,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     this.quickActions = {
       type: V2ActionType.MENU,
       label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
-      // visible: () => CaseModel.canExportMovementMap(this._authUser),
       menuOptions: [
         // Export map
         {
@@ -734,10 +739,120 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           },
           action: {
             click: () => {
-              // #TODO
+              this.dialogV2Service
+                .showSideDialog({
+                  title: {
+                    get: () => 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_SETTINGS'
+                  },
+                  hideInputFilter: true,
+                  width: '50rem',
+                  inputs: [
+                    {
+                      type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+                      name: 'showEvents',
+                      placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_EVENTS_LABEL',
+                      value: this.filters.showEvents
+                    }, {
+                      type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+                      name: 'showContacts',
+                      placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_LABEL',
+                      value: this.filters.showContacts,
+                      change: (data) => {
+                        // nothing to do ?
+                        const checked = (data.map.showContacts as IV2SideDialogConfigInputToggleCheckbox).value;
+                        if (!checked) {
+                          (data.map.includeContactsOfContacts as IV2SideDialogConfigInputToggleCheckbox).value = false;
+                        }
+                      }
+                    }, {
+                      type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+                      name: 'includeContactsOfContacts',
+                      placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_OF_CONTACTS',
+                      value: this.filters.includeContactsOfContacts,
+                      disabled: (data) => {
+                        return !(data.map.showContacts as IV2SideDialogConfigInputToggleCheckbox).value;
+                      }
+                    }, {
+                      type: V2SideDialogConfigInputType.DATE,
+                      name: 'dateGlobalFilter',
+                      placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DATE',
+                      tooltip: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DESCRIPTION',
+                      value: this.dateGlobalFilter
+                    }, {
+                      type: V2SideDialogConfigInputType.DIVIDER,
+                      placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTERS_TITLE'
+                    }, {
+                      type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
+                      name: 'classificationId',
+                      placeholder: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+                      options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                      values: this.filters.classificationId
+                    }, {
+                      type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
+                      name: 'occupation',
+                      placeholder: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
+                      options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                      values: this.filters.occupation
+                    }, {
+                      type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
+                      name: 'outcomeId',
+                      placeholder: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+                      options: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                      values: this.filters.outcomeId
+                    }, {
+                      type: V2SideDialogConfigInputType.TEXT,
+                      name: 'firstName',
+                      placeholder: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
+                      value: this.filters.firstName
+                    }, {
+                      type: V2SideDialogConfigInputType.TEXT,
+                      name: 'lastName',
+                      placeholder: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
+                      value: this.filters.lastName
+                    }, {
+                      type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
+                      name: 'gender',
+                      placeholder: 'LNG_CASE_FIELD_LABEL_GENDER',
+                      options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                      values: this.filters.gender
+                    }, {
+                      type: V2SideDialogConfigInputType.LOCATION_MULTIPLE,
+                      name: 'locationIds',
+                      placeholder: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
+                      useOutbreakLocations: true,
+                      values: this.filters.locationIds
+                    }, {
+                      type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
+                      name: 'clusterIds',
+                      placeholder: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+                      options: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ClusterModel>).options,
+                      values: this.filters.clusterIds
+                    }
+                  ],
+                  bottomButtons: [{
+                    type: IV2SideDialogConfigButtonType.OTHER,
+                    label: 'LNG_COMMON_BUTTON_CREATE',
+                    color: 'primary'
+                  }, {
+                    type: IV2SideDialogConfigButtonType.CANCEL,
+                    label: 'LNG_COMMON_BUTTON_CANCEL',
+                    color: 'text'
+                  }]
+                })
+                .subscribe((response) => {
+                  // cancelled ?
+                  if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+                    // finished
+                    return;
+                  }
+
+                  // #TODO - create snapshot
+                });
             }
+          },
+          visible: () => {
+            return this.selectedOutbreak?.id === this.authUser?.activeOutbreakId;
           }
-          // visible: () => CaseModel.canExportMovementMap(this._authUser)
         }
       ]
     };

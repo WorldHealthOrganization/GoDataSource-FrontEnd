@@ -19,7 +19,7 @@ export class TransmissionChainFilters {
   outcomeId: string[];
   firstName: string;
   lastName: string;
-  gender: string;
+  gender: string[];
   locationIds: string[];
   clusterIds: string[];
   age: AgeModel;
@@ -39,7 +39,7 @@ export class TransmissionChainFilters {
     outcomeId?: string[],
     firstName?: string,
     lastName?: string,
-    gender?: string,
+    gender?: string[],
     locationIds?: string[],
     clusterIds?: string[],
     age?: AgeModel,

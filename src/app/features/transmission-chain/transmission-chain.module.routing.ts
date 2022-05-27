@@ -5,6 +5,11 @@ import { PERMISSION } from '../../core/models/permission.model';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PermissionExpression } from '../../core/models/user.model';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
+import { ClassificationDataResolver } from '../../core/services/resolvers/data/classification.resolver';
+import { OccupationDataResolver } from '../../core/services/resolvers/data/occupation.resolver';
+import { OutcomeDataResolver } from '../../core/services/resolvers/data/outcome.resolver';
+import { GenderDataResolver } from '../../core/services/resolvers/data/gender.resolver';
+import { ClusterDataResolver } from '../../core/services/resolvers/data/cluster.resolver';
 
 const routes: Routes = [
   // Transmission Chains Graph
@@ -23,6 +28,13 @@ const routes: Routes = [
           PERMISSION.COT_VIEW_TIMELINE_NETWORK_DATE_OF_REPORTING
         ]
       })
+    },
+    resolve: {
+      classification: ClassificationDataResolver,
+      occupation: OccupationDataResolver,
+      outcome: OutcomeDataResolver,
+      gender: GenderDataResolver,
+      cluster: ClusterDataResolver
     }
   },
   // Transmission Chains List

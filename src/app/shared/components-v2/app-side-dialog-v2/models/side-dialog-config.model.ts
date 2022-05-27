@@ -31,6 +31,7 @@ export enum V2SideDialogConfigInputType {
   DROPDOWN_SINGLE,
   DROPDOWN_MULTI,
   LOCATION_SINGLE,
+  LOCATION_MULTIPLE,
   TOGGLE,
   TOGGLE_CHECKBOX,
   LINK,
@@ -244,6 +245,20 @@ export interface IV2SideDialogConfigInputSingleLocation extends IV2SideDialogCon
 }
 
 /**
+ * Side dialog input - location multiple
+ */
+export interface IV2SideDialogConfigInputMultipleLocation extends IV2SideDialogConfigInput {
+  // required
+  type: V2SideDialogConfigInputType.LOCATION_MULTIPLE;
+  placeholder: string;
+  values: string[];
+  useOutbreakLocations: boolean;
+
+  // optional
+  validators?: IV2SideDialogConfigInputValidator;
+}
+
+/**
  * Side dialog input - toggle
  */
 export interface IV2SideDialogConfigInputToggle extends IV2SideDialogConfigInput {
@@ -428,7 +443,8 @@ export interface IV2SideDialogConfigInputFilterList extends IV2SideDialogConfigI
  */
 export type V2SideDialogConfigInputFromInput = IV2SideDialogConfigInputCheckbox | IV2SideDialogConfigInputText | IV2SideDialogConfigInputTextarea
 | IV2SideDialogConfigInputTimepicker | IV2SideDialogConfigInputDate | IV2SideDialogConfigInputSingleDropdown | IV2SideDialogConfigInputMultiDropdown
-| IV2SideDialogConfigInputSingleLocation | IV2SideDialogConfigInputToggle | IV2SideDialogConfigInputToggleCheckbox | IV2SideDialogConfigInputNumber;
+| IV2SideDialogConfigInputSingleLocation | IV2SideDialogConfigInputMultipleLocation | IV2SideDialogConfigInputToggle | IV2SideDialogConfigInputToggleCheckbox
+| IV2SideDialogConfigInputNumber;
 export type V2SideDialogConfigInput = IV2SideDialogConfigInputDivider | IV2SideDialogConfigInputKeyValue | IV2SideDialogConfigInputHTML
 | V2SideDialogConfigInputFromInput | IV2SideDialogConfigInputLink | IV2SideDialogConfigInputLinkWithAction | IV2SideDialogConfigInputGroup
 | IV2SideDialogConfigInputButton | IV2SideDialogConfigInputRow | IV2SideDialogConfigInputAccordion | IV2SideDialogConfigInputFilterList;

@@ -210,6 +210,19 @@
               (selectedLocationChanged)="input.locationChanged ? input.locationChanged($event) : undefined">
             </app-form-select-location-single-v2>
 
+            <!-- Location - multiple -->
+            <app-form-select-location-multiple-v2
+              *ngSwitchCase="V2SideDialogConfigInputType.LOCATION_MULTIPLE"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
+              [(ngModel)]="input.value"
+              [name]="input.name"
+              [placeholder]="input.placeholder"
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
+              [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
+              [useOutbreakLocations]="input.useOutbreakLocations"
+              (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined">
+            </app-form-select-location-multiple-v2>
+
             <!-- Toggle -->
             <app-form-toggle-v2
               *ngSwitchCase="V2SideDialogConfigInputType.TOGGLE"

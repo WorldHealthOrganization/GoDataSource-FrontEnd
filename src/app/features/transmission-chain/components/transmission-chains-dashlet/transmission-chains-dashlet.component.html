@@ -16,14 +16,6 @@
             (click)="showSnapshotFiltersConf()">
             {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_SNAPSHOT_FILTERS' | translate }}
         </button>
-
-        <!-- Generate new graph -->
-        <button
-            *ngIf="!showFilters && selectedOutbreak?.id === authUser?.activeOutbreakId  && showSnapshots"
-            mat-raised-button
-            (click)="showFiltersHideGraphConf()">
-            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_SETTINGS' | translate }}
-        </button>
     </div>
 
     <!-- Generate new graph -->
@@ -31,57 +23,6 @@
         *ngIf="showFilters && selectedOutbreak?.id === authUser?.activeOutbreakId"
         fxLayout="column"
         class="settings-container">
-
-        <div
-            fxLayout="row" fxLayoutAlign="space-between end">
-            <div
-                fxLayout="row" fxLayoutGap="10px">
-                <!-- entity type filter - events -->
-                <app-form-checkbox
-                    fxFlex="150px"
-                    name="showEvents"
-                    [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_EVENTS_LABEL' | translate"
-                    [(ngModel)]="filters.showEvents">
-                </app-form-checkbox>
-
-                <!-- entity type filter - contacts -->
-                <app-form-checkbox
-                    fxFlex="150px"
-                    name="showContacts"
-                    [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_LABEL' | translate"
-                    [(ngModel)]="filters.showContacts"
-                    (optionChanged)="updateShowContactsOfContactValue($event)">
-                </app-form-checkbox>
-
-                <!-- This checkbox is valid only if 'showContacts' is already enabled -->
-                <app-form-checkbox
-                    name="includeContactsOfContacts"
-                    [disabled]="!filters.showContacts"
-                    [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_OF_CONTACTS' | translate"
-                    [(ngModel)]="filters.includeContactsOfContacts"
-                    fxFlex="150px">
-                </app-form-checkbox>
-            </div>
-
-            <!-- Date - moment in time -->
-            <div
-                fxFlex="150px">
-                <app-form-datepicker
-                    class="global-date-filter"
-                    [(ngModel)]="dateGlobalFilter"
-                    [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DATE' | translate"
-                    [tooltip]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DESCRIPTION' | translate">
-                </app-form-datepicker>
-            </div>
-        </div>
-
-        <!-- Filters -->
-        <app-transmission-chain-filters
-            fxFlex
-            titleName="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTERS_TITLE"
-            [filters]="filters"
-            [clusterOptions]="clusterOptions">
-        </app-transmission-chain-filters>
 
         <div fxLayout="row" fxFlexAlign="end" fxLayoutGap="10px">
             <!-- Cancel -->
