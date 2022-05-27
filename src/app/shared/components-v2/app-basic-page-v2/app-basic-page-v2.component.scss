@@ -55,5 +55,10 @@ app-basic-page-v2 {
       min-height: 52rem;
       overflow: hidden;
     }
+
+    app-view-movement-case &,
+    app-case-count-map & {
+      padding: 0;
+    }
   }
 }

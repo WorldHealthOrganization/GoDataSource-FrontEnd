@@ -35,7 +35,7 @@
   <div fxLayout="row" fxLayoutAlign="space-between center">
     <!-- settings toggle -->
     <button
-      mat-raised-button
+      mat-flat-button
       (click)="showSettings = !showSettings">
       {{ 'LNG_PAGE_CASE_COUNT_MAP_BUTTON_CONFIGURE_SETTINGS' | translate }}
     </button>
@@ -56,17 +56,16 @@
     <div fxLayout="row" fxFlexAlign="end" fxLayoutGap="10px">
       <!-- Reset filters -->
       <button
-        fxFlex="150px"
-        mat-raised-button
+        mat-flat-button
+        color="secondary"
         (click)="resetFilters()">
         {{ 'LNG_PAGE_CASE_COUNT_MAP_BUTTON_RESET_FILTERS' | translate }}
       </button>
 
       <!-- Apply filters -->
       <button
-        fxFlex="150px"
-        mat-raised-button
-        color="accent"
+        mat-flat-button
+        color="primary"
         (click)="reloadCases()">
         {{ 'LNG_PAGE_CASE_COUNT_MAP_BUTTON_APPLY_SETTINGS' | translate }}
       </button>
@@ -77,36 +76,36 @@
 <app-basic-page-v2
   [breadcrumbs]="breadcrumbs"
   pageTitle="LNG_PAGE_CASE_COUNT_TITLE">
-    <div fxLayout="row" fxLayoutGap="20px">
-        <div fxFlex="200px">
-            {{ 'LNG_PAGE_CASE_COUNT_MAP_DISTANCE_LABEL' | translate }} ( {{ clusterDistance }} )
-        </div>
-        <mat-slider
-            fxFlex
-            [min]="10"
-            [max]="150"
-            [(ngModel)]="clusterDistance"
-            [tickInterval]="10">
-        </mat-slider>
+  <div
+    class="gd-case-count-map-distance"
+    fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="none center" fxLayoutAlign.lt-md="none start" fxLayoutGap="1.6rem" fxLayoutGap.lt-md="0.8rem">
+    <div>
+      {{ 'LNG_PAGE_CASE_COUNT_MAP_DISTANCE_LABEL' | translate }} ( {{ clusterDistance }} )
     </div>
+    <mat-slider
+      color="primary"
+      [min]="10"
+      [max]="150"
+      [(ngModel)]="clusterDistance"
+      [tickInterval]="10">
+    </mat-slider>
+  </div>
 
-    <!-- Count map -->
-    <app-world-map
-        *ngIf="firstLoaded && (displayLoading || markers.length > 0)"
-        #worldMap
-        width="100%"
-        height="500px"
-        [markers]="markers"
-        [fitMapOnMarkersChange]="false"
-        [centerLocation]="markers[0]?.point"
-        [displayLoading]="displayLoading"
-        [fitLayer]="WorldMapMarkerLayer.CLUSTER"
-        [clusterDistance]="clusterDistance">
-    </app-world-map>
+  <!-- Count map -->
+  <app-world-map
+    *ngIf="firstLoaded && (displayLoading || markers.length > 0)"
+    #worldMap
+    [markers]="markers"
+    [fitMapOnMarkersChange]="false"
+    [centerLocation]="markers[0]?.point"
+    [displayLoading]="displayLoading"
+    [fitLayer]="WorldMapMarkerLayer.CLUSTER"
+    [clusterDistance]="clusterDistance">
+  </app-world-map>
 
-    <!-- No data -->
-    <div
-        *ngIf="firstLoaded && !displayLoading && markers.length < 1">
-        {{ 'LNG_PAGE_CASE_COUNT_MAP_NO_DATA' | translate }}
-    </div>
+  <!-- No data -->
+  <div
+    *ngIf="firstLoaded && !displayLoading && markers.length < 1">
+    {{ 'LNG_PAGE_CASE_COUNT_MAP_NO_DATA' | translate }}
+  </div>
 </app-basic-page-v2>
