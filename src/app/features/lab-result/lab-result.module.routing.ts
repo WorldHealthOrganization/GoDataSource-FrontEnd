@@ -1,6 +1,5 @@
 import { ModuleWithProviders } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
+import { Route, RouterModule, Routes } from '@angular/router';
 import { EntityType } from '../../core/models/entity-type';
 import { PERMISSION } from '../../core/models/permission.model';
 import { PermissionExpression } from '../../core/models/user.model';
@@ -21,6 +20,28 @@ import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.res
 import * as fromPages from './pages';
 import { LabPersonTypeDataResolver } from '../../core/services/resolvers/data/lab-person-type.resolver';
 import { GanttChartTypeDataResolver } from '../../core/services/resolvers/data/gantt-chart-type.resolver';
+import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
+import { SelectedOutbreakDataResolver } from '../../core/services/resolvers/data/selected-outbreak.resolver';
+
+// common base - create / view / modify
+const createViewModifyFoundation: Route = {
+  component: fromPages.LabResultsCreateViewModifyComponent,
+  canActivate: [AuthGuard],
+  resolve: {
+    yesNoAll: YesNoAllDataResolver,
+    labName: LabNameDataResolver,
+    labSampleType: LabSampleTypeDataResolver,
+    labTestType: LabTestTypeDataResolver,
+    labTestResult: LabTestResultDataResolver,
+    labResultProgress: LabProgressDataResolver,
+    labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
+    labSequenceResult: LabSequenceResultDataResolver,
+    user: UserDataResolver,
+    yesNo: YesNoDataResolver,
+    entityData: PersonDataResolver,
+    outbreak: SelectedOutbreakDataResolver
+  }
+};
 
 // common base - cases lab results / contacts lab results
 const entityLabResultsFoundation = {
@@ -105,13 +126,13 @@ const routes: Routes = [
   // Create Case Lab Result
   {
     path: 'cases/:caseId/create',
-    component: fromPages.CreateLabResultComponent,
-    canActivate: [AuthGuard],
+    ...createViewModifyFoundation,
     data: {
       permissions: [
         PERMISSION.CASE_CREATE_LAB_RESULT
       ],
-      personType: EntityType.CASE
+      personType: EntityType.CASE,
+      action: CreateViewModifyV2Action.CREATE
     },
     canDeactivate: [
       PageChangeConfirmationGuard
@@ -120,27 +141,25 @@ const routes: Routes = [
   // View Case Lab Result
   {
     path: 'cases/:caseId/:labResultId/view',
-    component: fromPages.ModifyLabResultComponent,
-    canActivate: [AuthGuard],
+    ...createViewModifyFoundation,
     data: {
       permissions: [
         PERMISSION.CASE_VIEW_LAB_RESULT
       ],
       personType: EntityType.CASE,
-      action: ViewModifyComponentAction.VIEW
+      action: CreateViewModifyV2Action.VIEW
     }
   },
   // Modify Case Lab Result
   {
     path: 'cases/:caseId/:labResultId/modify',
-    component: fromPages.ModifyLabResultComponent,
-    canActivate: [AuthGuard],
+    ...createViewModifyFoundation,
     data: {
       permissions: [
         PERMISSION.CASE_MODIFY_LAB_RESULT
       ],
       personType: EntityType.CASE,
-      action: ViewModifyComponentAction.MODIFY
+      action: CreateViewModifyV2Action.MODIFY
     },
     canDeactivate: [
       PageChangeConfirmationGuard
@@ -161,13 +180,13 @@ const routes: Routes = [
   // Create Contact Lab Result
   {
     path: 'contacts/:contactId/create',
-    component: fromPages.CreateLabResultComponent,
-    canActivate: [AuthGuard],
+    ...createViewModifyFoundation,
     data: {
       permissions: [
         PERMISSION.CONTACT_CREATE_LAB_RESULT
       ],
-      personType: EntityType.CONTACT
+      personType: EntityType.CONTACT,
+      action: CreateViewModifyV2Action.CREATE
     },
     canDeactivate: [
       PageChangeConfirmationGuard
@@ -176,27 +195,25 @@ const routes: Routes = [
   // View Contact Lab Result
   {
     path: 'contacts/:contactId/:labResultId/view',
-    component: fromPages.ModifyLabResultComponent,
-    canActivate: [AuthGuard],
+    ...createViewModifyFoundation,
     data: {
       permissions: [
         PERMISSION.CONTACT_VIEW_LAB_RESULT
       ],
       personType: EntityType.CONTACT,
-      action: ViewModifyComponentAction.VIEW
+      action: CreateViewModifyV2Action.VIEW
     }
   },
   // Modify Contact Lab Result
   {
     path: 'contacts/:contactId/:labResultId/modify',
-    component: fromPages.ModifyLabResultComponent,
-    canActivate: [AuthGuard],
+    ...createViewModifyFoundation,
     data: {
       permissions: [
         PERMISSION.CONTACT_MODIFY_LAB_RESULT
       ],
       personType: EntityType.CONTACT,
-      action: ViewModifyComponentAction.MODIFY
+      action: CreateViewModifyV2Action.MODIFY
     },
     canDeactivate: [
       PageChangeConfirmationGuard
@@ -205,25 +222,23 @@ const routes: Routes = [
   // Modify Questionnaire
   {
     path: ':labResultId/view-questionnaire',
-    component: fromPages.ModifyQuestionnaireLabResultComponent,
-    canActivate: [AuthGuard],
+    ...createViewModifyFoundation,
     data: {
       permissions: [
         PERMISSION.LAB_RESULT_VIEW
       ],
-      action: ViewModifyComponentAction.VIEW
+      action: CreateViewModifyV2Action.VIEW
     }
   },
   // Modify Questionnaire
   {
     path: ':labResultId/modify-questionnaire',
-    component: fromPages.ModifyQuestionnaireLabResultComponent,
-    canActivate: [AuthGuard],
+    ...createViewModifyFoundation,
     data: {
       permissions: [
         PERMISSION.LAB_RESULT_MODIFY
       ],
-      action: ViewModifyComponentAction.MODIFY
+      action: CreateViewModifyV2Action.MODIFY
     },
     canDeactivate: [
       PageChangeConfirmationGuard

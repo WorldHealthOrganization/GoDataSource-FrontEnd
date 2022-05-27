@@ -1,11 +1,12 @@
 import * as _ from 'lodash';
+import { Moment } from '../helperClasses/x-moment';
 
 export class LabResultSequenceModel {
   hasSequence: boolean;
   noSequenceReason: string;
-  dateSampleSent: string;
+  dateSampleSent: string | Moment;
   labId: string;
-  dateResult: string;
+  dateResult: string | Moment;
   resultId: string;
 
   /**
