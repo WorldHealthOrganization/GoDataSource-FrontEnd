@@ -105,7 +105,8 @@
 
   <!-- No data -->
   <div
-    *ngIf="firstLoaded && !displayLoading && markers.length < 1">
+    *ngIf="firstLoaded && !displayLoading && markers.length < 1"
+    class="gd-case-count-map-no-data">
     {{ 'LNG_PAGE_CASE_COUNT_MAP_NO_DATA' | translate }}
   </div>
 </app-basic-page-v2>

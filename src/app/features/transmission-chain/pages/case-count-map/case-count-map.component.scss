@@ -16,4 +16,10 @@ app-case-count-map {
       height: calc(100% - 10.9rem);
     }
   }
+
+  .gd-case-count-map-no-data {
+    color: var(--gd-secondary);
+    font-style: italic;
+    text-align: center;
+  }
 }
