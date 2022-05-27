@@ -53,7 +53,6 @@
   /* Epi Curve Outcome Dashlet - Expanded */
   &.gd-dashlet-epi-curve-outcome-expanded {
     height: 100%;
-    overflow-x: auto;
 
     .gd-dashlet-epi-curve-outcome-top {
       .gd-dashlet-epi-curve-outcome-top-actions {
@@ -63,6 +62,10 @@
           }
         }
       }
+    }
+
+    .gd-dashlet-epi-curve-outcome-bottom {
+      overflow-x: auto;
     }
   }
 
