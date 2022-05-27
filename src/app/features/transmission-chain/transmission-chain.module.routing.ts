@@ -15,6 +15,9 @@ import { CotNodeLabelDataResolver } from '../../core/services/resolvers/data/cot
 import { CotNodeColorDataResolver } from '../../core/services/resolvers/data/cot-node-color.resolver';
 import { CotNodeIconDataResolver } from '../../core/services/resolvers/data/cot-node-icon.resolver';
 import { CotNodeShapeDataResolver } from '../../core/services/resolvers/data/cot-node-shape.resolver';
+import { CotEdgeLabelDataResolver } from '../../core/services/resolvers/data/cot-edge-label.resolver';
+import { CotEdgeIconDataResolver } from '../../core/services/resolvers/data/cot-edge-icon.resolver';
+import { CotEdgeColorDataResolver } from '../../core/services/resolvers/data/cot-edge-color.resolver';
 
 const routes: Routes = [
   // Transmission Chains Graph
@@ -44,7 +47,10 @@ const routes: Routes = [
       cotNodeLabel: CotNodeLabelDataResolver,
       cotNodeColor: CotNodeColorDataResolver,
       cotNodeIcon: CotNodeIconDataResolver,
-      cotNodeShape: CotNodeShapeDataResolver
+      cotNodeShape: CotNodeShapeDataResolver,
+      cotEdgeLabel: CotEdgeLabelDataResolver,
+      cotEdgeIcon: CotEdgeIconDataResolver,
+      cotEdgeColor: CotEdgeColorDataResolver
     }
   },
   // Transmission Chains List

@@ -7,7 +7,7 @@ import { GraphNodeModel } from '../../../../core/models/graph-node.model';
 import { Constants } from '../../../../core/models/constants';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { forkJoin, Observable, Subscription, throwError } from 'rxjs';
+import { forkJoin, Subscription, throwError } from 'rxjs';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
@@ -45,7 +45,7 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IV2ActionIconLabel, IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import {
-  IV2SideDialogConfigButtonType, IV2SideDialogConfigInputDate, IV2SideDialogConfigInputDateRange, IV2SideDialogConfigInputMultiDropdown, IV2SideDialogConfigInputMultipleLocation, IV2SideDialogConfigInputNumberRange,
+  IV2SideDialogConfigButtonType, IV2SideDialogConfigInputDate, IV2SideDialogConfigInputDateRange, IV2SideDialogConfigInputMultiDropdown, IV2SideDialogConfigInputMultipleLocation, IV2SideDialogConfigInputNumberRange, IV2SideDialogConfigInputSingleDropdown,
   IV2SideDialogConfigInputText,
   IV2SideDialogConfigInputToggleCheckbox,
   V2SideDialogConfigInputType
@@ -121,10 +121,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   } = {};
   personName: string = '';
   dateGlobalFilter: string = moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-
-  edgeColorCriteriaOptions$: Observable<any[]>;
-  edgeLabelCriteriaOptions$: Observable<any[]>;
-  edgeIconCriteriaOptions$: Observable<any[]>;
 
   // reference data categories needed for filters
   referenceDataCategories: any = [
@@ -539,11 +535,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     this.filters.includeContactsOfContacts = true;
     this.filters.showEvents = true;
 
-    // color criteria
-    this.edgeColorCriteriaOptions$ = this.genericDataService.getTransmissionChainEdgeColorCriteriaOptions();
-    this.edgeLabelCriteriaOptions$ = this.genericDataService.getTransmissionChainEdgeLabelCriteriaOptions();
-    this.edgeIconCriteriaOptions$ = this.genericDataService.getTransmissionChainEdgeIconCriteriaOptions();
-
     // load view types
     this.genericDataService
       .getTransmissionChainViewTypes()
@@ -869,6 +860,37 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SHAPE_TITLE',
                 options: (this.activatedRoute.snapshot.data.cotNodeShape as IResolverV2ResponseModel<ILabelValuePairModel>).options,
                 value: this.colorCriteria.nodeShapeCriteria
+              }, {
+                type: V2SideDialogConfigInputType.DIVIDER,
+                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_SETTINGS_TITLE'
+              }, {
+                type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+                name: 'edgeLabelCriteria',
+                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_LABEL_TITLE',
+                options: (this.activatedRoute.snapshot.data.cotEdgeLabel as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+                value: this.colorCriteria.edgeLabelCriteria,
+                change: (data) => {
+                  if ((data.map.edgeLabelCriteria as IV2SideDialogConfigInputSingleDropdown).value !== Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value) {
+                    (data.map.edgeIconCriteria as IV2SideDialogConfigInputSingleDropdown).value = Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.NONE.value;
+                  }
+                }
+              }, {
+                type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+                name: 'edgeIconCriteria',
+                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_ICON_TITLE',
+                options: (this.activatedRoute.snapshot.data.cotEdgeIcon as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+                value: this.colorCriteria.edgeIconCriteria,
+                change: (data) => {
+                  if ((data.map.edgeIconCriteria as IV2SideDialogConfigInputSingleDropdown).value !== Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.NONE.value) {
+                    (data.map.edgeLabelCriteria as IV2SideDialogConfigInputSingleDropdown).value = Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value;
+                  }
+                }
+              }, {
+                type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+                name: 'edgeColorCriteria',
+                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE',
+                options: (this.activatedRoute.snapshot.data.cotEdgeColor as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+                value: this.colorCriteria.edgeColorCriteria
               }
             ],
             bottomButtons: [{
@@ -886,6 +908,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
               // finished
               return;
             }
+
+            // #TODO
           });
         }
       },
@@ -1594,19 +1618,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
     // finished
     return png64;
-  }
-
-  /**
-     * Only allow to show edge icon or edge label: switch between them
-     * @param field
-     * @param $event
-     */
-  changeEdgeLabelIconSelection(field, $event) {
-    if (field === 'label' && $event !== Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value) {
-      this.colorCriteria.edgeIconCriteria = Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.NONE.value;
-    } else if (field === 'icon' && $event !== Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.NONE.value) {
-      this.colorCriteria.edgeLabelCriteria = Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value;
-    }
   }
 
   /**

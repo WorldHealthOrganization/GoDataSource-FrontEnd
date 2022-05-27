@@ -123,6 +123,9 @@ import { CotNodeLabelDataResolver } from './resolvers/data/cot-node-label.resolv
 import { CotNodeColorDataResolver } from './resolvers/data/cot-node-color.resolver';
 import { CotNodeIconDataResolver } from './resolvers/data/cot-node-icon.resolver';
 import { CotNodeShapeDataResolver } from './resolvers/data/cot-node-shape.resolver';
+import { CotEdgeLabelDataResolver } from './resolvers/data/cot-edge-label.resolver';
+import { CotEdgeIconDataResolver } from './resolvers/data/cot-edge-icon.resolver';
+import { CotEdgeColorDataResolver } from './resolvers/data/cot-edge-color.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -135,6 +138,9 @@ export const services: any[] = [
   ClassificationDataResolver,
   ClusterDataResolver,
   ContextOfTransmissionDataResolver,
+  CotEdgeColorDataResolver,
+  CotEdgeIconDataResolver,
+  CotEdgeLabelDataResolver,
   CotNodeColorDataResolver,
   CotNodeIconDataResolver,
   CotNodeLabelDataResolver,
