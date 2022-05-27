@@ -42,7 +42,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { AuthenticatedComponent } from '../../../../core/components/authenticated/authenticated.component';
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2ActionIconLabel, IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import {
   IV2SideDialogConfigButtonType, IV2SideDialogConfigInputDate, IV2SideDialogConfigInputDateRange, IV2SideDialogConfigInputMultiDropdown, IV2SideDialogConfigInputMultipleLocation, IV2SideDialogConfigInputNumberRange,
@@ -491,9 +491,12 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   // advanced filters
   advancedFilters: V2AdvancedFilter[];
 
+  // action
+  actionButton: IV2ActionIconLabel;
+
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private outbreakDataService: OutbreakDataService,
     private transmissionChainDataService: TransmissionChainDataService,
@@ -776,6 +779,18 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           undefined;
       }
     }];
+
+    // action button
+    this.actionButton = {
+      type: V2ActionType.ICON_LABEL,
+      icon: '',
+      label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_GRAPH',
+      action: {
+        click: () => {
+          // #TODO
+        }
+      }
+    };
 
     // quick actions
     this.quickActions = {
