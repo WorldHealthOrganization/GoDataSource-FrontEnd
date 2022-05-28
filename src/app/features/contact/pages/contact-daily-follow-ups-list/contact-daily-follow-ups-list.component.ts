@@ -41,6 +41,7 @@ import {
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { FollowUpPage } from '../../typings/follow-up-page';
+import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 
 @Component({
   selector: 'app-daily-follow-ups-list',
@@ -105,6 +106,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     // get data
     this.caseData = this.activatedRoute.snapshot.data.entityData;
 
+    // disable outbreak change ?
+    if (this.caseData) {
+      TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = true;
+    }
+
     // update breadcrumbs
     this.initializeBreadcrumbs();
   }
@@ -115,6 +121,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
+
+    // enable select outbreak
+    TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = false;
   }
 
   /**
