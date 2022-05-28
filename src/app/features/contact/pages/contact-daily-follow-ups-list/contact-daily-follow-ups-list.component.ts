@@ -657,7 +657,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                           loading.close();
 
                           // reload data
-                          this.refreshList(true);
+                          this.needsRefreshList(true);
                         });
                     });
                   }
@@ -734,7 +734,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                           loading.close();
 
                           // reload data
-                          this.refreshList(true);
+                          this.needsRefreshList(true);
                         });
                     });
                   }
@@ -877,7 +877,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                             response.handler.hide();
 
                             // reload data
-                            this.refreshList(true);
+                            this.needsRefreshList(true);
                           });
                       });
                   }
@@ -966,7 +966,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                             response.handler.hide();
 
                             // reload data
-                            this.refreshList(true);
+                            this.needsRefreshList(true);
                           });
                       });
                   }
