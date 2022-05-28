@@ -22,7 +22,6 @@
       name="snapshotsList"
       [(ngModel)]="selectedSnapshot"
       [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOTS' | translate"
-      required="true"
       [options]="snapshotOptions"
       (ngModelChange)="mustLoadChain = true; showEvents = true; showContacts = false; showContactsOfContacts = false; showSnapshotFilters = false; snapshotFilters = {};">
     </app-form-select-single-v2>
@@ -32,7 +31,6 @@
       name="chainView"
       [(ngModel)]="transmissionChainViewType"
       [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_CHART' | translate"
-      required="true"
       [options]="transmissionChainViewTypes"
       [clearable]="false"
       (ngModelChange)="mustLoadChain = true">
@@ -44,7 +42,6 @@
       name="pageSize"
       [(ngModel)]="pageSize"
       [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE_SIZE' | translate"
-      required="true"
       (ngModelChange)="pageSizeChanged($event)">
     </app-form-number-v2>
 
@@ -58,18 +55,15 @@
     </app-form-toggle-v2>
 
     <!-- Pages -->
-    <app-form-select-vscroll
+    <app-form-select-single-v2
         *ngIf="showSnapshots && !mustLoadChain && chainGroupId && chainGroupId === selectedSnapshot && chainPages && chainPages.length > 0; else showButton"
         name="chainPagesList"
         [(ngModel)]="selectedChainPageIndex"
         [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE' | translate"
-        required="true"
-        [options]="chainPages"
+        [options]="chainPagesOptions"
         [clearable]="true"
-        optionLabelKey="pageLabel"
-        optionValueKey="pageIndex"
         (ngModelChange)="changedPage()">
-    </app-form-select-vscroll>
+    </app-form-select-single-v2>
 
     <!-- Apply filters -->
     <ng-template

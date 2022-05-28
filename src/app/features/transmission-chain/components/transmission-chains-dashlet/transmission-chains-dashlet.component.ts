@@ -94,6 +94,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   // chain pages
   chainPageSize: number;
   chainPages: ITransmissionChainGroupPageModel[];
+  chainPagesOptions: ILabelValuePairModel[];
   selectedChainPageIndex: number = null;
 
   // page size
@@ -645,6 +646,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
               this.selectedChainPageIndex = null;
               this.chainGroup = undefined;
               this.chainPages = undefined;
+              this.chainPagesOptions = undefined;
               this.showGraphConfiguration = false;
               this.showSnapshotFilters = false;
               this.mustLoadChain = true;
@@ -2906,6 +2908,13 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           this.pageSize,
           this.snapshotFilters
         );
+        this.chainPagesOptions = (this.chainPages || []).map((item) => {
+          return {
+            label: item.pageLabel,
+            value: item.pageIndex,
+            data: item
+          };
+        });
       }
 
       // reset the page number
@@ -2922,6 +2931,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     const loadingDialog = this.dialogV2Service.showLoadingDialog();
     this.chainGroup = undefined;
     this.chainPages = undefined;
+    this.chainPagesOptions = undefined;
     this.selectedChainPageIndex = null;
     this.chainGroupId = this.selectedSnapshot;
     this.transmissionChainDataService
@@ -2996,6 +3006,13 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             this.pageSize,
             this.snapshotFilters
           );
+          this.chainPagesOptions = (this.chainPages || []).map((item) => {
+            return {
+              label: item.pageLabel,
+              value: item.pageIndex,
+              data: item
+            };
+          });
 
           // preselect show contacts & show contact of contacts
           this.showContacts = this.snapshotOptionsMap[this.selectedSnapshot].snapshot.showContacts;
@@ -3043,6 +3060,13 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                 this.pageSize,
                 this.snapshotFilters
               );
+              this.chainPagesOptions = (this.chainPages || []).map((item) => {
+                return {
+                  label: item.pageLabel,
+                  value: item.pageIndex,
+                  data: item
+                };
+              });
 
               // preselect show contacts & show contact of contacts
               this.showContacts = this.snapshotOptionsMap[this.selectedSnapshot].snapshot.showContacts;
