@@ -540,13 +540,13 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         this.recordsSubscription = undefined;
 
         // set data & hide loading overlay
-        this._recordsData = data;
+        this._recordsData = data || [];
         this._processedSelectedResults = {};
         this._agTable.api.setRowData(this._recordsData);
 
         // map data
         this._recordsDataMap = {};
-        data.forEach((record) => {
+        this._recordsData.forEach((record) => {
           this._recordsDataMap[record[this.keyField]] = record;
         });
 
