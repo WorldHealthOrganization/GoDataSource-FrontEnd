@@ -12,6 +12,7 @@ import { IPermissionBasic, IPermissionExportable, IPermissionImportable, IPermis
 import { PERMISSION } from './permission.model';
 import { IAnswerData } from './question.model';
 import { UserModel } from './user.model';
+import { Moment } from '../helperClasses/x-moment';
 
 export class LabResultModel
   extends BaseModel
@@ -22,10 +23,10 @@ export class LabResultModel
         IPermissionExportable {
   id: string;
   sampleIdentifier: string;
-  dateSampleTaken: string;
-  dateSampleDelivered: string;
-  dateTesting: string;
-  dateOfResult: string;
+  dateSampleTaken: string | Moment;
+  dateSampleDelivered: string | Moment;
+  dateTesting: string | Moment;
+  dateOfResult: string | Moment;
   labName: string;
   sampleType: string;
   testType: string;
