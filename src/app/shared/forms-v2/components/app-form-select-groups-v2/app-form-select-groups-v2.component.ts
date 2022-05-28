@@ -40,6 +40,12 @@ export class AppFormSelectGroupsV2Component
   // float label
   @Input() neverFloatLabel: boolean = false;
 
+  // view only
+  @Input() viewOnly: boolean;
+
+  // no value string
+  @Input() noValueLabel: string = '—';
+
   // group keys
   @Input() groupLabelKey: string;
   @Input() groupValueKey: string;
