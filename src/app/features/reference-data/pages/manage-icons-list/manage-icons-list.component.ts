@@ -1,5 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
 import { throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
@@ -8,7 +8,6 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IconModel } from '../../../../core/models/icon.model';
 import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { IconDataService } from '../../../../core/services/data/icon.data.service';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
@@ -23,24 +22,22 @@ import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2
 })
 export class ManageIconsListComponent extends ListComponent<IconModel> implements OnDestroy {
   // Category Name
-  category: ReferenceDataCategoryModel;
+  private _category: ReferenceDataCategoryModel;
+
   /**
    * Constructor
    */
   constructor(
     protected listHelperService: ListHelperService,
     private activatedRoute: ActivatedRoute,
-    private referenceDataDataService: ReferenceDataDataService,
     private iconDataService: IconDataService,
     private toastV2Service: ToastV2Service,
     private dialogV2Service: DialogV2Service
   ) {
     super(listHelperService);
 
-    // retrieve Reference Data Category info
-    if (this.activatedRoute.snapshot.queryParams.categoryId) {
-      this.retrieveCategory(this.activatedRoute.snapshot.queryParams.categoryId);
-    }
+    // retrieve data
+    this._category = this.activatedRoute.snapshot.data.category;
   }
 
   /**
@@ -223,22 +220,6 @@ export class ManageIconsListComponent extends ListComponent<IconModel> implement
   protected initializeGroupedData(): void {}
 
   /**
-   * Retrieve category
-   * @param categoryId
-   */
-  retrieveCategory(categoryId: string) {
-    this.referenceDataDataService
-      .getReferenceDataByCategory(categoryId)
-      .subscribe((category: ReferenceDataCategoryModel) => {
-        // set category
-        this.category = category;
-
-        // update breadcrumbs
-        this.initializeBreadcrumbs();
-      });
-  }
-
-  /**
    * Initialize breadcrumbs
    */
   protected initializeBreadcrumbs(): void {
@@ -266,14 +247,13 @@ export class ManageIconsListComponent extends ListComponent<IconModel> implement
 
     // add category
     if (
-      this.category &&
-            ReferenceDataEntryModel.canList(this.authUser)
+      this._category &&
+      ReferenceDataEntryModel.canList(this.authUser)
     ) {
       this.breadcrumbs.push({
-        label: this.category.name,
+        label: this._category.name,
         action: {
-          link: [`/reference-data/${ this.category.id }`],
-          linkQueryParams: (): Params => ({ category: this.category })
+          link: [`/reference-data/${ this._category.id }`]
         }
       });
     }
@@ -302,6 +282,8 @@ export class ManageIconsListComponent extends ListComponent<IconModel> implement
     this.records$ = this.iconDataService
       .getIconsList(this.queryBuilder)
       .pipe(
+        // should be the last pipe
+        takeUntil(this.destroyed$)
       );
   }
 

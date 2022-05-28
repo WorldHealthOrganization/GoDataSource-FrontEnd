@@ -93,7 +93,8 @@ const routes: Routes = [
       ]
     },
     resolve: {
-      yesNoAll: YesNoAllDataResolver
+      yesNoAll: YesNoAllDataResolver,
+      category: ReferenceDataCategoryDataResolver
     }
   },
   // Manage Icons - Create

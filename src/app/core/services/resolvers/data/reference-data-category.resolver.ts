@@ -21,7 +21,8 @@ export class ReferenceDataCategoryDataResolver implements Resolve<ReferenceDataC
    */
   resolve(activatedRoute): Observable<ReferenceDataCategoryModel> {
     // retrieve categoryId
-    const categoryId: ReferenceDataCategory = activatedRoute.params.categoryId;
+    let categoryId: ReferenceDataCategory = activatedRoute.params.categoryId;
+    categoryId = categoryId || activatedRoute.queryParams.categoryId;
 
     // not found ?
     if (!categoryId) {
