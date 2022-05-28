@@ -148,9 +148,10 @@ export class PermissionExpression {
 }
 
 export class UserRoleModel
-implements
-        IPermissionBasic,
-        IPermissionCloneable {
+  extends BaseModel
+  implements
+    IPermissionBasic,
+    IPermissionCloneable {
   id: string | null;
   name: string | null;
   permissionIds: PERMISSION[];
@@ -234,6 +235,10 @@ implements
      * Constructor
      */
   constructor(data = null) {
+    // parent
+    super(data);
+
+    // data
     this.id = _.get(data, 'id');
     this.name = _.get(data, 'name');
     this.permissionIds = _.get(data, 'permissionIds', []);

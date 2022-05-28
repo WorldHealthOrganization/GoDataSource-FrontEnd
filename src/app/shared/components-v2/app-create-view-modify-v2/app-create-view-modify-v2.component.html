@@ -566,6 +566,33 @@
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-textarea-v2>
 
+                  <!-- Select groups -->
+                  <app-form-select-groups-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.SELECT_GROUPS"
+                    fxFlex
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [placeholder]="input.placeholder()"
+                    [groups]="input.groups"
+                    [groupLabelKey]="input.groupLabelKey"
+                    [groupValueKey]="input.groupValueKey"
+                    [groupOptionsKey]="input.groupOptionsKey"
+                    [groupOptionLabelKey]="input.groupOptionLabelKey"
+                    [groupOptionValueKey]="input.groupOptionValueKey"
+                    [groupNoneLabel]="input.groupNoneLabel"
+                    [groupPartialLabel]="input.groupPartialLabel"
+                    [groupAllLabel]="input.groupAllLabel"
+                    [groupTooltipKey]="input.groupTooltipKey"
+                    [groupOptionTooltipKey]="input.groupOptionTooltipKey"
+                    [groupNoneTooltip]="input.groupNoneTooltip"
+                    [groupPartialTooltip]="input.groupPartialTooltip"
+                    [groupAllTooltip]="input.groupAllTooltip"
+                    [groupOptionHiddenKey]="input.groupOptionHiddenKey"
+                    [defaultValues]="input.defaultValues"
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-select-groups-v2>
+
                   <!-- Number -->
                   <app-form-number-v2
                     *ngSwitchCase="CreateViewModifyV2TabInputType.NUMBER"

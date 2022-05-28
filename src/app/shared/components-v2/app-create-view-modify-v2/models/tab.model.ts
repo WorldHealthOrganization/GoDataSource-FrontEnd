@@ -35,6 +35,7 @@ export enum CreateViewModifyV2TabInputType {
   LOCATION_MULTIPLE,
   TEXTAREA,
   NUMBER,
+  SELECT_GROUPS,
 
   // input groups
   LIST,
@@ -249,6 +250,36 @@ interface ICreateViewModifyV2TabInputNumber extends Omit<ICreateViewModifyV2TabI
 }
 
 /**
+ * Input - select group
+ */
+interface ICreateViewModifyV2TabInputSelectGroups extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
+  // required
+  type: CreateViewModifyV2TabInputType.SELECT_GROUPS;
+  value: ICreateViewModifyV2TabInputValue<string[]>;
+  groups: any[];
+  groupLabelKey: string;
+  groupValueKey: string;
+  groupOptionsKey: string;
+  groupOptionLabelKey: string;
+  groupOptionValueKey: string;
+  groupNoneLabel: string;
+  groupPartialLabel: string;
+  groupAllLabel: string;
+  groupTooltipKey: string;
+  groupOptionTooltipKey: string;
+  groupNoneTooltip: string;
+  groupPartialTooltip: string;
+  groupAllTooltip: string;
+  groupOptionHiddenKey: string;
+  defaultValues: any[];
+
+  // optional
+  validators?: {
+    required?: () => boolean
+  };
+}
+
+/**
  * Input - age - date of birth
  */
 interface ICreateViewModifyV2TabInputAgeOrDOB extends Omit<ICreateViewModifyV2TabInputBase, 'name' | 'placeholder' | 'description' | 'value'> {
@@ -414,7 +445,7 @@ interface ICreateViewModifyV2TabLabel {
  */
 export type CreateViewModifyV2TabInput = ICreateViewModifyV2TabInputText | ICreateViewModifyV2TabInputEmail | ICreateViewModifyV2TabInputPassword | ICreateViewModifyV2TabInputSingleSelect
 | ICreateViewModifyV2TabInputMultipleSelect | ICreateViewModifyV2TabInputToggleCheckbox | ICreateViewModifyV2TabInputLocationSingle | ICreateViewModifyV2TabInputLocationMultiple
-| ICreateViewModifyV2TabInputTextArea | ICreateViewModifyV2TabInputNumber | ICreateViewModifyV2TabInputAgeOrDOB | ICreateViewModifyV2TabInputAsyncValidatorText
+| ICreateViewModifyV2TabInputTextArea | ICreateViewModifyV2TabInputNumber | ICreateViewModifyV2TabInputSelectGroups | ICreateViewModifyV2TabInputAgeOrDOB | ICreateViewModifyV2TabInputAsyncValidatorText
 | ICreateViewModifyV2TabInputDate | ICreateViewModifyV2TabInputList | ICreateViewModifyV2TabInputDocument | ICreateViewModifyV2TabInputAddress
 | ICreateViewModifyV2TabInputVaccine | ICreateViewModifyV2TabInputCenterDateRange | ICreateViewModifyV2TabInputMapServer | ICreateViewModifyV2TabLabel;
 
