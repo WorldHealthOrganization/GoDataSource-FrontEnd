@@ -740,10 +740,19 @@ export class AppFormEditQuestionnaireV2Component
           return;
         }
 
+        // get form data
+        const formData = this.formHelperService.getFields(response.handler.form);
+        formData.variable = formData.answerType === Constants.ANSWER_TYPES.MARKUP.value ?
+          (
+            modifyQuestion?.variable ?
+              modifyQuestion?.variable :
+              uuid()
+          ) :
+          formData.variable;
+
         // add / update question
         if (add) {
           // create question
-          const formData = this.formHelperService.getFields(response.handler.form);
           const question: QuestionModel = new QuestionModel(formData);
 
           // to value ?
@@ -769,7 +778,6 @@ export class AppFormEditQuestionnaireV2Component
           this.scrollToItem(question);
         } else {
           // update question
-          const formData = this.formHelperService.getFields(response.handler.form);
           modifyQuestion.text = formData.text;
           modifyQuestion.answerType = formData.answerType;
           modifyQuestion.variable = formData.variable;
