@@ -108,7 +108,8 @@ export class UserRoleHelper {
       readonly groupsMap: ISelectGroupMap<any>,
       value: string[],
       addValues(...values: string[]): string[],
-      hidePanel(): void
+      hidePanel(): void,
+      showPanel(): void
     },
     requiredByList: string[],
     selectBackIds: string[],
@@ -212,6 +213,9 @@ export class UserRoleHelper {
       .subscribe((response) => {
         // cancelled ?
         if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+          // open panel back
+          data.showPanel();
+
           // finished
           return;
         }
@@ -230,6 +234,9 @@ export class UserRoleHelper {
         if (doAfterPopupCloses) {
           doAfterPopupCloses();
         }
+
+        // open panel back
+        data.showPanel();
       });
   }
 
@@ -343,7 +350,8 @@ export class UserRoleHelper {
     data: {
       readonly optionsMap: ISelectGroupOptionMap<any>,
       addValues(...values: string[]): string[],
-      hidePanel(): void
+      hidePanel(): void,
+      showPanel(): void
     },
     missingPermissions: string[],
     translateService: TranslateService,
@@ -390,6 +398,9 @@ export class UserRoleHelper {
         .subscribe((response) => {
           // cancelled ?
           if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+            // open panel back
+            data.showPanel();
+
             // finished
             return;
           }
@@ -399,6 +410,9 @@ export class UserRoleHelper {
 
           // add values
           data.addValues(...missingPermissions);
+
+          // open panel back
+          data.showPanel();
         });
     }
   }

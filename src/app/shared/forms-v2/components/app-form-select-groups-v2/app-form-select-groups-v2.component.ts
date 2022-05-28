@@ -891,6 +891,7 @@ export class AppFormSelectGroupsV2Component
             action
           ) {
             const self = this;
+            const scrollPosition: number = self.selectItem.panel.nativeElement.scrollTop;
             this.groupSelectionChanged.emit({
               action,
               group,
@@ -903,6 +904,12 @@ export class AppFormSelectGroupsV2Component
               },
               hidePanel(): void {
                 self.selectItem.close();
+              },
+              showPanel(): void {
+                self.selectItem.open();
+                setTimeout(() => {
+                  self.selectItem.panel.nativeElement.scrollTop = scrollPosition;
+                });
               }
             });
           }
@@ -939,6 +946,7 @@ export class AppFormSelectGroupsV2Component
               group
             ) {
               const self = this;
+              const scrollPosition: number = self.selectItem.panel.nativeElement.scrollTop;
               this.groupOptionCheckStateChanged.emit({
                 group,
                 option,
@@ -952,6 +960,12 @@ export class AppFormSelectGroupsV2Component
                 },
                 hidePanel(): void {
                   self.selectItem.close();
+                },
+                showPanel(): void {
+                  self.selectItem.open();
+                  setTimeout(() => {
+                    self.selectItem.panel.nativeElement.scrollTop = scrollPosition;
+                  });
                 }
               });
             }

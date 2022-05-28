@@ -22,6 +22,7 @@ export interface IGroupEventData {
   readonly previousValue: string[];
   addValues(...values: string[]): string[];
   hidePanel(): void;
+  showPanel(): void;
 }
 
 /**
@@ -38,6 +39,7 @@ export interface IGroupOptionEventData {
   readonly allWasSelected: boolean;
   addValues(...values: string[]): string[];
   hidePanel(): void;
+  showPanel(): void;
 }
 
 /**
