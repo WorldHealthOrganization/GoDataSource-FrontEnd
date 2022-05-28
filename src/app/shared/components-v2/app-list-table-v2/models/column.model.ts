@@ -524,7 +524,9 @@ export const applyFilterBy = (
       // filter
       query.filter.bySelect(
         column.field,
-        valueOverwrite,
+        valueOverwrite ?
+          valueOverwrite :
+          [],
         true,
         null
       );

@@ -34,7 +34,10 @@ export class RolesListComponent extends ListComponent<UserRoleModel> implements 
     private dialogV2Service: DialogV2Service,
     private i18nService: I18nService
   ) {
-    super(listHelperService);
+    super(
+      listHelperService,
+      true
+    );
   }
 
   /**
