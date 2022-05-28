@@ -29,61 +29,6 @@ export abstract class ListQueryComponent {
     ) => void
   ) {}
 
-  // /**
-  //  * Filter the list by a text field
-  //  */
-  // protected filterByTextContainingField(
-  //   property: string,
-  //   value: string,
-  //   useLike?: boolean
-  // ) {
-  //   this.queryBuilder.filter.byContainingText(
-  //     property as string,
-  //     value,
-  //     true,
-  //     useLike
-  //   );
-  //
-  //   // refresh list
-  //   this.refreshCall();
-  // }
-  //
-  // /**
-  //  * Filter the list by a text field
-  //  */
-  // protected filterByBooleanField(
-  //   property: string,
-  //   value: boolean | null | undefined
-  // ) {
-  //   this.queryBuilder.filter.byBoolean(property, value);
-  //
-  //   // refresh list
-  //   this.refreshCall();
-  // }
-  //
-  // /**
-  //  * Filter the list by a date field ( startOf day => endOf day )
-  //  */
-  // protected filterByDateField(
-  //   property: string,
-  //   value: Moment
-  // ) {
-  //   // filter by date
-  //   if (_.isEmpty(value)) {
-  //     this.queryBuilder.filter.byDateRange(property, value);
-  //   } else {
-  //     this.queryBuilder.filter.byDateRange(
-  //       property, {
-  //         startDate: moment(value).startOf('day'),
-  //         endDate: moment(value).endOf('day')
-  //       }
-  //     );
-  //   }
-  //
-  //   // refresh list
-  //   this.refreshCall();
-  // }
-
   /**
    * Filter by
    */
