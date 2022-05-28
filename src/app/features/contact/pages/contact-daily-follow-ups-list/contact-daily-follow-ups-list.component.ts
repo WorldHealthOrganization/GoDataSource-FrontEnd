@@ -1410,6 +1410,16 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           visible: () => FollowUpModel.canGenerate(this.authUser)
         },
 
+        // Divider
+        {
+          visible: () => FollowUpModel.canGenerate(this.authUser) && (
+            !this.appliedListFilter && (
+              FollowUpModel.canExportDailyForm(this.authUser) ||
+              FollowUpModel.canExport(this.authUser)
+            )
+          )
+        },
+
         // print follow-ups daily form
         {
           label: {
