@@ -374,3 +374,22 @@
     }
   }
 }
+
+/* Requirements */
+.gd-form-select-groups-v2-panel {
+  .mat-option {
+    .select-group-option-info-right {
+      padding-left: 17px;
+      color: #777;
+      font-size: 12px;
+      width: 100%;
+      text-align: right;
+
+      .select-group-option-info-right-content {
+        display: inline-block;
+        text-align: left;
+        white-space: normal;
+      }
+    }
+  }
+}

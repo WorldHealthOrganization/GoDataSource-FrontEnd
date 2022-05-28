@@ -147,7 +147,6 @@ export class AppFormSelectGroupsV2Component
   @Input() groupOptionFormatMethod: (
     sanitized: DomSanitizer,
     i18nService: TranslateService,
-    groupsMap: ISelectGroupMap<any>,
     optionsMap: ISelectGroupOptionMap<any>,
     option: any
   ) => ISelectGroupOptionFormatResponse;
@@ -339,7 +338,6 @@ export class AppFormSelectGroupsV2Component
           const formatResponse = this.groupOptionFormatMethod(
             this.sanitized,
             this.translateService,
-            this.groupsMap,
             this.optionsMap,
             option
           );

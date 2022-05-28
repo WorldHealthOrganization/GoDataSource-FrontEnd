@@ -16,6 +16,9 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { V2AdvancedFilter } from '../../app-list-table-v2/models/advanced-filter.model';
 import { MapServerModel } from '../../../../core/models/map-server.model';
 import { IAnswerData, QuestionModel } from '../../../../core/models/question.model';
+import { DomSanitizer } from '@angular/platform-browser';
+import { TranslateService } from '@ngx-translate/core';
+import { ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from '../../../forms-v2/components/app-form-select-groups-v2/models/select-group.model';
 
 /**
  * Input type
@@ -272,6 +275,12 @@ interface ICreateViewModifyV2TabInputSelectGroups extends Omit<ICreateViewModify
   groupAllTooltip: string;
   groupOptionHiddenKey: string;
   defaultValues: any[];
+  groupOptionFormatMethod: (
+    sanitized: DomSanitizer,
+    i18nService: TranslateService,
+    optionsMap: ISelectGroupOptionMap<any>,
+    option: any
+  ) => ISelectGroupOptionFormatResponse;
 
   // optional
   validators?: {

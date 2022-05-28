@@ -383,6 +383,7 @@
                   [class.gd-create-view-modify-bottom-section-content-input-has-address]="input.type === CreateViewModifyV2TabInputType.ADDRESS"
                   [class.gd-create-view-modify-bottom-section-content-input-has-edit-questionnaire]="input.type === CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE"
                   [class.gd-create-view-modify-bottom-section-content-input-has-fill-questionnaire]="input.type === CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-select-groups]="input.type === CreateViewModifyV2TabInputType.SELECT_GROUPS"
                   [ngSwitch]="input.type">
 
                   <!-- Edit questionnaire -->
@@ -588,6 +589,7 @@
                     [groupAllTooltip]="input.groupAllTooltip"
                     [groupOptionHiddenKey]="input.groupOptionHiddenKey"
                     [defaultValues]="input.defaultValues"
+                    [groupOptionFormatMethod]="input.groupOptionFormatMethod"
                     [viewOnly]="isView || !input.value.set"
                     [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
                     [ngModel]="input.value.get(parentItemIndex)"
