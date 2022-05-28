@@ -235,7 +235,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+          options: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          value: this._workloadData?.status?.length > 0 ?
+            this._workloadData.status :
+            undefined,
+          defaultValue: this._workloadData?.status?.length > 0 ?
+            this._workloadData.status :
+            undefined
         }
       },
       {
@@ -448,7 +454,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
           options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
-          includeNoValue: true
+          includeNoValue: true,
+          value: this._workloadData?.user ?
+            [this._workloadData.user] :
+            undefined,
+          defaultValue: this._workloadData?.user ?
+            [this._workloadData.user] :
+            undefined
         },
         link: (data) => {
           return data.responsibleUserId ?
