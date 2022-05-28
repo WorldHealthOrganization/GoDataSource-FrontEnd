@@ -50,7 +50,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
   // case
   caseData: CaseModel;
 
-  workloadData: {
+  // redirect from team workload ?
+  private _workloadData: {
     date: Moment,
     team: string,
     user: string,
@@ -74,23 +75,14 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       true
     );
 
-    // page query params
-    const queryParams: {
-      fromWorkload: boolean,
-      date: string,
-      team: string,
-      user: string,
-      status: string[]
-    } = this.activatedRoute.snapshot.queryParams as any;
-
     // from team/user workload ?
-    if (queryParams.fromWorkload) {
-      this.workloadData = {
-        date: moment(queryParams.date),
-        team: queryParams.team,
-        user: queryParams.user,
-        status: queryParams.status ?
-          queryParams.status :
+    if (this.activatedRoute.snapshot.queryParams.fromWorkload) {
+      this._workloadData = {
+        date: moment(this.activatedRoute.snapshot.queryParams.date),
+        team: this.activatedRoute.snapshot.queryParams.team,
+        user: this.activatedRoute.snapshot.queryParams.user,
+        status: this.activatedRoute.snapshot.queryParams.status ?
+          this.activatedRoute.snapshot.queryParams.status :
           null
       };
     }
@@ -191,14 +183,22 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         },
         filter: {
           type: V2FilterType.DATE_RANGE,
-          value: {
-            startDate: moment().startOf('day'),
-            endDate: moment().endOf('day')
-          },
-          defaultValue: {
-            startDate: moment().startOf('day'),
-            endDate: moment().endOf('day')
-          }
+          value: this._workloadData?.date ?
+            {
+              startDate: moment(this._workloadData.date).startOf('day'),
+              endDate: moment(this._workloadData.date).endOf('day')
+            } : {
+              startDate: moment().startOf('day'),
+              endDate: moment().endOf('day')
+            },
+          defaultValue: this._workloadData?.date ?
+            {
+              startDate: moment(this._workloadData.date).startOf('day'),
+              endDate: moment(this._workloadData.date).endOf('day')
+            } : {
+              startDate: moment().startOf('day'),
+              endDate: moment().endOf('day')
+            }
         }
       },
       {
@@ -220,7 +220,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: this.activatedRoute.snapshot.data.team.options
+          options: this.activatedRoute.snapshot.data.team.options,
+          value: this._workloadData?.team ?
+            [this._workloadData.team] :
+            undefined,
+          defaultValue: this._workloadData?.team ?
+            [this._workloadData.team] :
+            undefined
         }
       },
       {
@@ -1915,11 +1921,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     // add case / contact breadcrumbs
     if (!this.caseData) {
       // add team/user workload page if necessary
-      if (
-        this.workloadData
-      ) {
+      if (this._workloadData) {
         if (
-          this.workloadData.user !== undefined &&
+          this._workloadData.user !== undefined &&
           UserModel.canListWorkload(this.authUser)
         ) {
           // add user workload page
