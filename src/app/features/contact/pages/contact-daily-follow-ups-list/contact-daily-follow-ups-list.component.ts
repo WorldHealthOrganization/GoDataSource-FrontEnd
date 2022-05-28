@@ -1,5 +1,4 @@
-import { Component, OnDestroy, ViewChild } from '@angular/core';
-import { NgModel } from '@angular/forms';
+import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import * as _ from 'lodash';
 import { throwError } from 'rxjs';
@@ -33,8 +32,8 @@ import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import {
-  IV2SideDialogConfigButtonType,
-  IV2SideDialogConfigInputDateRange,
+  IV2SideDialogConfigButtonType, IV2SideDialogConfigInputDate,
+  IV2SideDialogConfigInputDateRange, IV2SideDialogConfigInputNumber,
   IV2SideDialogConfigInputSingleDropdown, IV2SideDialogConfigInputText,
   IV2SideDialogConfigInputToggle, IV2SideDialogConfigInputToggleCheckbox,
   V2SideDialogConfigInputType
@@ -51,19 +50,12 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
   // case
   caseData: CaseModel;
 
-  @ViewChild('followUpDate', { read: NgModel, static: true }) followUpDateElem: NgModel;
-
   workloadData: {
     date: Moment,
     team: string,
     user: string,
     status: string[]
   };
-
-  // date filter
-  dateFilterValue: Moment;
-  displayMissedFollowUps: boolean = false;
-  displayMissedFollowUpsNoDays: number = 1;
 
   /**
    * Constructor
@@ -1454,12 +1446,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                           }
                         }
                       ]
-                    },
-                    extraFormData: {
-                      append: {
-                        startDate: moment(this.dateFilterValue).startOf('day'),
-                        endDate: moment(this.dateFilterValue).endOf('day')
-                      }
                     }
                   }
                 });
@@ -1482,6 +1468,114 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           },
           visible: (): boolean => {
             return !this.appliedListFilter && FollowUpModel.canExport(this.authUser);
+          }
+        },
+
+        // Divider
+        {
+          visible: () => FollowUpModel.canGenerate(this.authUser) || (
+            !this.appliedListFilter && (
+              FollowUpModel.canExportDailyForm(this.authUser) ||
+              FollowUpModel.canExport(this.authUser)
+            )
+          )
+        },
+
+        // Display missed follow-ups
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_SHOW_MISSED_FOLLOW_UPS'
+          },
+          action: {
+            click: () => {
+              this.dialogV2Service
+                .showSideDialog({
+                  // title
+                  title: {
+                    get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_SHOW_MISSED_FOLLOW_UPS'
+                  },
+
+                  // inputs
+                  inputs: [
+                    {
+                      type: V2SideDialogConfigInputType.DATE,
+                      name: 'date',
+                      placeholder: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
+                      value: undefined,
+                      validators: {
+                        required: () => true
+                      }
+                    }, {
+                      type: V2SideDialogConfigInputType.NUMBER,
+                      name: 'displayMissedFollowUpsNoDays',
+                      placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_SHOW_MISSED_FOLLOW_UPS_NO_DAYS',
+                      value: undefined,
+                      validators: {
+                        required: () => true
+                      }
+                    }
+                  ],
+
+                  // buttons
+                  bottomButtons: [
+                    // yes button
+                    {
+                      label: 'LNG_COMMON_BUTTON_APPLY',
+                      type: IV2SideDialogConfigButtonType.OTHER,
+                      color: 'primary',
+                      disabled: (_data, handler): boolean => {
+                        return !handler.form || handler.form.invalid;
+                      }
+                    },
+
+                    // cancel button
+                    {
+                      type: IV2SideDialogConfigButtonType.CANCEL,
+                      label: 'LNG_COMMON_BUTTON_CANCEL',
+                      color: 'text'
+                    }
+                  ]
+                })
+                .subscribe((response) => {
+                  // cancelled ?
+                  if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+                    return;
+                  }
+
+                  // filter
+                  const date = (response.data.map.date as IV2SideDialogConfigInputDate).value;
+                  this.queryBuilder.filter.where({
+                    or: [{
+                      date: {
+                        between: [
+                          moment(date).startOf('day'),
+                          moment(date).endOf('day')
+                        ]
+                      }
+                    }, {
+                      statusId: {
+                        inq: [
+                          'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_PERFORMED',
+                          'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_MISSED',
+                          'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_ATTEMPTED'
+                        ]
+                      },
+                      date: {
+                        between: [
+                          moment(date).add(-(response.data.map.displayMissedFollowUpsNoDays as IV2SideDialogConfigInputNumber).value, 'days').startOf('day'),
+                          moment(date).endOf('day')
+                        ]
+                      }
+                    }]
+                  });
+
+                  // close dialog
+                  response.handler.hide();
+
+                  // refresh
+                  this.needsRefreshList(true);
+                });
+            }
           }
         }
       ]
@@ -2105,93 +2199,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           this.needsRefreshList(true);
         });
     });
-  }
-
-  // TODO: DatePicker needed
-  /**
-   * Filter by follow-up date
-   * @param value
-   */
-  filterByFollowUpDate(_value: Moment) {
-    // // remember filter
-    // this.dateFilterValue = value;
-    //
-    // // cleanup
-    // this.queryBuilder.filter.removePathCondition('date');
-    // this.queryBuilder.filter.removePathCondition('or.date');
-    // this.queryBuilder.filter.removePathCondition('or.statusId');
-    //
-    // // do we need to remove filter ?
-    // if (!value) {
-    //   // send filter further
-    //   this.filterByDateField('date', value);
-    //
-    //   // reset values
-    //   this.displayMissedFollowUps = false;
-    // } else {
-    //   // do we need to retrieve missed follow-ups too ?
-    //   if (
-    //     this.displayMissedFollowUps &&
-    //             this.displayMissedFollowUpsNoDays > 0
-    //   ) {
-    //     this.queryBuilder.filter.where({
-    //       or: [{
-    //         date: {
-    //           between: [
-    //             moment(value).startOf('day'),
-    //             moment(value).endOf('day')
-    //           ]
-    //         }
-    //       }, {
-    //         statusId: {
-    //           inq: [
-    //             'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_PERFORMED',
-    //             'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_MISSED',
-    //             'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_ATTEMPTED'
-    //           ]
-    //         },
-    //         date: {
-    //           between: [
-    //             moment(value).add(-this.displayMissedFollowUpsNoDays, 'days').startOf('day'),
-    //             moment(value).endOf('day')
-    //           ]
-    //         }
-    //       }]
-    //     });
-    //
-    //     // refresh
-    //     this.needsRefreshList();
-    //   } else {
-    //     // retrieve follow-ups from specific day
-    //     this.filterByDateField('date', value);
-    //   }
-    // }
-    //
-    // // refresh dialog fields
-    // setTimeout(() => {
-    //   this.genericDataService
-    //     .getRangeFollowUpGroupByOptions(true)
-    //     .subscribe((options) => {
-    //       // print follow-up
-    //       this.printFollowUpsDialogExtraAPIData = {
-    //         date: {
-    //           startDate: moment(value).startOf('day'),
-    //           endDate: moment(value).endOf('day')
-    //         }
-    //       };
-    //
-    //       // print follow-up
-    //       this.printFollowUpsDialogFields = [
-    //         new DialogField({
-    //           name: 'groupBy',
-    //           placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON',
-    //           inputOptions: options,
-    //           value: Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE.value,
-    //           required: true
-    //         })
-    //       ];
-    //     });
-    // });
   }
 
   /**
