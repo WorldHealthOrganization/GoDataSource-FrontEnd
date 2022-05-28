@@ -754,36 +754,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                 visible: (item: FollowUpModel): boolean => {
                   // visible only if at least one of the previous...
                   return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    FollowUpModel.canModify(this.authUser) &&
-                    !Constants.isDateInTheFuture(item.date);
-                }
-              },
-
-              // Modify follow-up questionnaire
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MODIFY_QUESTIONNAIRE'
-                },
-                action: {
-                  click: (item: FollowUpModel) => {
-                    // TODO: Modify questionnaire needs to be implemented
-                    this.modifyQuestionnaire(item);
-                  }
-                },
-                visible: (item: FollowUpModel): boolean => {
-                  return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    FollowUpModel.canModify(this.authUser) &&
-                    !Constants.isDateInTheFuture(item.date);
-                }
-              },
-
-              // Divider
-              {
-                visible: (item: FollowUpModel): boolean => {
-                  // visible only if at least one of the previous...
-                  return !item.deleted &&
                     !this.caseData?.id &&
                     this.selectedOutbreakIsActive &&
                     FollowUpModel.canModify(this.authUser) &&
@@ -2424,10 +2394,5 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             });
         }
       });
-  }
-
-  // TODO: Method modifyQuestionnaire() to be deleted/replaced/implemented
-  private modifyQuestionnaire(_item: FollowUpModel) {
-    // Previously used from FollowUpsListComponent
   }
 }
