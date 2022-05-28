@@ -32,7 +32,13 @@ import { V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2Ad
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
-import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, IV2SideDialogConfigInputToggle, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import {
+  IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigInputDateRange,
+  IV2SideDialogConfigInputSingleDropdown, IV2SideDialogConfigInputText,
+  IV2SideDialogConfigInputToggle, IV2SideDialogConfigInputToggleCheckbox,
+  V2SideDialogConfigInputType
+} from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { FollowUpPage } from '../../typings/follow-up-page';
 
@@ -1974,15 +1980,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           }
         },
         {
-          type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+          type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
           placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TARGETED_LABEL',
           name: 'targeted',
-          options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-          clearable: false,
-          value: true as unknown as string,
-          validators: {
-            required: () => true
-          }
+          value: true
         },
         {
           type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
@@ -2054,18 +2055,12 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       this.followUpsDataService
         .generateFollowUps(
           this.selectedOutbreak.id,
-          // TODO: Needs IV2SideDialogConfigInput of type RANGE_DATE, temporary replaced with "null"
-          // (response.data.map.dates.startDate as ???).value,
-          null,
-          // TODO: Needs IV2SideDialogConfigInput of type RANGE_DATE, temporary replaced with "null"
-          // response.data.map.dates.endDate.value,
-          null,
-          (response.data.map.targeted as IV2SideDialogConfigInputSingleDropdown).value as unknown as boolean,
+          (response.data.map.dates as IV2SideDialogConfigInputDateRange).value?.startDate,
+          (response.data.map.dates as IV2SideDialogConfigInputDateRange).value?.endDate,
+          (response.data.map.targeted as IV2SideDialogConfigInputToggleCheckbox).value as unknown as boolean,
           (response.data.map.overwriteExistingFollowUps as IV2SideDialogConfigInputSingleDropdown).value as unknown as boolean,
           (response.data.map.keepTeamAssignment as IV2SideDialogConfigInputSingleDropdown).value as unknown as boolean,
-          // TODO: Needs IV2SideDialogConfigInput of type REGEX_INPUT, temporary replaced with "null"
-          // response.data.map.intervalOfFollowUp.value
-          null
+          (response.data.map.intervalOfFollowUp as IV2SideDialogConfigInputText).value
         )
         .pipe(
           catchError((err) => {
