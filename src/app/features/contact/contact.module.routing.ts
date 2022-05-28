@@ -4,10 +4,12 @@ import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-
 import { PERMISSION } from '../../core/models/permission.model';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
+import { ClassificationDataResolver } from '../../core/services/resolvers/data/classification.resolver';
 import { DailyFollowUpStatusDataResolver } from '../../core/services/resolvers/data/daily-follow-up-status.resolver';
 import { FinalFollowUpStatusDataResolver } from '../../core/services/resolvers/data/final-follow-up-status.resolver';
 import { GenderDataResolver } from '../../core/services/resolvers/data/gender.resolver';
 import { OccupationDataResolver } from '../../core/services/resolvers/data/occupation.resolver';
+import { OutcomeDataResolver } from '../../core/services/resolvers/data/outcome.resolver';
 import { PersonDataResolver } from '../../core/services/resolvers/data/person.resolver';
 import { PregnancyStatusDataResolver } from '../../core/services/resolvers/data/pregnancy-status.resolver';
 import { RiskDataResolver } from '../../core/services/resolvers/data/risk.resolver';
@@ -30,6 +32,24 @@ const viewFollowUpsListFoundation: Route = {
     user: UserDataResolver,
     entityData: PersonDataResolver,
     yesNo: YesNoDataResolver
+  }
+};
+
+// Daily Follow-ups list / Follow-ups list from a case
+const dailyFOllowUpsListFoundation: Route = {
+  component: fromPages.ContactDailyFollowUpsListComponent,
+  canActivate: [AuthGuard],
+  resolve: {
+    yesNoAll: YesNoAllDataResolver,
+    team: TeamDataResolver,
+    dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
+    risk: RiskDataResolver,
+    user: UserDataResolver,
+    yesNo: YesNoDataResolver,
+    gender: GenderDataResolver,
+    occupation: OccupationDataResolver,
+    classification: ClassificationDataResolver,
+    outcome: OutcomeDataResolver
   }
 };
 
@@ -196,8 +216,7 @@ const routes: Routes = [
   // Daily Follow-ups list
   {
     path: 'follow-ups',
-    component: fromPages.ContactDailyFollowUpsListComponent,
-    canActivate: [AuthGuard],
+    ...dailyFOllowUpsListFoundation,
     data: {
       permissions: [
         PERMISSION.FOLLOW_UP_LIST
@@ -207,8 +226,7 @@ const routes: Routes = [
   // Follow-ups list from a case
   {
     path: 'case-related-follow-ups/:caseId',
-    component: fromPages.ContactDailyFollowUpsListComponent,
-    canActivate: [AuthGuard],
+    ...dailyFOllowUpsListFoundation,
     data: {
       permissions: [
         PERMISSION.FOLLOW_UP_LIST
