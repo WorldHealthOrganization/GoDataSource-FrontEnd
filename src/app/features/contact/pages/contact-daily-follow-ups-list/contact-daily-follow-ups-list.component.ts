@@ -321,14 +321,15 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           relationshipKey: 'contact'
         }
       },
-      // TODO: "person.riskLevel" comes undefined...
       {
         field: 'riskLevel',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL',
         sortable: true,
         notVisible: true,
         format: {
-          type: 'person.riskLevel'
+          type: (item) => item.person?.riskLevel && (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.riskLevel] ?
+            this.i18nService.instant((this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.riskLevel].value) :
+            '-'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
