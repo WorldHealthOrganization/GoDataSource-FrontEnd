@@ -79,7 +79,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
   ) {
     super(
       listHelperService,
-      !!activatedRoute.snapshot.queryParams.fromWorkload
+      true
     );
 
     // page query params
