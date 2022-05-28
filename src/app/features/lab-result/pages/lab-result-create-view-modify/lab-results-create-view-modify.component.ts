@@ -803,6 +803,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
    */
   protected initializeExpandListQueryFields(): void {
     this.expandListQueryFields = [
+      'id',
       'sampleIdentifier'
     ];
   }
