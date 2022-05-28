@@ -185,8 +185,20 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'date',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
+        sortable: true,
         format: {
           type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE,
+          value: {
+            startDate: moment().startOf('day'),
+            endDate: moment().endOf('day')
+          },
+          defaultValue: {
+            startDate: moment().startOf('day'),
+            endDate: moment().endOf('day')
+          }
         }
       },
       {
@@ -1802,86 +1814,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         }
       }
     };
-  }
-
-  // TODO: Is this used somehow?
-  /**
-   * Loaded cached filters
-   */
-  beforeCacheLoadFilters(): void {
-    // set default filter rules
-    if (this.disableFilterCaching) {
-      setTimeout(() => {
-        this.initializeHeaderFilters();
-      });
-    } else {
-      this.initializeHeaderFilters();
-    }
-  }
-
-  /**
-   * Initialize header filters
-   */
-  initializeHeaderFilters() {
-    // // from workload page ?
-    // if (this.workloadData) {
-    //   // date
-    //   this.dateFilterDefaultValue = this.workloadData.date.clone().startOf('day');
-    //   this.dateFilterValue = this.dateFilterDefaultValue;
-    //
-    //   // team
-    //   this.selectedTeamIdFilterValue = this.workloadData.team ?
-    //     this.workloadData.team :
-    //     null;
-    //
-    //   // user
-    //   this.selectedResponsibleUserIdFilterValue = this.workloadData.user ?
-    //     this.workloadData.user :
-    //     null;
-    //
-    //   // make sure we filter by team first time
-    //   if (this.workloadData.team !== undefined) {
-    //     this.filterByTeam(new LabelValuePair(
-    //       '',
-    //       this.selectedTeamIdFilterValue
-    //     ));
-    //   }
-    //
-    //   // make sure we filter by responsible user first time
-    //   if (this.workloadData.user !== undefined) {
-    //     this.filterBySelectField(
-    //       'responsibleUserId',
-    //       this.selectedResponsibleUserIdFilterValue,
-    //       null
-    //     );
-    //   }
-    //
-    //   // filter by status ?
-    //   if (this.workloadData.status) {
-    //     this.selectedStatusFilterValue = this.workloadData.status;
-    //
-    //     // filter by status
-    //     this.filterBySelectField(
-    //       'statusId',
-    //       this.selectedStatusFilterValue,
-    //       null
-    //     );
-    //   }
-    // } else {
-    //   this.dateFilterDefaultValue = moment().startOf('day');
-    //   this.dateFilterValue = this.dateFilterDefaultValue;
-    //   this.selectedTeamIdFilterValue = this.teamIdFilterValue;
-    // }
-    //
-    // // filter
-    // this.filterByFollowUpDate(this.dateFilterDefaultValue);
-  }
-
-  /**
-   * Add search criteria
-   */
-  resetFiltersAddDefault() {
-    this.initializeHeaderFilters();
   }
 
   /**

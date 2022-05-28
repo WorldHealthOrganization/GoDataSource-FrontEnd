@@ -1023,13 +1023,6 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
   }
 
   /**
-     * Loaded cached filters
-     */
-  beforeCacheLoadFilters(): void {
-    // NOTHING
-  }
-
-  /**
    * Check if we need to load cached filters if necessary depending if we already loaded for this route or not
    */
   private loadCachedFiltersIfNecessary(): void {
@@ -1052,9 +1045,6 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
       authUser.dontCacheFilters ||
       this._disableFilterCaching
     ) {
-      // trigger finish callback
-      this.beforeCacheLoadFilters();
-
       // finished
       return;
     }
@@ -1099,10 +1089,6 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
       // update page index
       this.updatePageIndex();
     }
-
-    // trigger before actually refreshing page
-    // NO setTimeout because it will break some things
-    this.beforeCacheLoadFilters();
   }
 
   /**
