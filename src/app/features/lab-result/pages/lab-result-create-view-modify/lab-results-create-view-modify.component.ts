@@ -9,7 +9,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { Observable, throwError } from 'rxjs';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
-import { catchError, map, takeUntil } from 'rxjs/operators';
+import { catchError, takeUntil } from 'rxjs/operators';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -39,10 +39,9 @@ import {
   templateUrl: './lab-results-create-view-modify.component.html'
 })
 export class LabResultsCreateViewModifyComponent extends CreateViewModifyComponent<LabResultModel> implements OnDestroy {
-
-  entityData: CaseModel | ContactModel;
-  personType: EntityType;
-  sampleIdentifier;
+  // data
+  private _entityData: CaseModel | ContactModel;
+  private _personType: EntityType;
 
   /**
    * Constructor
@@ -57,6 +56,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     renderer2: Renderer2,
     redirectService: RedirectService
   ) {
+    // parent
     super(
       toastV2Service,
       renderer2,
@@ -65,8 +65,10 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       authDataService,
       true
     );
-    this.personType = this.activatedRoute.snapshot.data.personType;
-    this.entityData = this.activatedRoute.snapshot.data.entityData;
+
+    // get data
+    this._personType = this.activatedRoute.snapshot.data.personType;
+    this._entityData = this.activatedRoute.snapshot.data.entityData;
   }
 
   /**
@@ -88,24 +90,19 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
    * Retrieve item
    */
   protected retrieveItem(record?: LabResultModel): Observable<LabResultModel> {
-
     return this.labResultDataService
-      .getEntityLabResults(this.selectedOutbreak.id,
-        EntityModel.getLinkForEntityType(this.personType),
-        this.entityData.id
-      ).pipe(
-        map((labResults) => labResults.filter(
-          (labResult) => labResult.id ===
-            (record ? record.id : this.activatedRoute.snapshot.params.labResultId))[0])
+      .getOutbreakLabResult(
+        this.selectedOutbreak.id,
+        record ?
+          record.id :
+          this.activatedRoute.snapshot.params.labResultId
       );
   }
 
   /**
    * Data initialized
    */
-  protected initializedData(): void {
-    this.sampleIdentifier = this.itemData?.sampleIdentifier ? this.itemData.sampleIdentifier : '—';
-  }
+  protected initializedData(): void {}
 
   /**
    * Initialize page title
@@ -118,13 +115,17 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     } else if (this.isModify) {
       this.pageTitle = 'LNG_PAGE_MODIFY_LAB_RESULT_TITLE';
       this.pageTitleData = {
-        sampleIdentifier: this.sampleIdentifier
+        sampleIdentifier: this.itemData.sampleIdentifier ?
+          this.itemData.sampleIdentifier :
+          '-'
       };
     } else {
       // view
       this.pageTitle = 'LNG_PAGE_VIEW_LAB_RESULT_TITLE';
       this.pageTitleData = {
-        sampleIdentifier: this.sampleIdentifier
+        sampleIdentifier: this.itemData.sampleIdentifier ?
+          this.itemData.sampleIdentifier :
+          '-'
       };
     }
   }
@@ -147,7 +148,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
 
     // entity list
     if (
-      this.personType === EntityType.CONTACT &&
+      this._personType === EntityType.CONTACT &&
       ContactModel.canList(this.authUser)
     ) {
       this.breadcrumbs.push(
@@ -159,7 +160,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
         }
       );
     } else if (
-      this.personType === EntityType.CASE &&
+      this._personType === EntityType.CASE &&
       CaseModel.canList(this.authUser)
     ) {
       this.breadcrumbs.push(
@@ -173,31 +174,29 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     }
 
     // person breadcrumbs
-    if (this.entityData) {
+    if (this._entityData) {
       // entity view
       if (
-        this.personType === EntityType.CONTACT &&
+        this._personType === EntityType.CONTACT &&
         ContactModel.canView(this.authUser)
       ) {
-        if (this.isCreate) {
-        }
         this.breadcrumbs.push(
           {
-            label: this.entityData.name,
+            label: this._entityData.name,
             action: {
-              link: [`/contacts/${this.entityData.id}/view`]
+              link: [`/contacts/${this._entityData.id}/view`]
             }
           }
         );
       } else if (
-        this.personType === EntityType.CASE &&
+        this._personType === EntityType.CASE &&
         CaseModel.canView(this.authUser)
       ) {
         this.breadcrumbs.push(
           {
-            label: this.entityData.name,
+            label: this._entityData.name,
             action: {
-              link: [`/cases/${this.entityData.id}/view`]
+              link: [`/cases/${this._entityData.id}/view`]
             }
           }
         );
@@ -205,26 +204,26 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
 
       // lab result list
       if (
-        this.personType === EntityType.CONTACT &&
+        this._personType === EntityType.CONTACT &&
         ContactModel.canListLabResult(this.authUser)
       ) {
         this.breadcrumbs.push(
           {
             label: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE',
             action: {
-              link: [`/lab-results/contacts/${this.entityData.id}`]
+              link: [`/lab-results/contacts/${this._entityData.id}`]
             }
           }
         );
       } else if (
-        this.personType === EntityType.CASE &&
+        this._personType === EntityType.CASE &&
         CaseModel.canListLabResult(this.authUser)
       ) {
         this.breadcrumbs.push(
           {
             label: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE',
             action: {
-              link: [`/lab-results/cases/${this.entityData.id}`]
+              link: [`/lab-results/cases/${this._entityData.id}`]
             }
           }
         );
@@ -232,21 +231,43 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     }
 
     // current page
-    let currentPageTitleLabel;
     if (this.isCreate) {
-      currentPageTitleLabel = 'LNG_PAGE_CREATE_LAB_RESULT_TITLE';
+      this.breadcrumbs.push(
+        {
+          label: 'LNG_PAGE_CREATE_LAB_RESULT_TITLE',
+          action: null
+        }
+      );
     } else if (this.isModify) {
-      currentPageTitleLabel = 'LNG_PAGE_MODIFY_LAB_RESULT_TITLE';
+      this.breadcrumbs.push(
+        {
+          label: this.translateService.instant(
+            'LNG_PAGE_MODIFY_LAB_RESULT_TITLE',
+            {
+              sampleIdentifier: this.itemData.sampleIdentifier ?
+                this.itemData.sampleIdentifier :
+                '-'
+            }
+          ),
+          action: null
+        }
+      );
     } else {
       // view
-      currentPageTitleLabel = 'LNG_PAGE_VIEW_LAB_RESULT_TITLE';
+      this.breadcrumbs.push(
+        {
+          label: this.translateService.instant(
+            'LNG_PAGE_VIEW_LAB_RESULT_TITLE',
+            {
+              sampleIdentifier: this.itemData.sampleIdentifier ?
+                this.itemData.sampleIdentifier :
+                '-'
+            }
+          ),
+          action: null
+        }
+      );
     }
-    this.breadcrumbs.push(
-      {
-        label: currentPageTitleLabel,
-        action: null
-      }
-    );
   }
 
   /**
@@ -266,7 +287,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
           buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_LAB_RESULT_ACTION_CREATE_LAB_RESULT_BUTTON'),
           message: () => this.translateService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
-            this.entityData
+            this._entityData
           )
         }
       },
@@ -278,13 +299,13 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       createOrUpdate: this.initializeProcessData(),
       redirectAfterCreateUpdate: (data: LabResultModel) => {
         // redirect to view
-        if (this.personType === EntityType.CASE) {
+        if (this._personType === EntityType.CASE) {
           this.redirectService.to([
-            `/lab-results/cases/${this.entityData.id}/${data.id}/view`
+            `/lab-results/cases/${this._entityData.id}/${data.id}/view`
           ]);
-        } else if (this.personType === EntityType.CONTACT) {
+        } else if (this._personType === EntityType.CONTACT) {
           this.redirectService.to([
-            `/lab-results/contacts/${this.entityData.id}/${data.id}/view`
+            `/lab-results/contacts/${this._entityData.id}/${data.id}/view`
           ]);
         }
 
@@ -602,12 +623,12 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       view: {
         link: {
           link: () => {
-            if (this.personType === EntityType.CASE &&
+            if (this._personType === EntityType.CASE &&
               CaseModel.canViewLabResult(this.authUser)) {
-              return [`/lab-results/cases/${this.entityData.id}/${this.itemData?.id}/view`];
-            } else if (this.personType === EntityType.CONTACT &&
+              return [`/lab-results/cases/${this._entityData.id}/${this.itemData?.id}/view`];
+            } else if (this._personType === EntityType.CONTACT &&
               ContactModel.canViewLabResult(this.authUser)) {
-              return [`/lab-results/contacts/${this.entityData.id}/${this.itemData?.id}/view`];
+              return [`/lab-results/contacts/${this._entityData.id}/${this.itemData?.id}/view`];
             }
           }
         }
@@ -615,19 +636,19 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       modify: {
         link: {
           link: () => {
-            if (this.personType === EntityType.CASE &&
+            if (this._personType === EntityType.CASE &&
               CaseModel.canModifyLabResult(this.authUser)) {
-              return [`/lab-results/cases/${this.entityData.id}/${this.itemData?.id}/modify`];
-            } else if (this.personType === EntityType.CONTACT &&
+              return [`/lab-results/cases/${this._entityData.id}/${this.itemData?.id}/modify`];
+            } else if (this._personType === EntityType.CONTACT &&
               ContactModel.canModifyLabResult(this.authUser)) {
-              return [`/lab-results/contacts/${this.entityData.id}/${this.itemData?.id}/modify`];
+              return [`/lab-results/contacts/${this._entityData.id}/${this.itemData?.id}/modify`];
             }
           }
         },
         visible: () => {
-          if (this.personType === EntityType.CASE) {
+          if (this._personType === EntityType.CASE) {
             return CaseModel.canModifyLabResult(this.authUser);
-          } else if (this.personType === EntityType.CONTACT) {
+          } else if (this._personType === EntityType.CONTACT) {
             return ContactModel.canModifyLabResult(this.authUser);
           } else {
             return false;
@@ -637,12 +658,12 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       createCancel: {
         link: {
           link: () => {
-            if (this.personType === EntityType.CASE &&
+            if (this._personType === EntityType.CASE &&
               CaseModel.canViewLabResult(this.authUser)) {
-              return [`/lab-results/cases/${this.entityData.id}/${this.itemData?.id}/view`];
-            } else if (this.personType === EntityType.CONTACT &&
+              return [`/lab-results/cases/${this._entityData.id}/${this.itemData?.id}/view`];
+            } else if (this._personType === EntityType.CONTACT &&
               ContactModel.canViewLabResult(this.authUser)) {
-              return [`/lab-results/contacts/${this.entityData.id}/${this.itemData?.id}/view`];
+              return [`/lab-results/contacts/${this._entityData.id}/${this.itemData?.id}/view`];
             }
           }
         }
@@ -650,12 +671,12 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       viewCancel: {
         link: {
           link: () => {
-            if (this.personType === EntityType.CASE &&
+            if (this._personType === EntityType.CASE &&
               CaseModel.canViewLabResult(this.authUser)) {
-              return [`/lab-results/cases/${this.entityData.id}`];
-            } else if (this.personType === EntityType.CONTACT &&
+              return [`/lab-results/cases/${this._entityData.id}`];
+            } else if (this._personType === EntityType.CONTACT &&
               ContactModel.canViewLabResult(this.authUser)) {
-              return [`/lab-results/contacts/${this.entityData.id}`];
+              return [`/lab-results/contacts/${this._entityData.id}`];
             }
           }
         }
@@ -663,12 +684,12 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       modifyCancel: {
         link: {
           link: () => {
-            if (this.personType === EntityType.CASE &&
+            if (this._personType === EntityType.CASE &&
               CaseModel.canViewLabResult(this.authUser)) {
-              return [`/lab-results/cases/${this.entityData.id}/${this.itemData?.id}/view`];
-            } else if (this.personType === EntityType.CONTACT &&
+              return [`/lab-results/cases/${this._entityData.id}/${this.itemData?.id}/view`];
+            } else if (this._personType === EntityType.CONTACT &&
               ContactModel.canViewLabResult(this.authUser)) {
-              return [`/lab-results/contacts/${this.entityData.id}/${this.itemData?.id}/view`];
+              return [`/lab-results/contacts/${this._entityData.id}/${this.itemData?.id}/view`];
             }
           }
         }
@@ -710,8 +731,8 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       (type === CreateViewModifyV2ActionType.CREATE ?
         this.labResultDataService.createLabResult(
           this.selectedOutbreak.id,
-          EntityModel.getLinkForEntityType(this.personType),
-          this.entityData.id,
+          EntityModel.getLinkForEntityType(this._personType),
+          this._entityData.id,
           data
         ) :
         this.labResultDataService
@@ -755,10 +776,10 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       type: CreateViewModifyV2ExpandColumnType.TEXT,
       get: (item: LabResultModel) => item.sampleIdentifier,
       link: (item: LabResultModel) => {
-        if (this.personType === EntityType.CONTACT) {
-          return [`/lab-results/contacts/${this.entityData.id}/${item.id}`];
-        } else if (this.personType === EntityType.CASE) {
-          return [`/lab-results/cases/${this.entityData.id}/${item.id}`];
+        if (this._personType === EntityType.CONTACT) {
+          return [`/lab-results/contacts/${this._entityData.id}/${item.id}`];
+        } else if (this._personType === EntityType.CASE) {
+          return [`/lab-results/cases/${this._entityData.id}/${item.id}`];
         }
       }
     };
@@ -805,8 +826,8 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     this.expandListRecords$ = this.labResultDataService
       .getEntityLabResults(
         this.selectedOutbreak.id,
-        EntityModel.getLinkForEntityType(this.personType),
-        this.entityData.id,
+        EntityModel.getLinkForEntityType(this._personType),
+        this._entityData.id,
         data.queryBuilder
       )
       .pipe(
