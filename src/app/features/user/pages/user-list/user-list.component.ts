@@ -16,8 +16,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
-import { IExtendedColDef } from '../../../../shared/components-v2/app-list-table-v2/models/extended-column.model';
+import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 
 @Component({
@@ -237,9 +236,9 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
           options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
-          search: (column: IExtendedColDef) => {
+          search: (column: IV2Column) => {
             // retrieve teams
-            const teamIds: string[] = (column.columnDefinition.filter as IV2FilterMultipleSelect).value;
+            const teamIds: string[] = (column.filter as IV2FilterMultipleSelect).value;
 
             // determine user ids
             const userIdsMap: {

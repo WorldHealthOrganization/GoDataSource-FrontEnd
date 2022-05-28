@@ -978,7 +978,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     // filter
     applyFilterBy(
       tab.definition.queryBuilder,
-      data.column,
+      data.column.columnDefinition,
       data.valueOverwrite
     );
 

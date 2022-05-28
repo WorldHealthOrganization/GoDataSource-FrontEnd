@@ -9,7 +9,7 @@ import { SubscriptionLike } from 'rxjs/internal/types';
 import { StorageKey, StorageService } from '../services/helper/storage.service';
 import { UserModel, UserSettings } from '../models/user.model';
 import * as LzString from 'lz-string';
-import { applyResetOnAllFilters, applySortBy, IV2Column } from '../../shared/components-v2/app-list-table-v2/models/column.model';
+import { applyResetOnAllFilters, applySortBy } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { IV2ActionIconLabel, IV2ActionMenuLabel, V2ActionMenuItem } from '../../shared/components-v2/app-list-table-v2/models/action.model';
 import { OutbreakModel } from '../models/outbreak.model';
@@ -77,9 +77,6 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
   // constants
   UserSettings = UserSettings;
   Constants = Constants;
-
-  // table columns
-  tableColumns: IV2Column[] = [];
 
   // apply has more limit
   protected applyHasMoreLimit: boolean = true;
@@ -273,6 +270,9 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
       // load saved filters
       this.loadCachedFilters();
 
+      // apply table column filters
+      this.applyTableColumnFilters();
+
       // component initialized
       this.initialized();
     });
@@ -347,6 +347,9 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
 
           // load cached filters if necessary
           this.loadCachedFiltersIfNecessary();
+
+          // apply table column filters
+          this.applyTableColumnFilters();
 
           // refresh page
           this.needsRefreshList(true);
@@ -664,6 +667,9 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
 
     // add default filter criteria
     this.resetFiltersAddDefault();
+
+    // apply table column filters
+    this.applyTableColumnFilters();
 
     // retrieve Side filters
     let queryBuilder;

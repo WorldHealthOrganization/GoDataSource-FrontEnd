@@ -1,7 +1,6 @@
 import { V2Action } from './action.model';
 import { V2Filter, IV2FilterDate, V2FilterType, V2FilterTextType } from './filter.model';
 import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
-import { IExtendedColDef } from './extended-column.model';
 import { AppFormSelectMultipleV2Component } from '../../../forms-v2/components/app-form-select-multiple-v2/app-form-select-multiple-v2.component';
 import { AddressModel } from '../../../../core/models/address.model';
 import * as _ from 'lodash';
@@ -302,44 +301,44 @@ export type IV2Column = IV2ColumnBasic | IV2ColumnButton | IV2ColumnAge | IV2Col
  */
 export const applyFilterBy = (
   query: RequestQueryBuilder,
-  column: IExtendedColDef,
+  column: IV2Column,
   valueOverwrite?: any
 ): void => {
   // apply to child query builder ?
-  if (column.columnDefinition.filter.childQueryBuilderKey) {
-    query = query.addChildQueryBuilder(column.columnDefinition.filter.childQueryBuilderKey);
+  if (column.filter.childQueryBuilderKey) {
+    query = query.addChildQueryBuilder(column.filter.childQueryBuilderKey);
   }
 
   // apply to relationship ?
-  if (column.columnDefinition.filter.relationshipKey) {
-    query = query.include(column.columnDefinition.filter.relationshipKey).queryBuilder;
+  if (column.filter.relationshipKey) {
+    query = query.include(column.filter.relationshipKey).queryBuilder;
   }
 
   // custom filter ?
-  if (column.columnDefinition.filter.search) {
+  if (column.filter.search) {
     // call
-    column.columnDefinition.filter.search(column);
+    column.filter.search(column);
 
     // finished
     return;
   }
 
   // filter accordingly
-  switch (column.columnDefinition.filter.type) {
+  switch (column.filter.type) {
 
     // text
     case V2FilterType.TEXT:
 
       // text filter type
-      switch (column.columnDefinition.filter.textType) {
+      switch (column.filter.textType) {
         case V2FilterTextType.STARTS_WITH:
 
           // filter
           query.filter.byText(
-            column.columnDefinition.field,
-            column.columnDefinition.filter.value,
+            column.field,
+            column.filter.value,
             true,
-            column.columnDefinition.filter.useLike
+            column.filter.useLike
           );
 
           // finished
@@ -352,29 +351,29 @@ export const applyFilterBy = (
     // multiple select
     case V2FilterType.MULTIPLE_SELECT:
       // replace previous conditions
-      query.filter.remove(column.columnDefinition.field);
-      query.filter.removePathCondition(column.columnDefinition.field);
-      query.filter.removePathCondition(`or.${column.columnDefinition.field}`);
+      query.filter.remove(column.field);
+      query.filter.removePathCondition(column.field);
+      query.filter.removePathCondition(`or.${column.field}`);
 
       // do we need to retrieve empty
-      const hasNoValueIncluded: boolean = column.columnDefinition.filter.value ?
-        column.columnDefinition.filter.value.indexOf(AppFormSelectMultipleV2Component.HAS_NO_VALUE) > -1 :
+      const hasNoValueIncluded: boolean = column.filter.value ?
+        column.filter.value.indexOf(AppFormSelectMultipleV2Component.HAS_NO_VALUE) > -1 :
         false;
 
       // has no value ?
       if (
         hasNoValueIncluded &&
-        column.columnDefinition.filter.value.length === 1
+        column.filter.value.length === 1
       ) {
         // only has no value
         query.filter.where({
           or: [
             {
-              [column.columnDefinition.field]: {
+              [column.field]: {
                 eq: null
               }
             }, {
-              [column.columnDefinition.field]: {
+              [column.field]: {
                 exists: false
               }
             }
@@ -387,25 +386,25 @@ export const applyFilterBy = (
         query.filter.where({
           or: [
             {
-              [column.columnDefinition.field]: {
+              [column.field]: {
                 eq: null
               }
             }, {
-              [column.columnDefinition.field]: {
+              [column.field]: {
                 exists: false
               }
             }, {
-              [column.columnDefinition.field]: { inq: column.columnDefinition.filter.value.filter((value) => value !== AppFormSelectMultipleV2Component.HAS_NO_VALUE) }
+              [column.field]: { inq: column.filter.value.filter((value) => value !== AppFormSelectMultipleV2Component.HAS_NO_VALUE) }
             }
           ]
         }, true);
       } else if (
-        column.columnDefinition.filter.value &&
-        column.columnDefinition.filter.value.length > 0
+        column.filter.value &&
+        column.filter.value.length > 0
       ) {
         // only other values
         query.filter.where({
-          [column.columnDefinition.field]: { inq: column.columnDefinition.filter.value.filter((value) => value !== AppFormSelectMultipleV2Component.HAS_NO_VALUE) }
+          [column.field]: { inq: column.filter.value.filter((value) => value !== AppFormSelectMultipleV2Component.HAS_NO_VALUE) }
         }, true);
       }
 
@@ -416,8 +415,8 @@ export const applyFilterBy = (
     case V2FilterType.DATE_RANGE:
       // filter
       query.filter.byDateRange(
-        column.columnDefinition.field,
-        column.columnDefinition.filter.value
+        column.field,
+        column.filter.value
       );
 
       // finished
@@ -427,8 +426,8 @@ export const applyFilterBy = (
     case V2FilterType.AGE_RANGE:
       // filter
       query.filter.byAgeRange(
-        column.columnDefinition.field,
-        column.columnDefinition.filter.value
+        column.field,
+        column.filter.value
       );
 
       // finished
@@ -447,11 +446,11 @@ export const applyFilterBy = (
 
       // create a query builder
       const searchQb: RequestQueryBuilder = AddressModel.buildAddressFilter(
-        column.columnDefinition.filter.field,
-        column.columnDefinition.filter.fieldIsArray,
-        column.columnDefinition.filter.address,
-        column.columnDefinition.filter.address.filterLocationIds,
-        (column.columnDefinition.filter as any).useLike
+        column.filter.field,
+        column.filter.fieldIsArray,
+        column.filter.address,
+        column.filter.address.filterLocationIds,
+        (column.filter as any).useLike
       );
 
       // add condition if we were able to create it
@@ -469,8 +468,8 @@ export const applyFilterBy = (
     case V2FilterType.BOOLEAN:
       // filter
       query.filter.byBooleanUsingExist(
-        column.columnDefinition.field,
-        column.columnDefinition.filter.value as any
+        column.field,
+        column.filter.value as any
       );
 
       // finished
@@ -480,8 +479,8 @@ export const applyFilterBy = (
     case V2FilterType.NUMBER_RANGE:
       // filter
       query.filter.byRange(
-        column.columnDefinition.field,
-        column.columnDefinition.filter.value
+        column.field,
+        column.filter.value
       );
 
       // finished
@@ -490,12 +489,12 @@ export const applyFilterBy = (
     // deleted
     case V2FilterType.DELETED:
       // filter
-      if (column.columnDefinition.filter.value === false) {
+      if (column.filter.value === false) {
         query.excludeDeleted();
         query.filter.remove('deleted');
       } else {
         query.includeDeleted();
-        if (column.columnDefinition.filter.value === true) {
+        if (column.filter.value === true) {
           query.filter.where({
             deleted: {
               eq: true
@@ -513,8 +512,8 @@ export const applyFilterBy = (
     case V2FilterType.PHONE_NUMBER:
       // filter
       query.filter.byPhoneNumber(
-        column.columnDefinition.field,
-        column.columnDefinition.filter.value
+        column.field,
+        column.filter.value
       );
 
       // finished
@@ -524,7 +523,7 @@ export const applyFilterBy = (
     case V2FilterType.SELECT_GROUPS:
       // filter
       query.filter.bySelect(
-        column.columnDefinition.field,
+        column.field,
         valueOverwrite,
         true,
         null
@@ -575,15 +574,15 @@ export const applyResetOnAllFilters = (
         break;
 
       default:
-        column.filter.value =  column.filter.defaultValue;
+        column.filter.value =  column.filter.defaultValue && typeof column.filter.defaultValue === 'object' ?
+          _.cloneDeep(column.filter.defaultValue) :
+          column.filter.defaultValue;
     }
 
     // custom filter ?
     if (column.filter.search) {
       // call
-      column.filter.search({
-        columnDefinition: column
-      });
+      column.filter.search(column);
     }
   });
 };

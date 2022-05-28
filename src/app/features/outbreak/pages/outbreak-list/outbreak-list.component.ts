@@ -14,10 +14,9 @@ import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { AnswerModel, QuestionModel } from '../../../../core/models/question.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { IExtendedColDef } from '../../../../shared/components-v2/app-list-table-v2/models/extended-column.model';
 import { IV2BreadcrumbAction } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
@@ -170,14 +169,14 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
           type: V2FilterType.BOOLEAN,
           value: '',
           defaultValue: '',
-          search: (column: IExtendedColDef) => {
+          search: (column: IV2Column) => {
             // remove filter
             this.queryBuilder.filter.remove('id');
 
             // check if value is boolean. If not, remove filter
-            if (_.isBoolean(column.columnDefinition.filter.value)) {
+            if (_.isBoolean(column.filter.value)) {
               // remove filter on the property to not add more conditions on the same property.
-              switch (column.columnDefinition.filter.value) {
+              switch (column.filter.value) {
                 case true : {
                   this.queryBuilder.filter.where({
                     id: {

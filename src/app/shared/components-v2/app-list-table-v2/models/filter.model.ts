@@ -1,11 +1,11 @@
 import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.model';
-import { IExtendedColDef } from './extended-column.model';
 import { IV2DateRange } from '../../../forms-v2/components/app-form-date-range-v2/models/date.model';
 import { IV2NumberRange } from '../../../forms-v2/components/app-form-number-range-v2/models/number.model';
 import { AddressModel } from '../../../../core/models/address.model';
 import { DomSanitizer } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
 import { ISelectGroupMap, ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from '../../../forms-v2/components/app-form-select-groups-v2/models/select-group.model';
+import { IV2Column } from './column.model';
 
 /**
  * Filter Type
@@ -41,7 +41,7 @@ interface IV2FilterBasic {
   type: V2FilterType;
 
   // optional
-  search?: (column: IExtendedColDef) => void;
+  search?: (column: IV2Column) => void;
   childQueryBuilderKey?: string;
   relationshipKey?: string;
 

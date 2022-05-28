@@ -546,8 +546,8 @@ export class RequestFilter {
     }
 
     // determine what filters we need to add
-    const fromValue: number = _.isNumber(value.from) ? value.from : null;
-    const toValue: number = _.isNumber(value.to) ? value.to : null;
+    const fromValue: number = _.isNumber(value?.from) ? value.from : null;
+    const toValue: number = _.isNumber(value?.to) ? value.to : null;
 
     // do we need to add any conditions ?
     if (

@@ -22,7 +22,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { AddressModel } from '../../../../core/models/address.model';
 import { ExportFieldsGroupModelNameEnum } from '../../../../core/models/export-fields-group.model';
-import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -38,7 +38,6 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { LocationModel } from '../../../../core/models/location.model';
 import { IV2FilterBoolean, IV2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
-import { IExtendedColDef } from '../../../../shared/components-v2/app-list-table-v2/models/extended-column.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import * as moment from 'moment';
 
@@ -313,9 +312,9 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
           options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-          search: (column: IExtendedColDef) => {
+          search: (column: IV2Column) => {
             // create condition
-            const values: string[] = (column.columnDefinition.filter as IV2FilterMultipleSelect).value;
+            const values: string[] = (column.filter as IV2FilterMultipleSelect).value;
             const condition = {
               classification: {
                 inq: values
@@ -554,7 +553,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           defaultValue: this.notACaseFilter,
           search: (column) => {
             // update not a case
-            this.notACaseFilter = (column.columnDefinition.filter as IV2FilterBoolean).value;
+            this.notACaseFilter = (column.filter as IV2FilterBoolean).value;
 
             // refresh
             this.needsRefreshList();
