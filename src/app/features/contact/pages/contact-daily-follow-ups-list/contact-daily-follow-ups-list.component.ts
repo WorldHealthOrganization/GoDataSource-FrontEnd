@@ -1601,7 +1601,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         label: {
           get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_RESTORE_SELECTED_FOLLOW_UPS'
         },
-        // TODO: This had a tooltip, should we implement? - [matTooltip]="'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_RESTORE_SELECTED_FOLLOW_UPS_DESCRIPTION' | translate"
         action: {
           click: (selected: string[]) => {
             // create query
@@ -1754,8 +1753,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                 } else if (teamId === '') {
                   teamLabel = 'LNG_PAGE_LIST_FOLLOW_UPS_NO_TEAM_LABEL';
                 } else {
-                  // TODO: We should add a translation token or fix data?
-                  teamLabel = 'ID not matching any team...';
+                  teamLabel = '-';
                 }
 
                 values.push({
@@ -1769,7 +1767,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               gData.data.values = values.map((item) => {
                 return {
                   label: item.label,
-                  // TODO: Those may not be the righ colors, bg and text..
                   bgColor: Constants.DEFAULT_BACKGROUND_COLOR_NODES_CHAINS,
                   textColor: Constants.DEFAULT_COLOR_CHAINS,
                   value: item.value.toLocaleString('en')
