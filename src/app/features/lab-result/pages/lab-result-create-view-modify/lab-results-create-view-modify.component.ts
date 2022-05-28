@@ -836,6 +836,9 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       });
     }
 
+    // remove any relationships
+    data.queryBuilder.clearRelationships();
+
     // retrieve data
     this.expandListRecords$ = this.labResultDataService
       .getEntityLabResults(

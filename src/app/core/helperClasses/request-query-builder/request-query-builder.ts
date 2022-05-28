@@ -563,13 +563,20 @@ export class RequestQueryBuilder {
   }
 
   /**
+   * Clear relationships
+   */
+  clearRelationships(): void {
+    this.includedRelations = {};
+  }
+
+  /**
    * Clear filter and sort criterias
    */
   clear() {
     // clear
     this.clearFields();
     this.filter.clear();
-    this.includedRelations = {};
+    this.clearRelationships();
     this.sort.clear();
     this.clearChildrenQueryBuilders();
     this.deleted = false;
