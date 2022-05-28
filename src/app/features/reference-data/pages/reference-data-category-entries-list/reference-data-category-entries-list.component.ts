@@ -404,22 +404,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
    * Fields retrieved from api to reduce payload size
    */
   protected refreshListFields(): string[] {
-    return [
-      'id',
-      'categoryId',
-      'value',
-      'code',
-      'description',
-      'iconUrl',
-      'colorCode',
-      'order',
-      'active',
-      'readonly',
-      'createdBy',
-      'createdAt',
-      'updatedBy',
-      'updatedAt'
-    ];
+    return [];
   }
 
   /**
