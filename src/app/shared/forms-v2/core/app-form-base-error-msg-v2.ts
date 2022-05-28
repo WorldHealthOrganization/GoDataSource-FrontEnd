@@ -75,6 +75,13 @@ export abstract class AppFormBaseErrorMsgV2 {
       case 'noSpaces':
         return translateService.instant('LNG_FORM_VALIDATION_ERROR_FIELD_NO_SPACES');
 
+      case 'missingRequiredOptions':
+        return translateService.instant(
+          'LNG_FORM_VALIDATION_ERROR_MISSING_REQUIRED_OPTIONS', {
+            options: errData.options.join(', ')
+          }
+        );
+
       default:
         return `--- NOT HANDLED (${errKey}) ---`;
     }

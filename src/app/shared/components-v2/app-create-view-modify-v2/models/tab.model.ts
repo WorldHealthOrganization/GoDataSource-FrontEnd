@@ -283,6 +283,8 @@ interface ICreateViewModifyV2TabInputSelectGroups extends Omit<ICreateViewModify
   ) => ISelectGroupOptionFormatResponse;
   groupSelectionChanged: (data: IGroupEventData) => void;
   groupOptionCheckStateChanged: (data: IGroupOptionEventData) => void;
+  appGroupOptionsRequirementsKey: string;
+  requiredWithoutDefaultValues: boolean;
 
   // optional
   validators?: {

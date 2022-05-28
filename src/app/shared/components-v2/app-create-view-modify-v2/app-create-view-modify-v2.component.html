@@ -595,6 +595,14 @@
                     [ngModel]="input.value.get(parentItemIndex)"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                     [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
+                    app-group-option-requirements-validator
+                    [appGroupRequiredOptions]="input.groups"
+                    [appGroupKey]="input.groupValueKey"
+                    [appGroupOptionsKey]="input.groupOptionsKey"
+                    [appGroupOptionsValueKey]="input.groupOptionValueKey"
+                    [appGroupOptionsLabelKey]="input.groupOptionLabelKey"
+                    [appGroupOptionsRequirementsKey]="input.appGroupOptionsRequirementsKey"
+                    [requiredWithoutDefaultValues]="input.requiredWithoutDefaultValues"
                     (groupSelectionChanged)="input.groupSelectionChanged($event)"
                     (groupOptionCheckStateChanged)="input.groupOptionCheckStateChanged($event)"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-select-groups-v2>
