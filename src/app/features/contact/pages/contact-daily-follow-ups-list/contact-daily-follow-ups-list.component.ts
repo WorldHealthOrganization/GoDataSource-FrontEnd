@@ -1474,7 +1474,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
    * Initialize table group actions
    */
   protected initializeGroupActions(): void {
-    // TODO: This had a tooltip, should we implement? - [matTooltip]="'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_TOOLTIP' | translate"
     this.groupActions = [
       // bulk modify
       {
@@ -1532,7 +1531,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         label: {
           get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS'
         },
-        // TODO: This had a tooltip, should we implement? - [matTooltip]="'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS_DESCRIPTION' | translate"
         action: {
           click: (selected: string[]) => {
             // create query
