@@ -885,6 +885,12 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
             }
           },
 
+          // change section
+          {
+            type: V2SideDialogConfigInputType.DIVIDER,
+            placeholder: 'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_TITLE'
+          },
+
           // disabled
           {
             type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
