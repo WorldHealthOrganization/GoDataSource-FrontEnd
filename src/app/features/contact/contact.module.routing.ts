@@ -49,7 +49,8 @@ const dailyFOllowUpsListFoundation: Route = {
     gender: GenderDataResolver,
     occupation: OccupationDataResolver,
     classification: ClassificationDataResolver,
-    outcome: OutcomeDataResolver
+    outcome: OutcomeDataResolver,
+    entityData: PersonDataResolver
   }
 };
 

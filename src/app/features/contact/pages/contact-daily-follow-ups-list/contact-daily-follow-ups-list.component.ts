@@ -19,7 +19,6 @@ import { QuestionModel } from '../../../../core/models/question.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { TeamModel } from '../../../../core/models/team.model';
 import { UserModel } from '../../../../core/models/user.model';
-import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -48,11 +47,7 @@ import { FollowUpPage } from '../../typings/follow-up-page';
 })
 export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpModel> implements OnDestroy {
   // case
-  caseId: string;
   caseData: CaseModel;
-
-  // which follow-ups list page are we visiting?
-  rootPage: FollowUpPage = FollowUpPage.DAILY;
 
   @ViewChild('followUpDate', { read: NgModel, static: true }) followUpDateElem: NgModel;
 
@@ -80,7 +75,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     private toastV2Service: ToastV2Service,
     private genericDataService: GenericDataService,
     private activatedRoute: ActivatedRoute,
-    private caseDataService: CaseDataService,
     private dialogV2Service: DialogV2Service
   ) {
     super(
@@ -109,18 +103,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       };
     }
 
-    // case Id arrives only from cases list, view & modify pages
-    // coming directly to daily page doesn't provide us with a case id
-    this.caseId = this.activatedRoute.snapshot.params.caseId;
+    // get data
+    this.caseData = this.activatedRoute.snapshot.data.entityData;
 
-    // no need to retrieve any data? then we can initialize breadcrumbs
-    if (!this.caseId) {
-      this.initializeBreadcrumbs();
-    } else {
-      this.rootPage = FollowUpPage.CASE_RELATED;
-    }
-
-    this.retrieveCaseData();
+    // update breadcrumbs
+    this.initializeBreadcrumbs();
   }
 
   /**
@@ -558,8 +545,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               },
               linkQueryParams: (): Params => {
                 return {
-                  rootPage: this.rootPage,
-                  rootCaseId: this.caseId
+                  rootPage: this.caseData ? FollowUpPage.CASE_RELATED : FollowUpPage.DAILY,
+                  rootCaseId: this.caseData?.id
                 };
               }
             },
@@ -580,8 +567,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               },
               linkQueryParams: (): Params => {
                 return {
-                  rootPage: this.rootPage,
-                  rootCaseId: this.caseId
+                  rootPage: this.caseData ? FollowUpPage.CASE_RELATED : FollowUpPage.DAILY,
+                  rootCaseId: this.caseData?.id
                 };
               }
             },
@@ -782,7 +769,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                 visible: (item: FollowUpModel): boolean => {
                   // visible only if at least one of the previous...
                   return !item.deleted &&
-                    !this.caseId &&
+                    !this.caseData?.id &&
                     this.selectedOutbreakIsActive &&
                     FollowUpModel.canModify(this.authUser) &&
                     !Constants.isDateInTheFuture(item.date);
@@ -885,7 +872,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                 },
                 visible: (item: FollowUpModel): boolean => {
                   return !item.deleted &&
-                    !this.caseId &&
+                    !this.caseData?.id &&
                     this.selectedOutbreakIsActive &&
                     FollowUpModel.canModify(this.authUser);
                 }
@@ -975,7 +962,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                 visible: (item: FollowUpModel): boolean => {
                   return !item.deleted &&
                     // definitions.entityData.type === EntityType.CONTACT &&
-                    !this.caseId &&
+                    !this.caseData?.id &&
                     this.selectedOutbreakIsActive &&
                     FollowUpModel.canModify(this.authUser);
                 }
@@ -1817,25 +1804,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     };
   }
 
-  /**
-   * Retrieve case data
-   */
-  private retrieveCaseData() {
-    if (
-      this.selectedOutbreak &&
-            this.selectedOutbreak.id &&
-            this.caseId
-    ) {
-      // retrieve case data
-      this.caseDataService
-        .getCase(this.selectedOutbreak.id, this.caseId)
-        .subscribe((caseData: CaseModel) => {
-          this.caseData = caseData;
-          this.initializeBreadcrumbs();
-        });
-    }
-  }
-
   // TODO: Is this used somehow?
   /**
    * Loaded cached filters
@@ -2016,8 +1984,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
    */
   refreshList(triggeredByPageChange: boolean) {
     // add case id
-    if (this.caseId) {
-      this.queryBuilder.addChildQueryBuilder('case').filter.byEquality('id', this.caseId);
+    if (this.caseData?.id) {
+      this.queryBuilder.addChildQueryBuilder('case').filter.byEquality('id', this.caseData.id);
     }
 
     // refresh badges list with applied filter
@@ -2055,8 +2023,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     qb.merge(this.queryBuilder);
 
     // add case id
-    if (this.caseId) {
-      qb.addChildQueryBuilder('case').filter.byEquality('id', this.caseId);
+    if (this.caseData?.id) {
+      qb.addChildQueryBuilder('case').filter.byEquality('id', this.caseData.id);
     }
 
     // remove paginator from query builder
