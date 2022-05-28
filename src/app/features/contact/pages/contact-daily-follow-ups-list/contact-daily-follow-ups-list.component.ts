@@ -293,26 +293,28 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           fieldIsArray: false
         }
       },
-      // TODO: Needs date format..
       {
         field: 'dateOfLastContact',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
         sortable: true,
         format: {
-          type: 'person.dateOfLastContact'
+          type: (item) => item.person?.dateOfLastContact ?
+            moment(item.person.dateOfLastContact).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            '-'
         },
         filter: {
           type: V2FilterType.DATE_RANGE,
           relationshipKey: 'contact'
         }
       },
-      // TODO: Needs date format..
       {
         field: 'followUp.endDate',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP',
         sortable: true,
         format: {
-          type: 'person.followUp.endDate'
+          type: (item) => item.person?.followUp?.endDate ?
+            moment(item.person.followUp.endDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            '-'
         },
         filter: {
           type: V2FilterType.DATE_RANGE,
