@@ -117,6 +117,10 @@
               [checkErrorMsg]="input.validators?.notInObject ? input.validators?.notInObject(dialogHandler.data, dialogHandler, input)?.err : undefined"
               app-no-spaces-validator
               [noSpacesValidatorDisabled]="!input.validators?.noSpace || !input.validators.noSpace(dialogHandler.data, dialogHandler, input)"
+              app-regex-validator
+              [regexExpr]="input.validators?.regex ? input.validators?.regex().expression : undefined"
+              [regexExprFlags]="input.validators?.regex ? input.validators?.regex().flags : undefined"
+              [regexExprMsg]="input.validators?.regex ? input.validators?.regex().msg : undefined"
               (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-input-v2>
 
             <!-- Textarea -->

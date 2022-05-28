@@ -2010,19 +2010,19 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           visible: (dialogFieldsValues: any): boolean => {
             return !dialogFieldsValues.overwriteExistingFollowUps;
           }
+        },
+        {
+          type: V2SideDialogConfigInputType.TEXT,
+          name: 'intervalOfFollowUp',
+          placeholder: 'LNG_OUTBREAK_FIELD_LABEL_INTERVAL_OF_FOLLOW_UPS',
+          tooltip: 'LNG_OUTBREAK_FIELD_LABEL_INTERVAL_OF_FOLLOW_UPS_DESCRIPTION',
+          value: this.selectedOutbreak.intervalOfFollowUp,
+          validators: {
+            regex: () => ({
+              expression: '^\\s*([1-9][0-9]*)(\\s*,\\s*([1-9][0-9]*))*$'
+            })
+          }
         }
-        // TODO: Needs REGEX_INPUT
-        // {
-        //   type: V2SideDialogConfigInputType.???,
-        //   name: 'intervalOfFollowUp',
-        //   placeholder: 'LNG_OUTBREAK_FIELD_LABEL_INTERVAL_OF_FOLLOW_UPS',
-        //   tooltip: 'LNG_OUTBREAK_FIELD_LABEL_INTERVAL_OF_FOLLOW_UPS_DESCRIPTION',
-        //   value: this.selectedOutbreak.intervalOfFollowUp,
-        //   regex: '^\\s*([1-9][0-9]*)(\\s*,\\s*([1-9][0-9]*))*$',
-        //   validators: {
-        //     required: () => true
-        //   }
-        // }
       ],
 
       // buttons
