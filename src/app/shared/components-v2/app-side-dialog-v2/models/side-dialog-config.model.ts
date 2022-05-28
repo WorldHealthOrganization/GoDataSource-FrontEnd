@@ -307,6 +307,9 @@ export interface IV2SideDialogConfigInputDateRange extends IV2SideDialogConfigIn
   type: V2SideDialogConfigInputType.DATE_RANGE;
   value: IV2DateRange;
 
+  // optional
+  validators?: IV2SideDialogConfigInputValidator;
+
   // never
   placeholder?: never;
 }
@@ -318,6 +321,9 @@ export interface IV2SideDialogConfigInputNumberRange extends IV2SideDialogConfig
   // required
   type: V2SideDialogConfigInputType.NUMBER_RANGE;
   value: IV2NumberRange;
+
+  // optional
+  validators?: IV2SideDialogConfigInputValidator;
 
   // never
   placeholder?: never;

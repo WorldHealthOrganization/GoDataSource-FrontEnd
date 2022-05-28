@@ -14,22 +14,18 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { ExportFieldsGroupModelNameEnum } from '../../../../core/models/export-fields-group.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { QuestionModel } from '../../../../core/models/question.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { TeamModel } from '../../../../core/models/team.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
+import { ExportDataExtension, ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { DialogAnswerButton, DialogField, DialogFieldType } from '../../../../shared/components';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
@@ -37,7 +33,6 @@ import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, IV2SideDialogConfigInputToggle, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { DialogAnswer, DialogConfiguration } from '../../../../shared/components/dialog/dialog.component';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { FollowUpPage } from '../../typings/follow-up-page';
 
@@ -68,12 +63,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
    */
   constructor(
     protected listHelperService: ListHelperService,
-    protected dialogService: DialogService,
     protected followUpsDataService: FollowUpsDataService,
     protected i18nService: I18nService,
     protected outbreakDataService: OutbreakDataService,
     private toastV2Service: ToastV2Service,
-    private genericDataService: GenericDataService,
     private activatedRoute: ActivatedRoute,
     private dialogV2Service: DialogV2Service
   ) {
@@ -1957,119 +1950,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       });
   }
 
-  // TODO: Method generateFollowUpsOLD() to be deleted, left for inspiration
-  /**
-   * Generate Follow Ups
-   */
-  generateFollowUpsOLD() {
-    // must have outbreak
-    if (
-      !this.selectedOutbreak ||
-            !this.selectedOutbreak.id
-    ) {
-      return;
-    }
-
-    // display dialog
-    this.genericDataService
-      .getFilterYesNoOptions()
-      .subscribe((yesNoOptions: LabelValuePair[]) => {
-        const yesNoOptionsFiltered: LabelValuePair[] = _.filter(yesNoOptions, (item: LabelValuePair) => _.isBoolean(item.value));
-        this.dialogService
-          .showInput(new DialogConfiguration({
-            message: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TITLE',
-            yesLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_YES_BUTTON',
-            fieldsList: [
-              new DialogField({
-                name: 'dates',
-                required: true,
-                value: {
-                  startDate: moment().add(1, 'days').startOf('day').format(),
-                  endDate: moment().add(1, 'days').endOf('day').format()
-                },
-                fieldType: DialogFieldType.DATE_RANGE
-              }),
-              new DialogField({
-                name: 'targeted',
-                placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TARGETED_LABEL',
-                inputOptions: yesNoOptionsFiltered,
-                inputOptionsClearable: false,
-                required: true,
-                value: true
-              }),
-              new DialogField({
-                name: 'overwriteExistingFollowUps',
-                placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_OVERWRITE_EXISTING_LABEL',
-                description: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_OVERWRITE_EXISTING_LABEL_DESCRIPTION',
-                inputOptions: yesNoOptionsFiltered,
-                inputOptionsClearable: false,
-                required: true,
-                value: this.selectedOutbreak.generateFollowUpsOverwriteExisting
-              }),
-              new DialogField({
-                name: 'keepTeamAssignment',
-                placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_KEEP_TEAM_ASSIGNMENT_LABEL',
-                description: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_KEEP_TEAM_ASSIGNMENT_LABEL_DESCRIPTION',
-                inputOptions: yesNoOptionsFiltered,
-                inputOptionsClearable: false,
-                required: true,
-                value: this.selectedOutbreak.generateFollowUpsKeepTeamAssignment,
-                visible: (dialogFieldsValues: any): boolean => {
-                  return !dialogFieldsValues.overwriteExistingFollowUps;
-                }
-              }),
-              new DialogField({
-                name: 'intervalOfFollowUp',
-                placeholder: 'LNG_OUTBREAK_FIELD_LABEL_INTERVAL_OF_FOLLOW_UPS',
-                description: 'LNG_OUTBREAK_FIELD_LABEL_INTERVAL_OF_FOLLOW_UPS_DESCRIPTION',
-                required: false,
-                value: this.selectedOutbreak.intervalOfFollowUp,
-                fieldType: DialogFieldType.REGEX_INPUT,
-                regex: '^\\s*([1-9][0-9]*)(\\s*,\\s*([1-9][0-9]*))*$'
-              })
-            ]
-          }))
-          .subscribe((answer: DialogAnswer) => {
-            if (answer.button === DialogAnswerButton.Yes) {
-              // display loading
-              // this.showLoadingDialog();
-
-              // generate follow-ups
-              this.followUpsDataService
-                .generateFollowUps(
-                  this.selectedOutbreak.id,
-                  answer.inputValue.value.dates.startDate,
-                  answer.inputValue.value.dates.endDate,
-                  answer.inputValue.value.targeted,
-                  answer.inputValue.value.overwriteExistingFollowUps,
-                  answer.inputValue.value.keepTeamAssignment,
-                  answer.inputValue.value.intervalOfFollowUp
-                )
-                .pipe(
-                  catchError((err) => {
-                    // hide loading
-                    // this.closeLoadingDialog();
-
-                    // error
-                    this.toastV2Service.error(err);
-                    return throwError(err);
-                  })
-                )
-                .subscribe(() => {
-                  // hide loading
-                  // this.closeLoadingDialog();
-
-                  // finished
-                  this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
-
-                  // reload data
-                  this.needsRefreshList(true);
-                });
-            }
-          });
-      });
-  }
-
   /**
    * Generate Follow Ups
    */
@@ -2082,18 +1962,17 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
 
       // inputs
       inputs: [
-        // TODO: Needs RANGE_DATE
-        // {
-        //   type: V2SideDialogConfigInputType.???,
-        //   name: 'dates',
-        //   value: {
-        //     startDate: moment().add(1, 'days').startOf('day').format(),
-        //     endDate: moment().add(1, 'days').endOf('day').format()
-        //   },
-        //   validators: {
-        //     required: () => true
-        //   }
-        // },
+        {
+          type: V2SideDialogConfigInputType.DATE_RANGE,
+          name: 'dates',
+          value: {
+            startDate: moment().add(1, 'days').startOf('day').format(),
+            endDate: moment().add(1, 'days').endOf('day').format()
+          },
+          validators: {
+            required: () => true
+          }
+        },
         {
           type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
           placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_DIALOG_TARGETED_LABEL',
