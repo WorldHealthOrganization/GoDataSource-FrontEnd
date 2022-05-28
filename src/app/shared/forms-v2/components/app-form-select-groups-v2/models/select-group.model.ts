@@ -21,6 +21,7 @@ export interface IGroupEventData {
   readonly optionsMap: ISelectGroupOptionMap<any>;
   readonly previousValue: string[];
   addValues(...values: string[]): string[];
+  hidePanel(): void;
 }
 
 /**
@@ -36,6 +37,7 @@ export interface IGroupOptionEventData {
   readonly optionsMap: ISelectGroupOptionMap<any>;
   readonly allWasSelected: boolean;
   addValues(...values: string[]): string[];
+  hidePanel(): void;
 }
 
 /**

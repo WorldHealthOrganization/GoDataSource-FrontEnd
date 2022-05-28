@@ -5,12 +5,12 @@ import {
   Host, Input,
   OnDestroy,
   Optional, Output,
-  SkipSelf, ViewEncapsulation
+  SkipSelf, ViewChild, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
-import { MAT_SELECT_CONFIG } from '@angular/material/select';
+import { MAT_SELECT_CONFIG, MatSelect } from '@angular/material/select';
 import { GroupEventDataAction, IGroupEventData, IGroupOptionEventData, ISelectGroupMap, ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from './models/select-group.model';
 import * as _ from 'lodash';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -36,6 +36,9 @@ import { MatOptionSelectionChange } from '@angular/material/core';
 })
 export class AppFormSelectGroupsV2Component
   extends AppFormBaseV2<string[]> implements OnDestroy {
+
+  // select item
+  @ViewChild('selectItem') selectItem: MatSelect;
 
   // float label
   @Input() neverFloatLabel: boolean = false;
@@ -746,6 +749,9 @@ export class AppFormSelectGroupsV2Component
       this.value = [...this.value];
       this.valueChanged(this.value);
 
+      // update
+      this.valueChangedTrigger();
+
       // force partial refresh keys
       // fix for when jumping from 'None' to 'Partial' group checkbox
       setTimeout(() => {
@@ -884,6 +890,7 @@ export class AppFormSelectGroupsV2Component
             group &&
             action
           ) {
+            const self = this;
             this.groupSelectionChanged.emit({
               action,
               group,
@@ -893,6 +900,9 @@ export class AppFormSelectGroupsV2Component
               optionsMap: this.optionsMap,
               addValues: (...values: string[]): string[] => {
                 return this.internalAddValues(...values);
+              },
+              hidePanel(): void {
+                self.selectItem.close();
               }
             });
           }
@@ -928,6 +938,7 @@ export class AppFormSelectGroupsV2Component
               option &&
               group
             ) {
+              const self = this;
               this.groupOptionCheckStateChanged.emit({
                 group,
                 option,
@@ -938,6 +949,9 @@ export class AppFormSelectGroupsV2Component
                 value: [...this.value],
                 addValues: (...values: string[]): string[] => {
                   return this.internalAddValues(...values);
+                },
+                hidePanel(): void {
+                  self.selectItem.close();
                 }
               });
             }

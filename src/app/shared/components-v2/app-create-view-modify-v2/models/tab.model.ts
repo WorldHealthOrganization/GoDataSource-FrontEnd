@@ -18,7 +18,7 @@ import { MapServerModel } from '../../../../core/models/map-server.model';
 import { IAnswerData, QuestionModel } from '../../../../core/models/question.model';
 import { DomSanitizer } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
-import { ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from '../../../forms-v2/components/app-form-select-groups-v2/models/select-group.model';
+import { IGroupEventData, IGroupOptionEventData, ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from '../../../forms-v2/components/app-form-select-groups-v2/models/select-group.model';
 
 /**
  * Input type
@@ -281,6 +281,8 @@ interface ICreateViewModifyV2TabInputSelectGroups extends Omit<ICreateViewModify
     optionsMap: ISelectGroupOptionMap<any>,
     option: any
   ) => ISelectGroupOptionFormatResponse;
+  groupSelectionChanged: (data: IGroupEventData) => void;
+  groupOptionCheckStateChanged: (data: IGroupOptionEventData) => void;
 
   // optional
   validators?: {
