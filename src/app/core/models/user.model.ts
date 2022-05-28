@@ -6,6 +6,7 @@ import { IPermissionBasic, IPermissionCloneable, IPermissionUser } from './permi
 import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 import { TeamModel } from './team.model';
+import { BaseModel } from './base.model';
 
 export enum UserSettings {
   AUDIT_LOG_FIELDS = 'auditLogFields',
@@ -260,9 +261,10 @@ implements
 }
 
 export class UserModel
-implements
-        IPermissionBasic,
-        IPermissionUser {
+  extends BaseModel
+  implements
+    IPermissionBasic,
+    IPermissionUser {
   id: string;
   firstName: string;
   lastName: string;
@@ -419,6 +421,9 @@ implements
      * Constructor
      */
   constructor(data = null) {
+    // parent
+    super(data);
+
     this.id = _.get(data, 'id');
     this.firstName = _.get(data, 'firstName');
     this.lastName = _.get(data, 'lastName');

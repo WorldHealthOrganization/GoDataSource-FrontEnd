@@ -23,6 +23,7 @@ import { IAnswerData, QuestionModel } from '../../../../core/models/question.mod
 export enum CreateViewModifyV2TabInputType {
   // inputs
   TEXT,
+  EMAIL,
   PASSWORD,
   SELECT_SINGLE,
   SELECT_MULTIPLE,
@@ -104,6 +105,19 @@ interface ICreateViewModifyV2TabInputText extends Omit<ICreateViewModifyV2TabInp
   };
 }
 
+/**
+ * Input - email
+ */
+interface ICreateViewModifyV2TabInputEmail extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
+  // required
+  type: CreateViewModifyV2TabInputType.EMAIL;
+  value: ICreateViewModifyV2TabInputValue<string>;
+
+  // optional
+  validators?: {
+    required?: () => boolean
+  };
+}
 /**
  * Input - async validator text
  */
@@ -398,7 +412,7 @@ interface ICreateViewModifyV2TabLabel {
 /**
  * Input
  */
-export type CreateViewModifyV2TabInput = ICreateViewModifyV2TabInputText | ICreateViewModifyV2TabInputPassword | ICreateViewModifyV2TabInputSingleSelect
+export type CreateViewModifyV2TabInput = ICreateViewModifyV2TabInputText | ICreateViewModifyV2TabInputEmail | ICreateViewModifyV2TabInputPassword | ICreateViewModifyV2TabInputSingleSelect
 | ICreateViewModifyV2TabInputMultipleSelect | ICreateViewModifyV2TabInputToggleCheckbox | ICreateViewModifyV2TabInputLocationSingle | ICreateViewModifyV2TabInputLocationMultiple
 | ICreateViewModifyV2TabInputTextArea | ICreateViewModifyV2TabInputNumber | ICreateViewModifyV2TabInputAgeOrDOB | ICreateViewModifyV2TabInputAsyncValidatorText
 | ICreateViewModifyV2TabInputDate | ICreateViewModifyV2TabInputList | ICreateViewModifyV2TabInputDocument | ICreateViewModifyV2TabInputAddress
