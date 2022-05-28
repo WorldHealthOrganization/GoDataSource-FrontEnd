@@ -2010,6 +2010,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           },
           visible: (dialogFieldsValues: any): boolean => {
             return !dialogFieldsValues.overwriteExistingFollowUps;
+          },
+          disabled: (data) => {
+            return !!(data.map.overwriteExistingFollowUps as IV2SideDialogConfigInputSingleDropdown).value;
           }
         },
         {
@@ -2050,6 +2053,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
         return;
       }
+
+      // close popup
+      response.handler.loading.show();
 
       // generate follow-ups
       this.followUpsDataService
