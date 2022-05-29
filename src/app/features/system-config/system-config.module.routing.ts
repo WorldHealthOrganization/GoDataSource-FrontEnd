@@ -4,7 +4,6 @@ import * as fromPages from './pages';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
-import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { BackupModuleDataResolver } from '../../core/services/resolvers/data/backup-module.resolver';
@@ -127,24 +126,24 @@ const routes: Routes = [
       },
       {
         path: ':deviceId/view',
-        component: fromPages.ModifySystemDeviceComponent,
+        component: fromPages.SystemDevicesCreateViewModifyComponent,
         canActivate: [AuthGuard],
         data: {
           permissions: [
             PERMISSION.DEVICE_VIEW
           ],
-          action: ViewModifyComponentAction.VIEW
+          action: CreateViewModifyV2Action.VIEW
         }
       },
       {
         path: ':deviceId/modify',
-        component: fromPages.ModifySystemDeviceComponent,
+        component: fromPages.SystemDevicesCreateViewModifyComponent,
         canActivate: [AuthGuard],
         data: {
           permissions: [
             PERMISSION.DEVICE_MODIFY
           ],
-          action: ViewModifyComponentAction.MODIFY
+          action: CreateViewModifyV2Action.MODIFY
         },
         canDeactivate: [
           PageChangeConfirmationGuard
