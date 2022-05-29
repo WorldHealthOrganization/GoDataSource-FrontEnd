@@ -16,6 +16,8 @@ import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
 
 interface ITeamMap {
   id: string;
@@ -31,7 +33,7 @@ interface ITeamMap {
 })
 export class TeamWorkloadComponent extends ListComponent<any> implements OnInit, OnDestroy {
   // breadcrumbs
-  // breadcrumbs: BreadcrumbItemModel[] = [];
+  breadcrumbs: IV2Breadcrumb[] = [];
 
   dates: string[] = [];
   teamsDataShow: ITeamMap[] = [];
@@ -126,22 +128,6 @@ export class TeamWorkloadComponent extends ListComponent<any> implements OnInit,
   }
 
   /**
-     * Initialize breadcrumbs
-     */
-  // private initializeBreadcrumbs() {
-  //   // reset
-  //   this.breadcrumbs = [];
-  //
-  //   // add list breadcrumb only if we have permission
-  //   if (TeamModel.canList(this.authUser)) {
-  //     this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_TEAMS_TITLE', '/teams'));
-  //   }
-  //
-  //   // workload breadcrumb
-  //   this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_TEAMS_WORKLOAD_TITLE', '.', true));
-  // }
-
-  /**
      * Remove component resources
      */
   ngOnDestroy() {
@@ -198,6 +184,31 @@ export class TeamWorkloadComponent extends ListComponent<any> implements OnInit,
    * Initialize breadcrumbs
    */
   initializeBreadcrumbs(): void {
+    // reset
+    this.breadcrumbs = [{
+      label: 'LNG_COMMON_LABEL_HOME',
+      action: {
+        link: DashboardModel.canViewDashboard(this.authUser) ?
+          ['/dashboard'] :
+          ['/account/my-profile']
+      }
+    }];
+
+    // list page
+    if (TeamModel.canList(this.authUser)) {
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_TEAMS_TITLE',
+        action: {
+          link: ['/teams']
+        }
+      });
+    }
+
+    // current page
+    this.breadcrumbs.push({
+      label: 'LNG_PAGE_TEAMS_WORKLOAD_TITLE',
+      action: null
+    });
   }
 
   /**
