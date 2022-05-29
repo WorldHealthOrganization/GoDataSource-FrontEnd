@@ -22,6 +22,7 @@ import { ActivatedRoute } from '@angular/router';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { TransmissionChainFilters } from '../../classes/filter';
+import { IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 
 @Component({
   selector: 'app-case-count-map',
@@ -56,6 +57,9 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
 
   // advanced filters
   advancedFilters: V2AdvancedFilter[];
+
+  // quick actions
+  quickActions: IV2ActionMenuLabel;
 
   // subscribers
   outbreakSubscriber: Subscription;
@@ -197,6 +201,27 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
         }
       }
     ];
+
+    // quick actions
+    this.quickActions = {
+      type: V2ActionType.MENU,
+      label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
+      visible: () => TransmissionChainModel.canExportCaseCountMap(this.authUser),
+      menuOptions: [
+        // Export
+        {
+          label: {
+            get: () => 'LNG_PAGE_CASE_COUNT_EXPORT_MAP'
+          },
+          action: {
+            click: () => {
+              this.exportCaseCountMap();
+            }
+          },
+          visible: () => TransmissionChainModel.canExportCaseCountMap(this.authUser)
+        }
+      ]
+    };
   }
 
   /**
