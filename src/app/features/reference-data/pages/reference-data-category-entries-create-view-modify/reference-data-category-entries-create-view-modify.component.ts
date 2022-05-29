@@ -23,6 +23,8 @@ import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
 
 /**
  * Component
@@ -310,9 +312,20 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
                   this.itemData.colorCode = value;
                 }
               }
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'iconId',
+              placeholder: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON',
+              description: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON_DESCRIPTION',
+              options: (this.activatedRoute.snapshot.data.icon as IResolverV2ResponseModel<OutbreakModel>).options,
+              value: {
+                get: () => this.itemData.iconId,
+                set: (value) => {
+                  // set data
+                  this.itemData.iconId = value;
+                }
+              }
             }
-            // #TODO
-            // - icon picker
           ]
         }
       ]

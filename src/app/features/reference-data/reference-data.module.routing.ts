@@ -8,6 +8,7 @@ import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { ReferenceDataCategoryDataResolver } from '../../core/services/resolvers/data/reference-data-category.resolver';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
+import { IconDataResolver } from '../../core/services/resolvers/data/icon.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -15,7 +16,8 @@ const createViewModifyFoundation: Route = {
   canActivate: [AuthGuard],
   resolve: {
     category: ReferenceDataCategoryDataResolver,
-    user: UserDataResolver
+    user: UserDataResolver,
+    icon: IconDataResolver
   }
 };
 

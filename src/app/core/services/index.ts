@@ -127,6 +127,7 @@ import { CotEdgeLabelDataResolver } from './resolvers/data/cot-edge-label.resolv
 import { CotEdgeIconDataResolver } from './resolvers/data/cot-edge-icon.resolver';
 import { CotEdgeColorDataResolver } from './resolvers/data/cot-edge-color.resolver';
 import { UpstreamServersDataResolver } from './resolvers/data/upstream-servers.resolver';
+import { IconDataResolver } from './resolvers/data/icon.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -159,6 +160,7 @@ export const services: any[] = [
   FollowUpGenerationTeamAssignmentAlgorithmDataResolver,
   GanttChartTypeDataResolver,
   GenderDataResolver,
+  IconDataResolver,
   InstitutionDataResolver,
   LabNameDataResolver,
   LabPersonTypeDataResolver,
