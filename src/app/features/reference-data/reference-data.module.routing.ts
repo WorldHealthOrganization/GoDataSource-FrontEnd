@@ -1,14 +1,25 @@
 import { ModuleWithProviders } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { Routes, RouterModule, Route } from '@angular/router';
 import * as fromPages from './pages';
-import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PERMISSION } from '../../core/models/permission.model';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { ReferenceDataCategoryDataResolver } from '../../core/services/resolvers/data/reference-data-category.resolver';
+import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 
+// common base - create / view / modify
+const createViewModifyFoundation: Route = {
+  component: fromPages.ReferenceDataCategoryEntriesCreateViewModifyComponent,
+  canActivate: [AuthGuard],
+  resolve: {
+    category: ReferenceDataCategoryDataResolver,
+    user: UserDataResolver
+  }
+};
+
+// routes
 const routes: Routes = [
   // Reference Data Categories List
   {
@@ -43,12 +54,12 @@ const routes: Routes = [
   // Create new Reference Data entry
   {
     path: ':categoryId/create',
-    component: fromPages.CreateReferenceDataEntryComponent,
-    canActivate: [AuthGuard],
+    ...createViewModifyFoundation,
     data: {
       permissions: [
         PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_CREATE
-      ]
+      ],
+      action: CreateViewModifyV2Action.CREATE
     },
     canDeactivate: [
       PageChangeConfirmationGuard
@@ -57,25 +68,23 @@ const routes: Routes = [
   // View Reference Data Entry
   {
     path: ':categoryId/:entryId/view',
-    component: fromPages.ModifyReferenceDataEntryComponent,
-    canActivate: [AuthGuard],
+    ...createViewModifyFoundation,
     data: {
       permissions: [
         PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_VIEW
       ],
-      action: ViewModifyComponentAction.VIEW
+      action: CreateViewModifyV2Action.VIEW
     }
   },
   // Modify Reference Data entry
   {
     path: ':categoryId/:entryId/modify',
-    component: fromPages.ModifyReferenceDataEntryComponent,
-    canActivate: [AuthGuard],
+    ...createViewModifyFoundation,
     data: {
       permissions: [
         PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_MODIFY
       ],
-      action: ViewModifyComponentAction.MODIFY
+      action: CreateViewModifyV2Action.MODIFY
     },
     canDeactivate: [
       PageChangeConfirmationGuard

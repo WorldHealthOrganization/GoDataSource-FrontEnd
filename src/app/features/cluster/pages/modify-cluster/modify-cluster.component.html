@@ -65,21 +65,21 @@
                             [required]="false"/>
 
                         <!-- Read & Write -->
-                        <input
-                            *ngIf="!viewOnly"
-                            #colorPickerInput="ngModel"
-                            fxFlex="132px"
-                            class="cluster-color-picker"
-                            [style.background]="clusterData.colorCode"
-                            name="colorCode"
-                            [ngModel]="clusterData.colorCode"
-                            type="text"
-                            [readonly]="true"
-                            [required]="false"
-                            [colorPicker]="clusterData.colorCode"
-                            cpOutputFormat="hex"
-                            (colorPickerChange)="clusterData.colorCode = $event; colorPickerInput.control.markAsDirty();"
-                            (click)="$event.target.select()"/>
+<!--                        <input-->
+<!--                            *ngIf="!viewOnly"-->
+<!--                            #colorPickerInput="ngModel"-->
+<!--                            fxFlex="132px"-->
+<!--                            class="cluster-color-picker"-->
+<!--                            [style.background]="clusterData.colorCode"-->
+<!--                            name="colorCode"-->
+<!--                            [ngModel]="clusterData.colorCode"-->
+<!--                            type="text"-->
+<!--                            [readonly]="true"-->
+<!--                            [required]="false"-->
+<!--                            [colorPicker]="clusterData.colorCode"-->
+<!--                            cpOutputFormat="hex"-->
+<!--                            (colorPickerChange)="clusterData.colorCode = $event; colorPickerInput.control.markAsDirty();"-->
+<!--                            (click)="$event.target.select()"/>-->
                     </div>
 
                     <div fxFlex fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="20px">

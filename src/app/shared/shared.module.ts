@@ -22,10 +22,12 @@ import { AgGridModule } from '@ag-grid-community/angular';
 import { ToastrModule } from 'ngx-toastr';
 import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
 import { HotTableModule } from '@handsontable/angular';
+import { ColorPickerModule } from 'ngx-color-picker';
 
 @NgModule({
   imports: [
     AgGridModule.withComponents([]),
+    ColorPickerModule,
     CommonModule,
     DragDropModule,
     RouterModule,

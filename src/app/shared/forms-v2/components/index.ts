@@ -17,9 +17,11 @@ import { AppFormPasswordV2Component } from './app-form-password-v2/app-form-pass
 import { AppFormEditQuestionnaireV2Component } from './app-form-edit-questionnaire-v2/app-form-edit-questionnaire-v2.component';
 import { AppFormFillQuestionnaireV2Component } from './app-form-fill-questionnaire-v2/app-form-fill-questionnaire-v2.component';
 import { AppFormTimepickerV2Component } from './app-form-timepicker-v2/app-form-timepicker-v2.component';
+import { AppFormColorV2Component } from './app-form-color-v2/app-form-color-v2.component';
 
 export const components: any[] = [
   AppFormCheckboxV2Component,
+  AppFormColorV2Component,
   AppFormDateRangeV2Component,
   AppFormDateV2Component,
   AppFormEditQuestionnaireV2Component,

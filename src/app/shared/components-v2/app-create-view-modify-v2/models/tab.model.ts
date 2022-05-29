@@ -39,6 +39,7 @@ export enum CreateViewModifyV2TabInputType {
   TEXTAREA,
   NUMBER,
   SELECT_GROUPS,
+  COLOR,
 
   // input groups
   LIST,
@@ -113,6 +114,15 @@ interface ICreateViewModifyV2TabInputText extends Omit<ICreateViewModifyV2TabInp
       err: string
     }
   };
+}
+
+/**
+ * Input - color
+ */
+interface ICreateViewModifyV2TabInputColor extends Omit<ICreateViewModifyV2TabInputBase, 'value'> {
+  // required
+  type: CreateViewModifyV2TabInputType.COLOR;
+  value: ICreateViewModifyV2TabInputValue<string>;
 }
 
 /**
@@ -469,7 +479,7 @@ interface ICreateViewModifyV2TabLabel {
 export type CreateViewModifyV2TabInput = ICreateViewModifyV2TabInputText | ICreateViewModifyV2TabInputEmail | ICreateViewModifyV2TabInputPassword | ICreateViewModifyV2TabInputSingleSelect
 | ICreateViewModifyV2TabInputMultipleSelect | ICreateViewModifyV2TabInputToggleCheckbox | ICreateViewModifyV2TabInputLocationSingle | ICreateViewModifyV2TabInputLocationMultiple
 | ICreateViewModifyV2TabInputTextArea | ICreateViewModifyV2TabInputNumber | ICreateViewModifyV2TabInputSelectGroups | ICreateViewModifyV2TabInputAgeOrDOB | ICreateViewModifyV2TabInputAsyncValidatorText
-| ICreateViewModifyV2TabInputDate | ICreateViewModifyV2TabInputList | ICreateViewModifyV2TabInputDocument | ICreateViewModifyV2TabInputAddress
+| ICreateViewModifyV2TabInputColor | ICreateViewModifyV2TabInputDate | ICreateViewModifyV2TabInputList | ICreateViewModifyV2TabInputDocument | ICreateViewModifyV2TabInputAddress
 | ICreateViewModifyV2TabInputVaccine | ICreateViewModifyV2TabInputCenterDateRange | ICreateViewModifyV2TabInputMapServer | ICreateViewModifyV2TabLabel;
 
 /**
