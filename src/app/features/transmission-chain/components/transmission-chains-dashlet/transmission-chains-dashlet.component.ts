@@ -943,7 +943,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       type: V2ActionType.MENU,
       label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
       menuOptions: [
-        // Export map
+        // Create snapshot
         {
           label: {
             get: () => 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_SETTINGS'
