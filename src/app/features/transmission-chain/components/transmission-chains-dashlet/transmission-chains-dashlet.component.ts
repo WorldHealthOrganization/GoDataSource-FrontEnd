@@ -44,7 +44,14 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IV2ActionIconLabel, IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import {
-  IV2SideDialogConfigButtonType, IV2SideDialogConfigInputDate, IV2SideDialogConfigInputDateRange, IV2SideDialogConfigInputMultiDropdown, IV2SideDialogConfigInputMultipleLocation, IV2SideDialogConfigInputNumberRange, IV2SideDialogConfigInputSingleDropdown,
+  IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigInputDate,
+  IV2SideDialogConfigInputDateRange,
+  IV2SideDialogConfigInputMultiDropdown,
+  IV2SideDialogConfigInputMultipleLocation,
+  IV2SideDialogConfigInputNumber,
+  IV2SideDialogConfigInputNumberRange,
+  IV2SideDialogConfigInputSingleDropdown,
   IV2SideDialogConfigInputText,
   IV2SideDialogConfigInputToggleCheckbox,
   V2SideDialogConfigInputType
@@ -54,6 +61,8 @@ import { V2AdvancedFilter, V2AdvancedFilterComparatorOptions, V2AdvancedFilterCo
 import { AppBasicPageV2Component } from '../../../../shared/components-v2/app-basic-page-v2/app-basic-page-v2.component';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { TransmissionChainFilters } from '../../classes/filter';
+import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
+import * as FileSaver from 'file-saver';
 
 @Component({
   selector: 'app-transmission-chains-dashlet',
@@ -515,8 +524,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     private i18nService: I18nService,
     private locationDataService: LocationDataService,
     private clusterDataService: ClusterDataService,
-    protected activatedRoute: ActivatedRoute,
-    private authDataService: AuthDataService
+    private activatedRoute: ActivatedRoute,
+    private authDataService: AuthDataService,
+    private importExportDataService: ImportExportDataService
   ) {}
 
   /**
@@ -1095,6 +1105,46 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           visible: () => {
             return this.selectedOutbreak?.id === this.authUser?.activeOutbreakId;
           }
+        },
+
+        // Divider
+        {
+          visible: (): boolean => {
+            return this.selectedOutbreak?.id === this.authUser?.activeOutbreakId && (
+              TransmissionChainModel.canExportGraphs(this.authUser) ||
+              TransmissionChainModel.canList(this.authUser)
+            );
+          }
+        },
+
+        // export
+        {
+          label: {
+            get: () => this.transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value ?
+              'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT' :
+              'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_EXPORT'
+          },
+          action: {
+            click: () => {
+              if (this.transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value) {
+                this.exportChainsOfTransmission();
+              } else {
+                this.exportGeospatialMap();
+              }
+            }
+          },
+          visible: () => TransmissionChainModel.canExportGraphs(this.authUser)
+        },
+
+        // snapshots list
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_ASYNC_COT_TITLE'
+          },
+          action: {
+            link: () => ['/transmission-chains', 'snapshots']
+          },
+          visible: () => TransmissionChainModel.canList(this.authUser)
         }
       ]
     };
@@ -3104,6 +3154,113 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       loadingDialog.close();
     });
+  }
+
+  /**
+   * Export chains of transmission as pdf
+   */
+  private exportChainsOfTransmission(): void {
+    // open dialog to choose the split factor
+    this.dialogV2Service
+      .showSideDialog({
+        title: {
+          get: () => 'LNG_DIALOG_CONFIRM_EXPORT_CHAINS_OF_TRANSMISSION'
+        },
+        hideInputFilter: true,
+        inputs: [{
+          type: V2SideDialogConfigInputType.NUMBER,
+          name: 'splitFactor',
+          placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT_SPLIT_FACTOR',
+          tooltip: 'LNG_DIALOG_EXPORT_CHAIN_OF_TRANSMISSION_SCALE_INFO',
+          value: 1,
+          validators: {
+            required: () => true,
+            minMax: () => ({
+              min: 1,
+              max: 15
+            })
+          }
+        }],
+        bottomButtons: [{
+          type: IV2SideDialogConfigButtonType.OTHER,
+          label: 'LNG_DIALOG_CONFIRM_BUTTON_YES',
+          color: 'primary',
+          disabled: (_data, handler): boolean => {
+            return !handler.form || handler.form.invalid;
+          }
+        }, {
+          type: IV2SideDialogConfigButtonType.CANCEL,
+          label: 'LNG_COMMON_BUTTON_CANCEL',
+          color: 'text'
+        }]
+      })
+      .subscribe((response) => {
+        // cancelled ?
+        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+          // finished
+          return;
+        }
+
+        // show loading
+        const loadingDialog = this.dialogV2Service.showLoadingDialog();
+
+        // get the chosen split factor
+        const splitFactor: number = (response.data.map.splitFactor as IV2SideDialogConfigInputNumber).value;
+
+        // get the base64 png
+        let pngBase64 = this.getPng64(splitFactor);
+
+        // check that png was generated
+        if (!pngBase64) {
+          // display error
+          this.toastV2Service.notice('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT_NOTHING_TO_EXPORT');
+          loadingDialog.close();
+          return;
+        }
+
+        // format
+        pngBase64 = pngBase64.replace('data:image/png;base64,', '');
+
+        // call the api for the pdf
+        this.importExportDataService.exportImageToPdf({ image: pngBase64, responseType: 'blob', splitFactor: Number(splitFactor) })
+          .pipe(
+            catchError((err) => {
+              this.toastV2Service.error(err);
+              loadingDialog.close();
+              return throwError(err);
+            })
+          )
+          .subscribe((blob) => {
+            const fileName = this.i18nService.instant('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE');
+            FileSaver.saveAs(
+              blob,
+              `${fileName}.pdf`
+            );
+            loadingDialog.close();
+          });
+      });
+  }
+
+  /**
+   * Export geospatial map
+   */
+  private exportGeospatialMap(): void {
+    // #TODO
+    // if (this.cotDashletChild.worldMap) {
+    //   const loadingDialog = this.dialogService.showLoadingDialog();
+    //   this.cotDashletChild.worldMap
+    //     .printToBlob()
+    //     .subscribe((blob) => {
+    //       const fileName = this.i18nService.instant('LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_TITLE');
+    //       FileSaver.saveAs(
+    //         blob,
+    //         `${fileName}.png`
+    //       );
+    //       loadingDialog.close();
+    //     });
+    // } else {
+    //   this.toastV2Service.notice('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT_NOTHING_TO_EXPORT');
+    // }
   }
 }
 

@@ -1,9 +1,8 @@
-import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Constants } from '../../../../core/models/constants';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ActivatedRoute } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
-import { TransmissionChainsDashletComponent } from '../../components/transmission-chains-dashlet/transmission-chains-dashlet.component';
 import { GraphNodeModel } from '../../../../core/models/graph-node.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
@@ -23,7 +22,6 @@ import { catchError, switchMap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
@@ -43,8 +41,6 @@ enum NodeAction {
   styleUrls: ['./transmission-chains-graph.component.less']
 })
 export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
-  @ViewChild(TransmissionChainsDashletComponent, { static: true }) cotDashletChild;
-
   outbreakSubscriber: Subscription;
 
   // authenticated user
@@ -84,7 +80,6 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   Constants = Constants;
   EntityType = EntityType;
   NodeAction = NodeAction;
-  TransmissionChainModel = TransmissionChainModel;
 
   /**
      * Constructor
@@ -162,112 +157,6 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
       this.outbreakSubscriber.unsubscribe();
       this.outbreakSubscriber = null;
     }
-  }
-
-  /**
-     * Determine export button text depends on what type transmission chain is
-     * @returns {string|string}
-     */
-  get buttonText() {
-    return this.cotDashletChild.transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value ?
-      'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT' :
-      'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_EXPORT';
-  }
-  /**
-     *Export visualized map/graph seen in page
-     */
-  exportVisualizedMapOrGraph() {
-    if (this.cotDashletChild.transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value) {
-      this.exportChainsOfTransmission();
-    } else {
-      this.exportGeospatialMap();
-    }
-  }
-
-  /**
-     * Export chains of transmission as pdf
-     */
-  exportChainsOfTransmission() {
-    // open dialog to choose the split factor
-    // #TODO
-    // this.dialogService.showInput(
-    //   new DialogConfiguration({
-    //     message: 'LNG_DIALOG_CONFIRM_EXPORT_CHAINS_OF_TRANSMISSION',
-    //     additionalInfo: 'LNG_DIALOG_EXPORT_CHAIN_OF_TRANSMISSION_SCALE_INFO',
-    //     yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_YES',
-    //     required: true,
-    //     fieldsList: [new DialogField({
-    //       name: 'splitFactor',
-    //       placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT_SPLIT_FACTOR',
-    //       required: true,
-    //       type: 'number',
-    //       value: 1,
-    //       min: 1,
-    //       max: 15
-    //     })]
-    //   }), true)
-    //   .subscribe((answer) => {
-    //     if (answer.button === DialogAnswerButton.Yes) {
-    //       const loadingDialog = this.dialogService.showLoadingDialog();
-    //
-    //       // get the chosen split factor
-    //       const splitFactor = answer.inputValue.value.splitFactor;
-    //
-    //       // get the base64 png
-    //       let pngBase64 = this.cotDashletChild.getPng64(splitFactor);
-    //
-    //       // check that png was generated
-    //       if (!pngBase64) {
-    //         // display error
-    //         this.toastV2Service.notice('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT_NOTHING_TO_EXPORT');
-    //         loadingDialog.close();
-    //         return;
-    //       }
-    //
-    //       // format
-    //       pngBase64 = pngBase64.replace('data:image/png;base64,', '');
-    //
-    //       // call the api for the pdf
-    //       this.importExportDataService.exportImageToPdf({ image: pngBase64, responseType: 'blob', splitFactor: Number(splitFactor) })
-    //         .pipe(
-    //           catchError((err) => {
-    //             this.toastV2Service.error(err);
-    //             loadingDialog.close();
-    //             return throwError(err);
-    //           })
-    //         )
-    //         .subscribe((blob) => {
-    //           const fileName = this.i18nService.instant('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE');
-    //           FileSaver.saveAs(
-    //             blob,
-    //             `${fileName}.pdf`
-    //           );
-    //           loadingDialog.close();
-    //         });
-    //     }
-    //   });
-  }
-
-  /**
-   * Export geospatial map
-   */
-  exportGeospatialMap() {
-    // #TODO
-    // if (this.cotDashletChild.worldMap) {
-    //   const loadingDialog = this.dialogService.showLoadingDialog();
-    //   this.cotDashletChild.worldMap
-    //     .printToBlob()
-    //     .subscribe((blob) => {
-    //       const fileName = this.i18nService.instant('LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_TITLE');
-    //       FileSaver.saveAs(
-    //         blob,
-    //         `${fileName}.png`
-    //       );
-    //       loadingDialog.close();
-    //     });
-    // } else {
-    //   this.toastV2Service.notice('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT_NOTHING_TO_EXPORT');
-    // }
   }
 
   /**

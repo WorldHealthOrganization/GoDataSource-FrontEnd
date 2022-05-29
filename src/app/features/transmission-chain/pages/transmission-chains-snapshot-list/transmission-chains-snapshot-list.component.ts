@@ -24,12 +24,6 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   styleUrls: ['./transmission-chains-snapshot-list.component.less']
 })
 export class TransmissionChainsSnapshotListComponent extends ListComponent<CotSnapshotModel> implements OnInit, OnDestroy {
-  // breadcrumbs
-  // breadcrumbs: BreadcrumbItemModel[] = [
-  //   new BreadcrumbItemModel('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE', '/transmission-chains', false),
-  //   new BreadcrumbItemModel('LNG_PAGE_LIST_ASYNC_COT_TITLE', null, true)
-  // ];
-
   // constants
   UserSettings = UserSettings;
   Constants = Constants;
@@ -194,8 +188,7 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent<CotSn
   /**
    * Initialize breadcrumbs
    */
-  initializeBreadcrumbs(): void {
-  }
+  initializeBreadcrumbs(): void {}
 
   /**
    * Fields retrieved from api to reduce payload size

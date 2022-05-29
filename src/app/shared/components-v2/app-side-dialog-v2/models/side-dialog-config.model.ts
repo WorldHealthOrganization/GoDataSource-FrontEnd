@@ -300,7 +300,12 @@ export interface IV2SideDialogConfigInputNumber extends IV2SideDialogConfigInput
   value: number;
 
   // optional
-  validators?: IV2SideDialogConfigInputValidator;
+  validators?: IV2SideDialogConfigInputValidator | {
+    minMax?: (data: IV2SideDialogData, handler: IV2SideDialogHandler, item: V2SideDialogConfigInput) => ({
+      min: number,
+      max: number
+    });
+  };
   tooltip?: string;
 }
 

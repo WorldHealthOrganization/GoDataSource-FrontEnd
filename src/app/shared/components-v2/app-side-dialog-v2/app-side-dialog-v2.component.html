@@ -180,6 +180,9 @@
               autocomplete="off"
               [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
               [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
+              app-min-max-validator
+              [minNumber]="input.validators?.minMax ? input.validators?.minMax(dialogHandler.data, dialogHandler, input).min : undefined"
+              [maxNumber]="input.validators?.minMax ? input.validators?.minMax(dialogHandler.data, dialogHandler, input).max : undefined"
               (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-number-v2>
 
             <!-- Number Range -->
