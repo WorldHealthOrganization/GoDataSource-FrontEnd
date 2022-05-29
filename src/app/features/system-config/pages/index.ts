@@ -22,14 +22,13 @@ export * from './system-sync-logs/system-sync-logs.component';
 
 // export the list of all page components
 export const pageComponents: any[] = [
-  UpstreamServersCreateViewModifyComponent,
-  UpstreamServersListComponent,
+  BackupsComponent,
   ClientApplicationsCreateViewModifyComponent,
   ClientApplicationsListComponent,
-  BackupsComponent,
   SystemDevicesCreateViewModifyComponent,
   SystemDevicesComponent,
-
-  ViewHistorySystemDeviceComponent,
-  SystemSyncLogsComponent
+  SystemSyncLogsComponent,
+  UpstreamServersCreateViewModifyComponent,
+  UpstreamServersListComponent,
+  ViewHistorySystemDeviceComponent
 ];
