@@ -292,6 +292,10 @@ export class Constants {
     COT_GRAPH: {
       label: 'LNG_APP_PAGE_COT_GRAPH',
       value: 'LNG_APP_PAGE_COT_GRAPH'
+    },
+    CASE_COUNT_MAP: {
+      label: 'LNG_APP_PAGE_CASE_COUNT_MAP',
+      value: 'LNG_APP_PAGE_CASE_COUNT_MAP'
     }
   };
 

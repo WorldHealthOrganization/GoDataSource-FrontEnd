@@ -76,6 +76,13 @@ const routes: Routes = [
       permissions: [
         PERMISSION.COT_VIEW_CASE_COUNT_MAP
       ]
+    },
+    resolve: {
+      classification: ClassificationDataResolver,
+      occupation: OccupationDataResolver,
+      outcome: OutcomeDataResolver,
+      gender: GenderDataResolver,
+      cluster: ClusterDataResolver
     }
   },
 

@@ -1315,7 +1315,9 @@ export class WorldMapComponent implements OnInit, OnDestroy {
 
     // update map size
     setTimeout(() => {
-      this.map.updateSize();
+      if (this.map) {
+        this.map.updateSize();
+      }
     });
 
   }

@@ -19,7 +19,6 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import { ActivatedRoute } from '@angular/router';
 import { ITransmissionChainGroupPageModel, TransmissionChainGroupModel, TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
-import { TransmissionChainFilters } from '../transmission-chains-filters/transmission-chains-filters.component';
 import { catchError, tap } from 'rxjs/operators';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { WorldMapComponent, WorldMapMarker, WorldMapMarkerLayer, WorldMapMarkerType, WorldMapPath, WorldMapPathType, WorldMapPoint } from '../../../../common-modules/world-map/components/world-map/world-map.component';
@@ -54,6 +53,7 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { V2AdvancedFilter, V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { AppBasicPageV2Component } from '../../../../shared/components-v2/app-basic-page-v2/app-basic-page-v2.component';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { TransmissionChainFilters } from '../../classes/filter';
 
 @Component({
   selector: 'app-transmission-chains-dashlet',
