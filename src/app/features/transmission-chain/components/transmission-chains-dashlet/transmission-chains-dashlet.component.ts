@@ -3245,22 +3245,24 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
    * Export geospatial map
    */
   private exportGeospatialMap(): void {
-    // #TODO
-    // if (this.cotDashletChild.worldMap) {
-    //   const loadingDialog = this.dialogService.showLoadingDialog();
-    //   this.cotDashletChild.worldMap
-    //     .printToBlob()
-    //     .subscribe((blob) => {
-    //       const fileName = this.i18nService.instant('LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_TITLE');
-    //       FileSaver.saveAs(
-    //         blob,
-    //         `${fileName}.png`
-    //       );
-    //       loadingDialog.close();
-    //     });
-    // } else {
-    //   this.toastV2Service.notice('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT_NOTHING_TO_EXPORT');
-    // }
+    // world map visible ?
+    if (!this.worldMap) {
+      this.toastV2Service.notice('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT_NOTHING_TO_EXPORT');
+      return;
+    }
+
+    // export
+    const loadingDialog = this.dialogV2Service.showLoadingDialog();
+    this.worldMap
+      .printToBlob()
+      .subscribe((blob) => {
+        const fileName = this.i18nService.instant('LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_TITLE');
+        FileSaver.saveAs(
+          blob,
+          `${fileName}.png`
+        );
+        loadingDialog.close();
+      });
   }
 }
 
