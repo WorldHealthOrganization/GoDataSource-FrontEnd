@@ -1,156 +1,246 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { Observable, throwError } from 'rxjs';
-import { UserModel } from '../../../../core/models/user.model';
-import * as _ from 'lodash';
 import { TeamModel } from '../../../../core/models/team.model';
-import { TeamDataService } from '../../../../core/services/data/team.data.service';
-import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
-import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
-import { catchError, share } from 'rxjs/operators';
-import { Subscription } from 'rxjs/internal/Subscription';
-import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { ActivatedRoute } from '@angular/router';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
+import { of, throwError } from 'rxjs';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import * as _ from 'lodash';
+import { TeamDataService } from '../../../../core/services/data/team.data.service';
+import { UserModel } from '../../../../core/models/user.model';
+import { LocationModel } from '../../../../core/models/location.model';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { LocationDataService } from '../../../../core/services/data/location.data.service';
 
 @Component({
   selector: 'app-team-list',
   templateUrl: './team-list.component.html'
 })
-export class TeamListComponent extends ListComponent<TeamModel> implements OnInit, OnDestroy {
-  // breadcrumb header
-  // public breadcrumbs: BreadcrumbItemModel[] = [
-  //   new BreadcrumbItemModel(
-  //     'LNG_PAGE_LIST_TEAMS_TITLE',
-  //     '/teams'
-  //   )
-  // ];
-
-  outbreakSubscriber: Subscription;
-
-  // address model needed for filters
-  filterAddressParentLocationIds: string[] = [];
-
-  // constants
-  TeamModel = TeamModel;
-
-  // list of teams
-  teamsList$: Observable<TeamModel[]>;
-  teamsListCount$: Observable<IBasicCount>;
-
-  fixedTableColumns: string[] = [
-    'name',
-    'users',
-    'locations'
-  ];
-
-  // users
-  usersList$: Observable<UserModel[]>;
-
-  recordActions: HoverRowAction[] = [
-    // View Team
-    new HoverRowAction({
-      icon: 'visibility',
-      iconTooltip: 'LNG_PAGE_LIST_TEAMS_ACTION_VIEW_TEAM',
-      linkGenerator: (item: TeamModel): string[] => {
-        return ['/teams', item.id, 'view'];
-      },
-      visible: (): boolean => {
-        return TeamModel.canView(this.authUser);
-      }
-    }),
-
-    // Modify Team
-    new HoverRowAction({
-      icon: 'settings',
-      iconTooltip: 'LNG_PAGE_LIST_TEAMS_ACTION_MODIFY_TEAM',
-      linkGenerator: (item: TeamModel): string[] => {
-        return ['/teams', item.id, 'modify'];
-      },
-      visible: (): boolean => {
-        return TeamModel.canModify(this.authUser);
-      }
-    }),
-
-    // Other actions
-    new HoverRowAction({
-      type: HoverRowActionType.MENU,
-      icon: 'moreVertical',
-      menuOptions: [
-        // Delete Team
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM',
-          click: (item: TeamModel) => {
-            this.deleteTeam(item);
-          },
-          visible: (): boolean => {
-            return TeamModel.canDelete(this.authUser);
-          },
-          class: 'mat-menu-item-delete'
-        })
-      ]
-    })
-  ];
-
+export class TeamListComponent extends ListComponent<TeamModel> implements OnDestroy {
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     private teamDataService: TeamDataService,
-    private dialogService: DialogService,
-    private outbreakDataService: OutbreakDataService,
-    private followUpsDataService: FollowUpsDataService,
     private toastV2Service: ToastV2Service,
-    private userDataService: UserDataService
+    private activatedRoute: ActivatedRoute,
+    private dialogV2Service: DialogV2Service,
+    private locationDataService: LocationDataService
   ) {
+    // parent
     super(listHelperService);
   }
 
   /**
-     * Component initialized
-     */
-  ngOnInit() {
-    // get list of users
-    if (UserModel.canList(this.authUser)) {
-      this.retrieveEntireListOfUsers();
-    }
-
-    // subscribe to the Selected Outbreak Subject stream
-    this.outbreakSubscriber = this.outbreakDataService
-      .getSelectedOutbreakSubject()
-      .subscribe((selectedOutbreak: OutbreakModel) => {
-        this.selectedOutbreak = selectedOutbreak;
-        // initialize pagination
-        this.initPaginator();
-        this.needsRefreshList(true);
-      });
-  }
-
-  /**
-     * Component destroyed
-     */
+   * Release resources
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
+  }
 
-    // outbreak subscriber
-    if (this.outbreakSubscriber) {
-      this.outbreakSubscriber.unsubscribe();
-      this.outbreakSubscriber = null;
-    }
+  /**
+   * Component initialized
+   */
+  initialized(): void {
+    // initialize pagination
+    this.initPaginator();
+
+    // ...and re-load the list when the Selected Outbreak is changed
+    this.needsRefreshList(true);
   }
 
   /**
    * Initialize Side Table Columns
    */
-  protected initializeTableColumns(): void {}
+  protected initializeTableColumns() {
+    // default table columns
+    this.tableColumns = [
+      {
+        field: 'name',
+        label: 'LNG_TEAM_FIELD_LABEL_NAME',
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'userIds',
+        label: 'LNG_TEAM_FIELD_LABEL_USERS',
+        format: {
+          type: V2ColumnFormat.LINK_LIST
+        },
+        links: (item: TeamModel) => item.userIds?.length > 0 ?
+          item.userIds.map((userId) => {
+            return {
+              label: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).map[userId] ?
+                (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).map[userId].name :
+                '-',
+              href: UserModel.canView(this.authUser) ?
+                `/users/${userId}/view` :
+                null
+            };
+          }) :
+          [],
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+        }
+      },
+      {
+        field: 'locationIds',
+        label: 'LNG_TEAM_FIELD_LABEL_LOCATIONS',
+        format: {
+          type: V2ColumnFormat.LINK_LIST
+        },
+        links: (item: TeamModel) => item.locations?.length > 0 ?
+          item.locations.map((location) => {
+            return {
+              label: location.name,
+              href: LocationModel.canView(this.authUser) ?
+                `/locations/${location.id}/view` :
+                null
+            };
+          }) :
+          [],
+        filter: {
+          type: V2FilterType.MULTIPLE_LOCATION,
+          useOutbreakLocations: false,
+          field: 'parentLocationIdFilter'
+        }
+      },
+      // actions
+      {
+        field: 'actions',
+        label: 'LNG_COMMON_LABEL_ACTIONS',
+        pinned: IV2ColumnPinned.RIGHT,
+        notResizable: true,
+        cssCellClass: 'gd-cell-no-focus',
+        format: {
+          type: V2ColumnFormat.ACTIONS
+        },
+        actions: [
+          // View
+          {
+            type: V2ActionType.ICON,
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_TEAMS_ACTION_VIEW_TEAM',
+            action: {
+              link: (item: TeamModel): string[] => {
+                return ['/teams', item.id, 'view'];
+              }
+            },
+            visible: (item: TeamModel): boolean => {
+              return item.id !== this.authUser.id &&
+                TeamModel.canView(this.authUser);
+            }
+          },
+
+          // Modify
+          {
+            type: V2ActionType.ICON,
+            icon: 'edit',
+            iconTooltip: 'LNG_PAGE_LIST_TEAMS_ACTION_MODIFY_TEAM',
+            action: {
+              link: (item: TeamModel): string[] => {
+                return ['/teams', item.id, 'modify'];
+              }
+            },
+            visible: (item: TeamModel): boolean => {
+              return item.id !== this.authUser.id &&
+                TeamModel.canModify(this.authUser);
+            }
+          },
+
+          // Other actions
+          {
+            type: V2ActionType.MENU,
+            icon: 'more_horiz',
+            menuOptions: [
+              // Delete
+              {
+                label: {
+                  get: () => 'LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM'
+                },
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+                action: {
+                  click: (item: TeamModel): void => {
+                    // determine what we need to delete
+                    this.dialogV2Service.showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_DELETE',
+                          data: () => ({
+                            name: item.name
+                          })
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_TEAM',
+                          data: () => ({
+                            name: item.name
+                          })
+                        }
+                      }
+                    }).subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // delete
+                      this.teamDataService
+                        .deleteTeam(item.id)
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            this.toastV2Service.error(err);
+
+                            // hide loading
+                            loading.close();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          // success
+                          this.toastV2Service.success('LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_SUCCESS_MESSAGE');
+
+                          // hide loading
+                          loading.close();
+
+                          // reload data
+                          this.needsRefreshList(true);
+                        });
+                    });
+                  }
+                },
+                visible: (item: TeamModel): boolean => {
+                  return item.id !== this.authUser.id &&
+                    TeamModel.canDelete(this.authUser);
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ];
+  }
 
   /**
    * Initialize process data
@@ -165,12 +255,40 @@ export class TeamListComponent extends ListComponent<TeamModel> implements OnIni
   /**
    * Initialize Table Advanced Filters
    */
-  protected initializeTableAdvancedFilters(): void {}
+  protected initializeTableAdvancedFilters(): void {
+    this.advancedFilters = TeamModel.generateAdvancedFilters({
+      options: {
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+      }
+    });
+  }
 
   /**
    * Initialize table quick actions
    */
-  protected initializeQuickActions(): void {}
+  protected initializeQuickActions(): void {
+    this.quickActions = {
+      type: V2ActionType.MENU,
+      label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
+      visible: (): boolean => {
+        return TeamModel.canListWorkload(this.authUser);
+      },
+      menuOptions: [
+        // Onset report
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_TEAMS_ACTION_VIEW_TEAMS_WORKLOAD'
+          },
+          action: {
+            link: () => ['/teams', 'workload']
+          },
+          visible: (): boolean => {
+            return TeamModel.canListWorkload(this.authUser);
+          }
+        }
+      ]
+    };
+  }
 
   /**
    * Initialize table group actions
@@ -180,7 +298,19 @@ export class TeamListComponent extends ListComponent<TeamModel> implements OnIni
   /**
    * Initialize table add action
    */
-  protected initializeAddAction(): void {}
+  protected initializeAddAction(): void {
+    this.addAction = {
+      type: V2ActionType.ICON_LABEL,
+      label: 'LNG_COMMON_BUTTON_ADD',
+      icon: 'add_circle_outline',
+      action: {
+        link: (): string[] => ['/teams', 'create']
+      },
+      visible: (): boolean => {
+        return TeamModel.canCreate(this.authUser);
+      }
+    };
+  }
 
   /**
    * Initialize table grouped data
@@ -191,115 +321,155 @@ export class TeamListComponent extends ListComponent<TeamModel> implements OnIni
    * Initialize breadcrumbs
    */
   initializeBreadcrumbs(): void {
+    // set breadcrumbs
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
+        }
+      }, {
+        label: 'LNG_PAGE_LIST_TEAMS_TITLE',
+        action: null
+      }
+    ];
   }
 
   /**
    * Fields retrieved from api to reduce payload size
    */
   protected refreshListFields(): string[] {
-    return [];
+    return [
+      'id',
+      'name',
+      'userIds',
+      'locationIds'
+    ];
   }
 
   /**
-   * Re(load) the list of Teams
+   * Re(load) the Users list
    */
   refreshList() {
-    // retrieve the list of Teams
-    this.teamsList$ = this.teamDataService
+    // get the list of existing users
+    this.records$ = this.teamDataService
       .getTeamsList(this.queryBuilder)
       .pipe(
-        catchError((err) => {
-          this.toastV2Service.error(err);
-          return throwError(err);
+        switchMap((data) => {
+          // determine locations that we need to retrieve
+          const locationsIdsMap: {
+            [locationId: string]: true
+          } = {};
+          data.forEach((item) => {
+            (item.locationIds || []).forEach((locationId) => {
+              // nothing to add ?
+              if (!locationId) {
+                return;
+              }
+
+              // add location to list
+              locationsIdsMap[locationId] = true;
+            });
+          });
+
+          // determine ids
+          const locationIds: string[] = Object.keys(locationsIdsMap);
+
+          // nothing to retrieve ?
+          if (locationIds.length < 1) {
+            return of(data);
+          }
+
+          // construct location query builder
+          const qb = new RequestQueryBuilder();
+          qb.filter.bySelect(
+            'id',
+            locationIds,
+            false,
+            null
+          );
+
+          // retrieve locations
+          return this.locationDataService
+            .getLocationsList(qb)
+            .pipe(
+              map((locations) => {
+                // map locations
+                const locationsMap: {
+                  [locationId: string]: LocationModel
+                } = {};
+                locations.forEach((location) => {
+                  locationsMap[location.id] = location;
+                });
+
+                // set locations
+                data.forEach((item) => {
+                  // initialize ?
+                  if (!item.locations) {
+                    item.locations = [];
+                  }
+
+                  // attach locations
+                  item.locationIds.forEach((locationId) => {
+                    if (locationsMap[locationId]) {
+                      item.locations.push(locationsMap[locationId]);
+                    }
+                  });
+                });
+
+                // finished
+                return data;
+              })
+            );
         })
+      )
+      .pipe(
+        // should be the last pipe
+        takeUntil(this.destroyed$)
       );
   }
 
   /**
-     * Get total number of items, based on the applied filters
-     */
-  refreshListCount() {
+   * Get total number of items, based on the applied filters
+   */
+  refreshListCount(applyHasMoreLimit?: boolean) {
+    // reset
+    this.pageCount = undefined;
+
+    // set apply value
+    if (applyHasMoreLimit !== undefined) {
+      this.applyHasMoreLimit = applyHasMoreLimit;
+    }
+
     // remove paginator from query builder
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
-    this.teamsListCount$ = this.teamDataService
+
+    // apply has more limit
+    if (this.applyHasMoreLimit) {
+      countQueryBuilder.flag(
+        'applyHasMoreLimit',
+        true
+      );
+    }
+
+    // count
+    this.teamDataService
       .getTeamsCount(countQueryBuilder)
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
           return throwError(err);
         }),
-        share()
-      );
-  }
 
-  /**
-     * Delete a team
-     * @param team
-     */
-  deleteTeam(team) {
-    // show confirm dialog to confirm the action
-    this.dialogService
-      .showConfirm('LNG_DIALOG_CONFIRM_DELETE_TEAM', team)
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          // check if the team is in use
-          const qb: RequestQueryBuilder = new RequestQueryBuilder();
-          qb.filter
-            .where({
-              teamId: {
-                'eq': team.id
-              }
-            }, true);
-
-          // no need for more
-          qb.limit(1);
-
-          // retrieve follow-ups + contact details
-          this.followUpsDataService
-            .getFollowUpsCount(
-              this.selectedOutbreak.id,
-              qb
-            )
-            .subscribe((followUpsCount) => {
-              if (followUpsCount.count > 0) {
-                this.toastV2Service.error('LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_IN_USE_MESSAGE');
-              } else {
-                // delete the team
-                this.teamDataService
-                  .deleteTeam(team.id)
-                  .pipe(
-                    catchError((err) => {
-                      this.toastV2Service.error(err);
-                      return throwError(err);
-                    })
-                  )
-                  .subscribe(() => {
-                    this.toastV2Service.success('LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_SUCCESS_MESSAGE');
-                    // reload data
-                    this.needsRefreshList(true);
-                  });
-              }
-            });
-        }
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      )
+      .subscribe((response) => {
+        this.pageCount = response;
       });
-  }
-
-  /**
-     * Retrieve users
-     */
-  private retrieveEntireListOfUsers(): void {
-    // retrieve user list
-    const qbUsers = new RequestQueryBuilder();
-    qbUsers.sort
-      .by('firstName', RequestSortDirection.ASC)
-      .by('lastName', RequestSortDirection.ASC);
-    qbUsers.fields(
-      'id',
-      'firstName',
-      'lastName'
-    );
-    this.usersList$ = this.userDataService.getUsersList(qbUsers);
   }
 }

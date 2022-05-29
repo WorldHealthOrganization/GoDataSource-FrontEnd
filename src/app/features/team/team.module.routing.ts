@@ -7,6 +7,7 @@ import { PageChangeConfirmationGuard } from '../../core/services/guards/page-cha
 import { TeamCreateViewModifyComponent } from './pages/team-create-view-modify/team-create-view-modify.component';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -27,6 +28,10 @@ const routes: Routes = [
       permissions: [
         PERMISSION.TEAM_LIST
       ]
+    },
+    resolve: {
+      user: UserDataResolver,
+      yesNoAll: YesNoAllDataResolver
     }
   },
   // Create Team

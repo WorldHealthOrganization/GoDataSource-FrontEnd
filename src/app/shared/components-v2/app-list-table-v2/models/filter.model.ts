@@ -13,6 +13,7 @@ import { IV2Column } from './column.model';
 export enum V2FilterType {
   TEXT,
   MULTIPLE_SELECT,
+  MULTIPLE_LOCATION,
   DATE_RANGE,
   AGE_RANGE,
   ADDRESS_PHONE_NUMBER,
@@ -71,6 +72,7 @@ interface IV2FilterBasic {
   groupOptionHiddenKey?: never;
   groupOptionFormatMethod?: never;
   defaultValues?: never;
+  useOutbreakLocations?: never;
 }
 
 /**
@@ -99,6 +101,20 @@ export interface IV2FilterMultipleSelect extends Omit<IV2FilterBasic, 'options' 
   value?: string[];
   defaultValue?: string[];
   includeNoValue?: boolean;
+}
+
+/**
+ * Multiple location
+ */
+interface IV2FilterMultipleLocation extends Omit<IV2FilterBasic, 'value' | 'defaultValue' | 'useOutbreakLocations'> {
+  // required
+  type: V2FilterType.MULTIPLE_LOCATION;
+  useOutbreakLocations: boolean;
+  field: string;
+
+  // optional
+  value?: string[];
+  defaultValue?: string[];
 }
 
 /**
@@ -294,6 +310,6 @@ export interface IV2FilterSelectGroups
 /**
  * Filter
  */
-export type V2Filter = IV2FilterText | IV2FilterMultipleSelect | IV2FilterDate | IV2FilterAge | IV2FilterAddressPhoneNumber
+export type V2Filter = IV2FilterText | IV2FilterMultipleSelect | IV2FilterMultipleLocation | IV2FilterDate | IV2FilterAge | IV2FilterAddressPhoneNumber
 | IV2FilterAddressMultipleLocation | IV2FilterAddressField | IV2FilterAddressAccurateGeoLocation | IV2FilterBoolean | IV2FilterNumber
 | IV2FilterDeleted | IV2FilterPhoneNumber | IV2FilterSelectGroups;

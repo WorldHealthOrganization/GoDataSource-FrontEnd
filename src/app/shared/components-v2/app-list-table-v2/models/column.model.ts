@@ -411,6 +411,19 @@ export const applyFilterBy = (
       // finished
       break;
 
+    // multiple select
+    case V2FilterType.MULTIPLE_LOCATION:
+      // filter
+      query.filter.bySelect(
+        column.filter.field,
+        column.filter.value,
+        true,
+        null
+      );
+
+      // finished
+      break;
+
     // date range
     case V2FilterType.DATE_RANGE:
       // filter

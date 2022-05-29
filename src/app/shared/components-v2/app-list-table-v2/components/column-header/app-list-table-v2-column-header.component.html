@@ -58,6 +58,18 @@
       [options]="extendedColDef.columnDefinition.filter.options"
       (ngModelChange)="component.columnFilterBy(extendedColDef)"></app-form-select-multiple-v2>
 
+    <!-- Multiple location -->
+    <app-form-select-location-multiple-v2
+      *ngSwitchCase="V2FilterType.MULTIPLE_LOCATION"
+      class="gd-list-table-column-filter-input"
+      [(ngModel)]="extendedColDef.columnDefinition.filter.value"
+      [name]="'filterBy' + extendedColDef.field"
+      placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+      neverFloatLabel="true"
+      [useOutbreakLocations]="extendedColDef.columnDefinition.filter.useOutbreakLocations"
+      (ngModelChange)="component.columnFilterBy(extendedColDef)">
+    </app-form-select-location-multiple-v2>
+
     <!-- Date range -->
     <app-form-date-range-v2
       *ngSwitchCase="V2FilterType.DATE_RANGE"

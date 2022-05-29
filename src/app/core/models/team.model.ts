@@ -4,6 +4,8 @@ import { LocationModel } from './location.model';
 import { IPermissionBasic, IPermissionTeam } from './permission.interface';
 import { PERMISSION } from './permission.model';
 import { BaseModel } from './base.model';
+import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
+import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 
 export class TeamModel
   extends BaseModel
@@ -16,6 +18,33 @@ export class TeamModel
   members: UserModel[] = [];
   locationIds: string[];
   locations: LocationModel[] = [];
+
+  /**
+   * Advanced filters
+   */
+  static generateAdvancedFilters(data: {
+    options: {
+      user: ILabelValuePairModel[]
+    }
+  }): V2AdvancedFilter[] {
+    // initialize
+    const advancedFilters: V2AdvancedFilter[] = [
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'name',
+        label: 'LNG_TEAM_FIELD_LABEL_NAME',
+        sortable: true
+      }, {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'userIds',
+        label: 'LNG_TEAM_FIELD_LABEL_USERS',
+        options: data.options.user
+      }
+    ];
+
+    // finished
+    return advancedFilters;
+  }
 
   /**
      * Static Permissions - IPermissionBasic

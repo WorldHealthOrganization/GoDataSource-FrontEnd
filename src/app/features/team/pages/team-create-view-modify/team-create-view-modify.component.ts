@@ -484,16 +484,11 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
    * Initialize expand list advanced filters
    */
   protected initializeExpandListAdvancedFilters(): void {
-    // #TODO
-    // this.expandListAdvancedFilters = TeamModel.generateAdvancedFilters({
-    //   authUser: this.authUser,
-    //   options: {
-    //     institution: (this.activatedRoute.snapshot.data.institution as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     userRole: (this.activatedRoute.snapshot.data.userRole as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     outbreak: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-    //   }
-    // });
+    this.expandListAdvancedFilters = TeamModel.generateAdvancedFilters({
+      options: {
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+      }
+    });
   }
 
   /**
