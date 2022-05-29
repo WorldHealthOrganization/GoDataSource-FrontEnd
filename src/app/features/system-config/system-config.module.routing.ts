@@ -93,12 +93,16 @@ const routes: Routes = [
       },
       {
         path: 'create',
-        component: fromPages.CreateClientApplicationComponent,
+        component: fromPages.ClientApplicationsCreateViewModifyComponent,
         canActivate: [AuthGuard],
         data: {
           permissions: [
             PERMISSION.CLIENT_APPLICATION_CREATE
-          ]
+          ],
+          action: CreateViewModifyV2Action.CREATE
+        },
+        resolve: {
+          outbreak: OutbreakDataResolver
         }
       }
     ]

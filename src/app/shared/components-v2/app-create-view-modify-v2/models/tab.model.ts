@@ -165,6 +165,7 @@ interface ICreateViewModifyV2TabInputPassword extends Omit<ICreateViewModifyV2Ta
       err: string
     }
   };
+  suffixIconButtons?: IAppFormIconButtonV2[];
 }
 
 /**

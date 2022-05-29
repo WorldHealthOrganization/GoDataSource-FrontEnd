@@ -27,6 +27,9 @@ import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 export class AppFormPasswordV2Component
   extends AppFormBaseV2<string> implements OnDestroy {
 
+  // right - icon buttons
+  @Input() suffixIconButtons: IAppFormIconButtonV2[];
+
   // tooltip
   tooltipButton: IAppFormIconButtonV2;
   private _tooltip: string;
