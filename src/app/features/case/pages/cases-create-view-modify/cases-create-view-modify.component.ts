@@ -184,7 +184,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       this._caseVisualIDMask.mask :
       this.itemData.visualId;
 
-    // check if record has duplicate (all 3 pages types)
+    // check if record has duplicate
     if (
       this.isView ||
       this.isModify
