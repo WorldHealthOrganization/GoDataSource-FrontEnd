@@ -218,31 +218,6 @@ const routes: Routes = [
     canDeactivate: [
       PageChangeConfirmationGuard
     ]
-  },
-  // Modify Questionnaire
-  {
-    path: ':labResultId/view-questionnaire',
-    ...createViewModifyFoundation,
-    data: {
-      permissions: [
-        PERMISSION.LAB_RESULT_VIEW
-      ],
-      action: CreateViewModifyV2Action.VIEW
-    }
-  },
-  // Modify Questionnaire
-  {
-    path: ':labResultId/modify-questionnaire',
-    ...createViewModifyFoundation,
-    data: {
-      permissions: [
-        PERMISSION.LAB_RESULT_MODIFY
-      ],
-      action: CreateViewModifyV2Action.MODIFY
-    },
-    canDeactivate: [
-      PageChangeConfirmationGuard
-    ]
   }
 ];
 

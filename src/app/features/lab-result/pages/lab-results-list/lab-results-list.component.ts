@@ -552,40 +552,6 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                 }
               },
 
-              // Divider
-              {
-                visible: (item: LabResultModel): boolean => {
-                  // visible only if at least one of the first two items is visible
-                  return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    LabResultModel.canDelete(this.authUser) && (
-                    (
-                      item.personType === EntityType.CASE &&
-                        CaseModel.canDeleteLabResult(this.authUser)
-                    ) || (
-                      item.personType === EntityType.CONTACT &&
-                        ContactModel.canDeleteLabResult(this.authUser)
-                    )
-                  );
-                }
-              },
-
-              // See questionnaire
-              {
-                label: {
-                  get: () => 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE'
-                },
-                action: {
-                  link: (item: LabResultModel): string[] => {
-                    return ['/lab-results', item.id, 'view-questionnaire'];
-                  }
-                },
-                visible: (item: LabResultModel): boolean => {
-                  return !item.deleted &&
-                    LabResultModel.canView(this.authUser);
-                }
-              },
-
               // Restore
               {
                 label: {

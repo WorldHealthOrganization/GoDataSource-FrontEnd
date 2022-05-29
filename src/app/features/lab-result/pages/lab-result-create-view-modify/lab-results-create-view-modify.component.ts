@@ -19,7 +19,7 @@ import {
   CreateViewModifyV2TabInputType,
   ICreateViewModifyV2Buttons,
   ICreateViewModifyV2CreateOrUpdate,
-  ICreateViewModifyV2Tab
+  ICreateViewModifyV2Tab, ICreateViewModifyV2TabTable
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -281,7 +281,10 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       // tabs
       tabs: [
         // Personal
-        this.initializeTabsDetails()
+        this.initializeTabsDetails(),
+
+        // Questionnaires
+        this.initializeTabsQuestionnaire()
       ],
 
       // create details
@@ -626,6 +629,35 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
           ]
         }
       ]
+    };
+  }
+
+  /**
+   * Initialize tabs - Questionnaire
+   */
+  private initializeTabsQuestionnaire(): ICreateViewModifyV2TabTable {
+    let errors: string = '';
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      label: 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE',
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
+        name: 'questionnaireAnswers',
+        questionnaire: this.selectedOutbreak.labResultsTemplate,
+        value: {
+          get: () => this.itemData.questionnaireAnswers,
+          set: (value) => {
+            this.itemData.questionnaireAnswers = value;
+          }
+        },
+        updateErrors: (errorsHTML) => {
+          errors = errorsHTML;
+        }
+      },
+      invalidHTMLSuffix: () => {
+        return errors;
+      },
+      visible: () => this.selectedOutbreak.labResultsTemplate?.length > 0
     };
   }
 

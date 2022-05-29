@@ -468,22 +468,6 @@ export class EntityLabResultService {
                 }
               },
 
-              // See questionnaire
-              {
-                label: {
-                  get: () => 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE'
-                },
-                action: {
-                  link: (item: LabResultModel): string[] => {
-                    return ['/lab-results', item.id, 'view-questionnaire'];
-                  }
-                },
-                visible: (item: LabResultModel): boolean => {
-                  return !item.deleted &&
-                    LabResultModel.canView(definitions.authUser);
-                }
-              },
-
               // Restore
               {
                 label: {
