@@ -1,5 +1,5 @@
 import { ModuleWithProviders } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { Routes, RouterModule, Route } from '@angular/router';
 import * as fromPages from './pages';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
@@ -17,6 +17,16 @@ import { SyncPackageExportTypeDataResolver } from '../../core/services/resolvers
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { UpstreamServersDataResolver } from '../../core/services/resolvers/data/upstream-servers.resolver';
 
+// common base - create / view / modify
+const createViewModifyFoundation: Route = {
+  component: fromPages.SystemDevicesCreateViewModifyComponent,
+  canActivate: [AuthGuard],
+  resolve: {
+    user: UserDataResolver
+  }
+};
+
+// routes
 const routes: Routes = [
   // Backups
   {
@@ -126,30 +136,22 @@ const routes: Routes = [
       },
       {
         path: ':deviceId/view',
-        component: fromPages.SystemDevicesCreateViewModifyComponent,
-        canActivate: [AuthGuard],
+        ...createViewModifyFoundation,
         data: {
           permissions: [
             PERMISSION.DEVICE_VIEW
           ],
           action: CreateViewModifyV2Action.VIEW
-        },
-        resolve: {
-          user: UserDataResolver
         }
       },
       {
         path: ':deviceId/modify',
-        component: fromPages.SystemDevicesCreateViewModifyComponent,
-        canActivate: [AuthGuard],
+        ...createViewModifyFoundation,
         data: {
           permissions: [
             PERMISSION.DEVICE_MODIFY
           ],
           action: CreateViewModifyV2Action.MODIFY
-        },
-        resolve: {
-          user: UserDataResolver
         },
         canDeactivate: [
           PageChangeConfirmationGuard
