@@ -3,11 +3,13 @@ import { UserModel } from './user.model';
 import { LocationModel } from './location.model';
 import { IPermissionBasic, IPermissionTeam } from './permission.interface';
 import { PERMISSION } from './permission.model';
+import { BaseModel } from './base.model';
 
 export class TeamModel
-implements
-        IPermissionBasic,
-        IPermissionTeam {
+  extends BaseModel
+  implements
+    IPermissionBasic,
+    IPermissionTeam {
   id: string;
   name: string;
   userIds: string[];
@@ -33,6 +35,10 @@ implements
      * Constructor
      */
   constructor(data = null) {
+    // parent
+    super(data);
+
+    // data
     this.id = _.get(data, 'id');
     this.name = _.get(data, 'name');
     this.userIds = _.get(data, 'userIds', []);

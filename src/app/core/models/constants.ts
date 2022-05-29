@@ -265,6 +265,10 @@ export class Constants {
       label: 'LNG_APP_PAGE_USERS',
       value: 'LNG_APP_PAGE_USERS'
     },
+    TEAM: {
+      label: 'LNG_APP_PAGE_TEAMS',
+      value: 'LNG_APP_PAGE_TEAMS'
+    },
     ENTITY_NOT_DUPLICATES: {
       label: 'LNG_APP_PAGE_ENTITY_NOT_DUPLICATES',
       value: 'LNG_APP_PAGE_ENTITY_NOT_DUPLICATES'

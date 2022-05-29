@@ -93,7 +93,8 @@ export const EnglishUsLang = {
     'LNG_FORM_VALIDATION_ERROR_FIELD_NO_SPACES': 'Spaces not allowed',
     'LNG_COMMON_LABEL_DELETE_WITHOUT_NAME': 'Delete',
     'LNG_COMMON_LABEL_SYNC': 'Start sync',
-    'LNG_PAGE_MODIFY_USER_TAB_DETAILS_SECTION_PASSWORD_TITLE': 'Password'
+    'LNG_PAGE_MODIFY_USER_TAB_DETAILS_SECTION_PASSWORD_TITLE': 'Password',
+    'LNG_DIALOG_CONFIRM_ADD_USER_TEAM': 'Users are already assigned to other teams:{{assigned}}'
 
 
 

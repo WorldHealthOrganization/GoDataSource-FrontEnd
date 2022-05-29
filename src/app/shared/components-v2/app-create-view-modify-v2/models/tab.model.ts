@@ -227,6 +227,9 @@ interface ICreateViewModifyV2TabInputLocationMultiple extends Omit<ICreateViewMo
 
   // optional
   useOutbreakLocations?: boolean;
+  validators?: {
+    required?: () => boolean
+  };
 }
 
 /**

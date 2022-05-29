@@ -3201,6 +3201,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           return;
         }
 
+        // hide
+        response.handler.hide();
+
         // show loading
         const loadingDialog = this.dialogV2Service.showLoadingDialog();
 
