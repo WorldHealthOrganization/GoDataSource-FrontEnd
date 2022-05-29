@@ -105,6 +105,12 @@ interface ICreateViewModifyV2TabInputText extends Omit<ICreateViewModifyV2TabInp
       expression: string,
       flags?: string,
       msg?: string
+    },
+    notInObject?: () => {
+      values: {
+        [prop: string]: true
+      },
+      err: string
     }
   };
 }

@@ -426,6 +426,9 @@
                     [regexExpr]="!isView && input.validators?.regex ? input.validators?.regex().expression : undefined"
                     [regexExprFlags]="!isView && input.validators?.regex ? input.validators?.regex().flags : undefined"
                     [regexExprMsg]="!isView && input.validators?.regex ? input.validators?.regex().msg : undefined"
+                    app-has-property-validator
+                    [checkObject]="!isView && input.validators?.notInObject ? input.validators?.notInObject()?.values : undefined"
+                    [checkErrorMsg]="!isView && input.validators?.notInObject ? input.validators?.notInObject()?.err : undefined"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-input-v2>
 
                   <!-- Email -->

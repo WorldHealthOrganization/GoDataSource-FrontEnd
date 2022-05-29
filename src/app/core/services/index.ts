@@ -126,6 +126,7 @@ import { CotNodeShapeDataResolver } from './resolvers/data/cot-node-shape.resolv
 import { CotEdgeLabelDataResolver } from './resolvers/data/cot-edge-label.resolver';
 import { CotEdgeIconDataResolver } from './resolvers/data/cot-edge-icon.resolver';
 import { CotEdgeColorDataResolver } from './resolvers/data/cot-edge-color.resolver';
+import { UpstreamServersDataResolver } from './resolvers/data/upstream-servers.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -193,6 +194,7 @@ export const services: any[] = [
   SyncPackageModuleDataResolver,
   SyncPackageStatusDataResolver,
   TeamDataResolver,
+  UpstreamServersDataResolver,
   UserDataResolver,
   UserRoleDataResolver,
   YesNoAllDataResolver,

@@ -15,6 +15,8 @@ import { OutbreakDataResolver } from '../../core/services/resolvers/data/outbrea
 import { SyncPackageStatusDataResolver } from '../../core/services/resolvers/data/sync-package-status.resolver';
 import { SyncPackageModuleDataResolver } from '../../core/services/resolvers/data/sync-package-module.resolver';
 import { SyncPackageExportTypeDataResolver } from '../../core/services/resolvers/data/sync-package-export-type.resolver';
+import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
+import { UpstreamServersDataResolver } from '../../core/services/resolvers/data/upstream-servers.resolver';
 
 const routes: Routes = [
   // Backups
@@ -56,12 +58,16 @@ const routes: Routes = [
       },
       {
         path: 'create',
-        component: fromPages.CreateUpstreamServerComponent,
+        component: fromPages.UpstreamServersCreateViewModifyComponent,
         canActivate: [AuthGuard],
         data: {
           permissions: [
             PERMISSION.UPSTREAM_SERVER_CREATE
-          ]
+          ],
+          action: CreateViewModifyV2Action.CREATE
+        },
+        resolve: {
+          upstreamServers: UpstreamServersDataResolver
         }
       }
     ]

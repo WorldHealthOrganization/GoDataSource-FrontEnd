@@ -5,7 +5,7 @@ import { OutbreakModel } from '../../../models/outbreak.model';
 import { OutbreakDataService } from '../../data/outbreak.data.service';
 
 @Injectable()
-export class SelectedOutbreakDataResolver implements Resolve<Observable<OutbreakModel>> {
+export class SelectedOutbreakDataResolver implements Resolve<OutbreakModel> {
   /**
    * Constructor
    */

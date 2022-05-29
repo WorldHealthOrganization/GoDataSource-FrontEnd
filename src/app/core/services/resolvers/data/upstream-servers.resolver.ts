@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { Resolve } from '@angular/router';
-import { SystemSettingsVersionModel } from '../../../models/system-settings-version.model';
 import { SystemSettingsDataService } from '../../data/system-settings.data.service';
-import { catchError } from 'rxjs/operators';
+import { SystemUpstreamServerModel } from '../../../models/system-upstream-server.model';
 import { ToastV2Service } from '../../helper/toast-v2.service';
+import { catchError, map } from 'rxjs/operators';
 
 @Injectable()
-export class VersionDataResolver implements Resolve<SystemSettingsVersionModel> {
+export class UpstreamServersDataResolver implements Resolve<SystemUpstreamServerModel[]> {
   /**
    * Constructor
    */
@@ -19,11 +19,16 @@ export class VersionDataResolver implements Resolve<SystemSettingsVersionModel> 
   /**
    * Resolve response used later
    */
-  resolve(): Observable<SystemSettingsVersionModel> {
+  resolve(): Observable<SystemUpstreamServerModel[]> {
     // retrieve user information
     return this.systemSettingsDataService
-      .getAPIVersion()
+      .getSystemSettings()
       .pipe(
+        // map
+        map((data) => {
+          return data.upstreamServers || [];
+        }),
+
         // should be last one
         catchError((err) => {
           // display error
