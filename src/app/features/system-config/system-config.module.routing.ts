@@ -133,6 +133,9 @@ const routes: Routes = [
             PERMISSION.DEVICE_VIEW
           ],
           action: CreateViewModifyV2Action.VIEW
+        },
+        resolve: {
+          user: UserDataResolver
         }
       },
       {
@@ -144,6 +147,9 @@ const routes: Routes = [
             PERMISSION.DEVICE_MODIFY
           ],
           action: CreateViewModifyV2Action.MODIFY
+        },
+        resolve: {
+          user: UserDataResolver
         },
         canDeactivate: [
           PageChangeConfirmationGuard

@@ -7,6 +7,7 @@ import { Observable, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { TranslateService } from '@ngx-translate/core';
 import {
+  CreateViewModifyV2MenuType,
   CreateViewModifyV2TabInputType,
   ICreateViewModifyV2Buttons,
   ICreateViewModifyV2CreateOrUpdate,
@@ -18,6 +19,7 @@ import { DeviceModel } from '../../../../core/models/device.model';
 import { DeviceDataService } from '../../../../core/services/data/device.data.service';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { catchError, takeUntil } from 'rxjs/operators';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 
 /**
  * Component
@@ -36,6 +38,7 @@ export class SystemDevicesCreateViewModifyComponent extends CreateViewModifyComp
     protected translateService: TranslateService,
     protected router: Router,
     protected deviceDataService: DeviceDataService,
+    protected dialogV2Service: DialogV2Service,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
@@ -253,7 +256,36 @@ export class SystemDevicesCreateViewModifyComponent extends CreateViewModifyComp
           link: () => ['/system-config/devices']
         }
       },
-      quickActions: undefined
+      quickActions: {
+        options: [
+          // Record details
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_COMMON_LABEL_DETAILS',
+            action: {
+              click: () => {
+                // show record details dialog
+                this.dialogV2Service.showRecordDetailsDialog(
+                  'LNG_COMMON_LABEL_DETAILS',
+                  this.itemData,
+                  this.activatedRoute.snapshot.data.user
+                );
+              }
+            },
+            visible: () => !this.isCreate
+          },
+
+          // History
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_VIEW_HISTORY',
+            action: {
+              link: () => ['/system-config', 'devices', this.itemData.id, 'history']
+            },
+            visible: () => DeviceModel.canListHistory(this.authUser)
+          }
+        ]
+      }
     };
   }
 
