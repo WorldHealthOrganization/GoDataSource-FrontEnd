@@ -53,7 +53,8 @@ export enum UserSettings {
   OUTBREAK_INCONSISTENCIES_FIELDS = 'outbreakInconsistenciesFields',
   COT_FIELDS = 'cotFields',
   DEVICES_FIELDS = 'devicesFields',
-  ICON_FIELDS = 'iconFields'
+  ICON_FIELDS = 'iconFields',
+  VIEW_PEOPLE_FIELDS = 'viewPeopleFields'
 }
 
 export enum PhoneNumberType {
