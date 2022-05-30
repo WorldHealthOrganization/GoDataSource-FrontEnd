@@ -213,6 +213,9 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
         // Epidemiology
         this.initializeTabsEpidemiology(),
 
+        // Relationship - Create
+        // #TODO
+
         // exposures ...
         this.initializeTabsExposures()
       ],
