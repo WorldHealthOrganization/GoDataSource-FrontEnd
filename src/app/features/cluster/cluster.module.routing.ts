@@ -6,6 +6,9 @@ import { PERMISSION } from '../../core/models/permission.model';
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
+import { GenderDataResolver } from '../../core/services/resolvers/data/gender.resolver';
+import { RiskDataResolver } from '../../core/services/resolvers/data/risk.resolver';
+import { PersonTypeDataResolver } from '../../core/services/resolvers/data/person-type.resolver';
 
 const routes: Routes = [
   // Clusters list
@@ -73,6 +76,12 @@ const routes: Routes = [
       permissions: [
         PERMISSION.CLUSTER_LIST_PEOPLE
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      gender: GenderDataResolver,
+      risk: RiskDataResolver,
+      personType: PersonTypeDataResolver
     }
   }
 ];
