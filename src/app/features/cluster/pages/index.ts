@@ -11,7 +11,7 @@ export * from './cluster-create-view-modify/cluster-create-view-modify.component
 
 // export the list of all page components
 export const pageComponents: any[] = [
+  ClusterCreateViewModifyComponent,
   ClustersListComponent,
-  ClustersPeopleListComponent,
-  ClusterCreateViewModifyComponent
+  ClustersPeopleListComponent
 ];

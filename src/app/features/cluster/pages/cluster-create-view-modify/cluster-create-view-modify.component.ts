@@ -22,6 +22,7 @@ import {
   CreateViewModifyV2ExpandColumnType
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
+import { MAT_ICONS } from '../../../../shared/forms-v2/core/mat-icons-v2';
 
 /**
  * Component
@@ -49,8 +50,7 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
       renderer2,
       redirectService,
       activatedRoute,
-      authDataService,
-      true
+      authDataService
     );
   }
 
@@ -249,8 +249,24 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
                   this.itemData.colorCode = value;
                 }
               }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'icon',
+              placeholder: () => 'LNG_CLUSTER_FIELD_LABEL_ICON',
+              description: () => 'LNG_CLUSTER_FIELD_LABEL_ICON_DESCRIPTION',
+              options: MAT_ICONS.map((icon) => ({
+                label: icon,
+                value: icon,
+                icon
+              })),
+              value: {
+                get: () => this.itemData.icon,
+                set: (value) => {
+                  this.itemData.icon = value;
+                }
+              }
             }
-            // TODO icon selector input
           ]
         }
       ]
@@ -293,7 +309,6 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
           // Record details
           {
             type: CreateViewModifyV2MenuType.OPTION,
-            // TODO could not find specific label for this tab
             label: 'LNG_COMMON_LABEL_DETAILS',
             action: {
               click: () => {
