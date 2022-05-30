@@ -36,6 +36,7 @@ import { ClusterModel } from '../../../../core/models/cluster.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
+import { EntityType } from '../../../../core/models/entity-type';
 
 /**
  * Component
@@ -807,11 +808,56 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
             visible: () => !this.isCreate
           },
 
-          // #TODO
           // Divider
           {
             type: CreateViewModifyV2MenuType.DIVIDER,
             visible: () => !this.isCreate
+          },
+
+          // Duplicate records marked as not duplicate
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_SEE_RECORDS_NOT_DUPLICATES',
+            action: {
+              link: () => ['/duplicated-records', 'contacts-of-contacts', this.itemData.id, 'marked-not-duplicates']
+            },
+            visible: () => ContactOfContactModel.canList(this.authUser)
+          },
+
+          // exposures
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_COMMON_BUTTON_EXPOSURES_TO',
+            action: {
+              link: () => ['/relationships', EntityType.CONTACT_OF_CONTACT, this.itemData.id, 'exposures']
+            },
+            visible: () => ContactOfContactModel.canListRelationshipExposures(this.authUser)
+          },
+
+          // Divider
+          {
+            type: CreateViewModifyV2MenuType.DIVIDER,
+            visible: () => ContactOfContactModel.canList(this.authUser) || ContactOfContactModel.canListRelationshipExposures(this.authUser)
+          },
+
+          // movement map
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_VIEW_MOVEMENT',
+            action: {
+              link: () => ['/contacts-of-contacts', this.itemData.id, 'movement']
+            },
+            visible: () => ContactOfContactModel.canViewMovementMap(this.authUser)
+          },
+
+          // chronology chart
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_ACTION_VIEW_CHRONOLOGY',
+            action: {
+              link: () => ['/contacts-of-contacts', this.itemData.id, 'chronology']
+            },
+            visible: () => ContactOfContactModel.canViewChronologyChart(this.authUser)
           }
         ]
       }
