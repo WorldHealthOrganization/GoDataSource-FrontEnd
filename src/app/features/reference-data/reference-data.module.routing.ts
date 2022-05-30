@@ -120,7 +120,10 @@ const routes: Routes = [
     },
     canDeactivate: [
       PageChangeConfirmationGuard
-    ]
+    ],
+    resolve: {
+      category: ReferenceDataCategoryDataResolver
+    }
   }
 ];
 
