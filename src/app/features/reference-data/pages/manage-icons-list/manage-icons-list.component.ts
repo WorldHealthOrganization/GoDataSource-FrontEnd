@@ -206,7 +206,10 @@ export class ManageIconsListComponent extends ListComponent<IconModel> implement
       label: 'LNG_COMMON_BUTTON_ADD',
       icon: 'add_circle_outline',
       action: {
-        link: (): string[] => ['/reference-data', 'manage-icons', 'add']
+        link: (): string[] => ['/reference-data', 'manage-icons', 'add'],
+        linkQueryParams: () => ({
+          categoryId: this._category?.id
+        })
       },
       visible: (): boolean => {
         return IconModel.canCreate(this.authUser);
