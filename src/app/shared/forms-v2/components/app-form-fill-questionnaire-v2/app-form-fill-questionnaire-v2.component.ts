@@ -538,7 +538,7 @@ export class AppFormFillQuestionnaireV2Component
                         flattenedAnswer,
                         flattenedAnswer.oneParentIsInactive,
                         answerIndex,
-                        `${flattenedQuestion.no}.${answerIndex + 1}`,
+                        `${flattenedQuestion.no}.${answerIndex + 1} (${answersWithQuestionsMap[answerValue].label}) `,
                         collapsed || flattenedQuestion.data.collapsed
                       );
                     }
