@@ -852,8 +852,8 @@ export class TransmissionChainDataService {
         const sourceNode = chainGroup.nodesMap[graphEdge.source];
         const targetNode = chainGroup.nodesMap[graphEdge.target];
         let noDays = 0;
-        let sourceDate = '';
-        let targetDate = '';
+        let sourceDate: any = '';
+        let targetDate: any = '';
         if (
           sourceNode.type === EntityType.CASE &&
                     sourceNode.model instanceof CaseModel

@@ -7,7 +7,7 @@ import { LabelValuePair } from './label-value-pair';
 import { AddressModel } from './address.model';
 import { IAnswerData, QuestionModel } from './question.model';
 import { Constants } from './constants';
-import { moment } from '../helperClasses/x-moment';
+import { Moment, moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { RelationshipPersonModel } from './relationship-person.model';
 import { UserModel } from './user.model';
@@ -26,7 +26,7 @@ export class RelationshipModel
         IPermissionBasicBulk {
   id: string;
   persons: RelationshipPersonModel[];
-  contactDate: string;
+  contactDate: string | Moment;
   contactDateEstimated: boolean;
   certaintyLevelId: string;
   exposureTypeId: string;
@@ -37,7 +37,7 @@ export class RelationshipModel
   clusterId: string;
   comment: string;
   people: EntityModel[];
-  dateOfFirstContact: string;
+  dateOfFirstContact: string | Moment;
 
   /**
      * Static Permissions - IPermissionBasic

@@ -37,6 +37,7 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
+import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 
 /**
  * Component
@@ -53,6 +54,9 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
 
   // today
   private _today: Moment = moment();
+
+  // relationship
+  private _relationship: RelationshipModel;
 
   /**
    * Constructor
@@ -122,6 +126,11 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
     this.itemData.visualId = this.isCreate ?
       this._cocVisualIDMask.mask :
       this.itemData.visualId;
+
+    // initialize relationship
+    if (this.isCreate) {
+      this._relationship = new RelationshipModel();
+    }
   }
 
   /**
@@ -214,7 +223,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
         this.initializeTabsEpidemiology(),
 
         // Relationship - Create
-        // #TODO
+        this.initializeTabsRelationship(),
 
         // exposures ...
         this.initializeTabsExposures()
@@ -635,6 +644,169 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
                     return this.itemData.vaccinesReceived[index];
                   }
                 }
+              }
+            }
+          }]
+        }
+      ]
+    };
+  }
+
+  /**
+   * Initialize tabs - Relationship
+   */
+  private initializeTabsRelationship(): ICreateViewModifyV2Tab {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB,
+      label: 'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_TAB_RELATIONSHIP_TITLE',
+      visible: () => this.isCreate,
+      sections: [
+        // Details
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DETAILS',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: 'relationship[dateOfFirstContact]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT_DESCRIPTION',
+            value: {
+              get: () => this._relationship.dateOfFirstContact,
+              set: (value) => {
+                this._relationship.dateOfFirstContact = value;
+              }
+            },
+            maxDate: this._today,
+            validators: {
+              dateSameOrBefore: () => [
+                this._today
+              ]
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: 'relationship[contactDate]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_DESCRIPTION',
+            value: {
+              get: () => this._relationship.contactDate,
+              set: (value) => {
+                this._relationship.contactDate = value;
+              }
+            },
+            maxDate: this._today,
+            validators: {
+              required: () => true,
+              dateSameOrBefore: () => [
+                this._today
+              ]
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+            name: 'relationship[contactDateEstimated]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED_DESCRIPTION',
+            value: {
+              get: () => this._relationship.contactDateEstimated,
+              set: (value) => {
+                // set data
+                this._relationship.contactDateEstimated = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'relationship[certaintyLevelId]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this._relationship.certaintyLevelId,
+              set: (value) => {
+                this._relationship.certaintyLevelId = value;
+              }
+            },
+            validators: {
+              required: () => true
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'relationship[exposureTypeId]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this._relationship.exposureTypeId,
+              set: (value) => {
+                this._relationship.exposureTypeId = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'relationship[exposureFrequencyId]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this._relationship.exposureFrequencyId,
+              set: (value) => {
+                this._relationship.exposureFrequencyId = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'relationship[exposureDurationId]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this._relationship.exposureDurationId,
+              set: (value) => {
+                this._relationship.exposureDurationId = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'relationship[socialRelationshipTypeId]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this._relationship.socialRelationshipTypeId,
+              set: (value) => {
+                this._relationship.socialRelationshipTypeId = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'relationship[clusterId]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this._relationship.clusterId,
+              set: (value) => {
+                this._relationship.clusterId = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.TEXT,
+            name: 'socialRelationshipDetail',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_DESCRIPTION',
+            value: {
+              get: () => this._relationship.socialRelationshipDetail,
+              set: (value) => {
+                this._relationship.socialRelationshipDetail = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.TEXTAREA,
+            name: 'comment',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT_DESCRIPTION',
+            value: {
+              get: () => this._relationship.comment,
+              set: (value) => {
+                this._relationship.comment = value;
               }
             }
           }]
