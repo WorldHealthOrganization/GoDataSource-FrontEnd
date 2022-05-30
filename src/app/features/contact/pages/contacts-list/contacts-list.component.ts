@@ -1131,21 +1131,6 @@ export class ContactsListComponent
                 }
               },
 
-              // See questionnaire
-              {
-                label: {
-                  get: () => 'LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE'
-                },
-                action: {
-                  link: (item: ContactModel): string[] => {
-                    return ['/contacts', item.id, 'view-questionnaire'];
-                  }
-                },
-                visible: (item: ContactModel): boolean => {
-                  return !item.deleted && ContactModel.canView(this.authUser);
-                }
-              },
-
               // Divider
               {
                 visible: (item: ContactModel): boolean => {
