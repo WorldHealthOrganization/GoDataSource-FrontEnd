@@ -548,7 +548,7 @@ export class EntityHelperService {
   retrieveTableColumns(definitions: {
     selectedOutbreakIsActive: () => boolean,
     selectedOutbreak: () => OutbreakModel,
-    entity: CaseModel | ContactModel | EventModel,
+    entity: CaseModel | ContactModel | EventModel | ContactOfContactModel,
     relationshipType: RelationshipType,
     authUser: UserModel,
     personType: IResolverV2ResponseModel<ReferenceDataEntryModel>,
@@ -976,7 +976,7 @@ export class EntityHelperService {
   retrieveRecords(
     relationshipType: RelationshipType,
     selectedOutbreak: OutbreakModel,
-    entity: CaseModel | ContactModel | EventModel,
+    entity: CaseModel | ContactModel | EventModel | ContactOfContactModel,
     queryBuilder: RequestQueryBuilder
   ): Observable<EntityModel[]> {
     return relationshipType === RelationshipType.EXPOSURE ?
@@ -1000,7 +1000,7 @@ export class EntityHelperService {
   retrieveRecordsCount(
     relationshipType: RelationshipType,
     selectedOutbreak: OutbreakModel,
-    entity: CaseModel | ContactModel | EventModel,
+    entity: CaseModel | ContactModel | EventModel | ContactOfContactModel,
     countQueryBuilder: RequestQueryBuilder
   ): Observable<IBasicCount> {
     return (relationshipType === RelationshipType.EXPOSURE ?
