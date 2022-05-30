@@ -2,7 +2,7 @@ import { ListComponent } from '../../../core/helperClasses/list-component';
 import { UserModel } from '../../../core/models/user.model';
 import { FollowUpModel } from '../../../core/models/follow-up.model';
 import { ContactModel } from '../../../core/models/contact.model';
-import { DialogAnswer, DialogAnswerButton, DialogField, ModifyContactFollowUpQuestionnaireData, ModifyContactFollowUpQuestionnaireDialogComponent } from '../../../shared/components';
+import { DialogAnswer, DialogAnswerButton, DialogField } from '../../../shared/components';
 import { DialogService, ExportDataExtension } from '../../../core/services/helper/dialog.service';
 import { FollowUpsDataService } from '../../../core/services/data/follow-ups.data.service';
 import { Constants } from '../../../core/models/constants';
@@ -421,23 +421,23 @@ export abstract class FollowUpsListComponent extends ListComponent<FollowUpModel
      * Modify follow-up questionnaire
      * @param followUp
      */
-  modifyQuestionnaire(followUp: FollowUpModel) {
-    this.dialogService.showCustomDialog(
-      ModifyContactFollowUpQuestionnaireDialogComponent, {
-        ...ModifyContactFollowUpQuestionnaireDialogComponent.DEFAULT_CONFIG,
-        ...{
-          data: new ModifyContactFollowUpQuestionnaireData(
-            followUp,
-            this.selectedOutbreak
-          )
-        }
-      }
-    ).subscribe((answer: DialogAnswer) => {
-      if (answer.button === DialogAnswerButton.Yes) {
-        // update list information that was changed
-        followUp.statusId = (answer.inputValue.value as FollowUpModel).statusId;
-      }
-    });
+  modifyQuestionnaire(_followUp: FollowUpModel) {
+    // this.dialogService.showCustomDialog(
+    //   ModifyContactFollowUpQuestionnaireDialogComponent, {
+    //     ...ModifyContactFollowUpQuestionnaireDialogComponent.DEFAULT_CONFIG,
+    //     ...{
+    //       data: new ModifyContactFollowUpQuestionnaireData(
+    //         followUp,
+    //         this.selectedOutbreak
+    //       )
+    //     }
+    //   }
+    // ).subscribe((answer: DialogAnswer) => {
+    //   if (answer.button === DialogAnswerButton.Yes) {
+    //     // update list information that was changed
+    //     followUp.statusId = (answer.inputValue.value as FollowUpModel).statusId;
+    //   }
+    // });
   }
 
   /**

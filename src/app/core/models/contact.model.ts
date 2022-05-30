@@ -5,7 +5,7 @@ import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
 import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
-import { moment } from '../helperClasses/x-moment';
+import { Moment, moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { VaccineModel } from './vaccine.model';
 import { UserModel } from './user.model';
@@ -65,7 +65,7 @@ export class ContactModel
   riskLevel: string;
   riskReason: string;
   type: EntityType = EntityType.CONTACT;
-  dateOfReporting: string;
+  dateOfReporting: string | Moment;
   dateOfLastContact: string;
   isDateOfReportingApproximate: boolean;
   outbreakId: string;
@@ -91,7 +91,7 @@ export class ContactModel
   responsibleUserId: string;
   responsibleUser: UserModel;
 
-  dob: string;
+  dob: string | Moment;
   age: AgeModel;
 
   vaccinesReceived: VaccineModel[];
