@@ -1162,26 +1162,13 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
    * Initialize expand list advanced filters
    */
   protected initializeExpandListAdvancedFilters(): void {
-    // #TODO
-    // this.expandListAdvancedFilters = ContactOfContactModel.generateAdvancedFilters({
-    //   authUser: this.authUser,
-    //   caseInvestigationTemplate: () => this.selectedOutbreak.caseInvestigationTemplate,
-    //   options: {
-    //     gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     occupation: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     risk: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     classification: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-    //     outcome: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     clusterLoad: (finished) => {
-    //       finished(this.activatedRoute.snapshot.data.cluster);
-    //     },
-    //     pregnancy: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     vaccine: (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     vaccineStatus: (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
-    //   }
-    // });
+    this.expandListAdvancedFilters = ContactOfContactModel.generateAdvancedFilters({
+      authUser: this.authUser,
+      options: {
+        occupation: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+      }
+    });
   }
 
   /**
