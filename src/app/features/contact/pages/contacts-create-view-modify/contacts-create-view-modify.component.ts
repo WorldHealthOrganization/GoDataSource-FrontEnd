@@ -1479,7 +1479,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
         ).subscribe((item: ContactModel) => {
           // finished
           const finishedProcessingData = () => {
-            // success creating / updating case
+            // success creating / updating
             this.toastV2Service.success(
               type === CreateViewModifyV2ActionType.CREATE ?
                 'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE' :
@@ -1554,7 +1554,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
           takeUntil(this.destroyed$)
         )
         .subscribe((versionData) => {
-          // no duplicates - proceed to create case ?
+          // no duplicates - proceed to create ?
           if (
             (
               type === CreateViewModifyV2ActionType.CREATE &&
@@ -1601,7 +1601,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
             .subscribe((response) => {
               // no duplicates ?
               if (response.duplicates.length < 1) {
-                // create case
+                // create
                 return runCreateOrUpdate(undefined);
               }
 
