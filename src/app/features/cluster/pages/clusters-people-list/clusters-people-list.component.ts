@@ -22,6 +22,7 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 
 @Component({
   selector: 'app-clusters-people-list',
@@ -29,11 +30,11 @@ import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2
 })
 export class ClustersPeopleListComponent extends ListComponent<CaseModel | ContactModel | EventModel | ContactOfContactModel> implements OnDestroy {
   // present cluster
-  cluster: ClusterModel;
+  private _selectedCluster: ClusterModel;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     private activatedRoute: ActivatedRoute,
@@ -41,30 +42,31 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
     private toastV2Service: ToastV2Service,
     private i18nService: I18nService
   ) {
+    // parent
     super(listHelperService);
+
+    // disable select outbreak
+    TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = true;
+
+    // get data
+    this._selectedCluster = activatedRoute.snapshot.data.selectedCluster;
   }
 
   /**
-     * Release resources
-     */
+   * Release resources
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
+
+    // enable select outbreak
+    TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = false;
   }
 
   /**
-  * Selected outbreak was changed
-  */
+   * Selected outbreak was changed
+   */
   selectedOutbreakChanged(): void {
-    // retrieve cluster info
-    this.clusterDataService.getCluster(this.selectedOutbreak.id, this.activatedRoute.snapshot.params.clusterId)
-      .subscribe((clusterData: ClusterModel) => {
-        this.cluster = clusterData;
-
-        // Needed to show entity name in breadcrumbs after page refresh
-        this.initializeBreadcrumbs();
-      });
-
     // initialize pagination
     this.initPaginator();
 
@@ -326,13 +328,13 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
 
     // cluster breadcrumb
     if (
-      this.cluster &&
+      this._selectedCluster &&
       ClusterModel.canView(this.authUser)
     ) {
       this.breadcrumbs.push({
-        label: this.cluster.name,
+        label: this._selectedCluster.name,
         action: {
-          link: [`/clusters/${ this.cluster.id }/view`]
+          link: [`/clusters/${ this._selectedCluster.id }/view`]
         }
       });
     }
@@ -368,7 +370,11 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
    */
   refreshList() {
     this.records$ = this.clusterDataService
-      .getClusterPeople(this.selectedOutbreak.id, this.activatedRoute.snapshot.params.clusterId, this.queryBuilder)
+      .getClusterPeople(
+        this.selectedOutbreak.id,
+        this.activatedRoute.snapshot.params.clusterId,
+        this.queryBuilder
+      )
       .pipe(
         // should be the last pipe
         takeUntil(this.destroyed$)
@@ -376,8 +382,8 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
   }
 
   /**
-     * Get total number of items, based on the applied filters
-     */
+   * Get total number of items, based on the applied filters
+   */
   refreshListCount(applyHasMoreLimit?: boolean) {
     // reset
     this.pageCount = undefined;
@@ -400,6 +406,7 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
       );
     }
 
+    // count
     this.clusterDataService
       .getClusterPeopleCount(this.selectedOutbreak.id, this.activatedRoute.snapshot.params.clusterId, countQueryBuilder)
       .pipe(
@@ -417,8 +424,8 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
   }
 
   /**
-     * Get the link to redirect to view page depending on item type and action
-     */
+   * Get the link to redirect to view page depending on item type and action
+   */
   getItemRouterLink(item, action: string): string {
     switch (item.type) {
       case EntityType.CASE:

@@ -11,6 +11,7 @@ import { PersonTypeDataResolver } from '../../core/services/resolvers/data/perso
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { SelectedOutbreakDataResolver } from '../../core/services/resolvers/data/selected-outbreak.resolver';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
+import { SelectedClusterDataResolver } from '../../core/services/resolvers/data/selected-cluster.resolver';
 
 // create / view / modify
 const createViewModifyFoundation: Route = {
@@ -92,7 +93,8 @@ const routes: Routes = [
       yesNoAll: YesNoAllDataResolver,
       gender: GenderDataResolver,
       risk: RiskDataResolver,
-      personType: PersonTypeDataResolver
+      personType: PersonTypeDataResolver,
+      selectedCluster: SelectedClusterDataResolver
     }
   }
 ];

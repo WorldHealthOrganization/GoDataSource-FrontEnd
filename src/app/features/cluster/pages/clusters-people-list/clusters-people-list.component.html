@@ -26,31 +26,3 @@
   (resetHeaderFilters)="resetFiltersToSideFilters()"
   (advancedFilterBy)="applySideFilters($event)">
 </app-list-table-v2>
-
-
-<!-- <mat-card class="page-section page-content">
-    <mat-table #table [dataSource]="clusterPeopleList$ | async" matSort
-               (matSortChange)="sortBy($event, { age: [ 'years', 'months' ] })">
-
-         <!~~ TODO: Column not shown in the old design, what should we do with it? ~~>      
-        <!~~ Last follow-up ~~>
-        <ng-container matColumnDef="lastFollowUp">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div class="column-header">
-                        {{'LNG_ENTITY_FIELD_LABEL_LAST_FOLLOW_UP' | translate}}
-                    </div>
-                    <div class="column-filter">
-                        <!~~ placeholder ~~>
-                    </div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item" [style.color]="getPersonTypeColor(item.type)">
-                <!~~ placeholder ~~>
-            </mat-cell>
-        </ng-container>
-
-    </mat-table>
-</mat-card>
- -->
