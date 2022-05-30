@@ -15,15 +15,15 @@
     <div class="form-content">
         <mat-tab-group class="page-tabs-navbar">
             <mat-tab [label]="'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE' | translate">
-                <app-form-fill-questionnaire
-                    *ngIf="!!followUpData?.id"
-                    name="questionnaireAnswers"
-                    [ngModel]="followUpData.questionnaireAnswers"
-                    [questions]="selectedOutbreak?.contactFollowUpTemplate"
-                    [disabled]="viewOnly"
-                    [warningTitle]="!history ? undefined : 'LNG_QUESTIONNAIRE_REGISTERED_AS_CONTACT_MESSAGE' | translate: { personName: followUpData?.person?.name }"
-                    [componentTitle]="'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE' | translate">
-                </app-form-fill-questionnaire>
+<!--                <app-form-fill-questionnaire-->
+<!--                    *ngIf="!!followUpData?.id"-->
+<!--                    name="questionnaireAnswers"-->
+<!--                    [ngModel]="followUpData.questionnaireAnswers"-->
+<!--                    [questions]="selectedOutbreak?.contactFollowUpTemplate"-->
+<!--                    [disabled]="viewOnly"-->
+<!--                    [warningTitle]="!history ? undefined : 'LNG_QUESTIONNAIRE_REGISTERED_AS_CONTACT_MESSAGE' | translate: { personName: followUpData?.person?.name }"-->
+<!--                    [componentTitle]="'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE' | translate">-->
+<!--                </app-form-fill-questionnaire>-->
             </mat-tab>
         </mat-tab-group>
     </div>
