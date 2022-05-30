@@ -20,6 +20,25 @@ import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.res
 import { VaccineStatusDataResolver } from './../../core/services/resolvers/data/vaccine-status.resolver';
 import { VaccineDataResolver } from './../../core/services/resolvers/data/vaccine.resolver';
 import * as fromPages from './pages';
+import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
+import { DocumentTypeDataResolver } from '../../core/services/resolvers/data/document-type.resolver';
+import { AddressTypeDataResolver } from '../../core/services/resolvers/data/address-type.resolver';
+import { ContactsCreateViewModifyComponent } from './pages/contacts-create-view-modify/contacts-create-view-modify.component';
+import { SelectedOutbreakDataResolver } from '../../core/services/resolvers/data/selected-outbreak.resolver';
+import { PersonTypeDataResolver } from '../../core/services/resolvers/data/person-type.resolver';
+import { ClusterDataResolver } from '../../core/services/resolvers/data/cluster.resolver';
+import { CertaintyLevelDataResolver } from '../../core/services/resolvers/data/certainty-level.resolver';
+import { ExposureTypeDataResolver } from '../../core/services/resolvers/data/exposure-type.resolver';
+import { ExposureFrequencyDataResolver } from '../../core/services/resolvers/data/exposure-frequency.resolver';
+import { ExposureDurationDataResolver } from '../../core/services/resolvers/data/exposure-duration.resolver';
+import { ContextOfTransmissionDataResolver } from '../../core/services/resolvers/data/context-of-transmission.resolver';
+import { LabNameDataResolver } from '../../core/services/resolvers/data/lab-name.resolver';
+import { LabSampleTypeDataResolver } from '../../core/services/resolvers/data/lab-sample-type.resolver';
+import { LabTestTypeDataResolver } from '../../core/services/resolvers/data/lab-test-type.resolver';
+import { LabTestResultDataResolver } from '../../core/services/resolvers/data/lab-test-result.resolver';
+import { LabProgressDataResolver } from '../../core/services/resolvers/data/lab-progress.resolver';
+import { LabSequenceLaboratoryDataResolver } from '../../core/services/resolvers/data/lab-sequence-laboratory.resolver';
+import { LabSequenceResultDataResolver } from '../../core/services/resolvers/data/lab-sequence-result.resolver';
 
 // Follow-ups list from a - contact / case
 const viewFollowUpsListFoundation: Route = {
@@ -36,7 +55,7 @@ const viewFollowUpsListFoundation: Route = {
 };
 
 // Daily Follow-ups list / Follow-ups list from a case
-const dailyFOllowUpsListFoundation: Route = {
+const dailyFollowUpsListFoundation: Route = {
   component: fromPages.ContactDailyFollowUpsListComponent,
   canActivate: [AuthGuard],
   resolve: {
@@ -51,6 +70,43 @@ const dailyFOllowUpsListFoundation: Route = {
     classification: ClassificationDataResolver,
     outcome: OutcomeDataResolver,
     entityData: PersonDataResolver
+  }
+};
+
+// Contact - create / view modify
+const contactFoundation: Route = {
+  component: ContactsCreateViewModifyComponent,
+  canActivate: [AuthGuard],
+  resolve: {
+    outbreak: SelectedOutbreakDataResolver,
+    gender: GenderDataResolver,
+    pregnancy: PregnancyStatusDataResolver,
+    occupation: OccupationDataResolver,
+    user: UserDataResolver,
+    documentType: DocumentTypeDataResolver,
+    addressType: AddressTypeDataResolver,
+    risk: RiskDataResolver,
+    vaccine: VaccineDataResolver,
+    vaccineStatus: VaccineStatusDataResolver,
+    followUpStatus: FinalFollowUpStatusDataResolver,
+    yesNo: YesNoDataResolver,
+    team: TeamDataResolver,
+    dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
+    personType: PersonTypeDataResolver,
+    cluster: ClusterDataResolver,
+    certaintyLevel: CertaintyLevelDataResolver,
+    exposureType: ExposureTypeDataResolver,
+    exposureFrequency: ExposureFrequencyDataResolver,
+    exposureDuration: ExposureDurationDataResolver,
+    contextOfTransmission: ContextOfTransmissionDataResolver,
+    yesNoAll: YesNoAllDataResolver,
+    labName: LabNameDataResolver,
+    labSampleType: LabSampleTypeDataResolver,
+    labTestType: LabTestTypeDataResolver,
+    labTestResult: LabTestResultDataResolver,
+    labResultProgress: LabProgressDataResolver,
+    labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
+    labSequenceResult: LabSequenceResultDataResolver
   }
 };
 
@@ -84,12 +140,12 @@ const routes: Routes = [
   // Create Contact
   {
     path: 'create',
-    component: fromPages.CreateContactComponent,
-    canActivate: [AuthGuard],
+    ...contactFoundation,
     data: {
       permissions: [
         PERMISSION.CONTACT_CREATE
-      ]
+      ],
+      action: CreateViewModifyV2Action.CREATE
     },
     canDeactivate: [
       PageChangeConfirmationGuard
@@ -98,68 +154,27 @@ const routes: Routes = [
   // View Contact
   {
     path: ':contactId/view',
-    component: fromPages.ModifyContactComponent,
-    canActivate: [AuthGuard],
+    ...contactFoundation,
     data: {
       permissions: [
         PERMISSION.CONTACT_VIEW
       ],
-      action: ViewModifyComponentAction.VIEW
+      action: CreateViewModifyV2Action.VIEW
     }
   },
   // Modify Contact
   {
     path: ':contactId/modify',
-    component: fromPages.ModifyContactComponent,
-    canActivate: [AuthGuard],
+    ...contactFoundation,
     data: {
       permissions: [
         PERMISSION.CONTACT_MODIFY
       ],
-      action: ViewModifyComponentAction.MODIFY
+      action: CreateViewModifyV2Action.MODIFY
     },
     canDeactivate: [
       PageChangeConfirmationGuard
     ]
-  },
-  // View Contact Questionnaire
-  {
-    path: ':contactId/view-questionnaire',
-    component: fromPages.ModifyQuestionnaireContactComponent,
-    canActivate: [AuthGuard],
-    data: {
-      permissions: [
-        PERMISSION.CONTACT_VIEW
-      ],
-      action: ViewModifyComponentAction.VIEW
-    }
-  },
-  // Modify Contact Questionnaire
-  {
-    path: ':contactId/modify-questionnaire',
-    component: fromPages.ModifyQuestionnaireContactComponent,
-    canActivate: [AuthGuard],
-    data: {
-      permissions: [
-        PERMISSION.CONTACT_MODIFY
-      ],
-      action: ViewModifyComponentAction.MODIFY
-    },
-    canDeactivate: [
-      PageChangeConfirmationGuard
-    ]
-  },
-  // View Case Questionnaire
-  {
-    path: ':contactId/history',
-    component: fromPages.ModifyQuestionnaireContactComponent,
-    canActivate: [AuthGuard],
-    data: {
-      permissions: [
-        PERMISSION.CONTACT_VIEW
-      ],
-      action: ViewModifyComponentAction.HISTORY
-    }
   },
   // Bulk Add Contacts
   {
@@ -217,7 +232,7 @@ const routes: Routes = [
   // Daily Follow-ups list
   {
     path: 'follow-ups',
-    ...dailyFOllowUpsListFoundation,
+    ...dailyFollowUpsListFoundation,
     data: {
       permissions: [
         PERMISSION.FOLLOW_UP_LIST
@@ -227,7 +242,7 @@ const routes: Routes = [
   // Follow-ups list from a case
   {
     path: 'case-related-follow-ups/:caseId',
-    ...dailyFOllowUpsListFoundation,
+    ...dailyFollowUpsListFoundation,
     data: {
       permissions: [
         PERMISSION.FOLLOW_UP_LIST
@@ -310,45 +325,6 @@ const routes: Routes = [
   {
     path: ':contactId/follow-ups/:followUpId/history',
     component: fromPages.ModifyContactFollowUpComponent,
-    canActivate: [AuthGuard],
-    data: {
-      permissions: [
-        PERMISSION.FOLLOW_UP_VIEW
-      ],
-      action: ViewModifyComponentAction.HISTORY
-    }
-  },
-  // View Contact Questionnaire
-  {
-    path: ':contactId/follow-ups/:followUpId/view-questionnaire',
-    component: fromPages.ModifyQuestionnaireContactFollowUpComponent,
-    canActivate: [AuthGuard],
-    data: {
-      permissions: [
-        PERMISSION.FOLLOW_UP_VIEW
-      ],
-      action: ViewModifyComponentAction.VIEW
-    }
-  },
-  // Modify Contact Questionnaire
-  {
-    path: ':contactId/follow-ups/:followUpId/modify-questionnaire',
-    component: fromPages.ModifyQuestionnaireContactFollowUpComponent,
-    canActivate: [AuthGuard],
-    data: {
-      permissions: [
-        PERMISSION.FOLLOW_UP_MODIFY
-      ],
-      action: ViewModifyComponentAction.MODIFY
-    },
-    canDeactivate: [
-      PageChangeConfirmationGuard
-    ]
-  },
-  // View History Questionnaire
-  {
-    path: ':contactId/follow-ups/:followUpId/history-questionnaire',
-    component: fromPages.ModifyQuestionnaireContactFollowUpComponent,
     canActivate: [AuthGuard],
     data: {
       permissions: [

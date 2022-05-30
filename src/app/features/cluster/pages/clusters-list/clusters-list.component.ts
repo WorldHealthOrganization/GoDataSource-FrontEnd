@@ -130,9 +130,7 @@ export class ClustersListComponent extends ListComponent<ClusterModel> implement
               }
             },
             visible: (): boolean => {
-              return this.authUser &&
-                this.selectedOutbreak &&
-                this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+              return this.selectedOutbreakIsActive &&
                 ClusterModel.canModify(this.authUser);
             }
           },
@@ -205,9 +203,7 @@ export class ClustersListComponent extends ListComponent<ClusterModel> implement
                   }
                 },
                 visible: (): boolean => {
-                  return this.authUser &&
-                    this.selectedOutbreak &&
-                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                  return this.selectedOutbreakIsActive &&
                     ClusterModel.canDelete(this.authUser);
                 }
               },
@@ -216,9 +212,7 @@ export class ClustersListComponent extends ListComponent<ClusterModel> implement
               {
                 visible: (): boolean => {
                   // visible only if at least one of the previous...
-                  return this.authUser &&
-                    this.selectedOutbreak &&
-                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
+                  return this.selectedOutbreakIsActive &&
                     ClusterModel.canDelete(this.authUser);
                 }
               },
@@ -284,7 +278,8 @@ export class ClustersListComponent extends ListComponent<ClusterModel> implement
         link: (): string[] => ['/clusters', 'create']
       },
       visible: (): boolean => {
-        return ClusterModel.canCreate(this.authUser);
+        return ClusterModel.canCreate(this.authUser) &&
+          this.selectedOutbreakIsActive;
       }
     };
   }

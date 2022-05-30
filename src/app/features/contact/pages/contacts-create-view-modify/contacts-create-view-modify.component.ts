@@ -3,10 +3,8 @@ import { CreateViewModifyComponent } from '../../../../core/helperClasses/create
 import { ActivatedRoute, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { CaseModel } from '../../../../core/models/case.model';
-import { Observable, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { TranslateService } from '@ngx-translate/core';
 import {
   CreateViewModifyV2ActionType,
@@ -14,8 +12,7 @@ import {
   CreateViewModifyV2TabInputType,
   ICreateViewModifyV2Buttons,
   ICreateViewModifyV2CreateOrUpdate,
-  ICreateViewModifyV2Tab,
-  ICreateViewModifyV2TabTable, ICreateViewModifyV2TabTableRecordsList
+  ICreateViewModifyV2Tab, ICreateViewModifyV2TabTable, ICreateViewModifyV2TabTableRecordsList
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -28,15 +25,9 @@ import { DocumentModel } from '../../../../core/models/document.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { VaccineModel } from '../../../../core/models/vaccine.model';
-import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { LabResultModel } from '../../../../core/models/lab-result.model';
-import { FollowUpModel } from '../../../../core/models/follow-up.model';
-import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
-import { catchError, takeUntil } from 'rxjs/operators';
-import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
-import * as _ from 'lodash';
+import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RequestFilterGenerator, RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
@@ -47,26 +38,33 @@ import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { Location } from '@angular/common';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputLinkWithAction, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { EntityDataService } from '../../../../core/services/data/entity.data.service';
-import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
-import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
-import { ClusterModel } from '../../../../core/models/cluster.model';
-import { EntityLabResultService } from '../../../../core/services/helper/entity-lab-result-helper.service';
-import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
 import { TeamModel } from '../../../../core/models/team.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { CaseDataService } from '../../../../core/services/data/case.data.service';
+import { CaseModel } from '../../../../core/models/case.model';
+import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
+import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
+import { ClusterModel } from '../../../../core/models/cluster.model';
+import * as _ from 'lodash';
+import { FollowUpModel } from '../../../../core/models/follow-up.model';
+import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
+import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import { EntityLabResultService } from '../../../../core/services/helper/entity-lab-result-helper.service';
+import { EntityDataService } from '../../../../core/services/data/entity.data.service';
+import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputLinkWithAction, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 
 /**
  * Component
  */
 @Component({
-  selector: 'app-cases-create-view-modify',
-  templateUrl: './cases-create-view-modify.component.html'
+  selector: 'app-contacts-create-view-modify',
+  templateUrl: './contacts-create-view-modify.component.html'
 })
-export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<CaseModel> implements OnDestroy {
-  // case visual id mask
-  private _caseVisualIDMask: {
+export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent<ContactModel> implements OnDestroy {
+  // contact visual id mask
+  private _contactVisualIDMask: {
     mask: string
   };
 
@@ -87,8 +85,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       middleName: ''
     };
 
-  // custom uuid creation ?
-  customCaseUUID: string;
+  // relationship
+  private _relationship: RelationshipModel;
+  private _entityId: string;
 
   /**
    * Constructor
@@ -96,21 +95,23 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   constructor(
     protected router: Router,
     protected activatedRoute: ActivatedRoute,
+    protected contactDataService: ContactDataService,
     protected caseDataService: CaseDataService,
     protected translateService: TranslateService,
-    protected systemSettingsDataService: SystemSettingsDataService,
     protected toastV2Service: ToastV2Service,
-    protected contactDataService: ContactDataService,
     protected location: Location,
     protected dialogV2Service: DialogV2Service,
-    protected entityDataService: EntityDataService,
     protected entityHelperService: EntityHelperService,
-    protected entityLabResultService: EntityLabResultService,
     protected entityFollowUpHelperService: EntityFollowUpHelperService,
+    protected entityLabResultService: EntityLabResultService,
+    protected entityDataService: EntityDataService,
+    protected systemSettingsDataService: SystemSettingsDataService,
+    protected relationshipDataService: RelationshipDataService,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
   ) {
+    // parent
     super(
       toastV2Service,
       renderer2,
@@ -119,12 +120,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       authDataService
     );
 
-    // do we need to use custom id ?
+    // get data
     if (this.isCreate) {
-      const uid: string = this.activatedRoute.snapshot.queryParams.uid;
-      if (uid) {
-        this.customCaseUUID = uid;
-      }
+      this._entityId = this.activatedRoute.snapshot.queryParams.entityId;
     }
   }
 
@@ -149,8 +147,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   /**
    * Create new item model if needed
    */
-  protected createNewItem(): CaseModel {
-    return new CaseModel({
+  protected createNewItem(): ContactModel {
+    return new ContactModel({
       addresses: [new AddressModel({
         typeId: AddressType.CURRENT_ADDRESS
       })]
@@ -160,13 +158,13 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   /**
    * Retrieve item
    */
-  protected retrieveItem(record?: CaseModel): Observable<CaseModel> {
-    return this.caseDataService
-      .getCase(
+  protected retrieveItem(record?: ContactModel): Observable<ContactModel> {
+    return this.contactDataService
+      .getContact(
         this.selectedOutbreak.id,
         record ?
           record.id :
-          this.activatedRoute.snapshot.params.caseId
+          this.activatedRoute.snapshot.params.contactId
       );
   }
 
@@ -175,13 +173,13 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    */
   protected initializedData(): void {
     // initialize visual ID mask
-    this._caseVisualIDMask = {
-      mask: CaseModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask)
+    this._contactVisualIDMask = {
+      mask: ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask)
     };
 
     // set visual id for case
     this.itemData.visualId = this.isCreate ?
-      this._caseVisualIDMask.mask :
+      this._contactVisualIDMask.mask :
       this.itemData.visualId;
 
     // check if record has duplicate
@@ -195,6 +193,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       // check
       this.checkForPersonExistence();
     }
+
+    // initialize relationship
+    if (this.isCreate) {
+      this._relationship = new RelationshipModel();
+    }
   }
 
   /**
@@ -203,16 +206,16 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   protected initializePageTitle(): void {
     // add info accordingly to page type
     if (this.isCreate) {
-      this.pageTitle = 'LNG_PAGE_CREATE_CASE_TITLE';
+      this.pageTitle = 'LNG_PAGE_CREATE_CONTACT_TITLE';
       this.pageTitleData = undefined;
     } else if (this.isModify) {
-      this.pageTitle = 'LNG_PAGE_MODIFY_CASE_TITLE';
+      this.pageTitle = 'LNG_PAGE_MODIFY_CONTACT_TITLE';
       this.pageTitleData = {
         name: this.itemData.name
       };
     } else {
       // view
-      this.pageTitle = 'LNG_PAGE_VIEW_CASE_TITLE';
+      this.pageTitle = 'LNG_PAGE_VIEW_CONTACT_TITLE';
       this.pageTitleData = {
         name: this.itemData.name
       };
@@ -236,62 +239,25 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     ];
 
     // case list page
-    if (CaseModel.canList(this.authUser)) {
+    if (ContactModel.canList(this.authUser)) {
       this.breadcrumbs.push({
-        label: 'LNG_PAGE_LIST_CASES_TITLE',
+        label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
         action: {
-          link: ['/cases']
-        }
-      });
-    }
-
-    // case onset
-    if (
-      this.activatedRoute.snapshot.queryParams.onset &&
-      CaseModel.canListOnsetBeforePrimaryReport(this.authUser)
-    ) {
-      this.breadcrumbs.push({
-        label: 'LNG_PAGE_LIST_CASES_DATE_ONSET_TITLE',
-        action: {
-          link: ['/relationships/date-onset']
-        }
-      });
-    }
-
-    // case onset long
-    if (
-      this.activatedRoute.snapshot.queryParams.longPeriod &&
-      CaseModel.canListLongPeriodBetweenOnsetDatesReport(this.authUser)
-    ) {
-      this.breadcrumbs.push({
-        label: 'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_TITLE',
-        action: {
-          link: ['/relationships/long-period']
+          link: ['/contacts']
         }
       });
     }
 
     // add info accordingly to page type
     if (this.isCreate) {
-      if (this.customCaseUUID) {
-        this.breadcrumbs.push({
-          label: this.translateService.instant(
-            'LNG_PAGE_CREATE_CASE_WITH_UID_TITLE', {
-              uid: this.customCaseUUID
-            }
-          ),
-          action: null
-        });
-      } else {
-        this.breadcrumbs.push({
-          label: 'LNG_PAGE_CREATE_CASE_TITLE',
-          action: null
-        });
-      }
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_CREATE_CONTACT_TITLE',
+        action: null
+      });
     } else if (this.isModify) {
       this.breadcrumbs.push({
         label: this.translateService.instant(
-          'LNG_PAGE_MODIFY_CASE_TITLE', {
+          'LNG_PAGE_MODIFY_CONTACT_TITLE', {
             name: this.itemData.name
           }
         ),
@@ -301,7 +267,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       // view
       this.breadcrumbs.push({
         label: this.translateService.instant(
-          'LNG_PAGE_VIEW_CASE_TITLE', {
+          'LNG_PAGE_VIEW_CONTACT_TITLE', {
             name: this.itemData.name
           }
         ),
@@ -325,7 +291,10 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
         // Questionnaires
         this.initializeTabsQuestionnaire(),
-        this.initializeTabsQuestionnaireAsContact(),
+        this.initializeTabsQuestionnaireAsCase(),
+
+        // Relationship - Create
+        this.initializeTabsRelationship(),
 
         // Contacts, exposures ...
         this.initializeTabsContacts(),
@@ -337,7 +306,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_BUTTON'),
+          buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_BUTTON'),
           message: () => this.translateService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             this.itemData
@@ -350,10 +319,10 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
       // create or update
       createOrUpdate: this.initializeProcessData(),
-      redirectAfterCreateUpdate: (data: CaseModel) => {
+      redirectAfterCreateUpdate: (data: ContactModel) => {
         // redirect to view
         this.router.navigate([
-          '/cases',
+          '/contacts',
           data.id,
           'view'
         ]);
@@ -368,19 +337,19 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     return {
       type: CreateViewModifyV2TabInputType.TAB,
       label: this.isCreate ?
-        'LNG_PAGE_CREATE_CASE_TAB_PERSONAL_TITLE' :
-        'LNG_PAGE_MODIFY_CASE_TAB_PERSONAL_TITLE',
+        'LNG_PAGE_CREATE_CONTACT_TAB_PERSONAL_TITLE' :
+        'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_TITLE',
       sections: [
         // Details
         {
           type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_CASE_FIELD_LABEL_DETAILS',
+          label: 'LNG_COMMON_LABEL_DETAILS',
           inputs: [
             {
               type: CreateViewModifyV2TabInputType.TEXT,
               name: 'firstName',
-              placeholder: () => 'LNG_CASE_FIELD_LABEL_FIRST_NAME',
-              description: () => 'LNG_CASE_FIELD_LABEL_FIRST_NAME_DESCRIPTION',
+              placeholder: () => 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
+              description: () => 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME_DESCRIPTION',
               value: {
                 get: () => this.itemData.firstName,
                 set: (value) => {
@@ -397,8 +366,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             }, {
               type: CreateViewModifyV2TabInputType.TEXT,
               name: 'middleName',
-              placeholder: () => 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME',
-              description: () => 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION',
+              placeholder: () => 'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME',
+              description: () => 'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION',
               value: {
                 get: () => this.itemData.middleName,
                 set: (value) => {
@@ -412,8 +381,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             }, {
               type: CreateViewModifyV2TabInputType.TEXT,
               name: 'lastName',
-              placeholder: () => 'LNG_CASE_FIELD_LABEL_LAST_NAME',
-              description: () => 'LNG_CASE_FIELD_LABEL_LAST_NAME_DESCRIPTION',
+              placeholder: () => 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
+              description: () => 'LNG_CONTACT_FIELD_LABEL_LAST_NAME_DESCRIPTION',
               value: {
                 get: () => this.itemData.lastName,
                 set: (value) => {
@@ -427,8 +396,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'gender',
-              placeholder: () => 'LNG_CASE_FIELD_LABEL_GENDER',
-              description: () => 'LNG_CASE_FIELD_LABEL_GENDER_DESCRIPTION',
+              placeholder: () => 'LNG_CONTACT_FIELD_LABEL_GENDER',
+              description: () => 'LNG_CONTACT_FIELD_LABEL_GENDER_DESCRIPTION',
               options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
               value: {
                 get: () => this.itemData.gender,
@@ -445,8 +414,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'pregnancyStatus',
-              placeholder: () => 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS',
-              description: () => 'LNG_CASE_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION',
+              placeholder: () => 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
+              description: () => 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION',
               options: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
               value: {
                 get: () => this.itemData.pregnancyStatus,
@@ -460,8 +429,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'occupation',
-              placeholder: () => 'LNG_CASE_FIELD_LABEL_OCCUPATION',
-              description: () => 'LNG_CASE_FIELD_LABEL_OCCUPATION_DESCRIPTION',
+              placeholder: () => 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
+              description: () => 'LNG_CONTACT_FIELD_LABEL_OCCUPATION_DESCRIPTION',
               options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
               value: {
                 get: () => this.itemData.occupation,
@@ -476,8 +445,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                 dob: 'dob'
               },
               description: {
-                age: 'LNG_CASE_FIELD_LABEL_AGE_DESCRIPTION',
-                dob: 'LNG_CASE_FIELD_LABEL_DOB_DESCRIPTION'
+                age: 'LNG_CONTACT_FIELD_LABEL_AGE_DESCRIPTION',
+                dob: 'LNG_CONTACT_FIELD_LABEL_DOB_DESCRIPTION'
               },
               ageChecked: !this.itemData.dob,
               ageTypeYears: this.itemData.age?.months < 1,
@@ -510,10 +479,10 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             }, {
               type: CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT,
               name: 'visualId',
-              placeholder: () => 'LNG_CASE_FIELD_LABEL_VISUAL_ID',
+              placeholder: () => 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
               description: () => this.translateService.instant(
-                'LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
-                this._caseVisualIDMask
+                'LNG_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
+                this._contactVisualIDMask
               ),
               value: {
                 get: () => this.itemData.visualId,
@@ -527,12 +496,12 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                   tooltip: 'LNG_PAGE_ACTION_REFRESH_VISUAL_ID_DESCRIPTION',
                   clickAction: (input) => {
                     // nothing to do ?
-                    if (!this._caseVisualIDMask) {
+                    if (!this._contactVisualIDMask) {
                       return;
                     }
 
                     // generate
-                    this.itemData.visualId = CaseModel.generateCaseIDMask(this.selectedOutbreak.caseIdMask);
+                    this.itemData.visualId = ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask);
 
                     // mark as dirty
                     input.control?.markAsDirty();
@@ -542,8 +511,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               validators: {
                 async: new Observable((observer) => {
                   // construct cache key
-                  const cacheKey: string = 'CCA_' + this.selectedOutbreak.id +
-                    this._caseVisualIDMask.mask +
+                  const cacheKey: string = 'CCO_' + this.selectedOutbreak.id +
+                    this._contactVisualIDMask.mask +
                     this.itemData.visualId +
                     (
                       this.isCreate ?
@@ -554,9 +523,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                   // get data from cache or execute validator
                   TimerCache.run(
                     cacheKey,
-                    this.caseDataService.checkCaseVisualIDValidity(
+                    this.contactDataService.checkContactVisualIDValidity(
                       this.selectedOutbreak.id,
-                      this._caseVisualIDMask.mask,
+                      this._contactVisualIDMask.mask,
                       this.itemData.visualId,
                       this.isCreate ?
                         undefined :
@@ -571,8 +540,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'responsibleUserId',
-              placeholder: () => 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID',
-              description: () => 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
+              placeholder: () => 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+              description: () => 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
               options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
               value: {
                 get: () => this.itemData.responsibleUserId,
@@ -582,7 +551,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               },
               replace: {
                 condition: () => !UserModel.canList(this.authUser),
-                html: this.translateService.instant('LNG_PAGE_CREATE_CASE_CANT_SET_RESPONSIBLE_ID_TITLE')
+                html: this.translateService.instant('LNG_PAGE_CREATE_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE')
               }
             }
           ]
@@ -591,7 +560,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         // Documents
         {
           type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_CASE_FIELD_LABEL_DOCUMENTS',
+          label: 'LNG_CONTACT_FIELD_LABEL_DOCUMENTS',
           inputs: [{
             type: CreateViewModifyV2TabInputType.LIST,
             name: 'documents',
@@ -625,7 +594,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         // Addresses
         {
           type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
+          label: 'LNG_PAGE_CREATE_CONTACT_TAB_ADDRESS_TITLE',
           inputs: [{
             type: CreateViewModifyV2TabInputType.LIST,
             name: 'addresses',
@@ -669,230 +638,18 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     return {
       type: CreateViewModifyV2TabInputType.TAB,
       label: this.isCreate ?
-        'LNG_PAGE_CREATE_CASE_TAB_INFECTION_TITLE' :
-        'LNG_PAGE_MODIFY_CASE_TAB_INFECTION_TITLE',
+        'LNG_PAGE_CREATE_CONTACT_TAB_INFECTION_TITLE' :
+        'LNG_PAGE_MODIFY_CONTACT_TAB_INFECTION_TITLE',
       sections: [
         // Details
         {
           type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_CASE_FIELD_LABEL_DETAILS',
+          label: 'LNG_COMMON_LABEL_DETAILS',
           inputs: [{
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'classification',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-            description: () => 'LNG_CASE_FIELD_LABEL_CLASSIFICATION_DESCRIPTION',
-            options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            value: {
-              get: () => this.itemData.classification,
-              set: (value) => {
-                this.itemData.classification = value;
-              }
-            },
-            validators: {
-              required: () => true
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateOfOnset',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET',
-            description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_DESCRIPTION',
-            value: {
-              get: () => this.itemData.dateOfOnset,
-              set: (value) => {
-                this.itemData.dateOfOnset = value;
-              }
-            },
-            maxDate: this._today,
-            validators: {
-              required: () => !!this.selectedOutbreak.isDateOfOnsetRequired,
-              dateSameOrBefore: () => [
-                this._today,
-                'dateOfOutcome'
-              ],
-              dateSameOrAfter: () => [
-                'dateOfInfection'
-              ]
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-            name: 'isDateOfOnsetApproximate',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE',
-            description: () => 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE_DESCRIPTION',
-            value: {
-              get: () => this.itemData.isDateOfOnsetApproximate,
-              set: (value) => {
-                this.itemData.isDateOfOnsetApproximate = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateBecomeCase',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
-            description: () => 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE_DESCRIPTION',
-            value: {
-              get: () => this.itemData.dateBecomeCase,
-              set: (value) => {
-                this.itemData.dateBecomeCase = value;
-              }
-            },
-            maxDate: this._today,
-            validators: {
-              dateSameOrBefore: () => [
-                this._today
-              ]
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateOfInfection',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
-            description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION_DESCRIPTION',
-            value: {
-              get: () => this.itemData.dateOfInfection,
-              set: (value) => {
-                this.itemData.dateOfInfection = value;
-              }
-            },
-            maxDate: this._today,
-            validators: {
-              dateSameOrBefore: () => [
-                this._today,
-                'dateOfOutcome',
-                'dateOfOnset'
-              ]
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'outcomeId',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_OUTCOME',
-            description: () => 'LNG_CASE_FIELD_LABEL_OUTCOME_DESCRIPTION',
-            options: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            value: {
-              get: () => this.itemData.outcomeId,
-              set: (value) => {
-                // set data
-                this.itemData.outcomeId = value;
-
-                // reset data if not decease
-                if (this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED) {
-                  this.itemData.safeBurial = null;
-                  this.itemData.dateOfBurial = null;
-                  this.itemData.burialLocationId = null;
-                  this.itemData.burialPlaceName = null;
-                }
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateOfOutcome',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME',
-            description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME_DESCRIPTION',
-            value: {
-              get: () => this.itemData.dateOfOutcome,
-              set: (value) => {
-                this.itemData.dateOfOutcome = value;
-              }
-            },
-            maxDate: this._today,
-            validators: {
-              dateSameOrBefore: () => [
-                this._today,
-                'dateOfBurial'
-              ],
-              dateSameOrAfter: () => [
-                'dateOfOnset',
-                'dateOfInfection'
-              ]
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-            name: 'transferRefused',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
-            description: () => 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION',
-            value: {
-              get: () => this.itemData.transferRefused,
-              set: (value) => {
-                this.itemData.transferRefused = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-            name: 'safeBurial',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL',
-            description: () => 'LNG_CASE_FIELD_LABEL_SAFETY_BURIAL_DESCRIPTION',
-            value: {
-              get: () => this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
-                false :
-                this.itemData.safeBurial,
-              set: (value) => {
-                this.itemData.safeBurial = value;
-              }
-            },
-            disabled: () => {
-              return this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateOfBurial',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL',
-            description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL_DESCRIPTION',
-            value: {
-              get: () => this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
-                undefined :
-                this.itemData.dateOfBurial,
-              set: (value) => {
-                this.itemData.dateOfBurial = value;
-              }
-            },
-            maxDate: this._today,
-            validators: {
-              dateSameOrBefore: () => [
-                this._today
-              ],
-              dateSameOrAfter: () => [
-                'dateOfOutcome'
-              ]
-            },
-            disabled: () => {
-              return this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.LOCATION_SINGLE,
-            name: 'burialLocationId',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL',
-            description: () => 'LNG_CASE_FIELD_LABEL_PLACE_OF_BURIAL_DESCRIPTION',
-            useOutbreakLocations: true,
-            value: {
-              get: () => this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
-                undefined :
-                this.itemData.burialLocationId,
-              set: (value) => {
-                this.itemData.burialLocationId = value;
-              }
-            },
-            disabled: () => {
-              return this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.TEXT,
-            name: 'burialPlaceName',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME',
-            description: () => 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME_DESCRIPTION',
-            value: {
-              get: () => this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
-                undefined :
-                this.itemData.burialPlaceName,
-              set: (value) => {
-                this.itemData.burialPlaceName = value;
-              }
-            },
-            disabled: () => {
-              return this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
-            }
-          }, {
             type: CreateViewModifyV2TabInputType.DATE,
             name: 'dateOfReporting',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING',
-            description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
+            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
+            description: () => 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
             value: {
               get: () => this.itemData.dateOfReporting,
               set: (value) => {
@@ -909,8 +666,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }, {
             type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
             name: 'isDateOfReportingApproximate',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
-            description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION',
+            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+            description: () => 'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION',
             value: {
               get: () => this.itemData.isDateOfReportingApproximate,
               set: (value) => {
@@ -920,8 +677,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
             name: 'riskLevel',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
-            description: () => 'LNG_CASE_FIELD_LABEL_RISK_LEVEL_DESCRIPTION',
+            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL',
+            description: () => 'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL_DESCRIPTION',
             options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             value: {
               get: () => this.itemData.riskLevel,
@@ -932,12 +689,46 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }, {
             type: CreateViewModifyV2TabInputType.TEXTAREA,
             name: 'riskReason',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_RISK_REASON',
-            description: () => 'LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION',
+            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_RISK_REASON',
+            description: () => 'LNG_CONTACT_FIELD_LABEL_RISK_REASON_DESCRIPTION',
             value: {
               get: () => this.itemData.riskReason,
               set: (value) => {
                 this.itemData.riskReason = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'followUpTeamId',
+            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID',
+            description: () => 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
+            value: {
+              get: () => this.itemData.followUpTeamId,
+              set: (value) => {
+                this.itemData.followUpTeamId = value;
+              }
+            },
+            replace: {
+              condition: () => !TeamModel.canList(this.authUser),
+              html: this.translateService.instant('LNG_PAGE_CREATE_CONTACT_CANT_SET_FOLLOW_UP_TEAM_TITLE')
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'followUp[status]',
+            placeholder: () => 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS',
+            description: () => 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.followUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this.itemData.followUp?.status,
+              set: (value) => {
+                // initialize
+                if (!this.itemData.followUp) {
+                  this.itemData.followUp = {} as any;
+                }
+
+                // set data
+                this.itemData.followUp.status = value;
               }
             }
           }]
@@ -946,7 +737,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         // Vaccines
         {
           type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED_DETAILS',
+          label: 'LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED_DETAILS',
           inputs: [{
             type: CreateViewModifyV2TabInputType.LIST,
             name: 'vaccinesReceived',
@@ -976,46 +767,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               }
             }
           }]
-        },
-
-        // Date ranges
-        {
-          type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS',
-          inputs: [{
-            type: CreateViewModifyV2TabInputType.LIST,
-            name: 'dateRanges',
-            items: this.itemData.dateRanges,
-            itemsChanged: (list) => {
-              // update documents
-              this.itemData.dateRanges = list.items;
-            },
-            definition: {
-              add: {
-                label: 'LNG_COMMON_BUTTON_ADD_DATE_RANGE',
-                newItem: () => new CaseCenterDateRangeModel()
-              },
-              remove: {
-                label: 'LNG_COMMON_BUTTON_DELETE',
-                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_DATE_RANGE'
-              },
-              input: {
-                type: CreateViewModifyV2TabInputType.CENTER_DATE_RANGE,
-                typeOptions: (this.activatedRoute.snapshot.data.dateRangeType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                centerOptions: (this.activatedRoute.snapshot.data.dateRangeCenter as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                value: {
-                  get: (index: number) => {
-                    return this.itemData.dateRanges[index];
-                  }
-                },
-                startDateValidators: {
-                  dateSameOrAfter: () => [
-                    'dateOfOnset'
-                  ]
-                }
-              }
-            }
-          }]
         }
       ]
     };
@@ -1028,11 +779,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     let errors: string = '';
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
-      label: 'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE',
+      label: 'LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
         name: 'questionnaireAnswers',
-        questionnaire: this.selectedOutbreak.caseInvestigationTemplate,
+        questionnaire: this.selectedOutbreak.contactInvestigationTemplate,
         value: {
           get: () => this.itemData.questionnaireAnswers,
           set: (value) => {
@@ -1046,31 +797,194 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       invalidHTMLSuffix: () => {
         return errors;
       },
-      visible: () => this.selectedOutbreak.caseInvestigationTemplate?.length > 0
+      visible: () => this.selectedOutbreak.contactInvestigationTemplate?.length > 0
     };
   }
 
   /**
-   * Initialize tabs - Contact Questionnaire
+   * Initialize tabs - Case Questionnaire
    */
-  private initializeTabsQuestionnaireAsContact(): ICreateViewModifyV2TabTable {
+  private initializeTabsQuestionnaireAsCase(): ICreateViewModifyV2TabTable {
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
-      label: `${this.translateService.instant(EntityType.CONTACT)} ${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE')}`,
+      label: `${this.translateService.instant(EntityType.CONTACT)} ${this.translateService.instant('LNG_PAGE_MODIFY_CONTACT_TAB_CASE_QUESTIONNAIRE_TITLE')}`,
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
-        name: 'questionnaireAnswersContact',
-        questionnaire: this.selectedOutbreak.contactInvestigationTemplate,
+        name: 'questionnaireAnswersCase',
+        questionnaire: this.selectedOutbreak.caseInvestigationTemplate,
         value: {
-          get: () => this.itemData.questionnaireAnswersContact,
+          get: () => this.itemData.questionnaireAnswersCase,
           set: () => {}
         },
         updateErrors: () => {}
       },
       visible: () => this.isView &&
-        this.selectedOutbreak.contactInvestigationTemplate?.length > 0 &&
-        this.itemData.wasContact &&
-        this.itemData.hasQuestionnaireAnswersContact
+        this.selectedOutbreak.caseInvestigationTemplate?.length > 0 &&
+        this.itemData.wasCase &&
+        this.itemData.hasQuestionnaireAnswersCase
+    };
+  }
+
+  /**
+   * Initialize tabs - Relationship
+   */
+  private initializeTabsRelationship(): ICreateViewModifyV2Tab {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB,
+      label: 'LNG_PAGE_CREATE_CONTACT_TAB_RELATIONSHIP_TITLE',
+      visible: () => this.isCreate,
+      sections: [
+        // Details
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_COMMON_LABEL_DETAILS',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: 'relationship[dateOfFirstContact]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT_DESCRIPTION',
+            value: {
+              get: () => this._relationship.dateOfFirstContact,
+              set: (value) => {
+                this._relationship.dateOfFirstContact = value;
+              }
+            },
+            maxDate: this._today,
+            validators: {
+              dateSameOrBefore: () => [
+                this._today
+              ]
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: 'relationship[contactDate]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_DESCRIPTION',
+            value: {
+              get: () => this._relationship.contactDate,
+              set: (value) => {
+                this._relationship.contactDate = value;
+              }
+            },
+            maxDate: this._today,
+            validators: {
+              required: () => true,
+              dateSameOrBefore: () => [
+                this._today
+              ]
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+            name: 'relationship[contactDateEstimated]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED_DESCRIPTION',
+            value: {
+              get: () => this._relationship.contactDateEstimated,
+              set: (value) => {
+                // set data
+                this._relationship.contactDateEstimated = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'relationship[certaintyLevelId]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this._relationship.certaintyLevelId,
+              set: (value) => {
+                this._relationship.certaintyLevelId = value;
+              }
+            },
+            validators: {
+              required: () => true
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'relationship[exposureTypeId]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this._relationship.exposureTypeId,
+              set: (value) => {
+                this._relationship.exposureTypeId = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'relationship[exposureFrequencyId]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this._relationship.exposureFrequencyId,
+              set: (value) => {
+                this._relationship.exposureFrequencyId = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'relationship[exposureDurationId]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this._relationship.exposureDurationId,
+              set: (value) => {
+                this._relationship.exposureDurationId = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'relationship[socialRelationshipTypeId]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this._relationship.socialRelationshipTypeId,
+              set: (value) => {
+                this._relationship.socialRelationshipTypeId = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'relationship[clusterId]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this._relationship.clusterId,
+              set: (value) => {
+                this._relationship.clusterId = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.TEXT,
+            name: 'socialRelationshipDetail',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_DESCRIPTION',
+            value: {
+              get: () => this._relationship.socialRelationshipDetail,
+              set: (value) => {
+                this._relationship.socialRelationshipDetail = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.TEXTAREA,
+            name: 'comment',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT_DESCRIPTION',
+            value: {
+              get: () => this._relationship.comment,
+              set: (value) => {
+                this._relationship.comment = value;
+              }
+            }
+          }]
+        }
+      ]
     };
   }
 
@@ -1083,7 +997,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       label: 'LNG_COMMON_BUTTON_EXPOSURES_FROM',
       visible: () => this.isView &&
-        CaseModel.canListRelationshipContacts(this.authUser),
+        ContactModel.canListRelationshipContacts(this.authUser) &&
+        this.selectedOutbreak.isContactsOfContactsActive,
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST,
         pageSettingsKey: UserSettings.RELATIONSHIP_FIELDS,
@@ -1201,7 +1116,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       label: 'LNG_COMMON_BUTTON_EXPOSURES_TO',
       visible: () => this.isView &&
-        CaseModel.canListRelationshipExposures(this.authUser),
+        ContactModel.canListRelationshipExposures(this.authUser),
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST,
         pageSettingsKey: UserSettings.RELATIONSHIP_FIELDS,
@@ -1319,12 +1234,12 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
       label: 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS',
       visible: () => this.isView &&
-        LabResultModel.canList(this.authUser) &&
-        CaseModel.canListLabResult(this.authUser),
+        ContactModel.canListLabResult(this.authUser) &&
+        this.selectedOutbreak.isContactLabResultsActive,
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST,
-        pageSettingsKey: UserSettings.CASE_LAB_FIELDS,
-        advancedFilterType: Constants.APP_PAGE.CASE_LAB_RESULTS.value,
+        pageSettingsKey: UserSettings.CONTACT_LAB_FIELDS,
+        advancedFilterType: Constants.APP_PAGE.CONTACT_LAB_RESULTS.value,
         tableColumns: this.entityLabResultService.retrieveTableColumns({
           authUser: this.authUser,
           personType: this.itemData.type,
@@ -1444,13 +1359,12 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     // create tab
     const newTab: ICreateViewModifyV2TabTable = {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
-      label: 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE',
+      label: 'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_FOLLOW_UPS',
       visible: () => this.isView &&
-        FollowUpModel.canList(this.authUser) &&
-        this.itemData.wasContact,
+        FollowUpModel.canList(this.authUser),
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST,
-        pageSettingsKey: UserSettings.CONTACT_RELATED_DAILY_FOLLOW_UP_FIELDS,
+        pageSettingsKey: UserSettings.CONTACT_DAILY_FOLLOW_UP_FIELDS,
         advancedFilterType: Constants.APP_PAGE.INDIVIDUAL_CONTACT_FOLLOW_UPS.value,
         tableColumns: this.entityFollowUpHelperService.retrieveTableColumns({
           authUser: this.authUser,
@@ -1575,28 +1489,28 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     return {
       view: {
         link: {
-          link: () => ['/cases', this.itemData?.id, 'view']
+          link: () => ['/contacts', this.itemData?.id, 'view']
         }
       },
       modify: {
         link: {
-          link: () => ['/cases', this.itemData?.id, 'modify']
+          link: () => ['/contacts', this.itemData?.id, 'modify']
         },
-        visible: () => CaseModel.canModify(this.authUser)
+        visible: () => ContactModel.canModify(this.authUser)
       },
       createCancel: {
         link: {
-          link: () => ['/cases']
+          link: () => ['/contacts']
         }
       },
       viewCancel: {
         link: {
-          link: () => ['/cases']
+          link: () => ['/contacts']
         }
       },
       modifyCancel: {
         link: {
-          link: () => ['/cases']
+          link: () => ['/contacts']
         }
       },
       quickActions: {
@@ -1604,12 +1518,12 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           // Record details
           {
             type: CreateViewModifyV2MenuType.OPTION,
-            label: 'LNG_PAGE_MODIFY_CASE_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
+            label: 'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
             action: {
               click: () => {
                 // show record details dialog
                 this.dialogV2Service.showRecordDetailsDialog(
-                  'LNG_PAGE_MODIFY_CASE_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
+                  'LNG_PAGE_MODIFY_CONTACT_TAB_PERSONAL_SECTION_RECORD_DETAILS_TITLE',
                   this.itemData,
                   this.activatedRoute.snapshot.data.user
                 );
@@ -1624,36 +1538,14 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             visible: () => !this.isCreate
           },
 
-          // Add contact
-          {
-            type: CreateViewModifyV2MenuType.OPTION,
-            label: 'LNG_PAGE_ACTION_ADD_CONTACT',
-            action: {
-              link: () => ['/contacts', 'create'],
-              queryParams: () => {
-                return {
-                  entityType: EntityType.CASE,
-                  entityId: this.itemData?.id
-                };
-              }
-            },
-            visible: () => this.selectedOutbreakIsActive && CaseModel.canCreateContact(this.authUser) && ContactModel.canCreate(this.authUser)
-          },
-
-          // Divider
-          {
-            type: CreateViewModifyV2MenuType.DIVIDER,
-            visible: () => this.selectedOutbreakIsActive && CaseModel.canCreateContact(this.authUser) && ContactModel.canCreate(this.authUser)
-          },
-
           // Duplicate records marked as not duplicate
           {
             type: CreateViewModifyV2MenuType.OPTION,
-            label: 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_RECORDS_NOT_DUPLICATES',
+            label: 'LNG_PAGE_MODIFY_CONTACT_ACTION_SEE_RECORDS_NOT_DUPLICATES',
             action: {
-              link: () => ['/duplicated-records', 'cases', this.itemData.id, 'marked-not-duplicates']
+              link: () => ['/duplicated-records', 'contacts', this.itemData.id, 'marked-not-duplicates']
             },
-            visible: () => CaseModel.canList(this.authUser)
+            visible: () => ContactModel.canList(this.authUser)
           },
 
           // contacts
@@ -1661,16 +1553,17 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             type: CreateViewModifyV2MenuType.OPTION,
             label: 'LNG_COMMON_BUTTON_EXPOSURES_FROM',
             action: {
-              link: () => ['/relationships', EntityType.CASE, this.itemData.id, 'contacts']
+              link: () => ['/relationships', EntityType.CONTACT, this.itemData.id, 'contacts']
             },
-            visible: () => CaseModel.canListRelationshipContacts(this.authUser)
+            visible: () => ContactModel.canListRelationshipContacts(this.authUser) &&
+              this.selectedOutbreak.isContactsOfContactsActive
           },
           // exposures
           {
             type: CreateViewModifyV2MenuType.OPTION,
             label: 'LNG_COMMON_BUTTON_EXPOSURES_TO',
             action: {
-              link: () => ['/relationships', EntityType.CASE, this.itemData.id, 'exposures']
+              link: () => ['/relationships', EntityType.CONTACT, this.itemData.id, 'exposures']
             },
             visible: () => CaseModel.canListRelationshipExposures(this.authUser)
           },
@@ -1678,73 +1571,47 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           // lab results
           {
             type: CreateViewModifyV2MenuType.OPTION,
-            label: 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS',
+            label: 'LNG_PAGE_MODIFY_CONTACT_ACTION_SEE_LAB_RESULTS',
             action: {
-              link: () => ['/lab-results', 'cases', this.itemData.id]
+              link: () => ['/lab-results', 'contacts', this.itemData.id]
             },
-            visible: () => LabResultModel.canList(this.authUser) && CaseModel.canListLabResult(this.authUser)
+            visible: () => ContactModel.canListLabResult(this.authUser) &&
+              this.selectedOutbreak.isContactLabResultsActive
           },
 
           // follow-ups
           {
             type: CreateViewModifyV2MenuType.OPTION,
-            label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_FOLLOW_UPS',
+            label: 'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_FOLLOW_UPS',
             action: {
-              link: () => ['/contacts', 'case-related-follow-ups', this.itemData.id]
+              link: () => ['/contacts', 'contact-related-follow-ups', this.itemData.id]
             },
             visible: () => FollowUpModel.canList(this.authUser)
           },
 
           // Divider
           {
-            type: CreateViewModifyV2MenuType.DIVIDER,
-            visible: () => CaseModel.canList(this.authUser) || CaseModel.canListRelationshipContacts(this.authUser) ||
-              CaseModel.canListRelationshipExposures(this.authUser) || (LabResultModel.canList(this.authUser) && CaseModel.canListLabResult(this.authUser)) ||
-              FollowUpModel.canList(this.authUser)
+            type: CreateViewModifyV2MenuType.DIVIDER
           },
 
           // movement map
           {
             type: CreateViewModifyV2MenuType.OPTION,
-            label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_MOVEMENT',
+            label: 'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_MOVEMENT',
             action: {
-              link: () => ['/cases', this.itemData.id, 'movement']
+              link: () => ['/contacts', this.itemData.id, 'movement']
             },
-            visible: () => CaseModel.canViewMovementMap(this.authUser)
+            visible: () => ContactModel.canViewMovementMap(this.authUser)
           },
 
           // chronology chart
           {
             type: CreateViewModifyV2MenuType.OPTION,
-            label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CHRONOLOGY',
+            label: 'LNG_PAGE_MODIFY_CONTACT_ACTION_VIEW_CHRONOLOGY',
             action: {
-              link: () => ['/cases', this.itemData.id, 'chronology']
+              link: () => ['/contacts', this.itemData.id, 'chronology']
             },
-            visible: () => CaseModel.canViewChronologyChart(this.authUser)
-          },
-
-          // Divider
-          {
-            type: CreateViewModifyV2MenuType.DIVIDER,
-            visible: () => CaseModel.canViewMovementMap(this.authUser) || CaseModel.canViewChronologyChart(this.authUser)
-          },
-
-          // Contact group
-          {
-            type: CreateViewModifyV2MenuType.GROUP,
-            label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CASE_WAS_CONTACT_TITLE',
-            visible: () => this.itemData.wasContact && (
-              FollowUpModel.canList(this.authUser)
-            )
-          },
-          // case => contact follow-ups
-          {
-            type: CreateViewModifyV2MenuType.OPTION,
-            label: 'LNG_PAGE_MODIFY_CASE_ACTION_VIEW_CONTACT_FOLLOW_UPS',
-            action: {
-              link: () => ['/contacts', 'case-follow-ups', this.itemData.id]
-            },
-            visible: () => this.itemData.wasContact && FollowUpModel.canList(this.authUser)
+            visible: () => ContactModel.canViewChronologyChart(this.authUser)
           }
         ]
       }
@@ -1766,29 +1633,52 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       let itemsMarkedAsNotDuplicates: string[];
 
       // create / update
-      const runCreateOrUpdate = (overwriteFinished: (item: CaseModel) => void) => {
-        // attach custom id if we have one
-        if (
-          type === CreateViewModifyV2ActionType.CREATE &&
-          this.customCaseUUID
-        ) {
-          data.id = this.customCaseUUID;
+      const runCreateOrUpdate = (overwriteFinished: (item: ContactModel) => void) => {
+        // on create we have relationship data too
+        let relationship;
+        if (type === CreateViewModifyV2ActionType.CREATE) {
+          // cleanup
+          relationship = data.relationship;
+          delete data.relationship;
+
+          // add related entity
+          relationship.persons = [{
+            id: this._entityId
+          }];
         }
 
         // create / update
         (type === CreateViewModifyV2ActionType.CREATE ?
-          this.caseDataService
-            .createCase(
+          this.contactDataService
+            .createContact(
               this.selectedOutbreak.id,
               data
             ) :
-          this.caseDataService
-            .modifyCase(
+          this.contactDataService
+            .modifyContact(
               this.selectedOutbreak.id,
               this.itemData.id,
               data
             )
         ).pipe(
+          // create relationship if create
+          switchMap((contact: ContactModel) => {
+            // nothing to do ?
+            if (type !== CreateViewModifyV2ActionType.CREATE) {
+              return of(contact);
+            }
+
+            // create relationship
+            return this.relationshipDataService
+              .createRelationship(
+                this.selectedOutbreak.id,
+                EntityType.CONTACT,
+                contact.id,
+                relationship
+              )
+              .pipe(map(() => contact));
+          }),
+
           // handle error
           catchError((err) => {
             // show error
@@ -1800,14 +1690,14 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
           // should be the last pipe
           takeUntil(this.destroyed$)
-        ).subscribe((item: CaseModel) => {
+        ).subscribe((item: ContactModel) => {
           // finished
           const finishedProcessingData = () => {
-            // success creating / updating case
+            // success creating / updating
             this.toastV2Service.success(
               type === CreateViewModifyV2ActionType.CREATE ?
-                'LNG_PAGE_CREATE_CASE_ACTION_CREATE_CASE_SUCCESS_MESSAGE' :
-                'LNG_PAGE_MODIFY_CASE_ACTION_MODIFY_CASE_SUCCESS_MESSAGE'
+                'LNG_PAGE_CREATE_CONTACT_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE' :
+                'LNG_PAGE_MODIFY_CONTACT_ACTION_MODIFY_CONTACT_SUCCESS_MESSAGE'
             );
 
             // finished with success
@@ -1836,7 +1726,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             this.entityDataService
               .markPersonAsOrNotADuplicate(
                 this.selectedOutbreak.id,
-                EntityType.CASE,
+                EntityType.CONTACT,
                 item.id,
                 itemsMarkedAsNotDuplicates
               )
@@ -1878,14 +1768,14 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           takeUntil(this.destroyed$)
         )
         .subscribe((versionData) => {
-          // no duplicates - proceed to create case ?
+          // no duplicates - proceed to create ?
           if (
             (
               type === CreateViewModifyV2ActionType.CREATE &&
-              versionData.duplicate.disableCaseDuplicateCheck
+              versionData.duplicate.disableContactDuplicateCheck
             ) || (
               type === CreateViewModifyV2ActionType.UPDATE && (
-                versionData.duplicate.disableCaseDuplicateCheck || (
+                versionData.duplicate.disableContactDuplicateCheck || (
                   versionData.duplicate.executeCheckOnlyOnDuplicateDataChange &&
                   !EntityModel.duplicateDataHasChanged(data)
                 )
@@ -1897,7 +1787,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }
 
           // check for duplicates
-          this.caseDataService
+          this.contactDataService
             .findDuplicates(
               this.selectedOutbreak.id,
               this.isCreate ?
@@ -1925,7 +1815,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             .subscribe((response) => {
               // no duplicates ?
               if (response.duplicates.length < 1) {
-                // create case
+                // create
                 return runCreateOrUpdate(undefined);
               }
 
@@ -1942,11 +1832,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                   type: V2SideDialogConfigInputType.LINK_WITH_ACTION,
                   name: `actionsLink[${item.model.id}]`,
                   placeholder: (index + 1) + '. ' + EntityModel.getNameWithDOBAge(
-                    item.model as CaseModel,
+                    item.model as ContactModel,
                     this.translateService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
                     this.translateService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
                   ),
-                  link: () => ['/cases', item.model.id, 'view'],
+                  link: () => ['/contacts', item.model.id, 'view'],
                   actions: {
                     type: V2SideDialogConfigInputType.TOGGLE,
                     name: `actionsAction[${item.model.id}]`,
@@ -1984,8 +1874,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                     {
                       type: V2SideDialogConfigInputType.DIVIDER,
                       placeholder: this.isCreate ?
-                        'LNG_PAGE_CREATE_CASE_DUPLICATES_DIALOG_CONFIRM_MSG' :
-                        'LNG_PAGE_MODIFY_CASE_DUPLICATES_DIALOG_CONFIRM_MSG',
+                        'LNG_PAGE_CREATE_CONTACT_DUPLICATES_DIALOG_CONFIRM_MSG' :
+                        'LNG_PAGE_MODIFY_CONTACT_DUPLICATES_DIALOG_CONFIRM_MSG',
                       placeholderMultipleLines: true
                     },
 
@@ -2051,7 +1941,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
                       // redirect to merge
                       this.router.navigate(
-                        ['/duplicated-records', EntityModel.getLinkForEntityType(EntityType.CASE), 'merge'], {
+                        ['/duplicated-records', EntityModel.getLinkForEntityType(EntityType.CONTACT), 'merge'], {
                           queryParams: {
                             ids: JSON.stringify(mergeIds)
                           }
@@ -2073,8 +1963,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: CaseModel) => item.name,
-      link: (item: CaseModel) => ['/cases', item.id, 'view']
+      get: (item: ContactModel) => item.name,
+      link: (item: ContactModel) => ['/contacts', item.id, 'view']
     };
   }
 
@@ -2094,23 +1984,22 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Initialize expand list advanced filters
    */
   protected initializeExpandListAdvancedFilters(): void {
-    this.expandListAdvancedFilters = CaseModel.generateAdvancedFilters({
+    this.expandListAdvancedFilters = ContactModel.generateAdvancedFilters({
       authUser: this.authUser,
+      contactInvestigationTemplate: () => this.selectedOutbreak.contactInvestigationTemplate,
+      contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
       caseInvestigationTemplate: () => this.selectedOutbreak.caseInvestigationTemplate,
       options: {
-        gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         occupation: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        risk: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        classification: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-        outcome: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        clusterLoad: (finished) => {
-          finished(this.activatedRoute.snapshot.data.cluster);
-        },
-        pregnancy: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        followUpStatus: (this.activatedRoute.snapshot.data.followUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        pregnancyStatus: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         vaccine: (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         vaccineStatus: (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        dailyFollowUpStatus: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
       }
     });
   }
@@ -2145,8 +2034,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     }
 
     // retrieve data
-    this.expandListRecords$ = this.caseDataService
-      .getCasesList(
+    this.expandListRecords$ = this.contactDataService
+      .getContactsList(
         this.selectedOutbreak.id,
         data.queryBuilder
       )
@@ -2172,7 +2061,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     // update message & show alert if not visible already
     // - with links for cases / contacts view page if we have enough rights
     this.toastV2Service.notice(
-      this.translateService.instant('LNG_CASE_FIELD_LABEL_DUPLICATE_CONTACTS') +
+      this.translateService.instant('LNG_CONTACT_FIELD_LABEL_DUPLICATE_CASES') +
       ' ' +
       this._personDuplicates
         .map((item) => {
@@ -2290,17 +2179,17 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           this.contactDataService
             .findDuplicates(
               this.selectedOutbreak.id,
-              this._previousChecked
-            ),
-          this.caseDataService
-            .findDuplicates(
-              this.selectedOutbreak.id,
               this.isView || this.isModify ?
                 {
                   id: this.itemData.id,
                   ...this._previousChecked
                 } :
                 this._previousChecked
+            ),
+          this.caseDataService
+            .findDuplicates(
+              this.selectedOutbreak.id,
+              this._previousChecked
             )
         ]).pipe(
           // handle error

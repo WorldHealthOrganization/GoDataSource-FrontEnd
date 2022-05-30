@@ -13,7 +13,6 @@ import { FormDateRangeSliderComponent } from './form-date-range-slider/form-date
 import { FormHiddenInputComponent } from './form-hidden-input/form-hidden-input.component';
 import { FormSelectGroupsComponent } from './form-select-groups/form-select-groups.component';
 import { FormSelectVscrollComponent } from './form-select-vscroll/form-select-vscroll.component';
-import { FormIconPickerComponent } from './form-icon-picker/form-icon-picker.component';
 import { FormTimepickerComponent } from './form-timepicker/form-timepicker.component';
 
 export const components: any[] = [
@@ -23,7 +22,6 @@ export const components: any[] = [
   FormSelectComponent,
   FormSelectVscrollComponent,
   FormDatepickerComponent,
-  FormIconPickerComponent,
   FormSlideToggleComponent,
   FormCheckboxComponent,
   FormDaterangeComponent,

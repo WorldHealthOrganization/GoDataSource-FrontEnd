@@ -431,7 +431,10 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
       this.changeDetectorRef.detectChanges();
 
       // needed to update mat tab label warnings
-      if (this.isModify) {
+      if (
+        this.isCreate ||
+        this.isModify
+      ) {
         this.changeDetectorRef.markForCheck();
       }
     };
