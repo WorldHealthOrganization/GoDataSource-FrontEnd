@@ -3,7 +3,7 @@ import { CreateViewModifyComponent } from '../../../../core/helperClasses/create
 import { ActivatedRoute, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { Observable, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { TranslateService } from '@ngx-translate/core';
 import {
@@ -27,7 +27,7 @@ import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { catchError, takeUntil } from 'rxjs/operators';
+import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RequestFilterGenerator, RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
@@ -48,11 +48,12 @@ import { ClusterModel } from '../../../../core/models/cluster.model';
 import * as _ from 'lodash';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
-import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
+import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { EntityLabResultService } from '../../../../core/services/helper/entity-lab-result-helper.service';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputLinkWithAction, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 
 /**
  * Component
@@ -84,6 +85,10 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
       middleName: ''
     };
 
+  // relationship
+  private _relationship: RelationshipModel;
+  private _entityId: string;
+
   /**
    * Constructor
    */
@@ -101,10 +106,12 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
     protected entityLabResultService: EntityLabResultService,
     protected entityDataService: EntityDataService,
     protected systemSettingsDataService: SystemSettingsDataService,
+    protected relationshipDataService: RelationshipDataService,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
   ) {
+    // parent
     super(
       toastV2Service,
       renderer2,
@@ -112,6 +119,11 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
       activatedRoute,
       authDataService
     );
+
+    // get data
+    if (this.isCreate) {
+      this._entityId = this.activatedRoute.snapshot.queryParams.entityId;
+    }
   }
 
   /**
@@ -180,6 +192,11 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
 
       // check
       this.checkForPersonExistence();
+    }
+
+    // initialize relationship
+    if (this.isCreate) {
+      this._relationship = new RelationshipModel();
     }
   }
 
@@ -275,6 +292,9 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
         // Questionnaires
         this.initializeTabsQuestionnaire(),
         this.initializeTabsQuestionnaireAsCase(),
+
+        // Relationship - Create
+        this.initializeTabsRelationship(),
 
         // Contacts, exposures ...
         this.initializeTabsContacts(),
@@ -802,6 +822,169 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
         this.selectedOutbreak.caseInvestigationTemplate?.length > 0 &&
         this.itemData.wasCase &&
         this.itemData.hasQuestionnaireAnswersCase
+    };
+  }
+
+  /**
+   * Initialize tabs - Relationship
+   */
+  private initializeTabsRelationship(): ICreateViewModifyV2Tab {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB,
+      label: 'LNG_PAGE_CREATE_CONTACT_TAB_RELATIONSHIP_TITLE',
+      visible: () => this.isCreate,
+      sections: [
+        // Details
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_COMMON_LABEL_DETAILS',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: 'relationship[dateOfFirstContact]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT_DESCRIPTION',
+            value: {
+              get: () => this._relationship.dateOfFirstContact,
+              set: (value) => {
+                this._relationship.dateOfFirstContact = value;
+              }
+            },
+            maxDate: this._today,
+            validators: {
+              dateSameOrBefore: () => [
+                this._today
+              ]
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: 'relationship[contactDate]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_DESCRIPTION',
+            value: {
+              get: () => this._relationship.contactDate,
+              set: (value) => {
+                this._relationship.contactDate = value;
+              }
+            },
+            maxDate: this._today,
+            validators: {
+              required: () => true,
+              dateSameOrBefore: () => [
+                this._today
+              ]
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+            name: 'relationship[contactDateEstimated]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED_DESCRIPTION',
+            value: {
+              get: () => this._relationship.contactDateEstimated,
+              set: (value) => {
+                // set data
+                this._relationship.contactDateEstimated = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'relationship[certaintyLevelId]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this._relationship.certaintyLevelId,
+              set: (value) => {
+                this._relationship.certaintyLevelId = value;
+              }
+            },
+            validators: {
+              required: () => true
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'relationship[exposureTypeId]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this._relationship.exposureTypeId,
+              set: (value) => {
+                this._relationship.exposureTypeId = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'relationship[exposureFrequencyId]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this._relationship.exposureFrequencyId,
+              set: (value) => {
+                this._relationship.exposureFrequencyId = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'relationship[exposureDurationId]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this._relationship.exposureDurationId,
+              set: (value) => {
+                this._relationship.exposureDurationId = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'relationship[socialRelationshipTypeId]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this._relationship.socialRelationshipTypeId,
+              set: (value) => {
+                this._relationship.socialRelationshipTypeId = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'relationship[clusterId]',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this._relationship.clusterId,
+              set: (value) => {
+                this._relationship.clusterId = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.TEXT,
+            name: 'socialRelationshipDetail',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_DESCRIPTION',
+            value: {
+              get: () => this._relationship.socialRelationshipDetail,
+              set: (value) => {
+                this._relationship.socialRelationshipDetail = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.TEXTAREA,
+            name: 'comment',
+            placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
+            description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT_DESCRIPTION',
+            value: {
+              get: () => this._relationship.comment,
+              set: (value) => {
+                this._relationship.comment = value;
+              }
+            }
+          }]
+        }
+      ]
     };
   }
 
@@ -1451,6 +1634,19 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
 
       // create / update
       const runCreateOrUpdate = (overwriteFinished: (item: ContactModel) => void) => {
+        // on create we have relationship data too
+        let relationship;
+        if (type === CreateViewModifyV2ActionType.CREATE) {
+          // cleanup
+          relationship = data.relationship;
+          delete data.relationship;
+
+          // add related entity
+          relationship.persons = [{
+            id: this._entityId
+          }];
+        }
+
         // create / update
         (type === CreateViewModifyV2ActionType.CREATE ?
           this.contactDataService
@@ -1465,6 +1661,24 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
               data
             )
         ).pipe(
+          // create relationship if create
+          switchMap((contact: ContactModel) => {
+            // nothing to do ?
+            if (type !== CreateViewModifyV2ActionType.CREATE) {
+              return of(contact);
+            }
+
+            // create relationship
+            return this.relationshipDataService
+              .createRelationship(
+                this.selectedOutbreak.id,
+                EntityType.CONTACT,
+                contact.id,
+                relationship
+              )
+              .pipe(map(() => contact));
+          }),
+
           // handle error
           catchError((err) => {
             // show error
