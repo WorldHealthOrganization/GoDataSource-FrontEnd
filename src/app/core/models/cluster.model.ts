@@ -3,9 +3,10 @@ import { IPermissionBasic, IPermissionCluster } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { BaseModel } from './base.model';
 
-export class ClusterModel
-implements
+export class ClusterModel extends BaseModel
+  implements
         IPermissionBasic,
         IPermissionCluster {
 
@@ -57,6 +58,8 @@ implements
      * Constructor
      */
   constructor(data = null) {
+    super(data);
+
     this.id = _.get(data, 'id');
     this.name = _.get(data, 'name');
     this.description = _.get(data, 'description');
