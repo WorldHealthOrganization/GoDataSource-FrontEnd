@@ -820,7 +820,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: LabResultModel) => item.sampleIdentifier ?
+      get: (item: LabResultModel) => item.sampleIdentifier?.trim().length > 0 ?
         item.sampleIdentifier :
         moment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
       link: (item: LabResultModel) => {
