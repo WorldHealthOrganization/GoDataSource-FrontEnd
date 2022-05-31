@@ -408,7 +408,11 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
 
     // count
     this.clusterDataService
-      .getClusterPeopleCount(this.selectedOutbreak.id, this.activatedRoute.snapshot.params.clusterId, countQueryBuilder)
+      .getClusterPeopleCount(
+        this.selectedOutbreak.id,
+        this.activatedRoute.snapshot.params.clusterId,
+        countQueryBuilder
+      )
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);

@@ -218,10 +218,8 @@ export class ClusterDataService {
     clusterId: string,
     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
   ): Observable<IBasicCount> {
-
-    const whereFilter = queryBuilder.filter.generateCondition(true);
-
-    return this.http.get(`/outbreaks/${outbreakId}/clusters/${clusterId}/people/count?where=${whereFilter}`);
+    const filter = queryBuilder.buildQuery();
+    return this.http.get(`/outbreaks/${outbreakId}/clusters/${clusterId}/people/count?filter=${filter}`);
   }
 }
 
