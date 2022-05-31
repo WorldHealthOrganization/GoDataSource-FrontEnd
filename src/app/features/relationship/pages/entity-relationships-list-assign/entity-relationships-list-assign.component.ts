@@ -174,7 +174,7 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
     //   }),
     //   new VisibleColumnModel({
     //     field: 'place',
-    //     label: 'LNG_ENTITY_FIELD_LABEL_PLACE'
+    //     label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION'
     //   }),
     //   new VisibleColumnModel({
     //     field: 'address',

@@ -143,7 +143,7 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
       },
       {
         field: 'place',
-        label: 'LNG_ENTITY_FIELD_LABEL_PLACE',
+        label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
         format: {
           type: 'mainAddress.location.name'
         },
@@ -161,9 +161,9 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
       },
       {
         field: 'address',
-        label: 'LNG_ENTITY_FIELD_LABEL_ADDRESS',
+        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
         format: {
-          type: 'mainAddress.fullAddress'
+          type: 'mainAddress.addressLine1'
         },
         filter: {
           type: V2FilterType.ADDRESS_FIELD,
