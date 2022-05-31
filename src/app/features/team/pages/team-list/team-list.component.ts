@@ -88,7 +88,7 @@ export class TeamListComponent extends ListComponent<TeamModel> implements OnDes
             return {
               label: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).map[userId] ?
                 (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).map[userId].name :
-                '-',
+                '—',
               href: UserModel.canView(this.authUser) ?
                 `/users/${userId}/view` :
                 null

@@ -342,7 +342,7 @@ export class DialogService {
             .map((item) => {
               item.label = item.label ?
                 this.i18nService.instant(item.label) :
-                '-';
+                '—';
               return item;
             })
             .sort((v1, v2) => v1.label.localeCompare(v2.label)),

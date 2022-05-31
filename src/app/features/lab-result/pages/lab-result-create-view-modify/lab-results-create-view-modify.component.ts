@@ -121,7 +121,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       this.pageTitleData = {
         sampleIdentifier: this.itemData.sampleIdentifier ?
           this.itemData.sampleIdentifier :
-          '-'
+          '—'
       };
     } else {
       // view
@@ -129,7 +129,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       this.pageTitleData = {
         sampleIdentifier: this.itemData.sampleIdentifier ?
           this.itemData.sampleIdentifier :
-          '-'
+          '—'
       };
     }
   }
@@ -250,7 +250,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
             {
               sampleIdentifier: this.itemData.sampleIdentifier ?
                 this.itemData.sampleIdentifier :
-                '-'
+                '—'
             }
           ),
           action: null
@@ -265,7 +265,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
             {
               sampleIdentifier: this.itemData.sampleIdentifier ?
                 this.itemData.sampleIdentifier :
-                '-'
+                '—'
             }
           ),
           action: null

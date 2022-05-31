@@ -240,7 +240,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
                               {
                                 name: item.description ?
                                   item.description :
-                                  '-'
+                                  '—'
                               }
                             )
                           },
@@ -250,7 +250,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
                               {
                                 location: item.location ?
                                   item.location :
-                                  '-'
+                                  '—'
                               }
                             )
                           }
@@ -683,7 +683,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
           data: () => ({
             name: item.description ?
               item.description :
-              '-'
+              '—'
           })
         },
         message: {
@@ -691,7 +691,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
           data: () => ({
             name: item.description ?
               item.description :
-              '-'
+              '—'
           })
         }
       },

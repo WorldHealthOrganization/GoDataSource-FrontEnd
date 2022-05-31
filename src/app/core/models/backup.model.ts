@@ -34,7 +34,7 @@ implements
     if (this.sizeBytes) {
       this._sizeBytesHumanReadable = FileSize.bytesToReadableForm(this.sizeBytes);
     } else {
-      this._sizeBytesHumanReadable = '-';
+      this._sizeBytesHumanReadable = '—';
     }
   }
 
@@ -150,6 +150,6 @@ implements
      */
   private updateDuration(): void {
     this._duration = moment.humanizeDurationBetweenTwoDates(this._endedAt, this._startedAt);
-    this._duration = this._duration || '-';
+    this._duration = this._duration || '—';
   }
 }

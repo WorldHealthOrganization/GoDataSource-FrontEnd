@@ -291,13 +291,13 @@
                                 <!-- Source -->
                                 <div
                                     fxFlex="1 1" fxLayoutAlign="start end">
-                                    {{ item.sourceField ? item.sourceField : '-' }}
+                                    {{ item.sourceField ? item.sourceField : '—' }}
                                 </div>
 
                                 <!-- Destination -->
                                 <div
                                     fxFlex="1 1" fxLayoutAlign="start end">
-                                    {{ item.destinationField && importableObject.modelPropertiesKeyValueMap[item.destinationField] ? importableObject.modelPropertiesKeyValueMap[item.destinationField] : '-' }}
+                                    {{ item.destinationField && importableObject.modelPropertiesKeyValueMap[item.destinationField] ? importableObject.modelPropertiesKeyValueMap[item.destinationField] : '—' }}
                                 </div>
 
                                 <!-- Array indexes -->
@@ -607,7 +607,7 @@
                                             <!-- Option Source -->
                                             <div
                                                 fxFlex="1 1">
-                                                {{ mappedOpt.sourceOption ? mappedOpt.sourceOption : '-' }}
+                                                {{ mappedOpt.sourceOption ? mappedOpt.sourceOption : '—' }}
                                             </div>
 
                                             <!-- Option Destination -->
@@ -618,7 +618,7 @@
                                                         mappedOpt.destinationOption && importableObject.modelPropertyValuesMapChildMap[item.destinationField] &&
                                                         importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] ?
                                                             importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] :
-                                                            '-'
+                                                            '—'
                                                     )
                                                 }}
                                             </div>
@@ -972,7 +972,7 @@
                                 </mat-header-cell>
 
                                 <mat-cell *matCellDef="let item">
-                                    {{ item.error && item.error.message ? item.error.message : '-' }}
+                                    {{ item.error && item.error.message ? item.error.message : '—' }}
                                 </mat-cell>
                             </ng-container>
 

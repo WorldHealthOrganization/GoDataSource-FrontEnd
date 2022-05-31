@@ -469,7 +469,7 @@ export class AppFormEditQuestionnaireV2Component
           'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_DETAILS', {
             details: parent ?
               parent.label :
-              '-'
+              '—'
           }
         )
       });
@@ -939,7 +939,7 @@ export class AppFormEditQuestionnaireV2Component
           'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_DETAILS', {
             details: parent ?
               parent.text :
-              '-'
+              '—'
           }
         )
       });

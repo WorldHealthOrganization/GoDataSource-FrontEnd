@@ -847,7 +847,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
         // force filter by cases
         this.queryBuilder.filter.byEquality(
           'personType',
-          '-'
+          '—'
         );
       }
     } else {
