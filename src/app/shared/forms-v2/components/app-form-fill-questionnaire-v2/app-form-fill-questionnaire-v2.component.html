@@ -160,6 +160,7 @@
                 [options]="item.definition.options"
                 [viewOnly]="viewOnly"
                 [required]="item.parent.data.required"
+                [clearable]="true"
                 (ngModelChange)="answersWithChildrenQuestionsChanged()"></app-form-select-single-v2>
 
               <!-- Multiple select -->
