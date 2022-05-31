@@ -648,6 +648,14 @@ export class RequestFilter {
     replace: boolean = true,
     valueKey: string = 'value'
   ): RequestFilter {
+    // sanitize
+    if (
+      values === null ||
+      values === undefined
+    ) {
+      values = [];
+    }
+
     // sanitize the 'values' to filter by
     if (!_.isArray(values)) {
       values = [values];
