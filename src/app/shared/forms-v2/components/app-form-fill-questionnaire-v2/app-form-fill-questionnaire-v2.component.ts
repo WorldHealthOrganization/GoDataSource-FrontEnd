@@ -1157,7 +1157,7 @@ export class AppFormFillQuestionnaireV2Component
     // construct errors html
     let errorsString: string = '';
     errors.forEach((error) => {
-      errorsString += `<br/>- ${error.no}`;
+      errorsString += `<br/>- ${this.translateService.instant('LNG_COMMON_LABEL_ROW')} ${error.no}`;
     });
 
     // make sure we update control

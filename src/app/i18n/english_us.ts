@@ -20,6 +20,7 @@ export const EnglishUsLang = {
     'LNG_QUESTIONNAIRE_LABEL_FILE_UPLOAD': 'Please upload a file',
     'LNG_QUESTIONNAIRE_LABEL_FILL_NO_QUESTIONS': 'There are no questions to be filled',
     'LNG_QUESTIONNAIRE_LABEL_EDIT_NO_QUESTIONS': 'There are no questions to be displayed',
+    'LNG_COMMON_LABEL_ROW': 'Row',
     'LNG_COMMON_LABEL_DETAILS': 'Details',
     'LNG_COMMON_LABEL_ATTENTION_REQUIRED': 'Attention required',
     'LNG_COMMON_LABEL_ACTIONS': 'Actions',
