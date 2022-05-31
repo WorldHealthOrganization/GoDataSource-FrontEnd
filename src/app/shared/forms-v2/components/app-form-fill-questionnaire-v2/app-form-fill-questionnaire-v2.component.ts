@@ -1160,6 +1160,13 @@ export class AppFormFillQuestionnaireV2Component
       errorsString += `<br/>- ${error.no}`;
     });
 
+    // make sure we update control
+    if (!this.viewOnly) {
+      this.control?.markAsTouched();
+      this.control?.markAsDirty();
+      this.control?.updateValueAndValidity();
+    }
+
     // emit errors updated
     this.errorsChanged.emit(errorsString);
   }

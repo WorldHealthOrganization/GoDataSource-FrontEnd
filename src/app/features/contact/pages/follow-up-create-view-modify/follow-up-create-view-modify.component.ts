@@ -317,7 +317,8 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
               },
               validators: {
                 required: () => true
-              }
+              },
+              disabled: () => this.isModify
             }, {
               type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
               name: 'targeted',
@@ -343,7 +344,8 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
               },
               validators: {
                 required: () => true
-              }
+              },
+              disabled: () => this.isModify && Constants.isDateInTheFuture(this.itemData.date)
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'responsibleUserId',
