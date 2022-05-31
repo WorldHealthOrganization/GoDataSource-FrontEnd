@@ -29,6 +29,9 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 import { UserModel } from '../../../../core/models/user.model';
 import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { takeUntil } from 'rxjs/operators';
+import { TeamModel } from '../../../../core/models/team.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
 
 /**
  * Component
@@ -51,6 +54,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
     protected toastV2Service: ToastV2Service,
     protected dialogV2Service: DialogV2Service,
     protected followUpsDataService: FollowUpsDataService,
+    protected entityFollowUpHelperService: EntityFollowUpHelperService,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
@@ -860,25 +864,16 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
    * Initialize expand list advanced filters
    */
   protected initializeExpandListAdvancedFilters(): void {
-    // #TODO
-    // this.expandListAdvancedFilters = FollowUpModel.generateAdvancedFilters({
-    //   authUser: this.authUser,
-    //   contactInvestigationTemplate: () => this.selectedOutbreak.contactInvestigationTemplate,
-    //   contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
-    //   caseInvestigationTemplate: () => this.selectedOutbreak.caseInvestigationTemplate,
-    //   options: {
-    //     occupation: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     followUpStatus: (this.activatedRoute.snapshot.data.followUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     pregnancyStatus: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     vaccine: (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     vaccineStatus: (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-    //     team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
-    //     user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
-    //     dailyFollowUpStatus: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-    //     gender: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-    //   }
-    // });
+    this.expandListAdvancedFilters = this.entityFollowUpHelperService.generateAdvancedFilters({
+      authUser: this.authUser,
+      contactFollowUpTemplate: () => this.selectedOutbreak.contactFollowUpTemplate,
+      options: {
+        team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
+        yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        dailyFollowUpStatus: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+      }
+    });
   }
 
   /**

@@ -119,7 +119,8 @@ const followUpFoundation: Route = {
     user: UserDataResolver,
     dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
     team: TeamDataResolver,
-    addressType: AddressTypeDataResolver
+    addressType: AddressTypeDataResolver,
+    yesNoAll: YesNoAllDataResolver
   }
 };
 
