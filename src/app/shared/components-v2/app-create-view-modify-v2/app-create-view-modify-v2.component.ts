@@ -147,6 +147,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   // list of records
   expandList: boolean = false;
 
+  // show search by input ?
+  @Input() showSearchByInput: boolean = true;
+
   // search
   expandListSearchValue: string;
   expandListSearchValueTimeout: any;

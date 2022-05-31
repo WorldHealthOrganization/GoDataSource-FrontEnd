@@ -28,6 +28,7 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { takeUntil } from 'rxjs/operators';
 
 /**
  * Component
@@ -883,42 +884,21 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
   /**
    * Refresh expand list
    */
-  refreshExpandList(_data): void {
-    // #TODO
-    // // append / remove search
+  refreshExpandList(data): void {
+    // append / remove search
     // if (data.searchBy) {
-    //   data.queryBuilder.filter.where({
-    //     or: [
-    //       {
-    //         firstName: RequestFilterGenerator.textContains(
-    //           data.searchBy
-    //         )
-    //       }, {
-    //         lastName: RequestFilterGenerator.textContains(
-    //           data.searchBy
-    //         )
-    //       }, {
-    //         middleName: RequestFilterGenerator.textContains(
-    //           data.searchBy
-    //         )
-    //       }, {
-    //         visualId: RequestFilterGenerator.textContains(
-    //           data.searchBy
-    //         )
-    //       }
-    //     ]
-    //   });
+    //   NOTHING TO SEARCH BY
     // }
-    //
-    // // retrieve data
-    // this.expandListRecords$ = this.contactDataService
-    //   .getContactsList(
-    //     this.selectedOutbreak.id,
-    //     data.queryBuilder
-    //   )
-    //   .pipe(
-    //     // should be the last pipe
-    //     takeUntil(this.destroyed$)
-    //   );
+
+    // retrieve data
+    this.expandListRecords$ = this.followUpsDataService
+      .getFollowUpsList(
+        this.selectedOutbreak.id,
+        data.queryBuilder
+      )
+      .pipe(
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
   }
 }
