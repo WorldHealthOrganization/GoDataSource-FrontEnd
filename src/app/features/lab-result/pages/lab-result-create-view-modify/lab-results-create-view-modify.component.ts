@@ -214,7 +214,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
         this.breadcrumbs.push(
           {
             label: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE',
-            action: {
+            action: this.entityData.deleted ? null : {
               link: [`/lab-results/contacts/${this.entityData.id}`]
             }
           }
@@ -226,7 +226,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
         this.breadcrumbs.push(
           {
             label: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE',
-            action: {
+            action: this.entityData.deleted ? null : {
               link: [`/lab-results/cases/${this.entityData.id}`]
             }
           }
