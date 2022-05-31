@@ -1030,6 +1030,11 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
       // cleanup
       delete data._countryIds;
       delete data._countries;
+      if (data.countries) {
+        data.countries = data.countries.map((item) => ({
+          id: item
+        }));
+      }
 
       // create / modify
       (
