@@ -1027,6 +1027,10 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
         data.labResultsTemplate = (data.labResultsTemplate || []).map((question) => new QuestionModel(question));
       }
 
+      // cleanup
+      delete data._countryIds;
+      delete data._countries;
+
       // create / modify
       (
         type === CreateViewModifyV2ActionType.CREATE ?
