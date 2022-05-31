@@ -1,138 +1,37 @@
-<!--
-<app-topnav>
-    <ng-container dynamic-section>
-        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
-            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
-        </div>
-    </ng-container>
-</app-topnav>
--->
+<app-list-table-v2
+  pageTitle="LNG_PAGE_LIST_ASYNC_COT_TITLE"
+  [records$]="records$"
+  [processSelectedData]="processSelectedData"
+  [columns]="tableColumns"
+  [breadcrumbs]="breadcrumbs"
+  [quickActions]="quickActions"
+  [groupActions]="groupActions"
+  [addAction]="addAction"
+  [groupedData]="groupedData"
+  [pageCount]="pageCount"
+  [pageSize]="pageSize"
+  [pageIndex]="pageIndex"
+  [pageSettingsKey]="UserSettings.COT_SNAPSHOT_FIELDS"
+  [sortColumn]="tableSortBy"
+  [infos]="infos"
+  [suffixLegends]="suffixLegends"
+  [filtersApplied]="filtersApplied"
+  [advancedFilterType]="undefined"
+  [advancedFilters]="advancedFilters"
+  (refreshData)="needsRefreshList(true)"
+  (refreshDataCount)="refreshListCount(false)"
+  (pageChange)="changePage($event)"
+  (sortBy)="sortBy($event)"
+  (filterBy)="filterBy($event)"
+  (resetHeaderFilters)="resetFiltersToSideFilters()"
+  (advancedFilterBy)="applySideFilters($event)">
+</app-list-table-v2>
 
-<!--&lt;!&ndash; Side columns &ndash;&gt;-->
-<!--<app-side-columns-->
-<!--    [tableColumnsUserSettingsKey]="UserSettings.COT_SNAPSHOT_FIELDS"-->
-<!--    [tableColumns]="tableColumns"-->
-<!--    (visibleColumnsChanged)="applySideColumnsChanged($event)">-->
-<!--</app-side-columns>-->
 
-<!-- Total number of records from the list -->
-<!--<app-total-number-of-records-->
-<!--    [value]="cotSnapshotsListCount$ | async">-->
-<!--</app-total-number-of-records>-->
-
-<mat-card class="page-section page-content">
-
-    <!-- Table top info -->
-    <div
-        fxLayout="row">
-        <!-- Filters message -->
-        <div
-            fxFlex fxGrow="0" fxLayoutAlign="start center"
-            class="filters-applied">
-<!--            {{ queryBuilder.isEmptyOnlyFilters() ? '' : ('LNG_COMMON_LABEL_FILTERS_USED' | translate) }}-->
-        </div>
-
-        <!-- Filter buttons -->
-        <div
-            fxFlex
-            class="reset-filters">
-            <button
-                type="button"
-                mat-raised-button
-                color="accent"
-                (click)="resetFiltersToSideFilters()">
-                {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
-            </button>
-            <button
-                type="button"
-                mat-raised-button
-                color="accent"
-                (click)="needsRefreshList(true)">
-                {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
-            </button>
-        </div>
-    </div>
-
-    <!-- Hover question effects / actions -->
-<!--    <app-hover-row-actions-->
-<!--        #hoverRow-->
-<!--        [active]="!refreshingList"-->
-<!--        leftSideClass="hover-row-actions-mat-table-left">-->
-<!--    </app-hover-row-actions>-->
-
+<!-- <mat-card class="page-section page-content">
     <mat-table #table [dataSource]="cotSnapshotsList$ | async" matSort (matSortChange)="sortBy($event)">
-        <!-- Name -->
-        <ng-container matColumnDef="name">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell" fxLayout="column" >
-                    <div mat-sort-header class="column-header">
-                        {{'LNG_ASYNC_COT_FIELD_LABEL_NAME' | translate}}
-                    </div>
-                    <div class="column-filter">
-<!--                        <app-form-input-->
-<!--                            name="nameFilter"-->
-<!--                            ngModel-->
-<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
-<!--                            (optionChanged)="filterByTextField('name', $event)"-->
-<!--                            app-reset-input-on-side-filter-->
-<!--                            [displayFilterIcon]="true">-->
-<!--                        </app-form-input>-->
-                    </div>
-                </div>
-            </mat-header-cell>
 
-            <mat-cell *matCellDef="let item">
-                {{ item.name }}
-            </mat-cell>
-        </ng-container>
-
-        <!-- Start date -->
-        <ng-container matColumnDef="startDate">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell" fxLayout="column" >
-                    <div mat-sort-header class="column-header">
-                        {{'LNG_ASYNC_COT_FIELD_LABEL_START_DATE' | translate}}
-                    </div>
-                    <div class="column-filter">
-<!--                        <app-form-daterange-->
-<!--                            name="startDateFilter"-->
-<!--                            ngModel-->
-<!--                            (changed)="filterByDateRangeField('startDate', $event)"-->
-<!--                            app-reset-input-on-side-filter>-->
-<!--                        </app-form-daterange>-->
-                    </div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item">
-                {{ item.startDate | dateTimeDefault }}
-            </mat-cell>
-        </ng-container>
-
-        <!-- End date -->
-        <ng-container matColumnDef="endDate">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell" fxLayout="column" >
-                    <div mat-sort-header class="column-header">
-                        {{'LNG_ASYNC_COT_FIELD_LABEL_END_DATE' | translate}}
-                    </div>
-                    <div class="column-filter">
-<!--                        <app-form-daterange-->
-<!--                            name="endDateFilter"-->
-<!--                            ngModel-->
-<!--                            (changed)="filterByDateRangeField('endDate', $event)"-->
-<!--                            app-reset-input-on-side-filter>-->
-<!--                        </app-form-daterange>-->
-                    </div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item">
-                {{ item.endDate | dateTimeDefault }}
-            </mat-cell>
-        </ng-container>
-
-        <!-- Status -->
+        <!~~ Status ~~>
         <ng-container matColumnDef="status">
             <mat-header-cell *matHeaderCellDef>
                 <div class="table-header-cell" fxLayout="column" >
@@ -140,18 +39,18 @@
                         {{'LNG_ASYNC_COT_FIELD_LABEL_STATUS' | translate}}
                     </div>
                     <div class="column-filter">
-<!--                        <app-form-select-->
-<!--                            name="statusFilter"-->
-<!--                            ngModel-->
-<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
-<!--                            [options]="statusList$ | async"-->
-<!--                            (optionChanged)="filterBySelectField('status', $event)"-->
-<!--                            multiple="true"-->
-<!--                            app-reset-input-on-side-filter-->
-<!--                            [allowSelectionOfDisabledItems]="true"-->
-<!--                            [displayInvisibleItems]="true"-->
-<!--                            [displayFilterIcon]="true">-->
-<!--                        </app-form-select>-->
+<!~~                        <app-form-select~~>
+<!~~                            name="statusFilter"~~>
+<!~~                            ngModel~~>
+<!~~                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"~~>
+<!~~                            [options]="statusList$ | async"~~>
+<!~~                            (optionChanged)="filterBySelectField('status', $event)"~~>
+<!~~                            multiple="true"~~>
+<!~~                            app-reset-input-on-side-filter~~>
+<!~~                            [allowSelectionOfDisabledItems]="true"~~>
+<!~~                            [displayInvisibleItems]="true"~~>
+<!~~                            [displayFilterIcon]="true">~~>
+<!~~                        </app-form-select>~~>
                     </div>
                 </div>
             </mat-header-cell>
@@ -159,7 +58,8 @@
             <mat-cell *matCellDef="let item">
                 {{ item.status | translate }}
 
-                <!-- Periodic refresh ? -->
+                <!~~ TODO: How/Should we implement this "periodic refresh"? ~~>
+                <!~~ Periodic refresh ? ~~>
                 <div
                     *ngIf="item.status === Constants.COT_SNAPSHOT_STATUSES.LNG_COT_STATUS_IN_PROGRESS.value"
                     class="cot-snapshot-in-progress">
@@ -168,80 +68,5 @@
             </mat-cell>
         </ng-container>
 
-        <!-- Size -->
-        <ng-container matColumnDef="fileSize">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div class="column-header">
-                        {{ 'LNG_ASYNC_COT_FIELD_LABEL_FILE_SIZE' | translate }}
-                    </div>
-                    <div class="column-filter">
-                        <!--Placeholder-->
-                    </div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item">
-                {{ item.sizeBytesHumanReadable }}
-            </mat-cell>
-        </ng-container>
-
-        <!-- Error -->
-        <ng-container matColumnDef="error">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell" fxLayout="column" >
-                    <div mat-sort-header class="column-header">
-                        {{'LNG_ASYNC_COT_FIELD_LABEL_ERROR' | translate}}
-                    </div>
-                    <div class="column-filter">
-<!--                        <app-form-input-->
-<!--                            name="errorFilter"-->
-<!--                            ngModel-->
-<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
-<!--                            (optionChanged)="filterByTextField('error', $event)"-->
-<!--                            app-reset-input-on-side-filter-->
-<!--                            [displayFilterIcon]="true">-->
-<!--                        </app-form-input>-->
-                    </div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item">
-                {{ item.error }}
-            </mat-cell>
-        </ng-container>
-
-        <mat-header-row *matHeaderRowDef="[]"></mat-header-row>
-        <mat-row
-            *matRowDef="let item; columns: []">
-<!--            app-hover-row-actions-->
-<!--            [hoverRowActionsComponent]="hoverRow"-->
-<!--            [hoverRowActions]="recordActions"-->
-<!--            [hoverRowActionData]="item">-->
-        </mat-row>
     </mat-table>
-
-<!--    <div-->
-<!--        *ngIf="refreshingList"-->
-<!--        class="mat-table-loading-data">-->
-<!--        <mat-spinner></mat-spinner>-->
-<!--    </div>-->
-
-<!--    &lt;!&ndash; No data &ndash;&gt;-->
-<!--    <div-->
-<!--        *ngIf="!refreshingList && isEmptyList"-->
-<!--        class="empty-table-text">-->
-<!--        {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}-->
-<!--    </div>-->
-
-<!--    &lt;!&ndash; Pages (need to be hidden and not ngIf, otherwise it makes a new duplicate request) &ndash;&gt;-->
-<!--    <app-mat-paginator-extended-->
-<!--        [hidden]="refreshingList || isEmptyList"-->
-<!--        [pageIndex]="pageIndex"-->
-<!--        [countData]="cotSnapshotsListCount$ | async"-->
-<!--        [pageSize]="pageSize"-->
-<!--        [pageSizeOptions]="[]"-->
-<!--        (page)="changePage($event)">-->
-<!--    </app-mat-paginator-extended>-->
-
-</mat-card>
+</mat-card> -->
