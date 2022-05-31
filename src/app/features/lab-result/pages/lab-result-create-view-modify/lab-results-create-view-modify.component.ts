@@ -186,7 +186,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
         this.breadcrumbs.push(
           {
             label: this.entityData.name,
-            action: {
+            action: this.entityData.deleted ? null : {
               link: [`/contacts/${this.entityData.id}/view`]
             }
           }
@@ -198,7 +198,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
         this.breadcrumbs.push(
           {
             label: this.entityData.name,
-            action: {
+            action: this.entityData.deleted ? null : {
               link: [`/cases/${this.entityData.id}/view`]
             }
           }
