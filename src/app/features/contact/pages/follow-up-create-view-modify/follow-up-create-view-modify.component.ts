@@ -6,7 +6,14 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { Observable } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { TranslateService } from '@ngx-translate/core';
-import { CreateViewModifyV2MenuType, CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import {
+  CreateViewModifyV2MenuType,
+  CreateViewModifyV2TabInputType,
+  ICreateViewModifyV2Buttons,
+  ICreateViewModifyV2CreateOrUpdate,
+  ICreateViewModifyV2Tab,
+  ICreateViewModifyV2TabTable
+} from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { Constants } from '../../../../core/models/constants';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -240,11 +247,10 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
       // tabs
       tabs: [
         // Personal
-        this.initializeTabsPersonal()
+        this.initializeTabsPersonal(),
 
         // Questionnaires
-        // #TODO
-        // this.initializeTabsQuestionnaire()
+        this.initializeTabsQuestionnaire()
       ],
 
       // create details
@@ -386,32 +392,31 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
   /**
    * Initialize tabs - Questionnaire
    */
-  // #TODO
-  // private initializeTabsQuestionnaire(): ICreateViewModifyV2TabTable {
-  //   let errors: string = '';
-  //   return {
-  //     type: CreateViewModifyV2TabInputType.TAB_TABLE,
-  //     label: 'LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE',
-  //     definition: {
-  //       type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
-  //       name: 'questionnaireAnswers',
-  //       questionnaire: this.selectedOutbreak.contactInvestigationTemplate,
-  //       value: {
-  //         get: () => this.itemData.questionnaireAnswers,
-  //         set: (value) => {
-  //           this.itemData.questionnaireAnswers = value;
-  //         }
-  //       },
-  //       updateErrors: (errorsHTML) => {
-  //         errors = errorsHTML;
-  //       }
-  //     },
-  //     invalidHTMLSuffix: () => {
-  //       return errors;
-  //     },
-  //     visible: () => this.selectedOutbreak.contactInvestigationTemplate?.length > 0
-  //   };
-  // }
+  private initializeTabsQuestionnaire(): ICreateViewModifyV2TabTable {
+    let errors: string = '';
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      label: 'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE',
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
+        name: 'questionnaireAnswers',
+        questionnaire: this.selectedOutbreak.contactFollowUpTemplate,
+        value: {
+          get: () => this.itemData.questionnaireAnswers,
+          set: (value) => {
+            this.itemData.questionnaireAnswers = value;
+          }
+        },
+        updateErrors: (errorsHTML) => {
+          errors = errorsHTML;
+        }
+      },
+      invalidHTMLSuffix: () => {
+        return errors;
+      },
+      visible: () => this.selectedOutbreak.contactFollowUpTemplate?.length > 0
+    };
+  }
 
   /**
    * Initialize buttons
