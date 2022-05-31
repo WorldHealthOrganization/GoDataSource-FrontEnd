@@ -100,7 +100,8 @@ export const EnglishUsLang = {
     'LNG_COMMON_LABEL_DELETE_WITHOUT_NAME': 'Delete',
     'LNG_COMMON_LABEL_SYNC': 'Start sync',
     'LNG_PAGE_MODIFY_USER_TAB_DETAILS_SECTION_PASSWORD_TITLE': 'Password',
-    'LNG_DIALOG_CONFIRM_ADD_USER_TEAM': 'Users are already assigned to other teams:{{assigned}}'
+    'LNG_DIALOG_CONFIRM_ADD_USER_TEAM': 'Users are already assigned to other teams:{{assigned}}',
+    'LNG_COMMON_LABEL_APPROVE': 'Approve \'{{name}}\''
 
 
 
