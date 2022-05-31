@@ -1323,6 +1323,8 @@
                 <!-- Content -->
                 <div
                   class="gd-create-view-modify-bottom-content"
+                  [class.gd-create-view-modify-bottom-content-edit-questionnaire]="tab.type === CreateViewModifyV2TabInputType.TAB_TABLE && tab.definition.type === CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE"
+                  [class.gd-create-view-modify-bottom-content-fill-questionnaire]="tab.type === CreateViewModifyV2TabInputType.TAB_TABLE && tab.definition.type === CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE"
                   [ngSwitch]="tab.type">
 
                   <!-- Tab -->

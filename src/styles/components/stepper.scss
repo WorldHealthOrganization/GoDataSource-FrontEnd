@@ -121,6 +121,11 @@
       margin-right: -1.6rem;
       min-height: calc(100% - 6.9rem);
       padding: 1.6rem;
+
+      &.gd-create-view-modify-bottom-content-edit-questionnaire,
+      &.gd-create-view-modify-bottom-content-fill-questionnaire {
+        height: calc(100% - 6.9rem);
+      }
     }
 
     .gd-create-view-modify-bottom-content-final-step {
