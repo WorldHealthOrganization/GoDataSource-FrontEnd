@@ -62,7 +62,6 @@ export class HelpCategoryCreateViewModifyComponent extends CreateViewModifyCompo
     super.onDestroy();
   }
 
-
   /**
    * Create new item model if needed
    */
@@ -220,10 +219,9 @@ export class HelpCategoryCreateViewModifyComponent extends CreateViewModifyCompo
               placeholder: () => 'LNG_HELP_CATEGORY_FIELD_LABEL_NAME',
               description: () => 'LNG_HELP_CATEGORY_FIELD_LABEL_NAME_DESCRIPTION',
               value: {
-                // TODO not sure if this is the right place to use translateService,
-                //  without it the name displayed is like
-                //  'LNG_HELP_CATEGORY_TEST_OLD_4816bd64-4fde-47af-b6e6-175ea55ecb14'
-                get: () => this.itemData.name ? this.translateService.instant(this.itemData.name) : this.itemData.name,
+                get: () => this.itemData.name ?
+                  this.translateService.instant(this.itemData.name) :
+                  this.itemData.name,
                 set: (value) => {
                   this.itemData.name = value;
                 }
@@ -253,10 +251,9 @@ export class HelpCategoryCreateViewModifyComponent extends CreateViewModifyCompo
               placeholder: () => 'LNG_HELP_CATEGORY_FIELD_LABEL_DESCRIPTION',
               description: () => 'LNG_HELP_CATEGORY_FIELD_LABEL_DESCRIPTION_DESCRIPTION',
               value: {
-                // TODO not sure if this is the right place to use translateService,
-                //  without it the name displayed is like
-                //  'LNG_HELP_CATEGORY_TEST_OLD_4816bd64-4fde-47af-b6e6-175ea55ecb14_DESCRIPTION'
-                get: () => this.itemData.description ? this.translateService.instant(this.itemData.description) : this.itemData.description,
+                get: () => this.itemData.description ?
+                  this.translateService.instant(this.itemData.description) :
+                  this.itemData.description,
                 set: (value) => {
                   this.itemData.description = value;
                 }
@@ -396,7 +393,9 @@ export class HelpCategoryCreateViewModifyComponent extends CreateViewModifyCompo
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: HelpCategoryModel) => item.name,
+      get: (item: HelpCategoryModel) => item.name ?
+        this.translateService.instant(item.name) :
+        item.name,
       link: (item: HelpCategoryModel) => ['/help/categories', item.id, 'view']
     };
   }
@@ -407,8 +406,7 @@ export class HelpCategoryCreateViewModifyComponent extends CreateViewModifyCompo
   protected initializeExpandListQueryFields(): void {
     this.expandListQueryFields = [
       'id',
-      'name',
-      'order'
+      'name'
     ];
   }
 
@@ -448,6 +446,4 @@ export class HelpCategoryCreateViewModifyComponent extends CreateViewModifyCompo
         takeUntil(this.destroyed$)
       );
   }
-
-
 }
