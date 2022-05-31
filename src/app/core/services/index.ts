@@ -130,6 +130,7 @@ import { UpstreamServersDataResolver } from './resolvers/data/upstream-servers.r
 import { IconDataResolver } from './resolvers/data/icon.resolver';
 import { SelectedClusterDataResolver } from './resolvers/data/selected-cluster.resolver';
 import { CotSnapshotStatusDataResolver } from './resolvers/data/cot-snapshot-status.resolver';
+import { SelectedHelpCategoryDataResolver } from './resolvers/data/selected-help-category.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -195,6 +196,7 @@ export const services: any[] = [
   SavedImportMappingDataResolver,
   SecurityQuestionDataResolver,
   SelectedClusterDataResolver,
+  SelectedHelpCategoryDataResolver,
   SelectedOutbreakDataResolver,
   SyncPackageExportTypeDataResolver,
   SyncPackageModuleDataResolver,
