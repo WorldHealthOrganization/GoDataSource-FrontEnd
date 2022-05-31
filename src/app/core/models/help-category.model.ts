@@ -2,9 +2,10 @@ import * as _ from 'lodash';
 import { IPermissionBasic } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
+import { BaseModel } from './base.model';
 
-export class HelpCategoryModel
-implements
+export class HelpCategoryModel extends BaseModel
+  implements
         IPermissionBasic {
   id: string;
   name: string;
@@ -25,6 +26,8 @@ implements
      * Constructor
      */
   constructor(data = null) {
+    super(data);
+
     this.id = _.get(data, 'id');
     this.name = _.get(data, 'name');
     this.description = _.get(data, 'description');
