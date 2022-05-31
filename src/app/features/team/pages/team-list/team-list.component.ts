@@ -19,6 +19,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { LocationModel } from '../../../../core/models/location.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
+import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 
 @Component({
   selector: 'app-team-list',
@@ -34,7 +35,8 @@ export class TeamListComponent extends ListComponent<TeamModel> implements OnDes
     private toastV2Service: ToastV2Service,
     private activatedRoute: ActivatedRoute,
     private dialogV2Service: DialogV2Service,
-    private locationDataService: LocationDataService
+    private locationDataService: LocationDataService,
+    private followUpsDataService: FollowUpsDataService
   ) {
     // parent
     super(listHelperService);
@@ -202,9 +204,24 @@ export class TeamListComponent extends ListComponent<TeamModel> implements OnDes
                       // show loading
                       const loading = this.dialogV2Service.showLoadingDialog();
 
-                      // delete
-                      this.teamDataService
-                        .deleteTeam(item.id)
+                      // check if the team is in use
+                      const qb: RequestQueryBuilder = new RequestQueryBuilder();
+                      qb.filter
+                        .where({
+                          teamId: {
+                            'eq': item.id
+                          }
+                        }, true);
+
+                      // no need for more
+                      qb.limit(1);
+
+                      // retrieve follow-ups + contact details
+                      this.followUpsDataService
+                        .getFollowUpsCount(
+                          this.selectedOutbreak.id,
+                          qb
+                        )
                         .pipe(
                           catchError((err) => {
                             // show error
@@ -217,15 +234,44 @@ export class TeamListComponent extends ListComponent<TeamModel> implements OnDes
                             return throwError(err);
                           })
                         )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_SUCCESS_MESSAGE');
+                        .subscribe((followUpsCount) => {
+                          // used ?
+                          if (followUpsCount.count > 0) {
+                            // show error
+                            this.toastV2Service.error('LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_IN_USE_MESSAGE');
 
-                          // hide loading
-                          loading.close();
+                            // hide loading
+                            loading.close();
 
-                          // reload data
-                          this.needsRefreshList(true);
+                            // finished
+                            return;
+                          }
+
+                          // delete
+                          this.teamDataService
+                            .deleteTeam(item.id)
+                            .pipe(
+                              catchError((err) => {
+                                // show error
+                                this.toastV2Service.error(err);
+
+                                // hide loading
+                                loading.close();
+
+                                // send error down the road
+                                return throwError(err);
+                              })
+                            )
+                            .subscribe(() => {
+                              // success
+                              this.toastV2Service.success('LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_SUCCESS_MESSAGE');
+
+                              // hide loading
+                              loading.close();
+
+                              // reload data
+                              this.needsRefreshList(true);
+                            });
                         });
                     });
                   }
