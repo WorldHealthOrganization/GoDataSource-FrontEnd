@@ -374,29 +374,35 @@ export class OutbreakTemplatesListComponent
                       })
                       .subscribe((response) => {
                         // canceled ?
-                        if ( response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+                        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
                           // finished
                           return;
                         }
-
-                        // show loading
-                        const loading = this.dialogV2Service.showLoadingDialog();
 
                         // get the outbreak template to clone
                         const outbreakTemplateToClone = response.handler.data.map.cloneData.data;
 
                         // set the name for the cloned outbreak template
-                        outbreakTemplateToClone.name = (response.handler.data.inputs[0] as any).value;
+                        outbreakTemplateToClone.name = (response.handler.data.map.cloneData as IV2SideDialogConfigInputText).value;
 
+                        // close side dialog
+                        response.handler.hide();
+
+                        // show loading
+                        const loading = this.dialogV2Service.showLoadingDialog();
 
                         // create outbreak template clone
                         this.outbreakTemplateDataService
                           .createOutbreakTemplate(outbreakTemplateToClone, outbreakTemplateToClone.id)
                           .pipe(
                             catchError((err) => {
+                              // error
                               this.toastV2Service.error(err);
+
                               // hide loading
                               loading.close();
+
+                              // send further
                               return throwError(err);
                             }),
                             switchMap((clonedOutbreakTemplate) => {
@@ -404,8 +410,13 @@ export class OutbreakTemplatesListComponent
                               return this.i18nService.loadUserLanguage()
                                 .pipe(
                                   catchError((err) => {
+                                    // error
                                     this.toastV2Service.error(err);
+
+                                    // hide loading
                                     loading.close();
+
+                                    // send further
                                     return throwError(err);
                                   }),
                                   map(() => clonedOutbreakTemplate)
@@ -413,7 +424,7 @@ export class OutbreakTemplatesListComponent
                             })
                           )
                           .subscribe((clonedOutbreakTemplate) => {
-
+                            // msg
                             this.toastV2Service.success(
                               'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CLONE_SUCCESS_MESSAGE'
                             );
@@ -421,19 +432,17 @@ export class OutbreakTemplatesListComponent
                             // hide loading
                             loading.close();
 
-                            // reload data
-                            this.needsRefreshList(true);
-
                             // navigate to modify page of the new outbreak
                             if (OutbreakTemplateModel.canModify(this.authUser)) {
                               this.router.navigate([`/outbreak-templates/${clonedOutbreakTemplate.id}/modify`]);
                             } else if (OutbreakTemplateModel.canView(this.authUser)) {
                               this.router.navigate([`/outbreak-templates/${clonedOutbreakTemplate.id}/view`]);
-                            } else if (OutbreakTemplateModel.canList(this.authUser)) {
-                              this.router.navigate(['/outbreak-templates']);
                             } else {
                               // fallback to current page since we already know that we have access to this page
                               // Don't redirect :)
+
+                              // reload data
+                              this.needsRefreshList(true);
                             }
                           });
                       });
