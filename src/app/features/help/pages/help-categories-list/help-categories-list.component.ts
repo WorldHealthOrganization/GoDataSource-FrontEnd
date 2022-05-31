@@ -121,8 +121,7 @@ export class HelpCategoriesListComponent extends ListComponent<HelpCategoryModel
           // View Help Items
           {
             type: V2ActionType.ICON,
-            // TODO: Icon not shown correctly
-            icon: 'groupWork',
+            icon: 'group_work',
             iconTooltip: 'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_VIEW_HELP_ITEMS_BUTTON',
             action: {
               link: (item: HelpCategoryModel): string[] => {
@@ -140,7 +139,6 @@ export class HelpCategoriesListComponent extends ListComponent<HelpCategoryModel
             type: V2ActionType.MENU,
             icon: 'more_horiz',
             menuOptions: [
-              // Delete Help Category
               // Delete
               {
                 label: {
@@ -332,6 +330,7 @@ export class HelpCategoriesListComponent extends ListComponent<HelpCategoryModel
       );
     }
 
+    // count
     this.helpDataService
       .getHelpCategoryCount(countQueryBuilder)
       .pipe(
