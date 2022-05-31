@@ -1,6 +1,5 @@
 import { ModuleWithProviders } from '@angular/core';
 import { Route, RouterModule, Routes } from '@angular/router';
-import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PERMISSION } from '../../core/models/permission.model';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
@@ -107,6 +106,21 @@ const contactFoundation: Route = {
     labResultProgress: LabProgressDataResolver,
     labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
     labSequenceResult: LabSequenceResultDataResolver
+  }
+};
+
+// Follow-up - create / view / modify
+const followUpFoundation: Route = {
+  component: fromPages.FollowUpCreateViewModifyComponent,
+  canActivate: [AuthGuard],
+  resolve: {
+    outbreak: SelectedOutbreakDataResolver,
+    entityData: PersonDataResolver,
+    user: UserDataResolver,
+    dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
+    team: TeamDataResolver,
+    addressType: AddressTypeDataResolver,
+    yesNoAll: YesNoAllDataResolver
   }
 };
 
@@ -283,12 +297,12 @@ const routes: Routes = [
   // Create Follow Up
   {
     path: ':contactId/follow-ups/create',
-    component: fromPages.CreateContactFollowUpComponent,
-    canActivate: [AuthGuard],
+    ...followUpFoundation,
     data: {
       permissions: [
         PERMISSION.FOLLOW_UP_CREATE
-      ]
+      ],
+      action: CreateViewModifyV2Action.CREATE
     },
     canDeactivate: [
       PageChangeConfirmationGuard
@@ -297,25 +311,23 @@ const routes: Routes = [
   // View Follow Up
   {
     path: ':contactId/follow-ups/:followUpId/view',
-    component: fromPages.ModifyContactFollowUpComponent,
-    canActivate: [AuthGuard],
+    ...followUpFoundation,
     data: {
       permissions: [
         PERMISSION.FOLLOW_UP_VIEW
       ],
-      action: ViewModifyComponentAction.VIEW
+      action: CreateViewModifyV2Action.VIEW
     }
   },
   // Modify Follow Up
   {
     path: ':contactId/follow-ups/:followUpId/modify',
-    component: fromPages.ModifyContactFollowUpComponent,
-    canActivate: [AuthGuard],
+    ...followUpFoundation,
     data: {
       permissions: [
         PERMISSION.FOLLOW_UP_MODIFY
       ],
-      action: ViewModifyComponentAction.MODIFY
+      action: CreateViewModifyV2Action.MODIFY
     },
     canDeactivate: [
       PageChangeConfirmationGuard
@@ -324,13 +336,12 @@ const routes: Routes = [
   // View History Follow Up
   {
     path: ':contactId/follow-ups/:followUpId/history',
-    component: fromPages.ModifyContactFollowUpComponent,
-    canActivate: [AuthGuard],
+    ...followUpFoundation,
     data: {
       permissions: [
         PERMISSION.FOLLOW_UP_VIEW
       ],
-      action: ViewModifyComponentAction.HISTORY
+      action: CreateViewModifyV2Action.VIEW
     }
   },
   // Modify list of Follow Ups

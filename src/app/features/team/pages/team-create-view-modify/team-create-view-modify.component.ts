@@ -586,7 +586,7 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
             .filter((userId) => userIdsMap[userId])
             .map((userId) => users.map[userId] ?
               `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(`/users/${userId}/view`)}"><span>${users.map[userId].name}</span></a>` :
-              '-'
+              '—'
             ).join(', ');
 
           // render team

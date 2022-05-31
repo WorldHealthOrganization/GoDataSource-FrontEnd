@@ -225,7 +225,7 @@ export class AppContactsKpiDashletComponent
         prefixData: () => ({
           date: this.globalFilterDate ?
             moment(this.globalFilterDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
-            '-'
+            '—'
         }),
         refresh: (
           _inputValue,
@@ -641,7 +641,7 @@ export class AppContactsKpiDashletComponent
         prefixData: () => ({
           date: this.globalFilterDate ?
             moment(this.globalFilterDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
-            '-'
+            '—'
         }),
         refresh: (
           _inputValue,
@@ -700,7 +700,7 @@ export class AppContactsKpiDashletComponent
         prefixData: () => ({
           date: this.globalFilterDate ?
             moment(this.globalFilterDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
-            '-'
+            '—'
         }),
         refresh: (
           _inputValue,

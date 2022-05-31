@@ -312,7 +312,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         format: {
           type: (item) => item.person?.dateOfLastContact ?
             moment(item.person.dateOfLastContact).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
-            '-'
+            '—'
         },
         filter: {
           type: V2FilterType.DATE_RANGE,
@@ -326,7 +326,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         format: {
           type: (item) => item.person?.followUp?.endDate ?
             moment(item.person.followUp.endDate).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
-            '-'
+            '—'
         },
         filter: {
           type: V2FilterType.DATE_RANGE,
@@ -341,7 +341,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         format: {
           type: (item) => item.person?.riskLevel && (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.riskLevel] ?
             this.i18nService.instant((this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.riskLevel].value) :
-            '-'
+            '—'
         },
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
@@ -1883,7 +1883,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                 } else if (teamId === '') {
                   teamLabel = 'LNG_PAGE_LIST_FOLLOW_UPS_NO_TEAM_LABEL';
                 } else {
-                  teamLabel = '-';
+                  teamLabel = '—';
                 }
 
                 values.push({

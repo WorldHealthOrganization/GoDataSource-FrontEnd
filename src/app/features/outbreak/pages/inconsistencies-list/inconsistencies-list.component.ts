@@ -371,8 +371,8 @@ export class InconsistenciesListComponent extends ListComponent<CaseModel | Cont
       // translate label
       label = this.i18nService.instant(
         label, {
-          date1: inconsistency.dates.length > 0 ? this.i18nService.instant(inconsistency.dates[0].label) : '-',
-          date2: inconsistency.dates.length > 1 ? this.i18nService.instant(inconsistency.dates[1].label) : '-'
+          date1: inconsistency.dates.length > 0 ? this.i18nService.instant(inconsistency.dates[0].label) : '—',
+          date2: inconsistency.dates.length > 1 ? this.i18nService.instant(inconsistency.dates[1].label) : '—'
         }
       );
 

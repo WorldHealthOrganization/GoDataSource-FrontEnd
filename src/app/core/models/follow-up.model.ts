@@ -10,6 +10,7 @@ import { PERMISSION } from './permission.model';
 import { OutbreakModel } from './outbreak.model';
 import { EntityType } from './entity-type';
 import { CaseModel } from './case.model';
+import { Moment } from '../helperClasses/x-moment';
 
 export class FollowUpModel
   extends BaseModel
@@ -20,7 +21,7 @@ export class FollowUpModel
         IPermissionExportable,
         IPermissionFollowUp {
   id: string;
-  date: string;
+  date: string | Moment;
   address: AddressModel;
   personId: string;
   person: ContactModel | CaseModel;

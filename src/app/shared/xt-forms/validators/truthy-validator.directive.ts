@@ -28,7 +28,7 @@ export class TruthyValidatorDirective implements Validator {
       let validationKey = 'truthyValidator';
 
       if (this.errorMessageKey) {
-        validationKey += '-' + this.errorMessageKey;
+        validationKey += '—' + this.errorMessageKey;
       }
 
       const result = {};

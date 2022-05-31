@@ -9,7 +9,6 @@ import {
   IV2SideDialogConfigInputFilterList,
   IV2SideDialogConfigInputFilterListFilter,
   IV2SideDialogConfigInputFilterListSort,
-  IV2SideDialogConfigInputKeyValue,
   IV2SideDialogConfigInputMultiDropdown,
   IV2SideDialogConfigInputSingleDropdown,
   IV2SideDialogConfigInputText,
@@ -573,7 +572,7 @@ export class DialogV2Service {
                         total: data.total.toLocaleString('en'),
                         estimatedEnd: data.estimatedEndDate ?
                           data.estimatedEndDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
-                          '-'
+                          '—'
                       }
                     );
 
@@ -2179,10 +2178,11 @@ export class DialogV2Service {
   showRecordDetailsDialog(
     title: string,
     record: BaseModel,
-    users: IResolverV2ResponseModel<UserModel>
+    users: IResolverV2ResponseModel<UserModel>,
+    suffixInputs?: V2SideDialogConfigInput[]
   ): void {
     // construct list of details
-    const detailsInputs: IV2SideDialogConfigInputKeyValue[] = [];
+    const detailsInputs: V2SideDialogConfigInput[] = [];
 
     // created by
     let createdByName: string = '—';
@@ -2238,12 +2238,17 @@ export class DialogV2Service {
       value: updatedAt
     });
 
+    // push extra suffix
+    if (suffixInputs?.length > 0) {
+      detailsInputs.push(...suffixInputs);
+    }
+
     // display dialog
     this.showSideDialog({
       title: {
         get: () => title
       },
-      width: '35rem',
+      width: '45rem',
       inputs: detailsInputs,
       bottomButtons: [{
         type: IV2SideDialogConfigButtonType.CANCEL,
