@@ -18,6 +18,7 @@ import { CotNodeShapeDataResolver } from '../../core/services/resolvers/data/cot
 import { CotEdgeLabelDataResolver } from '../../core/services/resolvers/data/cot-edge-label.resolver';
 import { CotEdgeIconDataResolver } from '../../core/services/resolvers/data/cot-edge-icon.resolver';
 import { CotEdgeColorDataResolver } from '../../core/services/resolvers/data/cot-edge-color.resolver';
+import { CotSnapshotStatusDataResolver } from '../../core/services/resolvers/data/cot-snapshot-status.resolver';
 
 const routes: Routes = [
   // Transmission Chains Graph
@@ -95,6 +96,10 @@ const routes: Routes = [
       permissions: [
         PERMISSION.COT_LIST
       ]
+    },
+    resolve: {
+      cotSnapshotStatus: CotSnapshotStatusDataResolver,
+      yesNoAll: YesNoAllDataResolver
     }
   }
 ];

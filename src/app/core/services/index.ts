@@ -129,6 +129,7 @@ import { CotEdgeColorDataResolver } from './resolvers/data/cot-edge-color.resolv
 import { UpstreamServersDataResolver } from './resolvers/data/upstream-servers.resolver';
 import { IconDataResolver } from './resolvers/data/icon.resolver';
 import { SelectedClusterDataResolver } from './resolvers/data/selected-cluster.resolver';
+import { CotSnapshotStatusDataResolver } from './resolvers/data/cot-snapshot-status.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -148,6 +149,7 @@ export const services: any[] = [
   CotNodeIconDataResolver,
   CotNodeLabelDataResolver,
   CotNodeShapeDataResolver,
+  CotSnapshotStatusDataResolver,
   CountryDataResolver,
   DailyFollowUpStatusDataResolver,
   DateRangeCenterDataResolver,

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
 import { throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
@@ -14,12 +14,13 @@ import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { ActivatedRoute } from '@angular/router';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
   selector: 'app-transmission-chains-snapshot-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './transmission-chains-snapshot-list.component.html',
-  styleUrls: ['./transmission-chains-snapshot-list.component.less']
+  templateUrl: './transmission-chains-snapshot-list.component.html'
 })
 export class TransmissionChainsSnapshotListComponent extends ListComponent<CotSnapshotModel> implements OnDestroy {
   /**
@@ -29,13 +30,10 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent<CotSn
     protected listHelperService: ListHelperService,
     private toastV2Service: ToastV2Service,
     private transmissionChainDataService: TransmissionChainDataService,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private activatedRoute: ActivatedRoute
   ) {
     super(listHelperService);
-
-    // TODO: Needs resolver
-    // status options
-    // this.statusList$ = this.genericDataService.getCotSnapshotStatusList();
   }
 
   /**
@@ -97,12 +95,11 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent<CotSn
       },
       {
         field: 'status',
-        label: 'LNG_ASYNC_COT_FIELD_LABEL_STATUS'
-        // TODO: Needs resolver
-        // filter: {
-        //   type: V2FilterType.MULTIPLE_SELECT,
-        //   options: (this.activatedRoute.snapshot.data.snapshotStatus as IResolverV2ResponseModel<???>).options,
-        // }
+        label: 'LNG_ASYNC_COT_FIELD_LABEL_STATUS',
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.cotSnapshotStatus as IResolverV2ResponseModel<ILabelValuePairModel>).options
+        }
       },
       {
         field: 'sizeBytesHumanReadable',
@@ -344,6 +341,7 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent<CotSn
       );
     }
 
+    // count
     this.transmissionChainDataService
       .getSnapshotsCount(
         this.selectedOutbreak.id,
