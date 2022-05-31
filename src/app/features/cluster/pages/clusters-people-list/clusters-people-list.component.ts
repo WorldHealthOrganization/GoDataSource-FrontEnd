@@ -166,8 +166,9 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
           type: 'mainAddress.fullAddress'
         },
         filter: {
-          type: V2FilterType.ADDRESS_MULTIPLE_LOCATION,
+          type: V2FilterType.ADDRESS_FIELD,
           address: filterAddressModel,
+          addressField: 'addressLine1',
           field: 'addresses',
           fieldIsArray: true
         }
