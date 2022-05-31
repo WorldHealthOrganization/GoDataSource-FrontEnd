@@ -30,6 +30,7 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import {
   CreateViewModifyV2ExpandColumnType
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 /**
  * Component
@@ -819,7 +820,9 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: LabResultModel) => item.sampleIdentifier,
+      get: (item: LabResultModel) => item.sampleIdentifier ?
+        item.sampleIdentifier :
+        moment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
       link: (item: LabResultModel) => {
         if (this._personType === EntityType.CONTACT) {
           return [`/lab-results/contacts/${this.entityData.id}/${item.id}`];
@@ -836,7 +839,8 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
   protected initializeExpandListQueryFields(): void {
     this.expandListQueryFields = [
       'id',
-      'sampleIdentifier'
+      'sampleIdentifier',
+      'dateSampleTaken'
     ];
   }
 
