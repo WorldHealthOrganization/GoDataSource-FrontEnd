@@ -8,6 +8,7 @@ import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+import { SelectedHelpCategoryDataResolver } from '../../core/services/resolvers/data/selected-help-category.resolver';
 
 const routes: Routes = [
   // Help view / search
@@ -91,7 +92,8 @@ const routes: Routes = [
     },
     resolve: {
       yesNoAll: YesNoAllDataResolver,
-      user: UserDataResolver
+      user: UserDataResolver,
+      selectedCategory: SelectedHelpCategoryDataResolver
     }
   },
   // Create Help Item

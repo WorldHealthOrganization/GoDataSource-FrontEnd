@@ -23,8 +23,7 @@ import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v
 })
 export class HelpItemsListComponent extends ListComponent<HelpItemModel> implements OnDestroy {
   // category data
-  categoryId: string;
-  selectedCategory: HelpCategoryModel;
+  private _selectedCategory: HelpCategoryModel;
 
   /**
    * Constructor
@@ -40,16 +39,7 @@ export class HelpItemsListComponent extends ListComponent<HelpItemModel> impleme
     super(listHelperService);
 
     // Retrieve category
-    this.categoryId = this.activatedRoute.snapshot.params.categoryId;
-    this.helpDataService
-      .getHelpCategory(this.categoryId)
-      .subscribe((category) => {
-        // set data
-        this.selectedCategory = category;
-
-        // update breadcrumbs
-        this.initializeBreadcrumbs();
-      });
+    this._selectedCategory = this.activatedRoute.snapshot.data.selectedCategory;
   }
 
   /**
@@ -340,7 +330,7 @@ export class HelpItemsListComponent extends ListComponent<HelpItemModel> impleme
       label: 'LNG_COMMON_BUTTON_ADD',
       icon: 'add_circle_outline',
       action: {
-        link: (): string[] => ['/help/categories', this.categoryId, 'items', 'create']
+        link: (): string[] => ['/help/categories', this._selectedCategory.id, 'items', 'create']
       },
       visible: (): boolean => {
         return HelpItemModel.canCreate(this.authUser);
@@ -382,15 +372,12 @@ export class HelpItemsListComponent extends ListComponent<HelpItemModel> impleme
     }
 
     // view category breadcrumb
-    if (
-      HelpCategoryModel.canView(this.authUser) &&
-            this.selectedCategory
-    ) {
+    if (HelpCategoryModel.canView(this.authUser)) {
       this.breadcrumbs.push(
         {
-          label: this.selectedCategory.name,
+          label: this._selectedCategory.name,
           action: {
-            link: [`/help/categories/${ this.categoryId }/view`]
+            link: [`/help/categories/${ this._selectedCategory.id }/view`]
           }
         }
       );
@@ -425,7 +412,10 @@ export class HelpItemsListComponent extends ListComponent<HelpItemModel> impleme
   refreshList() {
     // retrieve the list of items
     this.records$ = this.helpDataService
-      .getHelpItemsCategoryList(this.categoryId, this.queryBuilder)
+      .getHelpItemsCategoryList(
+        this._selectedCategory.id,
+        this.queryBuilder
+      )
       .pipe(
         // should be the last pipe
         takeUntil(this.destroyed$)
@@ -457,9 +447,10 @@ export class HelpItemsListComponent extends ListComponent<HelpItemModel> impleme
       );
     }
 
+    // COUNT
     this.helpDataService
       .getHelpItemsCategoryCount(
-        this.categoryId,
+        this._selectedCategory.id,
         countQueryBuilder
       )
       .pipe(
