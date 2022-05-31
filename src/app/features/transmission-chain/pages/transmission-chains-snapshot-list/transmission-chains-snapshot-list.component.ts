@@ -1,21 +1,19 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { Observable, Subscription, throwError } from 'rxjs';
-import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { UserSettings } from '../../../../core/models/user.model';
-import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { IBasicCount } from '../../../../core/models/basic-count.interface';
-import { DialogAnswer, DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
-import { CotSnapshotModel } from '../../../../core/models/cot-snapshot.model';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
-import { catchError, share } from 'rxjs/operators';
+import { Component, OnDestroy, ViewEncapsulation } from '@angular/core';
 import * as _ from 'lodash';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { throwError } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { Constants } from '../../../../core/models/constants';
+import { CotSnapshotModel } from '../../../../core/models/cot-snapshot.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 
 @Component({
   selector: 'app-transmission-chains-snapshot-list',
@@ -23,131 +21,195 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   templateUrl: './transmission-chains-snapshot-list.component.html',
   styleUrls: ['./transmission-chains-snapshot-list.component.less']
 })
-export class TransmissionChainsSnapshotListComponent extends ListComponent<CotSnapshotModel> implements OnInit, OnDestroy {
-  // constants
-  UserSettings = UserSettings;
-  Constants = Constants;
-
-  // list of existing cot snapshots
-  cotSnapshotsList$: Observable<CotSnapshotModel[]>;
-  cotSnapshotsListCount$: Observable<IBasicCount>;
-
-  // filters
-  statusList$: Observable<any>;
-
-  // subscribers
-  outbreakSubscriber: Subscription;
-
-  // actions
-  recordActions: HoverRowAction[] = [
-    // Other actions
-    new HoverRowAction({
-      type: HoverRowActionType.MENU,
-      icon: 'moreVertical',
-      menuOptions: [
-        // Delete snapshot
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_ASYNC_COT_ACTION_DELETE_SNAPSHOT',
-          click: (item: CotSnapshotModel) => {
-            this.deleteSnapshot(item);
-          },
-          visible: (item: CotSnapshotModel): boolean => {
-            return !item.deleted &&
-                            this.authUser &&
-                            this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            CotSnapshotModel.canDelete(this.authUser);
-          },
-          class: 'mat-menu-item-delete'
-        })
-      ]
-    })
-  ];
-
+export class TransmissionChainsSnapshotListComponent extends ListComponent<CotSnapshotModel> implements OnDestroy {
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     private toastV2Service: ToastV2Service,
-    private outbreakDataService: OutbreakDataService,
     private transmissionChainDataService: TransmissionChainDataService,
-    private genericDataService: GenericDataService,
-    private dialogService: DialogService
+    private dialogV2Service: DialogV2Service
   ) {
     super(listHelperService);
-  }
 
-  /**
-     * Component initialized
-     */
-  ngOnInit() {
+    // TODO: Needs resolver
     // status options
-    this.statusList$ = this.genericDataService.getCotSnapshotStatusList();
-
-    // subscribe to the Selected Outbreak Subject stream
-    this.outbreakSubscriber = this.outbreakDataService
-      .getSelectedOutbreakSubject()
-      .subscribe((selectedOutbreak: OutbreakModel) => {
-        // selected outbreak
-        this.selectedOutbreak = selectedOutbreak;
-
-        // initialize pagination
-        this.initPaginator();
-
-        // ...and re-load the list when the Selected Outbreak is changed
-        this.needsRefreshList(true);
-      });
-
-    // initialize Side Table Columns
-    this.initializeTableColumns();
+    // this.statusList$ = this.genericDataService.getCotSnapshotStatusList();
   }
 
   /**
-     * Component destroyed
-     */
+   * Component destroyed
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
-
-    // outbreak subscriber
-    if (this.outbreakSubscriber) {
-      this.outbreakSubscriber.unsubscribe();
-      this.outbreakSubscriber = null;
-    }
   }
 
   /**
-     * Initialize Side Table Columns
-     */
-  initializeTableColumns() {
+   * Selected outbreak was changed
+   */
+  selectedOutbreakChanged(): void {
+    // initialize pagination
+    this.initPaginator();
+
+    // ...and re-load the list when the Selected Outbreak is changed
+    this.needsRefreshList(true);
+  }
+
+  /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns() {
     // default table columns
-    // this.tableColumns = [
-    //   new VisibleColumnModel({
-    //     field: 'name',
-    //     label: 'LNG_ASYNC_COT_FIELD_LABEL_NAME'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'startDate',
-    //     label: 'LNG_ASYNC_COT_FIELD_LABEL_START_DATE'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'endDate',
-    //     label: 'LNG_ASYNC_COT_FIELD_LABEL_END_DATE'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'status',
-    //     label: 'LNG_ASYNC_COT_FIELD_LABEL_STATUS'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'fileSize',
-    //     label: 'LNG_ASYNC_COT_FIELD_LABEL_FILE_SIZE'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'error',
-    //     label: 'LNG_ASYNC_COT_FIELD_LABEL_ERROR'
-    //   })
-    // ];
+    this.tableColumns = [
+      {
+        field: 'name',
+        label: 'LNG_ASYNC_COT_FIELD_LABEL_NAME',
+        sortable: true,
+        pinned: IV2ColumnPinned.LEFT,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'startDate',
+        label: 'LNG_ASYNC_COT_FIELD_LABEL_START_DATE',
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
+        field: 'endDate',
+        label: 'LNG_ASYNC_COT_FIELD_LABEL_END_DATE',
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
+        field: 'status',
+        label: 'LNG_ASYNC_COT_FIELD_LABEL_STATUS'
+        // TODO: Needs resolver
+        // filter: {
+        //   type: V2FilterType.MULTIPLE_SELECT,
+        //   options: (this.activatedRoute.snapshot.data.snapshotStatus as IResolverV2ResponseModel<???>).options,
+        // }
+      },
+      {
+        field: 'sizeBytesHumanReadable',
+        label: 'LNG_ASYNC_COT_FIELD_LABEL_FILE_SIZE'
+      },
+      {
+        field: 'error',
+        label: 'LNG_ASYNC_COT_FIELD_LABEL_ERROR',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+
+      // actions
+      {
+        field: 'actions',
+        label: 'LNG_COMMON_LABEL_ACTIONS',
+        pinned: IV2ColumnPinned.RIGHT,
+        notResizable: true,
+        cssCellClass: 'gd-cell-no-focus',
+        format: {
+          type: V2ColumnFormat.ACTIONS
+        },
+        actions: [
+          // Other actions
+          {
+            type: V2ActionType.MENU,
+            icon: 'more_horiz',
+            menuOptions: [
+              // Delete
+              {
+                label: {
+                  get: () => 'LNG_PAGE_LIST_ASYNC_COT_ACTION_DELETE_SNAPSHOT'
+                },
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+                action: {
+                  click: (item: CotSnapshotModel): void => {
+                    // determine what we need to delete
+                    this.dialogV2Service.showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_DELETE',
+                          data: () => ({
+                            name: item.name
+                          })
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_COT_SNAPSHOT',
+                          data: () => ({
+                            name: item.name
+                          })
+                        }
+                      }
+                    }).subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // delete
+                      this.transmissionChainDataService
+                        .deleteSnapshot(
+                          this.selectedOutbreak.id,
+                          item.id
+                        )
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            this.toastV2Service.error(err);
+
+                            // hide loading
+                            loading.close();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          // success
+                          this.toastV2Service.success('LNG_PAGE_LIST_ASYNC_COT_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                          // hide loading
+                          loading.close();
+
+                          // reload data
+                          this.needsRefreshList(true);
+                        });
+                    });
+                  }
+                },
+                visible: (item: CotSnapshotModel): boolean => {
+                  return !item.deleted &&
+                    this.selectedOutbreakIsActive &&
+                    CotSnapshotModel.canDelete(this.authUser);
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ];
   }
 
   /**
@@ -188,27 +250,49 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent<CotSn
   /**
    * Initialize breadcrumbs
    */
-  initializeBreadcrumbs(): void {}
+  protected initializeBreadcrumbs(): void {
+    // set breadcrumbs
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
+        }
+      },
+      {
+        label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE',
+        action: {
+          link: ['/transmission-chains']
+        }
+      },
+      {
+        label: 'LNG_PAGE_LIST_ASYNC_COT_TITLE',
+        action: null
+      }
+    ];
+  }
 
   /**
    * Fields retrieved from api to reduce payload size
    */
   protected refreshListFields(): string[] {
-    return [];
+    return [
+      'id',
+      'name',
+      'startDate',
+      'endDate',
+      'status',
+      'sizeBytes',
+      'createdBy'
+    ];
   }
 
   /**
    * Re(load) the Cases list, based on the applied filter, sort criterias
    */
   refreshList() {
-    // we need the outbreak to continue
-    if (
-      !this.selectedOutbreak ||
-            !this.selectedOutbreak.id
-    ) {
-      return;
-    }
-
     // default sort order ?
     if (this.queryBuilder.sort.isEmpty()) {
       this.queryBuilder.sort.by(
@@ -224,36 +308,43 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent<CotSn
     );
 
     // retrieve the list of Cases
-    this.cotSnapshotsList$ = this.transmissionChainDataService
+    this.records$ = this.transmissionChainDataService
       .getSnapshotsList(
         this.selectedOutbreak.id,
         this.queryBuilder
       )
       .pipe(
-        catchError((err) => {
-          this.toastV2Service.error(err);
-          return throwError(err);
-        })
+        // should be the last pipe
+        takeUntil(this.destroyed$)
       );
   }
 
   /**
-     * Get total number of items, based on the applied filters
-     */
-  refreshListCount() {
-    // we need the outbreak to continue
-    if (
-      !this.selectedOutbreak ||
-            !this.selectedOutbreak.id
-    ) {
-      return;
+   * Get total number of items, based on the applied filters
+   */
+  refreshListCount(applyHasMoreLimit?: boolean) {
+    // reset
+    this.pageCount = undefined;
+
+    // set apply value
+    if (applyHasMoreLimit !== undefined) {
+      this.applyHasMoreLimit = applyHasMoreLimit;
     }
 
     // remove paginator from query builder
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
-    this.cotSnapshotsListCount$ = this.transmissionChainDataService
+
+    // apply has more limit
+    if (this.applyHasMoreLimit) {
+      countQueryBuilder.flag(
+        'applyHasMoreLimit',
+        true
+      );
+    }
+
+    this.transmissionChainDataService
       .getSnapshotsCount(
         this.selectedOutbreak.id,
         countQueryBuilder
@@ -263,38 +354,12 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent<CotSn
           this.toastV2Service.error(err);
           return throwError(err);
         }),
-        share()
-      );
-  }
 
-  /**
-     * Delete item
-     */
-  deleteSnapshot(cotSnapshotModel: CotSnapshotModel) {
-    this.dialogService
-      .showConfirm('LNG_DIALOG_CONFIRM_DELETE_COT_SNAPSHOT')
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          // delete
-          this.transmissionChainDataService
-            .deleteSnapshot(
-              this.selectedOutbreak.id,
-              cotSnapshotModel.id
-            )
-            .pipe(
-              catchError((err) => {
-                this.toastV2Service.error(err);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              // show message
-              this.toastV2Service.success('LNG_PAGE_LIST_ASYNC_COT_ACTION_DELETE_SUCCESS_MESSAGE');
-
-              // reload data
-              this.needsRefreshList(true);
-            });
-        }
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      )
+      .subscribe((response) => {
+        this.pageCount = response;
       });
   }
 }
