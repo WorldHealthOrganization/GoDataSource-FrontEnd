@@ -92,7 +92,7 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
         pinned: IV2ColumnPinned.LEFT,
         format: {
           type: (item: CaseModel | ContactModel | EventModel | ContactOfContactModel): string => {
-            return item.type === EntityType.EVENT ? item.name : item.firstName;
+            return item.type === EntityType.EVENT ? item.name : item.lastName;
           }
         },
         filter: {
