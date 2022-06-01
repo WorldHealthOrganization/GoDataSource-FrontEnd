@@ -10,7 +10,6 @@ import { EventModel } from '../../../../core/models/event.model';
 import { catchError, map, share } from 'rxjs/internal/operators';
 import * as _ from 'lodash';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
-import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { Constants } from '../../../../core/models/constants';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -34,7 +33,7 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
   entityType: EntityType;
 
   // available side filters
-  availableSideFilters: FilterModel[];
+  availableSideFilters: any[]; // FilterModel[];
   selectedRecordsIds: string[];
   selectedPeopleIds: string[];
 
@@ -349,38 +348,38 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
   }
 
   private generateSideFilters() {
-    this.availableSideFilters = [
-      new FilterModel({
-        fieldName: 'firstName',
-        fieldLabel: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
-        type: FilterType.TEXT,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'lastName',
-        fieldLabel: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
-        type: FilterType.TEXT,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'visualId',
-        fieldLabel: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID',
-        type: FilterType.TEXT
-      }),
-      new FilterModel({
-        fieldName: 'gender',
-        fieldLabel: 'LNG_ENTITY_FIELD_LABEL_GENDER',
-        type: FilterType.MULTISELECT,
-        options$: this.genderList$,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'addresses',
-        fieldLabel: 'LNG_ENTITY_FIELD_LABEL_ADDRESS',
-        type: FilterType.ADDRESS,
-        addressFieldIsArray: true
-      })
-    ];
+    // this.availableSideFilters = [
+    //   new FilterModel({
+    //     fieldName: 'firstName',
+    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
+    //     type: FilterType.TEXT,
+    //     sortable: true
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'lastName',
+    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
+    //     type: FilterType.TEXT,
+    //     sortable: true
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'visualId',
+    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID',
+    //     type: FilterType.TEXT
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'gender',
+    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_GENDER',
+    //     type: FilterType.MULTISELECT,
+    //     options$: this.genderList$,
+    //     sortable: true
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'addresses',
+    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_ADDRESS',
+    //     type: FilterType.ADDRESS,
+    //     addressFieldIsArray: true
+    //   })
+    // ];
   }
 
   /**

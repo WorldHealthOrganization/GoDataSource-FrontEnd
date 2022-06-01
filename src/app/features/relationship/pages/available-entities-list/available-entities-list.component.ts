@@ -12,7 +12,6 @@ import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryMo
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import * as _ from 'lodash';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { catchError, map, share } from 'rxjs/operators';
 import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
@@ -34,7 +33,7 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
   entitiesListCount$: Observable<IBasicCount>;
 
   // available side filters
-  availableSideFilters: FilterModel[];
+  availableSideFilters: any[];
 
   // saved filters type
   savedFiltersType = Constants.APP_PAGE.AVAILABLE_ENTITIES_FOR_RELATIONSHIPS.value;
@@ -318,64 +317,64 @@ export class AvailableEntitiesListComponent extends RelationshipsListComponent i
   }
 
   private generateSideFilters() {
-    this.availableSideFilters = [
-      new FilterModel({
-        fieldName: 'type',
-        fieldLabel: 'LNG_ENTITY_FIELD_LABEL_TYPE',
-        type: FilterType.MULTISELECT,
-        options$: this.personTypesList$,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'firstName',
-        fieldLabel: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
-        type: FilterType.TEXT,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'lastName',
-        fieldLabel: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
-        type: FilterType.TEXT,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'visualId',
-        fieldLabel: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID',
-        type: FilterType.TEXT
-      }),
-      new FilterModel({
-        fieldName: 'gender',
-        fieldLabel: 'LNG_ENTITY_FIELD_LABEL_GENDER',
-        type: FilterType.MULTISELECT,
-        options$: this.genderList$,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'age',
-        fieldLabel: 'LNG_ENTITY_FIELD_LABEL_AGE',
-        type: FilterType.RANGE_AGE,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'addresses',
-        fieldLabel: 'LNG_ENTITY_FIELD_LABEL_ADDRESS',
-        type: FilterType.ADDRESS,
-        addressFieldIsArray: true
-      }),
-      new FilterModel({
-        fieldName: 'dob',
-        fieldLabel: 'LNG_ENTITY_FIELD_LABEL_DOB',
-        type: FilterType.RANGE_DATE,
-        sortable: true
-      }),
-      new FilterModel({
-        fieldName: 'riskLevel',
-        fieldLabel: 'LNG_ENTITY_FIELD_LABEL_RISK',
-        type: FilterType.MULTISELECT,
-        options$: this.riskLevelsList$,
-        sortable: true
-      })
-    ];
+    // this.availableSideFilters = [
+    //   new FilterModel({
+    //     fieldName: 'type',
+    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_TYPE',
+    //     type: FilterType.MULTISELECT,
+    //     options$: this.personTypesList$,
+    //     sortable: true
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'firstName',
+    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
+    //     type: FilterType.TEXT,
+    //     sortable: true
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'lastName',
+    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
+    //     type: FilterType.TEXT,
+    //     sortable: true
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'visualId',
+    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID',
+    //     type: FilterType.TEXT
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'gender',
+    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_GENDER',
+    //     type: FilterType.MULTISELECT,
+    //     options$: this.genderList$,
+    //     sortable: true
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'age',
+    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_AGE',
+    //     type: FilterType.RANGE_AGE,
+    //     sortable: true
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'addresses',
+    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_ADDRESS',
+    //     type: FilterType.ADDRESS,
+    //     addressFieldIsArray: true
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'dob',
+    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_DOB',
+    //     type: FilterType.RANGE_DATE,
+    //     sortable: true
+    //   }),
+    //   new FilterModel({
+    //     fieldName: 'riskLevel',
+    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_RISK',
+    //     type: FilterType.MULTISELECT,
+    //     options$: this.riskLevelsList$,
+    //     sortable: true
+    //   })
+    // ];
   }
 
   /**
