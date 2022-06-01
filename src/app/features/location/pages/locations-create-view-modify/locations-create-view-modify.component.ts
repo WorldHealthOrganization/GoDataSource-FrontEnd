@@ -333,58 +333,15 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
                 return this.isCreate;
               }
             }, {
-              type: CreateViewModifyV2TabInputType.NUMBER,
-              name: 'geoLocation[lat]',
-              placeholder: () => 'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LAT',
-              description: () => 'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LAT_DESCRIPTION',
+              type: CreateViewModifyV2TabInputType.LAT_LNG,
+              name: 'geoLocation',
               value: {
-                get: () => this.itemData.geoLocation?.lat,
-                set: (value) => {
-                  // initialize
-                  if (!this.itemData.geoLocation) {
-                    this.itemData.geoLocation = {
-                      lat: undefined,
-                      lng: undefined
-                    };
+                get: () => this.itemData.geoLocation ?
+                  this.itemData.geoLocation :
+                  {
+                    lat: undefined,
+                    lng: undefined
                   }
-
-                  // set data
-                  this.itemData.geoLocation.lat = value;
-                }
-              },
-              validators: {
-                required: () => typeof this.itemData.geoLocation.lng === 'number',
-                minMax: () => ({
-                  min: -90,
-                  max: 90
-                })
-              }
-            }, {
-              type: CreateViewModifyV2TabInputType.NUMBER,
-              name: 'geoLocation[lng]',
-              placeholder: () => 'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LNG',
-              description: () => 'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LNG_DESCRIPTION',
-              value: {
-                get: () => this.itemData.geoLocation?.lng,
-                set: (value) => {
-                  // initialize
-                  if (!this.itemData.geoLocation) {
-                    this.itemData.geoLocation = {
-                      lat: undefined,
-                      lng: undefined
-                    };
-                  }
-
-                  // set data
-                  this.itemData.geoLocation.lng = value;
-                }
-              },
-              validators: {
-                required: () => typeof this.itemData.geoLocation.lat === 'number',
-                minMax: () => ({
-                  min: -180,
-                  max: 180
-                })
               }
             }
           ]

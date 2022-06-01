@@ -640,12 +640,45 @@
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                     autocomplete="off"
                     [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
-                    app-min-max-validator
-                    [minNumber]="!isView && input.validators?.minMax ? input.validators?.minMax().min : undefined"
-                    [min]="!isView && input.validators?.minMax ? input.validators?.minMax().min : undefined"
-                    [maxNumber]="!isView && input.validators?.minMax ? input.validators?.minMax().max : undefined"
-                    [max]="!isView && input.validators?.minMax ? input.validators?.minMax().max : undefined"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-number-v2>
+
+                  <!-- Lat / Lng -->
+                  <div
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.LAT_LNG"
+                    fxFlex fxLayout="row wrap" fxLayout.lt-md="column" fxLayoutGap="1.6rem" fxLayoutGap.lt-md="0"
+                    [ngModelGroup]="parentName ? parentName + '[' + input.name + ']' : input.name">
+
+                    <!-- Lat -->
+                    <app-form-number-v2
+                      fxFlex="calc(50% - 0.8rem)" fxFlex.xs="100%"
+                      [(ngModel)]="input.value.get().lat"
+                      name="lat"
+                      placeholder="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT"
+                      tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT_DESCRIPTION"
+                      [viewOnly]="isView"
+                      [required]="!isView && input.value.get().lng"
+                      app-min-max-validator
+                      [min]="-90"
+                      [minNumber]="-90"
+                      [max]="90"
+                      [maxNumber]="90"></app-form-number-v2>
+
+                    <!-- Lng -->
+                    <app-form-number-v2
+                      fxFlex="calc(50% - 0.8rem)" fxFlex.xs="100%"
+                      [(ngModel)]="input.value.get().lng"
+                      name="lng"
+                      placeholder="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG"
+                      tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG_DESCRIPTION"
+                      [viewOnly]="isView"
+                      [required]="!isView && input.value.get().lat"
+                      app-min-max-validator
+                      [min]="-180"
+                      [minNumber]="-180"
+                      [max]="180"
+                      [maxNumber]="180"></app-form-number-v2>
+
+                  </div>
 
                   <!-- List Text -->
                   <app-form-input-v2

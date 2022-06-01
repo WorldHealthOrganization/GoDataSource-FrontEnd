@@ -44,6 +44,7 @@ export enum CreateViewModifyV2TabInputType {
 
   // input groups
   LIST,
+  LAT_LNG,
   LIST_TEXT,
   LOCATION_IDENTIFIER,
   DOCUMENT,
@@ -272,11 +273,7 @@ interface ICreateViewModifyV2TabInputNumber extends Omit<ICreateViewModifyV2TabI
 
   // optional
   validators?: {
-    required?: () => boolean,
-    minMax?: () => {
-      min: number,
-      max: number
-    }
+    required?: () => boolean
   };
 }
 
@@ -391,6 +388,18 @@ export interface ICreateViewModifyV2TabInputList {
 }
 
 /**
+ * Input - latitude / longitude
+ */
+interface ICreateViewModifyV2TabInputLatLng {
+  // required
+  type: CreateViewModifyV2TabInputType.LAT_LNG;
+  name: string;
+  value: {
+    get: () => { lat: number, lng: number }
+  };
+}
+
+/**
  * Input - list text
  */
 interface ICreateViewModifyV2TabInputListText {
@@ -401,11 +410,6 @@ interface ICreateViewModifyV2TabInputListText {
   placeholder: () => string;
   description?: () => string;
   disabled?: (item: CreateViewModifyV2TabInput) => boolean;
-
-  // never
-  name?: never;
-  value?: never;
-  validators?: never;
 }
 
 /**
@@ -518,7 +522,7 @@ export type CreateViewModifyV2TabInput = ICreateViewModifyV2TabInputText | ICrea
 | ICreateViewModifyV2TabInputLocationSingle | ICreateViewModifyV2TabInputLocationMultiple | ICreateViewModifyV2TabInputTextArea
 | ICreateViewModifyV2TabInputNumber | ICreateViewModifyV2TabInputSelectGroups | ICreateViewModifyV2TabInputAgeOrDOB
 | ICreateViewModifyV2TabInputAsyncValidatorText | ICreateViewModifyV2TabInputColor | ICreateViewModifyV2TabInputDate
-| ICreateViewModifyV2TabInputList | ICreateViewModifyV2TabInputListText | ICreateViewModifyV2TabInputLocationIdentifier
+| ICreateViewModifyV2TabInputList | ICreateViewModifyV2TabInputLatLng | ICreateViewModifyV2TabInputListText | ICreateViewModifyV2TabInputLocationIdentifier
 | ICreateViewModifyV2TabInputDocument | ICreateViewModifyV2TabInputAddress | ICreateViewModifyV2TabInputVaccine
 | ICreateViewModifyV2TabInputCenterDateRange | ICreateViewModifyV2TabInputMapServer | ICreateViewModifyV2TabLabel;
 
