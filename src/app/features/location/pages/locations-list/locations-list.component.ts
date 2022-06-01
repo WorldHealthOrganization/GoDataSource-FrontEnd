@@ -23,6 +23,7 @@ import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2FilterText, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-location.model';
 
 @Component({
   selector: 'app-locations-list',
@@ -30,10 +31,13 @@ import { IV2FilterText, V2FilterTextType, V2FilterType } from '../../../../share
 })
 export class LocationsListComponent extends ListComponent<LocationModel> implements OnDestroy {
   // parent location ID
-  parentId: string;
+  private _parentId: string;
 
   // TODO: Location filter needs to be implemented
   // @ViewChild('locationFilter', { static: true }) locationFilter: FormLocationDropdownComponent;
+
+  // parent tree
+  private _parentLocationTree: HierarchicalLocationModel;
 
   /**
    * Constructor
@@ -52,8 +56,9 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
       true
     );
 
-    // Get parent location ID
-    this.parentId = this.activatedRoute.snapshot.params.parentId;
+    // get data
+    this._parentId = this.activatedRoute.snapshot.params.parentId;
+    this._parentLocationTree = this.activatedRoute.snapshot.data.parentLocationTree;
   }
 
   /**
@@ -463,7 +468,12 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
       type: V2ActionType.MENU,
       label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
       visible: (): boolean => {
-        return !this.parentId && !this.appliedListFilter && (LocationModel.canExport(this.authUser) || LocationModel.canImport(this.authUser));
+        return !this._parentId &&
+          !this.appliedListFilter &&
+          (
+            LocationModel.canExport(this.authUser) ||
+            LocationModel.canImport(this.authUser)
+          );
       },
       menuOptions: [
         // Export hierarchical locations
@@ -538,7 +548,9 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
       label: 'LNG_COMMON_BUTTON_ADD',
       icon: 'add_circle_outline',
       action: {
-        link: (): string[] => this.parentId ? ['/locations', this.parentId, 'create'] : ['/locations', 'create']
+        link: (): string[] => this._parentId ?
+          ['/locations', this._parentId, 'create'] :
+          ['/locations', 'create']
       },
       visible: (): boolean => {
         return LocationModel.canCreate(this.authUser);
@@ -555,6 +567,7 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
    * Initialize breadcrumbs
    */
   protected initializeBreadcrumbs(): void {
+    // dashboard
     this.breadcrumbs = [
       {
         label: 'LNG_COMMON_LABEL_HOME',
@@ -563,12 +576,48 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
             ['/dashboard'] :
             ['/account/my-profile']
         }
-      },
-      {
-        label: 'LNG_PAGE_LIST_LOCATIONS_TITLE',
-        action: null
       }
     ];
+
+    // list parents ?
+    if (!this._parentLocationTree) {
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_LOCATIONS_TITLE',
+        action: null
+      });
+    } else {
+      // root
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_LOCATIONS_TITLE',
+        action: {
+          link: ['/locations']
+        }
+      });
+
+      // add tree
+      let tree: HierarchicalLocationModel = this._parentLocationTree;
+      while (tree) {
+        // add to list
+        if (tree.location?.id) {
+          this.breadcrumbs.push({
+            label: tree.location.name,
+            action: tree.children?.length > 0 ?
+              {
+                link: ['/redirect'],
+                linkQueryParams: {
+                  path: JSON.stringify(['/locations', tree.location.id, 'children'])
+                }
+              } :
+              null
+          });
+        }
+
+        // next
+        tree = tree.children?.length > 0 ?
+          tree.children[0] :
+          undefined;
+      }
+    }
   }
 
   /**
@@ -585,7 +634,7 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
     // refresh
     this.records$ = this.locationDataService
       .getLocationsListByParent(
-        this.parentId,
+        this._parentId,
         this.queryBuilder,
         true
       )
@@ -622,7 +671,10 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
 
     // count
     this.locationDataService
-      .getLocationsCountByParent(this.parentId, countQueryBuilder)
+      .getLocationsCountByParent(
+        this._parentId,
+        countQueryBuilder
+      )
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);

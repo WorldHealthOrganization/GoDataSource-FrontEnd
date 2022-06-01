@@ -8,6 +8,7 @@ import { PageChangeConfirmationGuard } from '../../core/services/guards/page-cha
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 import { LocationGeographicalLevelDataResolver } from '../../core/services/resolvers/data/location-geographical-level.resolver';
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+import { LocationTreeDataResolver } from '../../core/services/resolvers/data/location-tree.resolver';
 
 // common base - create / view / modify
 const locationFoundation: Route = {
@@ -16,7 +17,8 @@ const locationFoundation: Route = {
   resolve: {
     yesNoAll: YesNoAllDataResolver,
     geographicalLevel: LocationGeographicalLevelDataResolver,
-    user: UserDataResolver
+    user: UserDataResolver,
+    parentLocationTree: LocationTreeDataResolver
   }
 };
 

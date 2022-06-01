@@ -133,6 +133,7 @@ import { CotSnapshotStatusDataResolver } from './resolvers/data/cot-snapshot-sta
 import { SelectedHelpCategoryDataResolver } from './resolvers/data/selected-help-category.resolver';
 import { InvestigationStatusDataResolver } from './resolvers/data/investigation-status.resolver';
 import { SelectedLanguageDataResolver } from './resolvers/data/selected-language.resolver';
+import { LocationTreeDataResolver } from './resolvers/data/location-tree.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -180,6 +181,7 @@ export const services: any[] = [
   LanguageDataResolver,
   LanguageUserResolver,
   LocationGeographicalLevelDataResolver,
+  LocationTreeDataResolver,
   MapVectorTypeDataResolver,
   OccupationDataResolver,
   OutbreakDataResolver,
