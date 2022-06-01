@@ -3,15 +3,10 @@ import { CreateViewModifyComponent } from '../../../../core/helperClasses/create
 import { ActivatedRoute, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { TranslateService } from '@ngx-translate/core';
-import {
-  CreateViewModifyV2TabInputType,
-  ICreateViewModifyV2Buttons,
-  ICreateViewModifyV2CreateOrUpdate,
-  ICreateViewModifyV2Tab
-} from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import { CreateViewModifyV2ActionType, CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
@@ -19,10 +14,12 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-location.model';
-import { takeUntil } from 'rxjs/operators';
+import { catchError, takeUntil } from 'rxjs/operators';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { LocationIdentifierModel } from '../../../../core/models/location-identifier.model';
+import * as _ from 'lodash';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 
 /**
  * Component
@@ -518,46 +515,143 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
    */
   private initializeProcessData(): ICreateViewModifyV2CreateOrUpdate {
     return (
-      _type,
-      _data,
-      _finished,
+      type,
+      data,
+      finished,
       _loading,
       _forms
     ) => {
-      // #TODO
-      console.log(_data);
-      // // finished
-      // (type === CreateViewModifyV2ActionType.CREATE ?
-      //     this.languageDataService.createLanguage(
-      //       data
-      //     ) :
-      //     this.languageDataService.modifyLanguage(
-      //       this.itemData.id,
-      //       data
-      //     )
-      // ).pipe(
-      //   // handle error
-      //   catchError((err) => {
-      //     // show error
-      //     finished(err, undefined);
-      //
-      //     // finished
-      //     return throwError(err);
-      //   }),
-      //
-      //   // should be the last pipe
-      //   takeUntil(this.destroyed$)
-      // ).subscribe((item: ClusterModel) => {
-      //   // success creating / updating cluster
-      //   this.toastV2Service.success(
-      //     type === CreateViewModifyV2ActionType.CREATE ?
-      //       'LNG_PAGE_CREATE_LANGUAGE_ACTION_CREATE_LANGUAGE_SUCCESS_MESSAGE' :
-      //       'LNG_PAGE_MODIFY_LANGUAGE_ACTION_MODIFY_LANGUAGE_SUCCESS_MESSAGE'
-      //   );
-      //
-      //   // finished with success
-      //   finished(undefined, item);
-      // });
+      // even if we set value to float, some browser might get it as a string sicne we use form for this...
+      // so..we need to force again the geo location to have numbers
+      const lat: number | string = _.get(data, 'geoLocation.lat');
+      if (
+        !_.isNumber(lat) &&
+        !_.isEmpty(lat)
+      ) {
+        _.set(data, 'geoLocation.lat', parseFloat(lat as string));
+      }
+      const lng: number | string = _.get(data, 'geoLocation.lng');
+      if (
+        !_.isNumber(lng) &&
+        !_.isEmpty(lng)
+      ) {
+        _.set(data, 'geoLocation.lng', parseFloat(lng as string));
+      }
+
+      // check if we nee to remove geo Location
+      if (
+        data.geoLocation !== undefined &&
+        data.geoLocation.lat === undefined &&
+        data.geoLocation.lng === undefined
+      ) {
+        // on create we don't need to send it
+        delete data.geoLocation;
+      }
+
+      // finished
+      (type === CreateViewModifyV2ActionType.CREATE ?
+        this.locationDataService.createLocation(
+          data
+        ) :
+        this.locationDataService.modifyLocation(
+          this.itemData.id,
+          data
+        )
+      ).pipe(
+        // handle error
+        catchError((err) => {
+          // show error
+          finished(err, undefined);
+
+          // finished
+          return throwError(err);
+        }),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      ).subscribe((item: LocationModel) => {
+        // success creating / updating cluster
+        this.toastV2Service.success(
+          type === CreateViewModifyV2ActionType.CREATE ?
+            'LNG_PAGE_CREATE_LOCATION_ACTION_CREATE_LOCATION_SUCCESS_MESSAGE' :
+            'LNG_PAGE_MODIFY_LOCATION_ACTION_MODIFY_LOCATION_SUCCESS_MESSAGE'
+        );
+
+        // propagate geo location ?
+        if (
+          type === CreateViewModifyV2ActionType.UPDATE &&
+          data.geoLocation &&
+          LocationModel.canPropagateGeoToPersons(this.authUser)
+        ) {
+          // check if we need to update geo-locations
+          this.locationDataService
+            .getLocationUsageCount(this.itemData.id)
+            .pipe(
+              catchError((err) => {
+                // show error
+                finished(err, undefined);
+
+                // finished
+                return throwError(err);
+              })
+            )
+            .subscribe((usedEntitiesCount) => {
+              if (!usedEntitiesCount?.count) {
+                // finished with success
+                finished(undefined, item);
+
+                // finished
+                return;
+              }
+
+              // ask for confirmation
+              this.dialogV2Service
+                .showConfirmDialog({
+                  config: {
+                    title: {
+                      get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
+                    },
+                    message: {
+                      get: () => 'LNG_DIALOG_CONFIRM_PROPAGATE_LAT_LNG'
+                    }
+                  }
+                })
+                .subscribe((response) => {
+                  // canceled ?
+                  if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                    // finished with success
+                    finished(undefined, item);
+
+                    // finished
+                    return;
+                  }
+
+                  // propagate values to all the entities that have in use this location
+                  this.locationDataService
+                    .propagateGeoLocation(this.itemData.id)
+                    .pipe(
+                      catchError((err) => {
+                        // show error
+                        finished(err, undefined);
+
+                        // finished
+                        return throwError(err);
+                      })
+                    )
+                    .subscribe(() => {
+                      // finished with success
+                      finished(undefined, item);
+
+                      // success msg
+                      this.toastV2Service.success('LNG_PAGE_MODIFY_LOCATION_ACTION_PROPAGATE_LOCATION_GEO_LOCATION_SUCCESS_MESSAGE');
+                    });
+                });
+            });
+        } else {
+          // finished with success
+          finished(undefined, item);
+        }
+      });
     };
   }
 
