@@ -78,7 +78,7 @@ interface IV2FilterBasic {
 /**
  * Text
  */
-interface IV2FilterText extends Omit<IV2FilterBasic, 'value' | 'defaultValue'> {
+export interface IV2FilterText extends Omit<IV2FilterBasic, 'value' | 'defaultValue'> {
   // required
   type: V2FilterType.TEXT;
   textType: V2FilterTextType;

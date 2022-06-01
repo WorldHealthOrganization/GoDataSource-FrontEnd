@@ -1,4 +1,4 @@
-import { Component, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { throwError } from 'rxjs';
@@ -22,14 +22,11 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
-import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
-import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { IV2FilterText, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 
 @Component({
   selector: 'app-locations-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './locations-list.component.html',
-  styleUrls: ['./locations-list.component.less']
+  templateUrl: './locations-list.component.html'
 })
 export class LocationsListComponent extends ListComponent<LocationModel> implements OnDestroy {
   // parent location ID
@@ -95,8 +92,11 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
         }
       },
       {
-        field: 'synonymsAsString',
+        field: 'synonyms',
         label: 'LNG_LOCATION_FIELD_LABEL_SYNONYMS',
+        format: {
+          type: 'synonymsAsString'
+        },
         filter: {
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH
@@ -109,13 +109,11 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH,
           search: (column: IV2Column) => {
-            // TODO: (column.filter as any) should be (column.filter as IV2FilterText), couldn't set it..
             // value
-            const value: string = (column.filter as any).value;
+            const value: string = (column.filter as IV2FilterText).value;
 
             // remove previous condition
             this.queryBuilder.filter.remove('identifiers');
-
             if (!_.isEmpty(value)) {
               // add new condition
               this.queryBuilder.filter.where({
@@ -141,17 +139,22 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
         field: 'latLng',
         label: 'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION',
         format: {
-          type: (item: LocationModel) => item.geoLocation && item.geoLocation.lat ? item.geoLocation.lat + ', ' + item.geoLocation.lng : ''
+          type: (item: LocationModel) => item.geoLocation && item.geoLocation.lat ?
+            item.geoLocation.lat + ', ' + item.geoLocation.lng :
+            ''
         }
       },
       {
         field: 'active',
         label: 'LNG_LOCATION_FIELD_LABEL_ACTIVE',
         sortable: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
         filter: {
-          type: V2FilterType.MULTIPLE_SELECT,
-          options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-          includeNoValue: true
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
         }
       },
       {
@@ -286,8 +289,8 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
           // View Location Children
           {
             type: V2ActionType.ICON,
-            icon: 'groupWork',
-            iconTooltip: 'LNG_PAGE_LIST_LOCATIONS_ACTION_MODIFY_LOCATION',
+            icon: 'group_work',
+            iconTooltip: 'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN',
             action: {
               link: (item: LocationModel) => {
                 return ['/locations', item.id, 'children'];
@@ -612,6 +615,7 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
       );
     }
 
+    // count
     this.locationDataService
       .getLocationsCountByParent(this.parentId, countQueryBuilder)
       .pipe(
