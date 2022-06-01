@@ -818,7 +818,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
    * Initialize expand list column renderer fields
    */
   protected initializeExpandListColumnRenderer(): void {
-    this.expandListColumnRenderer = {
+    this.expandListColumnRenderer = this.entityData.deleted ? undefined : {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
       get: (item: LabResultModel) => item.sampleIdentifier?.trim().length > 0 ?
         item.sampleIdentifier :
