@@ -311,6 +311,11 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
     // check filters
     this.checkListFilters();
 
+    // always disable caching if applied filters used
+    if (this.appliedListFilter) {
+      this._disableFilterCaching = true;
+    }
+
     // remove old subscription since we shouldn't have more than one list component visible at the same time ( at least not now )
     if (ListComponent.locationSubscription) {
       ListComponent.locationSubscription.unsubscribe();
