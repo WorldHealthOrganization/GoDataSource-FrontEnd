@@ -24,7 +24,7 @@ export class UserDataResolver implements IMapResolverV2<UserModel> {
    */
   resolve(): Observable<IResolverV2ResponseModel<UserModel>> {
     // user doesn't have rights ?
-    if (!UserModel.canList(this.authDataService.getAuthenticatedUser())) {
+    if (!UserModel.canListForFilters(this.authDataService.getAuthenticatedUser())) {
       return of({
         list: [],
         map: {},

@@ -468,7 +468,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             undefined;
         },
         exclude: (): boolean => {
-          return !UserModel.canList(this.authUser);
+          return !UserModel.canListForFilters(this.authUser);
         }
       },
       {
@@ -1109,7 +1109,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     ];
 
     // allowed to filter by responsible user ?
-    if (UserModel.canList(this.authUser)) {
+    if (UserModel.canListForFilters(this.authUser)) {
       this.advancedFilters.push(
         {
           type: V2AdvancedFilterType.MULTISELECT,

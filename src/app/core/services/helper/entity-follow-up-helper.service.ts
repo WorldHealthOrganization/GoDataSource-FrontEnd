@@ -284,7 +284,7 @@ export class EntityFollowUpHelperService {
           includeNoValue: true
         },
         exclude: (): boolean => {
-          return !UserModel.canList(definitions.authUser);
+          return !UserModel.canListForFilters(definitions.authUser);
         },
         link: (data) => {
           return data.responsibleUserId ?
@@ -880,7 +880,7 @@ export class EntityFollowUpHelperService {
     ];
 
     // allowed to filter by responsible user ?
-    if (UserModel.canList(data.authUser)) {
+    if (UserModel.canListForFilters(data.authUser)) {
       advancedFilters.push(
         {
           type: V2AdvancedFilterType.MULTISELECT,
