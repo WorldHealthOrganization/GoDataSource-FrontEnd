@@ -19,6 +19,7 @@ import { IAnswerData, QuestionModel } from '../../../../core/models/question.mod
 import { DomSanitizer } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
 import { IGroupEventData, IGroupOptionEventData, ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from '../../../forms-v2/components/app-form-select-groups-v2/models/select-group.model';
+import { LocationIdentifierModel } from '../../../../core/models/location-identifier.model';
 
 /**
  * Input type
@@ -26,7 +27,6 @@ import { IGroupEventData, IGroupOptionEventData, ISelectGroupOptionFormatRespons
 export enum CreateViewModifyV2TabInputType {
   // inputs
   TEXT,
-  LIST_TEXT,
   EMAIL,
   PASSWORD,
   SELECT_SINGLE,
@@ -44,6 +44,8 @@ export enum CreateViewModifyV2TabInputType {
 
   // input groups
   LIST,
+  LIST_TEXT,
+  LOCATION_IDENTIFIER,
   DOCUMENT,
   ADDRESS,
   VACCINE,
@@ -115,19 +117,6 @@ interface ICreateViewModifyV2TabInputText extends Omit<ICreateViewModifyV2TabInp
       err: string
     }
   };
-}
-
-/**
- * Input - list text
- */
-interface ICreateViewModifyV2TabInputListText extends Omit<ICreateViewModifyV2TabInputText, 'type' | 'value' | 'validators' | 'name'> {
-  // required
-  type: CreateViewModifyV2TabInputType.LIST_TEXT;
-
-  // never
-  name?: never;
-  value?: never;
-  validators?: never;
 }
 
 /**
@@ -402,6 +391,35 @@ export interface ICreateViewModifyV2TabInputList {
 }
 
 /**
+ * Input - list text
+ */
+interface ICreateViewModifyV2TabInputListText {
+  // required
+  type: CreateViewModifyV2TabInputType.LIST_TEXT;
+
+  // optional
+  placeholder: () => string;
+  description?: () => string;
+  disabled?: (item: CreateViewModifyV2TabInput) => boolean;
+
+  // never
+  name?: never;
+  value?: never;
+  validators?: never;
+}
+
+/**
+ * Input - location identifier
+ */
+interface ICreateViewModifyV2TabInputLocationIdentifier {
+  // required
+  type: CreateViewModifyV2TabInputType.LOCATION_IDENTIFIER;
+  value: {
+    get: (index?: number) => LocationIdentifierModel;
+  };
+}
+
+/**
  * Input - document
  */
 interface ICreateViewModifyV2TabInputDocument {
@@ -495,12 +513,13 @@ interface ICreateViewModifyV2TabLabel {
 /**
  * Input
  */
-export type CreateViewModifyV2TabInput = ICreateViewModifyV2TabInputText | ICreateViewModifyV2TabInputListText | ICreateViewModifyV2TabInputEmail | ICreateViewModifyV2TabInputPassword
+export type CreateViewModifyV2TabInput = ICreateViewModifyV2TabInputText | ICreateViewModifyV2TabInputEmail | ICreateViewModifyV2TabInputPassword
 | ICreateViewModifyV2TabInputSingleSelect | ICreateViewModifyV2TabInputMultipleSelect | ICreateViewModifyV2TabInputToggleCheckbox
 | ICreateViewModifyV2TabInputLocationSingle | ICreateViewModifyV2TabInputLocationMultiple | ICreateViewModifyV2TabInputTextArea
 | ICreateViewModifyV2TabInputNumber | ICreateViewModifyV2TabInputSelectGroups | ICreateViewModifyV2TabInputAgeOrDOB
 | ICreateViewModifyV2TabInputAsyncValidatorText | ICreateViewModifyV2TabInputColor | ICreateViewModifyV2TabInputDate
-| ICreateViewModifyV2TabInputList | ICreateViewModifyV2TabInputDocument | ICreateViewModifyV2TabInputAddress | ICreateViewModifyV2TabInputVaccine
+| ICreateViewModifyV2TabInputList | ICreateViewModifyV2TabInputListText | ICreateViewModifyV2TabInputLocationIdentifier
+| ICreateViewModifyV2TabInputDocument | ICreateViewModifyV2TabInputAddress | ICreateViewModifyV2TabInputVaccine
 | ICreateViewModifyV2TabInputCenterDateRange | ICreateViewModifyV2TabInputMapServer | ICreateViewModifyV2TabLabel;
 
 /**

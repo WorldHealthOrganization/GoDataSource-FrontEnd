@@ -22,6 +22,7 @@ import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-
 import { takeUntil } from 'rxjs/operators';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { LocationIdentifierModel } from '../../../../core/models/location-identifier.model';
 
 /**
  * Component
@@ -419,6 +420,38 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
               }
             }
           }]
+        },
+
+        // Location identifiers
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_LOCATION_FIELD_LABEL_IDENTIFIERS',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.LIST,
+            name: 'identifiers',
+            items: this.itemData.identifiers,
+            itemsChanged: (list) => {
+              this.itemData.identifiers = list.items;
+            },
+            definition: {
+              add: {
+                label: 'LNG_INPUT_LABEL_ADD_INPUT',
+                newItem: () => new LocationIdentifierModel({})
+              },
+              remove: {
+                label: 'LNG_COMMON_BUTTON_DELETE',
+                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_ITEM'
+              },
+              input: {
+                type: CreateViewModifyV2TabInputType.LOCATION_IDENTIFIER,
+                value: {
+                  get: (index: number) => {
+                    return this.itemData.identifiers[index];
+                  }
+                }
+              }
+            }
+          }]
         }
       ]
     };
@@ -492,6 +525,7 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
       _forms
     ) => {
       // #TODO
+      console.log(_data);
       // // finished
       // (type === CreateViewModifyV2ActionType.CREATE ?
       //     this.languageDataService.createLanguage(

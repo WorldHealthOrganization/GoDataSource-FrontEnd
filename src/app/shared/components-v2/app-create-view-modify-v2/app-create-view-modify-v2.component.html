@@ -432,21 +432,6 @@
                     [checkErrorMsg]="!isView && input.validators?.notInObject ? input.validators?.notInObject()?.err : undefined"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-input-v2>
 
-                  <!-- List Text -->
-                  <app-form-input-v2
-                    *ngSwitchCase="CreateViewModifyV2TabInputType.LIST_TEXT"
-                    fxFlex
-                    [(ngModel)]="parentInput.items[parentItemIndex]"
-                    [name]="parentName + '[' + parentItemIndex + ']'"
-                    [placeholder]="input.placeholder()"
-                    [tooltip]="input.description ? input.description() : undefined"
-                    [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
-                    [viewOnly]="isView"
-                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
-                    autocomplete="off"
-                    [required]="true"
-                    (ngModelChange)="markArrayItemsAsDirty(form, parentName); "></app-form-input-v2>
-
                   <!-- Color -->
                   <app-form-color-v2
                     *ngSwitchCase="CreateViewModifyV2TabInputType.COLOR"
@@ -661,6 +646,48 @@
                     [maxNumber]="!isView && input.validators?.minMax ? input.validators?.minMax().max : undefined"
                     [max]="!isView && input.validators?.minMax ? input.validators?.minMax().max : undefined"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-number-v2>
+
+                  <!-- List Text -->
+                  <app-form-input-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.LIST_TEXT"
+                    fxFlex
+                    [(ngModel)]="parentInput.items[parentItemIndex]"
+                    [name]="parentName + '[' + parentItemIndex + ']'"
+                    [placeholder]="input.placeholder()"
+                    [tooltip]="input.description ? input.description() : undefined"
+                    [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
+                    [viewOnly]="isView"
+                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    autocomplete="off"
+                    [required]="true"
+                    (ngModelChange)="markArrayItemsAsDirty(form, parentName); "></app-form-input-v2>
+
+                  <!-- Location Identifier -->
+                  <div
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.LOCATION_IDENTIFIER"
+                    fxFlex fxLayout="row wrap" fxLayout.lt-md="column" fxLayoutGap="1.6rem" fxLayoutGap.lt-md="0"
+                    [ngModelGroup]="parentName ? parentName + '[' + parentItemIndex + ']' : input.name">
+
+                    <!-- Code -->
+                    <app-form-input-v2
+                      fxFlex
+                      [(ngModel)]="input.value.get(parentItemIndex).code"
+                      name="code"
+                      placeholder="LNG_LOCATION_FIELD_LABEL_IDENTIFIER_CODE"
+                      [viewOnly]="isView"
+                      required="true"
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
+
+                    <!-- Description -->
+                    <app-form-input-v2
+                      fxFlex
+                      [(ngModel)]="input.value.get(parentItemIndex).description"
+                      name="description"
+                      placeholder="LNG_LOCATION_FIELD_LABEL_IDENTIFIER_DESCRIPTION"
+                      [viewOnly]="isView"
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
+
+                  </div>
 
                   <!-- Age - Dob -->
                   <div
