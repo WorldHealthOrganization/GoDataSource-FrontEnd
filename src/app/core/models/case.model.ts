@@ -340,7 +340,7 @@ export class CaseModel
     ];
 
     // allowed to filter by responsible user ?
-    if (UserModel.canList(data.authUser)) {
+    if (UserModel.canListForFilters(data.authUser)) {
       advancedFilters.push({
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'responsibleUserId',

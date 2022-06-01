@@ -284,11 +284,11 @@ export class ContactModel
     }
 
     // allowed to filter by follow-up user ?
-    if (UserModel.canList(data.authUser)) {
+    if (UserModel.canListForFilters(data.authUser)) {
       advancedFilters.push({
+        type: V2AdvancedFilterType.MULTISELECT,
         field: 'responsibleUserId',
         label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
-        type: V2AdvancedFilterType.MULTISELECT,
         options: data.options.user
       });
     }

@@ -417,7 +417,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
           includeNoValue: true
         },
         exclude: (): boolean => {
-          return !UserModel.canList(this.authUser);
+          return !UserModel.canListForFilters(this.authUser);
         },
         link: (data) => {
           return data.responsibleUserId ?

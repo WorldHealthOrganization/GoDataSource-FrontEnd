@@ -480,7 +480,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
                 }
               },
               replace: {
-                condition: () => !UserModel.canList(this.authUser),
+                condition: () => !UserModel.canListForFilters(this.authUser),
                 html: this.translateService.instant('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE')
               }
             }

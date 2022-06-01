@@ -587,7 +587,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           includeNoValue: true
         },
         exclude: (): boolean => {
-          return !UserModel.canList(this.authUser);
+          return !UserModel.canListForFilters(this.authUser);
         },
         link: (data) => {
           return data.responsibleUserId ?
