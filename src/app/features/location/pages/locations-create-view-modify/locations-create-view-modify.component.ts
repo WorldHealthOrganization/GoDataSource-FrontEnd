@@ -20,6 +20,8 @@ import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-location.model';
 import { takeUntil } from 'rxjs/operators';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 
 /**
  * Component
@@ -260,23 +262,133 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
             'LNG_PAGE_CREATE_LOCATION_TAB_DETAILS_TITLE' :
             'LNG_PAGE_MODIFY_LOCATION_TAB_DETAILS_TITLE',
           inputs: [
-            // #TODO - inputs
-            // {
-            //   type: CreateViewModifyV2TabInputType.TEXT,
-            //   name: 'name',
-            //   placeholder: () => 'LNG_LANGUAGE_FIELD_LABEL_NAME',
-            //   description: () => 'LNG_LANGUAGE_FIELD_LABEL_NAME_DESCRIPTION',
-            //   value: {
-            //     get: () => this.itemData.name,
-            //     set: (value) => {
-            //       // set data
-            //       this.itemData.name = value;
-            //     }
-            //   },
-            //   validators: {
-            //     required: () => true
-            //   }
-            // }
+            {
+              type: CreateViewModifyV2TabInputType.TEXT,
+              name: 'name',
+              placeholder: () => 'LNG_LOCATION_FIELD_LABEL_NAME',
+              description: () => 'LNG_LOCATION_FIELD_LABEL_NAME_DESCRIPTION',
+              value: {
+                get: () => this.itemData.name,
+                set: (value) => {
+                  // set data
+                  this.itemData.name = value;
+                }
+              },
+              validators: {
+                required: () => true
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'active',
+              placeholder: () => 'LNG_LOCATION_FIELD_LABEL_ACTIVE',
+              description: () => 'LNG_LOCATION_FIELD_LABEL_ACTIVE_DESCRIPTION',
+              value: {
+                get: () => this.itemData.active,
+                set: (value) => {
+                  // set data
+                  this.itemData.active = value;
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.NUMBER,
+              name: 'populationDensity',
+              placeholder: () => 'LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY',
+              description: () => 'LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY_DESCRIPTION',
+              value: {
+                get: () => this.itemData.populationDensity,
+                set: (value) => {
+                  // set data
+                  this.itemData.populationDensity = value;
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'geographicalLevelId',
+              placeholder: () => 'LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL',
+              description: () => 'LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL_DESCRIPTION',
+              options: (this.activatedRoute.snapshot.data.geographicalLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              value: {
+                get: () => this.itemData.geographicalLevelId,
+                set: (value) => {
+                  this.itemData.geographicalLevelId = value;
+                }
+              },
+              validators: {
+                required: () => true
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.LOCATION_SINGLE,
+              name: 'parentLocationId',
+              placeholder: () => 'LNG_LOCATION_FIELD_LABEL_PARENT_LOCATION',
+              description: () => 'LNG_LOCATION_FIELD_LABEL_PARENT_LOCATION_DESCRIPTION',
+              useOutbreakLocations: false,
+              excludeLocationsIds: this.isCreate ?
+                undefined :
+                [this.itemData.id],
+              value: {
+                get: () => this.itemData.parentLocationId,
+                set: (value) => {
+                  this.itemData.parentLocationId = value;
+                }
+              },
+              disabled: () => {
+                return this.isCreate;
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.NUMBER,
+              name: 'geoLocation[lat]',
+              placeholder: () => 'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LAT',
+              description: () => 'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LAT_DESCRIPTION',
+              value: {
+                get: () => this.itemData.geoLocation?.lat,
+                set: (value) => {
+                  // initialize
+                  if (!this.itemData.geoLocation) {
+                    this.itemData.geoLocation = {
+                      lat: undefined,
+                      lng: undefined
+                    };
+                  }
+
+                  // set data
+                  this.itemData.geoLocation.lat = value;
+                }
+              },
+              validators: {
+                required: () => typeof this.itemData.geoLocation.lng === 'number',
+                minMax: () => ({
+                  min: -90,
+                  max: 90
+                })
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.NUMBER,
+              name: 'geoLocation[lng]',
+              placeholder: () => 'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LNG',
+              description: () => 'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION_LNG_DESCRIPTION',
+              value: {
+                get: () => this.itemData.geoLocation?.lng,
+                set: (value) => {
+                  // initialize
+                  if (!this.itemData.geoLocation) {
+                    this.itemData.geoLocation = {
+                      lat: undefined,
+                      lng: undefined
+                    };
+                  }
+
+                  // set data
+                  this.itemData.geoLocation.lng = value;
+                }
+              },
+              validators: {
+                required: () => typeof this.itemData.geoLocation.lat === 'number',
+                minMax: () => ({
+                  min: -180,
+                  max: 180
+                })
+              }
+            }
           ]
         }
       ]

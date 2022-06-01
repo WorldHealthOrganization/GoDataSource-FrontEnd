@@ -232,6 +232,7 @@ interface ICreateViewModifyV2TabInputLocationSingle extends Omit<ICreateViewModi
 
   // optional
   useOutbreakLocations?: boolean;
+  excludeLocationsIds?: string[];
 }
 
 /**
@@ -268,7 +269,11 @@ interface ICreateViewModifyV2TabInputNumber extends Omit<ICreateViewModifyV2TabI
 
   // optional
   validators?: {
-    required?: () => boolean
+    required?: () => boolean,
+    minMax?: () => {
+      min: number,
+      max: number
+    }
   };
 }
 

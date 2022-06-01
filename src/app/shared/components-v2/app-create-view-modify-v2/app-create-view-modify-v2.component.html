@@ -555,6 +555,7 @@
                     [viewOnly]="isView || !input.value.set"
                     [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
                     [useOutbreakLocations]="input.useOutbreakLocations"
+                    [excludeLocationsIds]="input.excludeLocationsIds"
                     [clearable]="true"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-select-location-single-v2>
@@ -638,6 +639,11 @@
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                     autocomplete="off"
                     [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
+                    app-min-max-validator
+                    [minNumber]="!isView && input.validators?.minMax ? input.validators?.minMax().min : undefined"
+                    [min]="!isView && input.validators?.minMax ? input.validators?.minMax().min : undefined"
+                    [maxNumber]="!isView && input.validators?.minMax ? input.validators?.minMax().max : undefined"
+                    [max]="!isView && input.validators?.minMax ? input.validators?.minMax().max : undefined"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-number-v2>
 
                   <!-- Age - Dob -->
