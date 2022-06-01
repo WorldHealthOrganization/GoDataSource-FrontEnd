@@ -26,28 +26,3 @@
   (resetHeaderFilters)="resetFiltersToSideFilters()"
   (advancedFilterBy)="applySideFilters($event)">
 </app-list-table-v2>
-
-
-<!--  TODO: Location filter needs to be implemented
-    <div
-        fxFlex
-        class="location-search-filter"
-        [ngClass]="{ 'form-section': !!parentId }">
-<!~~        <app-form-location-dropdown~~>
-<!~~            #locationFilter~~>
-<!~~            fxFlex~~>
-<!~~            name="locationIds"~~>
-<!~~            [ngModel]="undefined"~~>
-<!~~            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"~~>
-<!~~            [useOutbreakLocations]="false"~~>
-<!~~            (itemChanged)="searchLocationChanged($event)">~~>
-<!~~        </app-form-location-dropdown>~~>
-
-        <div
-            *ngIf="parentId"
-            class="form-actions">
-            <!~~ placeholder ~~>
-        </div>
-    </div>
-</div>
--->

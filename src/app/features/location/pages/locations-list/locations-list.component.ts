@@ -24,6 +24,7 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2FilterText, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-location.model';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleLocation, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 
 @Component({
   selector: 'app-locations-list',
@@ -32,9 +33,6 @@ import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-
 export class LocationsListComponent extends ListComponent<LocationModel> implements OnDestroy {
   // parent location ID
   private _parentId: string;
-
-  // TODO: Location filter needs to be implemented
-  // @ViewChild('locationFilter', { static: true }) locationFilter: FormLocationDropdownComponent;
 
   // parent tree
   private _parentLocationTree: HierarchicalLocationModel;
@@ -469,14 +467,71 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
       type: V2ActionType.MENU,
       label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
       visible: (): boolean => {
-        return !this._parentId &&
+        return LocationModel.canView(this.authUser) || (
+          !this._parentId &&
           !this.appliedListFilter &&
           (
             LocationModel.canExport(this.authUser) ||
             LocationModel.canImport(this.authUser)
-          );
+          )
+        );
       },
       menuOptions: [
+        // Find location
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_LOCATIONS_ACTION_FIND_LOCATION'
+          },
+          action: {
+            click: () => {
+              this.dialogV2Service
+                .showSideDialog({
+                  title: {
+                    get: () => 'LNG_PAGE_LIST_LOCATIONS_ACTION_FIND_LOCATION'
+                  },
+                  hideInputFilter: true,
+                  inputs: [{
+                    type: V2SideDialogConfigInputType.LOCATION_SINGLE,
+                    name: 'locationId',
+                    placeholder: 'LNG_PAGE_LIST_LOCATIONS_ACTION_FIND_LOCATION',
+                    value: undefined,
+                    useOutbreakLocations: false,
+                    validators: {
+                      required: () => true
+                    }
+                  }],
+                  bottomButtons: [{
+                    type: IV2SideDialogConfigButtonType.OTHER,
+                    label: 'LNG_COMMON_BUTTON_VIEW',
+                    color: 'primary',
+                    disabled: (_data, handler): boolean => {
+                      return !handler.form || handler.form.invalid;
+                    }
+                  }, {
+                    type: IV2SideDialogConfigButtonType.CANCEL,
+                    label: 'LNG_COMMON_BUTTON_CANCEL',
+                    color: 'text'
+                  }]
+                })
+                .subscribe((response) => {
+                  // cancelled ?
+                  if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+                    // finished
+                    return;
+                  }
+
+                  // close dialog
+                  response.handler.hide();
+
+                  // redirect
+                  const locationId: string = (response.data.map.locationId as IV2SideDialogConfigInputSingleLocation).value;
+                  this.router.navigate(['/locations', locationId, 'view']);
+                });
+            }
+          },
+          visible: () => LocationModel.canView(this.authUser)
+        },
+
         // Export hierarchical locations
         {
           label: {
@@ -502,7 +557,9 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
             }
           },
           visible: (): boolean => {
-            return LocationModel.canExport(this.authUser);
+            return !this._parentId &&
+              !this.appliedListFilter &&
+              LocationModel.canExport(this.authUser);
           }
         },
 
@@ -515,7 +572,9 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
             link: () => ['/import-export-data', 'hierarchical-locations', 'import']
           },
           visible: (): boolean => {
-            return LocationModel.canImport(this.authUser);
+            return !this._parentId &&
+              !this.appliedListFilter &&
+              LocationModel.canImport(this.authUser);
           }
         },
 
@@ -528,7 +587,9 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
             link: () => ['/import-export-data', 'location-data', 'import']
           },
           visible: (): boolean => {
-            return LocationModel.canImport(this.authUser);
+            return !this._parentId &&
+              !this.appliedListFilter &&
+              LocationModel.canImport(this.authUser);
           }
         }
       ]
@@ -699,20 +760,4 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
         this.pageCount = response;
       });
   }
-
-  // TODO: Location filter needs to be implemented, left for inspiration
-  /**
-   * Search location changed
-   * @param data
-   */
-  // searchLocationChanged(data: LocationAutoItem) {
-  //   if (
-  //     data &&
-  //           data.id
-  //   ) {
-  //     // redirect
-  //     this.locationFilter.clear();
-  //     this.router.navigate(['/locations', data.id, 'children']);
-  //   }
-  // }
 }
