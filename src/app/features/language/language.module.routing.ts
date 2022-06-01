@@ -6,6 +6,7 @@ import { PERMISSION } from '../../core/models/permission.model';
 import * as fromPages from './pages';
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
+import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 
 const routes: Routes = [
   // Language list
@@ -17,6 +18,9 @@ const routes: Routes = [
       permissions: [
         PERMISSION.LANGUAGE_LIST
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver
     }
   },
   // Create Language
