@@ -102,7 +102,12 @@ export const EnglishUsLang = {
     'LNG_COMMON_LABEL_SYNC': 'Start sync',
     'LNG_PAGE_MODIFY_USER_TAB_DETAILS_SECTION_PASSWORD_TITLE': 'Password',
     'LNG_DIALOG_CONFIRM_ADD_USER_TEAM': 'Users are already assigned to other teams:{{assigned}}',
-    'LNG_COMMON_LABEL_APPROVE': 'Approve \'{{name}}\''
+    'LNG_COMMON_LABEL_APPROVE': 'Approve \'{{name}}\'',
+    'LNG_PAGE_MODIFY_FOLLOW_UP_CANT_SET_RESPONSIBLE_ID_TITLE': 'You need \'User - list for dropdowns\' permission to change follow-up assigned user',
+    'LNG_PAGE_CREATE_CASE_CANT_SET_RESPONSIBLE_ID_TITLE': 'You need \'User - list for dropdowns\' permission to change case assigned user',
+    'LNG_PAGE_CREATE_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE': 'You need \'User - list for dropdowns\' permission to set contact assigned user',
+    'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE': 'You need \'User - list for dropdowns\' permission to set contact of contact assigned user',
+    'LNG_PAGE_CREATE_EVENT_CANT_SET_RESPONSIBLE_ID_TITLE': 'You need \'User - list for dropdowns\' permission to set event assigned user'
 
 
 
