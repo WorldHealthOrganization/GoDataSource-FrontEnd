@@ -292,8 +292,13 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
             icon: 'group_work',
             iconTooltip: 'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN',
             action: {
-              link: (item: LocationModel) => {
-                return ['/locations', item.id, 'children'];
+              link: () => {
+                return ['/redirect'];
+              },
+              linkQueryParams: (item: LocationModel) => {
+                return {
+                  path: JSON.stringify(['/locations', item.id, 'children'])
+                };
               }
             }
           },
