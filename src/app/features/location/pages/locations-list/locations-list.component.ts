@@ -38,6 +38,7 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
 
   // parent tree
   private _parentLocationTree: HierarchicalLocationModel;
+  pageTitle: string;
 
   /**
    * Constructor
@@ -580,6 +581,7 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
     ];
 
     // list parents ?
+    this.pageTitle = 'LNG_PAGE_LIST_LOCATIONS_TITLE';
     if (!this._parentLocationTree) {
       this.breadcrumbs.push({
         label: 'LNG_PAGE_LIST_LOCATIONS_TITLE',
@@ -599,16 +601,25 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
       while (tree) {
         // add to list
         if (tree.location?.id) {
+          // parent category ?
+          const isParent: boolean = !(tree.children?.length > 0);
+
+          // update page title
+          if (isParent) {
+            this.pageTitle = tree.location.name;
+          }
+
+          // add to list
           this.breadcrumbs.push({
             label: tree.location.name,
-            action: tree.children?.length > 0 ?
+            action: isParent ?
+              null :
               {
                 link: ['/redirect'],
                 linkQueryParams: {
                   path: JSON.stringify(['/locations', tree.location.id, 'children'])
                 }
-              } :
-              null
+              }
           });
         }
 
