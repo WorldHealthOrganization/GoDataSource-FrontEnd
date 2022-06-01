@@ -385,6 +385,33 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         }
       },
       {
+        field: 'riskLevel',
+        label: 'LNG_CASE_FIELD_LABEL_RISK_LEVEL',
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        }
+      },
+      {
+        field: 'riskReason',
+        label: 'LNG_CASE_FIELD_LABEL_RISK_REASON',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'occupation',
+        label: 'LNG_CASE_FIELD_LABEL_OCCUPATION',
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        }
+      },
+      {
         field: 'phoneNumber',
         label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER',
         format: {
@@ -2114,6 +2141,8 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       'visualId',
       'classification',
       'riskLevel',
+      'riskReason',
+      'occupation',
       'outcomeId',
       'dateOfOutcome',
       'age',
