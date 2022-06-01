@@ -77,6 +77,8 @@ export class CaseModel
   isDateOfReportingApproximate: boolean;
   transferRefused: boolean;
   outbreakId: string;
+  investigationStatus: string;
+  dateInvestigationCompleted: string | Moment;
   outcomeId: string;
   dateBecomeContact: string;
   wasContact: boolean;
@@ -136,7 +138,8 @@ export class CaseModel
       pregnancy: ILabelValuePairModel[],
       vaccine: ILabelValuePairModel[],
       vaccineStatus: ILabelValuePairModel[],
-      user: ILabelValuePairModel[]
+      user: ILabelValuePairModel[],
+      investigationStatus: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -273,6 +276,18 @@ export class CaseModel
         field: 'transferRefused',
         label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED',
         options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'investigationStatus',
+        label: 'LNG_CASE_FIELD_LABEL_INVESTIGATION_STATUS',
+        options: data.options.investigationStatus
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateInvestigationCompleted',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_INVESTIGATION_COMPLETED',
         sortable: true
       },
       {
@@ -536,6 +551,8 @@ export class CaseModel
     this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
     this.transferRefused = _.get(data, 'transferRefused');
     this.outbreakId = _.get(data, 'outbreakId');
+    this.investigationStatus = _.get(data, 'investigationStatus');
+    this.dateInvestigationCompleted = _.get(data, 'dateInvestigationCompleted');
     this.outcomeId = _.get(data, 'outcomeId');
 
     this.questionnaireAnswers = _.get(data, 'questionnaireAnswers', {});

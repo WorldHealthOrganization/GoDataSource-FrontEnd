@@ -131,6 +131,7 @@ import { IconDataResolver } from './resolvers/data/icon.resolver';
 import { SelectedClusterDataResolver } from './resolvers/data/selected-cluster.resolver';
 import { CotSnapshotStatusDataResolver } from './resolvers/data/cot-snapshot-status.resolver';
 import { SelectedHelpCategoryDataResolver } from './resolvers/data/selected-help-category.resolver';
+import { InvestigationStatusDataResolver } from './resolvers/data/investigation-status.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -166,6 +167,7 @@ export const services: any[] = [
   GenderDataResolver,
   IconDataResolver,
   InstitutionDataResolver,
+  InvestigationStatusDataResolver,
   LabNameDataResolver,
   LabPersonTypeDataResolver,
   LabProgressDataResolver,

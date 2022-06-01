@@ -762,6 +762,29 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'investigationStatus',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_INVESTIGATION_STATUS',
+            description: () => 'LNG_CASE_FIELD_LABEL_INVESTIGATION_STATUS_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.investigationStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this.itemData.investigationStatus,
+              set: (value) => {
+                this.itemData.investigationStatus = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: 'dateInvestigationCompleted',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_INVESTIGATION_COMPLETED',
+            description: () => 'LNG_CASE_FIELD_LABEL_DATE_INVESTIGATION_COMPLETED_DESCRIPTION',
+            value: {
+              get: () => this.itemData.dateInvestigationCompleted,
+              set: (value) => {
+                this.itemData.dateInvestigationCompleted = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
             name: 'outcomeId',
             placeholder: () => 'LNG_CASE_FIELD_LABEL_OUTCOME',
             description: () => 'LNG_CASE_FIELD_LABEL_OUTCOME_DESCRIPTION',
@@ -2110,7 +2133,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         pregnancy: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         vaccine: (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         vaccineStatus: (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        investigationStatus: (this.activatedRoute.snapshot.data.investigationStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
       }
     });
   }
