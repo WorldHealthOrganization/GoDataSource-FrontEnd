@@ -83,6 +83,8 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' },
     { label: 'LNG_CASE_FIELD_LABEL_WAS_CONTACT', value: 'wasContact' },
     { label: 'LNG_CONTACT_FIELD_LABEL_WAS_CASE', value: 'wasCase' },
+    { label: 'LNG_CASE_FIELD_LABEL_INVESTIGATION_STATUS', value: 'investigationStatus' },
+    { label: 'LNG_CASE_FIELD_LABEL_DATE_INVESTIGATION_COMPLETED', value: 'dateInvestigationCompleted' },
     { label: 'LNG_CASE_FIELD_LABEL_OUTCOME_ID', value: 'outcomeId' },
     { label: 'LNG_CASE_FIELD_LABEL_SAFE_BURIAL', value: 'safeBurial' },
     { label: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL', value: 'dateOfBurial' },
@@ -338,6 +340,28 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
               this.needsRefreshList();
             }
           }
+        }
+      },
+      {
+        field: 'investigationStatus',
+        label: 'LNG_CASE_FIELD_LABEL_INVESTIGATION_STATUS',
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.investigationStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          includeNoValue: true
+        }
+      },
+      {
+        field: 'dateInvestigationCompleted',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_INVESTIGATION_COMPLETED',
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        notVisible: true,
+        sortable: true,
+        filter: {
+          type: V2FilterType.DATE_RANGE
         }
       },
       {
@@ -1406,7 +1430,8 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         pregnancy: (this.activatedRoute.snapshot.data.pregnancy as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         vaccine: (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         vaccineStatus: (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        investigationStatus: (this.activatedRoute.snapshot.data.investigationStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
       }
     });
   }
@@ -2143,6 +2168,8 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       'riskLevel',
       'riskReason',
       'occupation',
+      'investigationStatus',
+      'dateInvestigationCompleted',
       'outcomeId',
       'dateOfOutcome',
       'age',

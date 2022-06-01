@@ -37,6 +37,7 @@ import { LabSequenceLaboratoryDataResolver } from '../../core/services/resolvers
 import { LabSequenceResultDataResolver } from '../../core/services/resolvers/data/lab-sequence-result.resolver';
 import { TeamDataResolver } from '../../core/services/resolvers/data/team.resolver';
 import { DailyFollowUpStatusDataResolver } from '../../core/services/resolvers/data/daily-follow-up-status.resolver';
+import { InvestigationStatusDataResolver } from '../../core/services/resolvers/data/investigation-status.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -74,7 +75,8 @@ const createViewModifyFoundation: Route = {
     labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
     labSequenceResult: LabSequenceResultDataResolver,
     team: TeamDataResolver,
-    dailyFollowUpStatus: DailyFollowUpStatusDataResolver
+    dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
+    investigationStatus: InvestigationStatusDataResolver
   }
 };
 
@@ -101,7 +103,8 @@ const routes: Routes = [
       yesNo: YesNoDataResolver,
       user: UserDataResolver,
       vaccine: VaccineDataResolver,
-      vaccineStatus: VaccineStatusDataResolver
+      vaccineStatus: VaccineStatusDataResolver,
+      investigationStatus: InvestigationStatusDataResolver
     }
   },
   // Create Case
