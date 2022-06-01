@@ -434,20 +434,25 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
         },
         visible: () => LocationModel.canModify(this.authUser)
       },
-      // #TODO - go back to parent
       createCancel: {
         link: {
-          link: () => ['/locations']
+          link: () => this.itemData?.parentLocationId ?
+            ['/locations', this.itemData.parentLocationId, 'children'] :
+            ['/locations']
         }
       },
       viewCancel: {
         link: {
-          link: () => ['/locations']
+          link: () => this.itemData?.parentLocationId ?
+            ['/locations', this.itemData.parentLocationId, 'children'] :
+            ['/locations']
         }
       },
       modifyCancel: {
         link: {
-          link: () => ['/locations']
+          link: () => this.itemData?.parentLocationId ?
+            ['/locations', this.itemData.parentLocationId, 'children'] :
+            ['/locations']
         }
       },
       quickActions: {
