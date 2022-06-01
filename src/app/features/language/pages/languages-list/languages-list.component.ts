@@ -321,7 +321,8 @@ export class LanguagesListComponent
   protected refreshListFields(): string[] {
     return [
       'id',
-      'name'
+      'name',
+      'readOnly'
     ];
   }
 
