@@ -19,6 +19,7 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-location.model';
+import { takeUntil } from 'rxjs/operators';
 
 /**
  * Component
@@ -29,10 +30,8 @@ import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-
 })
 export class LocationsCreateViewModifyComponent extends CreateViewModifyComponent<LocationModel> implements OnDestroy {
   // parent tree
-  // #TODO
-  // private _parentId: string;
   private _parentLocationTree: HierarchicalLocationModel;
-  pageTitle: string;
+  expandPageTitle: string;
 
   /**
    * Constructor
@@ -58,8 +57,6 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
     );
 
     // get data
-    // #TODO
-    // this._parentId = this.activatedRoute.snapshot.params.parentId;
     this._parentLocationTree = this.activatedRoute.snapshot.data.parentLocationTree;
   }
 
@@ -93,7 +90,11 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
   /**
    * Data initialized
    */
-  protected initializedData(): void {}
+  protected initializedData(): void {
+    if (this.isCreate) {
+      this.itemData.parentLocationId = this.activatedRoute.snapshot.params.parentId;
+    }
+  }
 
   /**
    * Initialize page title
@@ -144,7 +145,7 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
       });
 
       // list parents ?
-      this.pageTitle = 'LNG_PAGE_LIST_LOCATIONS_TITLE';
+      this.expandPageTitle = 'LNG_PAGE_LIST_LOCATIONS_TITLE';
       if (this._parentLocationTree) {
         // add tree
         let tree: HierarchicalLocationModel = this._parentLocationTree;
@@ -152,8 +153,11 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
           // add to list
           if (tree.location?.id) {
             // update page title
-            if (!(tree.children?.length > 0)) {
-              this.pageTitle = tree.location.name;
+            if (
+              this.itemData.parentLocationId &&
+              tree.location.id === this.itemData.parentLocationId
+            ) {
+              this.expandPageTitle = tree.location.name;
             }
 
             // add to list
@@ -422,12 +426,14 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
     }
 
     // retrieve data
-    // #TODO
-    // this.expandListRecords$ = this.languageDataService
-    //   .getLanguagesList(data.queryBuilder)
-    //   .pipe(
-    //     // should be the last pipe
-    //     takeUntil(this.destroyed$)
-    //   );
+    this.expandListRecords$ = this.locationDataService
+      .getLocationsListByParent(
+        this.itemData.parentLocationId,
+        data.queryBuilder
+      )
+      .pipe(
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
   }
 }

@@ -712,8 +712,7 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
     this.records$ = this.locationDataService
       .getLocationsListByParent(
         this._parentId,
-        this.queryBuilder,
-        true
+        this.queryBuilder
       )
       .pipe(
         // should be the last pipe
