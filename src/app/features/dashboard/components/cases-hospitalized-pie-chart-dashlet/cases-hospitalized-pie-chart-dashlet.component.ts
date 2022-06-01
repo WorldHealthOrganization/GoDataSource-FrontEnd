@@ -7,7 +7,7 @@ import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { catchError, map } from 'rxjs/operators';
 import { Constants } from '../../../../core/models/constants';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -15,6 +15,8 @@ import { UserModel } from '../../../../core/models/user.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { PieDonutChartData } from '../../../../shared/components/pie-donut-graph/pie-donut-chart.component';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 
 @Component({
   selector: 'app-cases-hospitalized-pie-chart-dashlet',
@@ -82,7 +84,8 @@ implements OnInit, OnDestroy {
     private caseDataService: CaseDataService,
     protected toastV2Service: ToastV2Service,
     private router: Router,
-    private authDataService: AuthDataService
+    private authDataService: AuthDataService,
+    private activatedRoute: ActivatedRoute
   ) {}
 
   /**
@@ -156,7 +159,8 @@ implements OnInit, OnDestroy {
       {
         queryParams: {
           global: JSON.stringify(global),
-          applyListFilter: item.key,
+          applyListFilter: Constants.APPLY_LIST_FILTER.CASES_DATE_RANGE_SUMMARY,
+          x: item.key,
           [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true
         }
       });
@@ -226,30 +230,18 @@ implements OnInit, OnDestroy {
         })
       )
       .pipe(map((response) => {
-        // create data
-        const data: PieDonutChartData[] = [
-          new PieDonutChartData({
-            key: Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED,
-            color: null,
-            label: 'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_HOSPITALIZED_LABEL',
-            value: response.hospitalized
-          }),
-          new PieDonutChartData({
-            key: Constants.APPLY_LIST_FILTER.CASES_ISOLATED,
-            color: null,
-            label: 'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_ISOLATED_LABEL',
-            value: response.isolated
-          }),
-          new PieDonutChartData({
-            key: Constants.APPLY_LIST_FILTER.CASES_NOT_HOSPITALISED,
-            color: null,
-            label: 'LNG_PAGE_DASHBOARD_CASE_HOSPITALIZATION_CASES_NOT_HOSPITALIZED_LABEL',
-            value: response.notHospitalized
-          })
-        ];
+        // don't display total
+        delete response.total;
 
-        // assign colors
-        PieDonutChartData.assignColorDomain(data);
+        // create data
+        const data: PieDonutChartData[] = Object.keys(response).map((key) => new PieDonutChartData({
+          key,
+          color: (this.activatedRoute.snapshot.data.dateRangeType as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[key] ?
+            (this.activatedRoute.snapshot.data.dateRangeType as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[key].getColorCode() :
+            null,
+          label: key,
+          value: response[key]
+        }));
 
         // finished
         return data;

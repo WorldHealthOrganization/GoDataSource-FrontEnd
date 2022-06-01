@@ -171,47 +171,6 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
         this.refreshCallback(true);
         break;
 
-      // filter cases isolated
-      case Constants.APPLY_LIST_FILTER.CASES_ISOLATED:
-        // add condition for deceased cases
-        globalQb = this.listHelperService.listFilterDataService.getGlobalFilterQB(
-          null,
-          null,
-          'addresses.parentLocationIdFilter',
-          globalFilters.locationId,
-          globalFilters.classificationId
-        );
-
-        // date
-        if (globalFilters.date) {
-          globalQb.filter.byDateRange(
-            'dateOfReporting', {
-              endDate: globalFilters.date.endOf('day').format()
-            }
-          );
-        }
-
-        // condition already include by default on cases list page
-        // qb.filter.bySelect(
-        //     'classification',
-        //     this.globalFilterClassificationId,
-        //     false,
-        //     null
-        // );
-
-        // get the correct query builder and merge with the existing one
-        this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterCasesIsolated(globalFilters.date);
-        if (!globalQb.isEmpty()) {
-          this.appliedListFilterQueryBuilder.merge(globalQb);
-        }
-
-        // merge query builder
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.refreshCallback(true);
-        break;
-
       // filter cases hospitalised
       case Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED:
         // add condition for deceased cases
@@ -253,7 +212,9 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
         this.refreshCallback(true);
         break;
 
-      case Constants.APPLY_LIST_FILTER.CASES_NOT_HOSPITALISED:
+      // filter cases hospitalised
+      case Constants.APPLY_LIST_FILTER.CASES_DATE_RANGE_SUMMARY:
+        // add condition for deceased cases
         globalQb = this.listHelperService.listFilterDataService.getGlobalFilterQB(
           null,
           null,
@@ -280,7 +241,45 @@ export abstract class ListAppliedFiltersComponent extends ListQueryComponent {
         // );
 
         // get the correct query builder and merge with the existing one
-        this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterCasesNotHospitalized(globalFilters.date);
+        this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
+        // get the number of contacts if it was updated
+        this.appliedListFilterQueryBuilder.filter.where(
+          {
+            dateRanges: {
+              elemMatch: {
+                typeId: _.get(queryParams, 'x', null),
+                $and: [
+                  {
+                    $or: [
+                      {
+                        startDate: {
+                          $eq: null
+                        }
+                      }, {
+                        startDate: {
+                          $lte: moment(globalFilters.date).endOf('day').toISOString()
+                        }
+                      }
+                    ]
+                  }, {
+                    $or: [
+                      {
+                        endDate: {
+                          $eq: null
+                        }
+                      }, {
+                        endDate: {
+                          $gte: moment(globalFilters.date).startOf('day').toISOString()
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          },
+          true
+        );
         if (!globalQb.isEmpty()) {
           this.appliedListFilterQueryBuilder.merge(globalQb);
         }

@@ -6,6 +6,7 @@ import { DashboardModel } from '../../core/models/dashboard.model';
 import { ClassificationDataResolver } from '../../core/services/resolvers/data/classification.resolver';
 import { PersonTypeDataResolver } from '../../core/services/resolvers/data/person-type.resolver';
 import { EpiCurveWeekTypesDataResolver } from '../../core/services/resolvers/data/epi-curve-week-types.resolver';
+import { PersonDateTypeDataResolver } from '../../core/services/resolvers/data/person-date-type.resolver';
 
 const routes: Routes = [
   // Dashboard page
@@ -19,7 +20,8 @@ const routes: Routes = [
     resolve: {
       classification: ClassificationDataResolver,
       personType: PersonTypeDataResolver,
-      epiCurveWeekTypes: EpiCurveWeekTypesDataResolver
+      epiCurveWeekTypes: EpiCurveWeekTypesDataResolver,
+      dateRangeType: PersonDateTypeDataResolver
     }
   }
 ];
