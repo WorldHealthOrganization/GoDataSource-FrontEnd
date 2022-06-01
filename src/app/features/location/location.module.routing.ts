@@ -16,7 +16,8 @@ const locationCreateViewModifyFoundation: Route = {
   canActivate: [AuthGuard],
   resolve: {
     parentLocationTree: LocationTreeDataResolver,
-    geographicalLevel: LocationGeographicalLevelDataResolver
+    geographicalLevel: LocationGeographicalLevelDataResolver,
+    user: UserDataResolver
   }
 };
 

@@ -6,7 +6,14 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { Observable, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { TranslateService } from '@ngx-translate/core';
-import { CreateViewModifyV2ActionType, CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import {
+  CreateViewModifyV2ActionType,
+  CreateViewModifyV2MenuType,
+  CreateViewModifyV2TabInputType,
+  ICreateViewModifyV2Buttons,
+  ICreateViewModifyV2CreateOrUpdate,
+  ICreateViewModifyV2Tab
+} from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
@@ -445,23 +452,22 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
       },
       quickActions: {
         options: [
-          // #TODO
           // Record details
-          // {
-          //   type: CreateViewModifyV2MenuType.OPTION,
-          //   label: 'LNG_COMMON_LABEL_DETAILS',
-          //   action: {
-          //     click: () => {
-          //       // show record details dialog
-          //       this.dialogV2Service.showRecordDetailsDialog(
-          //         'LNG_COMMON_LABEL_DETAILS',
-          //         this.itemData,
-          //         this.activatedRoute.snapshot.data.user
-          //       );
-          //     }
-          //   },
-          //   visible: () => !this.isCreate
-          // }
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_COMMON_LABEL_DETAILS',
+            action: {
+              click: () => {
+                // show record details dialog
+                this.dialogV2Service.showRecordDetailsDialog(
+                  'LNG_COMMON_LABEL_DETAILS',
+                  this.itemData,
+                  this.activatedRoute.snapshot.data.user
+                );
+              }
+            },
+            visible: () => !this.isCreate
+          }
         ]
       }
     };
