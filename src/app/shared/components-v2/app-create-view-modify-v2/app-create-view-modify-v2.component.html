@@ -371,7 +371,8 @@
                 #inputRender
                 let-input="input"
                 let-parentName="parentName"
-                let-parentItemIndex="parentItemIndex">
+                let-parentItemIndex="parentItemIndex"
+                let-parentInput="parentInput">
 
                 <!-- Input -->
                 <div
@@ -430,6 +431,21 @@
                     [checkObject]="!isView && input.validators?.notInObject ? input.validators?.notInObject()?.values : undefined"
                     [checkErrorMsg]="!isView && input.validators?.notInObject ? input.validators?.notInObject()?.err : undefined"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-input-v2>
+
+                  <!-- List Text -->
+                  <app-form-input-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.LIST_TEXT"
+                    fxFlex
+                    [(ngModel)]="parentInput.items[parentItemIndex]"
+                    [name]="parentName + '[' + parentItemIndex + ']'"
+                    [placeholder]="input.placeholder()"
+                    [tooltip]="input.description ? input.description() : undefined"
+                    [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
+                    [viewOnly]="isView"
+                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    autocomplete="off"
+                    [required]="true"
+                    (ngModelChange)="markArrayItemsAsDirty(form, parentName); "></app-form-input-v2>
 
                   <!-- Color -->
                   <app-form-color-v2
@@ -1145,7 +1161,7 @@
                             fxLayout="row wrap" fxLayoutGap="1.6rem"
                             class="gd-create-view-modify-bottom-section-content-input-list-item-content">
                             <ng-container
-                              *ngTemplateOutlet="inputRender; context: { input: input.definition.input, parentName: input.name, parentItemIndex: itemIndex }"></ng-container>
+                              *ngTemplateOutlet="inputRender; context: { input: input.definition.input, parentName: input.name, parentItemIndex: itemIndex, parentInput: input }"></ng-container>
                           </div>
 
                         </div>
@@ -1219,7 +1235,7 @@
                       <ng-container
                         *ngFor="let input of section.inputs">
                         <ng-container
-                          *ngTemplateOutlet="inputRender; context: { input, parentName: '', parentItemIndex: undefined }"></ng-container>
+                          *ngTemplateOutlet="inputRender; context: { input, parentName: '', parentItemIndex: undefined, parentInput: undefined }"></ng-container>
                       </ng-container>
 
                     </div>
@@ -1231,7 +1247,7 @@
               <ng-container
                 *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE">
                 <ng-container
-                  *ngTemplateOutlet="inputRender; context: { input: tab.definition, parentName: '', parentItemIndex: undefined }"></ng-container>
+                  *ngTemplateOutlet="inputRender; context: { input: tab.definition, parentName: '', parentItemIndex: undefined, parentInput: undefined }"></ng-container>
               </ng-container>
 
             </form>

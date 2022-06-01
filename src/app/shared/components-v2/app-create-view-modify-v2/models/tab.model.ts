@@ -26,6 +26,7 @@ import { IGroupEventData, IGroupOptionEventData, ISelectGroupOptionFormatRespons
 export enum CreateViewModifyV2TabInputType {
   // inputs
   TEXT,
+  LIST_TEXT,
   EMAIL,
   PASSWORD,
   SELECT_SINGLE,
@@ -114,6 +115,19 @@ interface ICreateViewModifyV2TabInputText extends Omit<ICreateViewModifyV2TabInp
       err: string
     }
   };
+}
+
+/**
+ * Input - list text
+ */
+interface ICreateViewModifyV2TabInputListText extends Omit<ICreateViewModifyV2TabInputText, 'type' | 'value' | 'validators' | 'name'> {
+  // required
+  type: CreateViewModifyV2TabInputType.LIST_TEXT;
+
+  // never
+  name?: never;
+  value?: never;
+  validators?: never;
 }
 
 /**
@@ -481,7 +495,7 @@ interface ICreateViewModifyV2TabLabel {
 /**
  * Input
  */
-export type CreateViewModifyV2TabInput = ICreateViewModifyV2TabInputText | ICreateViewModifyV2TabInputEmail | ICreateViewModifyV2TabInputPassword
+export type CreateViewModifyV2TabInput = ICreateViewModifyV2TabInputText | ICreateViewModifyV2TabInputListText | ICreateViewModifyV2TabInputEmail | ICreateViewModifyV2TabInputPassword
 | ICreateViewModifyV2TabInputSingleSelect | ICreateViewModifyV2TabInputMultipleSelect | ICreateViewModifyV2TabInputToggleCheckbox
 | ICreateViewModifyV2TabInputLocationSingle | ICreateViewModifyV2TabInputLocationMultiple | ICreateViewModifyV2TabInputTextArea
 | ICreateViewModifyV2TabInputNumber | ICreateViewModifyV2TabInputSelectGroups | ICreateViewModifyV2TabInputAgeOrDOB

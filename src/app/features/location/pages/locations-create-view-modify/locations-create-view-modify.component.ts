@@ -390,6 +390,35 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
               }
             }
           ]
+        },
+
+        // Synonyms
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_LOCATION_FIELD_LABEL_SYNONYMS',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.LIST,
+            name: 'synonyms',
+            items: this.itemData.synonyms,
+            itemsChanged: (list) => {
+              this.itemData.synonyms = list.items;
+            },
+            definition: {
+              add: {
+                label: 'LNG_INPUT_LABEL_ADD_INPUT',
+                newItem: () => ''
+              },
+              remove: {
+                label: 'LNG_COMMON_BUTTON_DELETE',
+                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_ITEM'
+              },
+              input: {
+                type: CreateViewModifyV2TabInputType.LIST_TEXT,
+                placeholder: () => 'LNG_LOCATION_FIELD_LABEL_SYNONYM',
+                description: () => 'LNG_LOCATION_FIELD_LABEL_SYNONYM_DESCRIPTION'
+              }
+            }
+          }]
         }
       ]
     };
