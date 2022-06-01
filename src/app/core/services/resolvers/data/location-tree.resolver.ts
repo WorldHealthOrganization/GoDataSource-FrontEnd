@@ -21,7 +21,8 @@ export class LocationTreeDataResolver implements Resolve<HierarchicalLocationMod
    */
   resolve(activatedRoute): Observable<HierarchicalLocationModel> {
     // location id
-    const locationId: string = activatedRoute.params?.parentId;
+    const locationId: string = activatedRoute.params?.parentId ||
+      activatedRoute.params?.locationId;
 
     // nothing to retrieve ?
     if (!locationId) {

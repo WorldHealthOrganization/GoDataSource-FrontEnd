@@ -532,6 +532,11 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
           visible: () => LocationModel.canView(this.authUser)
         },
 
+        // Divider
+        {
+          visible: () => LocationModel.canView(this.authUser)
+        },
+
         // Export hierarchical locations
         {
           label: {

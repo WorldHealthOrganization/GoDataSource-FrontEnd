@@ -15,6 +15,7 @@ const locationCreateViewModifyFoundation: Route = {
   component: fromPages.LocationsCreateViewModifyComponent,
   canActivate: [AuthGuard],
   resolve: {
+    parentLocationTree: LocationTreeDataResolver
   }
 };
 

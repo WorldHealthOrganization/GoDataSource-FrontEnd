@@ -18,6 +18,7 @@ import { RequestFilterGenerator } from '../../../../core/helperClasses/request-q
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { LocationModel } from '../../../../core/models/location.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
+import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-location.model';
 
 /**
  * Component
@@ -27,6 +28,12 @@ import { LocationDataService } from '../../../../core/services/data/location.dat
   templateUrl: './locations-create-view-modify.component.html'
 })
 export class LocationsCreateViewModifyComponent extends CreateViewModifyComponent<LocationModel> implements OnDestroy {
+  // parent tree
+  // #TODO
+  // private _parentId: string;
+  private _parentLocationTree: HierarchicalLocationModel;
+  pageTitle: string;
+
   /**
    * Constructor
    */
@@ -41,6 +48,7 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
     renderer2: Renderer2,
     redirectService: RedirectService
   ) {
+    // parent
     super(
       toastV2Service,
       renderer2,
@@ -48,6 +56,11 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
       activatedRoute,
       authDataService
     );
+
+    // get data
+    // #TODO
+    // this._parentId = this.activatedRoute.snapshot.params.parentId;
+    this._parentLocationTree = this.activatedRoute.snapshot.data.parentLocationTree;
   }
 
   /**
@@ -122,15 +135,43 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
 
     // list page
     if (LocationModel.canList(this.authUser)) {
+      // root
       this.breadcrumbs.push({
         label: 'LNG_PAGE_LIST_LOCATIONS_TITLE',
         action: {
           link: ['/locations']
         }
       });
-    }
 
-    // #TODO - add parent locations tree
+      // list parents ?
+      this.pageTitle = 'LNG_PAGE_LIST_LOCATIONS_TITLE';
+      if (this._parentLocationTree) {
+        // add tree
+        let tree: HierarchicalLocationModel = this._parentLocationTree;
+        while (tree) {
+          // add to list
+          if (tree.location?.id) {
+            // update page title
+            if (!(tree.children?.length > 0)) {
+              this.pageTitle = tree.location.name;
+            }
+
+            // add to list
+            this.breadcrumbs.push({
+              label: tree.location.name,
+              action: {
+                link: ['/locations', tree.location.id, 'children']
+              }
+            });
+          }
+
+          // next
+          tree = tree.children?.length > 0 ?
+            tree.children[0] :
+            undefined;
+        }
+      }
+    }
 
     // add info accordingly to page type
     if (this.isCreate) {
