@@ -11,7 +11,6 @@ import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { AbstractSheetColumn, LocationSheetColumn, DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
@@ -30,6 +29,7 @@ import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IV2ActionIconLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 
 @Component({
   selector: 'app-bulk-modify-contacts',
@@ -104,7 +104,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
     private toastV2Service: ToastV2Service,
     private referenceDataDataService: ReferenceDataDataService,
     private i18nService: I18nService,
-    private dialogService: DialogService,
+    private dialogV2Service: DialogV2Service,
     private authDataService: AuthDataService,
     private teamDataService: TeamDataService
   ) {
@@ -275,7 +275,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
     );
 
     // retrieve contacts
-    const loadingDialog = this.dialogService.showLoadingDialog();
+    const loadingDialog = this.dialogV2Service.showLoadingDialog();
     this.loadingData = true;
     this.contactDataService
       .getContactsList(this.selectedOutbreak.id, qb)
@@ -504,7 +504,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
     }
 
     // validate sheet
-    const loadingDialog = this.dialogService.showLoadingDialog();
+    const loadingDialog = this.dialogV2Service.showLoadingDialog();
     this.errorMessages = [];
     this.hotTableWrapper
       .validateTable()

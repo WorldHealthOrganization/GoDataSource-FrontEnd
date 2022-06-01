@@ -12,7 +12,6 @@ import { ContactsOfContactsDataService } from '../../../../core/services/data/co
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { catchError, share } from 'rxjs/operators';
@@ -27,6 +26,7 @@ import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IV2ActionIconLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 
 @Component({
   selector: 'app-bulk-modify-contacts-of-contacts',
@@ -93,7 +93,7 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
     private toastV2Service: ToastV2Service,
     private referenceDataDataService: ReferenceDataDataService,
     private i18nService: I18nService,
-    private dialogService: DialogService,
+    private dialogV2Service: DialogV2Service,
     private authDataService: AuthDataService
   ) {
     super();
@@ -241,7 +241,7 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
     );
 
     // retrieve contacts of contacts
-    const loadingDialog = this.dialogService.showLoadingDialog();
+    const loadingDialog = this.dialogV2Service.showLoadingDialog();
     this.loadingData = true;
     this.contactsOfContactsDataService
       .getContactsOfContactsList(this.selectedOutbreak.id, qb)
@@ -433,7 +433,7 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
     }
 
     // validate sheet
-    const loadingDialog = this.dialogService.showLoadingDialog();
+    const loadingDialog = this.dialogV2Service.showLoadingDialog();
     this.errorMessages = [];
     this.hotTableWrapper
       .validateTable()

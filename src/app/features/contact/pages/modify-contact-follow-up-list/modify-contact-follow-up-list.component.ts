@@ -7,7 +7,6 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { Observable, throwError } from 'rxjs';
@@ -24,6 +23,7 @@ import { GenericDataService } from '../../../../core/services/data/generic.data.
 import { CaseModel } from '../../../../core/models/case.model';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 
 @Component({
   selector: 'app-modify-contact-follow-ups-list',
@@ -78,7 +78,7 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     private followUpsDataService: FollowUpsDataService,
     private outbreakDataService: OutbreakDataService,
     private toastV2Service: ToastV2Service,
-    private dialogService: DialogService,
+    private dialogV2Service: DialogV2Service,
     private formHelper: FormHelperService,
     private referenceDataDataService: ReferenceDataDataService,
     private teamDataService: TeamDataService,
@@ -277,7 +277,7 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     });
 
     // start modifying follow-ups
-    const loadingDialog = this.dialogService.showLoadingDialog();
+    const loadingDialog = this.dialogV2Service.showLoadingDialog();
     this.followUpsDataService
       .bulkModifyFollowUps(
         this.selectedOutbreak.id,

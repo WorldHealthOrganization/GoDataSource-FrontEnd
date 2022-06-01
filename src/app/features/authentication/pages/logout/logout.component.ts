@@ -2,10 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Router } from '@angular/router';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 
 @Component({
   selector: 'app-logout',
@@ -20,7 +20,7 @@ export class LogoutComponent implements OnInit {
     private authDataService: AuthDataService,
     private toastV2Service: ToastV2Service,
     private i18nService: I18nService,
-    protected dialogService: DialogService
+    private dialogV2Service: DialogV2Service
   ) {}
 
   /**
@@ -29,7 +29,7 @@ export class LogoutComponent implements OnInit {
   ngOnInit() {
     setTimeout(() => {
       // show loading
-      const loadingDialog = this.dialogService.showLoadingDialog();
+      const loadingDialog = this.dialogV2Service.showLoadingDialog();
 
       // Logout from API
       this.authDataService

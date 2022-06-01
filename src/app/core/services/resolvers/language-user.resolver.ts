@@ -3,10 +3,10 @@ import { Resolve, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { I18nService } from '../helper/i18n.service';
 import { Observable, Subscriber } from 'rxjs';
-import { DialogService } from '../helper/dialog.service';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { AuthDataService } from '../data/auth.data.service';
+import { DialogV2Service } from '../helper/dialog-v2.service';
 
 @Injectable()
 export class LanguageUserResolver
@@ -18,7 +18,7 @@ implements Resolve<any> {
   constructor(
     private translateService: TranslateService,
     private i18nService: I18nService,
-    private dialogService: DialogService,
+    private dialogV2Service: DialogV2Service,
     private authDataService: AuthDataService,
     private router: Router
   ) {}
@@ -33,7 +33,7 @@ implements Resolve<any> {
         observer.complete();
       } else {
         // display loading
-        const loadingDialog = this.dialogService.showLoadingDialog();
+        const loadingDialog = this.dialogV2Service.showLoadingDialog();
 
         // load language - need to initialize like this because otherwise in some situations languageSubscriber variable isn't found when token expired
         const languageSubscriber = this.i18nService.waitForLanguageInitialization()

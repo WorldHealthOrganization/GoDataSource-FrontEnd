@@ -6,7 +6,6 @@ import { FormDatepickerComponent } from './form-datepicker/form-datepicker.compo
 import { FormSlideToggleComponent } from './form-slide-toggle/form-slide-toggle.component';
 import { FormCheckboxComponent } from './form-checkbox/form-checkbox.component';
 import { FormDaterangeComponent } from './form-daterange/form-daterange.component';
-import { FormDaterangeListComponent } from './form-daterange-list/form-daterange-list.component';
 import { FormRadioComponent } from './form-radio/form-radio.component';
 import { FormDateSliderComponent } from './form-date-slider/form-date-slider.component';
 import { FormDateRangeSliderComponent } from './form-date-range-slider/form-date-range-slider.component';
@@ -25,7 +24,6 @@ export const components: any[] = [
   FormSlideToggleComponent,
   FormCheckboxComponent,
   FormDaterangeComponent,
-  FormDaterangeListComponent,
   FormRadioComponent,
   FormDateSliderComponent,
   FormDateRangeSliderComponent,

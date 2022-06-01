@@ -17,7 +17,6 @@ import { DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, LocationSheet
 import * as Handsontable from 'handsontable';
 import { Constants } from '../../../../core/models/constants';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { catchError, map, share } from 'rxjs/operators';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
@@ -32,6 +31,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IV2ActionIconLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 
 @Component({
   selector: 'app-bulk-create-contacts',
@@ -109,7 +109,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     private toastV2Service: ToastV2Service,
     private referenceDataDataService: ReferenceDataDataService,
     private i18nService: I18nService,
-    private dialogService: DialogService,
+    private dialogV2Service: DialogV2Service,
     private authDataService: AuthDataService,
     private teamDataService: TeamDataService
   ) {
@@ -547,7 +547,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     }
 
     // validate sheet
-    const loadingDialog = this.dialogService.showLoadingDialog();
+    const loadingDialog = this.dialogV2Service.showLoadingDialog();
     this.errorMessages = [];
     this.hotTableWrapper
       .validateTable()

@@ -6,7 +6,6 @@ import { ContactDataService } from '../../../../core/services/data/contact.data.
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
 import { catchError, share } from 'rxjs/operators';
@@ -27,6 +26,7 @@ import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IV2ActionIconLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 
 @Component({
   selector: 'app-bulk-create-contacts-of-contacts',
@@ -99,7 +99,7 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
     private toastV2Service: ToastV2Service,
     private referenceDataDataService: ReferenceDataDataService,
     private i18nService: I18nService,
-    private dialogService: DialogService,
+    private dialogV2Service: DialogV2Service,
     private authDataService: AuthDataService
   ) {
     super();
@@ -470,7 +470,7 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
     }
 
     // validate sheet
-    const loadingDialog = this.dialogService.showLoadingDialog();
+    const loadingDialog = this.dialogV2Service.showLoadingDialog();
     this.errorMessages = [];
     this.hotTableWrapper
       .validateTable()
