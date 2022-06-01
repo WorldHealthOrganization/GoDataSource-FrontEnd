@@ -28,24 +28,6 @@
 </app-list-table-v2>
 
 
-<!--
-<app-topnav>
-    <ng-container dynamic-section>
-
-        <div class="topnav-actions">
-            <button
-                *ngIf="LocationModel.canCreate(authUser)"
-                mat-raised-button
-                color="accent"
-                [routerLink]="parentId ? ['/locations', parentId, 'create'] : ['/locations', 'create']">
-                <!~~ TODO: Should we change Add button label depending on parentId in new design too? ~~>
-                {{( parentId ? 'LNG_PAGE_LIST_LOCATIONS_ADD_SUBLOCATION_BUTTON' : 'LNG_PAGE_LIST_LOCATIONS_ADD_LOCATION_BUTTON') | translate}} <span class="xt-icon">addCircle</span>
-            </button>
-        </div>
-    </ng-container>
-</app-topnav>
--->
-
 <!--  TODO: Location filter needs to be implemented
     <div
         fxFlex
@@ -68,37 +50,4 @@
         </div>
     </div>
 </div>
-
-TODO: Needs redirect buttons for parrent location
-<div [ngClass]="{ 'form-section': !!parentId }">
-    <div class="form-content">
-        <mat-card class="page-section page-content">
-
-          OLD PAGE CONTENT
-
-        </mat-card>
-    </div>
-
-    <div
-        *ngIf="parentId"
-        class="form-actions">
-        <button
-            *ngIf="LocationModel.canView(authUser)"
-            mat-raised-button
-            color="accent"
-            [routerLink]="['/locations', parentId, 'view']"
-            [queryParams]="{ backToCurrent: true }">
-            {{'LNG_COMMON_BUTTON_VIEW' | translate}}
-        </button>
-
-        <button
-            *ngIf="LocationModel.canModify(authUser)"
-            mat-raised-button
-            color="accent"
-            [routerLink]="['/locations', parentId, 'modify']"
-            [queryParams]="{ backToCurrent: true }">
-            {{'LNG_COMMON_BUTTON_MODIFY' | translate}}
-        </button>
-    </div>
-</div>
- -->
+-->
