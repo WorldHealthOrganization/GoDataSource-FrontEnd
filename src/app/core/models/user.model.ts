@@ -54,7 +54,8 @@ export enum UserSettings {
   COT_FIELDS = 'cotFields',
   DEVICES_FIELDS = 'devicesFields',
   ICON_FIELDS = 'iconFields',
-  VIEW_PEOPLE_FIELDS = 'viewPeopleFields'
+  VIEW_PEOPLE_FIELDS = 'viewPeopleFields',
+  LANGUAGE_FIELDS = 'languageFields'
 }
 
 export enum PhoneNumberType {

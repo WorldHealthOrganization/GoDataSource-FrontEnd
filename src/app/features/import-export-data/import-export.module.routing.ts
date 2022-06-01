@@ -6,6 +6,7 @@ import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import * as fromPages from './pages';
 import { Constants } from '../../core/models/constants';
 import { SavedImportMappingDataResolver } from '../../core/services/resolvers/data/saved-import-mapping.resolver';
+import { SelectedLanguageDataResolver } from '../../core/services/resolvers/data/selected-language.resolver';
 
 const routes: Routes = [
   // Import locations
@@ -44,6 +45,9 @@ const routes: Routes = [
       permissions: [
         PERMISSION.LANGUAGE_IMPORT_TOKENS
       ]
+    },
+    resolve: {
+      language: SelectedLanguageDataResolver
     }
   },
 

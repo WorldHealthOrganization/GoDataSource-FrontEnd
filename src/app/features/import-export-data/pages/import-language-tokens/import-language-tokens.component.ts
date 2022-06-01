@@ -24,29 +24,27 @@ export class ImportLanguageTokensComponent implements OnInit {
 
   importFileUrl: string;
 
-  languageId: string;
+  // language
+  language: LanguageModel;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private router: Router,
-    protected route: ActivatedRoute,
+    protected activatedRoute: ActivatedRoute,
     private authDataService: AuthDataService,
     private redirectService: RedirectService
-  ) {}
+  ) {
+    // get data
+    this.language = activatedRoute.snapshot.data.language;
+    this.importFileUrl = `/languages/${this.language.id}/language-tokens/import`;
+  }
 
   /**
-     * Component initialized
-     */
+   * Component initialized
+   */
   ngOnInit() {
-    this.route.params
-      .subscribe((params: { languageId }) => {
-        // set import URL
-        this.languageId = params.languageId;
-        this.importFileUrl = `/languages/${this.languageId}/language-tokens/import`;
-      });
-
     // get the authenticated user
     this.authUser = this.authDataService.getAuthenticatedUser();
 
@@ -78,6 +76,16 @@ export class ImportLanguageTokensComponent implements OnInit {
       });
     }
 
+    // add list breadcrumb only if we have permission
+    if (LanguageModel.canView(this.authUser)) {
+      this.breadcrumbs.push({
+        label: this.language.name,
+        action: {
+          link: ['/languages', this.language.id, 'view']
+        }
+      });
+    }
+
     // current page
     this.breadcrumbs.push({
       label: 'LNG_PAGE_IMPORT_LANGUAGE_TOKENS_TITLE',
@@ -94,7 +102,7 @@ export class ImportLanguageTokensComponent implements OnInit {
       this.router.navigate(['/languages']);
     } else {
       // fallback
-      this.redirectService.to([`/import-export-data/language-data/${this.languageId}/import-tokens`]);
+      this.redirectService.to([`/import-export-data/language-data/${this.language.id}/import-tokens`]);
     }
   }
 }

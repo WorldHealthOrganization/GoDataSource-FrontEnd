@@ -23,6 +23,7 @@ import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2
 export class LanguagesListComponent
   extends ListComponent<LanguageModel>
   implements OnDestroy {
+
   /**
    * Constructor
    */
@@ -362,6 +363,7 @@ export class LanguagesListComponent
       );
     }
 
+    // count
     this.languageDataService
       .getLanguagesCount(countQueryBuilder)
       .pipe(

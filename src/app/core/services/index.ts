@@ -132,6 +132,7 @@ import { SelectedClusterDataResolver } from './resolvers/data/selected-cluster.r
 import { CotSnapshotStatusDataResolver } from './resolvers/data/cot-snapshot-status.resolver';
 import { SelectedHelpCategoryDataResolver } from './resolvers/data/selected-help-category.resolver';
 import { InvestigationStatusDataResolver } from './resolvers/data/investigation-status.resolver';
+import { SelectedLanguageDataResolver } from './resolvers/data/selected-language.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -199,6 +200,7 @@ export const services: any[] = [
   SecurityQuestionDataResolver,
   SelectedClusterDataResolver,
   SelectedHelpCategoryDataResolver,
+  SelectedLanguageDataResolver,
   SelectedOutbreakDataResolver,
   SyncPackageExportTypeDataResolver,
   SyncPackageModuleDataResolver,
