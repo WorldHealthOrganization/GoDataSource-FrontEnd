@@ -107,7 +107,8 @@ export const EnglishUsLang = {
     'LNG_PAGE_CREATE_CASE_CANT_SET_RESPONSIBLE_ID_TITLE': 'You need \'User - list for dropdowns\' permission to change case assigned user',
     'LNG_PAGE_CREATE_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE': 'You need \'User - list for dropdowns\' permission to set contact assigned user',
     'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE': 'You need \'User - list for dropdowns\' permission to set contact of contact assigned user',
-    'LNG_PAGE_CREATE_EVENT_CANT_SET_RESPONSIBLE_ID_TITLE': 'You need \'User - list for dropdowns\' permission to set event assigned user'
+    'LNG_PAGE_CREATE_EVENT_CANT_SET_RESPONSIBLE_ID_TITLE': 'You need \'User - list for dropdowns\' permission to set event assigned user',
+    'LNG_DIALOG_LIST_LOCATIONS_IN_USE_LOCATION_DIALOG_TITLE': 'Location \'{{name}}\' in use'
 
 
 

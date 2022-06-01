@@ -1,17 +1,32 @@
 import { ModuleWithProviders } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { Routes, RouterModule, Route } from '@angular/router';
 import * as fromPages from './pages';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
 import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
+import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
+import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
+import { LocationGeographicalLevelDataResolver } from '../../core/services/resolvers/data/location-geographical-level.resolver';
+import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+
+// common base - create / view / modify
+const locationFoundation: Route = {
+  component: fromPages.LocationsListComponent,
+  canActivate: [AuthGuard],
+  resolve: {
+    yesNoAll: YesNoAllDataResolver,
+    yesNo: YesNoDataResolver,
+    geographicalLevel: LocationGeographicalLevelDataResolver,
+    user: UserDataResolver
+  }
+};
 
 const routes: Routes = [
   // Root locations list
   {
     path: '',
-    component: fromPages.LocationsListComponent,
-    canActivate: [AuthGuard],
+    ...locationFoundation,
     data: {
       permissions: [
         PERMISSION.LOCATION_LIST
@@ -21,8 +36,7 @@ const routes: Routes = [
   // Children locations list
   {
     path: ':parentId/children',
-    component: fromPages.LocationsListComponent,
-    canActivate: [AuthGuard],
+    ...locationFoundation,
     data: {
       permissions: [
         PERMISSION.LOCATION_LIST
