@@ -1162,8 +1162,6 @@ export class AppFormFillQuestionnaireV2Component
 
     // make sure we update control
     if (!this.viewOnly) {
-      this.control?.markAsTouched();
-      this.control?.markAsDirty();
       this.control?.updateValueAndValidity();
     }
 
