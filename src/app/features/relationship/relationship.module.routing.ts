@@ -21,6 +21,7 @@ import { RiskDataResolver } from '../../core/services/resolvers/data/risk.resolv
 import { ClassificationDataResolver } from '../../core/services/resolvers/data/classification.resolver';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { SelectedOutbreakDataResolver } from '../../core/services/resolvers/data/selected-outbreak.resolver';
+import { SelectedEntitiesDataResolver } from '../../core/services/resolvers/data/selected-entities.resolver';
 
 // create - view - modify relationship
 const createViewModifyRelationship: Route = {
@@ -35,7 +36,8 @@ const createViewModifyRelationship: Route = {
     exposureDuration: ExposureDurationDataResolver,
     contextOfTransmission: ContextOfTransmissionDataResolver,
     cluster: ClusterDataResolver,
-    user: UserDataResolver
+    user: UserDataResolver,
+    selectedEntities: SelectedEntitiesDataResolver
   }
 };
 

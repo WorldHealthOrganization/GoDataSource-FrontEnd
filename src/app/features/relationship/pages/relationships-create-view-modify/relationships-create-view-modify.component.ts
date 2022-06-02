@@ -48,6 +48,10 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
   // constants
   RelationshipType = RelationshipType;
 
+  // relationship models for create
+  private _createRelationships: RelationshipModel[];
+  private _createEntities: (CaseModel | ContactModel | EventModel | ContactOfContactModel)[];
+
   /**
    * Constructor
    */
@@ -75,6 +79,21 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     // retrieve data from snapshot
     this.relationshipType = this.activatedRoute.snapshot.data.relationshipType;
     this._entity = this.activatedRoute.snapshot.data.entity;
+
+    // on create we should have selectedEntityIds
+    if (this.isCreate) {
+      // initialize
+      this._createEntities = (this.activatedRoute.snapshot.data.selectedEntities as IResolverV2ResponseModel<CaseModel | ContactModel | EventModel | ContactOfContactModel>).list;
+      this._createRelationships = (this._createEntities || []).map(() => new RelationshipModel());
+
+      // something went wrong, we should have at least one relationship model on create
+      if (this._createRelationships.length < 1) {
+        const loading = this.dialogV2Service.showLoadingDialog();
+        loading.message({
+          message: 'Something went wrong...'
+        });
+      }
+    }
   }
 
   /**

@@ -135,6 +135,7 @@ import { InvestigationStatusDataResolver } from './resolvers/data/investigation-
 import { SelectedLanguageDataResolver } from './resolvers/data/selected-language.resolver';
 import { LocationTreeDataResolver } from './resolvers/data/location-tree.resolver';
 import { SelectedUserRoleDataResolver } from './resolvers/data/selected-user-role.resolver';
+import { SelectedEntitiesDataResolver } from './resolvers/data/selected-entities.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -202,6 +203,7 @@ export const services: any[] = [
   SavedImportMappingDataResolver,
   SecurityQuestionDataResolver,
   SelectedClusterDataResolver,
+  SelectedEntitiesDataResolver,
   SelectedHelpCategoryDataResolver,
   SelectedLanguageDataResolver,
   SelectedOutbreakDataResolver,
