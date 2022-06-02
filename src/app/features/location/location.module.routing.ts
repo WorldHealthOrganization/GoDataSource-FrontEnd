@@ -9,6 +9,7 @@ import { LocationGeographicalLevelDataResolver } from '../../core/services/resol
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { LocationTreeDataResolver } from '../../core/services/resolvers/data/location-tree.resolver';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
+import { OutbreakDataResolver } from '../../core/services/resolvers/data/outbreak.resolver';
 
 // common base - create / view / modify
 const locationCreateViewModifyFoundation: Route = {
@@ -118,6 +119,10 @@ const routes: Routes = [
       permissions: [
         PERMISSION.LOCATION_USAGE
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      outbreak: OutbreakDataResolver
     }
   }
 ];
