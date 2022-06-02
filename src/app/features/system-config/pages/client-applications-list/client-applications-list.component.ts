@@ -518,8 +518,8 @@ export class ClientApplicationsListComponent
         },
         extraFormData: {
           append: {
-            clientId: clientApplication.credentials.clientId,
-            clientSecret: clientApplication.credentials.clientSecret
+            'data[clientId]': clientApplication.credentials.clientId,
+            'data[clientSecret]': clientApplication.credentials.clientSecret
           }
         },
         inputs: {

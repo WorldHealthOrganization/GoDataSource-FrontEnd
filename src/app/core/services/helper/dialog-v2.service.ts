@@ -449,10 +449,13 @@ export class DialogV2Service {
 
           // append extra data ?
           if (config.export.extraFormData?.append) {
-            Object.assign(
-              formData,
-              config.export.extraFormData?.append
-            );
+            Object.keys(config.export.extraFormData?.append).forEach((oKey) => {
+              _.set(
+                formData,
+                oKey,
+                config.export.extraFormData?.append[oKey]
+              );
+            });
           }
 
           // construct query builder
