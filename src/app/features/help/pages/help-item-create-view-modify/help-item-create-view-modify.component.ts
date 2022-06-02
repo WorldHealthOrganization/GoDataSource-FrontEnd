@@ -23,6 +23,7 @@ import {
   CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate,
   ICreateViewModifyV2Tab
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 
 @Component({
   selector: 'app-help-item-create-view-modify',
@@ -134,7 +135,7 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
     this.breadcrumbs.push({
       label: this.translateService.instant(this.selectedCategory.name),
       action: {
-        link: ['/help/categories/', this.selectedCategory.id]
+        link: [`/help/categories/${this.selectedCategory.id}/view`]
       }
     });
 
@@ -194,7 +195,7 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
       createOrUpdate: this.initializeProcessData(),
       redirectAfterCreateUpdate: (data: HelpItemModel) => {
         // redirect to view
-        this.redirectService.to([`/help/categories/${this.selectedCategory.id}/items/${data.id}/view`]);
+        this.redirectService.to([`/help/categories/${data.categoryId}/items/${data.id}/view`]);
       }
     };
 
@@ -239,13 +240,12 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
               name: 'categoryId',
               placeholder: () => 'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY',
               description: () => 'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY_DESCRIPTION',
-              // TODO was not able to find resolver that returns all help categories;
-              //  this input is used to change corresponding category when modifying help item
-              options: [],
+              options: (this.activatedRoute.snapshot.data.helpCategories as IResolverV2ResponseModel<HelpCategoryModel>).options,
               value: {
                 get: () => this.itemData.categoryId,
                 set: (value) => {
                   this.itemData.categoryId = value;
+                  this.itemData = new HelpItemModel(this.itemData);
                 }
               },
               validators: {
@@ -315,28 +315,28 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
     return {
       view: {
         link: {
-          link: () => ['/help/categories', this.selectedCategory.id, '/items', this.itemData?.id, 'view']
+          link: () => [`/help/categories/${this.selectedCategory.id}/items/${this.itemData?.id}/view`]
         }
       },
       modify: {
         link: {
-          link: () => ['/help/categories', this.selectedCategory.id, '/items', this.itemData?.id, 'modify']
+          link: () => [`/help/categories/${this.selectedCategory.id}/items/${this.itemData?.id}/modify`]
         },
         visible: () => HelpItemModel.canModify(this.authUser)
       },
       createCancel: {
         link: {
-          link: () => ['/help/categories', this.selectedCategory.id, '/items']
+          link: () => [`/help/categories/${this.selectedCategory.id}/items`]
         }
       },
       viewCancel: {
         link: {
-          link: () => ['/help/categories', this.selectedCategory.id, '/items']
+          link: () => [`/help/categories/${this.selectedCategory.id}/items`]
         }
       },
       modifyCancel: {
         link: {
-          link: () => ['/help/categories', this.selectedCategory.id, '/items']
+          link: () => [`/help/categories/${this.selectedCategory.id}/items`]
         }
       },
       quickActions: {
@@ -430,7 +430,7 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
       get: (item: HelpItemModel) => item.title ?
         this.translateService.instant(item.title) :
         item.title,
-      link: (item: HelpItemModel) => ['/help/categories', this.selectedCategory.id, '/items', item.id, 'view']
+      link: (item: HelpItemModel) => [`/help/categories/${this.selectedCategory.id}/items/${item.id}/view`]
     };
   }
 

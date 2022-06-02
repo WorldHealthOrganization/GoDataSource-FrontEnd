@@ -135,6 +135,7 @@ import { InvestigationStatusDataResolver } from './resolvers/data/investigation-
 import { SelectedLanguageDataResolver } from './resolvers/data/selected-language.resolver';
 import { LocationTreeDataResolver } from './resolvers/data/location-tree.resolver';
 import { SelectedUserRoleDataResolver } from './resolvers/data/selected-user-role.resolver';
+import { HelpCategoriesDataResolver } from './resolvers/data/help-categories-data-resolver.service';
 
 // export the list of services
 export const services: any[] = [
@@ -168,6 +169,7 @@ export const services: any[] = [
   FollowUpGenerationTeamAssignmentAlgorithmDataResolver,
   GanttChartTypeDataResolver,
   GenderDataResolver,
+  HelpCategoriesDataResolver,
   IconDataResolver,
   InstitutionDataResolver,
   InvestigationStatusDataResolver,

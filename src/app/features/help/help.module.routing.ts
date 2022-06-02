@@ -8,6 +8,7 @@ import { UserDataResolver } from '../../core/services/resolvers/data/user.resolv
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 import { SelectedHelpCategoryDataResolver } from '../../core/services/resolvers/data/selected-help-category.resolver';
+import { HelpCategoriesDataResolver } from '../../core/services/resolvers/data/help-categories-data-resolver.service';
 
 // create / view / modify
 const createViewModifyFoundationHelpCategory: Route = {
@@ -23,7 +24,8 @@ const createViewModifyFoundationHelpItem: Route = {
   canActivate: [AuthGuard],
   resolve: {
     user: UserDataResolver,
-    category: SelectedHelpCategoryDataResolver
+    category: SelectedHelpCategoryDataResolver,
+    helpCategories: HelpCategoriesDataResolver
   }
 };
 
