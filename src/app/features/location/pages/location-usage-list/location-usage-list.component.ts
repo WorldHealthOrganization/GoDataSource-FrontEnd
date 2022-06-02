@@ -1,6 +1,6 @@
-import { Component, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { map, takeUntil, tap } from 'rxjs/operators';
+import { map, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
@@ -16,17 +16,21 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-location.model';
 
 @Component({
   selector: 'app-location-usage-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './location-usage-list.component.html',
-  styleUrls: ['./location-usage-list.component.less']
+  templateUrl: './location-usage-list.component.html'
 })
 export class LocationUsageListComponent extends ListComponent<any> implements OnDestroy {
   // location
-  locationId: string;
-  locationData: LocationModel;
+  private _locationId: string;
+  private _parentLocationTree: HierarchicalLocationModel;
+  locationName: {
+    name: string
+  } = {
+      name: ''
+    };
 
   /**
    * Constructor
@@ -40,21 +44,8 @@ export class LocationUsageListComponent extends ListComponent<any> implements On
     super(listHelperService);
 
     // get location for which we need to retrieve usages
-    this.locationId = this.activatedRoute.snapshot.params.locationId;
-
-    // retrieve location
-    this.locationDataService
-      .getLocation(this.locationId)
-      .subscribe((location: LocationModel) => {
-        // location data
-        this.locationData = location;
-
-        // update breadcrumbs
-        this.initializeBreadcrumbs();
-
-        // get usage list
-        this.needsRefreshList(true);
-      });
+    this._locationId = this.activatedRoute.snapshot.params.locationId;
+    this._parentLocationTree = this.activatedRoute.snapshot.data.parentLocationTree;
   }
 
   /**
@@ -211,17 +202,51 @@ export class LocationUsageListComponent extends ListComponent<any> implements On
 
     // add list breadcrumb only if we have permission
     if (LocationModel.canList(this.authUser)) {
+      // root
       this.breadcrumbs.push({
         label: 'LNG_PAGE_LIST_LOCATIONS_TITLE',
         action: {
           link: ['/locations']
         }
       });
+
+      // list parents ?
+      if (this._parentLocationTree) {
+        // add tree
+        let tree: HierarchicalLocationModel = this._parentLocationTree;
+        while (tree) {
+          // add to list
+          if (tree.location?.id) {
+            // our location ?
+            if (tree.location?.id === this._locationId) {
+              this.locationName = {
+                name: tree.location.name
+              };
+            }
+
+            // add to list
+            this.breadcrumbs.push({
+              label: tree.location.name,
+              action: {
+                link: ['/locations', tree.location.id, 'children']
+              }
+            });
+          }
+
+          // next
+          tree = tree.children?.length > 0 ?
+            tree.children[0] :
+            undefined;
+        }
+      }
     }
 
     // usage breadcrumb
     this.breadcrumbs.push({
-      label: this.i18nService.instant('LNG_PAGE_LIST_USAGE_LOCATIONS_TITLE', this.locationData ? { name: this.locationData.name } : '?'),
+      label: this.i18nService.instant(
+        'LNG_PAGE_LIST_USAGE_LOCATIONS_TITLE',
+        this.locationName
+      ),
       action: null
     });
   }
@@ -237,54 +262,54 @@ export class LocationUsageListComponent extends ListComponent<any> implements On
    * Re(load) the list
    */
   refreshList() {
-    if (this.locationId) {
-      // retrieve usages of a location
-      this.records$ = this.locationDataService
-        .getLocationUsage(this.locationId)
-        .pipe(
-          map((locationUsage: LocationUsageModel) => {
-            // remove keys if we don't have rights
-            // #TODO - not sure if this is how it should be... (OLD COMMENT)
+    // retrieve usages of a location
+    this.records$ = this.locationDataService
+      .getLocationUsage(this._locationId)
+      .pipe(
+        map((locationUsage: LocationUsageModel) => {
+          // remove keys if we don't have rights
+          // #TODO - not sure if this is how it should be... (OLD COMMENT)
 
-            // follow-ups
-            if (!FollowUpModel.canList(this.authUser)) {
-              locationUsage.followUp = [];
-            }
+          // follow-ups
+          if (!FollowUpModel.canList(this.authUser)) {
+            locationUsage.followUp = [];
+          }
 
-            // events
-            if (!EventModel.canList(this.authUser)) {
-              locationUsage.event = [];
-            }
+          // events
+          if (!EventModel.canList(this.authUser)) {
+            locationUsage.event = [];
+          }
 
-            // contacts
-            if (!ContactModel.canList(this.authUser)) {
-              locationUsage.contact = [];
-            }
+          // contacts
+          if (!ContactModel.canList(this.authUser)) {
+            locationUsage.contact = [];
+          }
 
-            // cases
-            if (!CaseModel.canList(this.authUser)) {
-              locationUsage.case = [];
-            }
+          // cases
+          if (!CaseModel.canList(this.authUser)) {
+            locationUsage.case = [];
+          }
 
-            // create usage list
-            return new UsageDetails(locationUsage, (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map).items;
-          }),
+          // create usage
+          const usageDetails = new UsageDetails(
+            locationUsage,
+            (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map
+          );
 
           // update page count
-          tap((usageDetails: []) => {
-            this.pageCount = {
-              count: usageDetails.length,
-              hasMore: false
-            };
-          }),
+          this.pageCount = {
+            count: usageDetails.items.length,
+            hasMore: false
+          };
 
-          // TODO: Should be deleted?
-          // Constants.DEFAULT_USAGE_MAX_RECORDS_DISPLAYED,
+          // create usage list
+          // - max 1000
+          return usageDetails.items.slice(0, this.pageSize);
+        }),
 
-          // should be the last pipe
-          takeUntil(this.destroyed$)
-        );
-    }
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
   }
 
   /**

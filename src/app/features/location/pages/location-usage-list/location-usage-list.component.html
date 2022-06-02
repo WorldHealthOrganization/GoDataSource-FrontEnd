@@ -1,5 +1,5 @@
 <app-list-table-v2
-  [pageTitle]="i18nService.instant('LNG_PAGE_LIST_USAGE_LOCATIONS_TITLE', locationData ? { name: locationData.name } : '?')"
+  [pageTitle]="'LNG_PAGE_LIST_USAGE_LOCATIONS_TITLE' | translate:locationName"
   [records$]="records$"
   [processSelectedData]="processSelectedData"
   [columns]="tableColumns"
@@ -11,7 +11,7 @@
   [pageCount]="pageCount"
   [pageSize]="pageSize"
   [pageIndex]="pageIndex"
-  [pageSettingsKey]="'locationFields'"
+  [pageSettingsKey]="UserSettings.LOCATION_USAGE_FIELDS"
   [sortColumn]="tableSortBy"
   [infos]="infos"
   [suffixLegends]="suffixLegends"

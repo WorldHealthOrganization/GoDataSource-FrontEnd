@@ -121,6 +121,7 @@ const routes: Routes = [
       ]
     },
     resolve: {
+      parentLocationTree: LocationTreeDataResolver,
       yesNoAll: YesNoAllDataResolver,
       outbreak: OutbreakDataResolver
     }
