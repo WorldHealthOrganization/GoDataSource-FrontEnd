@@ -9,7 +9,7 @@
   [advancedFilters]="advancedFilters"
   [advancedFiltersVisible]="!showGraphConfiguration && selectedSnapshot && chainGroup && chainGroupId === selectedSnapshot"
   advancedFiltersHideOperator="true"
-  (advancedFilterBy)="loadChainsOfTransmission()">
+  (advancedFilterBy)="loadChainsOfTransmission($event)">
 
   <!-- Load snapshot -->
   <div

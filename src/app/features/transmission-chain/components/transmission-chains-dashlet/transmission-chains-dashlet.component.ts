@@ -44,6 +44,7 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IV2ActionIconLabel, IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import {
+  IV2SideDialogAdvancedFiltersResponse,
   IV2SideDialogConfigButtonType,
   IV2SideDialogConfigInputDate,
   IV2SideDialogConfigInputDateRange,
@@ -2926,7 +2927,34 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   /**
      * Retrieve snapshot / refresh graph
      */
-  loadChainsOfTransmission(): void {
+  loadChainsOfTransmission(advancedFiltersResponse?: IV2SideDialogAdvancedFiltersResponse): void {
+    // do cleanup
+    if (advancedFiltersResponse) {
+      const usedMap: {
+        [prop: string]: true
+      } = {};
+      (advancedFiltersResponse.filtersApplied?.appliedFilters || []).forEach((item) => {
+        // nothing to do ?
+        if (!item.filter.uniqueKey) {
+          return;
+        }
+
+        // add to map
+        usedMap[item.filter.uniqueKey] = true;
+      });
+
+      // cleanup
+      if (!usedMap['firstNameLNG_PAGE_GRAPH_SNAPSHOT_FILTER_FIRST_NAME_LABEL']) {
+        this.snapshotFilters.firstName = undefined;
+      }
+      if (!usedMap['lastNameLNG_PAGE_GRAPH_SNAPSHOT_FILTER_LAST_NAME_LABEL']) {
+        this.snapshotFilters.lastName = undefined;
+      }
+      if (!usedMap['labSeqResultLNG_PAGE_GRAPH_SNAPSHOT_FILTER_LAB_SEQ_RESULT_LABEL']) {
+        this.snapshotFilters.labSeqResult = undefined;
+      }
+    }
+
     // do we have required data ?
     if (
       !this.selectedOutbreak ||
