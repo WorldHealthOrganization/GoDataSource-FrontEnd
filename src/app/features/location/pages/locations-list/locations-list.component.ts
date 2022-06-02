@@ -399,7 +399,7 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
                         )
                         .subscribe(() => {
                           // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SUCCESS_MESSAGE');
+                          this.toastV2Service.success('LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                           // hide loading
                           loading.close();
