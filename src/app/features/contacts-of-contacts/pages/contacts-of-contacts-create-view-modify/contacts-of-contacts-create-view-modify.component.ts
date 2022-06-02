@@ -805,7 +805,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
             }
           }, {
             type: CreateViewModifyV2TabInputType.TEXT,
-            name: 'socialRelationshipDetail',
+            name: 'relationship[socialRelationshipDetail]',
             placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP',
             description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_DESCRIPTION',
             value: {
@@ -816,7 +816,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
             }
           }, {
             type: CreateViewModifyV2TabInputType.TEXTAREA,
-            name: 'comment',
+            name: 'relationship[comment]',
             placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
             description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT_DESCRIPTION',
             value: {
