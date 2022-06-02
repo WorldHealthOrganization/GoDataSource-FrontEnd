@@ -137,11 +137,15 @@ import { LocationTreeDataResolver } from './resolvers/data/location-tree.resolve
 import { SelectedUserRoleDataResolver } from './resolvers/data/selected-user-role.resolver';
 import { SelectedEntitiesDataResolver } from './resolvers/data/selected-entities.resolver';
 import { HelpCategoryDataResolver } from './resolvers/data/help-category.resolver';
+import { AuditLogActionDataResolver } from './resolvers/data/audit-log-action.resolver';
+import { AuditLogModuleDataResolver } from './resolvers/data/audit-log-module.resolver';
 
 // export the list of services
 export const services: any[] = [
   // resolver services
   AddressTypeDataResolver,
+  AuditLogActionDataResolver,
+  AuditLogModuleDataResolver,
   BackupModuleDataResolver,
   BackupStatusDataResolver,
   BackupTypesDataResolver,

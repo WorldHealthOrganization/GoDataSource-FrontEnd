@@ -5,7 +5,6 @@ import { throwError } from 'rxjs/internal/observable/throwError';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { AuditLogModel } from '../../../../core/models/audit-log.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { UserModel, UserRoleModel } from '../../../../core/models/user.model';
@@ -15,6 +14,8 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-audit-logs-list',
@@ -24,11 +25,11 @@ export class AuditLogsListComponent
   extends ListComponent<AuditLogModel>
   implements OnDestroy {
   // TODO: Left for changes tree feature inspiration
-  // date filter
-  dateFilterDefaultValue: {
-    startDate,
-    endDate
-  };
+  // // date filter
+  // dateFilterDefaultValue: {
+  //   startDate,
+  //   endDate
+  // };
 
   /**
    * Constructor
@@ -37,30 +38,10 @@ export class AuditLogsListComponent
     protected listHelperService: ListHelperService,
     private auditLogDataService: AuditLogDataService,
     private toastV2Service: ToastV2Service,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private translateService: TranslateService
   ) {
     super(listHelperService);
-
-    // TODO: Left for auditLogAction resolver inspiration
-    // initialize dropdown options
-    // this.auditLogActionsList$ = this.genericDataService.getAuditLogActionOptions();
-
-    // TODO: Left for moduleOption resolver inspiration
-    // // data modules
-    // this.genericDataService
-    //   .getDataModuleOptions()
-    //   .subscribe((data) => {
-    //     // data module
-    //     this.dataModuleList = data;
-
-    //     // map for easy access
-    //     this.dataModuleMapped = _.transform(
-    //       data,
-    //       (result, value: LabelValuePair) => {
-    //         result[value.value] = value.label;
-    //       }
-    //     ) as any;
-    //   });
   }
 
   /**
@@ -91,17 +72,17 @@ export class AuditLogsListComponent
       {
         field: 'action',
         label: 'LNG_AUDIT_LOG_FIELD_LABEL_ACTION',
+        pinned: IV2ColumnPinned.LEFT,
         sortable: true,
-        pinned: IV2ColumnPinned.LEFT
-        // TODO: Needs auditLogAction resolver
-        // filter: {
-        //   type: V2FilterType.MULTIPLE_SELECT,
-        //   options: (this.activatedRoute.snapshot.data.auditLogAction as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-        // }
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.auditLogAction as IResolverV2ResponseModel<ILabelValuePairModel>).options
+        }
       },
       {
         field: 'recordId',
         label: 'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_ID',
+        pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
           type: V2FilterType.TEXT,
@@ -111,12 +92,17 @@ export class AuditLogsListComponent
       {
         field: 'modelName',
         label: 'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_NAME',
-        sortable: true
-        // TODO: Needs moduleOption resolver
-        // filter: {
-        //   type: V2FilterType.MULTIPLE_SELECT,
-        //   options: (this.activatedRoute.snapshot.data.moduleOption as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-        // }
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true,
+        format: {
+          type: (item) => (this.activatedRoute.snapshot.data.auditLogModule as IResolverV2ResponseModel<ILabelValuePairModel>).map[item.modelName] ?
+            this.translateService.instant((this.activatedRoute.snapshot.data.auditLogModule as IResolverV2ResponseModel<ILabelValuePairModel>).map[item.modelName].label) :
+            item.modelName
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.auditLogModule as IResolverV2ResponseModel<ILabelValuePairModel>).options
+        }
       },
       {
         field: 'createdAt',
@@ -131,8 +117,11 @@ export class AuditLogsListComponent
       },
       {
         field: 'changedData',
-        label: 'LNG_AUDIT_LOG_FIELD_LABEL_CHANGE_DATA'
-        // TODO: Needs changes tree feature
+        label: 'LNG_AUDIT_LOG_FIELD_LABEL_CHANGE_DATA',
+        // TODO: Needs changes tree feature,
+        format: {
+          type: () => '...'
+        }
       },
       {
         field: 'userId',
@@ -317,23 +306,23 @@ export class AuditLogsListComponent
   /**
    * Initialize header filters
    */
-  initializeHeaderFilters() {
-    this.dateFilterDefaultValue = {
-      startDate: moment().startOf('day').toISOString(),
-      endDate: moment().endOf('day').toISOString()
-    };
-    this.queryBuilder.filter.byDateRange(
-      'createdAt',
-      this.dateFilterDefaultValue
-    );
-  }
+  // initializeHeaderFilters() {
+  //   this.dateFilterDefaultValue = {
+  //     startDate: moment().startOf('day').toISOString(),
+  //     endDate: moment().endOf('day').toISOString()
+  //   };
+  //   this.queryBuilder.filter.byDateRange(
+  //     'createdAt',
+  //     this.dateFilterDefaultValue
+  //   );
+  // }
 
   // TODO: Left for changes tree feature inspiration
   /**
    * Add search criteria
    */
-  resetFiltersAddDefault() {
-    this.initializeHeaderFilters();
-  }
+  // resetFiltersAddDefault() {
+  //   this.initializeHeaderFilters();
+  // }
 }
 

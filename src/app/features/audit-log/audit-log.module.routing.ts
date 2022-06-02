@@ -6,6 +6,8 @@ import { PERMISSION } from '../../core/models/permission.model';
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { UserRoleDataResolver } from '../../core/services/resolvers/data/user-role.resolver';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
+import { AuditLogActionDataResolver } from '../../core/services/resolvers/data/audit-log-action.resolver';
+import { AuditLogModuleDataResolver } from '../../core/services/resolvers/data/audit-log-module.resolver';
 
 const routes: Routes = [
   // Audit Logs list
@@ -20,10 +22,8 @@ const routes: Routes = [
     },
     resolve: {
       yesNoAll: YesNoAllDataResolver,
-      // TODO: Left for auditLogAction resolver
-      // auditLogAction: AuditLogActionDataResolver
-      // TODO: Left for moduleOption resolver
-      // moduleOption: ModuleOptionDataResolver
+      auditLogAction: AuditLogActionDataResolver,
+      auditLogModule: AuditLogModuleDataResolver,
       user: UserDataResolver,
       userRole: UserRoleDataResolver
     }
