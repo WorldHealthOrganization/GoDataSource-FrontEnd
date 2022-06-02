@@ -6,9 +6,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { Observable } from 'rxjs';
+import { forkJoin, Observable, throwError } from 'rxjs';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import {
+  CreateViewModifyV2ActionType,
   CreateViewModifyV2MenuType,
   CreateViewModifyV2TabInputType,
   ICreateViewModifyV2Buttons,
@@ -26,10 +27,11 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { map, takeUntil } from 'rxjs/operators';
+import { catchError, map, takeUntil } from 'rxjs/operators';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { ClusterModel } from '../../../../core/models/cluster.model';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'app-relationships-create-view-modify',
@@ -233,7 +235,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
       // tabs
       tabs: [
         // Details
-        this.initializeTabsDetails()
+        ...this.initializeDetailTabs()
       ],
 
       // create details
@@ -242,7 +244,9 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
           buttonLabel: this.translateService.instant('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_BUTTON'),
           message: () => this.translateService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
-            this.itemData
+            {
+              name: this._entity.name
+            }
           )
         }
       },
@@ -252,8 +256,24 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
 
       // create or update
       createOrUpdate: this.initializeProcessData(),
-      redirectAfterCreateUpdate: (data: RelationshipModel) => {
-        // redirect to view
+      redirectAfterCreateUpdate: (data: RelationshipModel | RelationshipModel[]) => {
+        // bulk create ?
+        if (Array.isArray(data)) {
+          // redirect to view
+          this.router.navigate([
+            '/relationships',
+            this._entity.type,
+            this._entity.id,
+            this.relationshipType === RelationshipType.CONTACT ?
+              'contacts' :
+              'exposures'
+          ]);
+
+          // finished
+          return;
+        }
+
+        // update - redirect to view
         this.router.navigate([
           '/relationships',
           this._entity.type,
@@ -261,7 +281,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
           this.relationshipType === RelationshipType.CONTACT ?
             'contacts' :
             'exposures',
-          data.id,
+          (data as RelationshipModel).id,
           'view'
         ]);
       }
@@ -269,122 +289,55 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
   }
 
   /**
-   * Initialize expand list column renderer fields
+   * Details tabs
    */
-  protected initializeExpandListColumnRenderer(): void {
-    this.expandListColumnRenderer = {
-      type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: EntityModel) => item.model.name,
-      link: (item: EntityModel) => [
-        '/relationships',
-        this._entity.type,
-        this._entity.id,
-        this.relationshipType === RelationshipType.CONTACT ?
-          'contacts' :
-          'exposures',
-        item.relationship.id,
-        'view'
-      ]
-    };
-  }
-
-  /**
-   * Initialize expand list query fields
-   */
-  protected initializeExpandListQueryFields(): void {
-    this.expandListQueryFields = [];
-  }
-
-  /**
-   * Refresh expand list
-   */
-  refreshExpandList(data): void {
-    // append / remove search
-    if (data.searchBy) {
-      data.queryBuilder.filter.where({
-        or: [
-          {
-            firstName: RequestFilterGenerator.textContains(
-              data.searchBy
-            )
-          }, {
-            lastName: RequestFilterGenerator.textContains(
-              data.searchBy
-            )
-          }, {
-            middleName: RequestFilterGenerator.textContains(
-              data.searchBy
-            )
-          }, {
-            visualId: RequestFilterGenerator.textContains(
-              data.searchBy
-            )
-          }, {
-            name: RequestFilterGenerator.textContains(
-              data.searchBy
-            )
-          }
-        ]
-      });
+  private initializeDetailTabs(): ICreateViewModifyV2Tab[] {
+    // view / modify ?
+    if (!this.isCreate) {
+      return [this.initializeTabsDetails(
+        'LNG_COMMON_LABEL_DETAILS',
+        (property) => property,
+        this.itemData
+      )];
     }
 
-    // retrieve data
-    this.expandListRecords$ = this.entityHelperService
-      .retrieveRecords(
-        this.relationshipType,
-        this.selectedOutbreak,
-        this._entity,
-        data.queryBuilder
-      )
-      .pipe(
-        // map to relationships
-        map((items) => {
-          // trick eslint
-          return (items || []).map((item) => item as any);
-        }),
-
-        // should be the last pipe
-        takeUntil(this.destroyed$)
+    // create ?
+    return this._createEntities.map((item, index) => {
+      // since merging forms overwrites the array due to spread operator we need unique root properties
+      // - fields = { ...fields, ...this.getFields(form) };
+      return this.initializeTabsDetails(
+        item.name,
+        (property) => `r_${_.camelCase(item.id)}[${item.id}][${property}]`,
+        this._createRelationships[index]
       );
-  }
-
-  /**
-   * Initialize expand list advanced filters
-   */
-  protected initializeExpandListAdvancedFilters(): void {
-    this.expandListAdvancedFilters = this.entityHelperService.generateAdvancedFilters({
-      options: {
-        certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        exposureFrequency: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        exposureDuration: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        contextOfTransmission: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        cluster: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ClusterModel>).options
-      }
     });
   }
 
   /**
    * Initialize tab details
    */
-  private initializeTabsDetails(): ICreateViewModifyV2Tab {
+  private initializeTabsDetails(
+    title: string,
+    name: (property: string) => string,
+    relationshipData: RelationshipModel
+  ): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
-      label: 'LNG_COMMON_LABEL_DETAILS',
+      label: title,
       sections: [
         // Details
         {
           type: CreateViewModifyV2TabInputType.SECTION,
-          label: 'LNG_COMMON_LABEL_DETAILS',
+          label: title,
           inputs: [{
             type: CreateViewModifyV2TabInputType.DATE,
-            name: 'dateOfFirstContact',
+            name: name('dateOfFirstContact'),
             placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT',
             description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT_DESCRIPTION',
             value: {
-              get: () => this.itemData.dateOfFirstContact,
+              get: () => relationshipData.dateOfFirstContact,
               set: (value) => {
-                this.itemData.dateOfFirstContact = value;
+                relationshipData.dateOfFirstContact = value;
               }
             },
             maxDate: this._today,
@@ -395,13 +348,13 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
             }
           }, {
             type: CreateViewModifyV2TabInputType.DATE,
-            name: 'contactDate',
+            name: name('contactDate'),
             placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
             description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_DESCRIPTION',
             value: {
-              get: () => this.itemData.contactDate,
+              get: () => relationshipData.contactDate,
               set: (value) => {
-                this.itemData.contactDate = value;
+                relationshipData.contactDate = value;
               }
             },
             maxDate: this._today,
@@ -413,26 +366,26 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
             }
           }, {
             type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-            name: 'contactDateEstimated',
+            name: name('contactDateEstimated'),
             placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED',
             description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED_DESCRIPTION',
             value: {
-              get: () => this.itemData.contactDateEstimated,
+              get: () => relationshipData.contactDateEstimated,
               set: (value) => {
                 // set data
-                this.itemData.contactDateEstimated = value;
+                relationshipData.contactDateEstimated = value;
               }
             }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'certaintyLevelId',
+            name: name('certaintyLevelId'),
             placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
             description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL_DESCRIPTION',
             options: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             value: {
-              get: () => this.itemData.certaintyLevelId,
+              get: () => relationshipData.certaintyLevelId,
               set: (value) => {
-                this.itemData.certaintyLevelId = value;
+                relationshipData.certaintyLevelId = value;
               }
             },
             validators: {
@@ -440,84 +393,84 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
             }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'exposureTypeId',
+            name: name('exposureTypeId'),
             placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
             description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE_DESCRIPTION',
             options: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             value: {
-              get: () => this.itemData.exposureTypeId,
+              get: () => relationshipData.exposureTypeId,
               set: (value) => {
-                this.itemData.exposureTypeId = value;
+                relationshipData.exposureTypeId = value;
               }
             }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'exposureFrequencyId',
+            name: name('exposureFrequencyId'),
             placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
             description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY_DESCRIPTION',
             options: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             value: {
-              get: () => this.itemData.exposureFrequencyId,
+              get: () => relationshipData.exposureFrequencyId,
               set: (value) => {
-                this.itemData.exposureFrequencyId = value;
+                relationshipData.exposureFrequencyId = value;
               }
             }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'exposureDurationId',
+            name: name('exposureDurationId'),
             placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
             description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION_DESCRIPTION',
             options: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             value: {
-              get: () => this.itemData.exposureDurationId,
+              get: () => relationshipData.exposureDurationId,
               set: (value) => {
-                this.itemData.exposureDurationId = value;
+                relationshipData.exposureDurationId = value;
               }
             }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'socialRelationshipTypeId',
+            name: name('socialRelationshipTypeId'),
             placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
             description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DESCRIPTION',
             options: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             value: {
-              get: () => this.itemData.socialRelationshipTypeId,
+              get: () => relationshipData.socialRelationshipTypeId,
               set: (value) => {
-                this.itemData.socialRelationshipTypeId = value;
+                relationshipData.socialRelationshipTypeId = value;
               }
             }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'clusterId',
+            name: name('clusterId'),
             placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
             description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER_DESCRIPTION',
             options: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             value: {
-              get: () => this.itemData.clusterId,
+              get: () => relationshipData.clusterId,
               set: (value) => {
-                this.itemData.clusterId = value;
+                relationshipData.clusterId = value;
               }
             }
           }, {
             type: CreateViewModifyV2TabInputType.TEXT,
-            name: 'socialRelationshipDetail',
+            name: name('socialRelationshipDetail'),
             placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP',
             description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_DESCRIPTION',
             value: {
-              get: () => this.itemData.socialRelationshipDetail,
+              get: () => relationshipData.socialRelationshipDetail,
               set: (value) => {
-                this.itemData.socialRelationshipDetail = value;
+                relationshipData.socialRelationshipDetail = value;
               }
             }
           }, {
             type: CreateViewModifyV2TabInputType.TEXTAREA,
-            name: 'comment',
+            name: name('comment'),
             placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
             description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT_DESCRIPTION',
             value: {
-              get: () => this.itemData.comment,
+              get: () => relationshipData.comment,
               set: (value) => {
-                this.itemData.comment = value;
+                relationshipData.comment = value;
               }
             }
           }]
@@ -624,46 +577,176 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
    */
   private initializeProcessData(): ICreateViewModifyV2CreateOrUpdate {
     return (
-      _type,
-      _data,
-      _finished
+      type,
+      data,
+      finished
     ) => {
-      // #TODO
-      // // finished
-      // (type === CreateViewModifyV2ActionType.CREATE ?
-      //     this.eventDataService.createEvent(
-      //       this.selectedOutbreak.id,
-      //       data
-      //     ) :
-      //     this.eventDataService.modifyEvent(
-      //       this.selectedOutbreak.id,
-      //       this.itemData.id,
-      //       data
-      //     )
-      // ).pipe(
-      //   // handle error
-      //   catchError((err) => {
-      //     // show error
-      //     finished(err, undefined);
-      //
-      //     // finished
-      //     return throwError(err);
-      //   }),
-      //
-      //   // should be the last pipe
-      //   takeUntil(this.destroyed$)
-      // ).subscribe((item: EventModel) => {
-      //   // success creating / updating event
-      //   this.toastV2Service.success(
-      //     type === CreateViewModifyV2ActionType.CREATE ?
-      //       'LNG_PAGE_CREATE_EVENT_ACTION_CREATE_EVENT_SUCCESS_MESSAGE' :
-      //       'LNG_PAGE_MODIFY_EVENT_ACTION_MODIFY_EVENT_SUCCESS_MESSAGE'
-      //   );
-      //
-      //   // finished with success
-      //   finished(undefined, item);
-      // });
+      // if create we need to do multiple requests
+      const requests$: Observable<RelationshipModel>[] = [];
+      if (type === CreateViewModifyV2ActionType.CREATE) {
+        Object.keys(data).forEach((uniqueKey) => {
+          Object.keys(data[uniqueKey]).forEach((personId) => {
+            // set target
+            const relationshipData = data[uniqueKey][personId];
+
+            // set target person
+            relationshipData.persons = [{
+              id: personId
+            }];
+
+            // add request
+            requests$.push(
+              this.relationshipDataService
+                .createRelationship(
+                  this.selectedOutbreak.id,
+                  this._entity.type,
+                  this._entity.id,
+                  relationshipData
+                )
+            );
+          });
+        });
+      } else {
+        // update
+        requests$.push(
+          this.relationshipDataService
+            .modifyRelationship(
+              this.selectedOutbreak.id,
+              this._entity.type,
+              this._entity.id,
+              this.itemData.id,
+              data
+            )
+        );
+      }
+
+      // do requests
+      forkJoin(requests$)
+        .pipe(
+          // handle error
+          catchError((err) => {
+            // show error
+            finished(err, undefined);
+
+            // finished
+            return throwError(err);
+          }),
+
+          // should be the last pipe
+          takeUntil(this.destroyed$)
+        )
+        .subscribe((items) => {
+          // success creating / updating event
+          this.toastV2Service.success(
+            type === CreateViewModifyV2ActionType.CREATE ?
+              (
+                items.length > 1 ?
+                  'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_MULTIPLE_RELATIONSHIP_SUCCESS_MESSAGE' :
+                  'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE'
+              ) :
+              'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE'
+          );
+
+          // finished with success
+          finished(undefined, items);
+        });
     };
+  }
+
+  /**
+   * Initialize expand list column renderer fields
+   */
+  protected initializeExpandListColumnRenderer(): void {
+    this.expandListColumnRenderer = {
+      type: CreateViewModifyV2ExpandColumnType.TEXT,
+      get: (item: EntityModel) => item.model.name,
+      link: (item: EntityModel) => [
+        '/relationships',
+        this._entity.type,
+        this._entity.id,
+        this.relationshipType === RelationshipType.CONTACT ?
+          'contacts' :
+          'exposures',
+        item.relationship.id,
+        'view'
+      ]
+    };
+  }
+
+  /**
+   * Initialize expand list query fields
+   */
+  protected initializeExpandListQueryFields(): void {
+    this.expandListQueryFields = [];
+  }
+
+  /**
+   * Refresh expand list
+   */
+  refreshExpandList(data): void {
+    // append / remove search
+    if (data.searchBy) {
+      data.queryBuilder.filter.where({
+        or: [
+          {
+            firstName: RequestFilterGenerator.textContains(
+              data.searchBy
+            )
+          }, {
+            lastName: RequestFilterGenerator.textContains(
+              data.searchBy
+            )
+          }, {
+            middleName: RequestFilterGenerator.textContains(
+              data.searchBy
+            )
+          }, {
+            visualId: RequestFilterGenerator.textContains(
+              data.searchBy
+            )
+          }, {
+            name: RequestFilterGenerator.textContains(
+              data.searchBy
+            )
+          }
+        ]
+      });
+    }
+
+    // retrieve data
+    this.expandListRecords$ = this.entityHelperService
+      .retrieveRecords(
+        this.relationshipType,
+        this.selectedOutbreak,
+        this._entity,
+        data.queryBuilder
+      )
+      .pipe(
+        // map to relationships
+        map((items) => {
+          // trick eslint
+          return (items || []).map((item) => item as any);
+        }),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
+  }
+
+  /**
+   * Initialize expand list advanced filters
+   */
+  protected initializeExpandListAdvancedFilters(): void {
+    this.expandListAdvancedFilters = this.entityHelperService.generateAdvancedFilters({
+      options: {
+        certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        exposureFrequency: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        exposureDuration: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        contextOfTransmission: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        cluster: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ClusterModel>).options
+      }
+    });
   }
 
   /**
