@@ -3,6 +3,9 @@ import { Routes, RouterModule } from '@angular/router';
 import * as fromPages from './pages';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
+import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+import { UserRoleDataResolver } from '../../core/services/resolvers/data/user-role.resolver';
+import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 
 const routes: Routes = [
   // Audit Logs list
@@ -14,6 +17,15 @@ const routes: Routes = [
       permissions: [
         PERMISSION.AUDIT_LOG_LIST
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      // TODO: Left for auditLogAction resolver
+      // auditLogAction: AuditLogActionDataResolver
+      // TODO: Left for moduleOption resolver
+      // moduleOption: ModuleOptionDataResolver
+      user: UserDataResolver,
+      userRole: UserRoleDataResolver
     }
   }
 ];

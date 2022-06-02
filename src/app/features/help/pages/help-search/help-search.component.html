@@ -1,3 +1,35 @@
+<app-list-table-v2
+  pageTitle="LNG_PAGE_GLOBAL_HELP_TITLE"
+  [records$]="records$"
+  [processSelectedData]="processSelectedData"
+  [columns]="tableColumns"
+  [breadcrumbs]="breadcrumbs"
+  [quickActions]="quickActions"
+  [groupActions]="groupActions"
+  [addAction]="addAction"
+  [groupedData]="groupedData"
+  [pageCount]="pageCount"
+  [pageSize]="pageSize"
+  [pageIndex]="pageIndex"
+  [pageSettingsKey]="UserSettings.HELP_SEARCH"
+  [sortColumn]="tableSortBy"
+  [infos]="infos"
+  [suffixLegends]="suffixLegends"
+  [filtersApplied]="filtersApplied"
+  [advancedFilterType]="undefined"
+  [advancedFilters]="advancedFilters"
+  (refreshData)="needsRefreshList(true)"
+  (refreshDataCount)="refreshListCount()"
+  (pageChange)="changePage($event)"
+  (sortBy)="sortBy($event)"
+  (filterBy)="filterBy($event)"
+  (resetHeaderFilters)="resetFiltersToSideFilters()"
+  (advancedFilterBy)="applySideFilters($event)">
+</app-list-table-v2>
+
+
+
+
 <!--
 <app-topnav>
     <ng-container dynamic-section>
@@ -5,6 +37,7 @@
             <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
 
             <div class="topnav-actions">
+              TODO: What should we do with this button?
                 <button
                     *ngIf="HelpCategoryModel.canList(authUser)"
                     mat-raised-button color="accent"
@@ -17,15 +50,9 @@
 </app-topnav>
 -->
 
-<!--&lt;!&ndash; Side columns &ndash;&gt;-->
-<!--<app-side-columns-->
-<!--    [tableColumnsUserSettingsKey]="UserSettings.HELP_SEARCH"-->
-<!--    [tableColumns]="tableColumns"-->
-<!--    (visibleColumnsChanged)="applySideColumnsChanged($event)">-->
-<!--</app-side-columns>-->
-
+<!-- 
 <mat-card class="page-section page-content">
-
+    TODO: Needed help search bar above table  
     <div>
         <app-form-input
             name="helpSearchFilter"
@@ -35,79 +62,4 @@
             [displayFilterIcon]="true">
         </app-form-input>
     </div>
-
-    <!-- Hover question effects / actions -->
-<!--    <app-hover-row-actions-->
-<!--        #hoverRow-->
-<!--        [active]="!refreshingList"-->
-<!--    ></app-hover-row-actions>-->
-
-    <mat-table #table [dataSource]="helpItemsList$ | async" matSort (matSortChange)="sortBy($event)">
-
-        <!-- Title -->
-        <ng-container matColumnDef="title">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_HELP_ITEM_FIELD_LABEL_TITLE' | translate}}</div>
-                    <div class="column-filter">
-                    </div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item">
-                {{ item.title | translate }}
-            </mat-cell>
-        </ng-container>
-
-        <!-- Category -->
-        <ng-container matColumnDef="categoryId">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell">
-                    <div mat-sort-header class="column-header">{{'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY' | translate}}</div>
-                    <div class="column-filter">
-<!--                        <app-form-select-->
-<!--                            name="categoryFilter"-->
-<!--                            ngModel-->
-<!--                            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
-<!--                            [options]="helpCategoriesList$ | async"-->
-<!--                            (optionChanged)="filterBySelectField('categoryId', $event, 'id')"-->
-<!--                            optionLabelKey="name"-->
-<!--                            optionValueKey="id"-->
-<!--                            [multiple]="true"-->
-<!--                            [allowSelectionOfDisabledItems]="true"-->
-<!--                            [displayInvisibleItems]="true"-->
-<!--                            [displayFilterIcon]="true">-->
-<!--                        </app-form-select>-->
-                    </div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item">
-                {{ (item.category ? item.category.name: '') | translate }}
-            </mat-cell>
-        </ng-container>
-
-        <mat-header-row *matHeaderRowDef="[]"></mat-header-row>
-        <mat-row
-            *matRowDef="let item; columns: []">
-<!--            app-hover-row-actions-->
-<!--            [hoverRowActionsComponent]="hoverRow"-->
-<!--            [hoverRowActions]="recordActions"-->
-<!--            [hoverRowActionData]="item"-->
-        </mat-row>
-    </mat-table>
-
-<!--    <div-->
-<!--        *ngIf="refreshingList"-->
-<!--        class="mat-table-loading-data">-->
-<!--        <mat-spinner></mat-spinner>-->
-<!--    </div>-->
-
-<!--    &lt;!&ndash; No data &ndash;&gt;-->
-<!--    <div-->
-<!--        *ngIf="!refreshingList && isEmptyList"-->
-<!--        class="empty-table-text">-->
-<!--        {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}-->
-<!--    </div>-->
-
-</mat-card>
+</mat-card> -->

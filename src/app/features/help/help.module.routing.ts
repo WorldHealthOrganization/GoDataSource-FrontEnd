@@ -24,8 +24,13 @@ const routes: Routes = [
   {
     path: '',
     component: fromPages.HelpSearchComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard],
     // NO permissions required, only to be authenticated
+    resolve: {
+      yesNoAll: YesNoAllDataResolver
+      // TODO: Left for helpCategory resolver
+      // helpCategory: HelpCategoryDataResolver
+    }
   },
   // Help view single item
   {
