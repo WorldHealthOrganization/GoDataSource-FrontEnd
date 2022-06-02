@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, HostListener, OnInit, ViewContainerRef, ViewEncapsulation } from '@angular/core';
 import { I18nService } from './core/services/helper/i18n.service';
 import { SystemSettingsDataService } from './core/services/data/system-settings.data.service';
 import { SystemSettingsVersionModel } from './core/models/system-settings-version.model';
@@ -18,7 +18,10 @@ export class AppComponent implements OnInit {
    */
   constructor(
     private i18nService: I18nService,
-    private systemSettingsDataService: SystemSettingsDataService
+    private systemSettingsDataService: SystemSettingsDataService,
+    // used by ngx color picker - to display as popup
+    // ngx-color-picker.mjs:1352 You are using cpUseRootViewContainer, but the root component is not exposing viewContainerRef!Please expose it by adding 'public vcRef: ViewContainerRef' to the constructor.
+    public viewContainerRef: ViewContainerRef
   ) {
     // update once
     this.updateVHOnWindowResize();
