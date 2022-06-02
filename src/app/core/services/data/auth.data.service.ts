@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import { StorageKey, StorageService } from '../helper/storage.service';
 import { UserDataService } from './user.data.service';
 import { AuthModel, IAuthTwoFactor, ITokenInfo } from '../../models/auth.model';
-import { UserModel, UserSettings } from '../../models/user.model';
+import { UserModel } from '../../models/user.model';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { map, mergeMap, switchMap, tap } from 'rxjs/operators';
 import * as moment from 'moment';
@@ -45,8 +45,8 @@ export class AuthDataService {
   };
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private http: HttpClient,
     private storageService: StorageService,
@@ -59,8 +59,8 @@ export class AuthDataService {
   }
 
   /**
-     * Authenticate with email and password
-     */
+   * Authenticate with email and password
+   */
   login(
     user,
     twoFA?: boolean
@@ -106,8 +106,8 @@ export class AuthDataService {
   }
 
   /**
-     * Reload user settings
-     */
+   * Reload user settings
+   */
   reloadAndPersistAuthUser(): Observable<AuthModel> {
     // refresh logic data
     const authData = this.getAuthData();
@@ -133,22 +133,19 @@ export class AuthDataService {
   }
 
   /**
-     * Update settings for current user
-     * @param settingsKey
-     * @param data
-     * @returns {Observable<any>}
-     */
+   * Update settings for current user
+   */
   updateSettingsForCurrentUser(
-    settingsKey: UserSettings,
-    data: any
+    settings: {
+      [settingsKey: string]: any
+    }
   ): Observable<any> {
     // save user settings to database
     const authUser = this.getAuthenticatedUser();
     return this.userDataService
       .updateSettings(
         authUser.id,
-        settingsKey,
-        data
+        settings
       )
       .pipe(
         mergeMap(() => {
@@ -159,9 +156,8 @@ export class AuthDataService {
   }
 
   /**
-     * Logout from API
-     * @returns {Observable<any>}
-     */
+   * Logout from API
+   */
   logout(): Observable<any> {
     return this.http
       .post('users/logout', null)
@@ -174,10 +170,9 @@ export class AuthDataService {
   }
 
   /**
-     * Get Authentication Data from local storage (if user is authenticated)
-     * @returns {AuthModel | null}
-     */
-  getAuthData(): AuthModel|null {
+   * Get Authentication Data from local storage (if user is authenticated)
+   */
+  getAuthData(): AuthModel | null {
     try {
       // get auth data from cache
       return <AuthModel>this.storageService.get(StorageKey.AUTH_DATA);
@@ -187,18 +182,16 @@ export class AuthDataService {
   }
 
   /**
-     * Get the API Authentication Token from local storage (if user is authenticated)
-     * @returns {string | null}
-     */
-  getAuthToken(): string|null {
+   * Get the API Authentication Token from local storage (if user is authenticated)
+   */
+  getAuthToken(): string | null {
     const authData = this.getAuthData();
     return _.get(authData, 'token');
   }
 
   /**
-     * Get the authenticated User from local storage (if user is authenticated)
-     * @returns {UserModel | null}
-     */
+   * Get the authenticated User from local storage (if user is authenticated)
+   */
   getAuthenticatedUser(): UserModel {
     const authData = this.getAuthData();
 
@@ -210,9 +203,8 @@ export class AuthDataService {
   }
 
   /**
-     * Check if user is authenticated
-     * @returns {boolean}
-     */
+   * Check if user is authenticated
+   */
   isAuthenticated(): boolean {
     // get authenticated user
     const user = this.getAuthenticatedUser();
@@ -220,8 +212,8 @@ export class AuthDataService {
   }
 
   /**
-     * Release resources
-     */
+   * Release resources
+   */
   private destroyTokenInfo() {
     // nothing to do ?
     if (!this.tokenInfo) {
@@ -377,8 +369,8 @@ export class AuthDataService {
   }
 
   /**
-     * Subject handler
-     */
+   * Subject handler
+   */
   public getTokenInfoSubject(): BehaviorSubject<ITokenInfo> {
     return this.tokenInfoSubscriberSubject;
   }

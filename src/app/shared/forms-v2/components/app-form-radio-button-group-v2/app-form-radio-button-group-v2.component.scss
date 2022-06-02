@@ -1,0 +1,119 @@
+@import 'font';
+
+/* Radio button */
+.gd-form-radio-button-group-v2 {
+  .mat-radio-button {
+    font-family: $gd-font-family;
+
+    /* Radio button label */
+    .mat-radio-label {
+      .mat-radio-container {
+        .mat-radio-outer-circle {
+          border-color: var(--gd-secondary);
+        }
+
+        .mat-ripple {
+          display: none;
+        }
+      }
+
+      .mat-radio-label-content {
+        line-height: 2rem;
+      }
+    }
+
+    /* Radio button types */
+    &.mat-primary {
+      .mat-radio-label {
+        .mat-radio-container {
+          .mat-radio-inner-circle {
+            background-color: var(--gd-primary);
+          }
+        }
+      }
+
+      &.mat-radio-checked {
+        .mat-radio-label {
+          .mat-radio-container {
+            .mat-radio-outer-circle {
+              border-color: var(--gd-primary);
+            }
+          }
+        }
+      }
+    }
+
+    &.mat-accent {
+      .mat-radio-label {
+        .mat-radio-container {
+          .mat-radio-inner-circle {
+            background-color: var(--gd-success);
+          }
+        }
+      }
+
+      &.mat-radio-checked {
+        .mat-radio-label {
+          .mat-radio-container {
+            .mat-radio-outer-circle {
+              border-color: var(--gd-success);
+            }
+          }
+        }
+      }
+    }
+
+    &.mat-warn {
+      .mat-radio-label {
+        .mat-radio-container {
+          .mat-radio-inner-circle {
+            background-color: var(--gd-danger);
+          }
+        }
+      }
+
+      &.mat-radio-checked {
+        .mat-radio-label {
+          .mat-radio-container {
+            .mat-radio-outer-circle {
+              border-color: var(--gd-danger);
+            }
+          }
+        }
+      }
+    }
+
+    /* Radio button disabled */
+    &.mat-radio-disabled {
+      .mat-radio-label {
+        .mat-radio-container {
+          .mat-radio-outer-circle {
+            border-color: rgba(var(--gd-secondary-rgb), 0.3);
+          }
+
+          .mat-radio-inner-circle {
+            background-color: var(--gd-secondary);
+          }
+        }
+
+        .mat-radio-label-content {
+          color: var(--gd-secondary);
+        }
+      }
+      
+      &.mat-radio-checked {
+        .mat-radio-label {
+          .mat-radio-container {
+            .mat-radio-outer-circle {
+              border-color: var(--gd-secondary);
+            }
+  
+            .mat-radio-inner-circle {
+              background-color: var(--gd-secondary);
+            }
+          }
+        }
+      }
+    }
+  }
+}

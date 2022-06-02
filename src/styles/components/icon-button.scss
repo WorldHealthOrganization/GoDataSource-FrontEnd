@@ -1,0 +1,124 @@
+/* Icon button */
+button.mat-icon-button,
+a.mat-icon-button {
+  background: rgba(var(--gd-secondary-rgb), 0.35);
+  @include border-radius(0.4rem);
+  color: var(--gd-text);
+  font-family: 'Material Icons';
+  font-size: 2.4rem;
+  height: 3.6rem;
+  line-height: 1;
+  min-width: 3.6rem;
+  padding: 0.6rem;
+  text-align: center;
+  width: 3.6rem;
+
+  .mat-button-focus-overlay {
+    background: var(--gd-background);
+  }
+
+  /* Icon button disabled */
+  &.mat-button-disabled,
+  &.mat-button-disabled.mat-button-disabled {
+    background-color: rgba(var(--gd-secondary-rgb), 0.15);
+    color: var(--gd-secondary);
+
+    &:hover {
+      .mat-button-focus-overlay {
+        @include opacity(0);
+      }
+    }
+  }
+
+  /* Icon button hover */
+  &:hover {
+    .mat-button-focus-overlay {
+      @include opacity(0.25);
+    }
+  }
+
+  /* Icon button types */
+  &.mat-primary {
+    background-color: var(--gd-primary);
+    color: var(--gd-background);
+
+    &.mat-button-disabled {
+      background-color: rgba(var(--gd-primary-rgb), 0.15);
+      color: var(--gd-background);
+    }
+
+    .mat-button-focus-overlay {
+      background: var(--gd-background);
+    }
+  }
+
+  &.mat-secondary {
+    background-color: rgba(var(--gd-secondary-rgb), 0.35);
+    color: var(--gd-text);
+
+    &.mat-button-disabled {
+      background-color: rgba(var(--gd-secondary-rgb), 0.15);
+      color: var(--gd-secondary);
+    }
+
+    .mat-button-focus-overlay {
+      background: var(--gd-background);
+    }
+  }
+
+  &.mat-accent {
+    background-color: var(--gd-success);
+    color: var(--gd-background);
+
+    &.mat-button-disabled {
+      background-color: rgba(var(--gd-success-rgb), 0.15);
+      color: var(--gd-background);
+    }
+
+    .mat-button-focus-overlay {
+      background: var(--gd-background);
+    }
+  }
+
+  &.mat-warn {
+    background-color: var(--gd-danger);
+    color: var(--gd-background);
+
+    &.mat-button-disabled {
+      background-color: rgba(var(--gd-danger-rgb), 0.15);
+      color: var(--gd-background);
+    }
+
+    .mat-button-focus-overlay {
+      background: var(--gd-background);
+    }
+  }
+
+  &.mat-text {
+    background-color: transparent;
+    color: var(--gd-primary);
+
+    &.mat-button-disabled {
+      background-color: transparent;
+      color: var(--gd-secondary);
+    }
+
+    .mat-button-focus-overlay {
+      background: var(--gd-background);
+    }
+  }
+
+  .mat-button-wrapper {
+    @include flex(flex);
+    @include flex_align_items(center);
+    @include flex_direction(row);
+    @include flex_justify(center);
+  }
+
+  .mat-icon {
+    font-size: 2rem;
+    height: auto;
+    line-height: 1;
+    width: auto;
+  }
+}

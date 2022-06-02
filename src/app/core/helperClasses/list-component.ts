@@ -1,312 +1,113 @@
-import { ISerializedQueryBuilder, RequestFilter, RequestFilterOperator, RequestQueryBuilder, RequestSortDirection } from './request-query-builder';
+import { RequestQueryBuilder, RequestSortDirection } from './request-query-builder';
 import * as _ from 'lodash';
-import { Subscriber } from 'rxjs';
-import { ApplyListFilter, Constants, ExportStatusStep } from '../models/constants';
-import { FormRangeModel } from '../../shared/components/form-range/form-range.model';
-import { BreadcrumbItemModel } from '../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { Directive, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { ResetInputOnSideFilterDirective, ResetLocationOnSideFilterDirective } from '../../shared/directives/reset-input-on-side-filter/reset-input-on-side-filter.directive';
+import { Observable, ReplaySubject, Subscriber, Subscription } from 'rxjs';
+import { Constants } from '../models/constants';
 import { PageEvent } from '@angular/material/paginator';
-import { MatSort, MatSortable, MatSortHeader } from '@angular/material/sort';
-import { SideFiltersComponent } from '../../shared/components/side-filters/side-filters.component';
 import { DebounceTimeCaller } from './debounce-time-caller';
-import { MetricContactsSeenEachDays } from '../models/metrics/metric-contacts-seen-each-days.model';
-import { FormCheckboxComponent } from '../../shared/xt-forms/components/form-checkbox/form-checkbox.component';
-import { ContactFollowedUp, MetricContactsWithSuccessfulFollowUp } from '../models/metrics/metric.contacts-with-success-follow-up.model';
-import { VisibleColumnModel } from '../../shared/components/side-columns/model';
-import {
-  AddressModel,
-  AddressType
-} from '../models/address.model';
-import { moment, Moment } from './x-moment';
 import { ListHelperService } from '../services/helper/list-helper.service';
 import { SubscriptionLike } from 'rxjs/internal/types';
-import { StorageKey } from '../services/helper/storage.service';
-import { UserModel } from '../models/user.model';
-import { ValueAccessorBase } from '../../shared/xt-forms/core';
-import { SavedFilterData } from '../models/saved-filters.model';
+import { StorageKey, StorageService } from '../services/helper/storage.service';
+import { UserModel, UserSettings } from '../models/user.model';
 import * as LzString from 'lz-string';
-import { LoadingDialogModel } from '../../shared/components';
-import { DialogExportProgressAnswer } from '../services/helper/dialog.service';
-
-/**
- * Used by caching filter
- */
-interface ICachedSortItem {
-  active: string;
-  direction: RequestSortDirection;
-}
-
-/**
- * Used by caching filter
- */
-interface ICachedFilterItems {
-  // keep the actual query executed to bring data
-  queryBuilder: ISerializedQueryBuilder;
-
-  // keep filters information
-  inputs: {
-    [inputName: string]: any
-  };
-
-  // keep sort information
-  sort: ICachedSortItem;
-
-  // side filters
-  sideFilters: SavedFilterData;
-}
-
-/**
- * Used by caching filter
- */
-interface ICachedFilter {
-  [filterKey: string]: ICachedFilterItems;
-}
-
-/**
- * Used by caching filter
- */
-interface ICachedInputsValues {
-  [inputName: string]: any;
-}
+import { applyResetOnAllFilters, applySortBy } from '../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { IV2ActionIconLabel, IV2ActionMenuLabel, V2ActionMenuItem } from '../../shared/components-v2/app-list-table-v2/models/action.model';
+import { OutbreakModel } from '../models/outbreak.model';
+import { IV2GroupedData } from '../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
+import { IBasicCount } from '../models/basic-count.interface';
+import { AuthenticatedComponent } from '../components/authenticated/authenticated.component';
+import { ICachedFilter, ICachedFilterItems, ICachedInputsValues, ICachedSortItem } from './models/cache.model';
+import { ListAppliedFiltersComponent } from './list-applied-filters-component';
+import { V2FilterType } from '../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { V2AdvancedFilter } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { Directive, ViewChild } from '@angular/core';
+import { AppListTableV2Component } from '../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
+import { SavedFilterData } from '../models/saved-filters.model';
+import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
+import { IV2ProcessSelectedData } from '../../shared/components-v2/app-list-table-v2/models/process-data.model';
 
 /**
  * List component
  */
 @Directive()
-export abstract class ListComponent implements OnDestroy {
+export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
   // handle pop state changes
   private static locationSubscription: SubscriptionLike;
 
-  /**
-     * Breadcrumbs
-     */
-  public breadcrumbs: BreadcrumbItemModel[];
+  // handler for stopping take until
+  protected destroyed$: ReplaySubject<boolean> = new ReplaySubject<boolean>();
 
-  /**
-     * Determine all children that we need to reset when side filters are being applied
-     */
-  @ViewChildren(ResetInputOnSideFilterDirective) protected filterInputs: QueryList<ResetInputOnSideFilterDirective>;
+  // authenticated user data
+  authUser: UserModel;
 
-  /**
-     * Determine all location children that we need to reset when side filters are being applied
-     */
-  @ViewChildren(ResetLocationOnSideFilterDirective) protected filterLocationInputs: QueryList<ResetLocationOnSideFilterDirective>;
+  // breadcrumbs
+  public breadcrumbs: IV2Breadcrumb[];
 
-  /**
-     * Retrieve Mat Table sort handler
-     */
-  @ViewChild('table', { read: MatSort }) matTableSort: MatSort;
+  // quick actions
+  quickActions: IV2ActionMenuLabel;
 
-  /**
-     * Retrieve Side Filters
-     */
-  @ViewChild(SideFiltersComponent) sideFilter: SideFiltersComponent;
+  // group actions
+  groupActions: V2ActionMenuItem[];
 
-  /**
-     * Individual checkboxes selects
-     */
-  @ViewChildren('listCheckedIndividual') protected listCheckedIndividualInputs: QueryList<FormCheckboxComponent>;
+  // add action
+  addAction: IV2ActionIconLabel;
 
-  /**
-     * List table columns
-     */
-  tableColumns: VisibleColumnModel[] = [];
+  // grouped data
+  groupedData: IV2GroupedData;
 
-  /**
-     * List table visible columns
-     */
-  visibleTableColumns: string[] = [];
+  // advanced filters
+  advancedFilters: V2AdvancedFilter[];
 
-  /**
-     * List of cells to be expanded for row/column
-     *  Example:
-     *      {
-     *          columnName: {
-     *              rowId1: true,
-     *              rowId2: false,
-     *              rowId3: true
-     *          }
-     *      }
-     */
-  expandCell: {
-    string?: {
-      string?: boolean
-    }[]
-  } = {};
+  // selected outbreak
+  selectedOutbreak: OutbreakModel;
+  selectedOutbreakSubscription: Subscription;
 
-  /**
-     * Expand all cells for a certain column
-     *  Example:
-     *      {
-     *          columnName1: true,
-     *          columnName2: false
-     *      }
-     */
-  expandAllCellsForColumn: {string?: boolean} = {};
+  // check if selected outbreak is the active one
+  get selectedOutbreakIsActive(): boolean {
+    return this.authUser &&
+      this.selectedOutbreak &&
+      this.selectedOutbreak.id &&
+      this.selectedOutbreak.id === this.authUser.activeOutbreakId;
+  }
 
-  /**
-     * Query builder
-     * @type {RequestQueryBuilder}
-     */
-  public queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(() => {
-    this.updateCachedFilters();
-  });
+  // page information
+  pageCount: IBasicCount;
+  pageIndex: number = 0;
 
-  // loading dialog
-  private loadingDialog: LoadingDialogModel;
-
-  /**
-     * Applied list filter on this list page
-     */
-  public appliedListFilter: ApplyListFilter;
-
-  /**
-     * Preparing loading filter ?
-     */
-  public appliedListFilterLoading: boolean = false;
+  // constants
+  UserSettings = UserSettings;
+  Constants = Constants;
 
   // apply has more limit
   protected applyHasMoreLimit: boolean = true;
 
-  /**
-     * List Filter Query Builder
-     */
-  protected appliedListFilterQueryBuilder: RequestQueryBuilder;
-
   // pagination
   public pageSize: number = Constants.DEFAULT_PAGE_SIZE;
-  public pageSizeOptions: number[] = Constants.PAGE_SIZE_OPTIONS;
   private paginatorInitialized = false;
 
-  // flag set to true if the list is empty
-  public isEmptyList: boolean;
+  // records
+  records$: Observable<T[]>;
 
-  // starting page
-  public pageIndex: number = 0;
+  // table sort by
+  tableSortBy: {
+    field?: string,
+    direction?: RequestSortDirection
+  } = {};
 
-  // Models for the checkbox functionality
-  private checkboxModels: {
-    multiCheck: boolean,
-    keyPath: string,
-    records: any[],
-    checkAll: boolean,
-    checkedOnlyDeletedRecords: boolean,
-    checkedOnlyNotDeletedRecords: boolean,
-    checkedRecords: {
-      [id: string]: boolean
-    }
-  } = {
-      multiCheck: true,
-      keyPath: null,
-      records: [],
-      checkAll: false,
-      checkedOnlyDeletedRecords: false,
-      checkedOnlyNotDeletedRecords: false,
-      checkedRecords: {}
-    };
+  // info
+  infos: string[];
 
-  // sort by disabled ?
-  private _sortByDisabled: boolean = false;
+  // suffix legends
+  suffixLegends: ILabelValuePairModel[];
 
-  /**
-     * Did we check at least one record ?
-     */
-  get checkedAtLeastOneRecord(): boolean {
-    return !_.isEmpty(this.checkboxModels.checkedRecords);
-  }
+  // process data
+  processSelectedData: IV2ProcessSelectedData[];
 
-  /**
-     * Checked only deleted records ?
-     */
-  get checkedOnlyDeletedRecords(): boolean {
-    return this.checkboxModels.checkedOnlyDeletedRecords;
-  }
-
-  /**
-     * Checked only not deleted records ?
-     */
-  get checkedOnlyNotDeletedRecords(): boolean {
-    return this.checkboxModels.checkedOnlyNotDeletedRecords;
-  }
-
-  /**
-     * Set checkbox behaviour ( key path - id used to identify a record )
-     */
-  set checkedKeyPath(keyPath: string) {
-    this.checkboxModels.keyPath = keyPath;
-  }
-
-  /**
-     * Get checkbox behaviour ( key path - id used to identify a record )
-     */
-  get checkedKeyPath(): string {
-    return this.checkboxModels.keyPath;
-  }
-
-  /**
-     * Set checkbox behaviour ( can or can't select multiple checkboxes at the same time )
-     */
-  set checkedIsMultiSelect(multiCheck: boolean) {
-    this.checkboxModels.multiCheck = multiCheck;
-  }
-
-  /**
-     * Get checkbox behaviour ( can or can't select multiple checkboxes at the same time )
-     */
-  get checkedIsMultiSelect(): boolean {
-    return this.checkboxModels.multiCheck;
-  }
-
-  /**
-     * All checkbox selected
-     * @param value
-     */
-  set checkedAllRecords(value: boolean) {
-    // set master check all
-    this.checkboxModels.checkAll = value;
-
-    // check/un-check all individual checkboxes
-    this.checkboxModels.checkedOnlyNotDeletedRecords = this.checkboxModels.checkAll;
-    this.checkboxModels.checkedOnlyDeletedRecords = this.checkboxModels.checkAll;
-    this.checkboxModels.checkedRecords = {};
-    if (this.checkboxModels.checkAll) {
-      this.checkboxModels.records.forEach((record: any) => {
-        // check record
-        this.checkboxModels.checkedRecords[this.getCheckRecordKey(record)] = true;
-
-        // all records are deleted ?
-        if (!record.deleted) {
-          this.checkboxModels.checkedOnlyDeletedRecords = false;
-        }
-
-        // all records aren't deleted ?
-        if (record.deleted) {
-          this.checkboxModels.checkedOnlyNotDeletedRecords = false;
-        }
-      });
-    }
-
-    // go through all html checkboxes and update their value - this is faster than using binding which slows down a lot the page
-    if (
-      this.listCheckedIndividualInputs &&
-            this.listCheckedIndividualInputs.length > 0
-    ) {
-      this.listCheckedIndividualInputs.forEach((checkbox: FormCheckboxComponent) => {
-        // retrieve id
-        const id = checkbox.name.substring(checkbox.name.lastIndexOf('[') + 1, checkbox.name.lastIndexOf(']'));
-        checkbox.value = !!this.checkboxModels.checkedRecords[id];
-      });
-    }
-  }
-
-  get checkedAllRecords(): boolean {
-    return this.checkboxModels.checkAll;
-  }
+  // retrieve table handler
+  @ViewChild(AppListTableV2Component, { static: true }) tableV2Component: AppListTableV2Component;
 
   // refresh only after we finish changing data
   // by default each time we get back to a page we should display loading spinner
-  public refreshingList: boolean = true;
   private _triggeredByPageChange: boolean = false;
   private triggerListRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
     // disabled ?
@@ -318,26 +119,19 @@ export abstract class ListComponent implements OnDestroy {
     const triggeredByPageChange: boolean = this._triggeredByPageChange;
     this._triggeredByPageChange = false;
 
+    // attach fields restrictions
+    const fields: string[] = this.refreshListFields();
+    if (fields.length > 0) {
+      this.queryBuilder.clearFields();
+      this.queryBuilder.fields(...fields);
+    }
+
     // refresh list
-    this.refreshingList = true;
-    this.refreshList((records: any[]) => {
-      // wait for binding
-      setTimeout(() => {
-        // reset checked items
-        this.resetCheckboxData();
-
-        // set items that can be checked
-        this.checkboxModels.records = records || [];
-
-        // finished refreshing list
-        this.refreshingList = false;
-      });
-    }, triggeredByPageChange);
+    this.refreshList(triggeredByPageChange);
   }));
 
   // disable next load from cache input values ?
   private _disableNextLoadCachedInputValues: boolean = false;
-  private _nextTimerForLoadCachedInputValues: number;
   private _loadedCachedFilterPage: string;
   private _disableFilterCaching: boolean = false;
   get disableFilterCaching(): boolean {
@@ -356,24 +150,171 @@ export abstract class ListComponent implements OnDestroy {
   }));
 
   /**
-     * Constructor
-     */
+   * Retrieve cached filters
+   */
+  static getCachedFiltersPageKey(
+    filterKey: string,
+    applySuffix: string
+  ): string {
+    // get path
+    const pathParamsIndex: number = filterKey.indexOf('?');
+    if (pathParamsIndex > -1) {
+      filterKey = filterKey.substr(0, pathParamsIndex);
+    }
+
+    // if apply list filter then we need to make sure we add it to our key so we don't break other pages by adding filters that we shouldn't
+    if (applySuffix) {
+      filterKey += `_${applySuffix}`;
+    }
+
+    // remove ids from link so we don't have filters for each item because this would mean that we will fill storage really fast
+    filterKey = filterKey.replace(
+      /[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}/ig,
+      ''
+    );
+
+    // finished
+    return filterKey;
+  }
+
+  /**
+   * Retrieve cached filters
+   */
+  static getCachedFiltersFromStorage(
+    authUser: UserModel,
+    storageService: StorageService
+  ): ICachedFilter {
+    // retrieve filters if there are any initialized
+    const cachedFilters: string = storageService.get(StorageKey.FILTERS);
+    let filters: {
+      [userId: string]: any
+    } = {};
+    if (cachedFilters) {
+      filters = JSON.parse(LzString.decompress(cachedFilters));
+    }
+
+    // we need to have data for this user, otherwise remove what we have
+    let currentUserCache: ICachedFilter = filters[authUser.id];
+    if (!currentUserCache) {
+      currentUserCache = {};
+    }
+
+    // finished
+    return currentUserCache;
+  }
+
+  /**
+   * Constructor
+   */
   protected constructor(
     protected listHelperService: ListHelperService,
     disableFilterCaching: boolean = false
   ) {
-    // clone current breadcrumbs
-    let currentBreadcrumbs;
+    // parent constructor
+    super(
+      listHelperService,
+      () => {
+        this.updateCachedFilters();
+      },
+      (
+        instant?: boolean,
+        resetPagination?: boolean,
+        triggeredByPageChange?: boolean
+      ) => {
+        // do we have outbreak - if not, it will be refreshed by that ?
+        if (!this.selectedOutbreak?.id) {
+          return;
+        }
+
+        // refresh
+        this.needsRefreshList(
+          instant !== undefined ? instant : false,
+          resetPagination !== undefined ? resetPagination : true,
+          triggeredByPageChange !== undefined ? triggeredByPageChange : false
+        );
+      }
+    );
+
+    // get auth data
+    this.authUser = this.listHelperService.authDataService.getAuthenticatedUser();
+
+    // wait for binding so some things get processed
     setTimeout(() => {
-      currentBreadcrumbs = _.cloneDeep(this.breadcrumbs);
+      // initialize breadcrumbs
+      this.initializeBreadcrumbs();
+
+      // initialize side columns
+      this.initializeTableColumns();
+
+      // initialize process data
+      this.initializeProcessSelectedData();
+
+      // initialize infos
+      this.initializeTableInfos();
+
+      // initialize advanced filters
+      this.initializeTableAdvancedFilters();
+
+      // initialize table quick actions
+      this.initializeQuickActions();
+
+      // initialize table group actions
+      this.initializeGroupActions();
+
+      // initialize table add actions
+      this.initializeAddAction();
+
+      // initialize table grouped data
+      this.initializeGroupedData();
+
+      // load saved filters
+      this.loadCachedFilters();
+
+      // apply table column filters
+      this.applyTableColumnFilters();
+
+      // component initialized
+      this.initialized();
     });
+
+    // listen for outbreak selection
+    this.selectedOutbreakSubscription = this.listHelperService.outbreakDataService
+      .getSelectedOutbreakSubject()
+      .subscribe((selectedOutbreak: OutbreakModel) => {
+        // ignore empty selection for now, no need to take in account ...de-selection
+        if (!selectedOutbreak) {
+          return;
+        }
+
+        // if same outbreak then don't trigger change
+        if (
+          this.selectedOutbreak &&
+          this.selectedOutbreak.id === selectedOutbreak.id
+        ) {
+          return;
+        }
+
+        // select outbreak
+        this.selectedOutbreak = selectedOutbreak;
+
+        // trigger outbreak selection changed
+        // - wait for binding
+        setTimeout(() => {
+          this.selectedOutbreakChanged();
+        });
+      });
+
+
+    // disable filter caching ?
+    this._disableFilterCaching = disableFilterCaching;
 
     // check filters
     this.checkListFilters();
 
-    // load saved filters
-    this._disableFilterCaching = disableFilterCaching;
-    this.loadCachedFilters();
+    // always disable caching if applied filters used
+    if (this.appliedListFilter) {
+      this._disableFilterCaching = true;
+    }
 
     // remove old subscription since we shouldn't have more than one list component visible at the same time ( at least not now )
     if (ListComponent.locationSubscription) {
@@ -388,13 +329,10 @@ export abstract class ListComponent implements OnDestroy {
           // check if subscription was closed
           if (
             !ListComponent.locationSubscription ||
-                        ListComponent.locationSubscription.closed
+            ListComponent.locationSubscription.closed
           ) {
             return;
           }
-
-          // reset loading
-          this.refreshingList = true;
 
           // clear all filters
           this.queryBuilder = new RequestQueryBuilder(() => {
@@ -406,14 +344,17 @@ export abstract class ListComponent implements OnDestroy {
             this.initPaginator();
           }
 
-          // revert breadcrumbs
-          this.breadcrumbs = _.cloneDeep(currentBreadcrumbs);
-
           // refresh filters
           this.checkListFilters();
 
+          // re-init breadcrumbs
+          this.initializeBreadcrumbs();
+
           // load cached filters if necessary
           this.loadCachedFiltersIfNecessary();
+
+          // apply table column filters
+          this.applyTableColumnFilters();
 
           // refresh page
           this.needsRefreshList(true);
@@ -422,32 +363,104 @@ export abstract class ListComponent implements OnDestroy {
   }
 
   /**
-     * Release resources
-     */
-  ngOnDestroy(): void {
+   * Release resources
+   */
+  onDestroy(): void {
+    // release subscribers
     this.releaseSubscribers();
+
+    // unsubscribe other requests
+    this.destroyed$.next(true);
+    this.destroyed$.complete();
+    this.destroyed$ = undefined;
   }
 
   /**
-     * Refresh list
-     */
+   * Initialize table columns
+   */
+  protected abstract initializeTableColumns(): void;
+
+  /**
+   * Initialize process data
+   */
+  protected abstract initializeProcessSelectedData(): void;
+
+  /**
+   * Initialize table infos
+   */
+  protected abstract initializeTableInfos(): void;
+
+  /**
+   * Initialize table advanced filters
+   */
+  protected abstract initializeTableAdvancedFilters(): void;
+
+  /**
+   * Initialize table quick actions
+   */
+  protected abstract initializeQuickActions(): void;
+
+  /**
+   * Initialize table group actions
+   */
+  protected abstract initializeGroupActions(): void;
+
+  /**
+   * Initialize table add action
+   */
+  protected abstract initializeAddAction(): void;
+
+  /**
+   * Initialize table grouped data
+   */
+  protected abstract initializeGroupedData(): void;
+
+  /**
+   * Selected outbreak changed
+   */
+  protected selectedOutbreakChanged(): void {}
+
+  /**
+   * Component initialized
+   */
+  protected initialized(): void {}
+
+  /**
+   * Initialize breadcrumbs
+   */
+  protected abstract initializeBreadcrumbs(): void;
+
+  /**
+   * Fields retrieved from api to reduce payload size
+   */
+  protected abstract refreshListFields(): string[];
+
+  /**
+   * Refresh list
+   */
   public abstract refreshList(
-    finishCallback: (records: any[]) => void,
     triggeredByPageChange?: boolean
   );
 
   /**
-     * Refresh items count
-     * Note: To be overridden on pages that implement pagination
-     */
+   * Refresh items count
+   * Note: To be overridden on pages that implement pagination
+   */
   public refreshListCount(_applyHasMoreLimit?: boolean) {
+    // eslint-disable-next-line no-console
     console.error('Component must implement \'refreshListCount\' method');
   }
 
   /**
-     * Release subscribers
-     */
+   * Release subscribers
+   */
   private releaseSubscribers() {
+    // selected outbreak
+    if (this.selectedOutbreakSubscription) {
+      this.selectedOutbreakSubscription.unsubscribe();
+      this.selectedOutbreakSubscription = undefined;
+    }
+
     // query builder
     this.queryBuilder.destroyListeners();
 
@@ -457,34 +470,17 @@ export abstract class ListComponent implements OnDestroy {
       ListComponent.locationSubscription = null;
     }
 
+    // refresh data
     if (this.triggerListRefresh) {
       this.triggerListRefresh.unsubscribe();
       this.triggerListRefresh = null;
     }
+
+    // refresh count
     if (this.triggerListCountRefresh) {
       this.triggerListCountRefresh.unsubscribe();
       this.triggerListCountRefresh = null;
     }
-  }
-
-  /**
-     * Reset checkbox data
-     */
-  private resetCheckboxData() {
-    this.checkboxModels.records = [];
-    this.checkboxModels.checkAll = false;
-    this.checkboxModels.checkedOnlyDeletedRecords = false;
-    this.checkboxModels.checkedOnlyNotDeletedRecords = false;
-    this.checkboxModels.checkedRecords = {};
-  }
-
-  /**
-     * Retrieve record key used by list component checkboxes
-     */
-  private getCheckRecordKey(record: any): string {
-    return this.checkedKeyPath ?
-      _.get(record, this.checkedKeyPath) :
-      record.id;
   }
 
   /**
@@ -500,13 +496,10 @@ export abstract class ListComponent implements OnDestroy {
       this._triggeredByPageChange = true;
     }
 
-    // reset checked items
-    this.resetCheckboxData();
-
     // do we need to reset pagination (aka go to the first page) ?
     if (
       resetPagination &&
-            this.paginatorInitialized
+      this.paginatorInitialized
     ) {
       // re-calculate items count (filters have changed)
       if (this.triggerListCountRefresh) {
@@ -524,403 +517,34 @@ export abstract class ListComponent implements OnDestroy {
   }
 
   /**
-     * Checks if list is empty
-     */
-  checkEmptyList(list: any[]) {
-    this.isEmptyList = _.isEmpty(list);
-  }
-
-  /**
-     * Sort asc / desc by specific fields
-     * @param data
-     * @param objectDetailsSort
-     */
+   * Sort asc / desc by specific fields
+   */
   public sortBy(
-    data: any,
+    data: {
+      field: string,
+      direction: RequestSortDirection
+    },
     objectDetailsSort?: {
       [property: string]: string[]
     }
   ) {
-    // sort by disabled ?
-    if (this._sortByDisabled) {
-      return;
-    }
-
     // sort information
-    const property = _.get(data, 'active');
-    const direction = _.get(data, 'direction');
+    this.tableSortBy.field = data?.field;
+    this.tableSortBy.direction = data?.direction;
 
-    // remove previous sort columns, we can sort only by one column at a time
-    this.queryBuilder.sort.clear();
-
-    // retrieve Side filters
-    let queryBuilder;
-    if (
-      this.sideFilter &&
-            (queryBuilder = this.sideFilter.getQueryBuilder())
-    ) {
-      this.queryBuilder.sort.merge(queryBuilder.sort);
-    }
-
-    // sort
-    if (
-      property &&
-            direction
-    ) {
-      // add sorting criteria
-      if (
-        objectDetailsSort &&
-                objectDetailsSort[property]
-      ) {
-        _.each(objectDetailsSort[property], (childProperty: string) => {
-          this.queryBuilder.sort.by(
-            `${property}.${childProperty}`,
-            direction
-          );
-        });
-      } else {
-        this.queryBuilder.sort.by(
-          property,
-          direction
-        );
-      }
-    }
+    // apply sort
+    applySortBy(
+      this.tableSortBy,
+      this.queryBuilder,
+      this.tableV2Component?.advancedFiltersQueryBuilder,
+      objectDetailsSort
+    );
 
     // refresh list
     this.needsRefreshList(
       false,
       false
     );
-  }
-
-  /**
-     * Filter the list by a text field
-     * @param {string | string[]} property
-     * @param {string} value
-     * @param {RequestFilterOperator} operator
-     */
-  filterByTextField(
-    property: string | string[],
-    value: string,
-    operator?: RequestFilterOperator,
-    useLike?: boolean
-  ) {
-    // default values
-    if (operator === undefined) {
-      operator = RequestFilterOperator.OR;
-    }
-
-    // filter
-    if (_.isArray(property)) {
-      this.queryBuilder.filter.byTextMultipleProperties(
-        property as string[],
-        value,
-        true,
-        operator
-      );
-    } else {
-      this.queryBuilder.filter.byText(
-        property as string,
-        value,
-        true,
-        useLike
-      );
-    }
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter by phone number
-     * @param {string} property
-     * @param {string} value
-     * @param {string} regexMethod
-     */
-  filterByPhoneNumber(
-    property: string,
-    value: string,
-    regexMethod: string = 'regex'
-  ) {
-    this.queryBuilder.filter.byPhoneNumber(
-      property as string,
-      value,
-      true,
-      regexMethod
-    );
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter the list by equality
-     * @param {string} property
-     * @param {*} value
-     */
-  filterByEquality(
-    property: string | string[],
-    value: any
-  ) {
-    this.queryBuilder.filter.byEquality(
-      property as string,
-      value
-    );
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter the list by a text field
-     * @param {string} property
-     * @param {string} value
-     * @param {boolean} useLike
-     */
-  filterByTextContainingField(
-    property: string,
-    value: string,
-    useLike?: boolean
-  ) {
-    this.queryBuilder.filter.byContainingText(
-      property as string,
-      value,
-      true,
-      useLike
-    );
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter the list by a text field
-     * @param {string} property
-     * @param {string} value
-     */
-  filterByBooleanField(property: string, value: boolean | null | undefined) {
-    this.queryBuilder.filter.byBoolean(property, value);
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter all records that don't have value on a specific field
-     * @param property
-     */
-  filterByNotHavingValue(
-    property: string
-  ): void {
-    // filter
-    this.queryBuilder.filter.byNotHavingValue(property);
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter the list by a range field ('from' / 'to')
-     * @param {string} property
-     * @param {FormRangeModel} value Object with 'from' and 'to' properties
-     */
-  filterByRangeField(property: string, value: FormRangeModel) {
-    this.queryBuilder.filter.byRange(property, value);
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter the list by an age range field ('from' / 'to')
-     * @param {string} property
-     * @param {FormRangeModel} value Object with 'from' and 'to' properties
-     */
-  filterByAgeRangeField(
-    property: string,
-    value: FormRangeModel
-  ) {
-    // filter by age range
-    this.queryBuilder.filter.byAgeRange(property, value);
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter the list by a date field ( startOf day => endOf day )
-     * @param {string} property
-     * @param value Date
-     */
-  filterByDateField(property: string, value: Moment) {
-    // filter by date
-    if (_.isEmpty(value)) {
-      this.queryBuilder.filter.byDateRange(property, value);
-    } else {
-      this.queryBuilder.filter.byDateRange(
-        property, {
-          startDate: moment(value).startOf('day'),
-          endDate: moment(value).endOf('day')
-        }
-      );
-    }
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter the list by a date range field ('startDate' / 'endDate')
-     * @param {string} property
-     * @param value Object with 'startDate' and 'endDate' properties
-     */
-  filterByDateRangeField(property: string, value: {startDate: Date, endDate: Date}) {
-    // filter by date range
-    this.queryBuilder.filter.byDateRange(property, value);
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter the list by a Select / Multi-Select field
-     * @param {string} property
-     * @param {any | any[]} values
-     * @param {string} valueKey
-     * @param {boolean} replace
-     */
-  filterBySelectField(property: string, values: any | any[], valueKey: string = 'value', replace: boolean = true) {
-    // no value ?
-    if (values === false) {
-      this.queryBuilder.filter.byBoolean(
-        property,
-        false,
-        true
-      );
-    } else {
-      this.queryBuilder.filter.bySelect(property, values, replace, valueKey);
-    }
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter by boolean with exists condition
-     * @param {string} property
-     * @param value
-     */
-  filterByBooleanUsingExistField(property: string, value: any) {
-    // filter by boolean using exist
-    this.queryBuilder.filter.byBooleanUsingExist(property, value);
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter by current address
-     */
-  filterByAddress(
-    property: string,
-    isArray: boolean,
-    addressModel: AddressModel,
-    addressParentLocationIds: string[],
-    useLike: boolean = false
-  ) {
-    // remove the previous conditions
-    this.queryBuilder.filter.removePathCondition('address');
-    this.queryBuilder.filter.removePathCondition('addresses');
-    this.queryBuilder.filter.removePathCondition('and.address');
-    this.queryBuilder.filter.removePathCondition('and.addresses');
-
-    // create a query builder
-    const searchQb: RequestQueryBuilder = AddressModel.buildAddressFilter(
-      property,
-      isArray,
-      addressModel,
-      addressParentLocationIds,
-      useLike
-    );
-
-    // add condition if we were able to create it
-    if (
-      searchQb &&
-            !searchQb.isEmpty()
-    ) {
-      this.queryBuilder.merge(searchQb);
-    }
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter by deleted field
-     * @param value
-     */
-  filterByDeletedField(value: boolean | null | undefined) {
-    // filter
-    if (value === false) {
-      this.queryBuilder.excludeDeleted();
-      this.queryBuilder.filter.remove('deleted');
-    } else {
-      this.queryBuilder.includeDeleted();
-      if (value === true) {
-        this.queryBuilder.filter.where({
-          'deleted': {
-            'eq': true
-          }
-        }, true);
-      } else {
-        this.queryBuilder.filter.remove('deleted');
-      }
-    }
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Filter by relation
-     * @param {string | string[]} relation
-     * @returns {RequestFilter}
-     */
-  filterByRelation(relation: string | string[]): RequestFilter {
-    // make sure we always have an array of relations
-    const relations: string[] = (_.isArray(relation) ?
-      relation :
-      [relation]
-    ) as string[];
-
-    // go through all the relations until we get the desired query builder
-    let relationQB: RequestQueryBuilder = this.queryBuilder;
-    _.each(relations, (rel: string) => {
-      relationQB = relationQB.include(rel).queryBuilder;
-    });
-
-    // refresh list
-    // this one isn't executed instantly, so there should be enough time to setup the relation filter
-    this.needsRefreshList();
-
-    // retrieve filter
-    return relationQB.filter;
-  }
-
-  /**
-     * Filter by child query builder
-     * @param {string} qbFilterKey
-     * @returns {RequestFilter}
-     */
-  filterByChildQueryBuilder(
-    qbFilterKey: string
-  ): RequestFilter {
-    const childQueryBuilder = this.queryBuilder.addChildQueryBuilder(qbFilterKey);
-
-    // refresh list
-    this.needsRefreshList();
-
-    return childQueryBuilder.filter;
   }
 
   /**
@@ -952,8 +576,8 @@ export abstract class ListComponent implements OnDestroy {
   }
 
   /**
-     * Change page
-     */
+   * Change page
+   */
   changePage(page: PageEvent) {
     // update API pagination params
     this.queryBuilder.paginator.setPage(page);
@@ -970,15 +594,15 @@ export abstract class ListComponent implements OnDestroy {
   }
 
   /**
-     * Called after query builder is cleared
-     */
+   * Called after query builder is cleared
+   */
   clearedQueryBuilder() {
     // NOTHING
   }
 
   /**
-     * Clear query builder of conditions and sorting criterias
-     */
+   * Clear query builder of conditions and sorting criterias
+   */
   clearQueryBuilder() {
     // clear query filters
     this.queryBuilder.clear();
@@ -988,36 +612,36 @@ export abstract class ListComponent implements OnDestroy {
   }
 
   /**
-     * Clear table filters
-     */
+   * Clear table filters
+   */
   clearHeaderFilters() {
     // clear header filters
-    if (this.filterInputs) {
-      this.filterInputs.forEach((input: ResetInputOnSideFilterDirective) => {
-        input.reset();
-      });
+    applyResetOnAllFilters(this.tableColumns);
+
+    // not rendered yet ?
+    if (!this.tableV2Component) {
+      return;
     }
 
-    // clear location header filters
-    if (this.filterLocationInputs) {
-      this.filterLocationInputs.forEach((input: ResetLocationOnSideFilterDirective) => {
-        input.reset();
-      });
-    }
-
-    // refresh of the list is done automatically after debounce time
-    // #
+    // force redraw
+    this.tableV2Component.updateColumnDefinitions();
   }
 
   /**
-     * Reset table sort columns
-     */
+   * Reset table sort columns
+   */
   clearHeaderSort() {
-    if (this.matTableSort) {
-      this.matTableSort.sort({
-        id: null
-      } as MatSortable);
+    // not rendered yet ?
+    if (!this.tableV2Component) {
+      return;
     }
+
+    // update
+    this.tableV2Component.columnSortBy(
+      null,
+      null,
+      null
+    );
 
     // refresh of the list is done automatically after debounce time
     // #
@@ -1031,8 +655,8 @@ export abstract class ListComponent implements OnDestroy {
   }
 
   /**
-     * Clear header filters & sort
-     */
+   * Clear header filters & sort
+   */
   resetFiltersToSideFilters() {
     // clear query builder
     this.clearQueryBuilder();
@@ -1049,32 +673,39 @@ export abstract class ListComponent implements OnDestroy {
     // add default filter criteria
     this.resetFiltersAddDefault();
 
+    // apply table column filters
+    this.applyTableColumnFilters();
+
     // retrieve Side filters
     let queryBuilder;
     if (
-      this.sideFilter &&
-            (queryBuilder = this.sideFilter.getQueryBuilder())
+      this.tableV2Component &&
+      (queryBuilder = this.tableV2Component.advancedFiltersQueryBuilder)
     ) {
       this.queryBuilder.merge(queryBuilder);
+    }
+
+    // if no side query builder then clear side filters too
+    if (
+      !queryBuilder &&
+      this.tableV2Component
+    ) {
+      this.tableV2Component.generateFiltersFromFilterData(undefined);
     }
 
     // apply list filters which is mandatory
     this.mergeListFilterToMainFilter();
 
-    // refresh of the list is done automatically after debounce time
-    // #
-
-    // refresh paginator?
-    if (this.paginatorInitialized) {
-      // refresh total number of items
-      this.triggerListCountRefresh.call(true);
-    }
+    // refresh
+    this.needsRefreshList(
+      true,
+      true
+    );
   }
 
   /**
-     * Apply the filters selected from the Side Filters section
-     * @param {RequestQueryBuilder} queryBuilder
-     */
+   * Apply the filters selected from the Side Filters section
+   */
   applySideFilters(queryBuilder: RequestQueryBuilder) {
     // clear query builder of conditions and sorting criterias
     this.clearQueryBuilder();
@@ -1086,7 +717,9 @@ export abstract class ListComponent implements OnDestroy {
     this.clearHeaderSort();
 
     // merge query builder with side filters
-    this.queryBuilder.merge(queryBuilder);
+    if (queryBuilder) {
+      this.queryBuilder.merge(queryBuilder);
+    }
 
     // apply list filters which is mandatory
     this.mergeListFilterToMainFilter();
@@ -1096,1197 +729,19 @@ export abstract class ListComponent implements OnDestroy {
   }
 
   /**
-     * Apply list filter
-     */
-  protected mergeListFilterToMainFilter() {
-    // finished with list filter
-    this.appliedListFilterLoading = false;
-
-    // merge filter query builder
-    if (this.appliedListFilterQueryBuilder) {
-      this.queryBuilder.merge(_.cloneDeep(this.appliedListFilterQueryBuilder));
-    }
-  }
-
-  /**
-     * Check if list filter applies
-     */
-  protected checkListFilters() {
-    // retrieve query params
-    const queryParams: any = this.listHelperService.route.snapshot.queryParams;
-
-    // reset values
-    this.appliedListFilter = queryParams && queryParams.applyListFilter ? queryParams.applyListFilter : null;
-    this.appliedListFilterQueryBuilder = null;
-
-    // do we need to wait for list filter to be initialized ?
-    this.appliedListFilterLoading = !_.isEmpty(this.appliedListFilter);
-
-    // wait for component initialization, since this method is called from constructor
-    setTimeout(() => {
-      // do we have query params to apply ?
-      if (_.isEmpty(queryParams)) {
-        return;
-      }
-
-      // call function to apply filters - update query builder
-      this.applyListFilters(queryParams);
-    });
-  }
-
-  /**
-     * Update page breadcrumbs based on the applied filter
-     * @param {string} listFilter
-     * @param listFilterData
-     */
-  protected setListFilterBreadcrumbs(
-    listFilter: string,
-    listFilterData: any = {}
-  ) {
-    const breadcrumbToken = Constants.LIST_FILTER_TITLE[listFilter];
-    if (breadcrumbToken) {
-      // get the breadcrumb representing the list page
-      const listPageBreadcrumb: BreadcrumbItemModel = _.find(this.breadcrumbs, {active: true});
-      if (listPageBreadcrumb) {
-        // update the breadcrumb
-        const fallbackUrl: string[] | boolean = this.listHelperService.determineFallbackUrl();
-        listPageBreadcrumb.active = false;
-        listPageBreadcrumb.onClick = () => {
-          // redirect to cases list pages ( hack since we can't use navigate for the same component )
-          if (fallbackUrl) {
-            this.listHelperService.redirectService.to(fallbackUrl as string[]);
-          } else {
-            // DON'T REDIRECT
-          }
-        };
-      }
-
-      // add new breadcrumb
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          breadcrumbToken,
-          '.',
-          true,
-          {},
-          listFilterData
-        )
-      );
-    }
-  }
-
-  /**
-     * Verify what list filter is sent into the query params and updates the query builder based in this.
-     * @param queryParams
-     */
-  protected applyListFilters(
-    queryParams: {
-      applyListFilter,
-      x,
-      date,
-      global
-    }
-  ): void {
-    // there are no filters to apply ?
-    if (!this.appliedListFilter) {
-      return;
-    }
-
-    // update breadcrumbs
-    this.setListFilterBreadcrumbs(
-      this.appliedListFilter,
-      queryParams
-    );
-
-    // get global filter values
-    const globalFilters = this.getGlobalFilterValues(queryParams);
-    let globalQb: RequestQueryBuilder;
-
-    // check params for apply list filter
-    switch (this.appliedListFilter) {
-      // Filter contacts on the followup list
-      case Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWUP_LIST:
-
-        // get the correct query builder and merge with the existing one
-        this.listHelperService.listFilterDataService
-          .filterContactsOnFollowUpLists(
-            globalFilters.date,
-            globalFilters.locationId,
-            globalFilters.classificationId
-          )
-          .subscribe((qbFilterContactsOnFollowUpLists) => {
-            // merge query builder
-            this.appliedListFilterQueryBuilder = qbFilterContactsOnFollowUpLists;
-            this.mergeListFilterToMainFilter();
-
-            // refresh list
-            this.needsRefreshList(true);
-          });
-        break;
-
-        // filter cases deceased
-      case Constants.APPLY_LIST_FILTER.CASES_DECEASED:
-        // add condition for deceased cases
-        this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.getGlobalFilterQB(
-          null,
-          null,
-          'addresses.parentLocationIdFilter',
-          globalFilters.locationId,
-          globalFilters.classificationId
-        );
-
-        // condition already include by default on cases list page
-        // qb.filter.bySelect(
-        //     'classification',
-        //     this.globalFilterClassificationId,
-        //     false,
-        //     null
-        // );
-
-        // date
-        if (globalFilters.date) {
-          this.appliedListFilterQueryBuilder.filter.byDateRange(
-            'dateOfOutcome', {
-              endDate: globalFilters.date.endOf('day').format()
-            }
-          );
-        }
-
-        // deceased
-        this.appliedListFilterQueryBuilder.filter.where({
-          outcomeId: Constants.OUTCOME_STATUS.DECEASED
-        }, true);
-
-        // merge query builder
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // filter cases isolated
-      case Constants.APPLY_LIST_FILTER.CASES_ISOLATED:
-        // add condition for deceased cases
-        globalQb = this.listHelperService.listFilterDataService.getGlobalFilterQB(
-          null,
-          null,
-          'addresses.parentLocationIdFilter',
-          globalFilters.locationId,
-          globalFilters.classificationId
-        );
-
-        // date
-        if (globalFilters.date) {
-          globalQb.filter.byDateRange(
-            'dateOfReporting', {
-              endDate: globalFilters.date.endOf('day').format()
-            }
-          );
-        }
-
-        // condition already include by default on cases list page
-        // qb.filter.bySelect(
-        //     'classification',
-        //     this.globalFilterClassificationId,
-        //     false,
-        //     null
-        // );
-
-        // get the correct query builder and merge with the existing one
-        this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterCasesIsolated(globalFilters.date);
-        if (!globalQb.isEmpty()) {
-          this.appliedListFilterQueryBuilder.merge(globalQb);
-        }
-
-        // merge query builder
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // filter cases hospitalised
-      case Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED:
-        // add condition for deceased cases
-        globalQb = this.listHelperService.listFilterDataService.getGlobalFilterQB(
-          null,
-          null,
-          'addresses.parentLocationIdFilter',
-          globalFilters.locationId,
-          globalFilters.classificationId
-        );
-
-        // date
-        if (globalFilters.date) {
-          globalQb.filter.byDateRange(
-            'dateOfReporting', {
-              endDate: globalFilters.date.endOf('day').format()
-            }
-          );
-        }
-
-        // condition already include by default on cases list page
-        // qb.filter.bySelect(
-        //     'classification',
-        //     this.globalFilterClassificationId,
-        //     false,
-        //     null
-        // );
-
-        // get the correct query builder and merge with the existing one
-        this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterCasesHospitalized(globalFilters.date);
-        if (!globalQb.isEmpty()) {
-          this.appliedListFilterQueryBuilder.merge(globalQb);
-        }
-
-        // merge query builder
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-      case Constants.APPLY_LIST_FILTER.CASES_NOT_HOSPITALISED:
-        globalQb = this.listHelperService.listFilterDataService.getGlobalFilterQB(
-          null,
-          null,
-          'addresses.parentLocationIdFilter',
-          globalFilters.locationId,
-          globalFilters.classificationId
-        );
-
-        // date
-        if (globalFilters.date) {
-          globalQb.filter.byDateRange(
-            'dateOfReporting', {
-              endDate: globalFilters.date.endOf('day').format()
-            }
-          );
-        }
-
-        // condition already include by default on cases list page
-        // qb.filter.bySelect(
-        //     'classification',
-        //     this.globalFilterClassificationId,
-        //     false,
-        //     null
-        // );
-
-        // get the correct query builder and merge with the existing one
-        this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterCasesNotHospitalized(globalFilters.date);
-        if (!globalQb.isEmpty()) {
-          this.appliedListFilterQueryBuilder.merge(globalQb);
-        }
-
-        // merge query builder
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // Filter contacts not seen
-      case Constants.APPLY_LIST_FILTER.CONTACTS_NOT_SEEN:
-        // get the number of days if it was updated
-        const noDaysNotSeen = _.get(queryParams, 'x', null);
-        // get the correct query builder and merge with the existing one
-        this.listHelperService.listFilterDataService
-          .filterContactsNotSeen(
-            globalFilters.date,
-            globalFilters.locationId,
-            globalFilters.classificationId,
-            noDaysNotSeen
-          )
-          .subscribe((qbFilterContactsNotSeen) => {
-            // merge query builder
-            this.appliedListFilterQueryBuilder = qbFilterContactsNotSeen;
-            this.mergeListFilterToMainFilter();
-
-            // refresh list
-            this.needsRefreshList(true);
-          });
-        break;
-
-        // filter cases with less than x contacts
-      case Constants.APPLY_LIST_FILTER.CASES_LESS_CONTACTS:
-        // get the number of contacts if it was updated
-        const noLessContacts = _.get(queryParams, 'x', null);
-
-        // get the correct query builder and merge with the existing one
-        this.listHelperService.listFilterDataService
-          .filterCasesLessThanContacts(
-            globalFilters.date,
-            globalFilters.locationId,
-            globalFilters.classificationId,
-            noLessContacts
-          )
-          .subscribe((qbFilterCasesLessThanContacts) => {
-            // merge query builder
-            this.appliedListFilterQueryBuilder = qbFilterCasesLessThanContacts;
-            this.mergeListFilterToMainFilter();
-
-            // refresh list
-            this.needsRefreshList(true);
-          });
-        break;
-
-        // filter cases by classification criteria
-      case Constants.APPLY_LIST_FILTER.CASE_SUMMARY:
-        globalQb = this.listHelperService.listFilterDataService.getGlobalFilterQB(
-          null,
-          null,
-          'addresses.parentLocationIdFilter',
-          globalFilters.locationId
-        );
-
-        // date
-        if (globalFilters.date) {
-          globalQb.filter.byDateRange(
-            'dateOfReporting', {
-              endDate: globalFilters.date.endOf('day').format()
-            }
-          );
-        }
-
-        // filter by classification
-        const classificationCriteria = _.get(queryParams, 'x', null);
-
-        // merge query builder
-        this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
-        this.appliedListFilterQueryBuilder.filter.where({
-          // add and condition because otherwise classification filter if overwritten by the default one
-          and: [
-            classificationCriteria === 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_UNCLASSIFIED' ? {
-              or: [
-                {
-                  classification: {
-                    exists: false
-                  }
-                }, {
-                  classification: {
-                    type: 'null'
-                  }
-                }, {
-                  classification: {
-                    eq: ''
-                  }
-                }
-              ]
-            } : {
-              classification: {
-                eq: classificationCriteria
-              }
-            }
-          ]
-        }, true);
-
-        if (!globalQb.isEmpty()) {
-          this.appliedListFilterQueryBuilder.merge(globalQb);
-        }
-
-        this.mergeListFilterToMainFilter();
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-      case Constants.APPLY_LIST_FILTER.CASES_BY_LOCATION:
-        // add condition for deceased cases
-        this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
-
-        // construct query builder to filter by location
-        const locationId = _.get(queryParams, 'locationId', null);
-        this.appliedListFilterQueryBuilder.filter.where({
-          addresses: {
-            elemMatch: {
-              typeId: AddressType.CURRENT_ADDRESS,
-              parentLocationIdFilter: {
-                // fix for not beeing consistent through the website, sometimes we use elemMatch other times $elemMatch which causes some issues on the api
-                // if we want to fix this we need to change in many places, so this is an workaround
-                $in: [locationId]
-              }
-            }
-          }
-        });
-
-        // date
-        if (globalFilters.date) {
-          this.appliedListFilterQueryBuilder.filter.byDateRange(
-            'dateOfReporting', {
-              endDate: globalFilters.date.endOf('day').format()
-            }
-          );
-        }
-
-        // condition already include by default on cases list page
-        // qb.filter.bySelect(
-        //     'classification',
-        //     this.globalFilterClassificationId,
-        //     false,
-        //     null
-        // );
-
-        // classification
-        if (!_.isEmpty(globalFilters.classificationId)) {
-          this.appliedListFilterQueryBuilder.filter.where({
-            and: [{
-              classification: {
-                inq: globalFilters.classificationId
-              }
-            }]
-          });
-        }
-
-        // main filters
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // Filter contacts lost to follow-up
-      case Constants.APPLY_LIST_FILTER.CONTACTS_LOST_TO_FOLLOW_UP:
-        // get the correct query builder and merge with the existing one
-        this.listHelperService.listFilterDataService.filterContactsLostToFollowUp(
-          globalFilters.date,
-          globalFilters.locationId,
-          globalFilters.classificationId
-        )
-          .subscribe((qbFilterContactsLostToFollowUp) => {
-            // merge query builder
-            this.appliedListFilterQueryBuilder = qbFilterContactsLostToFollowUp;
-            this.mergeListFilterToMainFilter();
-
-            // refresh list
-            this.needsRefreshList(true);
-          });
-        break;
-
-        // Filter cases in known transmission chains
-      case Constants.APPLY_LIST_FILTER.CASES_IN_THE_TRANSMISSION_CHAINS:
-        // get the number of days if it was updated
-        const noDaysInChains = _.get(queryParams, 'x', null);
-        // get the correct query builder and merge with the existing one
-        this.listHelperService.listFilterDataService.filterCasesInKnownChains(
-          globalFilters.date,
-          globalFilters.locationId,
-          globalFilters.classificationId,
-          noDaysInChains
-        )
-          .subscribe((qbFilterCasesInKnownChains) => {
-            // merge query builder
-            this.appliedListFilterQueryBuilder = qbFilterCasesInKnownChains;
-            this.mergeListFilterToMainFilter();
-
-            // refresh list
-            this.needsRefreshList(true);
-          });
-        break;
-
-        // filter cases among contacts
-      case Constants.APPLY_LIST_FILTER.CASES_PREVIOUS_DAYS_CONTACTS:
-        // get the number of days  if it was updated
-        const noDaysAmongContacts = _.get(queryParams, 'x', null);
-        // get the correct query builder and merge with the existing one
-        this.listHelperService.listFilterDataService.filterCasesAmongKnownContacts(
-          globalFilters.date,
-          globalFilters.locationId,
-          globalFilters.classificationId,
-          noDaysAmongContacts
-        )
-          .subscribe((qbFilterCasesAmongKnownContacts) => {
-            // merge query builder
-            this.appliedListFilterQueryBuilder = qbFilterCasesAmongKnownContacts;
-            this.mergeListFilterToMainFilter();
-
-            // refresh list
-            this.needsRefreshList(true);
-          });
-        break;
-
-        // filter suspect cases with pending lab result
-      case Constants.APPLY_LIST_FILTER.CASES_PENDING_LAB_RESULT:
-        // add condition for deceased cases
-        globalQb = this.listHelperService.listFilterDataService.getGlobalFilterQB(
-          null,
-          null,
-          'addresses.parentLocationIdFilter',
-          globalFilters.locationId,
-          globalFilters.classificationId
-        );
-
-        // condition already include by default on cases list page
-        // globalQb.filter.bySelect(
-        //     'classification',
-        //     this.globalFilterClassificationId,
-        //     false,
-        //     null
-        // );
-
-        // date
-        if (globalFilters.date) {
-          globalQb.filter.byDateRange(
-            'dateOfReporting', {
-              endDate: globalFilters.date.endOf('day').format()
-            }
-          );
-        }
-
-        // get the correct query builder and merge with the existing one
-        this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterCasesPendingLabResult();
-        if (!globalQb.isEmpty()) {
-          this.appliedListFilterQueryBuilder.merge(globalQb);
-        }
-
-        // merge query builder
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // filter suspect cases refusing treatment
-      case Constants.APPLY_LIST_FILTER.CASES_REFUSING_TREATMENT:
-        // add condition for deceased cases
-        globalQb = this.listHelperService.listFilterDataService.getGlobalFilterQB(
-          null,
-          null,
-          'addresses.parentLocationIdFilter',
-          globalFilters.locationId,
-          globalFilters.classificationId
-        );
-
-        // condition already include by default on cases list page
-        // globalQb.filter.bySelect(
-        //     'classification',
-        //     this.globalFilterClassificationId,
-        //     false,
-        //     null
-        // );
-
-        // date
-        if (globalFilters.date) {
-          globalQb.filter.byDateRange(
-            'dateOfReporting', {
-              endDate: globalFilters.date.endOf('day').format()
-            }
-          );
-        }
-
-        // get the correct query builder and merge with the existing one
-        this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterCasesRefusingTreatment();
-        if (!globalQb.isEmpty()) {
-          this.appliedListFilterQueryBuilder.merge(globalQb);
-        }
-
-        // merge query builder
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // filter cases among contacts
-      case Constants.APPLY_LIST_FILTER.NO_OF_ACTIVE_TRANSMISSION_CHAINS:
-        // get the correct query builder and merge with the existing one
-        this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterActiveChainsOfTransmission();
-
-        // change the way we build query
-        this.appliedListFilterQueryBuilder.filter.firstLevelConditions();
-
-        // date
-        if (globalFilters.date) {
-          this.appliedListFilterQueryBuilder.filter.byDateRange(
-            'contactDate', {
-              endDate: globalFilters.date.endOf('day').format()
-            }
-          );
-        }
-
-        // location
-        if (globalFilters.locationId) {
-          this.appliedListFilterQueryBuilder.addChildQueryBuilder('person').filter.where({
-            or: [
-              {
-                type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_EVENT',
-                'address.parentLocationIdFilter': globalFilters.locationId
-              }, {
-                type: {
-                  inq: [
-                    'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
-                    'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT'
-                  ]
-                },
-                'addresses.parentLocationIdFilter': globalFilters.locationId
-              }
-            ]
-          });
-        }
-
-        // classification
-        if (!_.isEmpty(globalFilters.classificationId)) {
-          // define classification conditions
-          const classificationConditions = {
-            or: [
-              {
-                type: {
-                  neq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE'
-                }
-              }, {
-                type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
-                classification: {
-                  inq: globalFilters.classificationId
-                }
-              }
-            ]
-          };
-
-          // top level classification
-          this.appliedListFilterQueryBuilder.filter.where(classificationConditions);
-
-          // person
-          this.appliedListFilterQueryBuilder.addChildQueryBuilder('person').filter.where(classificationConditions);
-        }
-
-        // merge query builder
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // filter contacts becoming cases overtime and place
-      case Constants.APPLY_LIST_FILTER.CONTACTS_BECOME_CASES:
-        // add condition for deceased cases
-        this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.getGlobalFilterQB(
-          null,
-          null,
-          'addresses.parentLocationIdFilter',
-          globalFilters.locationId,
-          globalFilters.classificationId
-        );
-
-        // date
-        if (globalFilters.date) {
-          this.appliedListFilterQueryBuilder.filter.byDateRange(
-            'dateBecomeCase', {
-              endDate: globalFilters.date.endOf('day').format()
-            }
-          );
-        }
-
-        // do we need to include default condition ?
-        if (!this.appliedListFilterQueryBuilder.filter.has('dateBecomeCase')) {
-          // any date
-          this.appliedListFilterQueryBuilder.filter.where({
-            'dateBecomeCase': {
-              neq: null
-            }
-          });
-        }
-
-        // exclude discarded cases
-        this.appliedListFilterQueryBuilder.filter.where({
-          classification: {
-            neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
-          }
-        });
-
-        // include was contact cases
-        this.appliedListFilterQueryBuilder.filter.byBoolean(
-          'wasContact',
-          true
-        );
-
-        // merge query builder
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // refresh list on query params changes ( example browser back button was pressed )
-      case Constants.APPLY_LIST_FILTER.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES:
-        // no extra filter
-        this.appliedListFilterQueryBuilder = null;
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // filter cases without relationships
-      case Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS:
-        this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterCasesWithoutRelationships();
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // filter events without relationships
-      case Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS:
-        this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterEventsWithoutRelationships();
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // Filter contacts seen
-      case Constants.APPLY_LIST_FILTER.CONTACTS_SEEN:
-        this.listHelperService.listFilterDataService.filterContactsSeen(
-          globalFilters.date,
-          globalFilters.locationId,
-          globalFilters.classificationId
-        )
-          .subscribe((result: MetricContactsSeenEachDays) => {
-            // merge query builder
-            this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
-            this.appliedListFilterQueryBuilder.filter.where({
-              id: {
-                'inq': result.contactIDs
-              }
-            }, true);
-            this.mergeListFilterToMainFilter();
-
-            // refresh list
-            this.needsRefreshList(true);
-          });
-        break;
-
-        // Filter contacts witch successful follow-up
-      case Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWED_UP:
-        this.listHelperService.listFilterDataService
-          .filterContactsWithSuccessfulFollowup(
-            globalFilters.date,
-            globalFilters.locationId,
-            globalFilters.classificationId
-          )
-          .subscribe((result: MetricContactsWithSuccessfulFollowUp) => {
-            const contactIDs: string[] = _.chain(result.contacts)
-              .filter((item: ContactFollowedUp) => item.successfulFollowupsCount > 0)
-              .map((item: ContactFollowedUp) => {
-                return item.id;
-              }).value();
-            // merge query builder
-            this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
-            this.appliedListFilterQueryBuilder.filter.where({
-              id: {
-                'inq': contactIDs
-              }
-            }, true);
-
-            this.mergeListFilterToMainFilter();
-
-            // refresh list
-            this.needsRefreshList(true);
-          });
-        break;
-
-        // Filter cases without date of onset.
-      case Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_ONSET_CHAIN:
-        // get the case ids that need to be updated
-        const caseIds = _.get(queryParams, 'caseIds', null);
-        // get the correct query builder and merge with the existing one
-        // merge query builder
-        this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
-        this.appliedListFilterQueryBuilder.filter.where({
-          id: {
-            'inq': Array.isArray(caseIds) ? caseIds : [caseIds]
-          }
-        }, true);
-        this.mergeListFilterToMainFilter();
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // Filter cases without date of last contact
-      case Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN:
-        // get the case ids that need to be updated
-        const caseLCIds = _.get(queryParams, 'caseIds', null);
-        // get the correct query builder and merge with the existing one
-        // merge query builder
-        this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
-        this.appliedListFilterQueryBuilder.filter.where({
-          id: {
-            'inq': Array.isArray(caseLCIds) ? caseLCIds : [caseLCIds]
-          }
-        }, true);
-        this.mergeListFilterToMainFilter();
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // Filter cases without date of reporting
-      case Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_REPORTING_CHAIN:
-        // get the case ids that need to be updated
-        const caseDRIds = _.get(queryParams, 'caseIds', null);
-        // get the correct query builder and merge with the existing one
-        // merge query builder
-        this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
-        this.appliedListFilterQueryBuilder.filter.where({
-          id: {
-            'inq': Array.isArray(caseDRIds) ? caseDRIds : [caseDRIds]
-          }
-        }, true);
-        this.mergeListFilterToMainFilter();
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // Filter contacts without date of last contact.
-      case Constants.APPLY_LIST_FILTER.CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN:
-        // get the contact ids that need to be updated
-        const contactIds = _.get(queryParams, 'contactIds', null);
-        // get the correct query builder and merge with the existing one
-        // merge query builder
-        this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
-        this.appliedListFilterQueryBuilder.filter.where({
-          id: {
-            'inq': Array.isArray(contactIds) ? contactIds : [contactIds]
-          }
-        }, true);
-        this.mergeListFilterToMainFilter();
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // Filter contacts without date of last contact.
-      case Constants.APPLY_LIST_FILTER.CONTACTS_WITHOUT_DATE_OF_REPORTING_CHAIN:
-        // get the contact ids that need to be updated
-        const contactDRIds = _.get(queryParams, 'contactIds', null);
-        // get the correct query builder and merge with the existing one
-        // merge query builder
-        this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
-        this.appliedListFilterQueryBuilder.filter.where({
-          id: {
-            'inq': Array.isArray(contactDRIds) ? contactDRIds : [contactDRIds]
-          }
-        }, true);
-        this.mergeListFilterToMainFilter();
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // Filter events without date
-      case Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_DATE_CHAIN:
-        // get the event ids that need to be updated
-        const eventIds = _.get(queryParams, 'eventIds', null);
-        // get the correct query builder and merge with the existing one
-        // merge query builder
-        this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
-        this.appliedListFilterQueryBuilder.filter.where({
-          id: {
-            'inq': Array.isArray(eventIds) ? eventIds : [eventIds]
-          }
-        }, true);
-        this.mergeListFilterToMainFilter();
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // Filter events without date
-      case Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_DATE_OF_REPORTING_CHAIN:
-        // get the event ids that need to be updated
-        const eventDRIds = _.get(queryParams, 'eventIds', null);
-        // get the correct query builder and merge with the existing one
-        // merge query builder
-        this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
-        this.appliedListFilterQueryBuilder.filter.where({
-          id: {
-            'inq': Array.isArray(eventDRIds) ? eventDRIds : [eventDRIds]
-          }
-        }, true);
-        this.mergeListFilterToMainFilter();
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // Filter cases who are not identified though known contact list
-      case Constants.APPLY_LIST_FILTER.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS:
-        // add condition for deceased cases
-        globalQb = this.listHelperService.listFilterDataService.getGlobalFilterQB(
-          null,
-          null,
-          'addresses.parentLocationIdFilter',
-          globalFilters.locationId,
-          globalFilters.classificationId
-        );
-
-        // date
-        if (globalFilters.date) {
-          globalQb.filter.byDateRange(
-            'dateOfReporting', {
-              endDate: globalFilters.date.endOf('day').format()
-            }
-          );
-        }
-
-        // get the correct query builder and merge with the existing one
-        // includes
-        // classification: {
-        //     neq: Constants.CASE_CLASSIFICATION.NOT_A_CASE
-        // }
-        this.appliedListFilterQueryBuilder = this.listHelperService.listFilterDataService.filterCasesNotIdentifiedThroughContacts();
-        if (!globalQb.isEmpty()) {
-          this.appliedListFilterQueryBuilder.merge(globalQb);
-        }
-
-        // merge query builder
-        this.mergeListFilterToMainFilter();
-
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-        // Filter context sensitive help items
-      case Constants.APPLY_LIST_FILTER.CONTEXT_SENSITIVE_HELP_ITEMS:
-        // get the help items ids that need to be updated
-        const helpItemsIds = _.get(queryParams, 'helpItemsIds', null);
-        const itemsIds: string[] = (_.isArray(helpItemsIds) ?
-          helpItemsIds :
-          [helpItemsIds]
-        ) as string[];
-        // get the correct query builder and merge with the existing one
-        // merge query builder
-        this.appliedListFilterQueryBuilder = new RequestQueryBuilder();
-        this.appliedListFilterQueryBuilder.filter.where({
-          id: {
-            'inq': itemsIds
-          }
-        }, true);
-        this.mergeListFilterToMainFilter();
-        // refresh list
-        this.needsRefreshList(true);
-        break;
-
-    }
-  }
-
-  /**
-     * Retrieve Global Filter Values
-     * @param queryParams
-     */
-  getGlobalFilterValues(queryParams: {
-    global?: string | {
-      date?: Moment,
-      locationId?: string,
-      classificationId?: string[]
-    }
-  }): {
-      date?: Moment,
-      locationId?: string,
-      classificationId?: string[]
-    } {
-    // do we need to decode global filters ?
-    const global: {
-      date?: Moment,
-      locationId?: string,
-      classificationId?: string[]
-    } = !queryParams.global ?
-      {} : (
-        _.isString(queryParams.global) ?
-          JSON.parse(queryParams.global as string) :
-          queryParams.global
-      );
-
-    // parse date
-    if (global.date) {
-      global.date = moment(global.date);
-    }
-
-    // finished
-    return global;
-  }
-
-  /**
-     * Individual Checkbox
-     */
-  checkedRecord(item: any, checked: boolean) {
-    // set value
-    const id: string = this.getCheckRecordKey(item);
-    if (checked) {
-      this.checkboxModels.checkedRecords[id] = true;
-    } else {
-      delete this.checkboxModels.checkedRecords[id];
-    }
-
-    // reset check all
-    let checkedAll: boolean = true;
-    this.checkboxModels.checkedOnlyDeletedRecords = true;
-    this.checkboxModels.checkedOnlyNotDeletedRecords = true;
-    this.checkboxModels.records.forEach((record: any) => {
-      // uncheck checked all ?
-      const idRecord: string = this.getCheckRecordKey(record);
-      if (!this.checkboxModels.checkedRecords[idRecord]) {
-        checkedAll = false;
-      }
-
-      // check only checked records
-      if (this.checkboxModels.checkedRecords[idRecord]) {
-        // all records are deleted ?
-        if (!record.deleted) {
-          this.checkboxModels.checkedOnlyDeletedRecords = false;
-        }
-
-        // all records aren't deleted ?
-        if (record.deleted) {
-          this.checkboxModels.checkedOnlyNotDeletedRecords = false;
-        }
-
-        // single select? - uncheck others
-        if (
-          !this.checkedIsMultiSelect &&
-                    idRecord !== id
-        ) {
-          // update the view
-          delete this.checkboxModels.checkedRecords[idRecord];
-          this.listCheckedIndividualInputs.forEach((checkbox: FormCheckboxComponent) => {
-            if (checkbox.name === 'listCheckedIndividual[' + idRecord + ']') {
-              checkbox.value = false;
-            }
-          });
-        }
-      }
-    });
-
-    // set check all value
-    this.checkboxModels.checkAll = checkedAll;
-  }
-
-  /**
-     * Retrieve list of checked records ( an array of IDs )
-     */
-  get checkedRecords(): string[] {
-    return Object.keys(this.checkboxModels.checkedRecords || {});
-  }
-
-  /**
-     * Check that we have at least one record selected
-     */
-  validateCheckedRecords() {
-    // get list of ids
-    const selectedRecords: string[] = this.checkedRecords;
-
-    // validate
-    if (selectedRecords.length < 1) {
-      // display message
-      if (this.listHelperService.snackbarService) {
-        this.listHelperService.snackbarService.showError('LNG_COMMON_LABEL_NO_RECORDS_SELECTED');
-      }
-
-      // not valid
-      return false;
-    }
-
-    // valid, send list of IDs back
-    return selectedRecords;
-  }
-
-  public checkAllRecords() {
-    this.checkedAllRecords = true;
-  }
-
-  public uncheckAllRecords() {
-    this.checkedAllRecords = false;
-  }
-
-  /**
-     * Visible columns
-     * @param visibleColumns
-     */
-  applySideColumnsChanged(visibleColumns: string[]) {
-    // apply side columns
-    this.visibleTableColumns = visibleColumns;
-
-    // disabled saved filters for current user ?
-    const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
-    if (
-      authUser.dontCacheFilters ||
-            this._disableFilterCaching
-    ) {
-      return;
-    }
-
-    // reload data into columns from cached filters
-    // load saved filters
-    const currentUserCache: ICachedFilter = this.getCachedFilters(true);
-    const currentUserCacheForCurrentPath: ICachedFilterItems = currentUserCache[this.getCachedFilterPageKey()];
-    if (currentUserCacheForCurrentPath) {
-      // load saved input values
-      this.loadCachedInputValues(currentUserCacheForCurrentPath);
-    }
-  }
-
-  /**
-     * Check if a row's cell is expanded
-     * @param columnName
-     * @param rowId
-     */
-  public isCellExpanded(columnName: string, rowId: string): boolean {
-    // is the whole column marked to be expanded?
-    const columnExpanded = _.get(this.expandAllCellsForColumn, columnName);
-    // is cell marked to be expanded/collapsed?
-    const cellExpanded = _.get(this.expandCell, `${columnName}.${rowId}`);
-
-    // note that individual cell configuration overrides generic configuration
-    // e.g. if columnExpanded = true, but cellExpanded = false, then the cell is NOT expanded
-    return (
-    // expand the cell if it is marked individually
-      cellExpanded === true ||
-            // expand the cell if column is expanded and cell is NOT collapsed individually
-            (columnExpanded === true) && (cellExpanded !== false)
-    );
-  }
-
-  /**
-     * Expand/Collapse a cell individually
-     * @param columnName
-     * @param rowId
-     * @param expand Expand or Collapse the cell?
-     */
-  public toggleCell(columnName: string, rowId: string, expand: boolean) {
-    _.set(this.expandCell, `${columnName}.${rowId}`, expand);
-  }
-
-  /**
-     * Expand/Collapse all cells of a certain column
-     * @param columnName
-     * @param expand Expand or Collapse the cells?
-     */
-  public toggleColumn(columnName: string, expand: boolean) {
-    // remove individual cells configurations
-    delete this.expandCell[columnName];
-
-    // set column configuration
-    this.expandAllCellsForColumn[columnName] = expand;
-  }
-
-  /**
-     * Retrieve cached filters
-     */
+   * Retrieve cached filters
+   */
   private getCachedFilters(forLoadingFilters: boolean): ICachedFilter {
-    // user information
-    const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
-
-    // retrieve filters if there are any initialized
-    const cachedFilters: string = this.listHelperService.storageService.get(StorageKey.FILTERS);
-    let filters: {
-      [userId: string]: any
-    } = {};
-    if (cachedFilters) {
-      filters = JSON.parse(LzString.decompress(cachedFilters));
-    }
-
     // we need to have data for this user, otherwise remove what we have
-    let currentUserCache: ICachedFilter = filters[authUser.id];
-    if (!currentUserCache) {
-      currentUserCache = {};
-    }
+    const currentUserCache: ICachedFilter = ListComponent.getCachedFiltersFromStorage(
+      this.listHelperService.authDataService.getAuthenticatedUser(),
+      this.listHelperService.storageService
+    );
 
     // check if we have something in url, which has priority against storage
     if (
       this.listHelperService.route.snapshot.queryParams &&
-            this.listHelperService.route.snapshot.queryParams.cachedListFilters
+      this.listHelperService.route.snapshot.queryParams.cachedListFilters
     ) {
       try {
         // retrieve data
@@ -2295,14 +750,14 @@ export abstract class ListComponent implements OnDestroy {
         // validate cached url filter
         if (
           cachedListFilters.sideFilters === undefined ||
-                    cachedListFilters.sort === undefined ||
-                    cachedListFilters.inputs === undefined ||
-                    cachedListFilters.queryBuilder === undefined
+          cachedListFilters.sort === undefined ||
+          cachedListFilters.inputs === undefined ||
+          cachedListFilters.queryBuilder === undefined
         ) {
           // display only if we're loading data, for save it doesn't matter since we will overwrite it
           if (forLoadingFilters) {
             setTimeout(() => {
-              this.listHelperService.snackbarService.showError('LNG_COMMON_LABEL_INVALID_URL_FILTERS');
+              this.listHelperService.toastV2Service.error('LNG_COMMON_LABEL_INVALID_URL_FILTERS');
             });
           }
         } else {
@@ -2317,62 +772,71 @@ export abstract class ListComponent implements OnDestroy {
   }
 
   /**
-     * Retrieve filter key for current page
-     */
+   * Retrieve filter key for current page
+   */
   private getCachedFilterPageKey(): string {
-    // get path
-    let filterKey: string = this.listHelperService.location.path();
-    const pathParamsIndex: number = filterKey.indexOf('?');
-    if (pathParamsIndex > -1) {
-      filterKey = filterKey.substr(0, pathParamsIndex);
-    }
-
-    // if apply list filter then we need to make sure we add it to our key so we don't break other pages by adding filters that we shouldn't
-    if (this.appliedListFilter) {
-      filterKey += `_${this.appliedListFilter}`;
-    }
-
-    // remove ids from link so we don't have filters for each item because this would mean that we will fill storage really fast
-    filterKey = filterKey.replace(
-      /[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}/ig,
-      ''
+    return ListComponent.getCachedFiltersPageKey(
+      this.listHelperService.location.path(),
+      this.appliedListFilter
     );
-
-    // finished
-    return filterKey;
   }
 
   /**
-     * Retrieve input values
-     */
+   * Retrieve input values
+   */
   private getInputsValuesForCache(): ICachedInputsValues {
     // initialize
     const inputValues: ICachedInputsValues = {};
 
     // determine filter input values
-    // keeping in mind that all filters should have ResetInputOnSideFilterDirective directives
-    (this.filterInputs || []).forEach((input: ResetInputOnSideFilterDirective) => {
-      // should we jump this one ?
-      if (input.disableCachedFilterOverwrite) {
+    (this.tableColumns || []).forEach((column) => {
+      // has no filter ?
+      if (!column.filter) {
+        return;
+      }
+
+      // handle accordingly to filter type
+      let value: any;
+      switch (column.filter.type) {
+        case V2FilterType.ADDRESS_PHONE_NUMBER:
+          // get value
+          value = column.filter.address.phoneNumber;
+
+          // finished
+          break;
+
+        case V2FilterType.ADDRESS_MULTIPLE_LOCATION:
+          // get value
+          value = column.filter.address.filterLocationIds;
+
+          // finished
+          break;
+
+        case V2FilterType.ADDRESS_FIELD:
+          // get value
+          value = column.filter.address[column.filter.addressField];
+
+          // finished
+          break;
+
+        case V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION:
+          // get value
+          value = column.filter.address.geoLocationAccurate;
+
+          // finished
+          break;
+
+        default:
+          value = column.filter.value;
+      }
+
+      // nothing to do ?
+      if (value === undefined) {
         return;
       }
 
       // update value
-      inputValues[input.control.name] = input.control && input.control.valueAccessor instanceof ValueAccessorBase ?
-        (input.control.valueAccessor as ValueAccessorBase<any>).value :
-        input.control.value;
-    });
-
-    // determine location input values
-    // keeping in mind that all filters should have ResetLocationOnSideFilterDirective directives
-    (this.filterLocationInputs || []).forEach((input: ResetLocationOnSideFilterDirective) => {
-      // should we jump this one ?
-      if (input.disableCachedFilterOverwrite) {
-        return;
-      }
-
-      // update value
-      inputValues[input.component.name] = input.component.value;
+      inputValues[column.field] = value;
     });
 
     // finished
@@ -2380,44 +844,50 @@ export abstract class ListComponent implements OnDestroy {
   }
 
   /**
-     * Determine what columns are sorted by
-     */
+   * Determine what columns are sorted by
+   */
   private getTableSortForCache(): ICachedSortItem {
     // nothing sorted by ?
-    if (
-      !this.matTableSort ||
-            !this.matTableSort.direction
-    ) {
+    if (!this.tableSortBy.direction) {
       return null;
     }
 
     // set sort values
     return {
-      active: this.matTableSort.active,
-      direction: this.matTableSort.direction as RequestSortDirection
+      active: this.tableSortBy.field,
+      direction: this.tableSortBy.direction
     };
   }
 
   /**
-     * Merge query params to url
-     */
+   * Merge query params to url
+   */
   private mergeQueryParamsToUrl(queryParams: {
     [queryParamKey: string]: any
   }): void {
-    this.listHelperService.router.navigate(
-      [],
-      {
-        relativeTo: this.listHelperService.route,
-        replaceUrl: true,
-        queryParamsHandling: 'merge',
-        queryParams
-      }
-    );
+    // disable show page loading
+    AuthenticatedComponent.DISABLE_PAGE_LOADING = true;
+
+    // add params to page
+    this.listHelperService.router
+      .navigate(
+        [],
+        {
+          relativeTo: this.listHelperService.route,
+          replaceUrl: true,
+          queryParamsHandling: 'merge',
+          queryParams
+        }
+      )
+      .then(() => {
+        // enable page loading
+        AuthenticatedComponent.DISABLE_PAGE_LOADING = false;
+      });
   }
 
   /**
-     * Save cache to url
-     */
+   * Save cache to url
+   */
   private saveCacheToUrl(currentUserCache: ICachedFilterItems): void {
     this.mergeQueryParamsToUrl({
       cachedListFilters: JSON.stringify(currentUserCache)
@@ -2425,14 +895,14 @@ export abstract class ListComponent implements OnDestroy {
   }
 
   /**
-     * Update cached query
-     */
+   * Update cached query
+   */
   private updateCachedFilters(): void {
     // disabled saved filters for current user ?
     const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
     if (
       authUser.dontCacheFilters ||
-            this._disableFilterCaching
+      this._disableFilterCaching
     ) {
       return;
     }
@@ -2443,8 +913,8 @@ export abstract class ListComponent implements OnDestroy {
       queryBuilder: this.queryBuilder.serialize(),
       inputs: this.getInputsValuesForCache(),
       sort: this.getTableSortForCache(),
-      sideFilters: this.sideFilter ?
-        this.sideFilter.toSaveData() :
+      sideFilters: this.tableV2Component ?
+        this.tableV2Component.advancedFiltersToSaveData() :
         null
     };
 
@@ -2461,55 +931,69 @@ export abstract class ListComponent implements OnDestroy {
   }
 
   /**
-     * Load cached input values
-     */
+   * Load cached input values
+   */
   private loadCachedInputValues(currentUserCacheForCurrentPath: ICachedFilterItems): void {
-    // already waiting for execution ?
-    if (this._nextTimerForLoadCachedInputValues !== undefined) {
+    // allow next reset
+    if (this._disableNextLoadCachedInputValues) {
+      // allow next reset
+      this._disableNextLoadCachedInputValues = false;
+
+      // finished
       return;
     }
 
-    // wait for inputs to be rendered
-    this._nextTimerForLoadCachedInputValues = setTimeout(() => {
-      // reset call
-      this._nextTimerForLoadCachedInputValues = undefined;
+    // nothing to load ?
+    if (_.isEmpty(currentUserCacheForCurrentPath.inputs)) {
+      return;
+    }
 
-      // allow next reset
-      if (this._disableNextLoadCachedInputValues) {
-        // allow next reset
-        this._disableNextLoadCachedInputValues = false;
-
-        // finished
+    // update filter input values
+    (this.tableColumns || []).forEach((column) => {
+      // has no filter ?
+      if (!column.filter) {
         return;
       }
 
-      // nothing to load ?
-      if (_.isEmpty(currentUserCacheForCurrentPath.inputs)) {
+      // determine if we have cached value
+      const value: any = currentUserCacheForCurrentPath.inputs[column.field];
+      if (value === undefined) {
         return;
       }
 
-      // update filter input values
-      // keeping in mind that all filters should have ResetInputOnSideFilterDirective directives
-      (this.filterInputs || []).forEach((input: ResetInputOnSideFilterDirective) => {
-        if (
-          input.control &&
-                    currentUserCacheForCurrentPath.inputs[input.control.name] !== undefined &&
-                    input.control.valueAccessor instanceof ValueAccessorBase
-        ) {
-          input.updateToAfterPristineValueIsTaken(currentUserCacheForCurrentPath.inputs[input.control.name]);
-        }
-      });
+      // handle accordingly to filter type
+      switch (column.filter.type) {
+        case V2FilterType.ADDRESS_PHONE_NUMBER:
+          // get value
+          column.filter.address.phoneNumber = value;
 
-      // update filter input values
-      // keeping in mind that all filters should have ResetLocationOnSideFilterDirective directives
-      (this.filterLocationInputs || []).forEach((input: ResetLocationOnSideFilterDirective) => {
-        if (
-          input.component &&
-                    currentUserCacheForCurrentPath.inputs[input.component.name] !== undefined
-        ) {
-          input.updateToAfterPristineValueIsTaken(currentUserCacheForCurrentPath.inputs[input.component.name]);
-        }
-      });
+          // finished
+          break;
+
+        case V2FilterType.ADDRESS_MULTIPLE_LOCATION:
+          // get value
+          column.filter.address.filterLocationIds = value;
+
+          // finished
+          break;
+
+        case V2FilterType.ADDRESS_FIELD:
+          // get value
+          column.filter.address[column.filter.addressField] = value;
+
+          // finished
+          break;
+
+        case V2FilterType.ADDRESS_ACCURATE_GEO_LOCATION:
+          // get value
+          column.filter.address.geoLocationAccurate = value;
+
+          // finished
+          break;
+
+        default:
+          column.filter.value = value;
+      }
     });
   }
 
@@ -2517,66 +1001,41 @@ export abstract class ListComponent implements OnDestroy {
      * Load cached sort column
      */
   private loadCachedSortColumn(currentUserCacheForCurrentPath: ICachedFilterItems): void {
-    // wait for inputs to be rendered
-    setTimeout(() => {
-      // no sort applied ?
-      // make sure we have the mat table visible
-      if (
-        !currentUserCacheForCurrentPath.sort ||
-                !currentUserCacheForCurrentPath.sort.active ||
-                !this.matTableSort
-      ) {
-        return;
-      }
+    // no sort applied ?
+    if (
+      !currentUserCacheForCurrentPath.sort ||
+      !currentUserCacheForCurrentPath.sort.active ||
+      !currentUserCacheForCurrentPath.sort.direction
+    ) {
+      return;
+    }
 
-      // reset state so that start is the first sort direction that you will see
-      this._sortByDisabled = true;
-      this.matTableSort.sort({
-        id: null,
-        start: currentUserCacheForCurrentPath.sort.direction,
-        disableClear: false
-      });
-      this.matTableSort.sort({
-        id: currentUserCacheForCurrentPath.sort.active,
-        start: currentUserCacheForCurrentPath.sort.direction,
-        disableClear: false
-      });
-
-      // ugly hack
-      (this.matTableSort.sortables.get(currentUserCacheForCurrentPath.sort.active) as MatSortHeader)._setAnimationTransitionState({ toState: 'active' });
-      this._sortByDisabled = false;
-    });
+    // reset state so that start is the first sort direction that you will see
+    this.tableSortBy = {
+      field: currentUserCacheForCurrentPath.sort.active,
+      direction: currentUserCacheForCurrentPath.sort.direction
+    };
   }
 
   /**
-     * Load side filters
-     */
+   * Load side filters
+   */
   private loadSideFilters(currentUserCacheForCurrentPath: ICachedFilterItems): void {
-    // wait for inputs to be rendered
-    setTimeout(() => {
-      // no side filters ?
-      if (
-        !currentUserCacheForCurrentPath.sideFilters ||
-                !this.sideFilter
-      ) {
-        return;
-      }
+    // no side filters ?
+    if (
+      !currentUserCacheForCurrentPath.sideFilters ||
+      !this.tableV2Component
+    ) {
+      return;
+    }
 
-      // load side filters
-      this.sideFilter.generateFiltersFromFilterData(new SavedFilterData(currentUserCacheForCurrentPath.sideFilters));
-    });
+    // load side filters
+    this.tableV2Component.generateFiltersFromFilterData(new SavedFilterData(currentUserCacheForCurrentPath.sideFilters));
   }
 
   /**
-     * Loaded cached filters
-     */
-  beforeCacheLoadFilters(): void {
-    // NOTHING
-  }
-
-  /**
-     * Check if we need to load cached filters if necessary depending if we already loaded for this route or not
-     */
+   * Check if we need to load cached filters if necessary depending if we already loaded for this route or not
+   */
   private loadCachedFiltersIfNecessary(): void {
     // if we loaded cached filters for this page then we don't need to load it again
     if (this._loadedCachedFilterPage === this.getCachedFilterPageKey()) {
@@ -2588,18 +1047,15 @@ export abstract class ListComponent implements OnDestroy {
   }
 
   /**
-     * Load cached filters
-     */
+   * Load cached filters
+   */
   private loadCachedFilters(): void {
     // disabled saved filters for current user ?
     const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
     if (
       authUser.dontCacheFilters ||
-            this._disableFilterCaching
+      this._disableFilterCaching
     ) {
-      // trigger finish callback
-      this.beforeCacheLoadFilters();
-
       // finished
       return;
     }
@@ -2644,21 +1100,17 @@ export abstract class ListComponent implements OnDestroy {
       // update page index
       this.updatePageIndex();
     }
-
-    // trigger before actually refreshing page
-    // NO setTimeout because it will break some things
-    this.beforeCacheLoadFilters();
   }
 
   /**
-     * Update page index
-     */
+   * Update page index
+   */
   private updatePageIndex(): void {
     // set paginator page
     if (this.queryBuilder.paginator) {
       if (
         this.queryBuilder.paginator.skip &&
-                this.queryBuilder.paginator.limit
+        this.queryBuilder.paginator.limit
       ) {
         this.pageIndex = this.queryBuilder.paginator.skip / this.queryBuilder.paginator.limit;
       } else {
@@ -2669,90 +1121,6 @@ export abstract class ListComponent implements OnDestroy {
       if (this.queryBuilder.paginator.limit) {
         this.pageSize = this.queryBuilder.paginator.limit;
       }
-    }
-  }
-
-  /**
-     * Display loading dialog
-     */
-  showLoadingDialog() {
-    this.loadingDialog = this.listHelperService.dialogService.showLoadingDialog();
-  }
-
-  /**
-     * Hide loading dialog
-     */
-  closeLoadingDialog() {
-    if (this.loadingDialog) {
-      this.loadingDialog.close();
-      this.loadingDialog = null;
-    }
-  }
-
-  /**
-     * Show Export progress
-     */
-  showExportProgress(progress: DialogExportProgressAnswer): void {
-    // no visible loading dialog ?
-    if (!this.loadingDialog) {
-      return;
-    }
-
-    // display progress accordingly to status steps
-    switch (progress.step) {
-      case ExportStatusStep.LNG_STATUS_STEP_RETRIEVING_LANGUAGE_TOKENS:
-        this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_RETRIEVING_LANGUAGE_TOKENS');
-        break;
-      case ExportStatusStep.LNG_STATUS_STEP_PREPARING_PREFILTERS:
-        this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING_PREFILTERS');
-        break;
-      case ExportStatusStep.LNG_STATUS_STEP_PREPARING_RECORDS:
-        this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING');
-        break;
-      case ExportStatusStep.LNG_STATUS_STEP_PREPARING_LOCATIONS:
-        this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_PREPARING_LOCATIONS');
-        break;
-      case ExportStatusStep.LNG_STATUS_STEP_CONFIGURE_HEADERS:
-        this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_CONFIGURE_HEADERS');
-        break;
-      case ExportStatusStep.LNG_STATUS_STEP_EXPORTING_RECORDS:
-        this.loadingDialog.showMessage(
-          'LNG_PAGE_EXPORT_DATA_EXPORT_PROCESSED', {
-            processed: progress.processed.toLocaleString('en'),
-            total: progress.total.toLocaleString('en'),
-            estimatedEnd: progress.estimatedEndDate ?
-              progress.estimatedEndDate.format(Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
-              '-'
-          }
-        );
-        break;
-      case ExportStatusStep.LNG_STATUS_STEP_ENCRYPT:
-        this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_ENCRYPTING');
-        break;
-      case ExportStatusStep.LNG_STATUS_STEP_ARCHIVE:
-        this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_ARCHIVING');
-        break;
-      case ExportStatusStep.LNG_STATUS_STEP_EXPORT_FINISHED:
-        if (
-          progress.downloadedBytes === undefined ||
-                    progress.totalBytes === undefined
-        ) {
-          this.loadingDialog.showMessage('LNG_PAGE_EXPORT_DATA_EXPORT_FINISHING');
-        } else {
-          this.loadingDialog.showMessage(
-            'LNG_PAGE_EXPORT_DATA_EXPORT_DOWNLOADING', {
-              downloaded: progress.downloadedBytes ?
-                progress.downloadedBytes :
-                '',
-              total: progress.totalBytes ?
-                progress.totalBytes :
-                ''
-            }
-          );
-        }
-
-        // finished
-        break;
     }
   }
 }

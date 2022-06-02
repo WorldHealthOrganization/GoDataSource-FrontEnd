@@ -1,0 +1,187 @@
+/* Tabs */
+.mat-tab-group {
+  font-family: $gd-font-family;
+
+  .mat-tab-header {
+    border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.5);
+
+    .mat-tab-header-pagination {
+      background: rgba(var(--gd-primary-rgb), 0.25);
+      @include box-shadow(none);
+
+      .mat-tab-header-pagination-chevron {
+        border-color: var(--gd-primary);
+      }
+
+      &.mat-tab-header-pagination-before {
+        margin-left: -2rem;
+      }
+
+      &.mat-tab-header-pagination-after {
+        margin-right: -2rem;
+      }
+
+      &.mat-tab-header-pagination-disabled {
+        background: rgba(var(--gd-secondary-rgb), 0.25);
+
+        .mat-tab-header-pagination-chevron {
+          border-color: rgba(var(--gd-secondary-rgb), 0.5);
+        }
+      }
+    }
+
+    .mat-tab-label-container {
+      .mat-tab-list {
+        .mat-tab-labels {
+          .mat-tab-label {
+            color: var(--gd-secondary);
+            font-family: $gd-font-family;
+            font-size: $gd-font-size;
+            height: auto;
+            line-height: $gd-line-height;
+            min-width: 0;
+            @include opacity(1);
+            padding: 0.8rem 1.6rem;
+
+            &.mat-tab-label-active {
+              color: var(--gd-primary);
+            }
+
+            .mat-tab-label-content {
+              .mat-icon {
+                height: 2.1rem;
+                margin-left: 0.8rem;
+                width: 2.1rem;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .mat-tab-body-wrapper {
+    .mat-tab-body {
+      &.mat-tab-body-active {
+        overflow: hidden;
+      }
+
+      .mat-tab-body-content {
+        height: auto;
+        overflow: hidden;
+      }
+    }
+  }
+
+  &.mat-primary {
+    .mat-tab-header {
+      .mat-tab-label-container {
+        .mat-tab-list {
+          .mat-ink-bar {
+            background-color: var(--gd-primary);
+          }
+        }
+      }
+    }
+  }
+
+  &.mat-accent {
+    .mat-tab-header {
+      .mat-tab-label-container {
+        .mat-tab-list {
+          .mat-ink-bar {
+            background-color: var(--gd-success);
+          }
+        }
+      }
+    }
+  }
+
+  &.mat-warn {
+    .mat-tab-header {
+      .mat-tab-label-container {
+        .mat-tab-list {
+          .mat-ink-bar {
+            background-color: var(--gd-danger);
+          }
+        }
+      }
+    }
+  }
+}
+
+.gd-create-view-modify-modify,
+.gd-create-view-modify-view {
+  .gd-create-view-modify-bottom {
+    .mat-tab-group {
+      height: 100%;
+
+      .mat-tab-header {
+        margin: 0 -4rem 2.4rem;
+        padding: 0 4rem;
+      }
+
+      .mat-tab-body-wrapper {
+        @include border-radius(0.4rem);
+        @include box-shadow(0 0.2rem 0.1rem -0.1rem rgb(0, 0, 0, 0.2),
+                            0 0.1rem 0.1rem 0 rgb(0, 0, 0, 0.14),
+                            0 0.1rem 0.3rem 0 rgb(0, 0, 0, 0.12));
+        height: 100%;
+        overflow: auto;
+
+        .mat-tab-body {
+          &.mat-tab-body-active {
+            background-color: var(--gd-background);
+            @include border-radius(0.4rem);
+            display: block;
+            max-height: 100%;
+            overflow-y: auto;
+          }
+
+          .mat-tab-body-content {
+            padding: 1.6rem;
+
+            @include breakpoint('xs') {
+              padding-right: 0;
+            }
+          }
+
+          &.gd-create-view-modify-tab-list {
+            .mat-tab-body-content {
+              height: 100%;
+              padding: 0;
+
+              .gd-create-view-modify-bottom-content {
+                height: 100%;
+
+                .mat-card {
+                  @include box-shadow(none);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.gd-create-view-modify-view {
+  .gd-create-view-modify-bottom {
+    .mat-tab-group {
+      .mat-tab-header {
+        @include breakpoint('lg') {
+          padding-left: 6rem;
+        }
+
+        @include breakpoint('lt-md') {
+          padding-left: 7.2rem;
+        }
+
+        @include breakpoint('xs') {
+          padding-left: 4rem;
+        }
+      }
+    }
+  }
+}

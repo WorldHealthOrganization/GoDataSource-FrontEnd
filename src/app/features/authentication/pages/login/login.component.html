@@ -1,131 +1,226 @@
-<!-- Language select -->
-<app-topnav-unauthenticated></app-topnav-unauthenticated>
+<div
+  class="gd-login"
+  fxLayout="row" fxLayoutAlign="start stretch">
 
-<app-not-auth-template>
-    <div class="not-auth-title">
-        {{ 'LNG_PAGE_LOGIN_WELCOME_MESSAGE' | translate }}
+  <!-- Left side -->
+  <div
+    *ngIf="renderMode !== RenderMode.SMALL"
+    class="gd-login-left"
+    fxLayout="column" fxLayoutAlign="space-between start">
+
+    <!-- Left - top -->
+    <div
+      class="gd-login-left-top">
+      Go.Data
     </div>
 
-    <mat-spinner
-        *ngIf="loading"
-        class="login-spinner">
-    </mat-spinner>
+    <!-- Left - bottom -->
+    <div
+      class="gd-login-left-bottom">
+      <img src="../../../../assets/images/gd-logomark.svg" alt="Go.Data Logo" />
+    </div>
 
-    <form
-        *ngIf="!loading"
-        #form="ngForm"
-        (submit)="login(form)"
-        class="login-form">
-        <div fxLayout="row" fxLayoutAlign="center" class="not-auth-content-limited">
-            <div fxLayout="column" fxFlex>
-                <!-- Email input -->
-                <div
-                    class="login-row-specific-height"
-                    fxLayout="row">
-                    <app-form-input
-                        [tabIndex]="1"
-                        name="email"
-                        [(ngModel)]="user.email"
-                        [placeholder]="'LNG_COMMON_FIELD_LABEL_EMAIL_ADDRESS' | translate"
-                        required="true"
-                        app-email-validator>
-                    </app-form-input>
-                </div>
+  </div>
 
-                <!-- Password input -->
-                <div
-                    *ngIf="!twoFA; else twoFACode"
-                    class="login-row-specific-height"
-                    fxLayout="row">
-                    <app-form-input
-                        [tabIndex]="2"
-                        class="password-input"
-                        type="password"
-                        name="password"
-                        [(ngModel)]="user.password"
-                        [placeholder]="'LNG_COMMON_FIELD_LABEL_PASSWORD' | translate"
-                        required="true">
-                    </app-form-input>
+  <!-- Right side -->
+  <div
+    class="gd-login-right"
+    fxLayout="column" fxLayoutAlign="space-between center">
 
-                    <button
-                        mat-raised-button
-                        type="button"
-                        class="reset-pass-button"
-                        routerLink="/auth/forgot-password">
-                        {{ 'LNG_PAGE_LOGIN_FORGOT_PASSWORD_LABEL' | translate }}
-                    </button>
-                </div>
+    <!-- Right - top -->
+    <div
+      class="gd-login-right-top"
+      fxFlexAlign="end">
+      <app-select-language-v2></app-select-language-v2>
+    </div>
 
-                <!-- Two Factor code -->
-                <ng-template
-                    #twoFACode>
-                    <div
-                        class="login-row-specific-height"
-                        fxLayout="row">
-                        <app-form-input
-                            [tabIndex]="2"
-                            name="code"
-                            [(ngModel)]="user.code"
-                            [placeholder]="'LNG_COMMON_FIELD_LABEL_CODE' | translate"
-                            required="true">
-                        </app-form-input>
-                    </div>
-                </ng-template>
+    <!-- Right - middle -->
+    <div
+      class="gd-login-right-middle">
 
-                <!-- Captcha input -->
-                <div
-                    *ngIf="displayCaptcha"
-                    class="login-captcha-row"
-                    fxLayout="row">
-                    <!-- Captcha SVG -->
-                    <div
-                        class="login-captcha-row-svg">
-                        <div
-                            fxLayout="row" fxLayoutAlign="start center"
-                            *ngIf="captchaData$ | async as captchaData; else loadingCaptcha">
-                            <!-- SVG -->
-                            <div [innerHTML]="captchaData"></div>
+      <!-- Right - middle - logo -->
+      <div
+        class="gd-login-right-middle-logo">
+        <img src="../../../../assets/images/gd-logo.svg" alt="Go.Data Logo" />
+      </div>
 
-                            <!-- Captcha SVG refresh -->
-                            <button
-                                fxGrow="0"
-                                type="button"
-                                mat-icon-button
-                                (click)="refreshCaptcha()">
-                                <span class="xt-icon">refresh</span>
-                            </button>
-                        </div>
+      <!-- Right - middle - title -->
+      <div
+        class="gd-login-right-middle-title">
+        {{ (pageType === CaptchaDataFor.LOGIN ? 'LNG_PAGE_LOGIN_WELCOME_MESSAGE' : 'LNG_PAGE_FORGOT_PASSWORD_TITLE') | translate }}
+      </div>
 
-                        <!-- Loading data -->
-                        <ng-template
-                            #loadingCaptcha>
-                            <div
-                                class="login-captcha-row-svg-loading">
-                                <mat-spinner></mat-spinner>
-                            </div>
-                        </ng-template>
-                    </div>
+      <!-- Details -->
+      <div
+        *ngIf="pageType === CaptchaDataFor.FORGOT_PASSWORD"
+        class="gd-login-right-middle-details">
+        {{ 'LNG_PAGE_FORGOT_PASSWORD_DESCRIPTION' | translate }}
+      </div>
 
-                    <!-- Captcha SVG input -->
-                    <app-form-input
-                        [tabIndex]="3"
-                        name="captcha"
-                        [(ngModel)]="user.captcha"
-                        [placeholder]="'LNG_COMMON_FIELD_LABEL_CAPTCHA' | translate"
-                        required="true"
-                        autocomplete="off">
-                    </app-form-input>
-                </div>
+      <!-- Right - middle - form -->
+      <div
+        class="gd-login-right-middle-form">
 
-                <!-- Login button -->
-                <div fxLayout="column" class="app-theme">
-                    <button
-                        tabindex="4"
-                        mat-raised-button color="accent">
-                        {{ 'LNG_PAGE_LOGIN_ACTION_LOGIN_BUTTON' | translate }}
-                    </button>
-                </div>
+        <!-- Login / Forgot password form -->
+        <form
+          #form="ngForm"
+          (submit)="pageType === CaptchaDataFor.LOGIN ? login(form) : forgotPassword(form)">
+
+          <!-- Login -->
+          <ng-container
+            *ngIf="pageType === CaptchaDataFor.LOGIN">
+
+            <!-- Email -->
+            <app-form-input-v2
+              ngModel
+              name="email"
+              placeholder="LNG_COMMON_FIELD_LABEL_EMAIL_ADDRESS"
+              required="true"
+              app-email-validator>
+            </app-form-input-v2>
+
+            <!-- First step -->
+            <ng-container
+              *ngIf="!twoFA; else twoFACode">
+
+              <!-- Password -->
+              <app-form-password-v2
+                ngModel
+                name="password"
+                placeholder="LNG_COMMON_FIELD_LABEL_PASSWORD"
+                required="true">
+              </app-form-password-v2>
+
+              <!-- Forgot password -->
+              <div
+                class="gd-login-right-middle-form-forgot-button">
+                <button
+                  mat-flat-button
+                  type="button"
+                  color="text"
+                  routerLink="/auth/forgot-password"
+                  tabindex="-1">
+                  {{ 'LNG_PAGE_LOGIN_FORGOT_PASSWORD_LABEL' | translate }}
+                </button>
+              </div>
+
+            </ng-container>
+
+            <!-- 2FA code -->
+            <ng-template
+              #twoFACode>
+
+              <!-- 2FA Code -->
+              <app-form-input-v2
+                ngModel
+                name="code"
+                placeholder="LNG_COMMON_FIELD_LABEL_CODE"
+                required="true"
+                autocomplete="off">
+              </app-form-input-v2>
+
+            </ng-template>
+          </ng-container>
+
+          <!-- Email -->
+          <app-form-input-v2
+            *ngIf="pageType === CaptchaDataFor.FORGOT_PASSWORD"
+            ngModel
+            name="email"
+            placeholder="LNG_COMMON_FIELD_LABEL_EMAIL_ADDRESS"
+            required="true"
+            app-email-validator>
+          </app-form-input-v2>
+
+          <!-- Captcha -->
+          <div
+            *ngIf="displayCaptcha"
+            class="gd-login-right-middle-form-captcha"
+            fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-between center">
+
+            <!-- Captcha SVG -->
+            <div
+              *ngIf="captchaData$ | async as captchaData; else loadingCaptcha"
+              fxLayout="row" fxLayoutAlign="start center" fxLayoutAlign.xs="center center">
+                <!-- SVG -->
+                <div [innerHTML]="captchaData"></div>
+
+                <!-- Captcha SVG refresh -->
+                <button
+                  type="button"
+                  mat-icon-button
+                  tabindex="-1"
+                  (click)="refreshCaptcha()">
+                  <mat-icon>refresh</mat-icon>
+                </button>
             </div>
-        </div>
-    </form>
-</app-not-auth-template>
+
+            <!-- Captcha loading -->
+            <ng-template
+                #loadingCaptcha>
+                <mat-progress-spinner
+                  mode="indeterminate"
+                  diameter="24">
+                </mat-progress-spinner>
+            </ng-template>
+
+            <!-- Captcha value -->
+            <app-form-input-v2
+              [(ngModel)]="captcha"
+              name="captcha"
+              placeholder="LNG_COMMON_FIELD_LABEL_CAPTCHA"
+              required="true"
+              autocomplete="off">
+            </app-form-input-v2>
+          </div>
+
+          <!-- Login -->
+          <div
+            class="gd-login-right-middle-form-login-button">
+            <button
+              mat-flat-button
+              color="primary">
+              {{ (pageType === CaptchaDataFor.LOGIN ? 'LNG_PAGE_LOGIN_ACTION_LOGIN_BUTTON' : 'LNG_PAGE_FORGOT_PASSWORD_BUTTON') | translate }}
+            </button>
+          </div>
+
+          <!-- Other forgot password buttons -->
+          <div
+            *ngIf="pageType === CaptchaDataFor.FORGOT_PASSWORD"
+            class="gd-login-right-middle-form-reset-buttons"
+            fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-between center">
+
+            <!-- Reset password with security questions -->
+            <button
+              mat-flat-button
+              type="button"
+              color="text"
+              routerLink="/auth/reset-password-questions">
+              {{ 'LNG_PAGE_FORGOT_PASSWORD_SECURITY_QUESTIONS_BUTTON' | translate }}
+            </button>
+
+            <!-- Reset password with security questions -->
+            <button
+              mat-flat-button
+              type="button"
+              color="text"
+              routerLink="/auth/login">
+              {{ 'LNG_COMMON_BUTTON_BACK_TO_LOGIN' | translate }}
+            </button>
+
+          </div>
+
+        </form>
+
+      </div>
+
+    </div>
+
+    <!-- Right - bottom -->
+    <div
+      class="gd-login-right-bottom">
+      {{ 'LNG_LAYOUT_MENU_VERSION_LABEL' | translate: { version: versionData.version, build: versionData.build } }}
+    </div>
+
+  </div>
+</div>

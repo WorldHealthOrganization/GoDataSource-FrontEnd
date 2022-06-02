@@ -1,7 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Observable, throwError } from 'rxjs';
@@ -13,7 +11,6 @@ import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { AbstractSheetColumn, LocationSheetColumn, DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
@@ -28,16 +25,21 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel } from '../../../../core/models/user.model';
 import { TeamModel } from '../../../../core/models/team.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
+import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { IV2ActionIconLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 
 @Component({
   selector: 'app-bulk-modify-contacts',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './bulk-modify-contacts.component.html',
-  styleUrls: ['./bulk-modify-contacts.component.less']
+  styleUrls: ['./bulk-modify-contacts.component.scss']
 })
 export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  breadcrumbs: IV2Breadcrumb[] = [];
 
   @ViewChild('inputForMakingFormDirty', { static: true }) inputForMakingFormDirty;
   @ViewChild('hotTableWrapper', { static: true }) hotTableWrapper: HotTableWrapperComponent;
@@ -82,6 +84,9 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
   outbreakSubscriber: Subscription;
   queryParamsSubscriber: Subscription;
 
+  // action
+  actionButton: IV2ActionIconLabel;
+
   // authenticated user details
   authUser: UserModel;
 
@@ -89,17 +94,17 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
   contactIds: string[];
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private contactDataService: ContactDataService,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private referenceDataDataService: ReferenceDataDataService,
     private i18nService: I18nService,
-    private dialogService: DialogService,
+    private dialogV2Service: DialogV2Service,
     private authDataService: AuthDataService,
     private teamDataService: TeamDataService
   ) {
@@ -107,8 +112,8 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
   }
 
   /**
-     * Component initialized
-     */
+   * Component initialized
+   */
   ngOnInit() {
     // get the authenticated user
     this.authUser = this.authDataService.getAuthenticatedUser();
@@ -152,7 +157,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
       .pipe(
         catchError((err) => {
           // show error message
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         })
       )
@@ -167,13 +172,25 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         });
       });
 
+    // action button
+    this.actionButton = {
+      type: V2ActionType.ICON_LABEL,
+      icon: '',
+      label: 'LNG_COMMON_BUTTON_SAVE',
+      action: {
+        click: () => {
+          this.modifyContacts();
+        }
+      }
+    };
+
     // initialize page breadcrumbs
     this.initializeBreadcrumbs();
   }
 
   /**
-     * Component destroyed
-     */
+   * Component destroyed
+   */
   ngOnDestroy() {
     // outbreak subscriber
     if (this.outbreakSubscriber) {
@@ -189,37 +206,44 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
   }
 
   /**
-     * Initialize breadcrumbs
-     */
+   * Initialize breadcrumbs
+   */
   initializeBreadcrumbs() {
     // reset
-    this.breadcrumbs = [];
+    this.breadcrumbs = [{
+      label: 'LNG_COMMON_LABEL_HOME',
+      action: {
+        link: DashboardModel.canViewDashboard(this.authUser) ?
+          ['/dashboard'] :
+          ['/account/my-profile']
+      }
+    }];
 
     // contacts list page
     if (ContactModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-      );
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
+        action: {
+          link: ['/contacts']
+        }
+      });
     }
 
     // current page breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        'LNG_PAGE_BULK_MODIFY_CONTACTS_TITLE',
-        '.',
-        true
-      )
-    );
+    this.breadcrumbs.push({
+      label: 'LNG_PAGE_BULK_MODIFY_CONTACTS_TITLE',
+      action: null
+    });
   }
 
   /**
-     * Retrieve contacts
-     */
+   * Retrieve contacts
+   */
   private retrieveContacts() {
     // no contact ids ?
     if (
       !this.contactIds ||
-            this.contactIds.length < 1
+      this.contactIds.length < 1
     ) {
       if (ContactModel.canList(this.authUser)) {
         this.router.navigate(['/contacts']);
@@ -232,10 +256,10 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
     // outbreak not retrieved ?
     if (
       this.loadingData ||
-            !this.selectedOutbreak ||
-            !this.selectedOutbreak.id || (
+      !this.selectedOutbreak ||
+      !this.selectedOutbreak.id || (
         TeamModel.canList(this.authUser) &&
-                this.teamIdNameMap === undefined
+        this.teamIdNameMap === undefined
       )
     ) {
       return;
@@ -251,13 +275,13 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
     );
 
     // retrieve contacts
-    const loadingDialog = this.dialogService.showLoadingDialog();
+    const loadingDialog = this.dialogV2Service.showLoadingDialog();
     this.loadingData = true;
     this.contactDataService
       .getContactsList(this.selectedOutbreak.id, qb)
       .pipe(catchError((err) => {
         loadingDialog.close();
-        this.snackbarService.showApiError(err);
+        this.toastV2Service.error(err);
         return throwError(err);
       }))
       .subscribe((contactModels) => {
@@ -343,8 +367,8 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
   }
 
   /**
-     * Configure 'Handsontable'
-     */
+   * Configure 'Handsontable'
+   */
   private configureSheetWidget() {
     // configure columns
     this.sheetColumns = [
@@ -458,8 +482,8 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
   }
 
   /**
-     * After changes
-     */
+   * After changes
+   */
   afterBecameDirty() {
     // no input to make dirty ?
     if (!this.inputForMakingFormDirty) {
@@ -471,8 +495,8 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
   }
 
   /**
-     * Modify Contacts
-     */
+   * Modify Contacts
+   */
   modifyContacts() {
     // make sure we have the component used to validate & retrieve data
     if (!this.hotTableWrapper) {
@@ -480,7 +504,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
     }
 
     // validate sheet
-    const loadingDialog = this.dialogService.showLoadingDialog();
+    const loadingDialog = this.dialogV2Service.showLoadingDialog();
     this.errorMessages = [];
     this.hotTableWrapper
       .validateTable()
@@ -495,7 +519,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
 
           // show error
           loadingDialog.close();
-          this.snackbarService.showError('LNG_PAGE_BULK_MODIFY_CONTACTS_WARNING_INVALID_FIELDS');
+          this.toastV2Service.error('LNG_PAGE_BULK_MODIFY_CONTACTS_WARNING_INVALID_FIELDS');
         } else {
           // collect data from table
           this.hotTableWrapper.getData()
@@ -511,8 +535,8 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                 // must reset follow-up team assign ?
                 if (
                   TeamModel.canList(this.authUser) &&
-                                    this.extraContactData[index].followUpTeamId &&
-                                    !contactData.followUpTeamId
+                  this.extraContactData[index].followUpTeamId &&
+                  !contactData.followUpTeamId
                 ) {
                   contactData.followUpTeamId = null;
                 }
@@ -591,12 +615,12 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                 .pipe(
                   catchError((err) => {
                     loadingDialog.close();
-                    this.snackbarService.showApiError(err);
+                    this.toastV2Service.error(err);
                     return throwError(err);
                   })
                 )
                 .subscribe(() => {
-                  this.snackbarService.showSuccess('LNG_PAGE_BULK_MODIFY_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE');
+                  this.toastV2Service.success('LNG_PAGE_BULK_MODIFY_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE');
 
                   // navigate to listing page
                   this.disableDirtyConfirm();

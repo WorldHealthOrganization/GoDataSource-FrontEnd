@@ -3,6 +3,10 @@ import { IPermissionChildModel, PERMISSION, PermissionModel } from './permission
 import { SecurityQuestionModel } from './securityQuestion.model';
 import { UserSettingsDashboardModel } from './user-settings-dashboard.model';
 import { IPermissionBasic, IPermissionCloneable, IPermissionUser } from './permission.interface';
+import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
+import { TeamModel } from './team.model';
+import { BaseModel } from './base.model';
 
 export enum UserSettings {
   AUDIT_LOG_FIELDS = 'auditLogFields',
@@ -15,7 +19,8 @@ export enum UserSettings {
   CONTACT_OF_CONTACT_FIELDS = 'contactOfContactFields',
   EVENT_FIELDS = 'eventFields',
   EVENT_WITHOUT_RELATIONSHIPS_FIELDS = 'eventWithoutRelationshipsFields',
-  LOCATION_FIELDS= 'locationFields',
+  LOCATION_FIELDS = 'locationFields',
+  LOCATION_USAGE_FIELDS = 'locationUsageFields',
   LAB_RESULTS_FIELDS = 'labResults',
   RELATIONSHIP_FIELDS = 'relationshipFields',
   OUTBREAK_FIELDS = 'outbreakFields',
@@ -28,57 +33,31 @@ export enum UserSettings {
   SYNC_UPSTREAM_SERVERS_FIELDS = 'syncUpstreamServersFields',
   SYNC_CLIENT_APPLICATIONS_FIELDS = 'syncClientApplicationsFields',
   SYNC_LOGS_FIELDS = 'syncLogsFields',
+  REF_DATA_CAT_FIELDS = 'refDataCategoriesFields',
   REF_DATA_CAT_ENTRIES_FIELDS = 'refDataCatEntriesFields',
   SHARE_RELATIONSHIPS = 'shareRelationships',
   USER_ROLE_FIELDS = 'userRoleFields',
   ENTITY_NOT_DUPLICATES_FIELDS = 'entityNotDuplicatesFields',
   USER_FIELDS = 'userFields',
+  TEAM_FIELDS = 'teamFields',
   COT_SNAPSHOT_FIELDS = 'cotSnapshotFields',
   SEARCH_RESULTS_FIELDS = 'searchResultsFields',
   HELP_CATEGORIES_LIST = 'helpCategoriesList',
   HELP_SEARCH = 'helpSearch',
   HELP_ITEMS_LIST = 'helpItemsList',
-  BACKUP_FIELDS = 'backupFields'
-}
-
-/**
- * Custom handlers
- */
-abstract class UserSettingsHandlers {
-  static AUDIT_LOG_FIELDS = [];
-  static DASHBOARD = UserSettingsDashboardModel;
-  static CASE_FIELDS = [];
-  static CASE_LAB_FIELDS = [];
-  static CASE_WITHOUT_RELATIONSHIPS_FIELDS = [];
-  static CONTACT_LAB_FIELDS = [];
-  static CONTACT_FIELDS = [];
-  static CONTACT_OF_CONTACT_FIELDS = [];
-  static EVENT_FIELDS = [];
-  static EVENT_WITHOUT_RELATIONSHIPS_FIELDS = [];
-  static LOCATION_FIELDS = [];
-  static LAB_RESULTS_FIELDS = [];
-  static RELATIONSHIP_FIELDS = [];
-  static OUTBREAK_FIELDS = [];
-  static OUTBREAK_MODIFY_QUESTIONNAIRE_FIELDS = [];
-  static OUTBREAK_TEMPLATE_FIELDS = [];
-  static OUTBREAK_TEMPLATE_MODIFY_QUESTIONNAIRE_FIELDS = [];
-  static CONTACT_DAILY_FOLLOW_UP_FIELDS = [];
-  static CASE_RELATED_DAILY_FOLLOW_UP_FIELDS = [];
-  static CONTACT_RELATED_DAILY_FOLLOW_UP_FIELDS = [];
-  static SYNC_UPSTREAM_SERVERS_FIELDS = [];
-  static SYNC_CLIENT_APPLICATIONS_FIELDS = [];
-  static SYNC_LOGS_FIELDS = [];
-  static REF_DATA_CAT_ENTRIES_FIELDS = [];
-  static SHARE_RELATIONSHIPS = [];
-  static USER_ROLE_FIELDS = [];
-  static ENTITY_NOT_DUPLICATES_FIELDS = [];
-  static USER_FIELDS = [];
-  static COT_SNAPSHOT_FIELDS = [];
-  static SEARCH_RESULTS_FIELDS = [];
-  static HELP_CATEGORIES_LIST = [];
-  static HELP_SEARCH = [];
-  static HELP_ITEMS_LIST = [];
-  static BACKUP_FIELDS = [];
+  BACKUP_FIELDS = 'backupFields',
+  CLUSTER_FIELDS = 'clusterFields',
+  ONSET_FIELDS = 'onsetFields',
+  LONG_ONSET_FIELDS = 'longOnsetFields',
+  SAVED_FILTER_FIELDS = 'savedFilterFields',
+  SAVED_IMPORT_MAPPING_FIELDS = 'savedImportMappingFields',
+  OUTBREAK_INCONSISTENCIES_FIELDS = 'outbreakInconsistenciesFields',
+  COT_FIELDS = 'cotFields',
+  DEVICES_FIELDS = 'devicesFields',
+  ICON_FIELDS = 'iconFields',
+  VIEW_PEOPLE_FIELDS = 'viewPeopleFields',
+  LANGUAGE_FIELDS = 'languageFields',
+  AVAILABLE_ENTITIES_FIELDS = 'availableEntitiesFields'
 }
 
 export enum PhoneNumberType {
@@ -174,9 +153,10 @@ export class PermissionExpression {
 }
 
 export class UserRoleModel
-implements
-        IPermissionBasic,
-        IPermissionCloneable {
+  extends BaseModel
+  implements
+    IPermissionBasic,
+    IPermissionCloneable {
   id: string | null;
   name: string | null;
   permissionIds: PERMISSION[];
@@ -184,6 +164,63 @@ implements
   permissions: IPermissionChildModel[];
 
   users: UserModel[];
+
+  /**
+   * Advanced filters
+   */
+  static generateAdvancedFilters(data: {
+    options: {
+      user: ILabelValuePairModel[],
+      permission: PermissionModel[]
+    }
+  }): V2AdvancedFilter[] {
+    // initialize
+    const advancedFilters: V2AdvancedFilter[] = [
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'name',
+        label: 'LNG_USER_ROLE_FIELD_LABEL_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'description',
+        label: 'LNG_USER_ROLE_FIELD_LABEL_DESCRIPTION',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'users._id',
+        label: 'LNG_USER_ROLE_FIELD_LABEL_USERS',
+        options: data.options.user
+      },
+      {
+        type: V2AdvancedFilterType.SELECT_GROUPS,
+        field: 'permissionIds',
+        label: 'LNG_USER_ROLE_FIELD_LABEL_PERMISSIONS',
+        groups: data.options.permission,
+        groupLabelKey: 'groupLabel',
+        groupTooltipKey: 'groupDescription',
+        groupValueKey: 'groupAllId',
+        groupOptionsKey: 'permissions',
+        groupOptionLabelKey: 'label',
+        groupOptionValueKey: 'id',
+        groupOptionTooltipKey: 'description',
+        groupAllLabel: 'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_ALL',
+        groupAllTooltip: 'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_ALL_DESCRIPTION',
+        groupNoneLabel: 'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_NONE',
+        groupNoneTooltip: 'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_NONE_DESCRIPTION',
+        groupPartialLabel: 'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL',
+        groupPartialTooltip: 'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_PARTIAL_DESCRIPTION',
+        groupOptionHiddenKey: 'hidden',
+        defaultValues: PermissionModel.HIDDEN_PERMISSIONS
+      }
+    ];
+
+    // finished
+    return advancedFilters;
+  }
+
 
   /**
      * Static Permissions - IPermissionBasic
@@ -203,6 +240,10 @@ implements
      * Constructor
      */
   constructor(data = null) {
+    // parent
+    super(data);
+
+    // data
     this.id = _.get(data, 'id');
     this.name = _.get(data, 'name');
     this.permissionIds = _.get(data, 'permissionIds', []);
@@ -230,9 +271,10 @@ implements
 }
 
 export class UserModel
-implements
-        IPermissionBasic,
-        IPermissionUser {
+  extends BaseModel
+  implements
+    IPermissionBasic,
+    IPermissionUser {
   id: string;
   firstName: string;
   lastName: string;
@@ -292,6 +334,84 @@ implements
   availablePermissions: PermissionModel[];
 
   /**
+   * Advanced filters
+   */
+  static generateAdvancedFilters(data: {
+    authUser: UserModel,
+    options: {
+      institution: ILabelValuePairModel[],
+      userRole: ILabelValuePairModel[],
+      outbreak: ILabelValuePairModel[],
+      team: ILabelValuePairModel[],
+    }
+  }): V2AdvancedFilter[] {
+    // initialize
+    const advancedFilters: V2AdvancedFilter[] = [
+      // User
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'firstName',
+        label: 'LNG_USER_FIELD_LABEL_FIRST_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'lastName',
+        label: 'LNG_USER_FIELD_LABEL_LAST_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'email',
+        label: 'LNG_USER_FIELD_LABEL_EMAIL',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'institutionName',
+        label: 'LNG_USER_FIELD_LABEL_INSTITUTION_NAME',
+        options: data.options.institution
+      },
+      {
+        type: V2AdvancedFilterType.PHONE_NUMBER,
+        field: `telephoneNumbers.${PhoneNumberType.PRIMARY_PHONE_NUMBER}`,
+        label: 'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'roleIds',
+        label: 'LNG_USER_FIELD_LABEL_ROLES',
+        options: data.options.userRole
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'activeOutbreakId',
+        label: 'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK',
+        options: data.options.outbreak
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'outbreakIds',
+        label: 'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS',
+        options: data.options.outbreak
+      }
+    ];
+
+    // can see teams ?
+    if (TeamModel.canList(data.authUser)) {
+      advancedFilters.push({
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'teams',
+        label: 'LNG_USER_FIELD_LABEL_TEAMS',
+        options: data.options.team
+      });
+    }
+
+    // finished
+    return advancedFilters;
+  }
+
+  /**
      * Static Permissions - IPermissionBasic
      */
   static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.USER_VIEW) : false; }
@@ -311,6 +431,9 @@ implements
      * Constructor
      */
   constructor(data = null) {
+    // parent
+    super(data);
+
     this.id = _.get(data, 'id');
     this.firstName = _.get(data, 'firstName');
     this.lastName = _.get(data, 'lastName');
@@ -328,8 +451,20 @@ implements
     this.disregardGeographicRestrictions = _.get(data, 'disregardGeographicRestrictions', false);
     this.dontCacheFilters = _.get(data, 'dontCacheFilters', false);
 
-    // initialize all settings
-    this.initializeSettings(data);
+    // initialize settings
+    _.each(data?.settings, (settings, property) => {
+      // initialize settings
+      if (property === UserSettings.DASHBOARD) {
+        this.settings[property] = new UserSettingsDashboardModel(settings);
+      } else {
+        this.settings[property] = settings;
+      }
+    });
+
+    // if dashboard settings are missing then add them
+    if (!this.settings[UserSettings.DASHBOARD]) {
+      this.settings[UserSettings.DASHBOARD] = new UserSettingsDashboardModel({});
+    }
   }
 
   /**
@@ -403,31 +538,9 @@ implements
   }
 
   /**
-     * Initialize settings
-     */
-  private initializeSettings(data) {
-    _.each(UserSettings, (property: string, enumKey: string) => {
-      // retrieve settings
-      const settings = _.get(
-        data,
-        `settings.${property}`
-      );
-
-      // initialize settings
-      this.settings[property] = UserSettingsHandlers[enumKey] !== undefined ? (
-        _.isArray(UserSettingsHandlers[enumKey]) ?
-          (_.isEmpty(settings) ? [] : settings) :
-          new UserSettingsHandlers[enumKey](settings)
-      ) :
-        settings;
-    });
-  }
-
-  /**
-     * Retrieve settings
-     * @param key
-     */
-  getSettings(key: UserSettings) {
+   * Retrieve settings
+   */
+  getSettings(key: string) {
     return this.settings[key];
   }
 

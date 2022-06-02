@@ -1,0 +1,160 @@
+/* Stepper - Horizontal */
+.mat-stepper-horizontal {
+  background-color: transparent;
+  font-family: $gd-font-family;
+  height: 100%;
+
+  .mat-horizontal-stepper-header-container {
+    background-color: var(--gd-background);
+    border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+    @include border-radius(0.4rem 0.4rem 0 0);
+    @include box-shadow(0 0.2rem 0.1rem -0.1rem rgb(0, 0, 0, 0.2),
+                        0 0.1rem 0.1rem 0 rgb(0, 0, 0, 0.14),
+                        0 0.1rem 0.3rem 0 rgb(0, 0, 0, 0.12));
+
+    .mat-step-header {
+      @include box-sizing(border-box);
+      height: 5.6rem;
+      padding: 1.6rem;
+
+      @include breakpoint('xs') {
+        padding: 1.6rem 0.8rem;
+      }
+
+      &:hover:not([aria-disabled]),
+      &:hover[aria-disabled=false] {
+        background-color: transparent;
+      }
+
+      .mat-step-header-ripple {
+        display: none;
+      }
+
+      .mat-step-icon {
+        background-color: rgba(var(--gd-secondary-rgb), 0.25);
+        color: var(--gd-secondary);
+
+        &.mat-step-icon-selected,
+        &.mat-step-icon-state-done,
+        &.mat-step-icon-state-edit {
+          background-color: var(--gd-primary);
+          color: var(--gd-background);
+        }
+
+        &.mat-step-icon-state-edit {
+          + .mat-step-label {
+            color: var(--gd-primary);
+
+            &.mat-step-label-active {
+              color: var(--gd-primary);
+            }
+          }
+        }
+
+        &.mat-step-icon-selected {
+          + .mat-step-label {
+            @include breakpoint('lt-sm') {
+              display: block;
+            }
+          }
+        }
+      }
+
+      .mat-step-label {
+        color: var(--gd-secondary);
+        font-size: 1.6rem;
+        font-weight: 400;
+        line-height: $gd-line-height;
+        min-width: 2.4rem;
+
+        @include breakpoint('md') {
+          font-size: 1.4rem;
+        }
+
+        @include breakpoint('lt-sm') {
+          display: none;
+        }
+
+        &.mat-step-label-active {
+          color: var(--gd-text);
+        }
+
+        .mat-step-text-label {
+          > div {
+            @include flex(flex);
+          }
+
+          .mat-icon {
+            height: 2.1rem;
+            margin-left: 0.8rem;
+            width: 2.1rem;
+          }
+        }
+      }
+    }
+
+    .mat-stepper-horizontal-line {
+      border-top-color: rgba(var(--gd-secondary-rgb), 0.25);
+      margin: 0;
+      min-width: 0.8rem;
+    }
+  }
+
+  .mat-horizontal-content-container {
+    background-color: var(--gd-background);
+    @include border-radius(0 0 0.4rem 0.4rem);
+    @include box-shadow(0 0.2rem 0.1rem -0.1rem rgb(0, 0, 0, 0.2),
+                        0 0.1rem 0.1rem 0 rgb(0, 0, 0, 0.14),
+                        0 0.1rem 0.3rem 0 rgb(0, 0, 0, 0.12));
+    height: 100%;
+    max-height: calc(100% - 5.7rem);
+    overflow-y: auto;
+    padding: 0;
+
+    .mat-horizontal-stepper-content {
+      &[aria-expanded="true"] {
+        height: 100%;
+      }
+    }
+
+    .gd-create-view-modify-bottom-content {
+      margin-right: -1.6rem;
+      min-height: calc(100% - 6.9rem);
+      padding: 1.6rem;
+
+      &.gd-create-view-modify-bottom-content-edit-questionnaire,
+      &.gd-create-view-modify-bottom-content-fill-questionnaire {
+        height: calc(100% - 6.9rem);
+      }
+    }
+
+    .gd-create-view-modify-bottom-content-final-step {
+      font-size: 1.6rem;
+
+      > div {
+        + div {
+          margin-top: 1.6rem;
+        }
+      }
+
+      .gd-message-name {
+        color: var(--gd-primary-alt);
+        font-weight: bold;
+      }
+
+      .gd-message-button-label {
+        color: var(--gd-primary);
+      }
+    }
+
+    .gd-create-view-modify-bottom-bottom {
+      background: var(--gd-background);
+      border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+      @include border-radius(0 0 0.4rem 0.4rem);
+      bottom: 0;
+      margin: 0;
+      padding: 1.6rem;
+      position: sticky;
+    }
+  }
+}

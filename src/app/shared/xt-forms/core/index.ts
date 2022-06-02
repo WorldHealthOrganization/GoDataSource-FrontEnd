@@ -7,7 +7,6 @@ export * from './element-base';
 export * from './group-validator';
 export * from './group-base';
 export * from './list-base';
-export * from './sortable-list-base';
 export * from './validate';
 export * from './value-accessor-base';
 

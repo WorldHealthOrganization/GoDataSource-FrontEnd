@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import * as Handsontable from 'handsontable';
 import * as _ from 'lodash';
 import { SheetCellValidator } from '../../../core/models/sheet/sheet-cell-validator';
@@ -15,11 +15,10 @@ import { LocationModel } from '../../../core/models/location.model';
 import { LocationDataService } from '../../../core/services/data/location.data.service';
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 import { throwError } from 'rxjs/internal/observable/throwError';
-import { SnackbarService } from '../../../core/services/helper/snackbar.service';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { DialogService } from '../../../core/services/helper/dialog.service';
-import { LocationDialogComponent } from '../location-dialog/location-dialog.component';
-import { DialogAnswer, DialogAnswerButton } from '../dialog/dialog.component';
+import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
+import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
+import { IV2SideDialogConfigButtonType, V2SideDialogConfigInputType } from '../../components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 
 /**
  * Error message
@@ -83,8 +82,8 @@ class CustomLocationEditor extends Handsontable.default.editors.BaseEditor {
   locationDialogVisible: HotTableWrapperDialogVisibility = HotTableWrapperDialogVisibility.Not_Visible;
 
   /**
-     * Begin editing
-     */
+   * Begin editing
+   */
   beginEditing(): void {
     // dialog either already visible or we don't need to show it ?
     if (this.locationDialogVisible === HotTableWrapperDialogVisibility.Visible) {
@@ -92,94 +91,121 @@ class CustomLocationEditor extends Handsontable.default.editors.BaseEditor {
     }
 
     // show dialog
+    let temporaryLocation: LocationModel;
     const wrapper: HotTableWrapperComponent = HotTableWrapperComponent.WRAPPERS[this.hot.rootElement.id];
     this.locationDialogVisible = HotTableWrapperDialogVisibility.Visible;
-    wrapper.dialogService.showCustomDialog(
-      LocationDialogComponent, {
-        ...LocationDialogComponent.DEFAULT_CONFIG,
-        ...{
-          data: {
-            message: 'LNG_FORM_HOT_TABLE_WRAPPER_CHANGE_LOCATION_DIALOG_TITLE',
-            locationId: this.originalValue ?
-              this.originalValue :
-              undefined,
-            required: wrapper.sheetColumns && wrapper.sheetColumns[this.col] && wrapper.sheetColumns[this.col].required,
-            useOutbreakLocations: wrapper.sheetColumns && wrapper.sheetColumns[this.col] && (wrapper.sheetColumns[this.col] as LocationSheetColumn).useOutbreakLocations
-          }
+    wrapper.dialogV2Service.showSideDialog({
+      title: {
+        get: () => 'LNG_FORM_HOT_TABLE_WRAPPER_CHANGE_LOCATION_DIALOG_TITLE'
+      },
+      hideInputFilter: true,
+      inputs: [{
+        type: V2SideDialogConfigInputType.LOCATION_SINGLE,
+        name: 'location',
+        placeholder: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
+        value: this.originalValue ?
+          this.originalValue :
+          undefined,
+        useOutbreakLocations: wrapper.sheetColumns && wrapper.sheetColumns[this.col] && (wrapper.sheetColumns[this.col] as LocationSheetColumn).useOutbreakLocations,
+        clearable: true,
+        validators: {
+          required: () => wrapper.sheetColumns && wrapper.sheetColumns[this.col] && wrapper.sheetColumns[this.col].required
+        },
+        locationChanged: (locationInfo) => {
+          temporaryLocation = locationInfo ?
+            new LocationModel({
+              id: locationInfo.id,
+              name: locationInfo.label
+            }) :
+            undefined;
         }
-      }
-    ).subscribe((answer: DialogAnswer) => {
-      if (answer.button === DialogAnswerButton.Yes) {
-        // check if we need to init location data
-        let selectedLocation: LocationModel;
-        if (
-          (selectedLocation = answer.inputValue.value as LocationModel) &&
-                    selectedLocation.id &&
-                    !wrapper.cachedLocations[selectedLocation.id]
-        ) {
-          wrapper.cachedLocations[selectedLocation.id] = selectedLocation;
-        }
-
-        // update spreadsheet data
-        this.instance.setDataAtCell(
-          this.row,
-          this.col,
-          selectedLocation ?
-            selectedLocation.id :
-            ''
-        );
-      }
-
+      }],
+      bottomButtons: [{
+        type: IV2SideDialogConfigButtonType.OTHER,
+        label: 'LNG_COMMON_BUTTON_APPLY',
+        color: 'primary'
+      }, {
+        type: IV2SideDialogConfigButtonType.CANCEL,
+        label: 'LNG_COMMON_BUTTON_CANCEL',
+        color: 'text'
+      }]
+    }).subscribe((response) => {
       // dialog not visible anymore
       this.locationDialogVisible = HotTableWrapperDialogVisibility.Not_Visible;
+
+      // cancelled ?
+      if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+        // finished
+        return;
+      }
+
+      // check if we need to init location data
+      if (
+        temporaryLocation &&
+        !wrapper.cachedLocations[temporaryLocation.id]
+      ) {
+        wrapper.cachedLocations[temporaryLocation.id] = temporaryLocation;
+      }
+
+      // update spreadsheet data
+      this.instance.setDataAtCell(
+        this.row,
+        this.col,
+        temporaryLocation ?
+          temporaryLocation.id :
+          ''
+      );
+
+      // close
+      response.handler.hide();
     });
   }
 
   /**
-     * Close
-     */
+   * Close
+   */
   close(): void {
     // NOTHING
   }
 
   /**
-     * Focus
-     */
+   * Focus
+   */
   focus(): void {
     // NOTHING
   }
 
   /**
-     * Get value
-     */
+   * Get value
+   */
   getValue(): any {
     return this.originalValue;
   }
 
   /**
-     * Is opened
-     */
+   * Is opened
+   */
   isOpened(): boolean {
     return this.locationDialogVisible !== HotTableWrapperDialogVisibility.Not_Visible;
   }
 
   /**
-     * Is waiting
-     */
+   * Is waiting
+   */
   isWaiting(): boolean {
     return this.locationDialogVisible !== HotTableWrapperDialogVisibility.Not_Visible;
   }
 
   /**
-     * Open
-     */
+   * Open
+   */
   open(): void {
     // NOTHING
   }
 
   /**
-     * Set value
-     */
+   * Set value
+   */
   setValue(newValue?: any): void {
     this.originalValue = newValue;
   }
@@ -189,7 +215,7 @@ class CustomLocationEditor extends Handsontable.default.editors.BaseEditor {
   selector: 'app-hot-table-wrapper',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './hot-table-wrapper.component.html',
-  styleUrls: ['./hot-table-wrapper.component.less']
+  styleUrls: ['./hot-table-wrapper.component.scss']
 })
 export class HotTableWrapperComponent
 implements OnInit, OnDestroy {
@@ -206,7 +232,6 @@ implements OnInit, OnDestroy {
   hotId: string = `hotWrapper_${HotTableWrapperComponent._hotId++}`;
 
   // input
-  @Input() widthReduction: number = 0;
   @Input() startRows: number = 1;
   @Input() minSpareRows: number = 0;
   @Input() sheetContextMenu: any;
@@ -257,7 +282,9 @@ implements OnInit, OnDestroy {
   CustomLocationEditor = CustomLocationEditor;
 
   // local variables
-  sheetWidth: number = window.innerWidth - this.widthReduction;
+  setSheetSizesCall: any;
+  sheetWidth: string;
+  sheetHeight: string;
 
   // callbacks
   afterChangeCallback: (
@@ -282,46 +309,94 @@ implements OnInit, OnDestroy {
   } = {};
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private i18nService: I18nService,
     private locationDataService: LocationDataService,
-    private snackbarService: SnackbarService,
-    public dialogService: DialogService
-  ) {}
+    private toastV2Service: ToastV2Service,
+    public dialogV2Service: DialogV2Service
+  ) {
+    // set spreadsheet width
+    this.setSheetSize();
+  }
 
   /**
-     * Component initialized
-     */
+   * Component initialized
+   */
   ngOnInit() {
-    // set spreadsheet width
-    this.setSheetWidth();
-
     // set wrapper
     HotTableWrapperComponent.WRAPPERS[this.hotId] = this;
   }
 
   /**
-     * Release resources
-     */
+   * Release resources
+   */
   ngOnDestroy() {
     // release wrapper
     delete HotTableWrapperComponent.WRAPPERS[this.hotId];
+
+    // stop previous
+    if (this.setSheetSizesCall) {
+      clearTimeout(this.setSheetSizesCall);
+      this.setSheetSizesCall = undefined;
+    }
   }
 
   /**
-     * Update sheet width based on browser width
-     * Note: It's a hack, but there's no other fix for now, since handsontable is working with pixels only
-     */
-  @HostListener('window:resize')
-  private setSheetWidth() {
-    this.sheetWidth = window.innerWidth - this.widthReduction;
+   * Update sheet size
+   */
+  setSheetSize() {
+    // stop previous
+    if (this.setSheetSizesCall) {
+      clearTimeout(this.setSheetSizesCall);
+      this.setSheetSizesCall = undefined;
+    }
+
+    // update sizes
+    const basicPageMatCard: any = document.querySelector('app-basic-page-v2 mat-card');
+    const basicPageHoTable: any = basicPageMatCard?.querySelector('hot-table');
+    if (
+      basicPageMatCard &&
+      basicPageHoTable
+    ) {
+      // determine element boundings
+      const boundingMatCard = basicPageMatCard.getBoundingClientRect();
+      const boundingHoTable = basicPageHoTable.getBoundingClientRect();
+      const height: number = basicPageMatCard.offsetHeight - boundingHoTable.top + boundingMatCard.top;
+
+      // update sizes
+      const sheetWidth: string = `calc(${basicPageMatCard.offsetWidth}px - var(--gd-basic-page-content-padding-left-right))`;
+      const sheetHeight: string = `calc(${height}px - var(--gd-basic-page-content-padding-bottom))`;
+
+      // render spreadsheet
+      if (
+        this.sheetWidth !== sheetWidth ||
+        this.sheetHeight !== sheetHeight
+      ) {
+        // update
+        this.sheetWidth = sheetWidth;
+        this.sheetHeight = sheetHeight;
+        this.sheetTable.updateHotTable({
+          width: this.sheetWidth,
+          height: this.sheetHeight
+        });
+      }
+    }
+
+    // call again
+    this.setSheetSizesCall = setTimeout(() => {
+      // reset
+      this.setSheetSizesCall = undefined;
+
+      // check and resize
+      this.setSheetSize();
+    }, 200);
   }
 
   /**
-     * Validate all table cells
-     */
+   * Validate all table cells
+   */
   validateTable(): Observable<InvalidTableData> {
     return new Observable((observer: Subscriber<InvalidTableData>) => {
       // validate all cells
@@ -367,8 +442,8 @@ implements OnInit, OnDestroy {
   }
 
   /**
-     * Get contacts data from table, ready to be sent in the API call for creating the contacts
-     */
+   * Get contacts data from table, ready to be sent in the API call for creating the contacts
+   */
   getData(): Observable<{
     data: any[],
     sheetCore: Handsontable.default
@@ -395,7 +470,7 @@ implements OnInit, OnDestroy {
                 // omit empty cells
                 if (
                   columnValue !== null &&
-                                    columnValue !== ''
+                  columnValue !== ''
                 ) {
                   // by default, keep the value as it is
                   let cellValue = columnValue;
@@ -426,10 +501,10 @@ implements OnInit, OnDestroy {
   }
 
   /**
-     * Retrieve errors
-     * @param response
-     * @param errToken
-     */
+   * Retrieve errors
+   * @param response
+   * @param errToken
+   */
   getErrors(
     response: any,
     errToken: string
@@ -464,8 +539,8 @@ implements OnInit, OnDestroy {
   }
 
   /**
-     * Get a map of (translated label - value) pairs for all dropdowns
-     */
+   * Get a map of (translated label - value) pairs for all dropdowns
+   */
   private getDropDownsLabelValueMap(): Observable<any> {
     const dropdownsMap = [];
     const dropdownItemsObservables = [];
@@ -504,8 +579,8 @@ implements OnInit, OnDestroy {
   }
 
   /**
-     * 'Handsontable' hook before running validation on a cell
-     */
+   * 'Handsontable' hook before running validation on a cell
+   */
   beforeValidateSheet(
     value: string,
     row: number,
@@ -527,8 +602,8 @@ implements OnInit, OnDestroy {
   }
 
   /**
-     * After removing row
-     */
+   * After removing row
+   */
   afterRemoveRow(row: number) {
     // determine if row is empty
     // this in this case is the handsontable core
@@ -555,8 +630,8 @@ implements OnInit, OnDestroy {
   }
 
   /**
-     * Data changed trigger
-     */
+   * Data changed trigger
+   */
   afterChangeTrigger(): (
     changes: any[],
     source: string
@@ -596,14 +671,14 @@ implements OnInit, OnDestroy {
   }
 
   /**
-     * Check if we need to trigger dirty event
-     * @param data
-     */
+   * Check if we need to trigger dirty event
+   * @param data
+   */
   checkForDirty(data: IHotTableWrapperEventTypeAfterChange) {
     // check if need to make form dirty
     if (
       data.source === 'edit' ||
-            data.source === 'Autofill.fill'
+      data.source === 'Autofill.fill'
     ) {
       // remove validations
       const row: number = data.changes[0][0];
@@ -638,13 +713,13 @@ implements OnInit, OnDestroy {
   }
 
   /**
-     * Update cached locations accordingly to data and columns
-     */
+   * Update cached locations accordingly to data and columns
+   */
   private updateCachedLocations() {
     // check if we have something to load
     if (
       _.isEmpty(this.data) ||
-            _.isEmpty(this.sheetColumns)
+      _.isEmpty(this.sheetColumns)
     ) {
       return;
     }
@@ -703,7 +778,7 @@ implements OnInit, OnDestroy {
     // stop previous request
     if (
       this.getLocationsListSubscriber &&
-            !this.getLocationsListSubscriber.closed
+      !this.getLocationsListSubscriber.closed
     ) {
       this.getLocationsListSubscriber.unsubscribe();
     }
@@ -715,7 +790,7 @@ implements OnInit, OnDestroy {
       .pipe(
         catchError((err) => {
           // display error message
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
 
           // location not loading anymore
           this.loadingLocations = false;
@@ -739,8 +814,8 @@ implements OnInit, OnDestroy {
   }
 
   /**
-     * Render location
-     */
+   * Render location
+   */
   locationRenderer(): (
     instance,
     td: HTMLTableCellElement,

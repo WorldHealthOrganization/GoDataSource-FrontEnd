@@ -1,356 +1,477 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
-import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { catchError, map, switchMap } from 'rxjs/operators';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
-import * as _ from 'lodash';
 import { throwError } from 'rxjs';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import { IBasicCount } from '../../../../core/models/basic-count.interface';
-import { IconModel } from '../../../../core/models/icon.model';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import * as _ from 'lodash';
+import { TranslateService } from '@ngx-translate/core';
+import { IconModel } from '../../../../core/models/icon.model';
 
 @Component({
   selector: 'app-reference-data-category-entries-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './reference-data-category-entries-list.component.html',
-  styleUrls: ['./reference-data-category-entries-list.component.less']
+  templateUrl: './reference-data-category-entries-list.component.html'
 })
-export class ReferenceDataCategoryEntriesListComponent extends ListComponent implements OnInit, OnDestroy {
-  // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
-
-  categoryEntriesCount: IBasicCount;
-  categoryEntries: ReferenceDataEntryModel[];
-  categoryEntriesAll: ReferenceDataEntryModel[];
-  categoryId: ReferenceDataCategory;
-
+export class ReferenceDataCategoryEntriesListComponent extends ListComponent<ReferenceDataEntryModel> implements OnDestroy {
+  // category
   category: ReferenceDataCategoryModel;
 
-  // constants
-  IconModel = IconModel;
-  ReferenceDataEntryModel = ReferenceDataEntryModel;
-
-  authUser: UserModel;
-
-  UserSettings = UserSettings;
-
-  recordActions: HoverRowAction[] = [
-    // View Item
-    new HoverRowAction({
-      icon: 'visibility',
-      iconTooltip: 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_VIEW_ENTRY',
-      linkGenerator: (item: ReferenceDataEntryModel): string[] => {
-        return ['/reference-data', item.categoryId, item.id, 'view'];
-      },
-      visible: (): boolean => {
-        return ReferenceDataEntryModel.canView(this.authUser);
-      }
-    }),
-
-    // Modify Item
-    new HoverRowAction({
-      icon: 'settings',
-      iconTooltip: 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_MODIFY_ENTRY',
-      linkGenerator: (item: ReferenceDataEntryModel): string[] => {
-        return ['/reference-data', item.categoryId, item.id, 'modify'];
-      },
-      visible: (): boolean => {
-        return ReferenceDataEntryModel.canModify(this.authUser);
-      }
-    }),
-
-    // Other actions
-    new HoverRowAction({
-      type: HoverRowActionType.MENU,
-      icon: 'moreVertical',
-      menuOptions: [
-        // Delete Item
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_DELETE_ENTRY',
-          click: (item: ReferenceDataEntryModel) => {
-            this.deleteEntry(item);
-          },
-          visible: (item: ReferenceDataEntryModel): boolean => {
-            return !item.readonly &&
-                            ReferenceDataEntryModel.canDelete(this.authUser);
-          },
-          class: 'mat-menu-item-delete'
-        })
-      ]
-    })
-  ];
-
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
-    private route: ActivatedRoute,
     private referenceDataDataService: ReferenceDataDataService,
-    private snackbarService: SnackbarService,
-    private dialogService: DialogService,
-    private authDataService: AuthDataService,
-    private i18nService: I18nService
+    private toastV2Service: ToastV2Service,
+    private activatedRoute: ActivatedRoute,
+    private dialogV2Service: DialogV2Service,
+    private translateService: TranslateService
   ) {
     super(
       listHelperService,
       true
     );
+
+    // retrieve category
+    this.category = this.activatedRoute.snapshot.data.category;
   }
 
   /**
-     * Component initialized
-     */
-  ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
-    // get the route params
-    this.route.params
-      .subscribe((params: { categoryId }) => {
-        this.categoryId = params.categoryId;
-
-        // initialize pagination
-        this.initPaginator();
-
-        // retrieve data
-        this.needsRefreshList(true);
-
-        // retrieve Reference Data Category info
-        this.referenceDataDataService
-          .getReferenceDataByCategory(params.categoryId)
-          .subscribe((category: ReferenceDataCategoryModel) => {
-            // set data
-            this.category = category;
-
-            // update breadcrumbs
-            this.initializeBreadcrumbs();
-          });
-      });
-
-    // initialize Side Table Columns
-    this.initializeSideTableColumns();
-  }
-
-  /**
-     * Release resources
-     */
+   * Release resources
+   */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
-     * Initialize breadcrumbs
-     */
-  initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
+   * Initialized
+   */
+  initialized(): void {
+    // initialize pagination
+    this.initPaginator();
 
-    // add list breadcrumb only if we have permission
-    if (ReferenceDataCategoryModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
-      );
-    }
-
-    // view / modify breadcrumb
-    if (this.category) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          this.category.name,
-          '.',
-          true
-        )
-      );
-    }
+    // ...and re-load the list when the Selected Outbreak is changed
+    this.needsRefreshList(true);
   }
 
   /**
-     * Initialize Side Table Columns
-     */
-  initializeSideTableColumns() {
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns() {
     // default table columns
     this.tableColumns = [
-      new VisibleColumnModel({
-        field: 'label',
-        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE'
-      }),
-      new VisibleColumnModel({
+      {
+        field: 'value',
+        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE',
+        pinned: IV2ColumnPinned.LEFT
+      },
+      {
         field: 'code',
         label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CODE'
-      }),
-      new VisibleColumnModel({
+      },
+      {
         field: 'description',
         label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION'
-      }),
-      new VisibleColumnModel({
-        field: 'icon',
-        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON'
-      }),
-      new VisibleColumnModel({
-        field: 'color',
-        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR'
-      }),
-      new VisibleColumnModel({
+      },
+      {
+        field: 'iconUrl',
+        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ICON',
+        noIconLabel: 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_LABEL_NO_ICON',
+        format: {
+          type: V2ColumnFormat.ICON_URL
+        }
+      },
+      {
+        field: 'colorCode',
+        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_COLOR',
+        noColorLabel: 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_LABEL_NO_COLOR',
+        format: {
+          type: V2ColumnFormat.COLOR
+        }
+      },
+      {
         field: 'order',
         label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ORDER'
-      }),
-      new VisibleColumnModel({
+      },
+      {
         field: 'active',
-        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE'
-      }),
-      new VisibleColumnModel({
+        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_ACTIVE',
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        }
+      },
+      {
         field: 'readonly',
-        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_SYSTEM_VALUE'
-      }),
-      new VisibleColumnModel({
+        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_SYSTEM_VALUE',
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        }
+      },
+      {
         field: 'createdBy',
         label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_BY',
-        visible: false
-      }),
-      new VisibleColumnModel({
+        notVisible: true,
+        format: {
+          type: (item) => item.createdBy && this.activatedRoute.snapshot.data.user.map[item.createdBy] ?
+            this.activatedRoute.snapshot.data.user.map[item.createdBy].name :
+            ''
+        },
+        exclude: (): boolean => {
+          return !UserModel.canView(this.authUser);
+        },
+        link: (data) => {
+          return data.createdBy ?
+            `/users/${ data.createdBy }/view` :
+            undefined;
+        }
+      },
+      {
         field: 'createdAt',
         label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_CREATED_AT',
-        visible: false
-      }),
-      new VisibleColumnModel({
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        }
+      },
+      {
         field: 'updatedBy',
         label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_UPDATED_BY',
-        visible: false
-      }),
-      new VisibleColumnModel({
+        notVisible: true,
+        format: {
+          type: (item) => item.updatedBy && this.activatedRoute.snapshot.data.user.map[item.updatedBy] ?
+            this.activatedRoute.snapshot.data.user.map[item.updatedBy].name :
+            ''
+        },
+        exclude: (): boolean => {
+          return !UserModel.canView(this.authUser);
+        },
+        link: (data) => {
+          return data.updatedBy ?
+            `/users/${ data.updatedBy }/view` :
+            undefined;
+        }
+      },
+      {
         field: 'updatedAt',
         label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_UPDATED_AT',
-        visible: false
-      })
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        }
+      },
+
+      // actions
+      {
+        field: 'actions',
+        label: 'LNG_COMMON_LABEL_ACTIONS',
+        pinned: IV2ColumnPinned.RIGHT,
+        notResizable: true,
+        cssCellClass: 'gd-cell-no-focus',
+        format: {
+          type: V2ColumnFormat.ACTIONS
+        },
+        actions: [
+          // View reference data
+          {
+            type: V2ActionType.ICON,
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_VIEW_ENTRY',
+            action: {
+              link: (item: ReferenceDataEntryModel): string[] => {
+                return ['/reference-data', item.categoryId, item.id, 'view'];
+              }
+            },
+            visible: (): boolean => {
+              return ReferenceDataEntryModel.canView(this.authUser);
+            }
+          },
+
+          // Modify reference data
+          {
+            type: V2ActionType.ICON,
+            icon: 'edit',
+            iconTooltip: 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_MODIFY_ENTRY',
+            action: {
+              link: (item: ReferenceDataEntryModel): string[] => {
+                return ['/reference-data', item.categoryId, item.id, 'modify'];
+              }
+            },
+            visible: (): boolean => {
+              return ReferenceDataEntryModel.canModify(this.authUser);
+            }
+          },
+
+          // Other actions
+          {
+            type: V2ActionType.MENU,
+            icon: 'more_horiz',
+            visible: (item: ReferenceDataEntryModel): boolean => {
+              return !item.readonly &&
+                ReferenceDataEntryModel.canDelete(this.authUser);
+            },
+            menuOptions: [
+              // Delete Lab Results
+              {
+                label: {
+                  get: () => 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_DELETE_ENTRY'
+                },
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+                action: {
+                  click: (item: ReferenceDataEntryModel): void => {
+                    // confirm
+                    this.dialogV2Service.showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_DELETE',
+                          data: () => ({
+                            name: `${ this.translateService.instant(item.value) }`
+                          })
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_REFERENCE_DATA_ENTRY'
+                        }
+                      }
+                    }).subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // delete reference data
+                      this.referenceDataDataService
+                        .deleteEntry(item.id)
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            this.toastV2Service.error(err);
+
+                            // hide loading
+                            loading.close();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          // success
+                          this.toastV2Service.success('LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_DELETE_ENTRY_SUCCESS_MESSAGE');
+
+                          // hide loading
+                          loading.close();
+
+                          // reload data
+                          this.needsRefreshList(true);
+                        });
+                    });
+                  }
+                },
+                visible: (item: ReferenceDataEntryModel): boolean => {
+                  return !item.readonly &&
+                    ReferenceDataEntryModel.canDelete(this.authUser);
+                }
+              }
+            ]
+          }
+        ]
+      }
     ];
   }
 
-  refreshList(finishCallback: (records: any[]) => void) {
-    this.categoryEntries = [];
-    this.categoryEntriesAll = undefined;
-    this.refreshListCount();
-    if (this.categoryId) {
-      this.referenceDataDataService
-        .getReferenceDataByCategory(this.categoryId)
-        .pipe(
-          catchError((err) => {
-            this.snackbarService.showApiError(err);
-            finishCallback([]);
-            return throwError(err);
-          }),
-          map((category: ReferenceDataCategoryModel) => {
-            return category.entries;
-          })
-        )
-        .subscribe((entries) => {
-          // retrieve all entries
-          this.categoryEntriesAll = entries ? entries : [];
-
-          // display only items from this page
-          if (this.queryBuilder.paginator) {
-            this.categoryEntries = this.categoryEntriesAll.slice(
-              this.queryBuilder.paginator.skip,
-              this.queryBuilder.paginator.skip + this.queryBuilder.paginator.limit
-            );
-          }
-
-          // refresh the total count
-          this.refreshListCount();
-
-          // flag if list is empty
-          this.checkEmptyList(this.categoryEntries);
-
-          // finished
-          finishCallback(entries);
-        });
-    } else {
-      finishCallback([]);
-    }
-  }
+  /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
 
   /**
-     * Get total number of items
-     */
-  refreshListCount() {
-    this.categoryEntriesCount = {
-      count: this.categoryEntriesAll !== undefined ?
-        this.categoryEntriesAll.length :
-        null
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
+   * Initialize table quick actions
+   */
+  protected initializeQuickActions(): void {
+    this.quickActions = {
+      type: V2ActionType.MENU,
+      label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
+      visible: (): boolean => {
+        return IconModel.canList(this.authUser);
+      },
+      menuOptions: [
+        // Manage Icons
+        {
+          label: {
+            get: () => 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_MANAGE_ICONS_BUTTON'
+          },
+          action: {
+            link: () => ['/reference-data', 'manage-icons', 'list'],
+            linkQueryParams: () => ({
+              categoryId: this.category.id
+            })
+          },
+          visible: (): boolean => {
+            return IconModel.canList(this.authUser);
+          }
+        }
+      ]
     };
   }
 
   /**
-     * Delete ref data entry
-     */
-  deleteEntry(entry: ReferenceDataEntryModel) {
-    this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_REFERENCE_DATA_ENTRY')
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          // delete entry
-          this.referenceDataDataService
-            .deleteEntry(entry.id)
-            .pipe(
-              catchError((err) => {
-                this.snackbarService.showApiError(err, {entryValue: entry.value});
-                return throwError(err);
-              }),
-              switchMap(() => {
-                // re-load language tokens
-                return this.i18nService.loadUserLanguage();
-              })
-            )
-            .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_DELETE_ENTRY_SUCCESS_MESSAGE');
+   * Initialize table group actions
+   */
+  protected initializeGroupActions(): void {}
 
-              // reload data
-              this.needsRefreshList(true);
-            });
-        }
-      });
+  /**
+   * Initialize table add action
+   */
+  protected initializeAddAction(): void {
+    this.addAction = {
+      type: V2ActionType.ICON_LABEL,
+      label: 'LNG_COMMON_BUTTON_ADD',
+      icon: 'add_circle_outline',
+      action: {
+        link: (): string[] => ['/reference-data', this.category.id, 'create']
+      },
+      visible: (): boolean => {
+        return ReferenceDataEntryModel.canCreate(this.authUser);
+      }
+    };
   }
 
   /**
-     * Change Reference entry item order value
-     */
-  changeRefEntryOrder(
-    refEntry: ReferenceDataEntryModel,
-    order: any
-  ) {
-    // convert string to number
-    order = order && _.isString(order) ? parseFloat(order) : order;
+   * Initialize table grouped data
+   */
+  protected initializeGroupedData(): void {}
 
-    // modify reference entry item
-    this.referenceDataDataService
-      .modifyEntry(
-        refEntry.id, {
-          order: order ? order : null
+  /**
+   * Initialize breadcrumbs
+   */
+  protected initializeBreadcrumbs(): void {
+    // set breadcrumbs
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
         }
-      )
-      .pipe(
-        catchError((err) => {
-          this.snackbarService.showApiError(err);
-          return throwError(err);
-        })
-      )
-      .subscribe(() => {
-        // update loaded ref data
-        refEntry.order = order ? order : null;
+      }
+    ];
 
-        // show success ?
-        // this might not be the best idea...maybe we can replace / remove it
-        this.snackbarService.showSuccess('LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_CHANGE_ORDER_SUCCESS_MESSAGE');
+    // add list breadcrumb only if we have permission
+    if (ReferenceDataCategoryModel.canList(this.authUser)) {
+      this.breadcrumbs.push(
+        {
+          label: 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE',
+          action: {
+            link: ['/reference-data']
+          }
+        });
+    }
+
+    // view / modify breadcrumb
+    this.breadcrumbs.push(
+      {
+        label: this.category.name,
+        action: null
+      }
+    );
+  }
+
+
+  /**
+   * Fields retrieved from api to reduce payload size
+   */
+  protected refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the Reference Data Categories list
+   */
+  refreshList() {
+    // add category id to request
+    this.queryBuilder.filter.byEquality(
+      'categoryId',
+      this.category.id
+    );
+
+    // retrieve records
+    this.records$ = this.referenceDataDataService
+      .getEntries(this.queryBuilder)
+      .pipe(
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
+  }
+
+  /**
+   * Get total number of items
+   */
+  refreshListCount(applyHasMoreLimit?: boolean) {
+    // reset
+    this.pageCount = undefined;
+
+    // set apply value
+    if (applyHasMoreLimit !== undefined) {
+      this.applyHasMoreLimit = applyHasMoreLimit;
+    }
+
+    // remove paginator from query builder
+    const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+    countQueryBuilder.paginator.clear();
+    countQueryBuilder.sort.clear();
+
+    // add category id to request
+    countQueryBuilder.filter.byEquality(
+      'categoryId',
+      this.category.id
+    );
+
+    // apply has more limit
+    if (this.applyHasMoreLimit) {
+      countQueryBuilder.flag(
+        'applyHasMoreLimit',
+        true
+      );
+    }
+
+    // count
+    this.referenceDataDataService
+      .getReferenceDataItemsCount(countQueryBuilder)
+      .pipe(
+        // error
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        }),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      )
+      .subscribe((response) => {
+        this.pageCount = response;
       });
   }
 }

@@ -1,13 +1,9 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { UserModel } from '../../../../core/models/user.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { Constants } from '../../../../core/models/constants';
@@ -33,27 +29,27 @@ import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { EntityType } from '../../../../core/models/entity-type';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { AppBasicPageV2Component } from '../../../../shared/components-v2/app-basic-page-v2/app-basic-page-v2.component';
 
 @Component({
   selector: 'app-contact-range-follow-ups-list',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './contact-range-follow-ups-list.component.html',
-  styleUrls: ['./contact-range-follow-ups-list.component.less']
+  styleUrls: ['./contact-range-follow-ups-list.component.scss']
 })
 export class ContactRangeFollowUpsListComponent
-  extends ListComponent
+  // #TODO - remove list component paginator ?
+  extends ListComponent<any>
   implements OnInit, OnDestroy {
 
-  // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // basic page component
+  @ViewChild('basicPage', { static: true }) basicPage: AppBasicPageV2Component;
 
-  // authenticated user
-  authUser: UserModel;
+  // breadcrumbs
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   outbreakSubscriber: Subscription;
-
-  // contacts outbreak
-  selectedOutbreak: OutbreakModel;
 
   // which follow-ups list page are we visiting?
   rootPage: FollowUpPage = FollowUpPage.RANGE;
@@ -137,10 +133,9 @@ export class ContactRangeFollowUpsListComponent
      */
   constructor(
     protected listHelperService: ListHelperService,
-    private authDataService: AuthDataService,
     private outbreakDataService: OutbreakDataService,
     private followUpsDataService: FollowUpsDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private referenceDataDataService: ReferenceDataDataService,
     private i18nService: I18nService,
     private genericDataService: GenericDataService,
@@ -157,11 +152,10 @@ export class ContactRangeFollowUpsListComponent
      */
   ngOnInit() {
     // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
     this.teamsList$ = this.teamDataService.getTeamsList().pipe(share());
 
     // add page title
-    this.exportRangeFollowUpsFileName = this.i18nService.instant('LNG_PAGE_LIST_RANGE_FOLLOW_UPS_TITLE') +
+    this.exportRangeFollowUpsFileName = this.i18nService.instant('LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL') +
             ' - ' +
             moment().format('YYYY-MM-DD');
 
@@ -228,6 +222,9 @@ export class ContactRangeFollowUpsListComponent
 
     // initialize breadcrumbs
     this.initializeBreadcrumbs();
+
+    // update ui size
+    this.basicPage.detectChanges();
   }
 
   /**
@@ -235,7 +232,7 @@ export class ContactRangeFollowUpsListComponent
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
 
     // outbreak subscriber
     if (this.outbreakSubscriber) {
@@ -245,134 +242,181 @@ export class ContactRangeFollowUpsListComponent
   }
 
   /**
-     * Initialize breadcrumbs
-     */
-  private initializeBreadcrumbs() {
-    // init breadcrumbs
-    this.breadcrumbs = [];
+   * Initialize side table columns
+   */
+  protected initializeTableColumns(): void {}
 
-    // contacts breadcrumb
-    if (ContactModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          'LNG_PAGE_LIST_CONTACTS_TITLE',
-          '/contacts'
-        )
-      );
-    }
+  /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
 
-    // current page breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_TITLE',
-        '.',
-        true
-      )
-    );
+  /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
+   * Initialize table quick actions
+   */
+  protected initializeQuickActions(): void {}
+
+  /**
+   * Initialize table group actions
+   */
+  protected initializeGroupActions(): void {}
+
+  /**
+   * Initialize table add action
+   */
+  protected initializeAddAction(): void {}
+
+  /**
+   * Initialize table grouped data
+   */
+  protected initializeGroupedData(): void {}
+
+  /**
+   * Initialize breadcrumbs
+   */
+  protected initializeBreadcrumbs(): void {
+    //   // init breadcrumbs
+    //   this.breadcrumbs = [];
+    //
+    //   // contacts breadcrumb
+    //   if (ContactModel.canList(this.authUser)) {
+    //     this.breadcrumbs.push(
+    //       new BreadcrumbItemModel(
+    //         'LNG_PAGE_LIST_CONTACTS_TITLE',
+    //         '/contacts'
+    //       )
+    //     );
+    //   }
+    //
+    //   // current page breadcrumb
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel(
+    //       'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL',
+    //       '.',
+    //       true
+    //     )
+    //   );
   }
 
   /**
-     * Refresh list
-     */
-  refreshList(finishCallback: (records: any[]) => void) {
-    if (this.selectedOutbreak) {
-      // order by name
-      this.queryBuilder.sort.clear();
-      this.queryBuilder.sort
-        .by(
-          'contact.firstName',
-          RequestSortDirection.ASC
-        )
-        .by(
-          'contact.lastName',
-          RequestSortDirection.ASC
-        )
-        .by(
-          'contact.visualId',
-          RequestSortDirection.ASC
-        );
+   * Fields retrieved from api to reduce payload size
+   */
+  protected refreshListFields(): string[] {
+    return [];
+  }
 
-      // retrieve the list of Follow Ups
-      this.displayLoading = true;
-      this.followUpsGroupedByContact = [];
-      let minDate: Moment;
-      let maxDate: Moment;
-      this.followUpsDataService
-        .getRangeFollowUpsList(
-          this.selectedOutbreak.id,
-          this.queryBuilder
-        )
-        .pipe(
-          catchError((err) => {
-            this.snackbarService.showApiError(err);
-            finishCallback([]);
-            return throwError(err);
-          })
-        )
-        .subscribe((rangeData: RangeFollowUpsModel[]) => {
-          this.followUpsGroupedByContact = _.map(rangeData, (data: RangeFollowUpsModel) => {
-            // determine follow-up questionnaire alertness
-            data.followUps = FollowUpModel.determineAlertness(
-              this.selectedOutbreak.contactFollowUpTemplate,
-              data.followUps
-            );
+  /**
+   * Refresh list
+   */
+  refreshList() {
+    // order by name
+    this.queryBuilder.sort.clear();
+    this.queryBuilder.sort
+      .by(
+        'contact.firstName',
+        RequestSortDirection.ASC
+      )
+      .by(
+        'contact.lastName',
+        RequestSortDirection.ASC
+      )
+      .by(
+        'contact.visualId',
+        RequestSortDirection.ASC
+      );
 
-            // get grouped followups by contact & date
-            return {
-              person: data.person,
-              followUps: _.chain(data.followUps)
-                .groupBy((followUp: FollowUpModel) => {
-                  // determine min & max dates
-                  const date = moment(followUp.date).startOf('day');
-                  if (followUp.statusId) {
-                    minDate = minDate ?
-                      (date.isBefore(minDate) ? date : minDate) :
-                      date;
-                    maxDate = maxDate ?
-                      (date.isAfter(maxDate) ? moment(date) : maxDate) :
-                      moment(date);
+    // #TODO - must remove, added only for test purposes
+    this.queryBuilder.filter.byDateRange(
+      'date', {
+        startDate: '2019-01-01',
+        endDate: '2019-02-28'
+      }
+    );
+
+    // retrieve the list of Follow Ups
+    this.displayLoading = true;
+    this.followUpsGroupedByContact = [];
+    let minDate: Moment;
+    let maxDate: Moment;
+    this.followUpsDataService
+      .getRangeFollowUpsList(
+        this.selectedOutbreak.id,
+        this.queryBuilder
+      )
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        })
+      )
+      .subscribe((rangeData: RangeFollowUpsModel[]) => {
+        this.followUpsGroupedByContact = _.map(rangeData, (data: RangeFollowUpsModel) => {
+          // determine follow-up questionnaire alertness
+          data.followUps = FollowUpModel.determineAlertness(
+            this.selectedOutbreak.contactFollowUpTemplate,
+            data.followUps
+          );
+
+          // get grouped followups by contact & date
+          return {
+            person: data.person,
+            followUps: _.chain(data.followUps)
+              .groupBy((followUp: FollowUpModel) => {
+                // determine min & max dates
+                const date = moment(followUp.date).startOf('day');
+                if (followUp.statusId) {
+                  minDate = minDate ?
+                    (date.isBefore(minDate) ? date : minDate) :
+                    date;
+                  maxDate = maxDate ?
+                    (date.isAfter(maxDate) ? moment(date) : maxDate) :
+                    moment(date);
+                }
+
+                // sort by date ascending
+                return date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+              })
+              .mapValues((followUpData: FollowUpModel[]) => {
+                return _.sortBy(
+                  followUpData,
+                  (followUp: FollowUpModel) => {
+                    return moment(followUp.date);
                   }
-
-                  // sort by date ascending
-                  return date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-                })
-                .mapValues((followUpData: FollowUpModel[]) => {
-                  return _.sortBy(
-                    followUpData,
-                    (followUp: FollowUpModel) => {
-                      return moment(followUp.date);
-                    }
-                  );
-                })
-                .value()
-            };
-          });
-
-          // create dates array
-          this.daysToDisplay = [];
-          if (
-            minDate &&
-                        maxDate
-          ) {
-            // push dates
-            while (minDate.isSameOrBefore(maxDate)) {
-              // add day to list
-              this.daysToDisplay.push(minDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
-
-              // next day
-              minDate.add('1', 'days');
-            }
-          }
-
-          // finished
-          finishCallback(rangeData);
-
-          // display data
-          this.displayLoading = false;
+                );
+              })
+              .value()
+          };
         });
-    } else {
-      finishCallback([]);
-    }
+
+        // create dates array
+        this.daysToDisplay = [];
+        if (
+          minDate &&
+                      maxDate
+        ) {
+          // push dates
+          while (minDate.isSameOrBefore(maxDate)) {
+            // add day to list
+            this.daysToDisplay.push(minDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
+
+            // next day
+            minDate.add('1', 'days');
+          }
+        }
+
+        // display data
+        this.displayLoading = false;
+      });
   }
 
   /**
@@ -388,7 +432,7 @@ export class ContactRangeFollowUpsListComponent
         .getRangeFollowUpsListCount(this.selectedOutbreak.id, countQueryBuilder)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             return throwError(err);
           }),
           share()

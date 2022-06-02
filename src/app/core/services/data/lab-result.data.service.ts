@@ -64,7 +64,7 @@ export class LabResultDataService {
   getOutbreakLabResults(
     outbreakId: string,
     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-  ): Observable<any> {
+  ): Observable<LabResultModel[]> {
     const filter = queryBuilder.buildQuery();
     return this.modelHelper.mapObservableListToModel(
       this.http.get(`outbreaks/${outbreakId}/lab-results/aggregate?filter=${filter}`),

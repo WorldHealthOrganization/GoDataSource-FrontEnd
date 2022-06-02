@@ -1,13 +1,47 @@
 import { ModuleWithProviders } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import * as fromPages from './pages';
-import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
-import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
-import { AuthGuard } from '../../core/services/guards/auth-guard.service';
-import { PERMISSION } from '../../core/models/permission.model';
+import { Route, RouterModule, Routes } from '@angular/router';
 import { RelationshipType } from '../../core/enums/relationship-type.enum';
+import { PERMISSION } from '../../core/models/permission.model';
 import { PermissionExpression } from '../../core/models/user.model';
+import { AuthGuard } from '../../core/services/guards/auth-guard.service';
+import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
+import { CertaintyLevelDataResolver } from '../../core/services/resolvers/data/certainty-level.resolver';
+import { ClusterDataResolver } from '../../core/services/resolvers/data/cluster.resolver';
+import { ContextOfTransmissionDataResolver } from '../../core/services/resolvers/data/context-of-transmission.resolver';
+import { ExposureDurationDataResolver } from '../../core/services/resolvers/data/exposure-duration.resolver';
+import { ExposureFrequencyDataResolver } from '../../core/services/resolvers/data/exposure-frequency.resolver';
+import { ExposureTypeDataResolver } from '../../core/services/resolvers/data/exposure-type.resolver';
+import { PersonTypeDataResolver } from '../../core/services/resolvers/data/person-type.resolver';
+import { RelationshipPersonDataResolver } from '../../core/services/resolvers/data/relationship-person.resolver';
+import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
+import * as fromPages from './pages';
+import { GenderDataResolver } from '../../core/services/resolvers/data/gender.resolver';
+import { RiskDataResolver } from '../../core/services/resolvers/data/risk.resolver';
+import { ClassificationDataResolver } from '../../core/services/resolvers/data/classification.resolver';
+import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
+import { SelectedOutbreakDataResolver } from '../../core/services/resolvers/data/selected-outbreak.resolver';
+import { SelectedEntitiesDataResolver } from '../../core/services/resolvers/data/selected-entities.resolver';
 
+// create - view - modify relationship
+const createViewModifyRelationship: Route = {
+  component: fromPages.RelationshipsCreateViewModifyComponent,
+  canActivate: [AuthGuard],
+  resolve: {
+    outbreak: SelectedOutbreakDataResolver,
+    entity: RelationshipPersonDataResolver,
+    certaintyLevel: CertaintyLevelDataResolver,
+    exposureType: ExposureTypeDataResolver,
+    exposureFrequency: ExposureFrequencyDataResolver,
+    exposureDuration: ExposureDurationDataResolver,
+    contextOfTransmission: ContextOfTransmissionDataResolver,
+    cluster: ClusterDataResolver,
+    user: UserDataResolver,
+    selectedEntities: SelectedEntitiesDataResolver
+  }
+};
+
+// routes
 const relationshipTypeChildrenRoutes = [
   // Relationships list
   {
@@ -19,6 +53,18 @@ const relationshipTypeChildrenRoutes = [
         PERMISSION.OUTBREAK_VIEW,
         PERMISSION.RELATIONSHIP_LIST
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      certaintyLevel: CertaintyLevelDataResolver,
+      exposureType: ExposureTypeDataResolver,
+      exposureFrequency: ExposureFrequencyDataResolver,
+      exposureDuration: ExposureDurationDataResolver,
+      contextOfTransmission: ContextOfTransmissionDataResolver,
+      cluster: ClusterDataResolver,
+      personType: PersonTypeDataResolver,
+      user: UserDataResolver,
+      entity: RelationshipPersonDataResolver
     }
   },
   // Create relationships (1): List available persons to be selected for creating new relationships
@@ -31,22 +77,15 @@ const relationshipTypeChildrenRoutes = [
         PERMISSION.OUTBREAK_VIEW,
         PERMISSION.RELATIONSHIP_CREATE
       ]
-    }
-  },
-  // Create relationships (2): Create relationships form
-  {
-    path: 'create',
-    component: fromPages.CreateEntityRelationshipComponent,
-    canActivate: [AuthGuard],
-    data: {
-      permissions: [
-        PERMISSION.OUTBREAK_VIEW,
-        PERMISSION.RELATIONSHIP_CREATE
-      ]
     },
-    canDeactivate: [
-      PageChangeConfirmationGuard
-    ]
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      entity: RelationshipPersonDataResolver,
+      gender: GenderDataResolver,
+      risk: RiskDataResolver,
+      classification: ClassificationDataResolver,
+      personType: PersonTypeDataResolver
+    }
   },
   // Share selected relationships (1): Select people to share with
   {
@@ -96,35 +135,48 @@ const relationshipTypeChildrenRoutes = [
       })
     }
   },
-  // View Relationship
+  // Create relationships
   {
-    path: ':relationshipId/view',
-    component: fromPages.ModifyEntityRelationshipComponent,
-    canActivate: [AuthGuard],
+    path: 'create',
+    ...createViewModifyRelationship,
     data: {
       permissions: [
         PERMISSION.OUTBREAK_VIEW,
-        PERMISSION.RELATIONSHIP_VIEW
+        PERMISSION.RELATIONSHIP_CREATE
       ],
-      action: ViewModifyComponentAction.VIEW
-    }
-  },
-  // Modify Relationship
-  {
-    path: ':relationshipId/modify',
-    component: fromPages.ModifyEntityRelationshipComponent,
-    canActivate: [AuthGuard],
-    data: {
-      permissions: [
-        PERMISSION.OUTBREAK_VIEW,
-        PERMISSION.RELATIONSHIP_MODIFY
-      ],
-      action: ViewModifyComponentAction.MODIFY
+      action: CreateViewModifyV2Action.CREATE
     },
     canDeactivate: [
       PageChangeConfirmationGuard
     ]
   },
+  // View Relationship
+  {
+    path: ':relationshipId/view',
+    ...createViewModifyRelationship,
+    data: {
+      permissions: [
+        PERMISSION.OUTBREAK_VIEW,
+        PERMISSION.RELATIONSHIP_VIEW
+      ],
+      action: CreateViewModifyV2Action.VIEW
+    }
+  },
+  // Modify Relationship
+  {
+    path: ':relationshipId/modify',
+    ...createViewModifyRelationship,
+    data: {
+      permissions: [
+        PERMISSION.OUTBREAK_VIEW,
+        PERMISSION.RELATIONSHIP_MODIFY
+      ],
+      action: CreateViewModifyV2Action.MODIFY
+    },
+    canDeactivate: [
+      PageChangeConfirmationGuard
+    ]
+  }
 ];
 
 const routes: Routes = [
@@ -134,7 +186,7 @@ const routes: Routes = [
     data: {
       relationshipType: RelationshipType.EXPOSURE
     },
-    children: relationshipTypeChildrenRoutes,
+    children: relationshipTypeChildrenRoutes
   },
   // Entity Contact Relationships
   {
@@ -153,6 +205,9 @@ const routes: Routes = [
       permissions: [
         PERMISSION.CASE_LIST_ONSET_BEFORE_PRIMARY_CASE_REPORT
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver
     }
   },
   // Report about the long periods in the dates of onset between cases in the chain of transmission i.e. indicate where an intermediate contact may have been missed
@@ -164,6 +219,9 @@ const routes: Routes = [
       permissions: [
         PERMISSION.CASE_LIST_LONG_PERIOD_BETWEEN_DATES_REPORT
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver
     }
   }
 ];

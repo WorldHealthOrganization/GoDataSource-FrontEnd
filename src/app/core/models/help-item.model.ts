@@ -3,9 +3,10 @@ import { UserModel } from './user.model';
 import { HelpCategoryModel } from './help-category.model';
 import { IPermissionBasic, IPermissionHelp } from './permission.interface';
 import { PERMISSION } from './permission.model';
+import { BaseModel } from './base.model';
 
-export class HelpItemModel
-implements
+export class HelpItemModel extends BaseModel
+  implements
         IPermissionBasic,
         IPermissionHelp {
   id: string;
@@ -39,6 +40,8 @@ implements
      * Constructor
      */
   constructor(data = null) {
+    super(data);
+
     this.id = _.get(data, 'id');
     this.title = _.get(data, 'title');
     this.content = _.get(data, 'content');

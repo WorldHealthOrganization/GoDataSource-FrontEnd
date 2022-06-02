@@ -1,234 +1,333 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
+import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import * as _ from 'lodash';
+import { throwError } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { IconModel } from '../../../../core/models/icon.model';
 import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { IconDataService } from '../../../../core/services/data/icon.data.service';
-import { IconModel } from '../../../../core/models/icon.model';
-import { Observable } from 'rxjs';
-import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { DialogAnswer, DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { catchError, share, tap } from 'rxjs/operators';
-import { throwError } from 'rxjs';
-import { UserModel } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { IBasicCount } from '../../../../core/models/basic-count.interface';
-import * as _ from 'lodash';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 
 @Component({
   selector: 'app-manage-icons-list',
   templateUrl: './manage-icons-list.component.html'
 })
-export class ManageIconsListComponent extends ListComponent implements OnInit, OnDestroy {
-  // Breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
-
+export class ManageIconsListComponent extends ListComponent<IconModel> implements OnDestroy {
   // Category Name
-  category: ReferenceDataCategoryModel;
-
-  // constants
-  IconModel = IconModel;
-
-  // Icons
-  iconsList$: Observable<IconModel[]>;
-  iconsListCount$: Observable<IBasicCount>;
-
-  // authenticated user
-  authUser: UserModel;
-
-  fixedTableColumns: string[] = [
-    'name',
-    'icon'
-  ];
-
-  recordActions: HoverRowAction[] = [
-    // Other actions
-    new HoverRowAction({
-      type: HoverRowActionType.MENU,
-      icon: 'moreVertical',
-      menuOptions: [
-        // Delete Icon
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_ACTION_DELETE',
-          click: (item: IconModel) => {
-            this.deleteIcon(item);
-          },
-          visible: (): boolean => {
-            return IconModel.canDelete(this.authUser);
-          },
-          class: 'mat-menu-item-delete'
-        })
-      ]
-    })
-  ];
+  private _category: ReferenceDataCategoryModel;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
-    private route: ActivatedRoute,
-    private referenceDataDataService: ReferenceDataDataService,
+    private activatedRoute: ActivatedRoute,
     private iconDataService: IconDataService,
-    private dialogService: DialogService,
-    private snackbarService: SnackbarService,
-    private authDataService: AuthDataService
+    private toastV2Service: ToastV2Service,
+    private dialogV2Service: DialogV2Service
   ) {
     super(listHelperService);
+
+    // retrieve data
+    this._category = this.activatedRoute.snapshot.data.category;
   }
 
   /**
-     * Component initialized
-     */
-  ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
+   * Release resources
+   */
+  ngOnDestroy() {
+    // release parent resources
+    super.onDestroy();
+  }
 
-    // get the query params
-    // retrieve Reference Data Category info
-    if (!this.route.snapshot.queryParams.categoryId) {
-      // update breadcrumbs
-      this.initializeBreadcrumbs();
-    } else {
-      this.retrieveCategory(this.route.snapshot.queryParams.categoryId);
-    }
-
+  /**
+   * Initialized
+   */
+  initialized(): void {
     // initialize pagination
     this.initPaginator();
 
-    // retrieve icons
+    // ...and re-load the list when the Selected Outbreak is changed
     this.needsRefreshList(true);
   }
 
   /**
-     * Release resources
-     */
-  ngOnDestroy() {
-    // release parent resources
-    super.ngOnDestroy();
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {
+    // default table columns
+    this.tableColumns = [
+      {
+        label: 'LNG_ICON_FIELD_LABEL_NAME',
+        field: 'name',
+        pinned: IV2ColumnPinned.LEFT,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        label: 'LNG_ICON_FIELD_LABEL_ICON',
+        field: 'url',
+        noIconLabel: null,
+        format: {
+          type: V2ColumnFormat.ICON_URL
+        }
+      },
+
+      // actions
+      {
+        field: 'actions',
+        label: 'LNG_COMMON_LABEL_ACTIONS',
+        pinned: IV2ColumnPinned.RIGHT,
+        notResizable: true,
+        cssCellClass: 'gd-cell-no-focus',
+        format: {
+          type: V2ColumnFormat.ACTIONS
+        },
+        actions: [
+          // Other actions
+          {
+            type: V2ActionType.MENU,
+            icon: 'more_horiz',
+            menuOptions: [
+              // Delete Icon
+              {
+                label: {
+                  get: () => 'LNG_PAGE_ACTION_DELETE'
+                },
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+                action: {
+                  click: (item: IconModel): void => {
+                    // confirm
+                    this.dialogV2Service.showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_DELETE',
+                          data: () => ({
+                            name: item.name
+                          })
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_ICON',
+                          data: () => ({
+                            name: item.name
+                          })
+                        }
+                      }
+                    }).subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // delete
+                      this.iconDataService
+                        .deleteIcon(item.id)
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            this.toastV2Service.error(err);
+
+                            // hide loading
+                            loading.close();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          // success
+                          this.toastV2Service.success('LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_LIST_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                          // hide loading
+                          loading.close();
+
+                          // reload data
+                          this.needsRefreshList(true);
+                        });
+                    });
+                  }
+                },
+                visible: (): boolean => {
+                  return IconModel.canDelete(this.authUser);
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ];
   }
 
   /**
-     * Initialize breadcrumbs
-     */
-  initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
+   * Initialize table quick actions
+   */
+  protected initializeQuickActions(): void {}
+
+  /**
+   * Initialize table group actions
+   */
+  protected initializeGroupActions(): void {}
+
+  /**
+   * Initialize table add action
+   */
+  protected initializeAddAction(): void {
+    this.addAction = {
+      type: V2ActionType.ICON_LABEL,
+      label: 'LNG_COMMON_BUTTON_ADD',
+      icon: 'add_circle_outline',
+      action: {
+        link: (): string[] => ['/reference-data', 'manage-icons', 'add'],
+        linkQueryParams: () => ({
+          categoryId: this._category?.id
+        })
+      },
+      visible: (): boolean => {
+        return IconModel.canCreate(this.authUser);
+      }
+    };
+  }
+
+  /**
+   * Initialize table grouped data
+   */
+  protected initializeGroupedData(): void {}
+
+  /**
+   * Initialize breadcrumbs
+   */
+  protected initializeBreadcrumbs(): void {
+    // set breadcrumbs
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
+        }
+      }
+    ];
 
     // add reference categories list breadcrumb only if we have permission
     if (ReferenceDataCategoryModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
-      );
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE',
+        action: {
+          link: ['/reference-data']
+        }
+      });
     }
 
     // add category
     if (
-      this.category &&
-            ReferenceDataEntryModel.canList(this.authUser)
+      this._category &&
+      ReferenceDataEntryModel.canList(this.authUser)
     ) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          this.category.name,
-          `/reference-data/${this.category.id}`,
-          false,
-          {},
-          this.category
-        )
-      );
+      this.breadcrumbs.push({
+        label: this._category.name,
+        action: {
+          link: [`/reference-data/${ this._category.id }`]
+        }
+      });
     }
 
     // add manage icons breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_LIST_TITLE',
-        '',
-        true
-      )
-    );
+    this.breadcrumbs.push({
+      label: 'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_LIST_TITLE',
+      action: null
+    });
   }
 
   /**
-     * Retrieve category
-     * @param categoryId
-     */
-  retrieveCategory(categoryId: string) {
-    this.referenceDataDataService
-      .getReferenceDataByCategory(categoryId)
-      .subscribe((category: ReferenceDataCategoryModel) => {
-        // set category
-        this.category = category;
-
-        // update breadcrumbs
-        this.initializeBreadcrumbs();
-      });
+   * Fields retrieved from api to reduce payload size
+   */
+  protected refreshListFields(): string[] {
+    return [
+      'id',
+      'name'
+    ];
   }
 
   /**
-     * Retrieve Icons
-     */
-  refreshList(finishCallback: (records: any[]) => void) {
-    this.iconsList$ = this.iconDataService
+   * Retrieve Icons
+   */
+  refreshList() {
+    this.records$ = this.iconDataService
       .getIconsList(this.queryBuilder)
       .pipe(
-        catchError((err) => {
-          this.snackbarService.showApiError(err);
-          finishCallback([]);
-          return throwError(err);
-        }),
-        tap(this.checkEmptyList.bind(this)),
-        tap((data: any[]) => {
-          finishCallback(data);
-        })
+        // should be the last pipe
+        takeUntil(this.destroyed$)
       );
   }
 
   /**
-     * Get total number of items, based on the applied filters
-     */
-  refreshListCount() {
+   * Get total number of items, based on the applied filters
+   */
+  refreshListCount(applyHasMoreLimit?: boolean) {
+    // reset
+    this.pageCount = undefined;
+
+    // set apply value
+    if (applyHasMoreLimit !== undefined) {
+      this.applyHasMoreLimit = applyHasMoreLimit;
+    }
+
     // remove paginator from query builder
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
-    this.iconsListCount$ = this.iconDataService
+
+    // apply has more limit
+    if (this.applyHasMoreLimit) {
+      countQueryBuilder.flag(
+        'applyHasMoreLimit',
+        true
+      );
+    }
+
+    this.iconDataService
       .getIconsCount(countQueryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         }),
-        share()
-      );
-  }
 
-  /**
-     * Delete Icon
-     * @param icon
-     */
-  deleteIcon(icon: IconModel) {
-    this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_ICON', icon)
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          // delete case
-          this.iconDataService
-            .deleteIcon(icon.id)
-            .pipe(
-              catchError((err) => {
-                this.snackbarService.showApiError(err);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_LIST_ACTION_DELETE_SUCCESS_MESSAGE');
-
-              // reload data
-              this.needsRefreshList(true);
-            });
-        }
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      )
+      .subscribe((response) => {
+        this.pageCount = response;
       });
   }
 }

@@ -1,0 +1,405 @@
+<!-- List page top -->
+<div
+  class="gd-list-top">
+
+  <!-- Breadcrumbs -->
+  <app-breadcrumb-v2
+    *ngIf="breadcrumbs"
+    [breadcrumbs]="breadcrumbs"
+    (detectChanges)="resizeTable()"></app-breadcrumb-v2>
+
+  <!-- Title & buttons -->
+  <div
+    *ngIf="pageTitle"
+    fxLayout="row"
+    class="gd-list-top-tile-buttons">
+
+    <!-- Title -->
+    <div
+      fxFlex
+      class="gd-list-top-tile-buttons-title">
+      {{pageTitle | translate}}
+    </div>
+
+    <!-- Buttons -->
+    <div
+      fxFlex fxLayoutAlign="end" fxLayoutGap="0.8rem"
+      class="gd-list-top-tile-buttons-buttons">
+
+      <!-- Hide / show groups -->
+      <button
+        *ngIf="groupedData"
+        type="button"
+        mat-flat-button color="text"
+        class="gd-list-top-tile-buttons-button-grouped"
+        [class.gd-list-top-tile-buttons-button-grouped-expanded]="groupedDataExpanded"
+        (click)="groupedDataExpanded ? collapseGroupedData() : expandRefreshGroupedData()">
+
+        <!-- Icon -->
+        <mat-icon>expand_more</mat-icon>
+
+        <!-- Label -->
+        <span>
+          {{groupedData.label | translate}}
+        </span>
+
+      </button>
+
+      <!-- Quick actions -->
+      <ng-container
+        *ngIf="quickActions && (!quickActions.visible || quickActions.visible(null))">
+
+        <!-- Menu -->
+        <!-- IMPORTANT: Menu of type icon isn't supported here -->
+        <button
+          #quickMenuTrigger="matMenuTrigger"
+          class="gd-list-top-tile-buttons-button-quick"
+          [class.gd-list-top-tile-buttons-button-quick-expanded]="quickMenuTrigger.menuOpen"
+          type="button"
+          mat-flat-button color="secondary"
+          [disabled]="quickActions.disable && quickActions.disable(null)"
+          [matMenuTriggerFor]="quickMenu"
+          (menuClosed)="detectChanges()">
+
+          <!-- Label -->
+          <span>
+            {{quickActions.label | translate}}
+          </span>
+
+          <!-- Icon -->
+          <mat-icon>expand_more</mat-icon>
+        </button>
+
+        <!-- Floating menu -->
+        <mat-menu
+          #quickMenu="matMenu"
+          class="gd-list-top-tile-buttons-button-quick-options">
+          <ng-container
+            *ngFor="let menuOption of quickActions.menuOptions">
+            <ng-container
+              *ngIf="!menuOption.visible || menuOption.visible(null)">
+
+              <!-- Child Menu link -->
+              <ng-container
+                *ngIf="menuOption.label; else divider">
+
+                <!-- Link -->
+                <a
+                  *ngIf="menuOption.action.link; else notLink"
+                  mat-menu-item
+                  class="gd-list-top-tile-buttons-button-quick-options-option {{menuOption.cssClasses}}"
+                  [routerLink]="menuOption.action.link && (!menuOption.disable || !menuOption.disable(null)) ? menuOption.action.link(null) : undefined"
+                  [queryParams]="menuOption.action.linkQueryParams ? menuOption.action.linkQueryParams(null) : undefined"
+                  [disabled]="menuOption.disable && menuOption.disable(null)">
+                  {{menuOption.label.get(null) | translate:(menuOption.label.data ? menuOption.label.data(null) : undefined)}}
+                </a>
+
+                <!-- Button -->
+                <ng-template
+                  #notLink>
+                  <button
+                    type="button"
+                    mat-menu-item
+                    class="gd-list-top-tile-buttons-button-quick-options-option {{menuOption.cssClasses}}"
+                    [disabled]="menuOption.disable && menuOption.disable(null)"
+                    (click)="menuOption.action.click ? menuOption.action.click(null) : undefined">
+                    {{menuOption.label.get(null) | translate:(menuOption.label.data ? menuOption.label.data(null) : undefined)}}
+                  </button>
+                </ng-template>
+
+              </ng-container>
+
+              <!-- Divider -->
+              <ng-template
+                #divider>
+                <mat-divider></mat-divider>
+              </ng-template>
+
+            </ng-container>
+          </ng-container>
+        </mat-menu>
+
+      </ng-container>
+
+      <!-- Add -->
+      <a
+        *ngIf="addAction && (!addAction.visible || addAction.visible(null))"
+        mat-flat-button
+        [routerLink]="addAction.action.link && (!addAction.disable || !addAction.disable(null)) ? addAction.action.link(null) : undefined"
+        [queryParams]="addAction.action.linkQueryParams ? addAction.action.linkQueryParams(null) : undefined"
+        [disabled]="addAction.disable && addAction.disable(null)"
+        (click)="addAction.action.click ? addAction.action.click(null) : undefined">
+
+        <!-- Icon -->
+        <mat-icon>{{addAction.icon}}</mat-icon>
+
+        <!-- Label -->
+        <span>{{ addAction.label | translate }}</span>
+
+      </a>
+
+    </div>
+  </div>
+
+  <!-- Grouped data -->
+  <div
+    *ngIf="groupedDataExpanded"
+    class="gd-list-top-grouped">
+
+    <!-- Loading data -->
+    <mat-progress-bar
+      *ngIf="groupedData.data.loading; else displayGroupedData"
+      mode="indeterminate"></mat-progress-bar>
+
+    <!-- Display data -->
+    <ng-template
+      #displayGroupedData>
+      <div
+        class="gd-list-top-grouped-data"
+        fxLayout="row" fxLayoutAlign="space-between stretch" fxLayoutGap="2.4rem">
+
+        <!-- Group value -->
+        <div
+          *ngFor="let groupValue of groupedData.data.values"
+          class="gd-list-top-grouped-data-value"
+          [class.gd-list-top-grouped-data-value-active]="groupValue.active"
+          [class.gd-list-top-grouped-data-value-not-active]="groupedDataOneActive && !groupValue.active"
+          fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="1.6rem"
+          [style.background-color]="groupValue.bgColor"
+          [style.color]="groupValue.textColor"
+          (click)="clickGroupValue(groupValue)">
+
+          <!-- Label -->
+          <div
+            class="gd-list-top-grouped-data-value-label"
+            fxFlex>
+            {{groupValue.label | translate}}
+          </div>
+
+          <!-- Count -->
+          <div
+            class="gd-list-top-grouped-data-value-count"
+            fxGrow="0">
+            {{groupValue.value}}
+          </div>
+
+        </div>
+
+      </div>
+    </ng-template>
+
+  </div>
+</div>
+
+<!-- Table related -->
+<mat-card
+  class="gd-list-table">
+
+  <!-- Table header -->
+  <div
+    fxLayout="row" fxLayoutAlign="space-between center"
+    class="gd-list-table-header">
+
+    <!-- Left -->
+    <div
+      fxFlex
+      class="gd-list-table-header-left">
+
+      <!-- Loading -->
+      <div
+        *ngIf="!pageCount || pageCount.count === null; else pageInfo"
+        class="gd-list-table-header-left-loading">
+        <mat-progress-spinner
+          mode="indeterminate"
+          diameter="24">
+        </mat-progress-spinner>
+      </div>
+
+      <!-- Counted items -->
+      <ng-template
+        #pageInfo>
+
+        <div
+          fxFlex fxLayout="row" fxLayoutAlign="start center">
+
+          <!-- Text -->
+          <div
+            class="gd-list-table-header-left-text">
+            {{ (pageCount.hasMore ? ('LNG_COMMON_LABEL_PAGINATOR_COUNT_BEFORE_LENGTH' | translate) + ' ' : '') + (pageCount.count | number) + (' ' + ('LNG_COMMON_LABEL_PAGINATOR_COUNT_AFTER_LENGTH' | translate)) }}
+          </div>
+
+          <!-- Determine total -->
+          <ng-container
+            *ngIf="pageCount.hasMore">
+            (<button
+              class="gd-list-table-header-left-show-total"
+              type="button"
+              mat-flat-button color="text"
+              (click)="refreshDataCountHandler()">{{'LNG_COMMON_LABEL_PAGINATOR_SHOW_EXACT_COUNT' | translate}}</button>)
+          </ng-container>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Right -->
+    <div
+      fxFlex fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="0.8rem"
+      class="gd-list-table-header-right">
+
+      <!-- Filters applied -->
+      <div
+        *ngIf="filtersApplied"
+        class="gd-list-table-header-right-filters-applied">
+        {{'LNG_COMMON_LABEL_FILTERS_USED' | translate}}
+      </div>
+
+      <!-- Info -->
+      <div
+        *ngIf="infosJoined"
+        fxFlex fxGrow="0" fxLayoutAlign="center"
+        class="gd-list-table-header-right-info">
+        <!-- Content -->
+        <popper-content
+          #popperContent>
+          <div
+            [innerHtml]="infosJoined">
+          </div>
+        </popper-content>
+
+        <!-- help button -->
+        <mat-icon
+          [popper]="popperContent"
+          popperTrigger="hover"
+          popperPlacement="bottom"
+          popperPreventOverflow="true"
+          popperPositionFixed="true"
+          popperAppendTo="body">help</mat-icon>
+      </div>
+
+      <!-- Reset filters -->
+      <button
+        *ngIf="hasTableHeaderFilters"
+        type="button"
+        mat-icon-button
+        [matTooltip]="'LNG_COMMON_BUTTON_RESET_FILTERS' | translate"
+        (click)="resetHeaderFilters.emit()">
+        <mat-icon class="material-icons-outlined">settings_backup_restore</mat-icon>
+      </button>
+
+      <!-- Advanced filters -->
+      <button
+        *ngIf="advancedFilters?.length > 0"
+        type="button"
+        mat-flat-button
+        color="primary"
+        (click)="showAdvancedFilters()">
+        <mat-icon>filter_alt</mat-icon>
+        {{'LNG_SIDE_FILTERS_TITLE' | translate}}
+      </button>
+
+      <!-- Refresh data -->
+      <button
+        type="button"
+        mat-icon-button
+        [matTooltip]="'LNG_COMMON_BUTTON_REFRESH_LIST' | translate"
+        (click)="refreshDataHandler()">
+        <mat-icon>refresh</mat-icon>
+      </button>
+
+      <!-- Show / Hide header filters -->
+      <button
+        *ngIf="hasTableHeaderFilters"
+        [class.gd-list-table-header-right-header-filters-active]="showHeaderFilters"
+        type="button"
+        mat-icon-button
+        [matTooltip]="(showHeaderFilters ? 'LNG_COMMON_LABEL_HEADER_FILTER_HIDE' : 'LNG_COMMON_LABEL_HEADER_FILTER_SHOW') | translate"
+        (click)="showHeaderFilters = !showHeaderFilters"
+        [disabled]="savingHeaderFilterVisibility">
+        <mat-icon
+          *ngIf="!savingHeaderFilterVisibility; else savingHeaderFilterVisibilityProgress">filter_alt</mat-icon>
+        <ng-template
+          #savingHeaderFilterVisibilityProgress>
+          <mat-progress-spinner
+            mode="indeterminate"
+            diameter="16"></mat-progress-spinner>
+        </ng-template>
+      </button>
+
+      <!-- Visible columns -->
+      <button
+        type="button"
+        mat-icon-button
+        [matTooltip]="'LNG_SIDE_COLUMNS_SECTION_COLUMNS_TO_DISPLAY_TITLE' | translate"
+        (click)="setVisibleColumns()"
+        [disabled]="savingColumns">
+        <mat-icon
+          *ngIf="!savingColumns; else savingColumnsProgress">view_column</mat-icon>
+        <ng-template
+          #savingColumnsProgress>
+          <mat-progress-spinner
+            mode="indeterminate"
+            diameter="16"></mat-progress-spinner>
+        </ng-template>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- Table -->
+  <ag-grid-angular
+    class="ag-theme-balham gd-list-table-data"
+    [class.gd-list-table-data-88]="showHeaderFilters"
+    [modules]="modules"
+    rowHeight="40"
+    rowSelection="multiple"
+    suppressRowClickSelection="true"
+    suppressPropertyNamesCheck="true"
+    enableCellTextSelection="true"
+    suppressDragLeaveHidesColumns="true"
+    suppressCellFocus="true"
+    columnHoverHighlight="true"
+    [loadingOverlayComponent]="AppListTableV2LoadingComponent"
+    [noRowsOverlayComponent]="AppListTableV2NoDataComponent"
+    (firstDataRendered)="firstDataRendered()"
+    (dragStopped)="saveVisibleAndOrderOfColumns($event)"
+    (selectionChanged)="selectionChanged()"
+    (gridReady)="gridReady($event)">
+  </ag-grid-angular>
+
+  <!-- Table paginator -->
+  <div
+    fxLayout="row" fxLayoutAlign="space-between center"
+    class="gd-list-table-bottom">
+
+    <!-- Left -->
+    <div
+      fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="0.4rem"
+      class="gd-list-table-bottom-left">
+
+      <!-- Legends & Messages -->
+      <div
+        *ngFor="let legend of legends"
+        fxLayout="row wrap" fxLayoutAlign="start center"
+        class="gd-list-table-bottom-left-legend"
+        [innerHTML]="legend.html | safeHtml"></div>
+
+    </div>
+
+    <!-- Right -->
+    <div
+      fxGrow="0"
+      class="gd-list-table-bottom-right">
+      <app-mat-paginator-extended
+        *ngIf="!paginatorDisabled"
+        [pageIndex]="pageIndex"
+        [countData]="pageCount"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="Constants.PAGE_SIZE_OPTIONS"
+        (page)="changePage($event)"
+        [disabled]="!pageCount">
+      </app-mat-paginator-extended>
+    </div>
+
+  </div>
+
+</mat-card>

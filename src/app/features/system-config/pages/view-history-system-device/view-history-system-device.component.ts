@@ -1,22 +1,22 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DeviceDataService } from '../../../../core/services/data/device.data.service';
 import { DeviceHistoryModel } from '../../../../core/models/device-history.model';
-import { DeviceModel } from '../../../../core/models/device.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { DeviceModel } from '../../../../core/models/device.model';
 
 @Component({
   selector: 'app-view-history-system-device',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './view-history-system-device.component.html',
-  styleUrls: ['./view-history-system-device.component.less']
+  templateUrl: './view-history-system-device.component.html'
 })
 export class ViewHistorySystemDeviceComponent extends ViewModifyComponent implements OnInit {
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs
+  breadcrumbs: IV2Breadcrumb[] = [];
 
   deviceHistoryList: DeviceHistoryModel[];
 
@@ -71,21 +71,29 @@ export class ViewHistorySystemDeviceComponent extends ViewModifyComponent implem
      */
   initializeBreadcrumbs() {
     // reset
-    this.breadcrumbs = [];
+    this.breadcrumbs = [{
+      label: 'LNG_COMMON_LABEL_HOME',
+      action: {
+        link: DashboardModel.canViewDashboard(this.authUser) ?
+          ['/dashboard'] :
+          ['/account/my-profile']
+      }
+    }];
 
-    // add list breadcrumb only if we have permission
+    // contacts list page
     if (DeviceModel.canList(this.authUser)) {
-      this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_SYSTEM_DEVICES_TITLE', '/system-config/devices'));
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_SYSTEM_DEVICES_TITLE',
+        action: {
+          link: ['/system-config/devices']
+        }
+      });
     }
 
-    // current page title
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        'LNG_PAGE_VIEW_SYSTEM_DEVICE_HISTORY_TITLE',
-        '.',
-        true,
-        {}
-      )
-    );
+    // current page breadcrumb
+    this.breadcrumbs.push({
+      label: 'LNG_PAGE_VIEW_SYSTEM_DEVICE_HISTORY_TITLE',
+      action: null
+    });
   }
 }

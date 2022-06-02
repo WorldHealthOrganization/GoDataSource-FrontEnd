@@ -1,20 +1,19 @@
 import { DomSanitizer } from '@angular/platform-browser';
-import { I18nService } from '../services/helper/i18n.service';
-import { GroupEventDataAction, IGroupEventData, IGroupOptionEventData, ISelectGroupMap, ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from '../../shared/xt-forms/components/form-select-groups/form-select-groups.component';
 import { IPermissionChildModel, PERMISSION, PermissionModel } from '../models/permission.model';
-import { DialogService } from '../services/helper/dialog.service';
-import { DialogAnswer, DialogAnswerButton, DialogButton, DialogComponent, DialogConfiguration } from '../../shared/components';
-import { MatDialogRef } from '@angular/material/dialog';
 import * as _ from 'lodash';
+import { TranslateService } from '@ngx-translate/core';
+import { DialogV2Service } from '../services/helper/dialog-v2.service';
+import { IV2SideDialogConfigButton, IV2SideDialogConfigButtonType, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { v4 as uuid } from 'uuid';
+import { GroupEventDataAction, IGroupEventData, IGroupOptionEventData, ISelectGroupMap, ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from '../../shared/forms-v2/components/app-form-select-groups-v2/models/select-group.model';
 
 export class UserRoleHelper {
   /**
-     * Add required permissions to token
-     */
+   * Add required permissions to token
+   */
   public static groupOptionFormatMethod(
     sanitized: DomSanitizer,
-    i18nService: I18nService,
-    _groupsMap: ISelectGroupMap<PermissionModel>,
+    translateService: TranslateService,
     optionsMap: ISelectGroupOptionMap<IPermissionChildModel>,
     option: IPermissionChildModel
   ): ISelectGroupOptionFormatResponse {
@@ -27,16 +26,16 @@ export class UserRoleHelper {
     // do we need to include permission requirements
     if (
       option.requires &&
-            option.requires.length > 0
+      option.requires.length > 0
     ) {
       // determine requirement tokens
       const requiredPermissionTranslations: string[] = [];
       option.requires.forEach((requiredPermission: PERMISSION) => {
         if (
           optionsMap[requiredPermission] &&
-                    optionsMap[requiredPermission].option.label
+          optionsMap[requiredPermission].option.label
         ) {
-          requiredPermissionTranslations.push(i18nService.instant(optionsMap[requiredPermission].option.label));
+          requiredPermissionTranslations.push(translateService.instant(optionsMap[requiredPermission].option.label));
         }
       });
 
@@ -53,13 +52,13 @@ export class UserRoleHelper {
 
       // label
       response.label = sanitized.bypassSecurityTrustHtml(
-        i18nService.instant(
+        translateService.instant(
           'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_LABEL_MESSAGE', {
             label: option.label ?
-              i18nService.instant(option.label) :
+              translateService.instant(option.label) :
               '',
             requirements: extraRequiredPermMessage ?
-              i18nService.instant(
+              translateService.instant(
                 'LNG_ROLE_AVAILABLE_PERMISSIONS_LABEL_REQUIRE_MESSAGE', {
                   labels: extraRequiredPermMessage
                 }
@@ -69,13 +68,13 @@ export class UserRoleHelper {
       );
 
       // tooltip
-      response.tooltip = i18nService.instant(
+      response.tooltip = translateService.instant(
         'LNG_ROLE_AVAILABLE_PERMISSIONS_GROUP_TOOLTIP_MESSAGE', {
           tooltip: option.description ?
-            i18nService.instant(option.description) :
+            translateService.instant(option.description) :
             '',
           requirements: extraRequiredPermMessage ?
-            i18nService.instant(
+            translateService.instant(
               'LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRES_MESSAGE', {
                 labels: extraRequiredPermMessage
               }
@@ -85,12 +84,12 @@ export class UserRoleHelper {
     } else {
       // label
       response.label = option.label ?
-        i18nService.instant(option.label) :
+        translateService.instant(option.label) :
         '';
 
       // tooltip
       response.tooltip = option.description ?
-        i18nService.instant(option.description) :
+        translateService.instant(option.description) :
         '';
     }
 
@@ -102,14 +101,15 @@ export class UserRoleHelper {
      * Display popup with required permissions
      */
   private static displayRequiredByPopup(
-    sanitized: DomSanitizer,
-    i18nService: I18nService,
-    dialogService: DialogService,
+    translateService: TranslateService,
+    dialogV2Service: DialogV2Service,
     data: {
       readonly optionsMap: ISelectGroupOptionMap<any>,
       readonly groupsMap: ISelectGroupMap<any>,
       value: string[],
-      addValues(...values: string[]): string[]
+      addValues(...values: string[]): string[],
+      hidePanel(): void,
+      showPanel(): void
     },
     requiredByList: string[],
     selectBackIds: string[],
@@ -123,7 +123,7 @@ export class UserRoleHelper {
     // display confirm popup if we are sure we wan't to uncheck this option
     if (
       !requiredByList ||
-            requiredByList.length < 1
+      requiredByList.length < 1
     ) {
       // continue with the next step
       if (doAfterPopupCloses) {
@@ -135,15 +135,15 @@ export class UserRoleHelper {
     }
 
     // labels
-    const requiredByLabel: string = i18nService.instant('LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRED_BY_PERMISSIONS_LABEL');
-    const requiredLabel: string = i18nService.instant('LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRED_PERMISSIONS_LABEL');
+    const requiredByLabel: string = translateService.instant('LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRED_BY_PERMISSIONS_LABEL');
+    const requiredLabel: string = translateService.instant('LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRED_PERMISSIONS_LABEL');
 
     // determine missing permission labels
     let labels: string[] = requiredByList.map((permission): string => {
       return `<div>${data.optionsMap[permission] ?
-        i18nService.instant((data.optionsMap[permission].option as IPermissionChildModel).label) : (
+        translateService.instant((data.optionsMap[permission].option as IPermissionChildModel).label) : (
           data.groupsMap[permission] ?
-            i18nService.instant((data.groupsMap[permission] as PermissionModel).groupLabel) :
+            translateService.instant((data.groupsMap[permission] as PermissionModel).groupLabel) :
             permission
         )}</div>`;
     });
@@ -151,8 +151,8 @@ export class UserRoleHelper {
     // add required permissions ?
     if (
       thirdButton &&
-            thirdButton.requiredPermissions &&
-            thirdButton.requiredPermissions.length > 0
+      thirdButton.requiredPermissions &&
+      thirdButton.requiredPermissions.length > 0
     ) {
       labels = [
         `<div style="font-weight: bold;">${requiredByLabel}</div>`,
@@ -160,41 +160,73 @@ export class UserRoleHelper {
         `<br /><div style="font-weight: bold;">${requiredLabel}</div>`,
         ...thirdButton.requiredPermissions.map((permission): string => {
           return `<div>${data.optionsMap[permission] ?
-            i18nService.instant((data.optionsMap[permission].option as IPermissionChildModel).label) :
+            translateService.instant((data.optionsMap[permission].option as IPermissionChildModel).label) :
             permission
           }</div>`;
         })
       ];
     }
 
-    // configure dialog
-    const dialogConfiguration = new DialogConfiguration({
-      message: 'LNG_ROLE_AVAILABLE_PERMISSIONS_UNCHECK_CONFIRM_POPUP_MESSAGE',
-      additionalInfo: sanitized.bypassSecurityTrustHtml(labels.join('')),
-      yesLabel: 'LNG_ROLE_AVAILABLE_PERMISSIONS_UNCHECK_CONFIRM_POPUP_YES_LABEL',
-      cancelLabel: 'LNG_ROLE_AVAILABLE_PERMISSIONS_UNCHECK_CONFIRM_POPUP_NO_LABEL'
-    });
+    // construct buttons
+    const bottomButtons: IV2SideDialogConfigButton[] = [{
+      type: IV2SideDialogConfigButtonType.OTHER,
+      label: 'LNG_ROLE_AVAILABLE_PERMISSIONS_UNCHECK_CONFIRM_POPUP_YES_LABEL',
+      color: 'primary',
+      key: 'yes'
+    }];
 
     // handle third button
     if (thirdButton) {
-      dialogConfiguration.addDefaultButtons = true;
-      dialogConfiguration.buttons = [
-        new DialogButton({
-          label: thirdButton.label,
-          clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
-            dialogHandler.close(new DialogAnswer(DialogAnswerButton.Extra_1));
-          }
-        })
-      ];
+      bottomButtons.push({
+        type: IV2SideDialogConfigButtonType.OTHER,
+        label: thirdButton.label,
+        color: 'primary',
+        key: 'third'
+      });
     }
 
+    // add cancel
+    bottomButtons.push({
+      type: IV2SideDialogConfigButtonType.CANCEL,
+      label: 'LNG_ROLE_AVAILABLE_PERMISSIONS_UNCHECK_CONFIRM_POPUP_NO_LABEL',
+      color: 'text'
+    });
+
+    // hide panel before showing dialog
+    data.hidePanel();
+
     // display confirm dialog - should we check back the unchecked option ?
-    dialogService
-      .showConfirm(dialogConfiguration)
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
+    dialogV2Service
+      .showSideDialog({
+        title: {
+          get: () => 'LNG_ROLE_AVAILABLE_PERMISSIONS_UNCHECK_CONFIRM_POPUP_MESSAGE'
+        },
+        width: '60rem',
+        dontCloseOnBackdrop: true,
+        bottomButtons,
+        inputs: labels.map((html) => ({
+          type: V2SideDialogConfigInputType.HTML,
+          name: uuid(),
+          placeholder: html
+        }))
+      })
+      .subscribe((response) => {
+        // cancelled ?
+        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+          // open panel back
+          data.showPanel();
+
+          // finished
+          return;
+        }
+
+        // close dialog
+        response.handler.hide();
+
+        // handle action
+        if (response.button.key === 'yes') {
           data.value = data.addValues(...selectBackIds);
-        } else if (answer.button === DialogAnswerButton.Extra_1) {
+        } else if (response.button.key === 'third') {
           thirdButton.action();
         }
 
@@ -202,12 +234,15 @@ export class UserRoleHelper {
         if (doAfterPopupCloses) {
           doAfterPopupCloses();
         }
+
+        // open panel back
+        data.showPanel();
       });
   }
 
   /**
-     * Determine what permissions depend on a specific permission
-     */
+   * Determine what permissions depend on a specific permission
+   */
   private static determineRequiredBy(
     data: {
       readonly optionsMap: ISelectGroupOptionMap<any>,
@@ -225,9 +260,9 @@ export class UserRoleHelper {
         const option: IPermissionChildModel = data.optionsMap[checkedOption].option;
         if (
           option &&
-                    option.requires &&
-                    option.requires.length > 0 &&
-                    option.requires.indexOf(selectedOptionId as any) > -1
+          option.requires &&
+          option.requires.length > 0 &&
+          option.requires.indexOf(selectedOptionId as any) > -1
         ) {
           requiredList.push(option.id);
         }
@@ -237,8 +272,8 @@ export class UserRoleHelper {
         _.each(group.permissions, (permission: IPermissionChildModel) => {
           if (
             permission.requires &&
-                        permission.requires.length > 0 &&
-                        permission.requires.indexOf(selectedOptionId as any) > -1
+            permission.requires.length > 0 &&
+            permission.requires.indexOf(selectedOptionId as any) > -1
           ) {
             // add group to list of items that requires this option
             requiredList.push(checkedOption);
@@ -255,8 +290,8 @@ export class UserRoleHelper {
   }
 
   /**
-     * Determine all required permissions ( recursive )
-     */
+   * Determine all required permissions ( recursive )
+   */
   private static determineMissingPermissions(
     data: {
       readonly optionsMap: ISelectGroupOptionMap<any>,
@@ -282,7 +317,7 @@ export class UserRoleHelper {
         !data.value || (
           data.value.indexOf(req) === -1 && (
             !data.optionsMap[req] ||
-                        data.value.indexOf(data.optionsMap[req].groupValue) === -1
+            data.value.indexOf(data.optionsMap[req].groupValue) === -1
           )
         )
       ) {
@@ -294,7 +329,7 @@ export class UserRoleHelper {
           const requireOption: IPermissionChildModel = data.optionsMap[req].option;
           if (
             requireOption.requires &&
-                        requireOption.requires.length > 0
+            requireOption.requires.length > 0
           ) {
             UserRoleHelper.determineMissingPermissions(
               data,
@@ -309,53 +344,86 @@ export class UserRoleHelper {
   }
 
   /**
-     * Display requires popup
-     */
+   * Display requires popup
+   */
   private static displayRequiresPopup(
     data: {
       readonly optionsMap: ISelectGroupOptionMap<any>,
-      addValues(...values: string[]): string[]
+      addValues(...values: string[]): string[],
+      hidePanel(): void,
+      showPanel(): void
     },
     missingPermissions: string[],
-    i18nService: I18nService,
-    dialogService: DialogService
+    translateService: TranslateService,
+    dialogV2Service: DialogV2Service
   ) {
     // do we need to request user if he want to enable missing permissions ?
     if (
       missingPermissions &&
-            missingPermissions.length > 0
+      missingPermissions.length > 0
     ) {
       // determine missing permission labels
-      const labels: string[] = missingPermissions.map((permission): string => {
-        return `<div>${data.optionsMap[permission] ?
-          i18nService.instant((data.optionsMap[permission].option as IPermissionChildModel).label) :
-          permission}</div>`;
+      const inputs: V2SideDialogConfigInput[] = [];
+      missingPermissions.forEach((permission) => {
+        inputs.push({
+          type: V2SideDialogConfigInputType.DIVIDER,
+          placeholder: data.optionsMap[permission] ?
+            translateService.instant((data.optionsMap[permission].option as IPermissionChildModel).label) :
+            permission
+        });
       });
 
+      // hide panel before showing dialog
+      data.hidePanel();
+
       // display confirm dialog - should we add missing required permissions ?
-      dialogService
-        .showConfirm(new DialogConfiguration({
-          message: 'LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRES_CONFIRM_POPUP_MESSAGE',
-          additionalInfo: labels.join(''),
-          yesLabel: 'LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRES_CONFIRM_POPUP_YES_LABEL',
-          cancelLabel: 'LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRES_CONFIRM_POPUP_NO_LABEL'
-        }))
-        .subscribe((answer: DialogAnswer) => {
-          if (answer.button === DialogAnswerButton.Yes) {
-            data.addValues(...missingPermissions);
+      dialogV2Service
+        .showSideDialog({
+          title: {
+            get: () => 'LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRES_CONFIRM_POPUP_MESSAGE'
+          },
+          width: '60rem',
+          dontCloseOnBackdrop: true,
+          bottomButtons: [{
+            type: IV2SideDialogConfigButtonType.OTHER,
+            label: 'LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRES_CONFIRM_POPUP_YES_LABEL',
+            color: 'primary'
+          }, {
+            type: IV2SideDialogConfigButtonType.CANCEL,
+            label: 'LNG_ROLE_AVAILABLE_PERMISSIONS_REQUIRES_CONFIRM_POPUP_NO_LABEL',
+            color: 'text'
+          }],
+          inputs
+        })
+        .subscribe((response) => {
+          // cancelled ?
+          if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+            // open panel back
+            data.showPanel();
+
+            // finished
+            return;
           }
+
+          // close dialog
+          response.handler.hide();
+
+          // add values
+          data.addValues(...missingPermissions);
+
+          // open panel back
+          data.showPanel();
         });
     }
   }
 
   /**
-     * Group child option check state changed
-     */
+   * Group child option check state changed
+   */
   public static groupOptionCheckStateChanged(
     data: IGroupOptionEventData,
-    sanitized: DomSanitizer,
-    i18nService: I18nService,
-    dialogService: DialogService
+    translateService: TranslateService,
+    dialogV2Service: DialogV2Service
   ) {
     // determine selected option
     const selectedOption: IPermissionChildModel = data.option;
@@ -385,8 +453,8 @@ export class UserRoleHelper {
           this.displayRequiresPopup(
             data,
             missingPermissions,
-            i18nService,
-            dialogService
+            translateService,
+            dialogV2Service
           );
         }
       };
@@ -425,9 +493,8 @@ export class UserRoleHelper {
 
           // display dependable options
           UserRoleHelper.displayRequiredByPopup(
-            sanitized,
-            i18nService,
-            dialogService,
+            translateService,
+            dialogV2Service,
             data,
             selectedOptionRequiredByList,
             [group.groupAllId],
@@ -450,9 +517,8 @@ export class UserRoleHelper {
     } else if (data.value) {
       // option unchecked - need to see if thi isn't required by other permissions
       UserRoleHelper.displayRequiredByPopup(
-        sanitized,
-        i18nService,
-        dialogService,
+        translateService,
+        dialogV2Service,
         data,
         UserRoleHelper.determineRequiredBy(
           data,
@@ -464,13 +530,12 @@ export class UserRoleHelper {
   }
 
   /**
-     * Group checked other option ( all / none / partial )
-     */
+   * Group checked other option ( all / none / partial )
+   */
   public static groupSelectionChanged(
     data: IGroupEventData,
-    sanitized: DomSanitizer,
-    i18nService: I18nService,
-    dialogService: DialogService
+    translateService: TranslateService,
+    dialogV2Service: DialogV2Service
   ) {
     // check if we don't have permissions that require permissions that we wan't to disable by changing to None
     if (data.action === GroupEventDataAction.None) {
@@ -494,7 +559,7 @@ export class UserRoleHelper {
           });
         } else if (
           data.optionsMap[permissionId] &&
-                    data.optionsMap[permissionId].groupValue === group.groupAllId
+          data.optionsMap[permissionId].groupValue === group.groupAllId
         ) {
           // add unique values - not really needed since previousValue should contain only unique values
           if (allUncheckedPermissionIds.indexOf(permissionId) === -1) {
@@ -535,9 +600,8 @@ export class UserRoleHelper {
         // do we need to display revert back popup ?
         if (requiredByPermissions.length > 0) {
           UserRoleHelper.displayRequiredByPopup(
-            sanitized,
-            i18nService,
-            dialogService,
+            translateService,
+            dialogV2Service,
             data,
             requiredByPermissions,
             uncheckedPermissionIds,
@@ -574,8 +638,8 @@ export class UserRoleHelper {
       this.displayRequiresPopup(
         data,
         missingPermissions,
-        i18nService,
-        dialogService
+        translateService,
+        dialogV2Service
       );
     }
   }

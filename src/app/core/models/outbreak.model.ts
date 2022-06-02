@@ -7,6 +7,9 @@ import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { IPermissionBasic, IPermissionCloneable, IPermissionOutbreak, IPermissionQuestionnaire, IPermissionRestorable } from './permission.interface';
 import { Constants } from './constants';
+import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
+import { Moment } from '../helperClasses/x-moment';
 
 export class OutbreakModel
   extends BaseModel
@@ -20,8 +23,8 @@ export class OutbreakModel
   name: string;
   description: string;
   disease: string;
-  startDate: string;
-  endDate: string | null;
+  startDate: string | Moment;
+  endDate: string | Moment;
   periodOfFollowup: number;
   frequencyOfFollowUp: number;
   frequencyOfFollowUpPerDay: number;
@@ -35,14 +38,29 @@ export class OutbreakModel
   contactInvestigationTemplate: QuestionModel[];
   contactFollowUpTemplate: QuestionModel[];
   labResultsTemplate: QuestionModel[];
-  // TODO - need to allow to set case classifications on outbreak
-  // caseClassification: any | null;
   caseIdMask: string;
   contactIdMask: string;
   contactOfContactIdMask: string;
-  countries: {
+
+  // countries
+  private _countries: {
     id: string
   }[];
+  set countries(countries: {
+    id: string
+  }[]) {
+    // set value
+    this._countries = countries;
+
+    // update ids
+    this._countryIds = (this.countries || []).map((item) => item.id);
+  }
+  get countries(): {
+    id: string
+  }[] {
+    return this._countries;
+  }
+
   locationIds: string[];
   locations: LocationModel[] = [];
   longPeriodsBetweenCaseOnset: number;
@@ -61,6 +79,115 @@ export class OutbreakModel
   // used for displaying information when hovering an outbreak from topnav component
   // no need to save this one in the database
   details: string;
+
+  // countries array
+  private _countryIds: string[];
+  get countryIds(): string[] {
+    return this._countryIds;
+  }
+
+  /**
+   * Advanced filters
+   */
+  static generateAdvancedFilters(data: {
+    options: {
+      disease: ILabelValuePairModel[],
+      country: ILabelValuePairModel[],
+      geographicalLevel: ILabelValuePairModel[],
+      followUpGenerationTeamAssignmentAlgorithm: ILabelValuePairModel[],
+      yesNo: ILabelValuePairModel[]
+    }
+  }): V2AdvancedFilter[] {
+    // initialize
+    const advancedFilters: V2AdvancedFilter[] = [
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'name',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'disease',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DISEASE',
+        options: data.options.disease,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'countries.id',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES',
+        options: data.options.country,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'reportingGeographicalLevelId',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_LOCATION_GEOGRAPHICAL_LEVEL',
+        options: data.options.geographicalLevel,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'startDate',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_START_DATE',
+        sortable: true,
+        havingNotHavingApplyMongo: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'endDate',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_END_DATE',
+        sortable: true,
+        havingNotHavingApplyMongo: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'generateFollowUpsTeamAssignmentAlgorithm',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM',
+        options: data.options.followUpGenerationTeamAssignmentAlgorithm,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'generateFollowUpsOverwriteExisting',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'generateFollowUpsKeepTeamAssignment',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'isContactLabResultsActive',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CONTACT_LAB_RESULTS_ACTIVE',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'isDateOfOnsetRequired',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_IS_CASE_DATE_OF_ONSET_REQUIRED',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'generateFollowUpsDateOfLastContact',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT',
+        options: data.options.yesNo,
+        sortable: true
+      }
+    ];
+
+    // finished
+    return advancedFilters;
+  }
 
   /**
      * Static Permissions - IPermissionBasic

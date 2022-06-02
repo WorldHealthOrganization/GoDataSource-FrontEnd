@@ -1,0 +1,41 @@
+<div
+  class="gd-form-date-range-v2"
+  fxLayout="row">
+
+  <!-- From -->
+  <app-form-date-v2
+    *ngIf="!fromHidden"
+    fxFlex
+    [name]="name + '[startDate]'"
+    [(ngModel)]="value.startDate"
+    placeholder="LNG_FORM_RANGE_FIELD_LABEL_FROM"
+    autocomplete="off"
+    [neverFloatLabel]="neverFloatLabel"
+    [disabled]="disabled"
+    [required]="required"
+    (ngModelChange)="onChangeDate()"
+    (blurEvent)="onTouchItem()"></app-form-date-v2>
+
+  <!-- Separator -->
+  <div
+    *ngIf="!fromHidden && !toHidden"
+    fxLayoutAlign="center center"
+    class="gd-form-date-range-separator-v2">
+    —
+  </div>
+
+  <!-- To -->
+  <app-form-date-v2
+    *ngIf="!toHidden"
+    fxFlex
+    [name]="name + '[endDate]'"
+    [(ngModel)]="value.endDate"
+    placeholder="LNG_FORM_RANGE_FIELD_LABEL_TO"
+    autocomplete="off"
+    [neverFloatLabel]="neverFloatLabel"
+    [disabled]="disabled"
+    [required]="required"
+    (ngModelChange)="onChangeDate()"
+    (blurEvent)="onTouchItem()"></app-form-date-v2>
+
+</div>

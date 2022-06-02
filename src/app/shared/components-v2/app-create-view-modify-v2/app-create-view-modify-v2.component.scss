@@ -1,0 +1,665 @@
+@import 'mixins';
+@import 'font';
+
+/* Create, Modify, View */
+.gd-create-view-modify-create,
+.gd-create-view-modify-modify,
+.gd-create-view-modify-view {
+  /* Variables */
+  --gd-side-list-width-expanded: 22rem;
+  --gd-side-list-width-collapsed: 5.6rem;
+
+  height: 100%;
+
+  > .mat-drawer-container {
+    background-color: transparent;
+    color: var(--gd-text);
+    height: calc(100% + 5.2rem);
+    margin: -1.2rem -4rem -4rem;
+
+    @include breakpoint('lt-md') {
+      height: calc(100% + 3.2rem);
+      margin: -1.2rem -2rem -2rem;
+    }
+
+    .gd-create-view-modify-list {
+      border-right: 0 none;
+      @include box-shadow(0.2rem 0 0.2rem rgba(var(--gd-text-rgb), 0.1));
+      color: var(--gd-text);
+      overflow: visible;
+      @include transition(all 0.24s ease-in-out 0s);
+
+      @include breakpoint('gt-lg') {
+        width: var(--gd-side-list-width-collapsed);
+      }
+
+      @include breakpoint('lt-lg') {
+        width: 0;
+      }
+
+      .mat-drawer-inner-container {
+        @include flex(flex);
+        @include flex_direction(column);
+        height: 100%;
+
+        .gd-create-view-modify-list-top {
+          .gd-create-view-modify-list-top-inner {
+            padding: 1.6rem 1.4rem;
+
+            .gd-create-view-modify-list-top-title {
+              color: var(--gd-primary-alt);
+              font-size: 1.8rem;
+              font-weight: 500;
+
+              @include breakpoint('gt-lg') {
+                text-orientation: upright;
+                writing-mode: vertical-lr;
+              }
+            }
+
+            .gd-create-view-modify-list-top-buttons {
+              button.mat-icon-button {
+                height: 2.4rem;
+                min-width: 2.4rem;
+                padding: 0;
+                width: 2.4rem;
+
+                .mat-icon {
+                  font-size: 1.6rem;
+                  height: 1.6rem;
+                  line-height: 1;
+                  text-align: center;
+                }
+              }
+            }
+          }
+
+          .gd-create-view-modify-list-search {
+            .gd-form-input-v2 {
+              .mat-form-field {
+                .mat-form-field-wrapper {
+                  background: rgba(var(--gd-secondary-rgb), 0.1);
+                  @include border-radius(0);
+
+                  .mat-form-field-flex {
+                    .mat-form-field-outline {
+                      color: transparent;
+
+                      .mat-form-field-outline-start,
+                      .mat-form-field-outline-gap,
+                      .mat-form-field-outline-end {
+                        border-width: 0;
+                      }
+                    }
+
+                    .mat-form-field-outline-thick {
+                      color: transparent;
+
+                      .mat-form-field-outline-start,
+                      .mat-form-field-outline-gap,
+                      .mat-form-field-outline-end {
+                        border-width: 0;
+                      }
+                    }
+                  }
+
+                  .mat-form-field-subscript-wrapper {
+                    min-height: 0;
+                    padding: 0;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        .gd-create-view-modify-list-data {
+          height: 100%;
+          position: relative;
+
+          .mat-progress-spinner {
+            left: 50%;
+            position: absolute;
+            top: 50%;
+            @include translate(-50%, -50%);
+          }
+
+          .cdk-virtual-scroll-viewport {
+            height: 100%;
+            overflow-y: overlay;
+            overflow-x: hidden;
+          }
+
+          .gd-create-view-modify-list-data-record {
+            cursor: pointer;
+            max-width: var(--gd-side-list-width-expanded);
+            width: 100%;
+
+            + .gd-create-view-modify-list-data-record {
+              border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.15);
+            }
+
+            &:hover {
+              background-color: rgba(var(--gd-secondary-rgb), 0.05);
+            }
+
+            &.gd-create-view-modify-list-data-record-active {
+              background-color: rgba(var(--gd-primary-alt-rgb), 0.1);
+            }
+
+            > a {
+              color: var(--gd-text);
+              @include flex(flex);
+              @include flex_align_items(center);
+
+              > * {
+                line-height: 2.4rem;
+                overflow: hidden;
+                padding: 0.8rem 1.6rem;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                width: 100%;
+              }
+            }
+          }
+
+          .gd-create-view-modify-list-data-no-records {
+            left: 50%;
+            position: absolute;
+            top: 50%;
+            @include translate(-50%, -50%);
+
+            .gd-create-view-modify-list-data-no-records-image {
+              background-image: url(../../../../assets/images/nothing-found.svg);
+              background-size: contain;
+              background-position: center;
+              background-repeat: no-repeat;
+              height: 15rem;
+              width: 15rem;
+            }
+
+            .gd-create-view-modify-list-data-no-records-text {
+              color: var(--gd-secondary);
+              display: block;
+              font-size: 1.4rem;
+              padding: 1.6rem 0.8rem;
+              text-align: center;
+            }
+          }
+        }
+      }
+
+      ~ .mat-drawer-content {
+        @include breakpoint('gt-lg') {
+          margin: 0 0 0 var(--gd-side-list-width-collapsed) !important;
+          @include transition(all 0.24s ease-in-out 0s);
+          width: calc(100% - var(--gd-side-list-width-collapsed));
+        }
+      }
+    }
+
+    .mat-drawer-content {
+      overflow: hidden;
+      padding: 1.2rem 4rem 4rem;
+
+      @include breakpoint('lt-md') {
+        padding: 1.2rem 2rem 2rem;
+      }
+
+      .gd-create-view-modify-content-loader {
+        .mat-progress-spinner {
+          left: 50%;
+          position: absolute;
+          top: 50%;
+          @include translate(-50%, -50%);
+        }
+      }
+    }
+
+    &.gd-create-view-modify-list-expanded {
+      .gd-create-view-modify-list {
+        width: var(--gd-side-list-width-expanded);
+
+        .mat-drawer-inner-container {
+          .gd-create-view-modify-list-top {
+            .gd-create-view-modify-list-top-inner {
+              @include breakpoint('gt-lg') {
+                padding: 4.5rem 1.6rem 0.8rem;
+              }
+
+              .gd-create-view-modify-list-top-title {
+                @include breakpoint('gt-lg') {
+                  text-orientation: initial;
+                  writing-mode: lr;
+                }
+              }
+            }
+          }
+        }
+
+        .gd-create-view-modify-list-expand-collapse-button {
+          @include breakpoint('lt-lg') {
+            background-color: var(--gd-warning);
+            color: var(--gd-text);
+          }
+        }
+
+        ~ .mat-drawer-content {
+          @include breakpoint('gt-lg') {
+            margin-left: var(--gd-side-list-width-expanded) !important;
+            width: calc(100% - var(--gd-side-list-width-expanded));
+          }
+        }
+      }
+    }
+
+    /* Expand / collapse button */
+    .gd-create-view-modify-list-expand-collapse-button {
+      position: absolute;
+      z-index: 1000;
+
+      @include breakpoint('gt-lg') {
+        background: var(--gd-background);
+        border: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.5);
+        @include border-radius(50%);
+        color: rgba(var(--gd-secondary-rgb), 0.5);
+        font-size: 2rem;
+        height: 2rem;
+        left: calc(100% - 1rem);
+        line-height: 1;
+        min-width: 0;
+        padding: 0;
+        top: 1.6rem;
+        width: 2rem;
+      }
+
+      @include breakpoint('lt-lg') {
+        background-color: var(--gd-primary-alt);
+        @include border-radius(0 0.4rem 0.4rem 0);
+        padding: 1rem;
+        right: -3.8rem;
+        top: 0;
+      }
+
+      .material-icons {
+        font-size: 2rem;
+        @include flex(flex);
+        @include flex_align_items(center);
+        @include flex_justify(center);
+        height: 1.8rem;
+        vertical-align: baseline;
+        width: 1.8rem;
+      }
+    }
+  }
+
+  .gd-create-view-modify-loading-data {
+    height: 100%;
+    position: relative;
+
+    .mat-progress-spinner {
+      left: 50%;
+      position: absolute;
+      top: 50%;
+      @include translate(-50%, -50%);
+    }
+  }
+
+  .gd-create-view-modify-top {
+    padding-bottom: 2.4rem;
+
+    @include breakpoint('xs') {
+      padding-bottom: 1.6rem;
+    }
+
+    .gd-create-view-modify-top-title-buttons {
+      .gd-create-view-modify-top-title-buttons-title {
+        span {
+          color: var(--gd-primary);
+          font-family: $gd-font-family;
+          font-size: 2.4rem;
+          font-weight: 500;
+          line-height: $gd-line-height;
+        }
+
+        .mat-icon-button {
+          font-size: 2.4rem;
+          height: auto;
+          min-width: 3rem;
+          padding: 0.4rem;
+          width: 3rem;
+
+          .mat-icon {
+            color: var(--gd-text);
+          }
+        }
+      }
+
+      .gd-create-view-modify-top-title-buttons-buttons {
+        @include breakpoint('xs') {
+          margin-top: 1.6rem;
+        }
+
+        .gd-create-view-modify-top-title-buttons-buttons-quick {
+          .mat-icon {
+            @include transition(all 0.24s ease-in-out 0s);
+          }
+
+          &.gd-create-view-modify-top-title-buttons-buttons-quick-expanded {
+            .mat-icon {
+              @include rotate(180deg);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .gd-create-view-modify-bottom {
+    .gd-create-view-modify-bottom-content {
+      .gd-create-view-modify-bottom-section {
+        + .gd-create-view-modify-bottom-section {
+          margin-top: 1.6rem;
+        }
+
+        .gd-create-view-modify-bottom-section-title {
+          color: var(--gd-primary-alt);
+          font-size: 1.8rem;
+          font-weight: 500;
+          margin-bottom: 1.6rem;
+        }
+
+        .gd-create-view-modify-bottom-section-content {
+          > .gd-create-view-modify-bottom-section-content-input {
+            &:not(.gd-create-view-modify-bottom-section-content-input-has-list) {
+              width: calc(25% - 1.6rem);
+
+              @include breakpoint('lg') {
+                width: calc(50% - 1.6rem);
+              }
+
+              @include breakpoint('md') {
+                width: calc(50% - 1.6rem);
+              }
+
+              @include breakpoint('sm') {
+                width: calc(50% - 1.6rem);
+              }
+
+              @include breakpoint('xs') {
+                width: calc(100% - 1.6rem);
+              }
+
+              &:last-child {
+                margin-right: 1.6rem;
+              }
+            }
+
+            &.gd-create-view-modify-bottom-section-content-input-has-age-dob {
+              width: calc(50% - 1.6rem);
+
+              @include breakpoint('lt-md') {
+                width: calc(100% - 1.6rem);
+              }
+            }
+
+            &.gd-create-view-modify-bottom-section-content-input-has-textarea {
+              width: 100%;
+            }
+
+            &.gd-create-view-modify-bottom-section-content-input-has-select-groups {
+              width: 100%;
+            }
+
+            &.gd-create-view-modify-bottom-section-content-input-has-address {
+              width: 100%;
+
+              > .gd-create-view-modify-bottom-section-content-input-list-multiple-rows {
+                margin-right: -1.6rem;
+
+                > * {
+                  width: calc(25% - 1.6rem);
+
+                  @include breakpoint('lg') {
+                    width: calc(50% - 1.6rem);
+                  }
+
+                  @include breakpoint('md') {
+                    width: calc(50% - 1.6rem);
+                  }
+
+                  @include breakpoint('sm') {
+                    width: calc(50% - 1.6rem);
+                  }
+
+                  @include breakpoint('xs') {
+                    width: calc(100% - 1.6rem);
+                  }
+
+                  &:last-child {
+                    margin-right: 1.6rem;
+                  }
+                }
+
+                > app-form-textarea-v2 {
+                  width: 100%;
+                }
+              }
+            }
+
+            &.gd-create-view-modify-bottom-section-content-input-has-list {
+              width: calc(100% - 1.6rem);
+
+              .gd-create-view-modify-bottom-section-content-input-list {
+                .gd-create-view-modify-bottom-section-content-input-list-item {
+                  @include border-radius(0.4rem);
+                  margin-bottom: 1.6rem;
+
+                  .gd-create-view-modify-bottom-section-content-input-list-item-buttons {
+                    button.mat-icon-button,
+                    a.mat-icon-button {
+                      @include border-radius(0.4rem 0.4rem 0 0);
+                      font-size: 1.6rem;
+                      height: 2.4rem;
+                      min-width: 2.4rem;
+                      padding: 0.4rem;
+                      width: 2.4rem;
+
+                      + button.mat-icon-button,
+                      + a.mat-icon-button {
+                        margin-left: 0.8rem;
+                      }
+
+                      .mat-icon {
+                        font-size: 1.6rem;
+                      }
+                    }
+                  }
+
+                  .gd-create-view-modify-bottom-section-content-input-list-item-content {
+                    border: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+                    @include border-radius(0.4rem 0 0.4rem 0.4rem);
+                    padding: 1.6rem 1.6rem 0;
+
+                    > .gd-create-view-modify-bottom-section-content-input {
+                      width: 100%;
+                    }
+
+                    .gd-create-view-modify-bottom-section-content-input-list-multiple-rows {
+                      margin-right: -1.6rem;
+
+                      > * {
+                        width: calc(25% - 1.6rem);
+
+                        @include breakpoint('lg') {
+                          width: calc(50% - 1.6rem);
+                        }
+
+                        @include breakpoint('md') {
+                          width: calc(50% - 1.6rem);
+                        }
+
+                        @include breakpoint('sm') {
+                          width: calc(50% - 1.6rem);
+                        }
+
+                        @include breakpoint('xs') {
+                          width: calc(100% - 1.6rem);
+                        }
+
+                        &:last-child {
+                          margin-right: 1.6rem;
+                        }
+                      }
+
+                      > app-form-textarea-v2 {
+                        width: 100%;
+                      }
+
+                      > .gd-create-view-modify-bottom-section-content-input-url {
+                        width: calc(50% - 1.6rem);
+
+                        @include breakpoint('xs') {
+                          width: calc(100% - 1.6rem);
+                        }
+                      }
+                    }
+                  }
+                }
+
+                .gd-create-view-modify-bottom-section-content-input-list-empty {
+                  color: var(--gd-secondary);
+                  @include flex(flex);
+                  @include flex_align_items(center);
+                  font-style: italic;
+                  margin: 0 0 1.6rem;
+                  padding-bottom: 0;
+
+                  .mat-icon {
+                    color: rgba(var(--gd-secondary-rgb), 0.5);
+                    font-size: 2.4rem;
+                    margin-right: 0.4rem;
+                  }
+                }
+
+                &.gd-create-view-modify-bottom-section-content-input-list-arcGisServers {
+                  .gd-drag-custom-placeholder {
+                    height: 10rem;
+                  }
+                }
+              }
+            }
+
+            .gd-create-view-modify-bottom-section-content-input-label {
+              color: var(--gd-secondary);
+              font-size: 1.2rem;
+              font-style: italic;
+            }
+          }
+
+          > .gd-create-view-modify-bottom-section-content-input-replaced {
+            color: var(--gd-secondary);
+            font-style: italic;
+            line-height: 4rem;
+          }
+        }
+      }
+
+      > form,
+      .gd-create-view-modify-bottom-section-content-input-has-edit-questionnaire,
+      .gd-create-view-modify-bottom-section-content-input-has-fill-questionnaire {
+        height: 100%;
+      }
+    }
+  }
+}
+
+/* View */
+.gd-create-view-modify-view {
+  .gd-create-view-modify-top {
+    @include breakpoint('lg') {
+      padding-left: 2rem;
+    }
+
+    @include breakpoint('lt-md') {
+      padding-left: 3.2rem;
+    }
+  }
+
+  .gd-create-view-modify-bottom {
+    .gd-create-view-modify-bottom-content {
+      .gd-create-view-modify-bottom-section {
+        + .gd-create-view-modify-bottom-section {
+          margin-top: 1.6rem;
+        }
+
+        .gd-create-view-modify-bottom-section-content {
+          > .gd-create-view-modify-bottom-section-content-input {
+            &:not(.gd-create-view-modify-bottom-section-content-input-has-list) {
+              margin-bottom: 1.6rem;
+
+              .gd-form-toggle-checkbox-v2 {
+                margin-bottom: 0;
+              }
+            }
+
+            &.gd-create-view-modify-bottom-section-content-input-has-age-dob {
+              @include breakpoint('lt-md') {
+                width: calc(50% - 1.6rem);
+              }
+
+              @include breakpoint('xs') {
+                width: calc(100% - 1.6rem);
+              }
+            }
+
+            &.gd-create-view-modify-bottom-section-content-input-has-list {
+              .gd-create-view-modify-bottom-section-content-input-list {
+                .gd-create-view-modify-bottom-section-content-input-list-item {
+                  .gd-create-view-modify-bottom-section-content-input-list-item-content {
+                    > .gd-create-view-modify-bottom-section-content-input {
+                      > div:not(.gd-create-view-modify-bottom-section-content-input-list-multiple-rows) {
+                        > * {
+                          margin-bottom: 1.6rem;
+                        }
+                      }
+                    }
+
+                    .gd-create-view-modify-bottom-section-content-input-list-multiple-rows {
+                      > * {
+                        margin-bottom: 1.6rem;
+                      }
+
+                      .gd-create-view-modify-bottom-section-content-input-coordinates {
+                        > *:first-child {
+                          @include breakpoint('xxs') {
+                            margin-bottom: 1.6rem !important;
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .gd-list-table {
+        .gd-list-table-header {
+          .gd-list-table-header-left {
+            .gd-list-table-header-left-loading {
+              .mat-progress-spinner {
+                left: 0;
+                position: static;
+                top: 0;
+                @include translate(0, 0);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

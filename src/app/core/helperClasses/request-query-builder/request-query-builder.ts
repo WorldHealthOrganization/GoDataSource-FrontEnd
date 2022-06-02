@@ -127,11 +127,8 @@ export class RequestQueryBuilder {
   }
 
   /**
-     * #TODO Replace usage with RequestPaginator
-     * Sets a "limit" on the number of results retrieved in a list
-     * @param {number} limit
-     * @returns {RequestQueryBuilder}
-     */
+   * Sets a "limit" on the number of results retrieved in a list
+   */
   limit(limit: number) {
     // limit
     this.limitResultsNumber = limit;
@@ -372,10 +369,7 @@ export class RequestQueryBuilder {
     this.fields(...queryBuilder.fieldsInResponse);
 
     // merge "where" conditions
-    if (this.filter.isEmpty()) {
-      // use the other filter
-      this.filter = queryBuilder.filter;
-    } else if (queryBuilder.filter.isEmpty()) {
+    if (queryBuilder.filter.isEmpty()) {
       // do nothing; there is no filter to merge with
     } else {
       // merge conditions - New
@@ -394,7 +388,7 @@ export class RequestQueryBuilder {
     }
 
     // merge "order" criterias
-    this.sort.criterias = {...this.sort.criterias, ...queryBuilder.sort.criterias};
+    this.sort.criterias = { ...this.sort.criterias, ...queryBuilder.sort.criterias };
 
     // update the "limit" if necessary
     this.limitResultsNumber = queryBuilder.limitResultsNumber || this.limitResultsNumber;
@@ -430,9 +424,8 @@ export class RequestQueryBuilder {
   }
 
   /**
-     * Check if the query builder is empty
-     * @returns {boolean}
-     */
+   * Check if the query builder is empty
+   */
   isEmpty(): boolean {
     // check if all child query builders are empty
     let isEmptyChildrenBuilders: boolean = true;
@@ -449,14 +442,21 @@ export class RequestQueryBuilder {
             this.sort.isEmpty() &&
             _.isEmpty(this.limitResultsNumber) &&
             this.paginator.isEmpty() &&
-            _.isEmpty(this.fieldsInResponse) &&
+            this.isEmptyFields() &&
             isEmptyChildrenBuilders &&
             _.isEmpty(this.flags);
   }
 
   /**
-     * Check if filters are empty
-     */
+   * Check if we have any fields...
+   */
+  isEmptyFields(): boolean {
+    return _.isEmpty(this.fieldsInResponse);
+  }
+
+  /**
+   * Check if filters are empty
+   */
   isEmptyOnlyFilters(): boolean {
     // check if all child query builders are empty
     let isEmptyChildrenBuilders: boolean = true;
@@ -552,12 +552,31 @@ export class RequestQueryBuilder {
   }
 
   /**
-     * Clear filter and sort criterias
-     */
+   * Clear fields
+   */
+  clearFields(): void {
+    // reset fields
+    this.fieldsInResponse = [];
+
+    // trigger change
+    this.triggerChangeListener();
+  }
+
+  /**
+   * Clear relationships
+   */
+  clearRelationships(): void {
+    this.includedRelations = {};
+  }
+
+  /**
+   * Clear filter and sort criterias
+   */
   clear() {
     // clear
+    this.clearFields();
     this.filter.clear();
-    this.includedRelations = {};
+    this.clearRelationships();
     this.sort.clear();
     this.clearChildrenQueryBuilders();
     this.deleted = false;
@@ -580,14 +599,14 @@ export class RequestQueryBuilder {
       fieldsInResponse: this.fieldsInResponse,
       includedRelations: _.transform(
         this.includedRelations,
-        (result: {[relationName: string]: ISerializedQueryBuilderRelation}, value: RequestRelationBuilder, key: string) => {
+        (result: { [relationName: string]: ISerializedQueryBuilderRelation }, value: RequestRelationBuilder, key: string) => {
           result[key] = value.serialize();
         },
         {}
       ),
       childrenQueryBuilders: _.transform(
         this.childrenQueryBuilders,
-        (result: {[qbFilterKey: string]: ISerializedQueryBuilder}, value: RequestQueryBuilder, key: string) => {
+        (result: { [qbFilterKey: string]: ISerializedQueryBuilder }, value: RequestQueryBuilder, key: string) => {
           result[key] = value.serialize();
         },
         {}
@@ -621,7 +640,7 @@ export class RequestQueryBuilder {
     this.fieldsInResponse = serializedValueObject.fieldsInResponse;
     this.includedRelations = _.transform(
       serializedValueObject.includedRelations,
-      (result: {[relationName: string]: RequestRelationBuilder}, value: ISerializedQueryBuilderRelation, key: string) => {
+      (result: { [relationName: string]: RequestRelationBuilder }, value: ISerializedQueryBuilderRelation, key: string) => {
         // create new relationship if necessary
         result[key] = new RequestRelationBuilder(
           key,
@@ -638,7 +657,7 @@ export class RequestQueryBuilder {
     );
     this.childrenQueryBuilders = _.transform(
       serializedValueObject.childrenQueryBuilders,
-      (result: {[qbFilterKey: string]: RequestQueryBuilder}, value: ISerializedQueryBuilder, key: string) => {
+      (result: { [qbFilterKey: string]: RequestQueryBuilder }, value: ISerializedQueryBuilder, key: string) => {
         // create new relationship if necessary
         result[key] = new RequestQueryBuilder(
           () => {

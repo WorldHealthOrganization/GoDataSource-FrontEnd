@@ -1,0 +1,344 @@
+@import 'mixins';
+
+/* Edit Questionnaire */
+.gd-form-edit-questionnaire-v2 {
+  height: 100%;
+
+  /* Questionnaire Top Section */
+  .gd-form-edit-questionnaire-v2-top {
+    border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+    padding: 1.6rem;
+  }
+
+  /* Questionnaire List */
+  .gd-form-edit-questionnaire-v2-list {
+    height: calc(100% - 10.8rem);
+    min-height: 30rem;
+
+    @include breakpoint('lt-md') {
+      height: calc(100% - 13rem);
+    }
+
+    @include breakpoint('xxs') {
+      height: calc(100% - 17.4rem);
+    }
+
+    .gd-create-view-modify-view & {
+      height: calc(100% - 3.9rem);
+
+      @include breakpoint('xs') {
+        height: calc(100% - 6.1rem);
+      }
+
+      @include breakpoint('xxs') {
+        height: calc(100% - 8.3rem);
+      }
+    }
+
+    .cdk-virtual-scroll-viewport {
+      height: 100%;
+      overflow-y: overlay;
+      overflow-x: hidden;
+    }
+
+    .gd-drag-custom-placeholder {
+      height: 3rem;
+    }
+  }
+
+  /* Questionnaire Legend Section */
+  .gd-form-edit-questionnaire-v2-legend {
+    border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+    padding: 0.8rem 0;
+
+    .gd-form-edit-questionnaire-v2-legend-title {
+      color: var(--gd-secondary);
+      font-size: 1.2rem;
+      margin-left: 0.8rem;
+      text-transform: uppercase;
+    }
+
+    .gd-form-edit-questionnaire-v2-legend-items {
+      .gd-form-edit-questionnaire-v2-legend-items-item {
+        @include flex_align_items(center);
+        @include flex(flex);
+        @include flex_direction(row);
+        font-size: 1.2rem;
+        margin-left: 0.8rem;
+
+        .mat-icon {
+          font-size: 2.4rem;
+          height: 2.2rem;
+          margin-right: 0.4rem;
+          width: 2.2rem;
+        }
+      }
+    }
+  }
+}
+
+/* Questionnaire List Item */
+.gd-form-edit-questionnaire-v2-item {
+  @include transition(background-color 0.24s ease-in-out 0s);
+
+  @include breakpoint('xxs') {
+    padding-left: 0 !important;
+  }
+
+  /* Question */
+  .gd-form-edit-questionnaire-v2-item-question {
+    height: 100%;
+
+    > .mat-icon {
+      color: rgba(var(--gd-secondary-rgb), 0.5);
+      height: 2rem;
+      margin-left: 0.8rem;
+      @include transition(color 0.24s ease-in-out 0s);
+      width: 2rem;
+
+      &.cdk-drag-handle {
+        cursor: grab;
+
+        &:hover,
+        &:focus,
+        &:active {
+          color: var(--gd-primary);
+        }
+
+        + .mat-icon {
+          color: var(--gd-secondary);
+        }
+      }
+    }
+
+    .gd-form-edit-questionnaire-v2-item-question-content {
+      @include flex(inline-flex);
+      @include flex_align_items(center);
+
+      .gd-form-edit-questionnaire-v2-item-question-content-number {
+        padding-left: 0.8rem;
+      }
+
+      .gd-form-edit-questionnaire-v2-item-question-content-title {
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        display: -webkit-box;
+        display: -moz-box;
+        max-height: 4.2rem;
+        max-width: calc(100% - 17rem);
+        overflow: hidden;
+        padding-left: 0.8rem;
+
+        @include breakpoint('lt-md') {
+          max-width: 100%;
+        }
+      }
+
+      .gd-form-edit-questionnaire-v2-item-question-content-icons {
+        @include flex(flex);
+
+        .mat-icon {
+          height: 2rem;
+          margin-left: 0.8rem;
+          width: 2rem;
+
+          &.mat-tooltip-trigger {
+            cursor: help;
+          }
+
+          &.mat-icon-no-color {
+            color: rgba(var(--gd-secondary-rgb), 0.5);
+            @include transition(color 0.24s ease-in-out 0s);
+
+            &:hover {
+              color: var(--gd-secondary);
+            }
+          }
+        }
+      }
+    }
+
+    .gd-form-edit-questionnaire-v2-item-question-buttons {
+      padding-right: 1.6rem;
+      white-space: nowrap;
+
+      .mat-icon-button {
+        font-size: 1.6rem;
+        height: 2.4rem;
+        margin-left: 0.8rem;
+        min-width: 2.4rem;
+        padding: 0.4rem;
+        width: 2.4rem;
+
+        .mat-icon {
+          font-size: 1.6rem;
+        }
+      }
+    }
+  }
+
+  /* Answer */
+  .gd-form-edit-questionnaire-v2-item-answer {
+    height: 100%;
+
+    > .mat-icon {
+      color: rgba(var(--gd-secondary-rgb), 0.5);
+      height: 2rem;
+      margin-left: 0.8rem;
+      @include transition(color 0.24s ease-in-out 0s);
+      width: 2rem;
+
+      &.cdk-drag-handle {
+        cursor: grab;
+
+        &:hover,
+        &:focus,
+        &:active {
+          color: var(--gd-primary);
+        }
+      }
+    }
+
+    .gd-form-edit-questionnaire-v2-item-answer-content {
+      @include flex(inline-flex);
+      @include flex_align_items(center);
+
+      .gd-form-edit-questionnaire-v2-item-answer-content-title {
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        display: -webkit-box;
+        display: -moz-box;
+        max-height: 4.2rem;
+        max-width: calc(100% - 3rem);
+        overflow: hidden;
+        padding-left: 0.8rem;
+
+        @include breakpoint('lt-md') {
+          max-width: 100%;
+        }
+      }
+
+      .gd-form-edit-questionnaire-v2-item-answer-content-icons {
+        @include flex(flex);
+
+        .mat-icon {
+          color: var(--gd-primary);
+          height: 2rem;
+          margin-left: 0.8rem;
+          width: 2rem;
+        }
+      }
+    }
+
+    .gd-form-edit-questionnaire-v2-item-answer-buttons {
+      padding-right: 1.6rem;
+      white-space: nowrap;
+
+      .mat-icon-button {
+        font-size: 1.6rem;
+        height: 2.4rem;
+        margin-left: 0.8rem;
+        min-width: 2.4rem;
+        padding: 0.4rem;
+        width: 2.4rem;
+
+        .mat-icon {
+          font-size: 1.6rem;
+        }
+      }
+    }
+  }
+
+  &:hover {
+    background-color: rgba(var(--gd-primary-alt-rgb), 0.05);
+  }
+
+  &.gd-form-edit-questionnaire-v2-item-inactive {
+    background: rgba(var(--gd-secondary-rgb), 0.1);
+
+    &:hover {
+      background: rgba(var(--gd-secondary-rgb), 0.1);
+    }
+
+    .gd-form-edit-questionnaire-v2-item-question {
+      > .mat-icon {
+        &.cdk-drag-handle {
+          + .mat-icon {
+            @include opacity(0.5);
+          }
+        }
+      }
+
+      .gd-form-edit-questionnaire-v2-item-question-content {
+        @include opacity(0.5);
+      }
+    }
+
+    .gd-form-edit-questionnaire-v2-item-answer {
+      > .mat-icon {
+        &.cdk-drag-handle {
+          + .mat-icon {
+            @include opacity(0.5);
+          }
+        }
+      }
+
+      .gd-form-edit-questionnaire-v2-item-answer-content {
+        @include opacity(0.5);
+      }
+    }
+  }
+
+  &.gd-form-edit-questionnaire-v2-item-markup {
+    background-color: rgba(var(--gd-warning-rgb), 0.2);
+    color: var(--gd-primary-alt);
+    font-weight: 700;
+
+    &:hover {
+      background-color: rgba(var(--gd-warning-rgb), 0.2);
+    }
+  }
+}
+
+/* Questionnaire Details */
+.gd-form-edit-questionnaire-v2-details {
+  background: rgba(var(--gd-secondary-rgb), 0.2);
+  @include flex(flex);
+  @include flex_direction(column);
+  margin: -1.6rem -1.6rem 1.6rem;
+  padding: 1.6rem;
+
+  .gd-form-edit-questionnaire-v2-details-label {
+    color: var(--gd-primary);
+    font-weight: 700;
+  }
+}
+
+/* Empty Questionnaire */
+.gd-form-edit-questionnaire-v2-empty {
+  height: 100%;
+
+  .gd-form-edit-questionnaire-v2-empty-image {
+    background-image: url(../../../../../assets/images/nothing-found.svg);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 25rem;
+    width: 25rem;
+
+    @include breakpoint('xs') {
+      height: 15rem;
+      width: 15rem;
+    }
+  }
+
+  .gd-form-edit-questionnaire-v2-empty-text {
+    color: var(--gd-secondary);
+    font-size: 1.6rem;
+    margin-top: 2rem;
+
+    @include breakpoint('xs') {
+      font-size: 1.4rem;
+    }
+  }
+}

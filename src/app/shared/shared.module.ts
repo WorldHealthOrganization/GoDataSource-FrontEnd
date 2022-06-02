@@ -6,10 +6,8 @@ import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { XtFormsModule } from './xt-forms/xt-forms.module';
 import { AngularMaterialModule } from './angular-material/angular-material.module';
-import { NgSelectModule } from '@ng-select/ng-select';
 import { FileUploadModule } from 'ng2-file-upload';
 import { NgxWigModule } from 'ngx-wig';
-import { HotTableModule } from '@handsontable/angular';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { ScrollingModule as ExperimentalScrollingModule } from '@angular/cdk-experimental/scrolling';
@@ -18,13 +16,21 @@ import { MglTimelineModule } from 'angular-mgl-timeline';
 import * as fromSharedComponents from './components';
 import * as fromSharedDirectives from './directives';
 import * as fromSharedPipes from './pipes';
+import * as formV2Components from './forms-v2/components';
+import * as v2Components from './components-v2';
+import { AgGridModule } from '@ag-grid-community/angular';
+import { ToastrModule } from 'ngx-toastr';
+import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
+import { HotTableModule } from '@handsontable/angular';
+import { ColorPickerModule } from 'ngx-color-picker';
 
 @NgModule({
   imports: [
+    AgGridModule.withComponents([]),
+    ColorPickerModule,
     CommonModule,
     DragDropModule,
     RouterModule,
-    NgSelectModule,
     FormsModule,
     FlexLayoutModule,
     XtFormsModule,
@@ -33,22 +39,35 @@ import * as fromSharedPipes from './pipes';
     FileUploadModule,
     MglTimelineModule,
     NgxWigModule,
+    NgxMaterialTimepickerModule,
     NgxMatSelectSearchModule,
     HotTableModule.forRoot(),
     ScrollingModule,
-    ExperimentalScrollingModule
+    ExperimentalScrollingModule,
+    ToastrModule.forRoot({
+      extendedTimeOut: 5000,
+      enableHtml: true,
+      progressBar: true,
+      progressAnimation: 'decreasing',
+      positionClass: 'toast-top-center',
+      maxOpened: 5,
+      newestOnTop: false,
+      closeButton: false
+    })
   ],
   declarations: [
     ...fromSharedComponents.components,
     ...fromSharedDirectives.directives,
-    ...fromSharedPipes.pipes
+    ...fromSharedPipes.pipes,
+    ...formV2Components.components,
+    ...v2Components.components
   ],
   providers: [],
   exports: [
+    AgGridModule.withComponents([]),
     CommonModule,
     DragDropModule,
     RouterModule,
-    NgSelectModule,
     FormsModule,
     FlexLayoutModule,
     TranslateModule,
@@ -57,9 +76,12 @@ import * as fromSharedPipes from './pipes';
     MglTimelineModule,
     ScrollingModule,
     ExperimentalScrollingModule,
+    ToastrModule,
     ...fromSharedDirectives.directives,
     ...fromSharedPipes.pipes,
-    ...fromSharedComponents.components
+    ...fromSharedComponents.components,
+    ...formV2Components.components,
+    ...v2Components.components
   ]
 })
 export class SharedModule {

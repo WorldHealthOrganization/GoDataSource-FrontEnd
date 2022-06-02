@@ -1,12 +1,6 @@
-<app-topnav>
-    <ng-container dynamic-section>
-        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
-            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
-        </div>
-    </ng-container>
-</app-topnav>
-
-<mat-card class="page-section page-content" fxLayout="column">
+<app-basic-page-v2
+  [breadcrumbs]="breadcrumbs"
+  pageTitle="LNG_PAGE_TEAMS_WORKLOAD_TITLE">
     <!-- Filters -->
     <div>
         <!-- Date range filter -->
@@ -95,5 +89,4 @@
             </div>
         </ng-template>
     </div>
-
-</mat-card>
+</app-basic-page-v2>

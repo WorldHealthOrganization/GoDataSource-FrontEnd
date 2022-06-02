@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
 
 export enum CacheKey {
-  LANGUAGES = 'LANGUAGES',
   LOCATIONS = 'LOCATIONS',
   REFERENCE_DATA = 'REFERENCE_DATA',
   HELP_ITEMS = 'HELP_ITEMS',

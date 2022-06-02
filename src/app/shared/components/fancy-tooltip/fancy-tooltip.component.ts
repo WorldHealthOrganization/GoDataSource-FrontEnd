@@ -5,7 +5,8 @@ import { Subscription } from 'rxjs/internal/Subscription';
 
 @Component({
   selector: 'app-fancy-tooltip',
-  templateUrl: './fancy-tooltip.component.html'
+  templateUrl: './fancy-tooltip.component.html',
+  styleUrls: ['./fancy-tooltip.component.scss']
 })
 export class FancyTooltipComponent implements OnDestroy {
   // tooltip
@@ -28,12 +29,6 @@ export class FancyTooltipComponent implements OnDestroy {
   get tooltip(): string | SafeHtml {
     return this._tooltip;
   }
-
-  // tooltip icon
-  @Input() tooltipIcon: string = 'help';
-
-  // tooltip icon classes
-  @Input() tooltipIconClasses: string = '';
 
   // language subscription
   private languageSubscription: Subscription;

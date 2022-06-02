@@ -1,161 +1,166 @@
 <div
-    [id]="chartId"
-    class="app-pie-donut-chart-main"
-    fxLayout="column">
+  [id]="chartId"
+  class="app-pie-donut-chart-main"
+  [class.gd-app-pie-donut-chart-main-expanded]="expanded"
+  fxLayout="column">
+
+  <!-- Title / Description -->
+  <div
+    class="app-pie-donut-chart-main-top"
+    fxLayout="row" fxLayoutAlign="none center">
+
+    <!-- Title -->
+    <div
+      fxFlex
+      class="app-pie-donut-chart-main-top-title">
+      <span>
+        {{ graphTitle | translate }}
+      </span>
+    </div>
+
+    <!-- Description -->
+    <div
+      class="app-pie-donut-chart-main-top-actions"
+      fxGrow="0" fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="0.8rem">
+      <!-- Tooltip -->
+      <app-fancy-tooltip
+        [tooltip]="description">
+      </app-fancy-tooltip>
+
+      <!-- Expand / Collapse -->
+      <button
+        type="button"
+        mat-icon-button
+        (click)="expanded = !expanded">
+        <mat-icon>expand_more</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Expanded -->
+  <ng-container
+    *ngIf="expanded">
 
     <!-- Loading data -->
     <div
-        *ngIf="loadingData; else dataLoaded"
-        fxFlex fxLayoutAlign="center center">
-        <mat-spinner
-            [diameter]="32">
-        </mat-spinner>
+      *ngIf="loadingData; else dataLoaded"
+      class="app-pie-donut-chart-main-loading"
+      fxFlex fxLayoutAlign="center center">
+      <mat-progress-spinner
+        diameter="24"
+        mode="indeterminate"></mat-progress-spinner>
     </div>
 
     <!-- Data loaded -->
     <ng-template
-        #dataLoaded>
+      #dataLoaded>
+      <!-- No Data -->
+      <div
+        *ngIf="!data || data.length < 1; else hasData"
+        class="app-pie-donut-chart-main-no-data"
+        fxFlex fxLayoutAlign="center center">
+        <span
+          fxGrow="0">
+          {{ noDataLabel | translate }}
+        </span>
+      </div>
 
-        <!-- Title / Description -->
+      <!-- Legend & Chart -->
+      <ng-template
+        #hasData>
         <div
-            fxGrow="0" fxLayout="row" fxLayoutGap="10px">
+          class="app-pie-donut-chart-main-bottom"
+          fxFlex fxLayout="row" fxLayout.xs="column" fxLayoutGap="1.6rem">
 
-            <!-- Title -->
+          <!-- Left side -->
+          <div
+            class="app-pie-donut-chart-main-left"
+            fxLayout="column">
+
+            <!-- Legend -->
             <div
-                fxFlex
-                class="app-pie-donut-chart-main-left-title">
-                <span
-                    [matTooltip]="graphTitle | translate">
-                    {{ graphTitle | translate }}
-                </span>
-            </div>
+              class="app-pie-donut-chart-main-left-legend">
 
-            <!-- Description -->
-            <div
-                fxGrow="0">
-                <app-fancy-tooltip
-                    [tooltip]="description">
-                </app-fancy-tooltip>
-            </div>
+              <!-- Legend -->
+              <div
+                class="app-pie-donut-chart-main-left-legend-items"
+                fxLayout="column" fxLayoutGap="0.8rem">
 
-        </div>
-
-        <!-- No Data -->
-        <div
-            *ngIf="!data || data.length < 1; else hasData"
-            fxFlex fxLayoutAlign="center center"
-            class="app-pie-donut-chart-main-no-data">
-            <span
-                fxGrow="0">
-                {{ noDataLabel | translate }}
-            </span>
-        </div>
-
-        <!-- Legend & Chart -->
-        <ng-template
-            #hasData>
-            <div
-                fxFlex fxLayout="row" fxLayoutGap="10px">
-
-                <!-- Left side -->
+                <!-- Legend items -->
                 <div
-                    fxFlex="45%" fxLayout="column"
-                    class="app-pie-donut-chart-main-left">
+                  *ngFor="let item of data"
+                  [id]="'legend' + item.id"
+                  class="app-pie-donut-chart-main-left-legend-items-item"
+                  [class.app-pie-donut-chart-main-left-legend-items-item-selected]="_graph?.selectedArc?.details.id === item.id"
+                  fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="0.8rem"
+                  (mouseenter)="findAndSelectArc(item)"
+                  (mouseleave)="findAndDeselectArc()">
 
-                    <!-- Legend -->
+                  <!-- Legend item visible -->
+                  <div
+                    fxFlex="1.6rem" fxLayoutAlign="start start">
                     <div
-                        class="app-pie-donut-chart-main-left-legend">
+                      class="app-pie-donut-chart-main-left-legend-items-item-check"
+                      [style.backgroundColor]="item.color"
+                      (click)="checkUncheckItem(item, !item.checked)">
 
-                        <!-- Legend -->
-                        <div
-                            class="app-pie-donut-chart-main-left-legend-items"
-                            fxLayout="column" fxLayoutGap="7px">
-
-                            <!-- Legend items -->
-                            <div
-                                *ngFor="let item of data"
-                                [id]="'legend' + item.id"
-                                fxLayout="row" fxLayoutGap="10px"
-                                class="app-pie-donut-chart-main-left-legend-items-item"
-                                [class.app-pie-donut-chart-main-left-legend-items-item-selected]="_graph?.selectedArc?.details.id === item.id"
-                                (mouseenter)="findAndSelectArc(item)"
-                                (mouseleave)="findAndDeselectArc()">
-
-                                <!-- Legend item visible -->
-                                <div
-                                    fxFlex="16px" fxLayoutAlign="start start">
-                                    <div
-                                        class="app-pie-donut-chart-main-left-legend-items-item-check"
-                                        [style.backgroundColor]="item.color"
-                                        (click)="checkUncheckItem(item, !item.checked)">
-
-                                        <!-- Check -->
-                                        <svg
-                                            *ngIf="item.checked"
-                                            width="16px"
-                                            height="16px">
-                                            <path fill="none" stroke="white" d="M2.87,8.89 6.419,12.32 14.21,4.41"></path>
-                                        </svg>
-
-                                    </div>
-                                </div>
-
-                                <!-- Legend item -->
-                                <div
-                                    fxFlex
-                                    class="app-pie-donut-chart-main-left-legend-items-item-text"
-                                    (click)="clickItem.emit(item)">
-
-                                    <!-- Text -->
-                                    <span
-                                        [matTooltip]="item.value + ' ' + (item.label | translate)">
-
-                                        <!-- No. of items -->
-                                        <span>
-                                            {{ item.valueText }}
-                                        </span>
-
-                                        <!-- Label -->
-                                        <span>
-                                            {{ item.label | translate }}
-                                        </span>
-
-                                    </span>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
+                      <!-- Check -->
+                      <svg
+                        *ngIf="item.checked"
+                        width="1.6rem"
+                        height="1.6rem">
+                        <path fill="none" stroke="white" d="M2.87,8.89 6.419,12.32 14.21,4.41"></path>
+                      </svg>
                     </div>
+                  </div>
 
+                  <!-- Legend item -->
+                  <div
+                    class="app-pie-donut-chart-main-left-legend-items-item-text"
+                    fxFlex
+                    (click)="clickItem.emit(item)">
+
+                    <!-- Text -->
+                    <span
+                      [matTooltip]="item.value + ' ' + (item.label | translate)">
+
+                      <!-- No. of items -->
+                      <span>
+                        {{ item.valueText }}
+                      </span>
+
+                      <!-- Label -->
+                      <span>
+                        {{ item.label | translate }}
+                      </span>
+                    </span>
+                  </div>
                 </div>
-
-                <!-- Chart -->
-                <div
-                    fxFlex fxLayout="column" fxLayoutGap="2px"
-                    class="app-pie-donut-chart-main-graph">
-
-                    <!-- Graph -->
-                    <div
-                        #chart
-                        class="app-pie-donut-chart-main-graph-pie">
-                    </div>
-
-                    <!-- Total -->
-                    <div
-                        *ngIf="graphTotal"
-                        fxGrow="0" fxFlexAlign="center"
-                        class="app-pie-donut-chart-main-graph-total">
-                        {{ graphTotal | translate:_graph?.rendered }}
-                    </div>
-
-                </div>
-
+              </div>
             </div>
-        </ng-template>
+          </div>
 
+          <!-- Chart -->
+          <div
+            class="app-pie-donut-chart-main-graph"
+            fxFlex fxLayout="column" fxLayoutGap="0.8rem">
+
+            <!-- Graph -->
+            <div
+              #chart
+              class="app-pie-donut-chart-main-graph-pie">
+            </div>
+
+            <!-- Total -->
+            <div
+              *ngIf="graphTotal"
+              class="app-pie-donut-chart-main-graph-total"
+              fxGrow="0" fxFlexAlign="center">
+              {{ graphTotal | translate:_graph?.rendered }}
+            </div>
+          </div>
+        </div>
+      </ng-template>
     </ng-template>
-
+  </ng-container>
 </div>

@@ -5,7 +5,6 @@ import { CaseModel } from '../../../core/models/case.model';
 import { EventModel } from '../../../core/models/event.model';
 import { ContactModel } from '../../../core/models/contact.model';
 import { EntityType } from '../../../core/models/entity-type';
-import { EntityDataService } from '../../../core/services/data/entity.data.service';
 import { LabelValuePair } from '../../../core/models/label-value-pair';
 import { EntityModel } from '../../../core/models/entity-and-relationship.model';
 import * as _ from 'lodash';
@@ -78,11 +77,13 @@ export class ViewCotNodeDialogComponent implements OnDestroy {
   constructor(
     public dialogRef: MatDialogRef<ViewCotNodeDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: ViewCOTNodeData,
-    private entityDataService: EntityDataService,
     private outbreakDataService: OutbreakDataService
   ) {
     this.entity = this.data.entity;
-    this.entityInfo = this.entityDataService.getLightObjectDisplay(this.entity);
+
+    // #TODO - new design
+    // this.entityInfo = this.entityDataService.getLightObjectDisplay(this.entity);
+
     this.displayPersonChainOfTransmissionLink = this.data.displayPersonalCotLink;
 
     const personListLink = EntityModel.getLinkForEntityType(this.entity.type);

@@ -1,246 +1,437 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ClusterModel } from '../../../../core/models/cluster.model';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { Observable } from 'rxjs';
-import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { EntityType } from '../../../../core/models/entity-type';
-import { UserModel } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { Constants } from '../../../../core/models/constants';
-import { catchError, share, tap } from 'rxjs/operators';
-import { HoverRowAction } from '../../../../shared/components';
-import { CaseModel } from '../../../../core/models/case.model';
-import { ContactModel } from '../../../../core/models/contact.model';
-import { EventModel } from '../../../../core/models/event.model';
 import { throwError } from 'rxjs/internal/observable/throwError';
-import { IBasicCount } from '../../../../core/models/basic-count.interface';
-import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { AddressModel } from '../../../../core/models/address.model';
+import { CaseModel } from '../../../../core/models/case.model';
+import { ClusterModel } from '../../../../core/models/cluster.model';
+import { Constants } from '../../../../core/models/constants';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { ContactModel } from '../../../../core/models/contact.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { EntityType } from '../../../../core/models/entity-type';
+import { EventModel } from '../../../../core/models/event.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 
 @Component({
   selector: 'app-clusters-people-list',
   templateUrl: './clusters-people-list.component.html'
 })
-export class ClustersPeopleListComponent extends ListComponent implements OnInit, OnDestroy {
-  // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
-
-  // authenticated user
-  authUser: UserModel;
-  // selected Outbreak
-  selectedOutbreak: OutbreakModel;
+export class ClustersPeopleListComponent extends ListComponent<CaseModel | ContactModel | EventModel | ContactOfContactModel> implements OnDestroy {
   // present cluster
-  cluster: ClusterModel;
-  // cluster people list
-  clusterPeopleList$: Observable<any>;
-  clusterPeopleListCount$: Observable<IBasicCount>;
-
-  // reference data
-  genderList$: Observable<any[]>;
-  riskLevelsList$: Observable<any[]>;
-  personTypesListMap: { [id: string]: ReferenceDataEntryModel };
-
-  // constants
-  EntityType = EntityType;
-  ReferenceDataCategory = ReferenceDataCategory;
-  Constants = Constants;
-
-  fixedTableColumns: string[] = [
-    'lastName',
-    'firstName',
-    'age',
-    'gender',
-    'riskLevel',
-    'place',
-    'address'
-  ];
-
-  recordActions: HoverRowAction[] = [
-    // View Person
-    new HoverRowAction({
-      icon: 'visibility',
-      iconTooltip: 'LNG_PAGE_ACTION_VIEW',
-      linkGenerator: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): string[] => {
-        return [this.getItemRouterLink(item, 'view')];
-      },
-      visible: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): boolean => {
-        return !item.deleted &&
-                    item.canView(this.authUser);
-      }
-    }),
-
-    // Modify Person
-    new HoverRowAction({
-      icon: 'settings',
-      iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
-      linkGenerator: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): string[] => {
-        return [this.getItemRouterLink(item, 'modify')];
-      },
-      visible: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): boolean => {
-        return !item.deleted &&
-                    this.authUser &&
-                    this.selectedOutbreak &&
-                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                    item.canModify(this.authUser);
-      }
-    })
-  ];
+  private _selectedCluster: ClusterModel;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
-    private route: ActivatedRoute,
-    private outbreakDataService: OutbreakDataService,
+    private activatedRoute: ActivatedRoute,
     private clusterDataService: ClusterDataService,
-    private authDataService: AuthDataService,
-    private snackbarService: SnackbarService,
-    private referenceDataDataService: ReferenceDataDataService
+    private toastV2Service: ToastV2Service,
+    private i18nService: I18nService
   ) {
+    // parent
     super(listHelperService);
+
+    // disable select outbreak
+    TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = true;
+
+    // get data
+    this._selectedCluster = activatedRoute.snapshot.data.selectedCluster;
   }
 
   /**
-     * Component initialized
-     */
-  ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
-    // retrieve cluster info
-    this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER);
-    this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL);
-    const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).pipe(share());
-    personTypes$.subscribe((personTypeCategory: ReferenceDataCategoryModel) => {
-      this.personTypesListMap = _.transform(
-        personTypeCategory.entries,
-        (result, entry: ReferenceDataEntryModel) => {
-          // groupBy won't work here since groupBy will put an array instead of one value
-          result[entry.id] = entry;
-        },
-        {}
-      );
-    });
-
-    // get cluster ID from route params
-    this.route.params.subscribe((params: { clusterId }) => {
-      // get selected outbreak
-      this.outbreakDataService.getSelectedOutbreak()
-        .subscribe((selectedOutbreak) => {
-          this.selectedOutbreak = selectedOutbreak;
-          if (selectedOutbreak && selectedOutbreak.id) {
-
-            // retrieve cluster info
-            this.clusterDataService.getCluster(selectedOutbreak.id, params.clusterId)
-              .subscribe((clusterData: ClusterModel) => {
-                this.cluster = clusterData;
-
-                // initialize breadcrumbs
-                this.initializeBreadcrumbs();
-
-                // initialize pagination
-                this.initPaginator();
-                // ...and load the list of items
-                this.needsRefreshList(true);
-              });
-          }
-        });
-    });
-
-    // initialize breadcrumbs
-    this.initializeBreadcrumbs();
-  }
-
-  /**
-     * Release resources
-     */
+   * Release resources
+   */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
+
+    // enable select outbreak
+    TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = false;
   }
 
   /**
-     * Initialize breadcrumbs
-     */
-  private initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
+   * Selected outbreak was changed
+   */
+  selectedOutbreakChanged(): void {
+    // initialize pagination
+    this.initPaginator();
+
+    // ...and re-load the list when the Selected Outbreak is changed
+    this.needsRefreshList(true);
+  }
+
+  /**
+   * Initialize side table columns
+   */
+  protected initializeTableColumns(): void {
+    // address model used to search by phone number, address line, postal code, city....
+    const filterAddressModel: AddressModel = new AddressModel({
+      geoLocationAccurate: ''
+    });
+
+    // default table columns
+    this.tableColumns = [
+      {
+        field: 'lastName',
+        label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
+        sortable: true,
+        pinned: IV2ColumnPinned.LEFT,
+        format: {
+          type: (item: CaseModel | ContactModel | EventModel | ContactOfContactModel): string => {
+            return item.type === EntityType.EVENT ? item.name : item.lastName;
+          }
+        },
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'firstName',
+        label: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
+        sortable: true,
+        pinned: IV2ColumnPinned.LEFT,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'age',
+        label: 'LNG_ENTITY_FIELD_LABEL_AGE',
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.AGE
+        },
+        filter: {
+          type: V2FilterType.AGE_RANGE,
+          min: 0,
+          max: Constants.DEFAULT_AGE_MAX_YEARS
+        }
+      },
+      {
+        field: 'gender',
+        label: 'LNG_ENTITY_FIELD_LABEL_GENDER',
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        }
+      },
+      {
+        field: 'riskLevel',
+        label: 'LNG_ENTITY_FIELD_LABEL_RISK',
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          includeNoValue: true
+        }
+      },
+      {
+        field: 'place',
+        label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
+        format: {
+          type: 'mainAddress.location.name'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_MULTIPLE_LOCATION,
+          address: filterAddressModel,
+          field: 'addresses',
+          fieldIsArray: true
+        },
+        link: (data) => {
+          return data.mainAddress?.location?.name ?
+            `/locations/${ data.mainAddress.location.id }/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'address',
+        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
+        format: {
+          type: 'mainAddress.addressLine1'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_FIELD,
+          address: filterAddressModel,
+          addressField: 'addressLine1',
+          field: 'addresses',
+          fieldIsArray: true
+        }
+      },
+      {
+        field: 'statuses',
+        label: 'LNG_COMMON_LABEL_STATUSES',
+        pinned: true,
+        notResizable: true,
+        format: {
+          type: V2ColumnFormat.STATUS
+        },
+        legends: [
+          // person type
+          {
+            title: 'LNG_ENTITY_FIELD_LABEL_TYPE',
+            items: (this.activatedRoute.snapshot.data.personType as IResolverV2ResponseModel<ReferenceDataEntryModel>).list.map((item) => {
+              return {
+                form: {
+                  type: IV2ColumnStatusFormType.CIRCLE,
+                  color: item.getColorCode()
+                },
+                label: item.id
+              };
+            })
+          }
+        ],
+        forms: (_column, data): V2ColumnStatusForm[] => {
+          // construct list of forms that we need to display
+          const forms: V2ColumnStatusForm[] = [];
+
+          // person type
+          if (
+            data.type &&
+            (this.activatedRoute.snapshot.data.personType as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[data.type]
+          ) {
+            forms.push({
+              type: IV2ColumnStatusFormType.CIRCLE,
+              color: (this.activatedRoute.snapshot.data.personType as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[data.type].getColorCode(),
+              tooltip: this.i18nService.instant(data.type)
+            });
+          }
+
+          // finished
+          return forms;
+        }
+      },
+
+      // actions
+      {
+        field: 'actions',
+        label: 'LNG_COMMON_LABEL_ACTIONS',
+        pinned: IV2ColumnPinned.RIGHT,
+        notResizable: true,
+        cssCellClass: 'gd-cell-no-focus',
+        format: {
+          type: V2ColumnFormat.ACTIONS
+        },
+        actions: [
+          // View Person
+          {
+            type: V2ActionType.ICON,
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_ACTION_VIEW',
+            action: {
+              link: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): string[] => {
+                return [this.getItemRouterLink(item, 'view')];
+              }
+            },
+            visible: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): boolean => {
+              return !item.deleted &&
+                item.canView(this.authUser);
+            }
+          },
+
+          // Modify Person
+          {
+            type: V2ActionType.ICON,
+            icon: 'edit',
+            iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
+            action: {
+              link: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): string[] => {
+                return [this.getItemRouterLink(item, 'modify')];
+              }
+            },
+            visible: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): boolean => {
+              return !item.deleted &&
+                this.selectedOutbreakIsActive &&
+                item.canModify(this.authUser);
+            }
+          }
+        ]
+      }
+    ];
+  }
+
+  /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
+   * Initialize table quick actions
+   */
+  protected initializeQuickActions(): void {}
+
+  /**
+   * Initialize table group actions
+   */
+  protected initializeGroupActions(): void {}
+
+  /**
+   * Initialize table add action
+   */
+  protected initializeAddAction(): void {}
+
+  /**
+   * Initialize table grouped data
+   */
+  protected initializeGroupedData(): void {}
+
+
+  /**
+   * Initialize breadcrumbs
+   */
+  protected initializeBreadcrumbs(): void {
+    // set breadcrumbs
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
+        }
+      }
+    ];
 
     // add list breadcrumb only if we have permission
     if (ClusterModel.canList(this.authUser)) {
-      this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_CLUSTERS_TITLE', '/clusters'));
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_CLUSTERS_TITLE',
+        action: {
+          link: ['/clusters']
+        }
+      });
     }
 
     // cluster breadcrumb
     if (
-      this.cluster &&
-            ClusterModel.canView(this.authUser)
+      this._selectedCluster &&
+      ClusterModel.canView(this.authUser)
     ) {
-      this.breadcrumbs.push(new BreadcrumbItemModel(
-        this.cluster.name,
-        `/clusters/${this.cluster.id}/view`
-      ));
+      this.breadcrumbs.push({
+        label: this._selectedCluster.name,
+        action: {
+          link: [`/clusters/${ this._selectedCluster.id }/view`]
+        }
+      });
     }
 
     // people breadcrumb
-    this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_VIEW_CLUSTERS_PEOPLE_TITLE', '.', true));
+    this.breadcrumbs.push(
+      {
+        label: 'LNG_PAGE_VIEW_CLUSTERS_PEOPLE_TITLE',
+        action: null
+      });
   }
 
   /**
-     * Re(load) the Cluster people list, based on the applied filter, sort criterias
-     */
-  refreshList(finishCallback: (records: any[]) => void) {
-    if (this.selectedOutbreak) {
-      this.clusterPeopleList$ = this.clusterDataService
-        .getClusterPeople(this.selectedOutbreak.id, this.cluster.id, this.queryBuilder)
-        .pipe(
-          catchError((err) => {
-            this.snackbarService.showApiError(err);
-            finishCallback([]);
-            return throwError(err);
-          }),
-          tap(this.checkEmptyList.bind(this)),
-          tap((data: any[]) => {
-            finishCallback(data);
-          })
-        );
-    } else {
-      finishCallback([]);
-    }
+   * Fields retrieved from api to reduce payload size
+   */
+  protected refreshListFields(): string[] {
+    return [
+      'id',
+      'lastName',
+      'firstName',
+      'name',
+      'age',
+      'gender',
+      'riskLevel',
+      'addresses',
+      'type',
+      'locations'
+    ];
   }
 
   /**
-     * Get total number of items, based on the applied filters
-     */
-  refreshListCount() {
-    // remove paginator from query builder
-    const countQueryBuilder = _.cloneDeep(this.queryBuilder);
-    countQueryBuilder.paginator.clear();
-    countQueryBuilder.sort.clear();
-    this.clusterPeopleListCount$ = this.clusterDataService
-      .getClusterPeopleCount(this.selectedOutbreak.id, this.cluster.id, countQueryBuilder)
+   * Re(load) the Cluster people list, based on the applied filter, sort criterias
+   */
+  refreshList() {
+    this.records$ = this.clusterDataService
+      .getClusterPeople(
+        this.selectedOutbreak.id,
+        this.activatedRoute.snapshot.params.clusterId,
+        this.queryBuilder
+      )
       .pipe(
-        catchError((err) => {
-          this.snackbarService.showApiError(err);
-          return throwError(err);
-        }),
-        share()
+        // should be the last pipe
+        takeUntil(this.destroyed$)
       );
   }
 
   /**
-     * Get the link to redirect to view page depending on item type and action
-     */
-  getItemRouterLink (item, action: string): string {
+   * Get total number of items, based on the applied filters
+   */
+  refreshListCount(applyHasMoreLimit?: boolean) {
+    // reset
+    this.pageCount = undefined;
+
+    // set apply value
+    if (applyHasMoreLimit !== undefined) {
+      this.applyHasMoreLimit = applyHasMoreLimit;
+    }
+
+    // remove paginator from query builder
+    const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+    countQueryBuilder.paginator.clear();
+    countQueryBuilder.sort.clear();
+
+    // apply has more limit
+    if (this.applyHasMoreLimit) {
+      countQueryBuilder.flag(
+        'applyHasMoreLimit',
+        true
+      );
+    }
+
+    // count
+    this.clusterDataService
+      .getClusterPeopleCount(
+        this.selectedOutbreak.id,
+        this.activatedRoute.snapshot.params.clusterId,
+        countQueryBuilder
+      )
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        }),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      )
+      .subscribe((response) => {
+        this.pageCount = response;
+      });
+  }
+
+  /**
+   * Get the link to redirect to view page depending on item type and action
+   */
+  getItemRouterLink(item, action: string): string {
     switch (item.type) {
       case EntityType.CASE:
         return `/cases/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
@@ -251,13 +442,5 @@ export class ClustersPeopleListComponent extends ListComponent implements OnInit
       case EntityType.EVENT:
         return `/events/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
     }
-  }
-
-  /**
-     * Retrieve Person Type color
-     */
-  getPersonTypeColor(personType: string) {
-    const personTypeData = _.get(this.personTypesListMap, personType);
-    return _.get(personTypeData, 'colorCode', '');
   }
 }

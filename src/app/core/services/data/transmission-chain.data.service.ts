@@ -76,7 +76,7 @@ export class TransmissionChainDataService {
     return this.http
       .get(`outbreaks/${outbreakId}/relationships/independent-transmission-chains?filter=${filter}`)
       .pipe(
-        map(this.mapTransmissionChainDataToModel),
+        map(this.mapTransmissionChainDataToModel)
       );
   }
 
@@ -782,7 +782,7 @@ export class TransmissionChainDataService {
               minTimelineDate = nodeData.dateTimeline;
             }
           }
-          graphData.nodes.push({data: nodeData});
+          graphData.nodes.push({ data: nodeData });
           selectedNodeIds[nodeData.id] = true;
         }
       });
@@ -801,7 +801,7 @@ export class TransmissionChainDataService {
           name: counterDateFormatted,
           nodeType: 'checkpoint'
         });
-        graphData.nodes.push({data: checkpointNode});
+        graphData.nodes.push({ data: checkpointNode });
       }
     }
 
@@ -852,14 +852,14 @@ export class TransmissionChainDataService {
         const sourceNode = chainGroup.nodesMap[graphEdge.source];
         const targetNode = chainGroup.nodesMap[graphEdge.target];
         let noDays = 0;
-        let sourceDate = '';
-        let targetDate = '';
+        let sourceDate: any = '';
+        let targetDate: any = '';
         if (
           sourceNode.type === EntityType.CASE &&
                     sourceNode.model instanceof CaseModel
         ) {
           if (sourceNode.model.dateOfOnset) {
-            sourceDate = sourceNode.model.dateOfOnset;
+            sourceDate = sourceNode.model.dateOfOnset as string;
           }
         } else if (sourceNode.type === EntityType.CONTACT) {
           if (relationship.contactDate) {
@@ -870,7 +870,7 @@ export class TransmissionChainDataService {
                     sourceNode.model instanceof EventModel
         ) {
           if (sourceNode.model.date) {
-            sourceDate = sourceNode.model.date;
+            sourceDate = sourceNode.model.date as string;
           }
         }
 
@@ -879,7 +879,7 @@ export class TransmissionChainDataService {
                     targetNode.model instanceof CaseModel
         ) {
           if (targetNode.model.dateOfOnset) {
-            targetDate = targetNode.model.dateOfOnset;
+            targetDate = targetNode.model.dateOfOnset as string;
           }
         } else if (targetNode.type === EntityType.CONTACT) {
           if (relationship.contactDate) {
@@ -890,7 +890,7 @@ export class TransmissionChainDataService {
                     targetNode.model instanceof EventModel
         ) {
           if (targetNode.model.date) {
-            targetDate = targetNode.model.date;
+            targetDate = targetNode.model.date as string;
           }
         }
 
@@ -924,7 +924,7 @@ export class TransmissionChainDataService {
       }
 
       // add edge
-      graphData.edges.push({data: graphEdge});
+      graphData.edges.push({ data: graphEdge });
     });
 
     // finished

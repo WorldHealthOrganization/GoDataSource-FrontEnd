@@ -22,8 +22,7 @@ export enum ApplyListFilter {
   CONTACTS_FOLLOWUP_LIST = 'contacts_followup_list',
   CASES_DECEASED = 'cases_deceased',
   CASES_HOSPITALISED = 'cases_hospitalised',
-  CASES_NOT_HOSPITALISED = 'cases_not_hospitalised',
-  CASES_ISOLATED = 'cases_isolated',
+  CASES_DATE_RANGE_SUMMARY = 'cases_date_range_summary',
   CONTACTS_LOST_TO_FOLLOW_UP = 'contacts_lost_to_follow_up',
   CONTACTS_NOT_SEEN = 'contacts_not_seen',
   CONTACTS_SEEN = 'contacts_seen',
@@ -48,7 +47,7 @@ export enum ApplyListFilter {
   EVENTS_WITHOUT_DATE_OF_REPORTING_CHAIN = 'events_without_date_of_reporting_chain',
   CONTEXT_SENSITIVE_HELP_ITEMS = 'context_sensitive_help_items',
   CASE_SUMMARY = 'case-summary',
-  CASES_BY_LOCATION = 'cases-by-location',
+  CASES_BY_LOCATION = 'cases-by-location'
 }
 
 export class Constants {
@@ -66,9 +65,8 @@ export class Constants {
   static DEFAULT_FILTER_POOLING_MS_CHECK_AGAIN = 2000; // 2 seconds ?
 
   // pagination defaults and configuration
-  static PAGE_SIZE_OPTIONS = [10, 25, 50];
-  static DEFAULT_PAGE_SIZE = 25;
-  static DEFAULT_USAGE_MAX_RECORDS_DISPLAYED = 10;
+  static PAGE_SIZE_OPTIONS = [50, 100, 500, 1000];
+  static DEFAULT_PAGE_SIZE = 50;
 
   // static gender
   static readonly GENDER_MALE = 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE';
@@ -248,6 +246,58 @@ export class Constants {
     EVENTS: {
       label: 'LNG_APP_PAGE_EVENTS',
       value: 'LNG_APP_PAGE_EVENTS'
+    },
+    OUTBREAKS: {
+      label: 'LNG_APP_PAGE_OUTBREAKS',
+      value: 'LNG_APP_PAGE_OUTBREAKS'
+    },
+    OUTBREAK_TEMPLATES: {
+      label: 'LNG_APP_PAGE_OUTBREAK_TEMPLATES',
+      value: 'LNG_APP_PAGE_OUTBREAK_TEMPLATES'
+    },
+    CLUSTERS: {
+      label: 'LNG_APP_PAGE_CLUSTERS',
+      value: 'LNG_APP_PAGE_CLUSTERS'
+    },
+    USERS: {
+      label: 'LNG_APP_PAGE_USERS',
+      value: 'LNG_APP_PAGE_USERS'
+    },
+    TEAM: {
+      label: 'LNG_APP_PAGE_TEAMS',
+      value: 'LNG_APP_PAGE_TEAMS'
+    },
+    ENTITY_NOT_DUPLICATES: {
+      label: 'LNG_APP_PAGE_ENTITY_NOT_DUPLICATES',
+      value: 'LNG_APP_PAGE_ENTITY_NOT_DUPLICATES'
+    },
+    ROLES: {
+      label: 'LNG_APP_PAGE_ROLES',
+      value: 'LNG_APP_PAGE_ROLES'
+    },
+    RELATIONSHIPS: {
+      label: 'LNG_APP_PAGE_RELATIONSHIPS',
+      value: 'LNG_APP_PAGE_RELATIONSHIPS'
+    },
+    COT_BAR_CHART: {
+      label: 'LNG_APP_PAGE_COT_BAR_CHART',
+      value: 'LNG_APP_PAGE_COT_BAR_CHART'
+    },
+    GANTT_CHART: {
+      label: 'LNG_APP_PAGE_GANTT_CHART',
+      value: 'LNG_APP_PAGE_GANTT_CHART'
+    },
+    DASHBOARD: {
+      label: 'LNG_APP_PAGE_DASHBOARD',
+      value: 'LNG_APP_PAGE_DASHBOARD'
+    },
+    COT_GRAPH: {
+      label: 'LNG_APP_PAGE_COT_GRAPH',
+      value: 'LNG_APP_PAGE_COT_GRAPH'
+    },
+    CASE_COUNT_MAP: {
+      label: 'LNG_APP_PAGE_CASE_COUNT_MAP',
+      value: 'LNG_APP_PAGE_CASE_COUNT_MAP'
     }
   };
 
@@ -399,40 +449,6 @@ export class Constants {
   // keep functionality
   static APPLY_LIST_FILTER = ApplyListFilter;
 
-  // list breadcrumbs
-  static LIST_FILTER_TITLE = {
-    [Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWUP_LIST]: 'LNG_PAGE_LIST_FILTER_CONTACTS_ON_THE_FOLLOW_UP_LIST',
-    [Constants.APPLY_LIST_FILTER.CASES_DECEASED]: 'LNG_PAGE_LIST_FILTER_CASES_DECEASED',
-    [Constants.APPLY_LIST_FILTER.CASES_ISOLATED]: 'LNG_PAGE_LIST_FILTER_CASES_ISOLATED',
-    [Constants.APPLY_LIST_FILTER.CASES_HOSPITALISED]: 'LNG_PAGE_LIST_FILTER_CASES_HOSPITALISED',
-    [Constants.APPLY_LIST_FILTER.CASES_NOT_HOSPITALISED]: 'LNG_PAGE_LIST_FILTER_CASES_NOT_HOSPITALISED',
-    [Constants.APPLY_LIST_FILTER.CASES_LESS_CONTACTS]: 'LNG_PAGE_LIST_FILTER_CASES_LESS_CONTACTS',
-    [Constants.APPLY_LIST_FILTER.CONTACTS_LOST_TO_FOLLOW_UP]: 'LNG_PAGE_LIST_FILTER_CONTACTS_LOST_TO_FOLLOW_UP',
-    [Constants.APPLY_LIST_FILTER.CONTACTS_NOT_SEEN]: 'LNG_PAGE_LIST_FILTER_CONTACTS_NOT_SEEN',
-    [Constants.APPLY_LIST_FILTER.CONTACTS_SEEN]: 'LNG_PAGE_LIST_FILTER_CONTACTS_SEEN',
-    [Constants.APPLY_LIST_FILTER.CONTACTS_FOLLOWED_UP]: 'LNG_PAGE_LIST_FILTER_CONTACTS_FOLLOWED_UP',
-    [Constants.APPLY_LIST_FILTER.CASES_IN_THE_TRANSMISSION_CHAINS]: 'LNG_PAGE_LIST_FILTER_CASES_IN_THE_TRANSMISSION_CHAINS',
-    [Constants.APPLY_LIST_FILTER.CASES_PREVIOUS_DAYS_CONTACTS]: 'LNG_PAGE_LIST_FILTER_CASES_AMONG_CONTACTS',
-    [Constants.APPLY_LIST_FILTER.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS]: 'LNG_PAGE_LIST_FILTER_CASES_NOT_IDENTIFIED_THROUGH_CONTACTS',
-    [Constants.APPLY_LIST_FILTER.CASES_PENDING_LAB_RESULT]: 'LNG_PAGE_LIST_FILTER_CASES_PENDING_LAB_RESULT',
-    [Constants.APPLY_LIST_FILTER.CASES_REFUSING_TREATMENT]: 'LNG_PAGE_LIST_FILTER_CASES_REFUSING_TREATMENT',
-    [Constants.APPLY_LIST_FILTER.CONTACTS_BECOME_CASES]: 'LNG_PAGE_DASHBOARD_NUMBER_OF_CONTACTS_BECOMING_CASES_OVER_TIME_AND_PLACE',
-    [Constants.APPLY_LIST_FILTER.NO_OF_ACTIVE_TRANSMISSION_CHAINS]: 'LNG_PAGE_DASHBOARD_KPI_CONTACTS_NUMBER_ACTIVE_CHAINS',
-    [Constants.APPLY_LIST_FILTER.NO_OF_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES]: 'LNG_PAGE_DASHBOARD_NEW_CHAINS_OF_TRANSMISSION_FROM_CONTACTS_WHO_BECOME_CASES',
-    [Constants.APPLY_LIST_FILTER.CASES_WITHOUT_RELATIONSHIPS]: 'LNG_PAGE_DASHBOARD_CASES_WITHOUT_RELATIONSHIPS',
-    [Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_RELATIONSHIPS]: 'LNG_PAGE_DASHBOARD_EVENTS_WITHOUT_RELATIONSHIPS',
-    [Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_ONSET_CHAIN]: 'LNG_PAGE_LIST_FILTER_CASES_WITHOUT_DATE_OF_ONSET_CHAIN',
-    [Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN]: 'LNG_PAGE_LIST_FILTER_CASES_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN',
-    [Constants.APPLY_LIST_FILTER.CASES_WITHOUT_DATE_OF_REPORTING_CHAIN]: 'LNG_PAGE_LIST_FILTER_CASES_WITHOUT_DATE_OF_REPORTING_CHAIN',
-    [Constants.APPLY_LIST_FILTER.CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN]: 'LNG_PAGE_LIST_FILTER_CONTACTS_WITHOUT_DATE_OF_LAST_CONTACT_CHAIN',
-    [Constants.APPLY_LIST_FILTER.CONTACTS_WITHOUT_DATE_OF_REPORTING_CHAIN]: 'LNG_PAGE_LIST_FILTER_CONTACTS_WITHOUT_DATE_OF_REPORTING_CHAIN',
-    [Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_DATE_CHAIN]: 'LNG_PAGE_LIST_FILTER_EVENTS_WITHOUT_DATE_CHAIN',
-    [Constants.APPLY_LIST_FILTER.EVENTS_WITHOUT_DATE_OF_REPORTING_CHAIN]: 'LNG_PAGE_LIST_FILTER_EVENTS_WITHOUT_DATE_OF_REPORTING_CHAIN',
-    [Constants.APPLY_LIST_FILTER.CONTEXT_SENSITIVE_HELP_ITEMS]: 'LNG_PAGE_LIST_FILTER_HELP_CONTEXT_SENSITIVE',
-    [Constants.APPLY_LIST_FILTER.CASE_SUMMARY]: 'LNG_PAGE_DASHBOARD_CASE_SUMMARY',
-    [Constants.APPLY_LIST_FILTER.CASES_BY_LOCATION]: 'LNG_PAGE_DASHBOARD_CASE_BY_LOCATION',
-  };
-
   // Options for Yes/No dropdowns
   static FILTER_YES_NO_OPTIONS = {
     ALL: {
@@ -516,7 +532,7 @@ export class Constants {
      * Chronology item type
      */
   static CHRONOLOGY_ITEM_TYPE = {
-    FOLLOW_UP: 'LNG_FOLLOW_UP_ITEM',
+    FOLLOW_UP: 'LNG_FOLLOW_UP_ITEM'
   };
 
   /**
@@ -1020,21 +1036,6 @@ export class Constants {
     }
   };
 
-  static EPI_CURVE_TYPES = {
-    CLASSIFICATION: {
-      label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_CLASSIFICATION_TITLE',
-      value: 'classification'
-    },
-    OUTCOME: {
-      label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE',
-      value: 'outcome'
-    },
-    REPORTING: {
-      label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORTING_TITLE',
-      value: 'reporting'
-    }
-  };
-
   static EPI_CURVE_WEEK_TYPES = {
     ISO: {
       label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_WEEK_TYPE_ISO',
@@ -1141,4 +1142,36 @@ export class Constants {
     return result;
   }
 
+  /**
+   * Determine color depending of base color luminosity
+   */
+  static hexColorToTextColor(color: string): string {
+    // determine text color from bg-color
+    let textColor: string = color;
+    if (textColor.length === 4) {
+      textColor = textColor.substring(0, 1) +
+        textColor.substring(1, 2) +
+        textColor.substring(1, 2) +
+        textColor.substring(2, 3) +
+        textColor.substring(2, 3) +
+        textColor.substring(3, 4) +
+        textColor.substring(3, 4);
+    }
+
+    // determine lightness
+    textColor = textColor.substring(1);
+    const rgb: number = parseInt(textColor, 16);
+    // eslint-disable-next-line no-bitwise
+    const r: number = (rgb >> 16) & 0xff;
+    // eslint-disable-next-line no-bitwise
+    const g: number = (rgb >>  8) & 0xff;
+    // eslint-disable-next-line no-bitwise
+    const b: number = (rgb >>  0) & 0xff;
+
+    // per ITU-R BT.709
+    const luma: number = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    return (luma / 255.0) > 0.4 ?
+      '#333' :
+      '#FFF';
+  }
 }

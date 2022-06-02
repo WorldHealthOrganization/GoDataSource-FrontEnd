@@ -7,7 +7,7 @@ import { LabelValuePair } from './label-value-pair';
 import { AddressModel } from './address.model';
 import { IAnswerData, QuestionModel } from './question.model';
 import { Constants } from './constants';
-import { moment } from '../helperClasses/x-moment';
+import { Moment, moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { RelationshipPersonModel } from './relationship-person.model';
 import { UserModel } from './user.model';
@@ -26,7 +26,7 @@ export class RelationshipModel
         IPermissionBasicBulk {
   id: string;
   persons: RelationshipPersonModel[];
-  contactDate: string;
+  contactDate: string | Moment;
   contactDateEstimated: boolean;
   certaintyLevelId: string;
   exposureTypeId: string;
@@ -37,7 +37,7 @@ export class RelationshipModel
   clusterId: string;
   comment: string;
   people: EntityModel[];
-  dateOfFirstContact: string;
+  dateOfFirstContact: string | Moment;
 
   /**
      * Static Permissions - IPermissionBasic
@@ -187,8 +187,8 @@ export class EntityModel {
   matchesFilter: boolean = false;
 
   /**
-     * Link accordingly to type
-     */
+   * Link accordingly to type
+   */
   static getLinkForEntityType(entityType: EntityType): string {
     switch (entityType) {
       case EntityType.CASE:
@@ -206,10 +206,8 @@ export class EntityModel {
   }
 
   /**
-     * Unique values
-     * @param records
-     * @param path
-     */
+   * Unique values
+   */
   private static uniqueValueOptions(
     records: EntityModel[],
     path: string,
@@ -397,12 +395,12 @@ export class EntityModel {
   }
 
   /**
-     * Determine alertness
-     */
-  static determineAlertness(
+   * Determine alertness
+   */
+  static determineAlertness<T extends CaseModel | ContactModel>(
     template: QuestionModel[],
-    entities: CaseModel[]
-  ): CaseModel[] {
+    entities: T[]
+  ): T[] {
     // map alert question answers to object for easy find
     const alertQuestionAnswers: {
       [question_variable: string]: {
@@ -411,10 +409,10 @@ export class EntityModel {
     } = QuestionModel.determineAlertAnswers(template);
 
     // map alert value to cases
-    return _.map(entities, (caseData: CaseModel) => {
+    return _.map(entities, (itemData: T) => {
       // check if we need to mark case as alerted because of questionnaire answers
-      caseData.alerted = false;
-      _.each(caseData.questionnaireAnswers, (
+      itemData.alerted = false;
+      _.each(itemData.questionnaireAnswers, (
         answers: IAnswerData[],
         questionVariable: string
       ) => {
@@ -426,7 +424,7 @@ export class EntityModel {
         // there is no point in checking the value if there isn't one
         if (
           _.isEmpty(answerKey) &&
-                    !_.isNumber(answerKey)
+          !_.isNumber(answerKey)
         ) {
           return;
         }
@@ -437,7 +435,7 @@ export class EntityModel {
           _.each(answerKey, (childAnswerKey: string) => {
             if (_.get(alertQuestionAnswers, `[${questionVariable}][${childAnswerKey}]`)) {
               // alerted
-              caseData.alerted = true;
+              itemData.alerted = true;
 
               // stop each
               return false;
@@ -445,14 +443,14 @@ export class EntityModel {
           });
 
           // stop ?
-          if (caseData.alerted) {
+          if (itemData.alerted) {
             // stop each
             return false;
           }
         } else {
           if (_.get(alertQuestionAnswers, `[${questionVariable}][${answerKey}]`)) {
             // alerted
-            caseData.alerted = true;
+            itemData.alerted = true;
 
             // stop each
             return false;
@@ -461,7 +459,7 @@ export class EntityModel {
       });
 
       // finished
-      return caseData;
+      return itemData;
     });
   }
 

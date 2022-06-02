@@ -572,7 +572,7 @@ export class ImportableMapField {
 
     // invalid ?
     if (!this._sourceDestinationLevelAreValid) {
-      this._sourceDestinationLevelForDisplay = '-';
+      this._sourceDestinationLevelForDisplay = '—';
     }
   }
 

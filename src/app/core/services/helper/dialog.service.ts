@@ -5,22 +5,21 @@ import {
   DialogComponent,
   DialogConfiguration, DialogField, DialogFieldType
 } from '../../../shared/components/dialog/dialog.component';
-import { Observable, Subscriber } from 'rxjs';
+import { Observable, Subscriber, throwError } from 'rxjs';
 import * as _ from 'lodash';
 import { LabelValuePair } from '../../models/label-value-pair';
 import { ImportExportDataService } from '../data/import-export.data.service';
-import { SnackbarService } from './snackbar.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import * as FileSaver from 'file-saver';
 import { LoadingDialogComponent, LoadingDialogDataModel, LoadingDialogModel } from '../../../shared/components/loading-dialog/loading-dialog.component';
 import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import { IExportFieldsGroupRequired } from '../../../core/models/export-fields-group.model';
 import { ExportLogDataService } from '../data/export-log.data.service';
 import { Constants, ExportStatusStep } from '../../models/constants';
 import { Moment } from 'moment';
 import * as moment from 'moment';
 import { I18nService } from './i18n.service';
+import { ToastV2Service } from './toast-v2.service';
 
 /**
  * Export accepted extensions
@@ -65,7 +64,7 @@ export class DialogService {
   constructor(
     private dialog: MatDialog,
     private importExportDataService: ImportExportDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private exportLogDataService: ExportLogDataService,
     private i18nService: I18nService
   ) {}
@@ -211,7 +210,6 @@ export class DialogService {
     useDbColumnsDontTranslateValueDescription?: string,
     yesLabel?: string,
     queryBuilder?: RequestQueryBuilder,
-    queryBuilderClearOthers?: string[],
     extraAPIData?: {
       [key: string]: any
     },
@@ -287,15 +285,6 @@ export class DialogService {
     if (!data.yesLabel) {
       data.yesLabel = 'LNG_COMMON_LABEL_EXPORT';
     }
-    if (_.isEmpty(data.queryBuilderClearOthers)) {
-      data.queryBuilderClearOthers = [
-        'childrenQueryBuilders',
-        'includedRelations',
-        'filter',
-        'sort',
-        'deleted'
-      ];
-    }
 
     // default extra api data
     if (!data.extraAPIData) {
@@ -353,7 +342,7 @@ export class DialogService {
             .map((item) => {
               item.label = item.label ?
                 this.i18nService.instant(item.label) :
-                '-';
+                '—';
               return item;
             })
             .sort((v1, v2) => v1.label.localeCompare(v2.label)),
@@ -475,14 +464,16 @@ export class DialogService {
       data.queryBuilder &&
             !data.queryBuilder.isEmpty()
     ) {
-      if (_.isEmpty(data.queryBuilderClearOthers)) {
-        qb = _.cloneDeep(data.queryBuilder);
-      } else {
-        qb = new RequestQueryBuilder();
-        _.each(data.queryBuilderClearOthers, (property: string) => {
-          qb[property] = _.cloneDeep(data.queryBuilder[property]);
-        });
-      }
+      qb = new RequestQueryBuilder();
+      _.each([
+        'childrenQueryBuilders',
+        'includedRelations',
+        'filter',
+        'sort',
+        'deleted'
+      ], (property: string) => {
+        qb[property] = _.cloneDeep(data.queryBuilder[property]);
+      });
     }
 
     // display dialog
@@ -533,7 +524,7 @@ export class DialogService {
           )
             .pipe(
               catchError((err) => {
-                this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
+                this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
 
                 // call dialog closed
                 if (data.exportFinished) {
@@ -565,7 +556,7 @@ export class DialogService {
                     .getExportLog((blobOrJson as IAsyncExportResponse).exportLogId)
                     .pipe(
                       catchError((err) => {
-                        this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
+                        this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
 
                         // call dialog closed
                         if (data.exportFinished) {
@@ -641,7 +632,7 @@ export class DialogService {
                           )
                           .pipe(
                             catchError((err) => {
-                              this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
+                              this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
 
                               // call dialog closed
                               if (data.exportFinished) {
@@ -678,7 +669,7 @@ export class DialogService {
                       // process errors
                       if (exportLogModel.status === Constants.SYSTEM_SYNC_LOG_STATUS.FAILED.value) {
                         // error exporting data
-                        this.snackbarService.showError('LNG_COMMON_LABEL_EXPORT_ERROR');
+                        this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
 
                         // call dialog closed
                         if (data.exportFinished) {

@@ -1,0 +1,20 @@
+<app-create-view-modify-v2
+  [action]="action"
+  allowEdit="true"
+  [loadingPage]="loadingPage"
+  [loadingItemData]="loadingItemData"
+  [breadcrumbs]="breadcrumbs"
+  [pageTitle]="pageTitle"
+  [pageTitleData]="pageTitleData"
+  [itemID]="itemData?.id"
+  [tabData]="tabData"
+  listTitle="LNG_PAGE_LIST_LAB_RESULTS_TITLE"
+  [expandListRecords$]="expandListRecords$"
+  [expandListColumnRenderer]="expandListColumnRenderer"
+  [expandListAdvancedFilterType]="!entityData?.id ? Constants.APP_PAGE.LAB_RESULTS.value : (entityData.type === EntityType.CASE ? Constants.APP_PAGE.CASE_LAB_RESULTS.value : Constants.APP_PAGE.CONTACT_LAB_RESULTS.value)"
+  [expandListAdvancedFilters]="expandListAdvancedFilters"
+  [expandListQueryFields]="expandListQueryFields"
+  expandListAdvancedFiltersCacheKey="/lab-results"
+  (expandListRefreshData)="refreshExpandList($event)"
+  (expandListChangeRecord)="expandListChangeRecord($event)">
+</app-create-view-modify-v2>

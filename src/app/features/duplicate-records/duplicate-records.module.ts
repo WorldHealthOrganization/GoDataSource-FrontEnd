@@ -1,5 +1,4 @@
 import { NgModule } from '@angular/core';
-import { HotTableModule } from '@handsontable/angular';
 
 // modules
 import { routing } from './duplicate-records.module.routing';
@@ -11,8 +10,7 @@ import * as fromPages from './pages';
 @NgModule({
   imports: [
     routing,
-    SharedModule,
-    HotTableModule.forRoot()
+    SharedModule
   ],
   declarations: [
     ...fromPages.pageComponents

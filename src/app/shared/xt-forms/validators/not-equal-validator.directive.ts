@@ -1,6 +1,5 @@
-import { Directive, forwardRef, Attribute } from '@angular/core';
+import { Directive, forwardRef, Input } from '@angular/core';
 import { Validator, AbstractControl, NG_VALIDATORS } from '@angular/forms';
-import * as _ from 'lodash';
 
 /**
  * Custom form validation for fields that should not have the same value (e.g. security questions)
@@ -16,26 +15,35 @@ import * as _ from 'lodash';
   ]
 })
 export class NotEqualValidatorDirective implements Validator {
-  constructor(
-    @Attribute('app-not-equal-validator') public notEqualValidator: string
-  ) {
-  }
+  // input
+  @Input() notEqualValidatorCompareTo: string;
+  @Input() notEqualValidatorError: string;
 
+  /**
+   * Validate
+   */
   validate(control: AbstractControl): { [key: string]: any } {
-    if (_.isEmpty(control.value)) {
+    // nothing to validate ?
+    if (
+      !control.value ||
+      !this.notEqualValidatorCompareTo
+    ) {
       return null;
     }
 
     // get the target control
-    const targetControl = control.root.get(this.notEqualValidator);
+    const targetControl = control.root.get(this.notEqualValidatorCompareTo);
 
     // check if the current value and target value match
     if (targetControl && control.value === targetControl.value) {
       return {
-        notEqualValidator: false
+        notEqualValidator: {
+          err: this.notEqualValidatorError
+        }
       };
     }
 
+    // valid
     return null;
   }
 }

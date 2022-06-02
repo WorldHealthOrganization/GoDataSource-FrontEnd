@@ -1,759 +1,424 @@
-<div class="chain-settings">
-    <div
-        class="chain-settings-buttons">
-        <!-- See snapshot -->
-        <button
-            *ngIf="!showGraphConfiguration && selectedSnapshot && chainGroup && chainGroupId === selectedSnapshot"
-            mat-raised-button
-            (click)="showGraphConfigurationHideFilters()">
-            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_GRAPH' | translate }}
-        </button>
-
-        <!-- Show snapshot filters -->
-        <button
-            *ngIf="!showSnapshotFilters && selectedSnapshot && chainGroup && chainGroupId === selectedSnapshot"
-            mat-raised-button
-            (click)="showSnapshotFiltersConf()">
-            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_SNAPSHOT_FILTERS' | translate }}
-        </button>
-
-        <!-- Generate new graph -->
-        <button
-            *ngIf="!showFilters && selectedOutbreak?.id === authUser?.activeOutbreakId  && showSnapshots"
-            mat-raised-button
-            (click)="showFiltersHideGraphConf()">
-            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_SETTINGS' | translate }}
-        </button>
-    </div>
-
-    <!-- Generate new graph -->
-    <div
-        *ngIf="showFilters && selectedOutbreak?.id === authUser?.activeOutbreakId"
-        fxLayout="column"
-        class="settings-container">
-
-        <div
-            fxLayout="row" fxLayoutAlign="space-between end">
-            <div
-                fxLayout="row" fxLayoutGap="10px">
-                <!-- entity type filter - events -->
-                <app-form-checkbox
-                    fxFlex="150px"
-                    name="showEvents"
-                    [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_EVENTS_LABEL' | translate"
-                    [(ngModel)]="filters.showEvents">
-                </app-form-checkbox>
-
-                <!-- entity type filter - contacts -->
-                <app-form-checkbox
-                    fxFlex="150px"
-                    name="showContacts"
-                    [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_LABEL' | translate"
-                    [(ngModel)]="filters.showContacts"
-                    (optionChanged)="updateShowContactsOfContactValue($event)">
-                </app-form-checkbox>
-
-                <!-- This checkbox is valid only if 'showContacts' is already enabled -->
-                <app-form-checkbox
-                    name="includeContactsOfContacts"
-                    [disabled]="!filters.showContacts"
-                    [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_OF_CONTACTS' | translate"
-                    [(ngModel)]="filters.includeContactsOfContacts"
-                    fxFlex="150px">
-                </app-form-checkbox>
-            </div>
-
-            <!-- Date - moment in time -->
-            <div
-                fxFlex="150px">
-                <app-form-datepicker
-                    class="global-date-filter"
-                    [(ngModel)]="dateGlobalFilter"
-                    [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DATE' | translate"
-                    [tooltip]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DESCRIPTION' | translate">
-                </app-form-datepicker>
-            </div>
-        </div>
-
-        <!-- Filters -->
-        <app-transmission-chain-filters
-            fxFlex
-            titleName="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTERS_TITLE"
-            [filters]="filters"
-            [clusterOptions]="clusterOptions">
-        </app-transmission-chain-filters>
-
-        <div fxLayout="row" fxFlexAlign="end" fxLayoutGap="10px">
-            <!-- Cancel -->
-            <button
-                fxFlex="150px"
-                mat-raised-button
-                (click)="showFilters = false">
-                {{ 'LNG_COMMON_BUTTON_CANCEL' | translate }}
-            </button>
-
-            <!-- Apply filters -->
-            <button
-                fxFlex="150px"
-                mat-raised-button
-                color="accent"
-                (click)="generateChainsOfTransmission()">
-                {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_APPLY_SETTINGS' | translate }}
-            </button>
-        </div>
-    </div>
-
-    <!-- Graph configuration -->
-    <div
-        *ngIf="showGraphConfiguration && selectedSnapshot && chainGroup && chainGroupId === selectedSnapshot"
-        class="settings-container">
-
-        <div
-            fxLayout="row" fxLayoutGap="10px">
-            <!-- entity type filter - events -->
-            <app-form-checkbox
-                fxFlex fxGrow="0"
-                name="showEvents"
-                [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_EVENTS_LABEL' | translate"
-                [(ngModel)]="showEvents">
-            </app-form-checkbox>
-
-            <!-- entity type filter - contacts -->
-            <app-form-checkbox
-                *ngIf="!snapshotOptionsMap || !selectedSnapshot || !snapshotOptionsMap[selectedSnapshot] || snapshotOptionsMap[selectedSnapshot].snapshot.showContacts"
-                fxFlex fxGrow="0"
-                name="showContacts"
-                [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_LABEL' | translate"
-                [(ngModel)]="showContacts"
-                (optionChanged)="updateShowContactsOfContactValue($event)">
-            </app-form-checkbox>
-
-            <!-- This checkbox is valid only if 'showContacts' is already enabled -->
-            <app-form-checkbox
-                *ngIf="!snapshotOptionsMap || !selectedSnapshot || !snapshotOptionsMap[selectedSnapshot] || snapshotOptionsMap[selectedSnapshot].snapshot.showContactsOfContacts"
-                fxFlex fxGrow="0"
-                name="includeContactsOfContacts"
-                [disabled]="!showContacts"
-                [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_OF_CONTACTS' | translate"
-                [(ngModel)]="showContactsOfContacts">
-            </app-form-checkbox>
-
-            <!-- Show lab results -->
-            <app-form-checkbox
-                fxFlex fxGrow="0"
-                name="showLabResultsSeqData"
-                [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_LAB_RESULTS_SEQUENCE_DATA' | translate"
-                [(ngModel)]="showLabResultsSeqData">
-            </app-form-checkbox>
-
-            <!-- Empty space since all others are with fxGrow=0 -->
-            <div
-                fxFlex>
-                <!-- Placeholder -->
-            </div>
-        </div>
-
-        <!-- Node Settings -->
-        <mat-card fxLayout="column" fxLayoutGap="10px">
-            <div class="settings-container-title">
-                {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SETTINGS_TITLE' | translate }}
-            </div>
-
-            <!-- Node Label -->
-            <div fxLayout="column">
-                <div>
-                    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_TITLE' | translate }}
-                </div>
-
-                <div fxLayout="row">
-                    <app-form-radio
-                        name="nodeLabelCriteria"
-                        [(ngModel)]="colorCriteria.nodeLabelCriteria"
-                        [options]="nodeLabelCriteriaOptions$ | async">
-                    </app-form-radio>
-                </div>
-            </div>
-
-            <!-- Node Label Color -->
-            <div fxLayout="column">
-                <div>
-                    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE' | translate }}
-                </div>
-
-                <div fxLayout="row">
-                    <app-form-radio
-                        name="nodeNameColorCriteria"
-                        [(ngModel)]="colorCriteria.nodeNameColorCriteria"
-                        [options]="nodeColorCriteriaOptions$ | async">
-                    </app-form-radio>
-                </div>
-            </div>
-
-            <!-- Node Color -->
-            <div fxLayout="column">
-                <div>
-                    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE' | translate }}
-                </div>
-
-                <div fxLayout="row">
-                    <app-form-radio
-                        name="nodeColorCriteria"
-                        [(ngModel)]="colorCriteria.nodeColorCriteria"
-                        [options]="nodeColorCriteriaOptions$ | async">
-                    </app-form-radio>
-                </div>
-            </div>
-
-            <!-- Node Icon -->
-            <div fxLayout="column">
-                <div>
-                    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_ICON_TITLE' | translate }}
-                </div>
-
-                <div fxLayout="row">
-                    <app-form-radio
-                        name="nodeIconCriteria"
-                        [(ngModel)]="colorCriteria.nodeIconCriteria"
-                        [options]="nodeIconCriteriaOptions$ | async">
-                    </app-form-radio>
-                </div>
-            </div>
-
-            <!-- Node Shape -->
-            <div fxLayout="column">
-                <div>
-                    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SHAPE_TITLE' | translate }}
-                </div>
-
-                <div fxLayout="row">
-                    <app-form-radio
-                        name="nodeShapeCriteria"
-                        [(ngModel)]="colorCriteria.nodeShapeCriteria"
-                        [options]="nodeShapeCriteriaOptions$ | async">
-                    </app-form-radio>
-                </div>
-            </div>
-
-        </mat-card>
-
-        <!-- Edge Settings -->
-        <mat-card fxLayout="column" fxLayoutGap="10px">
-            <div class="settings-container-title">
-                {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_SETTINGS_TITLE' | translate }}
-            </div>
-
-            <!-- Edge Label -->
-            <div fxLayout="column">
-                <div>
-                    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_LABEL_TITLE' | translate }}
-                </div>
-
-                <div fxLayout="row">
-                    <app-form-radio
-                        name="edgeLabelCriteria"
-                        [(ngModel)]="colorCriteria.edgeLabelCriteria"
-                        [options]="edgeLabelCriteriaOptions$ | async"
-                        (optionChanged)="changeEdgeLabelIconSelection('label',$event)">
-                    </app-form-radio>
-                </div>
-            </div>
-
-            <!-- Edge Icon -->
-            <div fxLayout="column">
-                <div>
-                    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_ICON_TITLE' | translate }}
-                </div>
-
-                <div fxLayout="row">
-                    <app-form-radio
-                        name="edgeIconCriteria"
-                        [(ngModel)]="colorCriteria.edgeIconCriteria"
-                        [options]="edgeIconCriteriaOptions$ | async"
-                        (optionChanged)="changeEdgeLabelIconSelection('icon',$event)">
-                    </app-form-radio>
-                </div>
-            </div>
-
-            <!-- Edge Color -->
-            <div fxLayout="column">
-                <div>
-                    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE' | translate }}
-                </div>
-
-                <div fxLayout="row">
-                    <app-form-radio
-                        name="edgeColorCriteria"
-                        [(ngModel)]="colorCriteria.edgeColorCriteria"
-                        [options]="edgeColorCriteriaOptions$ | async">
-                    </app-form-radio>
-                </div>
-            </div>
-        </mat-card>
-    </div>
-
-    <!-- Snapshot filters -->
-    <div
-        *ngIf="showSnapshotFilters"
-        class="settings-container">
-        <mat-card fxLayout="column">
-            <div
-                fxLayout="row" fxLayoutGap="20px">
-                <!-- first name -->
-                <app-form-input
-                    name="snapshotFirstName"
-                    [(ngModel)]="snapshotFilters.firstName"
-                    [placeholder]="'LNG_PAGE_GRAPH_SNAPSHOT_FILTER_FIRST_NAME_LABEL' | translate">
-                </app-form-input>
-
-                <!-- last name -->
-                <app-form-input
-                    name="snapshotLastName"
-                    [(ngModel)]="snapshotFilters.lastName"
-                    [placeholder]="'LNG_PAGE_GRAPH_SNAPSHOT_FILTER_LAST_NAME_LABEL' | translate">
-                </app-form-input>
-
-                <!-- Lab sequence result -->
-                <app-form-select
-                    name="snapshotLabSeqResult"
-                    [(ngModel)]="snapshotFilters.labSeqResult"
-                    [placeholder]="'LNG_PAGE_GRAPH_SNAPSHOT_FILTER_LAB_SEQ_RESULT_LABEL' | translate"
-                    [options]="labSequenceResultOptions"
-                    [multiple]="true">
-                </app-form-select>
-            </div>
-        </mat-card>
-    </div>
-
-    <!-- Load snapshot -->
-    <div
-        *ngIf="!showFilters"
-        class="settings-container">
-        <mat-card fxLayout="column">
-            <div
-                fxLayout="row" fxLayoutGap="20px">
-
-                <!-- Snapshots -->
-                <app-form-select
-                    *ngIf="showSnapshots"
-                    name="snapshotsList"
-                    [(ngModel)]="selectedSnapshot"
-                    [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOTS' | translate"
-                    required="true"
-                    [options]="snapshotOptions"
-                    [clearable]="false"
-                    (ngModelChange)="mustLoadChain = true; showEvents = true; showContacts = false; showContactsOfContacts = false; showSnapshotFilters = false; snapshotFilters = {};">
-                </app-form-select>
-
-                <!-- dropdown with view types -->
-                <app-form-select
-                    name="chainView"
-                    [(ngModel)]="transmissionChainViewType"
-                    [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_CHART' | translate"
-                    required="true"
-                    [options]="transmissionChainViewTypes"
-                    [clearable]="false"
-                    (ngModelChange)="mustLoadChain = true">
-                </app-form-select>
-
-                <!-- Page size -->
-                <app-form-input
-                    *ngIf="showSnapshots"
-                    name="chainView"
-                    [(ngModel)]="pageSize"
-                    [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE_SIZE' | translate"
-                    required="true"
-                    type="number"
-                    (ngModelChange)="pageSizeChanged($event)">
-                </app-form-input>
-
-            </div>
-
-            <!-- Bubble chart specific configuration -->
-            <div
-                *ngIf="transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value"
-                fxLayout="row" fxLayoutGap="20px">
-
-                <!-- Fast / Slow render -->
-                <app-form-radio
-                    name="chainColaRenderMethod"
-                    [(ngModel)]="renderMethod"
-                    [options]="renderMethodOptions"
-                    (ngModelChange)="mustLoadChain = true">
-                </app-form-radio>
-
-            </div>
-
-            <div
-                *ngIf="mustLoadChain && selectedSnapshot && transmissionChainViewType && pageSize > 0 && snapshotOptionsMap[selectedSnapshot] && !snapshotOptionsMap[selectedSnapshot].option.disabled"
-                fxLayout="row" fxFlexAlign="end" fxLayoutGap="10px">
-                <!-- Apply filters -->
-                <button
-                    fxFlex="150px"
-                    mat-raised-button
-                    color="accent"
-                    (click)="loadChainsOfTransmission()">
-                    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_LOAD_SNAPSHOT' | translate }}
-                </button>
-            </div>
-
-            <div
-                *ngIf="showSnapshots"
-                fxLayout="row" fxLayoutGap="20px">
-
-                <!-- Pages -->
-                <app-form-select-vscroll
-                    *ngIf="!mustLoadChain && chainGroupId && chainGroupId === selectedSnapshot && chainPages && chainPages.length > 0"
-                    name="chainPagesList"
-                    [(ngModel)]="selectedChainPageIndex"
-                    [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE' | translate"
-                    required="true"
-                    [options]="chainPages"
-                    [clearable]="true"
-                    optionLabelKey="pageLabel"
-                    optionValueKey="pageIndex"
-                    (ngModelChange)="changedPage()">
-                </app-form-select-vscroll>
-
-                <!-- Nothing to display ? -->
-                <div
-                    *ngIf="!mustLoadChain && chainGroupId && chainGroupId === selectedSnapshot && chainPages && chainPages.length < 1"
-                    style="text-align: center; width: 100%">
-                    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NOTHING_TO_DISPLAY' | translate }}
-                </div>
-            </div>
-        </mat-card>
-
-    </div>
-</div>
-
 <!-- cytoscape element -->
-<div
-    *ngIf="chainGroup &&
-        !mustLoadChain &&
-        selectedChainPageIndex !== null"
-    class="cytoscape-graph-element">
-    <div class="cytoscape-graph-container">
-        <!-- legend -->
-        <div
-            *ngIf="legend && showLegend && (transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0)"
-            class="graph-legend {{ fullScreen ? 'full-screen-graph-legend' : '' }}">
+<app-basic-page-v2
+  #basicPage
+  [breadcrumbs]="breadcrumbs"
+  pageTitle="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE"
+  [actionButton]="actionButton"
+  [quickActions]="quickActions"
+  [advancedFilterType]="Constants.APP_PAGE.COT_GRAPH.value"
+  [advancedFilters]="advancedFilters"
+  [advancedFiltersVisible]="!showGraphConfiguration && selectedSnapshot && chainGroup && chainGroupId === selectedSnapshot"
+  advancedFiltersHideOperator="true"
+  (advancedFilterBy)="loadChainsOfTransmission($event)">
 
-            <!-- Filter Match -->
-            <div
-                class="legend-name"
-                fxLayout="row" fxLayoutAlign="start center">
+  <!-- Load snapshot -->
+  <div
+    *ngIf="!showFilters"
+    class="chains-of-transmission-top-bar"
+    fxLayout="row" fxLayoutAlign="none start" fxLayoutGap="1.6rem">
+    <!-- Snapshots -->
+    <app-form-select-single-v2
+      [disabled]="!showSnapshots"
+      name="snapshotsList"
+      [(ngModel)]="selectedSnapshot"
+      [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOTS' | translate"
+      [options]="snapshotOptions"
+      (ngModelChange)="mustLoadChain = true; showEvents = true; showContacts = false; showContactsOfContacts = false; showSnapshotFilters = false; snapshotFilters = {};">
+    </app-form-select-single-v2>
 
-                <!-- Circle -->
-                <div
-                    fxGrow="0"
-                    class="matches-filter"
-                    [style.borderColor]="Constants.DEFAULT_GRAPH_NODE_MATCH_FILTER_COLOR">
-                    <!-- Placeholder -->
-                </div>
+    <!-- dropdown with view types -->
+    <app-form-select-single-v2
+      name="chainView"
+      [(ngModel)]="transmissionChainViewType"
+      [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_CHART' | translate"
+      [options]="transmissionChainViewTypes"
+      [clearable]="false"
+      (ngModelChange)="mustLoadChain = true">
+    </app-form-select-single-v2>
 
-                <!-- details -->
-                <div
-                    fxFlex>
-                    {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_MATCH_FILTER_TITLE' | translate}}
-                </div>
+    <!-- Page size -->
+    <app-form-number-v2
+      [disabled]="!showSnapshots"
+      name="pageSize"
+      [(ngModel)]="pageSize"
+      [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE_SIZE' | translate"
+      (ngModelChange)="pageSizeChanged($event)">
+    </app-form-number-v2>
 
-                <!-- help -->
-                <app-fancy-tooltip
-                    fxGrow="0"
-                    tooltip="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_MATCH_FILTER_TITLE_DESCRIPTION"></app-fancy-tooltip>
-            </div>
+    <!-- Fast / Slow render -->
+    <app-form-toggle-v2
+      [disabled]="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value"
+      name="chainColaRenderMethod"
+      [(ngModel)]="renderMethod"
+      [options]="renderMethodOptions"
+      (ngModelChange)="mustLoadChain = true">
+    </app-form-toggle-v2>
 
-            <!-- node color -->
-            <div *ngIf="legend.nodeColorKeys && legend.nodeColorKeys.length"
-                 class="legend-name">
-                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE' | translate}}
-                <div class="legend-field-name">{{legend.nodeColorLabel | translate}}:</div>
-            </div>
-            <div
-                *ngFor="let nodeColorItem of legend.nodeColorKeys" class="legend-item">
-                <div
-                    class="legend-color"
-                    [style.background-color]="legend.nodeColor[nodeColorItem]">
-                </div>
-                <div>
-                    {{nodeColorItem | translate}}
-                </div>
-            </div>
+    <!-- Pages -->
+    <app-form-select-single-v2
+        *ngIf="showSnapshots && !mustLoadChain && chainGroupId && chainGroupId === selectedSnapshot && chainPages && chainPages.length > 0; else showButton"
+        name="chainPagesList"
+        [(ngModel)]="selectedChainPageIndex"
+        [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE' | translate"
+        [options]="chainPagesOptions"
+        [clearable]="true"
+        (ngModelChange)="changedPage()">
+    </app-form-select-single-v2>
 
-            <!-- node name color -->
-            <div *ngIf="legend.nodeNameColorKeys && legend.nodeNameColorKeys.length"
-                 class="legend-name">
-                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE' | translate}}
-                <div class="legend-field-name">{{legend.nodeNameColorLabel | translate}}:</div>
-            </div>
-            <div
-                *ngFor="let nodeNameColorItem of legend.nodeNameColorKeys" class="legend-item">
-                <div
-                    class="legend-color"
-                    [style.background-color]="legend.nodeNameColor[nodeNameColorItem]">
-                </div>
-                <div>
-                    {{nodeNameColorItem | translate}}
-                </div>
-                <div *ngIf="transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
-                    || transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
-                    || transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value">
-                    - {{legend.nodeNameColorAdditionalInfo[nodeNameColorItem] | translate}}
-                </div>
-            </div>
+    <!-- Apply filters -->
+    <ng-template
+        #showButton>
+        <button
+            [disabled]="!(mustLoadChain && selectedSnapshot && transmissionChainViewType && pageSize > 0 && snapshotOptionsMap[selectedSnapshot] && !snapshotOptionsMap[selectedSnapshot].option.disabled)"
+            mat-flat-button
+            color="primary"
+            (click)="loadChainsOfTransmission()">
+            {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_LOAD_SNAPSHOT' | translate }}
+        </button>
+    </ng-template>
+  </div>
 
-            <!-- edge color -->
-            <div *ngIf="legend.edgeColorKeys && legend.edgeColorKeys.length"
-                 class="legend-name">
-                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE' | translate}}
-                <div class="legend-field-name">{{legend.edgeColorLabel | translate}}:</div>
-            </div>
-            <div
-                *ngFor="let edgeColorItem of legend.edgeColorKeys" class="legend-item">
-                <div
-                    class="legend-color"
-                    [style.background-color]="legend.edgeColor[edgeColorItem]">
-                </div>
-                <div>
-                    {{legend.clustersList && legend.clustersList[edgeColorItem] ? legend.clustersList[edgeColorItem] : (edgeColorItem | translate)}}
-                </div>
-            </div>
+  <!-- Nothing to display ? -->
+  <div
+    *ngIf="showSnapshots && !mustLoadChain && chainGroupId && chainGroupId === selectedSnapshot && chainPages && chainPages.length < 1">
+    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NOTHING_TO_DISPLAY' | translate }}
+  </div>
 
-            <!-- node icon -->
-            <div *ngIf="legend.nodeIconKeys && legend.nodeIconKeys.length"
-                 class="legend-name">
-                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_ICON_TITLE' | translate}}
-                <div class="legend-field-name">{{legend.nodeIconLabel | translate}}:</div>
-            </div>
-            <div
-                *ngFor="let nodeIconItem of legend.nodeIconKeys" class="legend-item">
-                <div
-                    class="legend-icon"
-                    [style.background-image]="'url(' + legend.nodeIcon[nodeIconItem] + ')'">
-                </div>
-                <div>
-                    {{nodeIconItem | translate}}
-                </div>
-            </div>
+  <!-- Graph -->
+  <div
+      *ngIf="chainGroup &&
+      !mustLoadChain &&
+      selectedChainPageIndex !== null"
+      class="cytoscape-graph-element">
+      <div class="cytoscape-graph-container">
+          <!-- legend -->
+          <div
+              *ngIf="legend && showLegend && (transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0)"
+              class="graph-legend {{ fullScreen ? 'full-screen-graph-legend' : '' }}">
 
-            <!-- node shape -->
-            <div *ngIf="legend.nodeShapeKeys && legend.nodeShapeKeys.length"
-                 class="legend-name">
-                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SHAPE_TITLE' | translate}}
-                <div class="legend-field-name">{{legend.nodeShapeLabel | translate}}:</div>
-            </div>
-            <div
-                *ngFor="let nodeShapeItem of legend.nodeShapeKeys" class="legend-item">
-                <span class="xt-icon">{{legend.nodeShape[nodeShapeItem]}}</span>
-                <div>
-                    {{nodeShapeItem | translate}}
-                </div>
-            </div>
+              <!-- Filter Match -->
+              <div
+                  class="legend-name"
+                  fxLayout="row" fxLayoutAlign="start center">
 
-            <!-- edge icon -->
-            <div *ngIf="legend.edgeIconKeys && legend.edgeIconKeys.length"
-                 class="legend-name">
-                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_ICON_TITLE' | translate}}
-                <div class="legend-field-name">{{legend.edgeIconLabel | translate}}:</div>
-            </div>
-            <div
-                *ngFor="let edgeIconItem of legend.edgeIconKeys" class="legend-item">
-                <span
-                    [class]="legend.edgeIcon[edgeIconItem].class">
-                    {{ legend.edgeIcon[edgeIconItem].icon }}
-                </span>
-                <div>
-                    {{legend.clustersList && legend.clustersList[edgeIconItem] ? legend.clustersList[edgeIconItem] : (edgeIconItem | translate)}}
-                </div>
-            </div>
+                  <!-- Circle -->
+                  <div
+                      fxGrow="0"
+                      class="matches-filter"
+                      [style.borderColor]="Constants.DEFAULT_GRAPH_NODE_MATCH_FILTER_COLOR">
+                      <!-- Placeholder -->
+                  </div>
 
-            <!-- lab result sequence color -->
-            <ng-container
-                *ngIf="showLabResultsSeqData">
-                <div *ngIf="legend.labSequenceColorKeys && legend.labSequenceColorKeys.length"
-                     class="legend-name">
-                    {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_COLOR_TITLE' | translate}}
-                </div>
-                <div
-                    class="legend-item"
-                    fxLayout="row" fxLayoutAlign="start center">
-                    <div
-                        fxGrow="0"
-                        class="legend-color"
-                        [style.background-color]="Constants.DEFAULT_GRAPH_NODE_HAS_MORE_LAB_SEQ_COLOR">
-                    </div>
-                    <div
-                        fxFlex>
-                        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_HAS_MORE_COLOR_TITLE' | translate}}
-                    </div>
+                  <!-- details -->
+                  <div
+                      fxFlex>
+                      {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_MATCH_FILTER_TITLE' | translate}}
+                  </div>
 
-                    <!-- help -->
-                    <app-fancy-tooltip
-                        fxGrow="0"
-                        tooltip="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_HAS_MORE_COLOR_TITLE_DESCRIPTION"></app-fancy-tooltip>
-                </div>
-                <hr />
-                <div
-                    *ngFor="let labSequenceColorItem of legend.labSequenceColorKeys" class="legend-item">
-                    <div
-                        class="legend-color"
-                        [style.background-color]="legend.labSequenceColor[labSequenceColorItem]">
-                    </div>
-                    <div>
-                        {{labSequenceColorItem | translate}}
-                    </div>
-                </div>
-            </ng-container>
+                  <!-- help -->
+                  <app-fancy-tooltip
+                      fxGrow="0"
+                      tooltip="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_MATCH_FILTER_TITLE_DESCRIPTION"></app-fancy-tooltip>
+              </div>
+
+              <!-- node color -->
+              <div *ngIf="legend.nodeColorKeys && legend.nodeColorKeys.length"
+                   class="legend-name">
+                  {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE' | translate}}
+                  <div class="legend-field-name">{{legend.nodeColorLabel | translate}}:</div>
+              </div>
+              <div
+                  *ngFor="let nodeColorItem of legend.nodeColorKeys" class="legend-item">
+                  <div
+                      class="legend-color"
+                      [style.background-color]="legend.nodeColor[nodeColorItem]">
+                  </div>
+                  <div>
+                      {{nodeColorItem | translate}}
+                  </div>
+              </div>
+
+              <!-- node name color -->
+              <div *ngIf="legend.nodeNameColorKeys && legend.nodeNameColorKeys.length"
+                   class="legend-name">
+                  {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE' | translate}}
+                  <div class="legend-field-name">{{legend.nodeNameColorLabel | translate}}:</div>
+              </div>
+              <div
+                  *ngFor="let nodeNameColorItem of legend.nodeNameColorKeys" class="legend-item">
+                  <div
+                      class="legend-color"
+                      [style.background-color]="legend.nodeNameColor[nodeNameColorItem]">
+                  </div>
+                  <div>
+                      {{nodeNameColorItem | translate}}
+                  </div>
+                  <div *ngIf="transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+                      || transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
+                      || transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value">
+                      - {{legend.nodeNameColorAdditionalInfo[nodeNameColorItem] | translate}}
+                  </div>
+              </div>
+
+              <!-- edge color -->
+              <div *ngIf="legend.edgeColorKeys && legend.edgeColorKeys.length"
+                   class="legend-name">
+                  {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE' | translate}}
+                  <div class="legend-field-name">{{legend.edgeColorLabel | translate}}:</div>
+              </div>
+              <div
+                  *ngFor="let edgeColorItem of legend.edgeColorKeys" class="legend-item">
+                  <div
+                      class="legend-color"
+                      [style.background-color]="legend.edgeColor[edgeColorItem]">
+                  </div>
+                  <div>
+                      {{legend.clustersList && legend.clustersList[edgeColorItem] ? legend.clustersList[edgeColorItem] : (edgeColorItem | translate)}}
+                  </div>
+              </div>
+
+              <!-- node icon -->
+              <div *ngIf="legend.nodeIconKeys && legend.nodeIconKeys.length"
+                   class="legend-name">
+                  {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_ICON_TITLE' | translate}}
+                  <div class="legend-field-name">{{legend.nodeIconLabel | translate}}:</div>
+              </div>
+              <div
+                  *ngFor="let nodeIconItem of legend.nodeIconKeys" class="legend-item">
+                  <div
+                      class="legend-icon"
+                      [style.background-image]="'url(' + legend.nodeIcon[nodeIconItem] + ')'">
+                  </div>
+                  <div>
+                      {{nodeIconItem | translate}}
+                  </div>
+              </div>
+
+              <!-- node shape -->
+              <div *ngIf="legend.nodeShapeKeys && legend.nodeShapeKeys.length"
+                   class="legend-name">
+                  {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SHAPE_TITLE' | translate}}
+                  <div class="legend-field-name">{{legend.nodeShapeLabel | translate}}:</div>
+              </div>
+              <div
+                  *ngFor="let nodeShapeItem of legend.nodeShapeKeys" class="legend-item">
+                  <span class="xt-icon">{{legend.nodeShape[nodeShapeItem]}}</span>
+                  <div>
+                      {{nodeShapeItem | translate}}
+                  </div>
+              </div>
+
+              <!-- edge icon -->
+              <div *ngIf="legend.edgeIconKeys && legend.edgeIconKeys.length"
+                   class="legend-name">
+                  {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_ICON_TITLE' | translate}}
+                  <div class="legend-field-name">{{legend.edgeIconLabel | translate}}:</div>
+              </div>
+              <div
+                  *ngFor="let edgeIconItem of legend.edgeIconKeys" class="legend-item">
+                  <span
+                      [class]="legend.edgeIcon[edgeIconItem].class">
+                      {{ legend.edgeIcon[edgeIconItem].icon }}
+                  </span>
+                  <div>
+                      {{legend.clustersList && legend.clustersList[edgeIconItem] ? legend.clustersList[edgeIconItem] : (edgeIconItem | translate)}}
+                  </div>
+              </div>
+
+              <!-- lab result sequence color -->
+              <ng-container
+                  *ngIf="showLabResultsSeqData">
+                  <div *ngIf="legend.labSequenceColorKeys && legend.labSequenceColorKeys.length"
+                       class="legend-name">
+                      {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_COLOR_TITLE' | translate}}
+                  </div>
+                  <div
+                      class="legend-item"
+                      fxLayout="row" fxLayoutAlign="start center">
+                      <div
+                          fxGrow="0"
+                          class="legend-color"
+                          [style.background-color]="Constants.DEFAULT_GRAPH_NODE_HAS_MORE_LAB_SEQ_COLOR">
+                      </div>
+                      <div
+                          fxFlex>
+                          {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_HAS_MORE_COLOR_TITLE' | translate}}
+                      </div>
+
+                      <!-- help -->
+                      <app-fancy-tooltip
+                          fxGrow="0"
+                          tooltip="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_HAS_MORE_COLOR_TITLE_DESCRIPTION"></app-fancy-tooltip>
+                  </div>
+                  <hr />
+                  <div
+                      *ngFor="let labSequenceColorItem of legend.labSequenceColorKeys" class="legend-item">
+                      <div
+                          class="legend-color"
+                          [style.background-color]="legend.labSequenceColor[labSequenceColorItem]">
+                      </div>
+                      <div>
+                          {{labSequenceColorItem | translate}}
+                      </div>
+                  </div>
+              </ng-container>
+          </div>
+
+          <!-- Toggles -->
+          <div
+              *ngIf="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0"
+              class="graph-actions {{ fullScreen ? 'graph-actions-full-screen' : '' }} {{ transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value ? 'graph-actions-geo-map' : '' }}" fxLayout="row" fxLayoutGap="1.6rem">
+
+              <!-- Toggle Edit mode -->
+              <app-form-toggle-checkbox-v2
+                  *ngIf="isEditModeAvailable() && !fullScreen"
+                  name="toggleEditMode"
+                  [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_EDIT_MODE_LABEL' | translate"
+                  [(ngModel)]="editMode"
+                  (ngModelChange)="toggleEditMode()">
+              </app-form-toggle-checkbox-v2>
+
+              <!-- Display Labels -->
+              <app-form-toggle-checkbox-v2
+                  *ngIf="transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value"
+                  name="displayLabels"
+                  [(ngModel)]="displayLabels"
+                  [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_DISPLAY_MARKER_LABELS_LABEL' | translate">
+              </app-form-toggle-checkbox-v2>
+
+              <!-- Show / hide legend -->
+              <app-form-toggle-checkbox-v2
+                  name="showLegend"
+                  [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_LEGEND_LABEL' | translate"
+                  [(ngModel)]="showLegend">
+              </app-form-toggle-checkbox-v2>
+
+              <!-- Toggle full screen -->
+              <app-form-toggle-checkbox-v2
+                  *ngIf="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value"
+                  [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_FULL_SCREEN_LABEL' | translate"
+                  [ngModel]="fullScreen"
+                  (ngModelChange)="onFullScreenToggle($event)">
+              </app-form-toggle-checkbox-v2>
+          </div>
+
+          <div
+            class="graph-inner-container"
+              [fxShow]="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value">
+              <!-- zoom in / out buttons -->
+              <div
+                  class="cy-zoom-buttons {{ fullScreen ? 'cy-zoom-buttons-full-screen' : '' }}">
+                  <button
+                      mat-raised-button
+                      class="cy-zoom-button"
+                      [disableRipple]="true"
+                      (click)="zoomInGraph()">
+                      +
+                  </button>
+                  <br />
+                  <button
+                      mat-raised-button
+                      class="cy-zoom-button"
+                      [disableRipple]="true"
+                      (click)="zoomOutGraph()">
+                      -
+                  </button>
+              </div>
+
+              <!-- cytoscape element -->
+              <div
+                  #cyItem
+                  class="cy xt-icon {{ fullScreen ? 'cy-full-screen' : ''}}">
+              </div>
+          </div>
+
+          <!-- Geospatial map -->
+          <div
+              class="geospatial-map-container"
+              *ngIf="transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value">
+              <!-- Geospatial map -->
+              <app-world-map
+                  *ngIf="markers.length > 0"
+                  #worldMap
+                  width="100%"
+                  height="500px"
+                  [markers]="markers"
+                  [lines]="lines"
+                  [displayLabels]="displayLabels"
+                  [fitMapOnMarkersChange]="false"
+                  [centerLocation]="markers[0]?.point"
+                  [fitLayer]="WorldMapMarkerLayer.CLUSTER"
+                  [clusterDistance]="30"
+                  (fullScreenToggle)="onFullScreenToggle($event)"
+                  groupMarkerTitle="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_GROUP_DIALOG_MARKER_SECTION_TITLE"
+                  groupPathTitle="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_GROUP_DIALOG_PATHS_SECTION_TITLE">
+              </app-world-map>
+
+              <!-- No data -->
+              <div
+                  *ngIf="markers.length < 1"
+                  class="geo-map-no-data">
+              <span>
+                  {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NO_DATA' | translate }}
+              </span>
+              </div>
+          </div>
+      </div>
+
+      <div
+        class="timeline-info-buttons"
+        fxLayout="row" fxLayoutAlign="none center" fxLayoutGap="1.6rem">
+        <button *ngIf="( transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+            || transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
+            || transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value)"
+            mat-flat-button
+            color="secondary"
+            [ngClass]="{'full-screen-bottomed-item': fullScreen}"
+            (click)="switchTimelineView(timelineViewType === 'horizontal' ? 'vertical' : 'horizontal')">
+            {{ ( timelineViewType === 'horizontal' ? 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_VERTICAL' : 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_HORIZONTAL' )| translate }}
+        </button>
+        <div *ngIf="showCaseNodesWithoutDates()"
+                class="entities-no-dates">
+            <a target="_blank"
+                routerLink="/cases"
+                [queryParams]="{applyListFilter: getCasesListFilter(), caseIds: graphElements.caseNodesWithoutDates}">
+                {{graphElements.caseNodesWithoutDates.length}}
+                {{ getCasesWithoutDatesTitle() | translate}}
+            </a>
         </div>
-
-        <!-- Toggles -->
-        <div
-            *ngIf="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0"
-            class="graph-actions {{ fullScreen ? 'graph-actions-full-screen' : '' }} {{ transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value ? 'graph-actions-geo-map' : '' }}" fxLayout="row" fxLayoutGap="30px">
-
-            <!-- Toggle Edit mode -->
-            <app-form-slide-toggle
-                *ngIf="isEditModeAvailable() && !fullScreen"
-                name="toggleEditMode"
-                [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_EDIT_MODE_LABEL' | translate"
-                [(ngModel)]="editMode"
-                (optionChanged)="toggleEditMode()">
-            </app-form-slide-toggle>
-
-            <!-- Display Labels -->
-            <app-form-slide-toggle
-                *ngIf="transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value"
-                name="displayLabels"
-                [(ngModel)]="displayLabels"
-                [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_DISPLAY_MARKER_LABELS_LABEL' | translate">
-            </app-form-slide-toggle>
-
-            <!-- Show / hide legend -->
-            <app-form-slide-toggle
-                name="showLegend"
-                [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_LEGEND_LABEL' | translate"
-                [(ngModel)]="showLegend">
-            </app-form-slide-toggle>
-
-            <!-- Toggle full screen -->
-            <app-form-slide-toggle
-                *ngIf="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value"
-                [label]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TOGGLE_FULL_SCREEN_LABEL' | translate"
-                [ngModel]="fullScreen"
-                (optionChanged)="onFullScreenToggle($event)">
-            </app-form-slide-toggle>
+        <div *ngIf="showContactNodesWithoutDates()"
+                class="entities-no-dates">
+            <a target="_blank"
+                routerLink="/contacts"
+                [queryParams]="{applyListFilter: getContactsListFilter(), contactIds: graphElements.caseNodesWithoutDates}">
+                {{graphElements.contactNodesWithoutDates.length}}
+                {{ getContactsWithoutDatesTitle() | translate}}
+            </a>
         </div>
-
-        <div
-            [fxShow]="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value">
-            <!-- zoom in / out buttons -->
-            <div
-                class="cy-zoom-buttons {{ fullScreen ? 'cy-zoom-buttons-full-screen' : '' }}">
-                <button
-                    mat-raised-button
-                    class="cy-zoom-button"
-                    [disableRipple]="true"
-                    (click)="zoomInGraph()">
-                    +
-                </button>
-                <br />
-                <button
-                    mat-raised-button
-                    class="cy-zoom-button"
-                    [disableRipple]="true"
-                    (click)="zoomOutGraph()">
-                    -
-                </button>
-            </div>
-
-            <!-- cytoscape element -->
-            <div
-                #cyItem
-                class="cy xt-icon {{ fullScreen ? 'cy-full-screen' : ''}}">
-            </div>
+        <div *ngIf="showEventNodesWithoutDates()"
+                class="entities-no-dates">
+            <a target="_blank"
+                routerLink="/events"
+                [queryParams]="{applyListFilter: getEventsListFilter(), eventIds: graphElements.eventNodesWithoutDates}">
+                {{graphElements.eventNodesWithoutDates.length}}
+                {{ getEventsWithoutDatesTitle() | translate}}
+            </a>
         </div>
+      </div>
+  </div>
 
-        <!-- Geospatial map -->
-        <div
-            *ngIf="transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value">
-            <!-- Geospatial map -->
-            <app-world-map
-                *ngIf="markers.length > 0"
-                #worldMap
-                width="100%"
-                height="500px"
-                [markers]="markers"
-                [lines]="lines"
-                [displayLabels]="displayLabels"
-                [fitMapOnMarkersChange]="false"
-                [centerLocation]="markers[0]?.point"
-                [fitLayer]="WorldMapMarkerLayer.CLUSTER"
-                [clusterDistance]="30"
-                (fullScreenToggle)="onFullScreenToggle($event)"
-                groupMarkerTitle="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_GROUP_DIALOG_MARKER_SECTION_TITLE"
-                groupPathTitle="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_GROUP_DIALOG_PATHS_SECTION_TITLE">
-            </app-world-map>
-
-            <!-- No data -->
-            <div
-                *ngIf="markers.length < 1"
-                class="geo-map-no-data">
-            <span>
-                {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NO_DATA' | translate }}
-            </span>
-            </div>
-        </div>
-    </div>
-
-    <div *ngIf="showCaseNodesWithoutDates()"
-         class="entities-no-dates">
-        <a target="_blank"
-           routerLink="/cases"
-           [queryParams]="{applyListFilter: getCasesListFilter(), caseIds: graphElements.caseNodesWithoutDates}">
-            {{graphElements.caseNodesWithoutDates.length}}
-            {{ getCasesWithoutDatesTitle() | translate}}
-        </a>
-    </div>
-    <div *ngIf="showContactNodesWithoutDates()"
-         class="entities-no-dates">
-        <a target="_blank"
-           routerLink="/contacts"
-           [queryParams]="{applyListFilter: getContactsListFilter(), contactIds: graphElements.caseNodesWithoutDates}">
-            {{graphElements.contactNodesWithoutDates.length}}
-            {{ getContactsWithoutDatesTitle() | translate}}
-        </a>
-    </div>
-    <div *ngIf="showEventNodesWithoutDates()"
-         class="entities-no-dates">
-        <a target="_blank"
-           routerLink="/events"
-           [queryParams]="{applyListFilter: getEventsListFilter(), eventIds: graphElements.eventNodesWithoutDates}">
-            {{graphElements.eventNodesWithoutDates.length}}
-            {{ getEventsWithoutDatesTitle() | translate}}
-        </a>
-    </div>
-
-    <button *ngIf="( transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
-        || transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
-        || transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value)"
-        mat-raised-button
-        [ngClass]="{'full-screen-bottomed-item': fullScreen}"
-        (click)="switchTimelineView(timelineViewType === 'horizontal' ? 'vertical' : 'horizontal')">
-        {{ ( timelineViewType === 'horizontal' ? 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_VERTICAL' : 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CHANGE_TIMELINE_VIEW_HORIZONTAL' )| translate }}
-    </button>
-</div>
-
-<div *ngIf="sizeOfChainsFilter && !chainGroup &&
-        mustLoadChain &&
-        selectedChainPageIndex === null">
-    <div>
-        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CHAINS_FILTERED_BY_SIZE' | translate}} {{sizeOfChainsFilter}}
-    </div>
-</div>
-<div *ngIf="personId && !chainGroup &&
-        mustLoadChain &&
-        selectedChainPageIndex === null">
-    <div>
-        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CHAINS_FILTERED_BY_PERSON' | translate}} {{personName}}
-    </div>
-</div>
+  <div *ngIf="sizeOfChainsFilter && !chainGroup &&
+          mustLoadChain &&
+          selectedChainPageIndex === null">
+      <div>
+          {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CHAINS_FILTERED_BY_SIZE' | translate}} {{sizeOfChainsFilter}}
+      </div>
+  </div>
+  <div *ngIf="personId && !chainGroup &&
+          mustLoadChain &&
+          selectedChainPageIndex === null">
+      <div>
+          {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_CHAINS_FILTERED_BY_PERSON' | translate}} {{personName}}
+      </div>
+  </div>
+</app-basic-page-v2>

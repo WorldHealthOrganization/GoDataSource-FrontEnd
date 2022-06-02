@@ -1,0 +1,41 @@
+@import 'mixins';
+
+:host {
+  width: 100%;
+
+  .gd-list-table-column {
+    .gd-list-table-column-header {
+      &.gd-list-table-column-header-sortable {
+        cursor: pointer;
+        @include transition(all 0.24s ease-in-out 0s);
+
+        &:hover {
+          .gd-list-table-column-header-title {
+            color: var(--gd-primary);
+          }
+        }
+
+        .gd-list-table-column-header-sort {
+          width: 2.4rem;
+
+          .mat-icon {
+            color: var(--gd-primary);
+            @include flex(flex);
+            @include flex_align_items(center);
+            @include flex_justify(center);
+
+            &.gd-list-table-column-header-sort-desc {
+              @include rotate(180deg);
+            }
+          }
+        }
+
+        &.gd-list-table-column-header-sortable-active {
+          .gd-list-table-column-header-title {
+            color: var(--gd-primary);
+          }
+        }
+      }
+    }
+  }
+}

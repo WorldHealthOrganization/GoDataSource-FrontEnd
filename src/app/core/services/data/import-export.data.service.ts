@@ -44,7 +44,7 @@ export class ImportExportDataService {
       useQuestionVariable?: boolean,
       [otherData: string]: any
     },
-    queryBuilder?: RequestQueryBuilder,
+    queryBuilder: RequestQueryBuilder,
     responseType: 'blob' | 'json' = 'blob'
   ): Observable<Blob | IAsyncExportResponse>  {
     // clone data object
@@ -135,7 +135,7 @@ export class ImportExportDataService {
     // filter ?
     if (
       queryBuilder &&
-            !queryBuilder.isEmpty()
+      !queryBuilder.isEmpty()
     ) {
       const filter = queryBuilder.buildQuery();
       completeURL += `&filter=${filter}`;
@@ -166,10 +166,78 @@ export class ImportExportDataService {
     queryBuilder?: RequestQueryBuilder,
     responseType: 'blob' | 'json' = 'blob'
   ): Observable<Blob | IAsyncExportResponse>  {
+    // initialize query builder if we have to
+    if (!queryBuilder) {
+      queryBuilder = new RequestQueryBuilder();
+    }
+
+    // clone data object
+    data = data ? _.cloneDeep(data) : {};
+
+    // be expecting type
+    if (data.fileType !== undefined) {
+      data.type = data.fileType;
+      delete data.fileType;
+    }
+
+    // add flag useDbColumns
+    if (!_.isUndefined(data.useDbColumns)) {
+      queryBuilder.filter.flag(
+        'useDbColumns',
+        data.useDbColumns
+      );
+      delete data.useDbColumns;
+    }
+
+    // add flag jsonReplaceUndefinedWithNull
+    if (!_.isUndefined(data.jsonReplaceUndefinedWithNull)) {
+      queryBuilder.filter.flag(
+        'jsonReplaceUndefinedWithNull',
+        data.jsonReplaceUndefinedWithNull
+      );
+      delete data.jsonReplaceUndefinedWithNull;
+    }
+
+    // add flag dontTranslateValues
+    if (!_.isUndefined(data.dontTranslateValues)) {
+      queryBuilder.filter.flag(
+        'dontTranslateValues',
+        data.dontTranslateValues
+      );
+      delete data.dontTranslateValues;
+    }
+
+    // add flag useQuestionVariable
+    if (!_.isUndefined(data.useQuestionVariable)) {
+      queryBuilder.filter.flag(
+        'useQuestionVariable',
+        data.useQuestionVariable
+      );
+      delete data.useQuestionVariable;
+    }
+
+    // add flag includeContactFields
+    if (!_.isUndefined(data.includeContactFields)) {
+      queryBuilder.filter.flag(
+        'includeContactFields',
+        data.includeContactFields
+      );
+      delete data.includeContactFields;
+    }
+
+    // add flag includeCaseFields
+    if (!_.isUndefined(data.includeCaseFields)) {
+      queryBuilder.filter.flag(
+        'includeCaseFields',
+        data.includeCaseFields
+      );
+      delete data.includeCaseFields;
+    }
+
     // filter ?
     if (
       queryBuilder &&
-            !queryBuilder.isEmpty()
+      !queryBuilder.isEmpty()
     ) {
       const filterData = queryBuilder.buildQuery(false);
       if (_.isEmpty(data)) {
@@ -207,8 +275,8 @@ export class ImportExportDataService {
      * @param {{image: string; responseType: string; splitFactor: number}} imageData
      * @returns {Observable<any>}
      */
-  exportImageToPdf( imageData: {image: string, responseType: string, splitFactor: number}): Observable<any> {
-    const headers = new HttpHeaders({ 'Content-Type': 'application/pdf'});
+  exportImageToPdf( imageData: { image: string, responseType: string, splitFactor: number }): Observable<any> {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/pdf' });
     return this.http.post('/system-settings/image-to-pdf/', imageData,  { headers, responseType: 'blob' });
   }
 

@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -19,6 +18,8 @@ import { UserModel } from '../../../../core/models/user.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
+import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
 
 @Component({
   selector: 'app-view-chronology-contact',
@@ -28,7 +29,7 @@ import { LabResultDataService } from '../../../../core/services/data/lab-result.
 })
 export class ViewChronologyContactComponent implements OnInit {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  breadcrumbs: IV2Breadcrumb[] = [];
 
   contactData: ContactModel = new ContactModel();
   chronologyEntries: ChronologyItem[] = [];
@@ -136,37 +137,41 @@ export class ViewChronologyContactComponent implements OnInit {
      */
   initializeBreadcrumbs() {
     // reset
-    this.breadcrumbs = [];
+    this.breadcrumbs = [{
+      label: 'LNG_COMMON_LABEL_HOME',
+      action: {
+        link: DashboardModel.canViewDashboard(this.authUser) ?
+          ['/dashboard'] :
+          ['/account/my-profile']
+      }
+    }];
 
-    // contacts list page
+    // list page
     if (ContactModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-      );
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
+        action: {
+          link: ['/contacts']
+        }
+      });
     }
 
-    // contact breadcrumbs
+    // view page
     if (this.contactData) {
-      // contacts view page
       if (ContactModel.canView(this.authUser)) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel(
-            this.contactData.name,
-            `/contacts/${this.contactData.id}/view`
-          )
-        );
+        this.breadcrumbs.push({
+          label: this.contactData.name,
+          action: {
+            link: [`/contacts/${this.contactData.id}/view`]
+          }
+        });
       }
 
       // current page
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_TITLE',
-          '.',
-          true,
-          {},
-          this.contactData
-        )
-      );
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_VIEW_CHRONOLOGY_CONTACT_TITLE',
+        action: null
+      });
     }
   }
 }

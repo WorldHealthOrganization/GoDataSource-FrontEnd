@@ -12,7 +12,6 @@ export interface EntityBarModel {
   safeBurial: boolean;
   dateOfBurial: string;
   addresses?: {
-    // #TODO we may need location name
     locationId: string,
     date: string
   }[];
@@ -20,7 +19,6 @@ export interface EntityBarModel {
     typeId: string;
     startDate: string;
     endDate: string;
-    // #TODO we may need location name
     locationId: string;
     centerName: string;
   }[];

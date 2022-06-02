@@ -33,7 +33,7 @@ export class ExportLogModel
     if (this.sizeBytes) {
       this._sizeBytesHumanReadable = FileSize.bytesToReadableForm(this.sizeBytes);
     } else {
-      this._sizeBytesHumanReadable = '-';
+      this._sizeBytesHumanReadable = '—';
     }
   }
 

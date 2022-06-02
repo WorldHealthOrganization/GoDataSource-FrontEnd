@@ -1,17 +1,45 @@
 import { ModuleWithProviders } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { Routes, RouterModule, Route } from '@angular/router';
 import * as fromPages from './pages';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
-import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
+import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
+import { LocationGeographicalLevelDataResolver } from '../../core/services/resolvers/data/location-geographical-level.resolver';
+import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+import { LocationTreeDataResolver } from '../../core/services/resolvers/data/location-tree.resolver';
+import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
+import { OutbreakDataResolver } from '../../core/services/resolvers/data/outbreak.resolver';
 
+// common base - create / view / modify
+const locationCreateViewModifyFoundation: Route = {
+  component: fromPages.LocationsCreateViewModifyComponent,
+  canActivate: [AuthGuard],
+  resolve: {
+    parentLocationTree: LocationTreeDataResolver,
+    geographicalLevel: LocationGeographicalLevelDataResolver,
+    user: UserDataResolver
+  }
+};
+
+// common base
+const locationFoundation: Route = {
+  component: fromPages.LocationsListComponent,
+  canActivate: [AuthGuard],
+  resolve: {
+    yesNoAll: YesNoAllDataResolver,
+    geographicalLevel: LocationGeographicalLevelDataResolver,
+    user: UserDataResolver,
+    parentLocationTree: LocationTreeDataResolver
+  }
+};
+
+// routes
 const routes: Routes = [
   // Root locations list
   {
     path: '',
-    component: fromPages.LocationsListComponent,
-    canActivate: [AuthGuard],
+    ...locationFoundation,
     data: {
       permissions: [
         PERMISSION.LOCATION_LIST
@@ -21,8 +49,7 @@ const routes: Routes = [
   // Children locations list
   {
     path: ':parentId/children',
-    component: fromPages.LocationsListComponent,
-    canActivate: [AuthGuard],
+    ...locationFoundation,
     data: {
       permissions: [
         PERMISSION.LOCATION_LIST
@@ -32,12 +59,12 @@ const routes: Routes = [
   // Create Top Level Location
   {
     path: 'create',
-    component: fromPages.CreateLocationComponent,
-    canActivate: [AuthGuard],
+    ...locationCreateViewModifyFoundation,
     data: {
       permissions: [
         PERMISSION.LOCATION_CREATE
-      ]
+      ],
+      action: CreateViewModifyV2Action.CREATE
     },
     canDeactivate: [
       PageChangeConfirmationGuard
@@ -46,12 +73,12 @@ const routes: Routes = [
   // Create Sub Level Location
   {
     path: ':parentId/create',
-    component: fromPages.CreateLocationComponent,
-    canActivate: [AuthGuard],
+    ...locationCreateViewModifyFoundation,
     data: {
       permissions: [
         PERMISSION.LOCATION_CREATE
-      ]
+      ],
+      action: CreateViewModifyV2Action.CREATE
     },
     canDeactivate: [
       PageChangeConfirmationGuard
@@ -60,26 +87,24 @@ const routes: Routes = [
   // View Location
   {
     path: ':locationId/view',
-    component: fromPages.ModifyLocationComponent,
-    canActivate: [AuthGuard],
+    ...locationCreateViewModifyFoundation,
     data: {
       permissions: [
         PERMISSION.LOCATION_VIEW
       ],
-      action: ViewModifyComponentAction.VIEW
+      action: CreateViewModifyV2Action.VIEW
     }
   },
   // Modify Location
   {
     path: ':locationId/modify',
-    component: fromPages.ModifyLocationComponent,
-    canActivate: [AuthGuard],
+    ...locationCreateViewModifyFoundation,
     data: {
       permissions: [
         PERMISSION.LOCATION_VIEW,
         PERMISSION.LOCATION_MODIFY
       ],
-      action: ViewModifyComponentAction.MODIFY
+      action: CreateViewModifyV2Action.MODIFY
     },
     canDeactivate: [
       PageChangeConfirmationGuard
@@ -94,6 +119,11 @@ const routes: Routes = [
       permissions: [
         PERMISSION.LOCATION_USAGE
       ]
+    },
+    resolve: {
+      parentLocationTree: LocationTreeDataResolver,
+      yesNoAll: YesNoAllDataResolver,
+      outbreak: OutbreakDataResolver
     }
   }
 ];

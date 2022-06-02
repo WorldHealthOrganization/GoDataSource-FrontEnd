@@ -1,0 +1,70 @@
+@import 'mixins';
+@import 'font';
+
+app-basic-page-v2 {
+  /* Page top section */
+  .gd-basic-top {
+    padding-bottom: 2.4rem;
+  
+    @include breakpoint('xs') {
+      padding-bottom: 1.6rem;
+    }
+  
+    .gd-basic-top-title-buttons {
+      /* Page title */
+      .gd-basic-top-title-buttons-title {
+        color: var(--gd-primary);
+        font-family: $gd-font-family;
+        font-size: 2.4rem;
+        font-weight: 500;
+        line-height: $gd-line-height;
+      }
+    
+      /* Page top buttons */
+      .gd-basic-top-title-buttons-buttons {
+        @include breakpoint('xs') {
+          margin-top: 1.6rem;
+        }
+  
+        .gd-basic-top-title-buttons-buttons-quick {
+          .mat-icon {
+            @include transition(all 0.24s ease-in-out 0s);
+          }
+    
+          &.gd-basic-top-title-buttons-buttons-quick-expanded {
+            .mat-icon {
+              @include rotate(180deg);
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  /* Page content section */
+  .gd-basic-content.mat-card {
+    min-height: 0;
+    overflow: auto;
+    padding: 1.6rem;
+
+    @media screen and (max-height: 480px) {
+      min-height: 50rem;
+    }
+
+    app-import-case-data & {
+      min-height: 52rem;
+      overflow: hidden;
+    }
+
+    app-view-movement-case &,
+    app-case-count-map &,
+    app-duplicate-records-list & {
+      padding: 0;
+    }
+
+    app-contact-range-follow-ups-list & {
+      overflow: hidden;
+      padding: 0;
+    }
+  }
+}

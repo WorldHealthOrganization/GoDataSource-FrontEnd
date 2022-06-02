@@ -9,7 +9,7 @@ import { ContactOfContactModel } from '../../../../../core/models/contact-of-con
 export class ContactOfContactChronology {
   static getChronologyEntries(
     contactOfContactData: ContactOfContactModel,
-    relationshipsData?: RelationshipModel[],
+    relationshipsData?: RelationshipModel[]
   ): ChronologyItem[] {
     const chronologyEntries: ChronologyItem[] = [];
     const sourcePersons = [];
@@ -55,7 +55,7 @@ export class ContactOfContactChronology {
           chronologyEntries.push(new ChronologyItem({
             date: relationship.contactDate,
             label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_EXPOSURE',
-            translateData: {exposureName: sourcePerson ? sourcePerson.name : ''}
+            translateData: { exposureName: sourcePerson ? sourcePerson.name : '' }
           }));
         }
       });

@@ -1,0 +1,59 @@
+<div
+  class="gd-form-timepicker-v2">
+
+  <!-- Input data -->
+  <mat-form-field
+    appearance="outline">
+
+    <!-- Place holder -->
+    <mat-label>
+      {{ placeholder | translate }}
+    </mat-label>
+
+    <!-- Left - Icon buttons -->
+    <ng-container
+      *ngIf="tooltipButton?.tooltip"
+      matPrefix>
+      <popper-content
+        #popperContent>
+        <div
+          [innerHtml]="tooltipButton.tooltip | safeHtml">
+        </div>
+      </popper-content>
+      <mat-icon
+        tabindex="-1"
+        [popper]="popperContent"
+        popperTrigger="hover"
+        popperApplyClass="gd-form-timepicker-v2-tooltip"
+        popperPreventOverflow="true"
+        popperPositionFixed="true"
+        popperAppendTo="body"
+        (click)="$event.stopPropagation()">{{tooltipButton.icon}}</mat-icon>
+    </ng-container>
+
+    <!-- Input -->
+    <input
+      matInput
+      [(ngModel)]="value"
+      [errorStateMatcher]="errMatcher"
+      [disabled]="disabled"
+      [required]="required"
+      autocomplete="off"
+      [ngxTimepicker]="timePicker"
+      [format]="24"
+      [readonly]="true"
+      (blur)="onTouchItem()"
+      (input)="onChange(value)"/>
+      <ngx-material-timepicker
+        #timePicker
+        timepickerClass="gd-form-timepicker-v2-panel"></ngx-material-timepicker>
+
+    <!-- Errors -->
+    <mat-error
+      *ngIf="control?.invalid && control?.touched">
+      {{ getErrorMessages() }}
+    </mat-error>
+
+  </mat-form-field>
+
+</div>

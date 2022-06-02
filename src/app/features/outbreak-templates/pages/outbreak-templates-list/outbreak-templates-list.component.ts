@@ -1,224 +1,62 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
+import { Component, OnDestroy } from '@angular/core';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { Observable } from 'rxjs';
-import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
+import { Observable, throwError } from 'rxjs';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
-import { DialogAnswer, DialogAnswerButton, DialogConfiguration, DialogField } from '../../../../shared/components/dialog/dialog.component';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { OutbreakTemplateDataService } from '../../../../core/services/data/outbreak-template.data.service';
-import { catchError, map, share, switchMap, tap } from 'rxjs/operators';
-import { throwError } from 'rxjs';
-import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
-import { Router } from '@angular/router';
+import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import * as _ from 'lodash';
-import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { V2FilterType, V2FilterTextType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { V2SideDialogConfigInputType, IV2SideDialogConfigButtonType, IV2SideDialogConfigInputText } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
   selector: 'app-outbreak-templates-list',
   templateUrl: './outbreak-templates-list.component.html'
 })
 export class OutbreakTemplatesListComponent
-  extends ListComponent
-  implements OnInit, OnDestroy {
-
-  // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE', '.', true)
-  ];
-
-  // constants
-  OutbreakTemplateModel = OutbreakTemplateModel;
-
-  outbreakTemplatesList$: Observable<OutbreakTemplateModel[]>;
-  outbreakTemplatesListCount$: Observable<IBasicCount>;
-
-  diseasesList$: Observable<any[]>;
-  followUpsTeamAssignmentAlgorithm$: Observable<any[]>;
-  yesNoOptionsList$: Observable<any[]>;
-
-  authUser: UserModel;
-
-  // constants
-  UserSettings = UserSettings;
-  ReferenceDataCategory = ReferenceDataCategory;
-
-  recordActions: HoverRowAction[] = [
-    // View Outbreak template
-    new HoverRowAction({
-      icon: 'visibility',
-      iconTooltip: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_VIEW_OUTBREAK_TEMPLATE',
-      linkGenerator: (item: OutbreakTemplateModel): string[] => {
-        return ['/outbreak-templates', item.id, 'view'];
-      },
-      visible: (): boolean => {
-        return OutbreakTemplateModel.canView(this.authUser);
-      }
-    }),
-
-    // Modify Outbreak template
-    new HoverRowAction({
-      icon: 'settings',
-      iconTooltip: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_MODIFY_OUTBREAK_TEMPLATE',
-      linkGenerator: (item: OutbreakTemplateModel): string[] => {
-        return ['/outbreak-templates', item.id, 'modify'];
-      },
-      visible: (): boolean => {
-        return OutbreakTemplateModel.canModify(this.authUser);
-      }
-    }),
-
-    // Create outbreak from outbreak template
-    new HoverRowAction({
-      icon: 'add',
-      iconTooltip: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_GENERATE_OUTBREAK',
-      click: (item: OutbreakTemplateModel) => {
-        this.router.navigate(['/outbreaks', 'create'], {
-          queryParams: {
-            outbreakTemplateId: item.id
-          }
-        });
-      },
-      visible: (): boolean => {
-        return OutbreakTemplateModel.canGenerateOutbreak(this.authUser);
-      }
-    }),
-
-    // Other actions
-    new HoverRowAction({
-      type: HoverRowActionType.MENU,
-      icon: 'moreVertical',
-      menuOptions: [
-        // Delete Outbreak template
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_DELETE_OUTBREAK_TEMPLATE',
-          click: (item: OutbreakTemplateModel) => {
-            this.deleteOutbreakTemplate(item);
-          },
-          visible: (): boolean => {
-            return OutbreakTemplateModel.canDelete(this.authUser);
-          },
-          class: 'mat-menu-item-delete'
-        }),
-
-        // Divider
-        new HoverRowAction({
-          type: HoverRowActionType.DIVIDER,
-          visible: (): boolean => {
-            // visible only if at least one of the previous...
-            return OutbreakTemplateModel.canDelete(this.authUser);
-          }
-        }),
-
-        // View Outbreak template case form
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE',
-          click: (item: OutbreakTemplateModel) => {
-            this.router.navigate(['/outbreak-templates', item.id, 'case-questionnaire']);
-          },
-          visible: (): boolean => {
-            return OutbreakTemplateModel.canModifyCaseQuestionnaire(this.authUser);
-          }
-        }),
-
-        // View Outbreak template contact form
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE',
-          click: (item: OutbreakTemplateModel) => {
-            this.router.navigate(['/outbreak-templates', item.id, 'contact-questionnaire']);
-          },
-          visible: (): boolean => {
-            return OutbreakTemplateModel.canModifyContactQuestionnaire(this.authUser);
-          }
-        }),
-
-        // View Outbreak template contact follow-up form
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE',
-          click: (item: OutbreakTemplateModel) => {
-            this.router.navigate(['/outbreak-templates', item.id, 'contact-follow-up-questionnaire']);
-          },
-          visible: (): boolean => {
-            return OutbreakTemplateModel.canModifyContactFollowUpQuestionnaire(this.authUser);
-          }
-        }),
-
-        // View Outbreak template case lab result form
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE',
-          click: (item: OutbreakTemplateModel) => {
-            this.router.navigate(['/outbreak-templates', item.id, 'case-lab-results-questionnaire']);
-          },
-          visible: (): boolean => {
-            return OutbreakTemplateModel.canModifyCaseLabResultQuestionnaire(this.authUser);
-          }
-        }),
-
-        // Divider
-        new HoverRowAction({
-          type: HoverRowActionType.DIVIDER,
-          visible: (): boolean => {
-            return OutbreakTemplateModel.canClone(this.authUser);
-          }
-        }),
-
-        // Clone Template Outbreak
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTIONS_CLONE_OUTBREAK_TEMPLATE',
-          click: (item: OutbreakTemplateModel) => {
-            this.cloneOutbreakTemplate(item);
-          },
-          visible: (): boolean => {
-            return OutbreakTemplateModel.canClone(this.authUser);
-          }
-        })
-      ]
-    })
-  ];
-
+  extends ListComponent<OutbreakTemplateModel>
+  implements OnDestroy {
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     private router: Router,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private authDataService: AuthDataService,
-    private referenceDataDataService: ReferenceDataDataService,
-    private dialogService: DialogService,
     private outbreakTemplateDataService: OutbreakTemplateDataService,
     private i18nService: I18nService,
-    private genericDataService: GenericDataService
+    private activatedRoute: ActivatedRoute,
+    private dialogV2Service: DialogV2Service
   ) {
     super(listHelperService);
   }
 
   /**
-     * Component initialization
-     */
-  ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
+   * Release resources
+   */
+  ngOnDestroy() {
+    // release parent resources
+    super.onDestroy();
+  }
 
-    // get the lists for forms
-    this.diseasesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DISEASE);
-    this.followUpsTeamAssignmentAlgorithm$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM);
-    this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
-
-    // attach default projection
-    this.clearedQueryBuilder();
-
-    // initialize Side Table Columns
-    this.initializeSideTableColumns();
-
+  /**
+   * Component initialized
+   */
+  initialized(): void {
     // initialize pagination
     this.initPaginator();
 
@@ -227,59 +65,481 @@ export class OutbreakTemplatesListComponent
   }
 
   /**
-     * Release resources
-     */
-  ngOnDestroy() {
-    // release parent resources
-    super.ngOnDestroy();
-  }
+   * Initialize Table Columns
+   */
+  protected initializeTableColumns() {
+    // validate clone outbreak template name
+    let cloneTemplateName: string;
+    const asyncValidateCloneOutbreakTemplateName: Observable<boolean | IGeneralAsyncValidatorResponse> = new Observable((observer) => {
+      this.outbreakTemplateDataService.checkOutbreakTemplateNameUniquenessValidity(cloneTemplateName)
+        .subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+          observer.next(isValid);
+          observer.complete();
+        });
+    });
 
-  /**
-     * Initialize Side Table Columns
-     */
-  initializeSideTableColumns() {
     // default table columns
     this.tableColumns = [
-      new VisibleColumnModel({
+      {
         field: 'name',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_NAME'
-      }),
-      new VisibleColumnModel({
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_NAME',
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
         field: 'description',
-        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DESCRIPTION'
-      }),
-      new VisibleColumnModel({
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DESCRIPTION',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
         field: 'disease',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_DISEASE'
-      }),
-      new VisibleColumnModel({
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DISEASE',
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          includeNoValue: true
+        }
+      },
+      {
         field: 'generateFollowUpsTeamAssignmentAlgorithm',
         label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM',
-        visible: false
-      }),
-      new VisibleColumnModel({
+        notVisible: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.followUpGenerationTeamAssignmentAlgorithm as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        }
+      },
+      {
         field: 'generateFollowUpsOverwriteExisting',
         label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING',
-        visible: false
-      }),
-      new VisibleColumnModel({
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      },
+      {
         field: 'generateFollowUpsKeepTeamAssignment',
         label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT',
-        visible: false
-      }),
-      new VisibleColumnModel({
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      },
+      {
         field: 'generateFollowUpsDateOfLastContact',
         label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT',
-        visible: false
-      }),
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      },
+
+      // actions
+      {
+        field: 'actions',
+        label: 'LNG_COMMON_LABEL_ACTIONS',
+        pinned: IV2ColumnPinned.RIGHT,
+        notResizable: true,
+        cssCellClass: 'gd-cell-no-focus',
+        format: {
+          type: V2ColumnFormat.ACTIONS
+        },
+        actions: [
+          // View Outbreak template
+          {
+            type: V2ActionType.ICON,
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_VIEW_OUTBREAK_TEMPLATE',
+            action: {
+              link: (item: OutbreakTemplateModel): string[] => {
+                return ['/outbreak-templates', item.id, 'view'];
+              }
+            },
+            visible: (): boolean => {
+              return OutbreakTemplateModel.canView(this.authUser);
+            }
+          },
+
+          // Modify Outbreak template
+          {
+            type: V2ActionType.ICON,
+            icon: 'edit',
+            iconTooltip: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_MODIFY_OUTBREAK_TEMPLATE',
+            action: {
+              link: (item: OutbreakTemplateModel): string[] => {
+                return ['/outbreak-templates', item.id, 'modify'];
+              }
+            },
+            visible: (): boolean => {
+              return (
+                OutbreakTemplateModel.canModify(this.authUser)
+              );
+            }
+          },
+
+          // Create outbreak from outbreak template
+          {
+            type: V2ActionType.ICON,
+            icon: 'add',
+            iconTooltip: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_GENERATE_OUTBREAK',
+            action: {
+              link: (): string[] => {
+                return ['/outbreaks', 'create'];
+              },
+              linkQueryParams: (item: OutbreakTemplateModel): Params => {
+                return {
+                  outbreakTemplateId: item.id
+                };
+              }
+            },
+            visible: (): boolean => {
+              return (
+                OutbreakTemplateModel.canGenerateOutbreak(this.authUser)
+              );
+            }
+          },
+
+          // Other actions
+          {
+            type: V2ActionType.MENU,
+            icon: 'more_horiz',
+            menuOptions: [
+              // Delete Outbreak template
+              {
+                label: {
+                  get: () => 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_DELETE_OUTBREAK_TEMPLATE'
+                },
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+                action: {
+                  click: (item: OutbreakTemplateModel): void => {
+                    // show confirm dialog
+                    this.dialogV2Service.showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_DELETE',
+                          data: () => ({
+                            name: item.name
+                          })
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_OUTBREAK_TEMPLATE',
+                          data: () => ({
+                            name: item.name
+                          })
+                        }
+                      }
+                    }).subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // delete outbreak
+                      this.outbreakTemplateDataService
+                        .deleteOutbreakTemplate(item.id)
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            this.toastV2Service.error(err);
+
+                            // hide loading
+                            loading.close();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+
+                          // reload user data to get the updated data regarding active outbreak
+                          this.authDataService
+                            .reloadAndPersistAuthUser()
+                            .subscribe((authenticatedUser) => {
+                              this.authUser = authenticatedUser.user;
+
+                              // success
+                              this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                              // hide loading
+                              loading.close();
+
+                              // reload data
+                              this.needsRefreshList(true);
+                            });
+                        });
+                    });
+                  }
+                },
+                visible: (): boolean => {
+                  return OutbreakTemplateModel.canDelete(this.authUser);
+                }
+              },
+
+              // Divider
+              {
+                visible: (): boolean => {
+                  // visible only if at least one of the first two items is visible
+                  return OutbreakTemplateModel.canClone(this.authUser);
+                }
+              },
+
+              // Clone Template Outbreak
+              {
+                label: {
+                  get: () => 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTIONS_CLONE_OUTBREAK_TEMPLATE'
+                },
+                action: {
+                  click: (item: OutbreakTemplateModel): void => {
+                    // determine what we need to clone
+                    this.dialogV2Service
+                      .showSideDialog({
+                        title: {
+                          get: () => 'LNG_COMMON_BUTTON_CLONE',
+                          data: () => ({
+                            name: item.name
+                          })
+                        },
+                        hideInputFilter: true,
+                        inputs: [{
+                          type: V2SideDialogConfigInputType.TEXT,
+                          name: 'cloneData',
+                          data: item,
+                          placeholder: 'LNG_DIALOG_FIELD_PLACEHOLDER_CLONED_OUTBREAK_TEMPLATE_NAME',
+                          value: this.i18nService.instant('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_CLONE_NAME', { name: item.name }),
+                          validators: {
+                            required: () => true,
+                            async: (_data, _handler, input: IV2SideDialogConfigInputText) => {
+                              cloneTemplateName = input.value;
+                              return asyncValidateCloneOutbreakTemplateName;
+                            }
+                          }
+                        }],
+                        bottomButtons: [{
+                          type: IV2SideDialogConfigButtonType.OTHER,
+                          label: 'LNG_COMMON_BUTTON_CLONE',
+                          color: 'primary',
+                          key: 'apply',
+                          disabled: (_data, handler): boolean => {
+                            return !handler.form ||
+                              handler.form.invalid ||
+                              handler.form.pending;
+                          }
+                        }, {
+                          type: IV2SideDialogConfigButtonType.CANCEL,
+                          label: 'LNG_COMMON_BUTTON_CANCEL',
+                          color: 'text'
+                        }],
+                        initialized: (handler) => {
+                          // display loading
+                          handler.loading.show();
+
+                          // get the outbreak template to clone
+                          this.outbreakTemplateDataService
+                            .getOutbreakTemplate(handler.data.map.cloneData.data.id)
+                            .subscribe((outbreak: OutbreakTemplateModel) => {
+                              handler.data.map.cloneData.data = outbreak;
+
+                              // hide loading
+                              handler.loading.hide();
+                            });
+                        }
+                      })
+                      .subscribe((response) => {
+                        // canceled ?
+                        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+                          // finished
+                          return;
+                        }
+
+                        // get the outbreak template to clone
+                        const outbreakTemplateToClone = response.handler.data.map.cloneData.data;
+
+                        // set the name for the cloned outbreak template
+                        outbreakTemplateToClone.name = (response.handler.data.map.cloneData as IV2SideDialogConfigInputText).value;
+
+                        // close side dialog
+                        response.handler.hide();
+
+                        // show loading
+                        const loading = this.dialogV2Service.showLoadingDialog();
+
+                        // create outbreak template clone
+                        this.outbreakTemplateDataService
+                          .createOutbreakTemplate(outbreakTemplateToClone, outbreakTemplateToClone.id)
+                          .pipe(
+                            catchError((err) => {
+                              // error
+                              this.toastV2Service.error(err);
+
+                              // hide loading
+                              loading.close();
+
+                              // send further
+                              return throwError(err);
+                            }),
+                            switchMap((clonedOutbreakTemplate) => {
+                              // update language tokens to get the translation of submitted questions and answers
+                              return this.i18nService.loadUserLanguage()
+                                .pipe(
+                                  catchError((err) => {
+                                    // error
+                                    this.toastV2Service.error(err);
+
+                                    // hide loading
+                                    loading.close();
+
+                                    // send further
+                                    return throwError(err);
+                                  }),
+                                  map(() => clonedOutbreakTemplate)
+                                );
+                            })
+                          )
+                          .subscribe((clonedOutbreakTemplate) => {
+                            // msg
+                            this.toastV2Service.success(
+                              'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CLONE_SUCCESS_MESSAGE'
+                            );
+
+                            // hide loading
+                            loading.close();
+
+                            // navigate to modify page of the new outbreak
+                            if (OutbreakTemplateModel.canModify(this.authUser)) {
+                              this.router.navigate([`/outbreak-templates/${clonedOutbreakTemplate.id}/modify`]);
+                            } else if (OutbreakTemplateModel.canView(this.authUser)) {
+                              this.router.navigate([`/outbreak-templates/${clonedOutbreakTemplate.id}/view`]);
+                            } else {
+                              // fallback to current page since we already know that we have access to this page
+                              // Don't redirect :)
+
+                              // reload data
+                              this.needsRefreshList(true);
+                            }
+                          });
+                      });
+                  }
+                },
+                visible: (): boolean => {
+                  return OutbreakTemplateModel.canClone(this.authUser);
+                }
+              }
+            ]
+          }
+        ]
+      }
     ];
   }
 
   /**
-     * Attach default projection
-     */
-  clearedQueryBuilder(): void {
-    this.queryBuilder.fields(
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {
+    // Outbreak template
+    this.advancedFilters = OutbreakTemplateModel.generateAdvancedFilters({
+      options: {
+        disease: (this.activatedRoute.snapshot.data.disease as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        followUpGenerationTeamAssignmentAlgorithm: (this.activatedRoute.snapshot.data.followUpGenerationTeamAssignmentAlgorithm as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        yesNo: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
+      }
+    });
+  }
+
+  /**
+   * Initialize table quick actions
+   */
+  protected initializeQuickActions(): void {}
+
+  /**
+   * Initialize table group actions
+   */
+  protected initializeGroupActions(): void {}
+
+  /**
+   * Initialize table add action
+   */
+  protected initializeAddAction(): void {
+    this.addAction = {
+      type: V2ActionType.ICON_LABEL,
+      label: 'LNG_COMMON_BUTTON_ADD',
+      icon: 'add_circle_outline',
+      action: {
+        link: (): string[] => ['/outbreak-templates', 'create']
+      },
+      visible: (): boolean => {
+        return OutbreakTemplateModel.canCreate(this.authUser);
+      }
+    };
+  }
+
+  /**
+   * Initialize table grouped data
+   */
+  protected initializeGroupedData(): void {}
+
+  /**
+   * Initialize breadcrumbs
+   */
+  protected initializeBreadcrumbs(): void {
+    // set breadcrumbs
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
+        }
+      }, {
+        label: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_TITLE',
+        action: null
+      }
+    ];
+  }
+
+  /**
+   * Fields retrieved from api to reduce payload size
+   */
+  protected refreshListFields(): string[] {
+    return [
       'id',
       'name',
       'description',
@@ -288,152 +548,51 @@ export class OutbreakTemplatesListComponent
       'generateFollowUpsOverwriteExisting',
       'generateFollowUpsKeepTeamAssignment',
       'generateFollowUpsDateOfLastContact'
-    );
+    ];
   }
 
   /**
-     * Re(load) the Outbreak Templates list
-     */
-  refreshList(finishCallback: (records: any[]) => void) {
-    // retrieve the list of Events
-    this.outbreakTemplatesList$ = this.outbreakTemplateDataService
+   * Re(load) the Outbreak Templates list
+   */
+  refreshList() {
+    // retrieve the list of outbreak templates
+    this.records$ = this.outbreakTemplateDataService
       .getOutbreakTemplatesList(this.queryBuilder)
       .pipe(
-        catchError((err) => {
-          this.snackbarService.showApiError(err);
-          finishCallback([]);
-          return throwError(err);
-        }),
-        tap(this.checkEmptyList.bind(this)),
-        tap((data: any[]) => {
-          finishCallback(data);
-        })
+        // should be the last pipe
+        takeUntil(this.destroyed$)
       );
   }
 
   /**
-     * Get total number of items, based on the applied filters
-     */
-  refreshListCount() {
+   * Get total number of items, based on the applied filters
+   */
+  refreshListCount(applyHasMoreLimit?: boolean) {
+    // reset
+    this.pageCount = undefined;
+
+    // set apply value
+    if (applyHasMoreLimit !== undefined) {
+      this.applyHasMoreLimit = applyHasMoreLimit;
+    }
+
     // remove paginator from query builder
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
-    this.outbreakTemplatesListCount$ = this.outbreakTemplateDataService
+
+    this.outbreakTemplateDataService
       .getOutbreakTemplatesCount(countQueryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         }),
-        share()
-      );
-  }
 
-  /**
-     * Delete an outbreak template
-     * @param {OutbreakTemplateModel} outbreakTemplate
-     */
-  deleteOutbreakTemplate(outbreakTemplate: OutbreakTemplateModel) {
-    this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_OUTBREAK_TEMPLATE', outbreakTemplate)
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          this.outbreakTemplateDataService
-            .deleteOutbreakTemplate(outbreakTemplate.id)
-            .pipe(
-              catchError((err) => {
-                this.snackbarService.showApiError(err);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              // reload user data to get the updated data regarding active outbreak
-              this.authDataService
-                .reloadAndPersistAuthUser()
-                .subscribe((authenticatedUser) => {
-                  this.authUser = authenticatedUser.user;
-                });
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_DELETE_SUCCESS_MESSAGE');
-              this.needsRefreshList(true);
-            });
-        }
-      });
-  }
-
-  /**
-     * Clone existing outbreak template
-     * @param outbreakTemplateModel
-     */
-  cloneOutbreakTemplate(outbreakTemplateModel: OutbreakTemplateModel) {
-    // get the outbreak template to clone
-    this.outbreakTemplateDataService
-      .getOutbreakTemplate(outbreakTemplateModel.id)
-      .subscribe((outbreakTemplate: OutbreakTemplateModel) => {
-        // create the clone of the parent outbreak template
-        this.dialogService
-          .showInput(
-            new DialogConfiguration({
-              message: 'LNG_DIALOG_CONFIRM_CLONE_OUTBREAK_TEMPLATE',
-              yesLabel: 'LNG_COMMON_BUTTON_CLONE',
-              required: true,
-              fieldsList: [new DialogField({
-                name: 'clonedOutbreakTemplateName',
-                placeholder: 'LNG_DIALOG_FIELD_PLACEHOLDER_CLONED_OUTBREAK_TEMPLATE_NAME',
-                required: true,
-                type: 'text',
-                value: this.i18nService.instant('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_CLONE_NAME', {name: outbreakTemplate.name})
-              })],
-            }),
-            true
-          )
-          .subscribe((answer) => {
-            if (answer.button === DialogAnswerButton.Yes) {
-              // set the name for the cloned outbreak template
-              outbreakTemplate.name = answer.inputValue.value.clonedOutbreakTemplateName;
-
-              // show loading
-              const loadingDialog = this.dialogService.showLoadingDialog();
-              this.outbreakTemplateDataService
-                .createOutbreakTemplate(outbreakTemplate, outbreakTemplate.id)
-                .pipe(
-                  catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    loadingDialog.close();
-                    return throwError(err);
-                  }),
-                  switchMap((clonedOutbreakTemplate) => {
-                    // update language tokens to get the translation of submitted questions and answers
-                    return this.i18nService.loadUserLanguage()
-                      .pipe(
-                        catchError((err) => {
-                          this.snackbarService.showApiError(err);
-                          loadingDialog.close();
-                          return throwError(err);
-                        }),
-                        map(() => clonedOutbreakTemplate)
-                      );
-                  })
-                )
-                .subscribe((clonedOutbreakTemplate) => {
-                  this.snackbarService.showSuccess('LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_SUCCESS_MESSAGE');
-
-                  // hide dialog
-                  loadingDialog.close();
-
-                  // navigate to modify page of the new outbreak
-                  if (OutbreakTemplateModel.canModify(this.authUser)) {
-                    this.router.navigate([`/outbreak-templates/${clonedOutbreakTemplate.id}/modify`]);
-                  } else if (OutbreakTemplateModel.canView(this.authUser)) {
-                    this.router.navigate([`/outbreak-templates/${clonedOutbreakTemplate.id}/view`]);
-                  } else if (OutbreakTemplateModel.canList(this.authUser)) {
-                    this.router.navigate(['/outbreak-templates']);
-                  } else {
-                    // fallback to current page since we already know that we have access to this page
-                    // Don't redirect :)
-                  }
-                });
-            }
-          });
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      ).subscribe((response) => {
+        this.pageCount = response;
       });
   }
 }

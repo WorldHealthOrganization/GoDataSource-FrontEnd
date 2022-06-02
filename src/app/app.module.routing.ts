@@ -3,12 +3,13 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './core/services/guards/auth-guard.service';
 import { PERMISSION } from './core/models/permission.model';
 import { AuthenticatedComponent } from './core/components/authenticated/authenticated.component';
-import { LanguageResolver } from './core/services/resolvers/language.resolver';
 import { ModulePath } from './core/enums/module-path.enum';
 import { PasswordChangeGuard } from './core/services/guards/password-change-guard.service';
 import { RedirectComponent } from './core/components/redirect/redirect.component';
 import { PermissionExpression } from './core/models/user.model';
 import { DashboardModel } from './core/models/dashboard.model';
+import { LanguageUserResolver } from './core/services/resolvers/language-user.resolver';
+import { NotAuthRedirectGuard } from './core/services/guards/not-auth-redirect-guard.service';
 
 const routes: Routes = [
   // Authentication Module routes
@@ -16,7 +17,7 @@ const routes: Routes = [
     path: ModulePath.AuthenticationModule,
     loadChildren: () => import('./features/authentication/authentication.module').then(m => m.AuthenticationModule),
     resolve: {
-      language: LanguageResolver
+      language: LanguageUserResolver
     }
   },
 
@@ -24,8 +25,11 @@ const routes: Routes = [
   {
     path: '',
     component: AuthenticatedComponent,
+    canActivate: [
+      NotAuthRedirectGuard
+    ],
     resolve: {
-      language: LanguageResolver
+      language: LanguageUserResolver
     },
     children: [
       // Account Module routes
@@ -35,12 +39,7 @@ const routes: Routes = [
         canActivate: [
           AuthGuard,
           PasswordChangeGuard
-        ],
-        data: {
-          permissions: [
-            PERMISSION.USER_MODIFY_OWN_ACCOUNT
-          ]
-        }
+        ]
       },
       // User Module routes
       {
@@ -149,24 +148,6 @@ const routes: Routes = [
           })
         }
       },
-      // Terms of use Module routes
-      {
-        path: ModulePath.TermsOfUseModule,
-        loadChildren: () => import('./features/terms-of-use/terms-of-use.module').then(m => m.TermsOfUseModule),
-        canActivate: [
-          AuthGuard,
-          PasswordChangeGuard
-        ]
-      },
-      // Version
-      {
-        path: ModulePath.VersionModule,
-        loadChildren: () => import('./features/version/version.module').then(m => m.VersionModule),
-        canActivate: [
-          AuthGuard,
-          PasswordChangeGuard
-        ]
-      },
       // Outbreak Module routes
       {
         path: ModulePath.OutbreakModule,
@@ -182,10 +163,7 @@ const routes: Routes = [
               PERMISSION.OUTBREAK_VIEW,
               PERMISSION.OUTBREAK_CREATE,
               PERMISSION.OUTBREAK_MODIFY,
-              PERMISSION.OUTBREAK_SEE_INCONSISTENCIES,
-              PERMISSION.OUTBREAK_MODIFY_CASE_QUESTIONNAIRE,
-              PERMISSION.OUTBREAK_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE,
-              PERMISSION.OUTBREAK_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE
+              PERMISSION.OUTBREAK_SEE_INCONSISTENCIES
             ]
           })
         }
@@ -204,10 +182,7 @@ const routes: Routes = [
               PERMISSION.OUTBREAK_TEMPLATE_LIST,
               PERMISSION.OUTBREAK_TEMPLATE_VIEW,
               PERMISSION.OUTBREAK_TEMPLATE_CREATE,
-              PERMISSION.OUTBREAK_TEMPLATE_MODIFY,
-              PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CASE_QUESTIONNAIRE,
-              PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CONTACT_FOLLOW_UP_QUESTIONNAIRE,
-              PERMISSION.OUTBREAK_TEMPLATE_MODIFY_CASE_LAB_RESULT_QUESTIONNAIRE
+              PERMISSION.OUTBREAK_TEMPLATE_MODIFY
             ]
           })
         }
@@ -267,7 +242,7 @@ const routes: Routes = [
                   PERMISSION.CONTACT_OF_CONTACT_BULK_CREATE,
                   PERMISSION.CONTACT_OF_CONTACT_BULK_MODIFY,
                   PERMISSION.CONTACT_OF_CONTACT_VIEW_MOVEMENT_MAP,
-                  PERMISSION.CONTACT_OF_CONTACT_VIEW_CHRONOLOGY_CHART,
+                  PERMISSION.CONTACT_OF_CONTACT_VIEW_CHRONOLOGY_CHART
                 ]
               })
             ]

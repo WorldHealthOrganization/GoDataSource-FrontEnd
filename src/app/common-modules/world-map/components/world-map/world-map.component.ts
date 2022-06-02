@@ -21,7 +21,7 @@ import {
 import VectorTileLayer from 'ol/layer/VectorTile';
 import VectorTileSource from 'ol/source/VectorTile';
 import MVT from 'ol/format/MVT';
-import { transform } from 'ol/proj';
+import { transform, addCommon as addCommonProjections } from 'ol/proj';
 import Feature from 'ol/Feature';
 import { LineString, Point } from 'ol/geom';
 import { Circle as CircleStyle, Fill, Icon, Stroke, Style, Text } from 'ol/style';
@@ -29,14 +29,14 @@ import { OutbreakDataService } from '../../../../core/services/data/outbreak.dat
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Constants } from '../../../../core/models/constants';
 import { Observable, Subscriber, Subscription } from 'rxjs';
-import { addCommon as addCommonProjections } from 'ol/proj';
 import { v4 as uuid } from 'uuid';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
 import { MatDialogRef } from '@angular/material/dialog';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { applyStyle } from 'ol-mapbox-style';
 import RenderFeature from 'ol/render/Feature';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { AuthenticatedComponent } from '../../../../core/components/authenticated/authenticated.component';
 
 /**
  * Point used for rendering purposes
@@ -82,8 +82,8 @@ export class WorldMapMarker {
   data: any;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(data: {
     // required
     point: WorldMapPoint,
@@ -201,12 +201,12 @@ class WorldMapClusterLine {
   selector: 'app-world-map',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './world-map.component.html',
-  styleUrls: ['./world-map.component.less']
+  styleUrls: ['./world-map.component.scss']
 })
 export class WorldMapComponent implements OnInit, OnDestroy {
   // Map fill size ( Default w: 100%, h: 400px )
   private _width: string = '100%';
-  private _height: string = '400px';
+  private _height: string = '100%';
   @Input() set width(width: string) {
     // set value
     this._width = width;
@@ -404,7 +404,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   constructor(
     private outbreakDataService: OutbreakDataService,
     private dialogService: DialogService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service
   ) {}
 
   /**
@@ -494,7 +494,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                       this.initializeMap();
                     }).catch(() => {
                       // display an error
-                      this.snackbarService.showError('LNG_PAGE_WORLD_MAP_OUTBREAK_MAP_SERVER_STYLE_INVALID_URL');
+                      this.toastV2Service.error('LNG_PAGE_WORLD_MAP_OUTBREAK_MAP_SERVER_STYLE_INVALID_URL');
                     });
                   });
               }
@@ -528,14 +528,17 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Component destroyed
-     */
+   * Component destroyed
+   */
   ngOnDestroy() {
     // outbreak subscriber
     if (this.outbreakSubscriber) {
       this.outbreakSubscriber.unsubscribe();
       this.outbreakSubscriber = null;
     }
+
+    // not full screen anymore
+    AuthenticatedComponent.FULL_SCREEN = false;
   }
 
   /**
@@ -1312,20 +1315,25 @@ export class WorldMapComponent implements OnInit, OnDestroy {
 
     // update map size
     setTimeout(() => {
-      this.map.updateSize();
+      if (this.map) {
+        this.map.updateSize();
+      }
     });
 
   }
 
   /**
-     * Trigger map update and full screen toggle
-     */
+   * Trigger map update and full screen toggle
+   */
   fullScreenToggleTrigger() {
     // update map size
     this.updateMapSize();
 
     // emit value to parent component
     this.fullScreenToggle.emit(this.fullScreenMode);
+
+    // toggle full screen class
+    AuthenticatedComponent.FULL_SCREEN = this.fullScreenMode;
   }
 
   /**
@@ -1360,7 +1368,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
           const mapContext = mapCanvas.getContext('2d');
           Array.prototype.forEach.call(
             document.querySelectorAll('.ol-layer canvas'),
-            function (canvas) {
+            function(canvas) {
               if (canvas.width > 0) {
                 const opacity = canvas.parentNode.style.opacity;
                 mapContext.globalAlpha = opacity === '' ? 1 : Number(opacity);
@@ -1381,7 +1389,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
           );
 
           // create blob object
-          mapCanvas.toBlob(function (blob) {
+          mapCanvas.toBlob(function(blob) {
             observer.next(blob);
             observer.complete();
           });

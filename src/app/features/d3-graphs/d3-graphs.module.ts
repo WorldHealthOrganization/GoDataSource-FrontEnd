@@ -1,14 +1,7 @@
 import { NgModule } from '@angular/core';
-
-// modules
 import { routing } from './d3-graphs.module.routing';
 import { SharedModule } from '../../shared/shared.module';
-
-// components
 import * as fromPages from './pages';
-import * as fromComponents from './components';
-
-// services
 import * as fromServices from './services';
 
 @NgModule({
@@ -17,8 +10,7 @@ import * as fromServices from './services';
     SharedModule
   ],
   declarations: [
-    ...fromPages.pageComponents,
-    ...fromComponents.components
+    ...fromPages.pageComponents
   ],
   providers: [
     ...fromServices.services

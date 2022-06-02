@@ -28,12 +28,12 @@ export class ErrorMessage {
       case 'minNumberValidator':
         return new ElementBaseFailure(
           'LNG_FORM_VALIDATION_ERROR_MIN_NUMBER',
-          {min: this.validator.minNumberValidator['min']}
+          { min: this.validator.minNumberValidator['min'] }
         );
       case 'maxNumberValidator':
         return new ElementBaseFailure(
           'LNG_FORM_VALIDATION_ERROR_MAX_NUMBER',
-          {max: this.validator.maxNumberValidator['max']}
+          { max: this.validator.maxNumberValidator['max'] }
         );
       case 'missingRequiredOptions':
         return new ElementBaseFailure(
@@ -45,12 +45,12 @@ export class ErrorMessage {
       case 'minlength':
         return new ElementBaseFailure(
           'LNG_FORM_VALIDATION_ERROR_MIN_LENGTH',
-          {length: this.validator.minlength['requiredLength']}
+          { length: this.validator.minlength['requiredLength'] }
         );
       case 'maxlength':
         return new ElementBaseFailure(
           'LNG_FORM_VALIDATION_ERROR_MAX_LENGTH',
-          {length: this.validator.maxlength['requiredLength']}
+          { length: this.validator.maxlength['requiredLength'] }
         );
       case 'equalValidator':
         return new ElementBaseFailure(
@@ -79,7 +79,7 @@ export class ErrorMessage {
       case 'extensionValidator':
         return new ElementBaseFailure(
           'LNG_FORM_VALIDATION_ERROR_EXTENSION',
-          {extensions: this.validator.extensionValidator['extensions']}
+          { extensions: this.validator.extensionValidator['extensions'] }
         );
       case 'uniqueEmail':
         return new ElementBaseFailure(
@@ -138,7 +138,7 @@ export class ErrorMessage {
       default:
         return new ElementBaseFailure(
           'LNG_FORM_VALIDATION_ERROR_DEFAULT',
-          {validation: this.key}
+          { validation: this.key }
         );
     }
   }

@@ -2,21 +2,21 @@ import { Component, Input, ViewChild, ViewEncapsulation } from '@angular/core';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import * as _ from 'lodash';
 import { WorldMapComponent, WorldMapMarker, WorldMapPath, WorldMapPathType, WorldMapPoint } from '../../../world-map/components/world-map/world-map.component';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as FileSaver from 'file-saver';
 import { EntityType } from '../../../../core/models/entity-type';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 
 @Component({
   selector: 'app-world-map-movement',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './world-map-movement.component.html',
-  styleUrls: ['./world-map-movement.component.less']
+  styleUrls: ['./world-map-movement.component.scss']
 })
 export class WorldMapMovementComponent {
   @Input() width: string = '100%';
-  @Input() height: string = '400px';
+  @Input() height: string = '100%';
 
   @ViewChild(WorldMapComponent) worldMapComponent: WorldMapComponent;
 
@@ -85,8 +85,8 @@ export class WorldMapMovementComponent {
   /**
      * Constructor
      */
-  constructor (
-    private dialogService: DialogService,
+  constructor(
+    private dialogV2Service: DialogV2Service,
     private i18nService: I18nService
   ) {}
 
@@ -116,7 +116,7 @@ export class WorldMapMovementComponent {
      */
   exportMovementMap(entityType: EntityType) {
     if (this.worldMapComponent) {
-      const loadingDialog = this.dialogService.showLoadingDialog();
+      const loadingDialog = this.dialogV2Service.showLoadingDialog();
       this.worldMapComponent
         .printToBlob()
         .subscribe((blob) => {

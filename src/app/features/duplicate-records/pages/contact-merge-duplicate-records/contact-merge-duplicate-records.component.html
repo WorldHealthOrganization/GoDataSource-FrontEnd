@@ -1,8 +1,10 @@
+<!--
 <app-topnav [activeOutbreakEditable]="false">
     <ng-container dynamic-section>
         <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
     </ng-container>
 </app-topnav>
+-->
 
 <div class="page-content">
     <div
@@ -238,13 +240,13 @@
                         [clearable]="false">
                     </app-form-select>
 
-                    <!-- Questionnaire section -->
-                    <app-form-fill-questionnaire
-                        name="questionnaireAnswers"
-                        [ngModel]="questionnaireAnswers"
-                        [questions]="selectedOutbreak?.contactInvestigationTemplate"
-                        [disabled]="true">
-                    </app-form-fill-questionnaire>
+<!--                    &lt;!&ndash; Questionnaire section &ndash;&gt;-->
+<!--                    <app-form-fill-questionnaire-->
+<!--                        name="questionnaireAnswers"-->
+<!--                        [ngModel]="questionnaireAnswers"-->
+<!--                        [questions]="selectedOutbreak?.contactInvestigationTemplate"-->
+<!--                        [disabled]="true">-->
+<!--                    </app-form-fill-questionnaire>-->
 
                     <div class="stepper-navigation-buttons">
                         <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>

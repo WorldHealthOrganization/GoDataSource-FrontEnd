@@ -14,6 +14,8 @@ import { HasPropertyDirective } from './has-property.directive';
 import { NotNumberValidatorDirective } from './not-number-validator.directive';
 import { GroupOptionRequirementsValidator } from './group-option-requirements-validator.directive';
 import { RegexValidatorDirective } from './regex-validator.directive';
+import { NoSpacesValidatorDirective } from './no-spaces-validator.directive';
+import { QuestionnaireAnswersValidatorDirective } from './questionnaire-answers-validator.directive';
 
 export const validatorDirectives: any[] = [
   EmailValidatorDirective,
@@ -31,5 +33,7 @@ export const validatorDirectives: any[] = [
   HasPropertyDirective,
   NotNumberValidatorDirective,
   GroupOptionRequirementsValidator,
-  RegexValidatorDirective
+  RegexValidatorDirective,
+  NoSpacesValidatorDirective,
+  QuestionnaireAnswersValidatorDirective
 ];

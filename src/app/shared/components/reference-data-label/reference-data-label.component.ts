@@ -24,12 +24,12 @@ export class ReferenceDataLabelComponent {
             category.entries,
             (entry) => {
               return hasObjects ?
-                !_.isEmpty(_.find(entriesIds as {id: any}[], {id: entry.id})) :
+                !_.isEmpty(_.find(entriesIds as { id: any }[], { id: entry.id })) :
                 (_.indexOf(entriesIds as any[], entry.id) > -1);
             }
           );
         } else {
-          entries = _.find(category.entries, {id: entriesIds as string});
+          entries = _.find(category.entries, { id: entriesIds as string });
         }
 
         if (

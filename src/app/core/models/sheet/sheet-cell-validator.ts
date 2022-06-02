@@ -17,9 +17,9 @@ export class SheetCellValidator {
   };
 
   /**
-     * Merge multiple validations into a single function respecting the format that 'handsontable' expects
-     * @param validationTypes
-     */
+   * Merge multiple validations into a single function respecting the format that 'handsontable' expects
+   * @param validationTypes
+   */
   static mergeValidations(
     validationTypes: SheetCellValidationType[],
     sheetColumn: any
@@ -66,10 +66,10 @@ export class SheetCellValidator {
   }
 
   /**
-     * Get the validation function for a given type
-     * Note: Each function must respect the format expected by 'handsontable'
-     * @param validationType
-     */
+   * Get the validation function for a given type
+   * Note: Each function must respect the format expected by 'handsontable'
+   * @param validationType
+   */
   static getValidation(
     validationType: SheetCellValidationType
   ): (value: any, callback: (boolean) => void, sheetColumn: any) => void {
@@ -85,8 +85,8 @@ export class SheetCellValidator {
           callback(
             _.isEmpty(value) || (
               moment(value, Constants.DEFAULT_DATE_DISPLAY_FORMAT).isValid() &&
-                            (sheetColumn.min ? sheetColumn.min.isSameOrBefore(moment(value, Constants.DEFAULT_DATE_DISPLAY_FORMAT)) : true) &&
-                            (sheetColumn.max ? sheetColumn.max.isSameOrAfter(moment(value, Constants.DEFAULT_DATE_DISPLAY_FORMAT)) : true)
+              (sheetColumn.min ? sheetColumn.min.isSameOrBefore(moment(value, Constants.DEFAULT_DATE_DISPLAY_FORMAT)) : true) &&
+              (sheetColumn.max ? sheetColumn.max.isSameOrAfter(moment(value, Constants.DEFAULT_DATE_DISPLAY_FORMAT)) : true)
             )
           );
         };
@@ -113,7 +113,7 @@ export class SheetCellValidator {
           const next = (isValid: boolean) => {
             if (
               !isValid ||
-                            index >= sheetColumn.asyncValidators.length
+              index >= sheetColumn.asyncValidators.length
             ) {
               return callback(isValid);
             }
@@ -135,7 +135,7 @@ export class SheetCellValidator {
           // empty string is handled by required validator
           if (
             _.isEmpty(value) &&
-                        !_.isNumber(value)
+            !_.isNumber(value)
           ) {
             callback(true);
           } else {
@@ -145,10 +145,10 @@ export class SheetCellValidator {
                 _.isNumber(value)
             ) && (
               sheetColumn.min === undefined ||
-                                value >= sheetColumn.min
+              value >= sheetColumn.min
             ) && (
               sheetColumn.max === undefined ||
-                                value <= sheetColumn.max
+              value <= sheetColumn.max
             )
             );
           }

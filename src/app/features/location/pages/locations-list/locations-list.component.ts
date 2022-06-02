@@ -1,407 +1,767 @@
-import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { LocationModel } from '../../../../core/models/location.model';
-import { Observable } from 'rxjs';
-import { LocationDataService } from '../../../../core/services/data/location.data.service';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
-import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import * as _ from 'lodash';
-import { ErrorCodes } from '../../../../core/enums/error-codes.enum';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { FormLocationDropdownComponent, LocationAutoItem } from '../../../../shared/components/form-location-dropdown/form-location-dropdown.component';
-import { catchError, share, tap } from 'rxjs/operators';
-import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import { RequestFilter } from '../../../../core/helperClasses/request-query-builder';
 import { throwError } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { ErrorCodes } from '../../../../core/enums/error-codes.enum';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { RequestFilter } from '../../../../core/helperClasses/request-query-builder';
 import { moment } from '../../../../core/helperClasses/x-moment';
-import { UserDataService } from '../../../../core/services/data/user.data.service';
-import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { LocationModel } from '../../../../core/models/location.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { LocationDataService } from '../../../../core/services/data/location.data.service';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { ExportDataExtension } from '../../../../core/services/helper/dialog.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2FilterText, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-location.model';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleLocation, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 
 @Component({
   selector: 'app-locations-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './locations-list.component.html',
-  styleUrls: ['./locations-list.component.less']
+  templateUrl: './locations-list.component.html'
 })
-export class LocationsListComponent extends ListComponent implements OnInit, OnDestroy {
-  // breadcrumb header
-  public breadcrumbs: BreadcrumbItemModel[] =  [
-    new BreadcrumbItemModel(
-      'LNG_PAGE_LIST_LOCATIONS_TITLE',
-      '/locations'
-    )
-  ];
-
-  // constants
-  ExportDataExtension = ExportDataExtension;
-  LocationModel = LocationModel;
-
-  // user list
-  userList$: Observable<UserModel[]>;
-
+export class LocationsListComponent extends ListComponent<LocationModel> implements OnDestroy {
   // parent location ID
-  parentId: string;
+  private _parentId: string;
 
-  // list of existing locations
-  locationsList$: Observable<LocationModel[]>;
-  locationsListCount$: Observable<IBasicCount>;
-
-  yesNoOptionsList$: Observable<any[]>;
-
-  // authenticated user
-  authUser: UserModel;
-  UserSettings = UserSettings;
-
-  @ViewChild('locationFilter', { static: true }) locationFilter: FormLocationDropdownComponent;
-
-  // export
-  hierarchicalLocationsDataExportFileName: string = moment().format('YYYY-MM-DD');
-
-  geographicalLevelsList$: Observable<any[]>;
-
-  recordActions: HoverRowAction[] = [
-    // View Location
-    new HoverRowAction({
-      icon: 'visibility',
-      iconTooltip: 'LNG_PAGE_LIST_LOCATIONS_ACTION_VIEW_LOCATION',
-      linkGenerator: (item: LocationModel): string[] => {
-        return ['/locations', item.id, 'view'];
-      },
-      visible: (): boolean => {
-        return LocationModel.canView(this.authUser);
-      }
-    }),
-
-    // Modify Location
-    new HoverRowAction({
-      icon: 'settings',
-      iconTooltip: 'LNG_PAGE_LIST_LOCATIONS_ACTION_MODIFY_LOCATION',
-      linkGenerator: (item: LocationModel): string[] => {
-        return ['/locations', item.id, 'modify'];
-      },
-      visible: (): boolean => {
-        return LocationModel.canModify(this.authUser);
-      }
-    }),
-
-    // View Location Children
-    new HoverRowAction({
-      icon: 'groupWork',
-      iconTooltip: 'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN',
-      click: (item: LocationModel) => {
-        this.router.navigate(['/locations', item.id, 'children']);
-      }
-    }),
-
-    // Other actions
-    new HoverRowAction({
-      type: HoverRowActionType.MENU,
-      icon: 'moreVertical',
-      menuOptions: [
-        // Delete Location
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_LOCATION',
-          click: (item: LocationModel) => {
-            this.deleteLocation(item);
-          },
-          visible: (): boolean => {
-            return LocationModel.canDelete(this.authUser);
-          },
-          class: 'mat-menu-item-delete'
-        }),
-
-        // Divider
-        new HoverRowAction({
-          type: HoverRowActionType.DIVIDER,
-          visible: (): boolean => {
-            // visible only if at least one of the previous...
-            return LocationModel.canDelete(this.authUser);
-          }
-        }),
-
-        // See Location usage
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_LOCATIONS_ACTION_USAGE',
-          click: (item: LocationModel) => {
-            this.router.navigate(['/locations', item.id, 'usage']);
-          },
-          visible: (): boolean => {
-            return LocationModel.canListUsage(this.authUser);
-          }
-        })
-      ]
-    })
-  ];
+  // parent tree
+  private _parentLocationTree: HierarchicalLocationModel;
+  pageTitle: string;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
-    private authDataService: AuthDataService,
     private locationDataService: LocationDataService,
-    private genericDataService: GenericDataService,
-    private route: ActivatedRoute,
-    private dialogService: DialogService,
-    private snackbarService: SnackbarService,
+    private activatedRoute: ActivatedRoute,
+    private toastV2Service: ToastV2Service,
     private router: Router,
     private i18nService: I18nService,
-    private referenceDataDataService: ReferenceDataDataService,
-    private userDataService: UserDataService
+    private dialogV2Service: DialogV2Service
   ) {
     super(
       listHelperService,
       true
     );
+
+    // get data
+    this._parentId = this.activatedRoute.snapshot.params.parentId;
+    this._parentLocationTree = this.activatedRoute.snapshot.data.parentLocationTree;
   }
 
   /**
-     * Component initialized
-     */
-  ngOnInit() {
-    // add page title
-    this.hierarchicalLocationsDataExportFileName = `${this.i18nService.instant('LNG_PAGE_LIST_LOCATIONS_TITLE')} - ${this.hierarchicalLocationsDataExportFileName}`;
-
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
-    // retrieve users
-    this.userList$ = this.userDataService.getUsersListSorted().pipe(share());
-
-    // lists
-    this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
-
-    // geographical level list
-    this.geographicalLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL);
-
-    // reload data
-    this.route.params
-      .subscribe((params: { parentId }) => {
-        // set parent
-        this.parentId = params.parentId;
-
-        // initialize pagination
-        this.initPaginator();
-        // ...and re-load the list when parent location is changed
-        this.needsRefreshList(true);
-      });
-
-    // initialize side table columns
-    this.initializeSideTableColumns();
-  }
-
-  /**
-     * Release resources
-     */
+   * Release resources
+   */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
-     * Initialize Side Table Columns
-     */
-  initializeSideTableColumns() {
+   * Component initialized
+   */
+  initialized(): void {
+    // initialize pagination
+    this.initPaginator();
+
+    // ...and re-load the list when the Selected Outbreak is changed
+    this.needsRefreshList(true);
+  }
+
+  /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns() {
     // default table columns
     this.tableColumns = [
-      new VisibleColumnModel({
+      {
         field: 'name',
-        label: 'LNG_LOCATION_FIELD_LABEL_NAME'
-      }),
-      new VisibleColumnModel({
+        label: 'LNG_LOCATION_FIELD_LABEL_NAME',
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
         field: 'synonyms',
-        label: 'LNG_LOCATION_FIELD_LABEL_SYNONYMS'
-      }),
-      new VisibleColumnModel({
-        field: 'identifiers',
-        label: 'LNG_LOCATION_FIELD_LABEL_IDENTIFIERS'
-      }),
-      new VisibleColumnModel({
+        label: 'LNG_LOCATION_FIELD_LABEL_SYNONYMS',
+        format: {
+          type: 'synonymsAsString'
+        },
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'identifiersAsString',
+        label: 'LNG_LOCATION_FIELD_LABEL_IDENTIFIERS',
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH,
+          search: (column: IV2Column) => {
+            // value
+            const value: string = (column.filter as IV2FilterText).value;
+
+            // remove previous condition
+            this.queryBuilder.filter.remove('identifiers');
+            if (!_.isEmpty(value)) {
+              // add new condition
+              this.queryBuilder.filter.where({
+                identifiers: {
+                  elemMatch: {
+                    code: {
+                      $regex: RequestFilter.escapeStringForRegex(value)
+                        .replace(/%/g, '.*')
+                        .replace(/\\\?/g, '.'),
+                      $options: 'i'
+                    }
+                  }
+                }
+              });
+            }
+
+            // refresh list
+            this.needsRefreshList();
+          }
+        }
+      },
+      {
         field: 'latLng',
-        label: 'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION'
-      }),
-      new VisibleColumnModel({
+        label: 'LNG_LOCATION_FIELD_LABEL_GEO_LOCATION',
+        format: {
+          type: (item: LocationModel) => item.geoLocation && item.geoLocation.lat ?
+            item.geoLocation.lat + ', ' + item.geoLocation.lng :
+            ''
+        }
+      },
+      {
         field: 'active',
-        label: 'LNG_LOCATION_FIELD_LABEL_ACTIVE'
-      }),
-      new VisibleColumnModel({
+        label: 'LNG_LOCATION_FIELD_LABEL_ACTIVE',
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      },
+      {
         field: 'populationDensity',
-        label: 'LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY'
-      }),
-      new VisibleColumnModel({
+        label: 'LNG_LOCATION_FIELD_LABEL_POPULATION_DENSITY',
+        sortable: true,
+        filter: {
+          type: V2FilterType.NUMBER_RANGE
+        }
+      },
+      {
         field: 'geographicalLevelId',
-        label: 'LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL'
-      }),
-      new VisibleColumnModel({
+        label: 'LNG_LOCATION_FIELD_LABEL_GEOGRAPHICAL_LEVEL',
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.geographicalLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        }
+      },
+      {
         field: 'createdBy',
         label: 'LNG_LOCATION_FIELD_LABEL_CREATED_BY',
-        visible: false
-      }),
-      new VisibleColumnModel({
+        notVisible: true,
+        format: {
+          type: (item) => item.createdBy && this.activatedRoute.snapshot.data.user.map[item.createdBy] ?
+            this.activatedRoute.snapshot.data.user.map[item.createdBy].name :
+            ''
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        exclude: (): boolean => {
+          return !UserModel.canView(this.authUser);
+        },
+        link: (data) => {
+          return data.createdBy ?
+            `/users/${ data.createdBy }/view` :
+            undefined;
+        }
+      },
+      {
         field: 'createdAt',
         label: 'LNG_LOCATION_FIELD_LABEL_CREATED_AT',
-        visible: false
-      }),
-      new VisibleColumnModel({
+        notVisible: true,
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
         field: 'updatedBy',
         label: 'LNG_LOCATION_FIELD_LABEL_UPDATED_BY',
-        visible: false
-      }),
-      new VisibleColumnModel({
+        notVisible: true,
+        format: {
+          type: (item) => item.updatedBy && this.activatedRoute.snapshot.data.user.map[item.updatedBy] ?
+            this.activatedRoute.snapshot.data.user.map[item.updatedBy].name :
+            ''
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        exclude: (): boolean => {
+          return !UserModel.canView(this.authUser);
+        },
+        link: (data) => {
+          return data.updatedBy ?
+            `/users/${ data.updatedBy }/view` :
+            undefined;
+        }
+      },
+      {
         field: 'updatedAt',
         label: 'LNG_LOCATION_FIELD_LABEL_UPDATED_AT',
-        visible: false
-      })
+        notVisible: true,
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+
+      // actions
+      {
+        field: 'actions',
+        label: 'LNG_COMMON_LABEL_ACTIONS',
+        pinned: IV2ColumnPinned.RIGHT,
+        notResizable: true,
+        cssCellClass: 'gd-cell-no-focus',
+        format: {
+          type: V2ColumnFormat.ACTIONS
+        },
+        actions: [
+          // View Location
+          {
+            type: V2ActionType.ICON,
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_LOCATIONS_ACTION_VIEW_LOCATION',
+            action: {
+              link: (item: LocationModel): string[] => {
+                return ['/locations', item.id, 'view'];
+              }
+            },
+            visible: (): boolean => {
+              return LocationModel.canView(this.authUser);
+            }
+          },
+
+          // Modify Location
+          {
+            type: V2ActionType.ICON,
+            icon: 'edit',
+            iconTooltip: 'LNG_PAGE_LIST_LOCATIONS_ACTION_MODIFY_LOCATION',
+            action: {
+              link: (item: LocationModel): string[] => {
+                return ['/locations', item.id, 'modify'];
+              }
+            },
+            visible: (): boolean => {
+              return LocationModel.canModify(this.authUser);
+            }
+          },
+
+          // View Location Children
+          {
+            type: V2ActionType.ICON,
+            icon: 'group_work',
+            iconTooltip: 'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN',
+            action: {
+              link: () => {
+                return ['/redirect'];
+              },
+              linkQueryParams: (item: LocationModel) => {
+                return {
+                  path: JSON.stringify(['/locations', item.id, 'children'])
+                };
+              }
+            }
+          },
+
+          // Other actions
+          {
+            type: V2ActionType.MENU,
+            icon: 'more_horiz',
+            menuOptions: [
+              // Delete Location
+              {
+                label: {
+                  get: () => 'LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_LOCATION'
+                },
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+                action: {
+                  click: (item: LocationModel): void => {
+                    // determine what we need to delete
+                    this.dialogV2Service.showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_DELETE',
+                          data: () => ({
+                            name: item.name
+                          })
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_LOCATION',
+                          data: () => ({
+                            name: item.name
+                          })
+                        }
+                      }
+                    }).subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // delete record
+                      this.locationDataService
+                        .deleteLocation(item.id)
+                        .pipe(
+                          catchError((err: {
+                            message: string,
+                            code: ErrorCodes,
+                            details: {
+                              id: string,
+                              model: string
+                            }
+                          }) => {
+                            // hide loading
+                            loading.close();
+
+                            // check if we have a model in use error
+                            if (err.code === ErrorCodes.MODEL_IN_USE) {
+                              this.dialogV2Service.showConfirmDialog({
+                                config: {
+                                  title: {
+                                    get: () => 'LNG_DIALOG_LIST_LOCATIONS_IN_USE_LOCATION_DIALOG_TITLE',
+                                    data: () => ({
+                                      name: item.name
+                                    })
+                                  },
+                                  message: {
+                                    get: () => 'LNG_DIALOG_CONFIRM_LOCATION_USED',
+                                    data: () => ({
+                                      name: item.name
+                                    })
+                                  }
+                                }
+                              }).subscribe((answer) => {
+                                // canceled ?
+                                if (answer.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                                  // finished
+                                  return;
+                                }
+
+                                // redirect to usage page where we can make changes
+                                this.router.navigate(['/locations', err.details.id, 'usage']);
+                              });
+                            } else {
+                              // show error
+                              this.toastV2Service.error(err);
+                            }
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          // success
+                          this.toastV2Service.success('LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                          // hide loading
+                          loading.close();
+
+                          // reload data
+                          this.needsRefreshList(true);
+                        });
+                    });
+                  }
+                },
+                visible: (): boolean => {
+                  return LocationModel.canDelete(this.authUser);
+                }
+              },
+
+              // Divider
+              {
+                visible: (): boolean => {
+                  // visible only if at least one of the previous...
+                  return LocationModel.canDelete(this.authUser);
+                }
+              },
+
+              // See Location usage
+              {
+                label: {
+                  get: () => 'LNG_PAGE_LIST_LOCATIONS_ACTION_USAGE'
+                },
+                action: {
+                  link: (item: LocationModel) => {
+                    return ['/locations', item.id, 'usage'];
+                  }
+                },
+                visible: (): boolean => {
+                  return LocationModel.canListUsage(this.authUser);
+                }
+              }
+            ]
+          }
+        ]
+      }
     ];
   }
 
   /**
-     * Re(load) the list of Locations
-     */
-  refreshList(finishCallback: (records: any[]) => void) {
-    // retrieve created user & modified user information
-    this.queryBuilder.include('createdByUser', true);
-    this.queryBuilder.include('updatedByUser', true);
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
 
+  /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
+   * Initialize table quick actions
+   */
+  protected initializeQuickActions(): void {
+    this.quickActions = {
+      type: V2ActionType.MENU,
+      label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
+      visible: (): boolean => {
+        return LocationModel.canView(this.authUser) || (
+          !this._parentId &&
+          !this.appliedListFilter &&
+          (
+            LocationModel.canExport(this.authUser) ||
+            LocationModel.canImport(this.authUser)
+          )
+        );
+      },
+      menuOptions: [
+        // Find location
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_LOCATIONS_ACTION_FIND_LOCATION'
+          },
+          action: {
+            click: () => {
+              this.dialogV2Service
+                .showSideDialog({
+                  title: {
+                    get: () => 'LNG_PAGE_LIST_LOCATIONS_ACTION_FIND_LOCATION'
+                  },
+                  hideInputFilter: true,
+                  inputs: [{
+                    type: V2SideDialogConfigInputType.LOCATION_SINGLE,
+                    name: 'locationId',
+                    placeholder: 'LNG_PAGE_LIST_LOCATIONS_ACTION_FIND_LOCATION',
+                    value: undefined,
+                    useOutbreakLocations: false,
+                    validators: {
+                      required: () => true
+                    }
+                  }],
+                  bottomButtons: [{
+                    type: IV2SideDialogConfigButtonType.OTHER,
+                    label: 'LNG_COMMON_BUTTON_VIEW',
+                    color: 'primary',
+                    disabled: (_data, handler): boolean => {
+                      return !handler.form || handler.form.invalid;
+                    }
+                  }, {
+                    type: IV2SideDialogConfigButtonType.CANCEL,
+                    label: 'LNG_COMMON_BUTTON_CANCEL',
+                    color: 'text'
+                  }]
+                })
+                .subscribe((response) => {
+                  // cancelled ?
+                  if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+                    // finished
+                    return;
+                  }
+
+                  // close dialog
+                  response.handler.hide();
+
+                  // redirect
+                  const locationId: string = (response.data.map.locationId as IV2SideDialogConfigInputSingleLocation).value;
+                  this.router.navigate(['/locations', locationId, 'view']);
+                });
+            }
+          },
+          visible: () => LocationModel.canView(this.authUser)
+        },
+
+        // Divider
+        {
+          visible: () => LocationModel.canView(this.authUser)
+        },
+
+        // Export hierarchical locations
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_LOCATIONS_EXPORT_BUTTON'
+          },
+          action: {
+            click: () => {
+              this.dialogV2Service
+                .showExportData({
+                  title: {
+                    get: () => 'LNG_PAGE_LIST_LOCATIONS_EXPORT_TITLE'
+                  },
+                  export: {
+                    url: 'locations/hierarchical/export',
+                    async: false,
+                    method: ExportDataMethod.GET,
+                    fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_LOCATIONS_TITLE') } - ${ moment().format('YYYY-MM-DD') }`,
+                    allow: {
+                      types: [ExportDataExtension.JSON]
+                    }
+                  }
+                });
+            }
+          },
+          visible: (): boolean => {
+            return !this._parentId &&
+              !this.appliedListFilter &&
+              LocationModel.canExport(this.authUser);
+          }
+        },
+
+        // Import hierarchical locations
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_LOCATIONS_IMPORT_HIERARCHICAL_BUTTON'
+          },
+          action: {
+            link: () => ['/import-export-data', 'hierarchical-locations', 'import']
+          },
+          visible: (): boolean => {
+            return !this._parentId &&
+              !this.appliedListFilter &&
+              LocationModel.canImport(this.authUser);
+          }
+        },
+
+        // Import locations
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_LOCATIONS_IMPORT_LOCATIONS_BUTTON'
+          },
+          action: {
+            link: () => ['/import-export-data', 'location-data', 'import']
+          },
+          visible: (): boolean => {
+            return !this._parentId &&
+              !this.appliedListFilter &&
+              LocationModel.canImport(this.authUser);
+          }
+        }
+      ]
+    };
+  }
+
+  /**
+   * Initialize table group actions
+   */
+  protected initializeGroupActions(): void {}
+
+  /**
+   * Initialize table add action
+   */
+  protected initializeAddAction(): void {
+    this.addAction = {
+      type: V2ActionType.ICON_LABEL,
+      label: 'LNG_COMMON_BUTTON_ADD',
+      icon: 'add_circle_outline',
+      action: {
+        link: (): string[] => this._parentId ?
+          ['/locations', this._parentId, 'create'] :
+          ['/locations', 'create']
+      },
+      visible: (): boolean => {
+        return LocationModel.canCreate(this.authUser);
+      }
+    };
+  }
+
+  /**
+   * Initialize table grouped data
+   */
+  protected initializeGroupedData(): void {}
+
+  /**
+   * Initialize breadcrumbs
+   */
+  protected initializeBreadcrumbs(): void {
+    // dashboard
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
+        }
+      }
+    ];
+
+    // list parents ?
+    this.pageTitle = 'LNG_PAGE_LIST_LOCATIONS_TITLE';
+    if (!this._parentLocationTree) {
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_LOCATIONS_TITLE',
+        action: null
+      });
+    } else {
+      // root
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_LOCATIONS_TITLE',
+        action: {
+          link: ['/locations']
+        }
+      });
+
+      // add tree
+      let tree: HierarchicalLocationModel = this._parentLocationTree;
+      while (tree) {
+        // add to list
+        if (tree.location?.id) {
+          // parent category ?
+          const isParent: boolean = !(tree.children?.length > 0);
+
+          // update page title
+          if (isParent) {
+            this.pageTitle = tree.location.name;
+          }
+
+          // add to list
+          this.breadcrumbs.push({
+            label: tree.location.name,
+            action: isParent ?
+              null :
+              {
+                link: ['/redirect'],
+                linkQueryParams: {
+                  path: JSON.stringify(['/locations', tree.location.id, 'children'])
+                }
+              }
+          });
+        }
+
+        // next
+        tree = tree.children?.length > 0 ?
+          tree.children[0] :
+          undefined;
+      }
+    }
+  }
+
+  /**
+   * Fields retrieved from api to reduce payload size
+   */
+  protected refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the list of Locations
+   */
+  refreshList() {
     // refresh
-    this.locationsList$ = this.locationDataService
+    this.records$ = this.locationDataService
       .getLocationsListByParent(
-        this.parentId,
-        this.queryBuilder,
-        true
+        this._parentId,
+        this.queryBuilder
       )
       .pipe(
-        catchError((err) => {
-          this.snackbarService.showApiError(err);
-          finishCallback([]);
-          return throwError(err);
-        }),
-        tap(this.checkEmptyList.bind(this)),
-        tap((data: any[]) => {
-          finishCallback(data);
-        })
+        // should be the last pipe
+        takeUntil(this.destroyed$)
       );
   }
 
   /**
-     * Get total number of items, based on the applied filters
-     */
-  refreshListCount() {
+   * Get total number of items, based on the applied filters
+   */
+  refreshListCount(applyHasMoreLimit?: boolean) {
+    // reset
+    this.pageCount = undefined;
+
+    // set apply value
+    if (applyHasMoreLimit !== undefined) {
+      this.applyHasMoreLimit = applyHasMoreLimit;
+    }
+
     // remove paginator from query builder
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
-    this.locationsListCount$ = this.locationDataService
-      .getLocationsCountByParent(this.parentId, countQueryBuilder)
+
+    // apply has more limit
+    if (this.applyHasMoreLimit) {
+      countQueryBuilder.flag(
+        'applyHasMoreLimit',
+        true
+      );
+    }
+
+    // count
+    this.locationDataService
+      .getLocationsCountByParent(
+        this._parentId,
+        countQueryBuilder
+      )
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         }),
-        share()
-      );
-  }
 
-  /**
-     * Delete location
-     */
-  deleteLocation(location: LocationModel) {
-    // show confirm dialog to confirm the action
-    this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_LOCATION', location)
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          // delete record
-          this.showLoadingDialog();
-          this.locationDataService
-            .deleteLocation(location.id)
-            .pipe(
-              catchError((err: {
-                message: string,
-                code: ErrorCodes,
-                details: {
-                  id: string,
-                  model: string
-                }
-              }) => {
-                // check if we have a model in use error
-                this.closeLoadingDialog();
-                if (err.code === ErrorCodes.MODEL_IN_USE) {
-                  this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_LOCATION_USED', location)
-                    .subscribe((answerC: DialogAnswer) => {
-                      if (answerC.button === DialogAnswerButton.Yes) {
-                        // redirect to usage page where we can make changes
-                        this.router.navigate(['/locations', err.details.id, 'usage']);
-                      }
-                    });
-                } else {
-                  this.snackbarService.showApiError(err);
-                }
-
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_SUCCESS_MESSAGE');
-
-              // reset location cache after deleting a location
-              FormLocationDropdownComponent.CACHE = {};
-
-              // hide loading
-              this.closeLoadingDialog();
-
-              // reload data
-              this.needsRefreshList(true);
-            });
-        }
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      )
+      .subscribe((response) => {
+        this.pageCount = response;
       });
-  }
-
-  /**
-     * Search location changed
-     * @param data
-     */
-  searchLocationChanged(data: LocationAutoItem) {
-    if (
-      data &&
-            data.id
-    ) {
-      // redirect
-      this.locationFilter.clear();
-      this.router.navigate(['/locations', data.id, 'children']);
-    }
-  }
-
-  filterByIdentifierCode(value: string) {
-    // remove previous condition
-    this.queryBuilder.filter.remove('identifiers');
-
-    if (!_.isEmpty(value)) {
-      // add new condition
-      this.queryBuilder.filter.where({
-        identifiers: {
-          elemMatch: {
-            code: {
-              $regex: RequestFilter.escapeStringForRegex(value)
-                .replace(/%/g, '.*')
-                .replace(/\\\?/g, '.'),
-              $options: 'i'
-            }
-          }
-        }
-      });
-    }
-
-    // refresh list
-    this.needsRefreshList();
   }
 }

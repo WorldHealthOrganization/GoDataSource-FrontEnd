@@ -4,6 +4,9 @@ import { PERMISSION } from '../../core/models/permission.model';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 
 import * as fromPages from './pages';
+import { Constants } from '../../core/models/constants';
+import { SavedImportMappingDataResolver } from '../../core/services/resolvers/data/saved-import-mapping.resolver';
+import { SelectedLanguageDataResolver } from '../../core/services/resolvers/data/selected-language.resolver';
 
 const routes: Routes = [
   // Import locations
@@ -14,7 +17,11 @@ const routes: Routes = [
     data: {
       permissions: [
         PERMISSION.LOCATION_IMPORT
-      ]
+      ],
+      savedImportPage: Constants.APP_IMPORT_PAGE.LOCATION_DATA.value
+    },
+    resolve: {
+      savedImportMapping: SavedImportMappingDataResolver
     }
   },
   // Import hierarchical locations
@@ -38,6 +45,9 @@ const routes: Routes = [
       permissions: [
         PERMISSION.LANGUAGE_IMPORT_TOKENS
       ]
+    },
+    resolve: {
+      language: SelectedLanguageDataResolver
     }
   },
 
@@ -49,7 +59,11 @@ const routes: Routes = [
     data: {
       permissions: [
         PERMISSION.REFERENCE_DATA_IMPORT
-      ]
+      ],
+      savedImportPage: Constants.APP_IMPORT_PAGE.REFERENCE_DATA.value
+    },
+    resolve: {
+      savedImportMapping: SavedImportMappingDataResolver
     }
   },
 
@@ -61,7 +75,11 @@ const routes: Routes = [
     data: {
       permissions: [
         PERMISSION.CASE_IMPORT
-      ]
+      ],
+      savedImportPage: Constants.APP_IMPORT_PAGE.CASE.value
+    },
+    resolve: {
+      savedImportMapping: SavedImportMappingDataResolver
     }
   },
 
@@ -73,7 +91,11 @@ const routes: Routes = [
     data: {
       permissions: [
         PERMISSION.EVENT_IMPORT
-      ]
+      ],
+      savedImportPage: Constants.APP_IMPORT_PAGE.EVENT.value
+    },
+    resolve: {
+      savedImportMapping: SavedImportMappingDataResolver
     }
   },
 
@@ -85,7 +107,11 @@ const routes: Routes = [
     data: {
       permissions: [
         PERMISSION.CASE_IMPORT_LAB_RESULT
-      ]
+      ],
+      savedImportPage: Constants.APP_IMPORT_PAGE.CASE_LAB_DATA.value
+    },
+    resolve: {
+      savedImportMapping: SavedImportMappingDataResolver
     }
   },
 
@@ -97,7 +123,11 @@ const routes: Routes = [
     data: {
       permissions: [
         PERMISSION.CONTACT_IMPORT
-      ]
+      ],
+      savedImportPage: Constants.APP_IMPORT_PAGE.CONTACT.value
+    },
+    resolve: {
+      savedImportMapping: SavedImportMappingDataResolver
     }
   },
 
@@ -109,7 +139,11 @@ const routes: Routes = [
     data: {
       permissions: [
         PERMISSION.CONTACT_OF_CONTACT_IMPORT
-      ]
+      ],
+      savedImportPage: Constants.APP_IMPORT_PAGE.CONTACT_OF_CONTACT.value
+    },
+    resolve: {
+      savedImportMapping: SavedImportMappingDataResolver
     }
   },
 
@@ -121,7 +155,11 @@ const routes: Routes = [
     data: {
       permissions: [
         PERMISSION.CONTACT_IMPORT_LAB_RESULT
-      ]
+      ],
+      savedImportPage: Constants.APP_IMPORT_PAGE.CONTACT_LAB_DATA.value
+    },
+    resolve: {
+      savedImportMapping: SavedImportMappingDataResolver
     }
   },
 
@@ -145,7 +183,11 @@ const routes: Routes = [
     data: {
       permissions: [
         PERMISSION.OUTBREAK_IMPORT_RELATIONSHIP
-      ]
+      ],
+      savedImportPage: Constants.APP_IMPORT_PAGE.RELATIONSHIP_DATA.value
+    },
+    resolve: {
+      savedImportMapping: SavedImportMappingDataResolver
     }
   }
 ];

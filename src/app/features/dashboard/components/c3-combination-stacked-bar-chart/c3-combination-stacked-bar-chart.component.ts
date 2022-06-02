@@ -102,7 +102,7 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
         columns: this.chartData,
         type: 'bar',
         types: {
-          [this.lineData]: 'spline',
+          [this.lineData]: 'spline'
         },
         groups: [
           this.chartDataColumns
@@ -165,7 +165,7 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
       legend: {
         item: {
           // disable click on legend
-          onclick: function () {
+          onclick: function() {
             return false;
           }
         }

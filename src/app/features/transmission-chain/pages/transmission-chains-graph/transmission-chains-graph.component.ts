@@ -1,16 +1,8 @@
-import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { Constants } from '../../../../core/models/constants';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ActivatedRoute } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
-import { TransmissionChainsDashletComponent } from '../../components/transmission-chains-dashlet/transmission-chains-dashlet.component';
-import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswer, DialogAnswerButton, LoadingDialogModel, ViewCotEdgeDialogComponent, ViewCotNodeDialogComponent } from '../../../../shared/components';
-import { DialogConfiguration, DialogField } from '../../../../shared/components/dialog/dialog.component';
 import { GraphNodeModel } from '../../../../core/models/graph-node.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
@@ -24,19 +16,16 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { SelectedNodes } from '../../classes/selected-nodes';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { UserModel } from '../../../../core/models/user.model';
-import * as FileSaver from 'file-saver';
-import { DomService } from '../../../../core/services/helper/dom.service';
 import { GraphEdgeModel } from '../../../../core/models/graph-edge.model';
 import * as _ from 'lodash';
 import { catchError, switchMap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
-import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 
 enum NodeAction {
   MODIFY_PERSON = 'modify-person',
@@ -52,13 +41,6 @@ enum NodeAction {
   styleUrls: ['./transmission-chains-graph.component.less']
 })
 export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
-  // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE', null, true)
-  ];
-
-  @ViewChild(TransmissionChainsDashletComponent, { static: true }) cotDashletChild;
-
   outbreakSubscriber: Subscription;
 
   // authenticated user
@@ -66,7 +48,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   // selected outbreak
   selectedOutbreak: OutbreakModel;
   // filter used for size of chains
-  sizeOfChainsFilter: number = null;
+  sizeOfChainsFilter: string | number = null;
   // person Id - to filter the chain
   personId: string = null;
   // snapshot Id, showPersonContacts, showPersonContactsOfContacts - to filter the chains
@@ -93,33 +75,26 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   newRelationship = new RelationshipModel();
   // new contact model
   newContact = new ContactModel();
-  // do architecture is x32?
-  x86Architecture: boolean = false;
 
   // provide constants to template
   Constants = Constants;
   EntityType = EntityType;
   NodeAction = NodeAction;
-  TransmissionChainModel = TransmissionChainModel;
 
   /**
      * Constructor
      */
   constructor(
     private authDataService: AuthDataService,
-    protected snackbarService: SnackbarService,
+    protected toastV2Service: ToastV2Service,
     protected route: ActivatedRoute,
-    private importExportDataService: ImportExportDataService,
-    private i18nService: I18nService,
-    private dialogService: DialogService = null,
     private entityDataService: EntityDataService,
     private outbreakDataService: OutbreakDataService,
     private formHelper: FormHelperService,
     private relationshipDataService: RelationshipDataService,
     private contactDataService: ContactDataService,
     private contactsOfContactsDataService: ContactsOfContactsDataService,
-    private domService: DomService,
-    private systemSettingsDataService: SystemSettingsDataService
+    private dialogV2Service: DialogV2Service
   ) {}
 
   /**
@@ -171,15 +146,6 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
       .subscribe((selectedOutbreak: OutbreakModel) => {
         this.selectedOutbreak = selectedOutbreak;
       });
-
-    // check if platform architecture is x32
-    this.systemSettingsDataService
-      .getAPIVersion()
-      .subscribe((versionData: SystemSettingsVersionModel) => {
-        if (versionData.arch === Constants.PLATFORM_ARCH.X86) {
-          this.x86Architecture = true;
-        }
-      });
   }
 
   /**
@@ -190,110 +156,6 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     if (this.outbreakSubscriber) {
       this.outbreakSubscriber.unsubscribe();
       this.outbreakSubscriber = null;
-    }
-  }
-
-  /**
-     * Determine export button text depends on what type transmission chain is
-     * @returns {string|string}
-     */
-  get buttonText() {
-    return this.cotDashletChild.transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value ?
-      'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT' :
-      'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_EXPORT';
-  }
-  /**
-     *Export visualized map/graph seen in page
-     */
-  exportVisualizedMapOrGraph() {
-    if (this.cotDashletChild.transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value) {
-      this.exportChainsOfTransmission();
-    } else {
-      this.exportGeospatialMap();
-    }
-  }
-
-  /**
-     * Export chains of transmission as pdf
-     */
-  exportChainsOfTransmission() {
-    // open dialog to choose the split factor
-    this.dialogService.showInput(
-      new DialogConfiguration({
-        message: 'LNG_DIALOG_CONFIRM_EXPORT_CHAINS_OF_TRANSMISSION',
-        additionalInfo: 'LNG_DIALOG_EXPORT_CHAIN_OF_TRANSMISSION_SCALE_INFO',
-        yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_YES',
-        required: true,
-        fieldsList: [new DialogField({
-          name: 'splitFactor',
-          placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT_SPLIT_FACTOR',
-          required: true,
-          type: 'number',
-          value: 1,
-          min: 1,
-          max: 15
-        })],
-      }), true)
-      .subscribe((answer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          const loadingDialog = this.dialogService.showLoadingDialog();
-
-          // get the chosen split factor
-          const splitFactor = answer.inputValue.value.splitFactor;
-
-          // get the base64 png
-          let pngBase64 = this.cotDashletChild.getPng64(splitFactor);
-
-          // check that png was generated
-          if (!pngBase64) {
-            // display error
-            this.snackbarService.showNotice('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT_NOTHING_TO_EXPORT');
-            loadingDialog.close();
-            return;
-          }
-
-          // format
-          pngBase64 = pngBase64.replace('data:image/png;base64,', '');
-
-          // call the api for the pdf
-          this.importExportDataService.exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: Number(splitFactor)})
-            .pipe(
-              catchError((err) => {
-                this.snackbarService.showApiError(err);
-                loadingDialog.close();
-                return throwError(err);
-              })
-            )
-            .subscribe((blob) => {
-              const fileName = this.i18nService.instant('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE');
-              FileSaver.saveAs(
-                blob,
-                `${fileName}.pdf`
-              );
-              loadingDialog.close();
-            });
-        }
-      });
-  }
-
-  /**
-     * Export geospatial map
-     */
-  exportGeospatialMap() {
-    if (this.cotDashletChild.worldMap) {
-      const loadingDialog = this.dialogService.showLoadingDialog();
-      this.cotDashletChild.worldMap
-        .printToBlob()
-        .subscribe((blob) => {
-          const fileName = this.i18nService.instant('LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_TITLE');
-          FileSaver.saveAs(
-            blob,
-            `${fileName}.png`
-          );
-          loadingDialog.close();
-        });
-    } else {
-      this.snackbarService.showNotice('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT_NOTHING_TO_EXPORT');
     }
   }
 
@@ -317,158 +179,162 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     // not really of expected format ?
     if (
       !entity ||
-            !entity.type
+      !entity.type
     ) {
       return;
     }
 
     // retrieve entity info
-    const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
-    this.entityDataService
-      .getEntity(entity.type, this.selectedOutbreak.id, entity.id)
-      .pipe(
-        catchError((err) => {
-          this.snackbarService.showApiError(err);
-          loadingDialog.close();
-          return throwError(err);
-        })
-      )
-      .subscribe((entityData: CaseModel | EventModel | ContactModel | ContactOfContactModel) => {
-        if (entityData.type !== EntityType.CONTACT_OF_CONTACT) {
-          this.entityDataService
-            .checkEntityRelationshipsCount(
-              this.selectedOutbreak.id,
-              entityData.type,
-              entityData.id
-            )
-            .pipe(
-              catchError((err) => {
-                this.snackbarService.showApiError(err);
-                loadingDialog.close();
-                return throwError(err);
-              })
-            )
-            .subscribe((relationshipCount: { count: number }) => {
-              // set the flag for displaying personal chain of transmission link
-              this.displayPersonChainOfTransmissionLink = relationshipCount.count > 0;
-
-              // hide loading dialog
-              loadingDialog.close();
-
-              if (this.editMode) {
-                this.selectedRelationship = undefined;
-                // add node to selected persons list
-                this.selectedNodes.addNode(entityData);
-
-                // check if we can swap nodes
-                this.canSwapRelationshipPersons = this.canSwapSelectedNodes();
-
-                // focus boxes
-                setTimeout(() => {
-                  this.domService.scrollItemIntoView(
-                    '.selected-node-details'
-                  );
-                });
-              } else {
-                // show node information
-                this.dialogService.showCustomDialog(
-                  ViewCotNodeDialogComponent,
-                  {
-                    ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
-                    ...{
-                      data: {
-                        entity: entityData,
-                        displayPersonalCotLink: this.displayPersonChainOfTransmissionLink,
-                        snapshotId: this.cotDashletChild.selectedSnapshot,
-                        showPersonContacts: this.cotDashletChild.showContacts,
-                        showPersonContactsOfContacts: this.cotDashletChild.showContactsOfContacts
-                      }
-                    }
-                  }
-                );
-              }
-            });
-        } else {
-          // hide loading dialog
-          loadingDialog.close();
-
-          // reset relationship swap persons
-          this.canSwapRelationshipPersons = false;
-
-          if (this.editMode) {
-            this.selectedRelationship = undefined;
-            // add node to selected persons list
-            this.selectedNodes.addNode(entityData);
-
-            // focus boxes
-            setTimeout(() => {
-              this.domService.scrollItemIntoView(
-                '.selected-node-details'
-              );
-            });
-          } else {
-            // show node information
-            this.dialogService.showCustomDialog(
-              ViewCotNodeDialogComponent,
-              {
-                ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
-                ...{
-                  data: {
-                    entity: entityData
-                  }
-                }
-              }
-            );
-          }
-        }
-      });
+    this.dialogV2Service.showLoadingDialog();
+    // #TODO
+    // const loadingDialog = this.dialogV2Service.showLoadingDialog();
+    // this.entityDataService
+    //   .getEntity(entity.type, this.selectedOutbreak.id, entity.id)
+    //   .pipe(
+    //     catchError((err) => {
+    //       this.toastV2Service.error(err);
+    //       loadingDialog.close();
+    //       return throwError(err);
+    //     })
+    //   )
+    //   .subscribe((entityData: CaseModel | EventModel | ContactModel | ContactOfContactModel) => {
+    //     if (entityData.type !== EntityType.CONTACT_OF_CONTACT) {
+    //       this.entityDataService
+    //         .checkEntityRelationshipsCount(
+    //           this.selectedOutbreak.id,
+    //           entityData.type,
+    //           entityData.id
+    //         )
+    //         .pipe(
+    //           catchError((err) => {
+    //             this.toastV2Service.error(err);
+    //             loadingDialog.close();
+    //             return throwError(err);
+    //           })
+    //         )
+    //         .subscribe((relationshipCount: { count: number }) => {
+    //           // set the flag for displaying personal chain of transmission link
+    //           this.displayPersonChainOfTransmissionLink = relationshipCount.count > 0;
+    //
+    //           // hide loading dialog
+    //           loadingDialog.close();
+    //
+    //           if (this.editMode) {
+    //             this.selectedRelationship = undefined;
+    //             // add node to selected persons list
+    //             this.selectedNodes.addNode(entityData);
+    //
+    //             // check if we can swap nodes
+    //             this.canSwapRelationshipPersons = this.canSwapSelectedNodes();
+    //
+    //             // focus boxes
+    //             setTimeout(() => {
+    //               this.domService.scrollItemIntoView(
+    //                 '.selected-node-details'
+    //               );
+    //             });
+    //           } else {
+    //             // show node information
+    //             this.dialogService.showCustomDialog(
+    //               ViewCotNodeDialogComponent,
+    //               {
+    //                 ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
+    //                 ...{
+    //                   data: {
+    //                     entity: entityData,
+    //                     displayPersonalCotLink: this.displayPersonChainOfTransmissionLink,
+    //                     snapshotId: this.cotDashletChild.selectedSnapshot,
+    //                     showPersonContacts: this.cotDashletChild.showContacts,
+    //                     showPersonContactsOfContacts: this.cotDashletChild.showContactsOfContacts
+    //                   }
+    //                 }
+    //               }
+    //             );
+    //           }
+    //         });
+    //     } else {
+    //       // hide loading dialog
+    //       loadingDialog.close();
+    //
+    //       // reset relationship swap persons
+    //       this.canSwapRelationshipPersons = false;
+    //
+    //       if (this.editMode) {
+    //         this.selectedRelationship = undefined;
+    //         // add node to selected persons list
+    //         this.selectedNodes.addNode(entityData);
+    //
+    //         // focus boxes
+    //         setTimeout(() => {
+    //           this.domService.scrollItemIntoView(
+    //             '.selected-node-details'
+    //           );
+    //         });
+    //       } else {
+    //         // show node information
+    //         this.dialogService.showCustomDialog(
+    //           ViewCotNodeDialogComponent,
+    //           {
+    //             ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
+    //             ...{
+    //               data: {
+    //                 entity: entityData
+    //               }
+    //             }
+    //           }
+    //         );
+    //       }
+    //     }
+    //   });
   }
 
   /**
      * Edge tap / click
      */
-  onEdgeTap(relationship: GraphEdgeModel) {
+  onEdgeTap(_relationship: GraphEdgeModel) {
     // retrieve relationship info
-    const loadingDialog: LoadingDialogModel = this.dialogService.showLoadingDialog();
-    this.relationshipDataService
-      .getEntityRelationship(this.selectedOutbreak.id, relationship.sourceType, relationship.source, relationship.id)
-      .pipe(
-        catchError((err) => {
-          this.snackbarService.showApiError(err);
-          loadingDialog.close();
-          return throwError(err);
-        })
-      )
-      .subscribe((relationshipData) => {
-        // hide loading dialog
-        loadingDialog.close();
-
-        if (this.editMode) {
-          this.resetNodes();
-
-          this.selectedRelationship = relationshipData;
-
-          // focus box
-          setTimeout(() => {
-            this.domService.scrollItemIntoView(
-              '.selected-relationship-details'
-            );
-          });
-        } else {
-          // show edge information
-          this.dialogService.showCustomDialog(
-            ViewCotEdgeDialogComponent,
-            {
-              ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
-              ...{
-                data: {
-                  relationship: relationshipData
-                }
-              }
-            }
-          );
-        }
-      });
+    this.dialogV2Service.showLoadingDialog();
+    // #TODO
+    // const loadingDialog = this.dialogV2Service.showLoadingDialog();
+    // this.relationshipDataService
+    //   .getEntityRelationship(this.selectedOutbreak.id, relationship.sourceType, relationship.source, relationship.id)
+    //   .pipe(
+    //     catchError((err) => {
+    //       this.toastV2Service.error(err);
+    //       loadingDialog.close();
+    //       return throwError(err);
+    //     })
+    //   )
+    //   .subscribe((relationshipData) => {
+    //     // hide loading dialog
+    //     loadingDialog.close();
+    //
+    //     if (this.editMode) {
+    //       this.resetNodes();
+    //
+    //       this.selectedRelationship = relationshipData;
+    //
+    //       // focus box
+    //       setTimeout(() => {
+    //         this.domService.scrollItemIntoView(
+    //           '.selected-relationship-details'
+    //         );
+    //       });
+    //     } else {
+    //       // show edge information
+    //       this.dialogService.showCustomDialog(
+    //         ViewCotEdgeDialogComponent,
+    //         {
+    //           ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
+    //           ...{
+    //             data: {
+    //               relationship: relationshipData
+    //             }
+    //           }
+    //         }
+    //       );
+    //     }
+    //   });
   }
 
   removeSelectedNode(index) {
@@ -528,31 +394,32 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     );
   }
 
-  deleteSelectedPerson(person: (CaseModel | ContactModel | EventModel)) {
-    this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_CASE', {name: person.name})
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          // delete person
-          this.entityDataService
-            .deleteEntity(person.type, this.selectedOutbreak.id, person.id)
-            .pipe(
-              catchError((err) => {
-                this.snackbarService.showApiError(err);
-
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_DELETE_PERSON_SUCCESS_MESSAGE');
-
-              // reset form
-              this.resetFormModels();
-
-              // reset selected nodes
-              this.resetNodes();
-            });
-        }
-      });
+  deleteSelectedPerson(_person: (CaseModel | ContactModel | EventModel)) {
+    // #TODO
+    // this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_CASE', { name: person.name })
+    //   .subscribe((answer: DialogAnswer) => {
+    //     if (answer.button === DialogAnswerButton.Yes) {
+    //       // delete person
+    //       this.entityDataService
+    //         .deleteEntity(person.type, this.selectedOutbreak.id, person.id)
+    //         .pipe(
+    //           catchError((err) => {
+    //             this.toastV2Service.error(err);
+    //
+    //             return throwError(err);
+    //           })
+    //         )
+    //         .subscribe(() => {
+    //           this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_DELETE_PERSON_SUCCESS_MESSAGE');
+    //
+    //           // reset form
+    //           this.resetFormModels();
+    //
+    //           // reset selected nodes
+    //           this.resetNodes();
+    //         });
+    //     }
+    //   });
   }
 
   resetFormModels() {
@@ -594,12 +461,12 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
       )
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
-        this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE');
 
         // reset form
         this.resetFormModels();
@@ -652,7 +519,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             .pipe(
               catchError((err) => {
                 // display error message
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
 
                 // rollback - remove contact
                 this.contactDataService
@@ -665,12 +532,12 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             );
         }),
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
-        this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
 
         // reset form
         this.resetFormModels();
@@ -718,7 +585,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             .pipe(
               catchError((err) => {
                 // display error message
-                this.snackbarService.showApiError(err);
+                this.toastV2Service.error(err);
 
                 // rollback - remove contact
                 this.contactsOfContactsDataService
@@ -731,12 +598,12 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             );
         }),
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
-        this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_SUCCESS_MESSAGE');
 
         // reset form
         this.resetFormModels();
@@ -769,12 +636,12 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
       .modifyEntity(person.type, this.selectedOutbreak.id, person.id, dirtyFields)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
-        this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_SUCCESS_MESSAGE');
 
         // reset form
         this.resetFormModels();
@@ -810,13 +677,13 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
       )
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
 
           return throwError(err);
         })
       )
       .subscribe(() => {
-        this.snackbarService.showSuccess('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE');
 
         // reset selected relationship
         this.selectedRelationship = undefined;
@@ -836,36 +703,37 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
      * Delete selected relationship
      */
   deleteSelectedRelationship() {
-    this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP_CHAIN_OF_TRANSMISSION')
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          const sourcePerson = _.find(this.selectedRelationship.persons, person => person.source === true);
-          // delete relationship
-          this.relationshipDataService
-            .deleteRelationship(this.selectedOutbreak.id, sourcePerson.type, sourcePerson.id, this.selectedRelationship.id)
-            .pipe(
-              catchError((err) => {
-                this.snackbarService.showApiError(err);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
-
-              // reset selected relationship
-              this.selectedRelationship = undefined;
-
-              // reset form
-              this.resetFormModels();
-
-              // reset selected nodes
-              this.resetNodes();
-
-              // reset node action
-              this.currentNodeAction = null;
-            });
-        }
-      });
+    // #TODO
+    // this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP_CHAIN_OF_TRANSMISSION')
+    //   .subscribe((answer: DialogAnswer) => {
+    //     if (answer.button === DialogAnswerButton.Yes) {
+    //       const sourcePerson = _.find(this.selectedRelationship.persons, person => person.source === true);
+    //       // delete relationship
+    //       this.relationshipDataService
+    //         .deleteRelationship(this.selectedOutbreak.id, sourcePerson.type, sourcePerson.id, this.selectedRelationship.id)
+    //         .pipe(
+    //           catchError((err) => {
+    //             this.toastV2Service.error(err);
+    //             return throwError(err);
+    //           })
+    //         )
+    //         .subscribe(() => {
+    //           this.toastV2Service.success('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
+    //
+    //           // reset selected relationship
+    //           this.selectedRelationship = undefined;
+    //
+    //           // reset form
+    //           this.resetFormModels();
+    //
+    //           // reset selected nodes
+    //           this.resetNodes();
+    //
+    //           // reset node action
+    //           this.currentNodeAction = null;
+    //         });
+    //     }
+    //   });
   }
 
   /**

@@ -1,5 +1,4 @@
-<mat-card
-    class="page-section page-content"
+<div
     fxLayout="column">
 
     <!-- Uploading / Saving data -->
@@ -26,7 +25,7 @@
     <!-- Select / Upload file -->
     <div
         *ngIf="!displayLoading && !importableObject"
-        fxLayout="column" fxLayoutGap="12px"
+        fxLayout="column" fxLayoutGap="1.6rem"
         class="import-data">
         <div fxLayout="column">
             <input
@@ -38,13 +37,14 @@
                 [accept]="allowedExtensions"/>
 
             <div
-                fxLayout="row" fxLayoutAlign="center center"
+                fxLayout="column" fxLayoutAlign="center center"
                 class="import-data-drop-zone"
                 [class.import-data-file-over]="hasFileOver"
                 ng2FileDrop
                 [uploader]="uploader"
                 (fileOver)="hoverDropZone($event)"
                 (click)="importDataBtn.click()">
+                <mat-icon>upload_file</mat-icon>
                 {{ 'LNG_PAGE_IMPORT_DATA_LABEL_DRAG_AND_DROP_FILE_HERE' | translate:translationData }}
             </div>
         </div>
@@ -73,19 +73,18 @@
             </div>
         </div>
 
-        <div fxLayout="row">
-            <app-form-input
+        <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-between start">
+            <app-form-input-v2
                 name="decryptPassword"
                 [(ngModel)]="decryptPassword"
                 [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_DECRYPT_PASSWORD' | translate"
-                tooltip="LNG_PAGE_IMPORT_DATA_LABEL_DECRYPT_PASSWORD_DESTINATION">
-            </app-form-input>
-        </div>
+                tooltip="LNG_PAGE_IMPORT_DATA_LABEL_DECRYPT_PASSWORD_DESTINATION"
+                autocomplete="off">
+            </app-form-input-v2>
 
-        <div fxLayout="row" fxLayoutAlign="end">
             <button
-                mat-raised-button
-                color="accent"
+                mat-flat-button
+                color="primary"
                 [disabled]="!uploader || uploader.queue.length < 1"
                 (click)="uploadFile()"
                 type="button">
@@ -100,21 +99,20 @@
         fxLayout="column"
         class="import-data-map-fields">
         <div
-            fxLayout="row" fxLayoutGap="20px">
-            <app-form-select
+            fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-between start" fxLayoutGap="1.6rem" fxLayoutGap.xs="0">
+            <app-form-select-single-v2
                 *ngIf="savedImportPage"
                 name="loadImportMapping"
                 [ngModel]="loadedImportMapping?.id"
                 [placeholder]="'LNG_PAGE_IMPORT_DATA_LOAD_SAVED_IMPORT_MAPPING_LABEL' | translate"
-                [options]="savedMappingsList$ | async "
-                (optionChanged)="loadSavedImportMapping($event)"
-                optionLabelKey="name"
-                optionValueKey="id">
-            </app-form-select>
+                [options]="savedMappings?.options"
+                (ngModelChange)="loadSavedImportMapping($event)">
+            </app-form-select-single-v2>
 
             <!-- Number of columns mapped -->
             <div
-                fxFlex fxLayoutAlign="end center">
+                class="import-data-map-fields-counters"
+                fxLayout="row" fxLayout.xs="column" fxLayoutAlign="end center" fxLayoutAlign.xs="end start">
                 <span>
                     {{ 'LNG_PAGE_IMPORT_DATA_NO_FILE_COLUMN_MAPPED' | translate:notMappedTransData}}
                 </span>
@@ -131,6 +129,7 @@
         <!-- Mapped Data -->
         <div
             #mappedDataTable
+            class="import-data-table"
             fxLayout="column">
 
             <!-- Hover question effects / actions -->
@@ -156,13 +155,12 @@
                     <!-- Filter -->
                     <div
                         fxFlex>
-                        <app-form-input
+                        <app-form-input-v2
                             #filterBySourceInput="ngModel"
                             [ngModel]="filterBySourceInputValue"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="triggerFilterVisibleData()"
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+                            (ngModelChange)="triggerFilterVisibleData()">
+                        </app-form-input-v2>
                     </div>
 
                     <!-- Label -->
@@ -179,13 +177,12 @@
                     <!-- Filter -->
                     <div
                         fxFlex>
-                        <app-form-input
+                        <app-form-input-v2
                             #filterByDestinationInput="ngModel"
                             [ngModel]="filterByDestinationInputValue"
                             [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                            (optionChanged)="triggerFilterVisibleData()"
-                            [displayFilterIcon]="true">
-                        </app-form-input>
+                            (ngModelChange)="triggerFilterVisibleData()">
+                        </app-form-input-v2>
                     </div>
 
                     <!-- Label -->
@@ -216,9 +213,7 @@
 
                             <!-- details popover -->
                             <app-fancy-tooltip
-                                tooltip="LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX_DESCRIPTION"
-                                tooltipIcon="info"
-                                tooltipIconClasses="xt-icon-xsmall">
+                                tooltip="LNG_PAGE_IMPORT_DATA_LABEL_ARRAY_INDEX_DESCRIPTION">
                             </app-fancy-tooltip>
                         </div>
                     </div>
@@ -235,9 +230,7 @@
                         fxFlex>
                         <!-- details popover -->
                         <app-fancy-tooltip
-                            tooltip="LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_DESCRIPTION"
-                            tooltipIcon="info"
-                            tooltipIconClasses="xt-icon-xsmall">
+                            tooltip="LNG_PAGE_IMPORT_DATA_LABEL_MODEL_MAPPINGS_DESCRIPTION">
                         </app-fancy-tooltip>
                     </div>
                 </div>
@@ -246,8 +239,8 @@
                 <div
                     fxFlex="100px" fxLayoutAlign="start end">
                     <button
-                        mat-raised-button
-                        color="accent"
+                        mat-flat-button
+                        color="primary"
                         type="button"
                         [matTooltip]="'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD' | translate"
                         (click)="addNewFieldMap()">
@@ -298,13 +291,13 @@
                                 <!-- Source -->
                                 <div
                                     fxFlex="1 1" fxLayoutAlign="start end">
-                                    {{ item.sourceField ? item.sourceField : '-' }}
+                                    {{ item.sourceField ? item.sourceField : '—' }}
                                 </div>
 
                                 <!-- Destination -->
                                 <div
                                     fxFlex="1 1" fxLayoutAlign="start end">
-                                    {{ item.destinationField && importableObject.modelPropertiesKeyValueMap[item.destinationField] ? importableObject.modelPropertiesKeyValueMap[item.destinationField] : '-' }}
+                                    {{ item.destinationField && importableObject.modelPropertiesKeyValueMap[item.destinationField] ? importableObject.modelPropertiesKeyValueMap[item.destinationField] : '—' }}
                                 </div>
 
                                 <!-- Array indexes -->
@@ -614,7 +607,7 @@
                                             <!-- Option Source -->
                                             <div
                                                 fxFlex="1 1">
-                                                {{ mappedOpt.sourceOption ? mappedOpt.sourceOption : '-' }}
+                                                {{ mappedOpt.sourceOption ? mappedOpt.sourceOption : '—' }}
                                             </div>
 
                                             <!-- Option Destination -->
@@ -625,7 +618,7 @@
                                                         mappedOpt.destinationOption && importableObject.modelPropertyValuesMapChildMap[item.destinationField] &&
                                                         importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] ?
                                                             importableObject.modelPropertyValuesMapChildMap[item.destinationField][mappedOpt.destinationOption] :
-                                                            '-'
+                                                            '—'
                                                     )
                                                 }}
                                             </div>
@@ -737,15 +730,15 @@
                                                     <div
                                                         fxFlex
                                                         class="import-data-body-row-edit-extra-details-row-location">
-                                                        <app-form-location-dropdown
+                                                        <app-form-select-location-single-v2
                                                             name="mapObjectOptionsDestination"
                                                             required="true"
                                                             [ngModel]="mappedOpt.destinationOption"
                                                             [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_SELECT_DESTINATION' | translate"
                                                             [useOutbreakLocations]="useOutbreakLocations"
                                                             [disabled]="mappedOpt.readOnly"
-                                                            (itemChanged)="mappedOptionsLocationChanged(mappedOpt, $event)">
-                                                        </app-form-location-dropdown>
+                                                            (selectedLocationChanged)="mappedOptionsLocationChanged(mappedOpt, $event)">
+                                                        </app-form-select-location-single-v2>
                                                     </div>
                                                 </ng-template>
                                             </div>
@@ -778,8 +771,8 @@
                 *ngIf="savedImportPage"
                 (click)="saveImportMapping()"
                 type="button"
-                mat-raised-button
-                color="accent">
+                mat-flat-button
+                color="primary">
                 {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_SAVE_IMPORT_MAPPING' | translate }}
             </button>
 
@@ -788,16 +781,16 @@
                 *ngIf="needToMapOptions"
                 (click)="retrieveDistinctValues()"
                 type="button"
-                mat-raised-button
-                color="accent">
+                mat-flat-button
+                color="primary">
                 {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_MAP_SUB_OPTIONS' | translate }}
             </button>
 
             <!-- Import -->
             <button
                 *ngIf="!needToMapOptions"
-                mat-raised-button
-                color="accent"
+                mat-flat-button
+                color="primary"
                 type="button"
                 (click)="importData()">
                 {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE' | translate }}
@@ -833,7 +826,7 @@
 
                         <!-- Hide / Show details -->
                         <button
-                            mat-raised-button color="accent"
+                            mat-raised-button color="primary"
                             (click)="err.showData = !err.showData">
                             {{ (err.showData ? 'LNG_PAGE_IMPORT_DATA_BUTTON_HIDE_ERR_RECORD_DETAILS' : 'LNG_PAGE_IMPORT_DATA_BUTTON_SHOW_ERR_RECORD_DETAILS') | translate }}
                         </button>
@@ -926,11 +919,6 @@
                 <div
                     *ngIf="errMsgDetailsAsPI.imported.failedNo > 0">
 
-                    <!-- Total number of records from the list -->
-                    <app-total-number-of-records
-                        [value]="importResultsListCount$ | async">
-                    </app-total-number-of-records>
-
                     <!-- Errors table -->
                     <div class="page-section">
                         <!-- Reset Filters -->
@@ -938,14 +926,14 @@
                             <button
                                 type="button"
                                 mat-raised-button
-                                color="accent"
+                                color="primary"
                                 (click)="resetFiltersToSideFilters()">
                                 {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
                             </button>
                             <button
                                 type="button"
                                 mat-raised-button
-                                color="accent"
+                                color="primary"
                                 (click)="needsRefreshList(true)">
                                 {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
                             </button>
@@ -954,26 +942,16 @@
                         <!-- Error rows data -->
                         <mat-table
                             #table
-                            [dataSource]="importResultsList$ | async"
-                            matSort
-                            (matSortChange)="sortBy($event)">
+                            [dataSource]="importResultsList$ | async">
 
                             <!-- Record No. -->
                             <ng-container matColumnDef="recordNo">
                                 <mat-header-cell *matHeaderCellDef>
                                     <div class="table-header-cell">
-                                        <div mat-sort-header class="column-header">
+                                        <div class="column-header">
                                             {{ 'LNG_IMPORT_RESULT_FIELD_LABEL_RECORD_NO' | translate }}
                                         </div>
-                                        <div class="column-filter">
-                                            <app-form-range
-                                                name="recordNoFilter"
-                                                ngModel
-                                                (changed)="filterByRangeField('recordNo', $event)"
-                                                app-reset-input-on-side-filter
-                                                [min]="1">
-                                            </app-form-range>
-                                        </div>
+                                        <div class="column-filter"></div>
                                     </div>
                                 </mat-header-cell>
                                 <mat-cell
@@ -986,24 +964,15 @@
                             <ng-container matColumnDef="error.message">
                                 <mat-header-cell *matHeaderCellDef>
                                     <div class="table-header-cell">
-                                        <div mat-sort-header class="column-header">
+                                        <div class="column-header">
                                             {{'LNG_IMPORT_RESULT_FIELD_LABEL_ERROR_MESSAGE' | translate}}
                                         </div>
-                                        <div class="column-filter">
-                                            <app-form-input
-                                                name="errorMessageFilter"
-                                                ngModel
-                                                [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate "
-                                                (optionChanged)="filterByTextContainingField('error.message', $event, true)"
-                                                app-reset-input-on-side-filter
-                                                [displayFilterIcon]="true">
-                                            </app-form-input>
-                                        </div>
+                                        <div class="column-filter"></div>
                                     </div>
                                 </mat-header-cell>
 
                                 <mat-cell *matCellDef="let item">
-                                    {{ item.error && item.error.message ? item.error.message : '-' }}
+                                    {{ item.error && item.error.message ? item.error.message : '—' }}
                                 </mat-cell>
                             </ng-container>
 
@@ -1025,7 +994,7 @@
                                         *ngIf="item.error && item.error.details">
                                         <button
                                             mat-raised-button
-                                            color="accent"
+                                            color="primary"
                                             type="button"
                                             (click)="seeErrorDetails(item.error.details)">
                                             {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_SEE_ERROR_DETAILS' | translate }}
@@ -1052,7 +1021,7 @@
                                         *ngIf="item.data && item.data.file && item.data.save">
                                         <button
                                             mat-raised-button
-                                            color="accent"
+                                            color="primary"
                                             type="button"
                                             (click)="seeRecordData(item.data.file, item.data.save)">
                                             {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_SEE_RECORD_DATA' | translate }}
@@ -1061,34 +1030,11 @@
                                 </mat-cell>
                             </ng-container>
 
-                            <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
+                            <mat-header-row *matHeaderRowDef="[]"></mat-header-row>
                             <mat-row
-                                *matRowDef="let item; columns: visibleTableColumns">
+                                *matRowDef="let item; columns: []">
                             </mat-row>
                         </mat-table>
-
-                        <div
-                            *ngIf="refreshingList"
-                            class="mat-table-loading-data">
-                            <mat-spinner></mat-spinner>
-                        </div>
-
-                        <!-- No data -->
-                        <div
-                            *ngIf="!refreshingList && isEmptyList"
-                            class="empty-table-text">
-                            {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
-                        </div>
-
-                        <!-- Pages (need to be hidden and not ngIf, otherwise it makes a new duplicate request) -->
-                        <app-mat-paginator-extended
-                            [hidden]="refreshingList || isEmptyList"
-                            [pageIndex]="pageIndex"
-                            [countData]="importResultsListCount$ | async"
-                            [pageSize]="pageSize"
-                            [pageSizeOptions]="pageSizeOptions"
-                            (page)="changePage($event)">
-                        </app-mat-paginator-extended>
 
                     </div>
                 </div>
@@ -1100,12 +1046,12 @@
         <!-- #TODO - to be removed since this one is kinda useless -->
         <div fxLayout="row" fxLayoutAlign="end">
             <button
-                mat-raised-button
-                color="accent"
+                mat-flat-button
+                color="primary"
                 type="button"
                 (click)="tryAgain()">
                 {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_TRY_AGAIN' | translate }}
             </button>
         </div>
     </ng-container>
-</mat-card>
+</div>

@@ -1,8 +1,6 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { NgForm } from '@angular/forms';
 import { IconModel } from '../../../../core/models/icon.model';
@@ -10,8 +8,11 @@ import { FileItem, FileLikeObject, FileUploader } from 'ng2-file-upload';
 import { environment } from '../../../../../environments/environment';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { UserModel } from '../../../../core/models/user.model';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { IV2ActionIconLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 
 export enum IconExtension {
   PNG = '.png',
@@ -27,8 +28,10 @@ export enum IconExtension {
   styleUrls: ['./manage-icons-create.component.less']
 })
 export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements OnInit {
-  // Breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs
+  breadcrumbs: IV2Breadcrumb[] = [];
+
+  @ViewChild('form', { static: true }) form: NgForm;
 
   // Extension mapped to mimes
   private allowedMimeTypes: string[] = [];
@@ -44,6 +47,9 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
 
   // Icon Model
   icon: IconModel = new IconModel();
+
+  // action
+  actionButton: IV2ActionIconLabel;
 
   // File uploader
   uploader: FileUploader;
@@ -87,14 +93,17 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
      * Constructor
      */
   constructor(
-    protected route: ActivatedRoute,
-    private referenceDataDataService: ReferenceDataDataService,
+    protected activatedRoute: ActivatedRoute,
     private authDataService: AuthDataService,
     private formHelper: FormHelperService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private router: Router
   ) {
+    // parent
     super();
+
+    // retrieve data
+    this.category = this.activatedRoute.snapshot.data.category;
   }
 
   /**
@@ -115,17 +124,23 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
     // initialize uploader
     this.configureUploader();
 
-    // get the query params
-    this.route.queryParams
-      .subscribe((params: { categoryId?: string }) => {
-        // retrieve Reference Data Category info
-        if (!params.categoryId) {
-          // update breadcrumbs
-          this.initializeBreadcrumbs();
-        } else {
-          this.retrieveCategory(params.categoryId);
+    // action button
+    this.actionButton = {
+      type: V2ActionType.ICON_LABEL,
+      icon: '',
+      label: 'LNG_COMMON_BUTTON_SAVE',
+      action: {
+        click: () => {
+          this.createNewIcon(this.form);
         }
-      });
+      },
+      disable: () => {
+        return this.displayLoading;
+      }
+    };
+
+    // breadcrumbs
+    this.initializeBreadcrumbs();
   }
 
   /**
@@ -133,68 +148,59 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
      */
   initializeBreadcrumbs() {
     // reset
-    this.breadcrumbs = [];
+    this.breadcrumbs = [{
+      label: 'LNG_COMMON_LABEL_HOME',
+      action: {
+        link: DashboardModel.canViewDashboard(this.authUser) ?
+          ['/dashboard'] :
+          ['/account/my-profile']
+      }
+    }];
 
     // add reference categories list breadcrumb only if we have permission
     if (ReferenceDataCategoryModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '/reference-data')
-      );
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE',
+        action: {
+          link: ['/reference-data']
+        }
+      });
     }
 
     // add cluster list breadcrumb only if we have permission
     if (IconModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_LIST_TITLE',
-          '/reference-data/manage-icons/list',
-          false, {
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_LIST_TITLE',
+        action: {
+          link: ['/reference-data/manage-icons/list'],
+          linkQueryParams: {
             categoryId: this.category ? this.category.id : undefined
           }
-        )
-      );
+        }
+      });
     }
 
     // add category
     if (
       this.category &&
-            ReferenceDataEntryModel.canList(this.authUser)
+      ReferenceDataEntryModel.canList(this.authUser)
     ) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          this.category.name,
-          `/reference-data/${this.category.id}`,
-          false,
-          {},
-          this.category
-        )
-      );
+      this.breadcrumbs.push({
+        label: this.category.name,
+        action: {
+          link: [`/reference-data/${this.category.id}`],
+          linkQueryParams: {
+            categoryId: this.category ? this.category.id : undefined
+          }
+        }
+      });
     }
 
-    // add manage icons breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_TITLE',
-        '',
-        true
-      )
-    );
-  }
-
-  /**
-     * Retrieve category
-     * @param categoryId
-     */
-  retrieveCategory(categoryId: string) {
-    this.referenceDataDataService
-      .getReferenceDataByCategory(categoryId)
-      .subscribe((category: ReferenceDataCategoryModel) => {
-        // set category
-        this.category = category;
-
-        // update breadcrumbs
-        this.initializeBreadcrumbs();
-      });
+    // current page
+    this.breadcrumbs.push({
+      label: 'LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_TITLE',
+      action: null
+    });
   }
 
   /**
@@ -215,7 +221,7 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
     hideLoading: boolean = false
   ) {
     // display toast
-    this.snackbarService.showError(
+    this.toastV2Service.error(
       messageToken,
       this.translationData
     );
@@ -308,9 +314,8 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
   }
 
   /**
-     * Create new Icon
-     * @param form
-     */
+   * Create new Icon
+   */
   createNewIcon(form: NgForm) {
     // validate form
     if (!this.formHelper.validateForm(form)) {
@@ -321,9 +326,9 @@ export class ManageIconsCreateComponent extends ConfirmOnFormChanges implements 
     // check if a file was attached
     if (
       !this.uploader ||
-            this.uploader.queue.length < 1
+      this.uploader.queue.length < 1
     ) {
-      this.snackbarService.showError('LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_WARNING_IMG_REQUIRED');
+      this.toastV2Service.error('LNG_PAGE_REFERENCE_DATA_MANAGE_ICONS_CREATE_WARNING_IMG_REQUIRED');
       return;
     }
 

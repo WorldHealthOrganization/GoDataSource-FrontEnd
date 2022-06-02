@@ -5,7 +5,7 @@ import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { AgeModel } from './age.model';
 import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
-import { moment } from '../helperClasses/x-moment';
+import { Moment, moment } from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { VaccineModel } from './vaccine.model';
 import { UserModel } from './user.model';
@@ -22,6 +22,8 @@ import {
   IPermissionRelatedRelationship,
   IPermissionRestorable
 } from './permission.interface';
+import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 
 export class ContactOfContactModel
   extends BaseModel
@@ -46,7 +48,7 @@ export class ContactOfContactModel
   riskLevel: string;
   riskReason: string;
   type: EntityType = EntityType.CONTACT_OF_CONTACT;
-  dateOfReporting: string;
+  dateOfReporting: string | Moment;
   dateOfLastContact: string;
   isDateOfReportingApproximate: boolean;
   outbreakId: string;
@@ -55,7 +57,7 @@ export class ContactOfContactModel
 
   numberOfExposures: number;
 
-  dob: string;
+  dob: string | Moment;
   age: AgeModel;
 
   vaccinesReceived: VaccineModel[];
@@ -68,6 +70,108 @@ export class ContactOfContactModel
 
   responsibleUserId: string;
   responsibleUser: UserModel;
+
+  /**
+   * Advanced filters
+   */
+  static generateAdvancedFilters(data: {
+    authUser: UserModel,
+    options: {
+      occupation: ILabelValuePairModel[],
+      user: ILabelValuePairModel[]
+    }
+  }): V2AdvancedFilter[] {
+    // initialize
+    const advancedFilters: V2AdvancedFilter[] = [
+      // Contact of contact
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'firstName',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'middleName',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'lastName',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'occupation',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION',
+        options: data.options.occupation,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_AGE,
+        field: 'age',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateOfReporting',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dob',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'visualId',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.ADDRESS,
+        field: 'addresses',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESS_LOCATION',
+        isArray: true
+      },
+      {
+        type: V2AdvancedFilterType.ADDRESS_PHONE_NUMBER,
+        field: 'addresses',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PHONE_NUMBER',
+        isArray: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateOfLastContact',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_NUMBER,
+        field: 'numberOfExposures',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_NUMBER_OF_EXPOSURES',
+        sortable: true
+      }
+    ];
+
+    // allowed to filter by responsible user ?
+    if (UserModel.canListForFilters(data.authUser)) {
+      advancedFilters.push({
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'responsibleUserId',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+        options: data.options.user
+      });
+    }
+
+    // finished
+    return advancedFilters;
+  }
 
   /**
      * Return contact id mask with data replaced
@@ -324,7 +428,7 @@ export class ContactOfContactModel
      */
   get mainAddress(): AddressModel {
     // get main address
-    const mainAddress = _.find(this.addresses, {'typeId': AddressType.CURRENT_ADDRESS});
+    const mainAddress = _.find(this.addresses, { 'typeId': AddressType.CURRENT_ADDRESS });
     // do we have main address? Otherwise use any address
     const address = mainAddress ? mainAddress : this.addresses[0];
 

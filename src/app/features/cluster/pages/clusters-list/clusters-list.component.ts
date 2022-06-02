@@ -1,247 +1,369 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { Observable } from 'rxjs';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { UserModel } from '../../../../core/models/user.model';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
-import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { ClusterModel } from '../../../../core/models/cluster.model';
-import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
+import { Component, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
-import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { Router } from '@angular/router';
-import { Subscription } from 'rxjs/internal/Subscription';
-import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { ClusterModel } from '../../../../core/models/cluster.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 
 @Component({
   selector: 'app-clusters-list',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './clusters-list.component.html',
-  styleUrls: ['./clusters-list.component.less']
+  templateUrl: './clusters-list.component.html'
 })
-export class ClustersListComponent extends ListComponent implements OnInit, OnDestroy {
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_LIST_CLUSTERS_TITLE', '.', true)
-  ];
-
-  // constants
-  ClusterModel = ClusterModel;
-
-  outbreakSubscriber: Subscription;
-
-  // authenticated user
-  authUser: UserModel;
-  // selected Outbreak
-  selectedOutbreak: OutbreakModel;
-  // list of existing clusters
-  clustersList$: Observable<ClusterModel[]>;
-  clustersListCount$: Observable<IBasicCount>;
-
-  fixedTableColumns: string[] = [
-    'name',
-    'description',
-    'icon',
-    'color'
-  ];
-
-  recordActions: HoverRowAction[] = [
-    // View Cluster
-    new HoverRowAction({
-      icon: 'visibility',
-      iconTooltip: 'LNG_PAGE_LIST_CLUSTERS_ACTION_VIEW_CLUSTER',
-      linkGenerator: (item: ClusterModel): string[] => {
-        return ['/clusters', item.id, 'view'];
-      },
-      visible: (): boolean => {
-        return ClusterModel.canView(this.authUser);
-      }
-    }),
-
-    // Modify Cluster
-    new HoverRowAction({
-      icon: 'settings',
-      iconTooltip: 'LNG_PAGE_LIST_CLUSTERS_ACTION_MODIFY_CLUSTER',
-      linkGenerator: (item: ClusterModel): string[] => {
-        return ['/clusters', item.id, 'modify'];
-      },
-      visible: (): boolean => {
-        return this.authUser &&
-                    this.selectedOutbreak &&
-                    this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                    ClusterModel.canModify(this.authUser);
-      }
-    }),
-
-    // Other actions
-    new HoverRowAction({
-      type: HoverRowActionType.MENU,
-      icon: 'moreVertical',
-      menuOptions: [
-        // Delete Cluster
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_CLUSTERS_ACTION_DELETE_CLUSTER',
-          click: (item: ClusterModel) => {
-            this.deleteCluster(item);
-          },
-          visible: (): boolean => {
-            return this.authUser &&
-                            this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            ClusterModel.canDelete(this.authUser);
-          },
-          class: 'mat-menu-item-delete'
-        }),
-
-        // Divider
-        new HoverRowAction({
-          type: HoverRowActionType.DIVIDER,
-          visible: (): boolean => {
-            // visible only if at least one of the previous...
-            return this.authUser &&
-                            this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            ClusterModel.canDelete(this.authUser);
-          }
-        }),
-
-        // View People
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_CLUSTERS_ACTION_VIEW_PEOPLE',
-          click: (item: ClusterModel) => {
-            this.router.navigate(['/clusters', item.id, 'people']);
-          },
-          visible: (): boolean => {
-            return ClusterModel.canListPeople(this.authUser);
-          }
-        })
-      ]
-    })
-  ];
-
+export class ClustersListComponent extends ListComponent<ClusterModel> implements OnDestroy {
   /**
      * Constructor
      */
   constructor(
     protected listHelperService: ListHelperService,
-    private router: Router,
     private clusterDataService: ClusterDataService,
-    private authDataService: AuthDataService,
-    private snackbarService: SnackbarService,
-    private outbreakDataService: OutbreakDataService,
-    private dialogService: DialogService
+    private toastV2Service: ToastV2Service,
+    private dialogV2Service: DialogV2Service
   ) {
     super(listHelperService);
   }
 
   /**
-     * Component initialized
-     */
-  ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
-    // subscribe to the Selected Outbreak Subject stream
-    this.outbreakSubscriber = this.outbreakDataService
-      .getSelectedOutbreakSubject()
-      .subscribe((selectedOutbreak: OutbreakModel) => {
-        this.selectedOutbreak = selectedOutbreak;
-
-        // initialize pagination
-        this.initPaginator();
-        // ...and re-load the list when the Selected Outbreak is changed
-        this.needsRefreshList(true);
-      });
-  }
-
-  /**
-     * Component destroyed
-     */
+   * Component destroyed
+   */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
-
-    // outbreak subscriber
-    if (this.outbreakSubscriber) {
-      this.outbreakSubscriber.unsubscribe();
-      this.outbreakSubscriber = null;
-    }
+    super.onDestroy();
   }
 
   /**
-     * Re(load) the Clusters list, based on the applied filter, sort criterias
-     */
-  refreshList(finishCallback: (records: any[]) => void) {
-    if (this.selectedOutbreak) {
-      this.clustersList$ = this.clusterDataService
-        .getClusterList(this.selectedOutbreak.id, this.queryBuilder)
-        .pipe(
-          catchError((err) => {
-            this.snackbarService.showApiError(err);
-            finishCallback([]);
-            return throwError(err);
-          }),
-          tap(this.checkEmptyList.bind(this)),
-          tap((data: any[]) => {
-            finishCallback(data);
-          })
-        );
-    } else {
-      finishCallback([]);
-    }
+  * Selected outbreak was changed
+  */
+  selectedOutbreakChanged(): void {
+    // initialize pagination
+    this.initPaginator();
+
+    // ...and re-load the list when the Selected Outbreak is changed
+    this.needsRefreshList(true);
   }
 
   /**
-     * Get total number of items, based on the applied filters
-     */
-  refreshListCount() {
+   * Initialize side table columns
+   */
+  protected initializeTableColumns(): void {
+    // default table columns
+    this.tableColumns = [
+      {
+        field: 'name',
+        label: 'LNG_CLUSTER_FIELD_LABEL_NAME',
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'description',
+        label: 'LNG_CLUSTER_FIELD_LABEL_DESCRIPTION',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'icon',
+        label: 'LNG_CLUSTER_FIELD_LABEL_ICON',
+        noIconLabel: 'LNG_PAGE_LIST_CLUSTERS_LABEL_NO_ICON',
+        format: {
+          type: V2ColumnFormat.ICON_MATERIAL
+        }
+      },
+      {
+        field: 'colorCode',
+        label: 'LNG_CLUSTER_FIELD_LABEL_COLOR',
+        noColorLabel: 'LNG_PAGE_LIST_CLUSTERS_LABEL_NO_COLOR',
+        format: {
+          type: V2ColumnFormat.COLOR
+        }
+      },
+
+      // actions
+      {
+        field: 'actions',
+        label: 'LNG_COMMON_LABEL_ACTIONS',
+        pinned: IV2ColumnPinned.RIGHT,
+        notResizable: true,
+        cssCellClass: 'gd-cell-no-focus',
+        format: {
+          type: V2ColumnFormat.ACTIONS
+        },
+        actions: [
+          // View Cluster
+          {
+            type: V2ActionType.ICON,
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_CLUSTERS_ACTION_VIEW_CLUSTER',
+            action: {
+              link: (item: OutbreakModel): string[] => {
+                return ['/clusters', item.id, 'view'];
+              }
+            },
+            visible: (): boolean => {
+              return ClusterModel.canView(this.authUser);
+            }
+          },
+
+          // Modify Cluster
+          {
+            type: V2ActionType.ICON,
+            icon: 'edit',
+            iconTooltip: 'LNG_PAGE_LIST_CLUSTERS_ACTION_MODIFY_CLUSTER',
+            action: {
+              link: (item: OutbreakModel): string[] => {
+                return ['/clusters', item.id, 'modify'];
+              }
+            },
+            visible: (): boolean => {
+              return this.selectedOutbreakIsActive &&
+                ClusterModel.canModify(this.authUser);
+            }
+          },
+
+          // Other actions
+          {
+            type: V2ActionType.MENU,
+            icon: 'more_horiz',
+            menuOptions: [
+              // Delete Cluster
+              {
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CLUSTERS_ACTION_DELETE_CLUSTER'
+                },
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+                action: {
+                  click: (item: OutbreakModel): void => {
+                    // show confirm dialog
+                    this.dialogV2Service.showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_DELETE',
+                          data: () => ({
+                            name: item.name
+                          })
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_CLUSTER',
+                          data: () => ({
+                            name: item.name
+                          })
+                        }
+                      }
+                    }).subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // delete cluster
+                      this.clusterDataService
+                        .deleteCluster(this.selectedOutbreak.id, item.id)
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            this.toastV2Service.error(err);
+
+                            // hide loading
+                            loading.close();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          // success
+                          this.toastV2Service.success('LNG_PAGE_LIST_CLUSTERS_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                          // hide loading
+                          loading.close();
+
+                          // reload data
+                          this.needsRefreshList(true);
+                        });
+                    });
+                  }
+                },
+                visible: (): boolean => {
+                  return this.selectedOutbreakIsActive &&
+                    ClusterModel.canDelete(this.authUser);
+                }
+              },
+
+              // Divider
+              {
+                visible: (): boolean => {
+                  // visible only if at least one of the previous...
+                  return this.selectedOutbreakIsActive &&
+                    ClusterModel.canDelete(this.authUser);
+                }
+              },
+
+              // View People
+              {
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CLUSTERS_ACTION_VIEW_PEOPLE'
+                },
+                action: {
+                  link: (item: OutbreakModel): string[] => {
+                    return ['/clusters', item.id, 'people'];
+                  }
+                },
+                visible: (): boolean => {
+                  return ClusterModel.canListPeople(this.authUser);
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ];
+  }
+
+  /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {
+    // Cluster
+    this.advancedFilters = ClusterModel.generateAdvancedFilters();
+  }
+
+  /**
+   * Initialize table quick actions
+   */
+  protected initializeQuickActions(): void {}
+
+  /**
+   * Initialize table group actions
+   */
+  protected initializeGroupActions(): void {}
+
+  /**
+   * Initialize table add action
+   */
+  protected initializeAddAction(): void {
+    this.addAction = {
+      type: V2ActionType.ICON_LABEL,
+      label: 'LNG_COMMON_BUTTON_ADD',
+      icon: 'add_circle_outline',
+      action: {
+        link: (): string[] => ['/clusters', 'create']
+      },
+      visible: (): boolean => {
+        return ClusterModel.canCreate(this.authUser) &&
+          this.selectedOutbreakIsActive;
+      }
+    };
+  }
+
+  /**
+   * Initialize table grouped data
+   */
+  protected initializeGroupedData(): void {}
+
+  /**
+   * Initialize breadcrumbs
+   */
+  protected initializeBreadcrumbs(): void {
+    // set breadcrumbs
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
+        }
+      }, {
+        label: 'LNG_PAGE_LIST_CLUSTERS_TITLE',
+        action: null
+      }
+    ];
+  }
+
+  /**
+   * Fields retrieved from api to reduce payload size
+   */
+  protected refreshListFields(): string[] {
+    return [
+      'id',
+      'name',
+      'description',
+      'colorCode',
+      'icon'
+    ];
+  }
+
+  /**
+   * Re(load) the Clusters list, based on the applied filter, sort criterias
+   */
+  refreshList() {
+    this.records$ = this.clusterDataService
+      .getClusterList(this.selectedOutbreak.id, this.queryBuilder)
+      .pipe(
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
+  }
+
+  /**
+   * Get total number of items, based on the applied filters
+   */
+  refreshListCount(applyHasMoreLimit?: boolean) {
     if (this.selectedOutbreak) {
+      // reset
+      this.pageCount = undefined;
+
+      // set apply value
+      if (applyHasMoreLimit !== undefined) {
+        this.applyHasMoreLimit = applyHasMoreLimit;
+      }
+
       // remove paginator from query builder
       const countQueryBuilder = _.cloneDeep(this.queryBuilder);
       countQueryBuilder.paginator.clear();
       countQueryBuilder.sort.clear();
-      this.clustersListCount$ = this.clusterDataService
+      this.clusterDataService
         .getClustersCount(this.selectedOutbreak.id, countQueryBuilder)
         .pipe(
           catchError((err) => {
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
             return throwError(err);
           }),
-          share()
-        );
+
+          // should be the last pipe
+          takeUntil(this.destroyed$)
+        ).subscribe((response) => {
+          this.pageCount = response;
+        });
     }
-  }
-
-  /**
-     * Delete specific Cluster from the selected outbreak
-     * @param {ClusterModel} clusterModel
-     */
-  deleteCluster(clusterModel: ClusterModel) {
-    this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_CLUSTER', clusterModel)
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          // delete cluster
-          this.clusterDataService
-            .deleteCluster(this.selectedOutbreak.id, clusterModel.id)
-            .pipe(
-              catchError((err) => {
-                this.snackbarService.showApiError(err);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_CLUSTERS_ACTION_DELETE_SUCCESS_MESSAGE');
-
-              // reload data
-              this.needsRefreshList(true);
-            });
-        }
-      });
   }
 }

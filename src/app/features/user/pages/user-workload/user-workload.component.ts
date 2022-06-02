@@ -1,10 +1,8 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { UserFollowupsPerDayModel } from '../../../../core/models/user-followups-per-day.model';
 import { Constants } from '../../../../core/models/constants';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -16,8 +14,8 @@ import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { UserModel } from '../../../../core/models/user.model';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs/internal/observable/throwError';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 interface IUserMap {
   id: string;
@@ -31,11 +29,9 @@ interface IUserMap {
   templateUrl: './user-workload.component.html',
   styleUrls: ['./user-workload.component.less']
 })
-export class UserWorkloadComponent extends ListComponent implements OnInit, OnDestroy {
+export class UserWorkloadComponent extends ListComponent<any> implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
-
-  selectedOutbreak: OutbreakModel;
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   dates: string[] = [];
   usersDataShow: IUserMap[] = [];
@@ -55,9 +51,6 @@ export class UserWorkloadComponent extends ListComponent implements OnInit, OnDe
       maxRange: 0
     };
 
-  // authenticated user
-  authUser: UserModel;
-
   // Slider Date Filter Value
   sliderDateFilterValue: FormDateRangeSliderData;
 
@@ -70,10 +63,9 @@ export class UserWorkloadComponent extends ListComponent implements OnInit, OnDe
     protected listHelperService: ListHelperService,
     private outbreakDataService: OutbreakDataService,
     private followUpsDataService: FollowUpsDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private i18nService: I18nService,
-    private userDataService: UserDataService,
-    private authDataService: AuthDataService
+    private userDataService: UserDataService
   ) {
     super(
       listHelperService,
@@ -85,9 +77,6 @@ export class UserWorkloadComponent extends ListComponent implements OnInit, OnDe
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     // get users
     this.displayLoading = true;
     this.userDataService
@@ -139,25 +128,25 @@ export class UserWorkloadComponent extends ListComponent implements OnInit, OnDe
   /**
      * Initialize breadcrumbs
      */
-  private initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (UserModel.canList(this.authUser)) {
-      this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '/users'));
-    }
-
-    // workload breadcrumb
-    this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_USERS_WORKLOAD_TITLE', '.', true));
-  }
+  // private initializeBreadcrumbs() {
+  //   // reset
+  //   this.breadcrumbs = [];
+  //
+  //   // add list breadcrumb only if we have permission
+  //   if (UserModel.canList(this.authUser)) {
+  //     this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '/users'));
+  //   }
+  //
+  //   // workload breadcrumb
+  //   this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_USERS_WORKLOAD_TITLE', '.', true));
+  // }
 
   /**
      * Remove component resources
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
 
     if (this.getSelectedOutbreakSubject) {
       this.getSelectedOutbreakSubject.unsubscribe();
@@ -166,9 +155,62 @@ export class UserWorkloadComponent extends ListComponent implements OnInit, OnDe
   }
 
   /**
-     * Refresh list
-     */
-  refreshList(finishCallback: (records: any[]) => void) {
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {}
+
+  /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
+   * Initialize table quick actions
+   */
+  protected initializeQuickActions(): void {}
+
+  /**
+   * Initialize table group actions
+   */
+  protected initializeGroupActions(): void {}
+
+  /**
+   * Initialize table add action
+   */
+  protected initializeAddAction(): void {}
+
+  /**
+   * Initialize table grouped data
+   */
+  protected initializeGroupedData(): void {}
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
+  }
+
+  /**
+   * Fields retrieved from api to reduce payload size
+   */
+  protected refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Refresh list
+   */
+  refreshList() {
     if (
       this.selectedOutbreak &&
             !_.isEmpty(this.usersData)
@@ -203,8 +245,7 @@ export class UserWorkloadComponent extends ListComponent implements OnInit, OnDe
               // hide loading
               this.displayLoading = false;
 
-              this.snackbarService.showApiError(err);
-              finishCallback([]);
+              this.toastV2Service.error(err);
               return throwError(err);
             })
           )
@@ -214,23 +255,14 @@ export class UserWorkloadComponent extends ListComponent implements OnInit, OnDe
 
             // format data
             this.formatData(metricUsersFollowups);
-
-            // finished
-            finishCallback([]);
           });
       } else {
         // hide loading
         this.displayLoading = false;
-
-        // finished
-        finishCallback([]);
       }
     } else {
       // hide loading
       this.displayLoading = false;
-
-      // finished
-      finishCallback([]);
     }
   }
 

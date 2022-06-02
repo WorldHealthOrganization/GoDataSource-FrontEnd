@@ -2,11 +2,13 @@ import * as _ from 'lodash';
 import { IPermissionBasic, IPermissionDevice } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
+import { BaseModel } from './base.model';
 
 export class DeviceModel
-implements
-        IPermissionBasic,
-        IPermissionDevice {
+  extends BaseModel
+  implements
+    IPermissionBasic,
+    IPermissionDevice {
   id: string;
   name: string;
   description: string;
@@ -36,6 +38,10 @@ implements
      * Constructor
      */
   constructor(data = null) {
+    // parent
+    super(data);
+
+    // data
     this.id = _.get(data, 'id', '');
     this.name = _.get(data, 'name', '');
     this.description = _.get(data, 'description', '');

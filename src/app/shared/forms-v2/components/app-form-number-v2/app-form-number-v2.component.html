@@ -1,0 +1,78 @@
+<div
+  class="gd-form-number-v2">
+
+  <!-- Input data -->
+  <mat-form-field
+    *ngIf="!viewOnly; else viewOnlyTemplate"
+    appearance="outline">
+
+    <!-- Place holder -->
+    <mat-label
+      *ngIf="!neverFloatLabel">
+      {{ placeholder | translate }}
+    </mat-label>
+
+    <!-- Left - Icon buttons -->
+    <ng-container
+      *ngIf="tooltipButton?.tooltip"
+      matPrefix>
+      <popper-content
+        #popperContent>
+        <div
+          [innerHtml]="tooltipButton.tooltip | safeHtml">
+        </div>
+      </popper-content>
+      <mat-icon
+        tabindex="-1"
+        [popper]="popperContent"
+        popperTrigger="hover"
+        popperApplyClass="gd-form-input-v2-tooltip"
+        popperPreventOverflow="true"
+        popperPositionFixed="true"
+        popperAppendTo="body"
+        (click)="$event.stopPropagation()">{{tooltipButton.icon}}</mat-icon>
+    </ng-container>
+
+    <!-- Input -->
+    <input
+      matInput
+      [(ngModel)]="value"
+      (blur)="onTouchItem()"
+      [errorStateMatcher]="errMatcher"
+      [disabled]="disabled"
+      [required]="required"
+      [placeholder]="neverFloatLabel ? (placeholder | translate) : undefined"
+      [autocomplete]="autocomplete"
+      [min]="min"
+      [max]="max"
+      type="number">
+
+    <!-- Errors -->
+    <mat-error
+      *ngIf="control?.invalid && control?.touched">
+      {{ getErrorMessages() }}
+    </mat-error>
+
+  </mat-form-field>
+
+  <!-- View only -->
+  <ng-template
+    #viewOnlyTemplate>
+    <div
+      fxLayout="row" fxLayoutGap="1.6rem"
+      class="gd-form-number-v2-viewonly">
+      <!-- Label -->
+      <div
+        *ngIf="placeholder"
+        class="gd-form-number-v2-viewonly-label">
+        {{ placeholder | translate }}:
+      </div>
+
+      <!-- Value -->
+      <div
+        class="gd-form-number-v2-viewonly-value">
+        {{value ? value : noValueLabel}}
+      </div>
+    </div>
+  </ng-template>
+</div>

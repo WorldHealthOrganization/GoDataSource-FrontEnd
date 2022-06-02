@@ -156,7 +156,7 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
       .subscribe((answer: DialogAnswer) => {
         if (answer.button === DialogAnswerButton.Yes) {
           const relationshipPersons = {
-            sourceId: _.find(this.relationship.persons, {target: true}).id,
+            sourceId: _.find(this.relationship.persons, { target: true }).id,
             targetId: this.relationship.sourcePerson.id
           };
           this.relationshipDataService
@@ -171,8 +171,9 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
       });
   }
 
-  updateRelationshipData(relationship: RelationshipModel) {
-    this.relationshipData = this.relationshipDataService.getLightObjectDisplay(relationship);
+  updateRelationshipData(_relationship: RelationshipModel) {
+    // #TODO - new design
+    // this.relationshipData = this.relationshipDataService.getLightObjectDisplay(relationship);
   }
 
   onRemove() {

@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { HelpCategoryModel } from '../../models/help-category.model';
 import { HelpItemModel } from '../../models/help-item.model';
 import * as _ from 'lodash';
 import { CacheKey, CacheService } from '../helper/cache.service';
-import { map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
@@ -92,7 +92,7 @@ export class HelpDataService {
      * @returns {Observable<HelpItemModel[]>}
      */
   getHelpItemsList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<HelpItemModel[]> {
-    queryBuilder.filter.where({approved: true}, true);
+    queryBuilder.filter.where({ approved: true }, true);
     const filter = queryBuilder.buildQuery();
     return this.modelHelper.mapObservableListToModel(
       this.http.get(`help-items?filter=${filter}`),
@@ -211,10 +211,9 @@ export class HelpDataService {
   }
 
   /**
-     * Search for context specific help
-     * @param {string} url
-     */
-  getContextHelpItems(url: string): Observable<string[]> {
+   * Search for context specific help
+   */
+  getContextHelpItems(url: string): Observable<HelpItemModel[]> {
     return new Observable((observer) => {
       // get help items list from cache
       const helpItemsList = this.cacheService.get(CacheKey.HELP_ITEMS);
@@ -224,14 +223,22 @@ export class HelpDataService {
         observer.complete();
       } else {
         const qB = new RequestQueryBuilder();
-        qB.filter.where({approved: true});
-        this.getHelpItemsList(qB).subscribe((items) => {
-          // cache the list
-          this.cacheService.set(CacheKey.HELP_ITEMS, items);
-          const helpItems = this.checkContextSensitiveHelp(url, items);
-          observer.next(helpItems);
-          observer.complete();
-        });
+        qB.filter.where({ approved: true });
+        this.getHelpItemsList(qB)
+          .pipe(
+            catchError((err) => {
+              observer.error(err);
+              observer.complete();
+              return throwError(err);
+            })
+          )
+          .subscribe((items) => {
+            // cache the list
+            this.cacheService.set(CacheKey.HELP_ITEMS, items);
+            const helpItems = this.checkContextSensitiveHelp(url, items);
+            observer.next(helpItems);
+            observer.complete();
+          });
       }
     });
   }

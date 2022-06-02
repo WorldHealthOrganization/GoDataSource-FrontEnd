@@ -1,0 +1,364 @@
+<form
+  class="gd-form-fill-questionnaire-v2">
+
+  <!-- Records -->
+  <div
+    class="gd-form-fill-questionnaire-v2-list">
+    <!-- Records -->
+    <ng-container
+      *ngIf="flattenedQuestions?.length > 0; else noQuestions">
+      <cdk-virtual-scroll-viewport
+        #cdkViewport
+        [minBufferPx]="1024"
+        [maxBufferPx]="1024"
+        [itemSize]="viewOnly ? 45 : 60">
+        <!-- Item -->
+        <div
+          *cdkVirtualFor="let item of flattenedQuestions; templateCacheSize: 0"
+          class="gd-form-fill-questionnaire-v2-list-item"
+          [class.gd-form-fill-questionnaire-v2-list-item-inactive]="item.data?.inactive || item.oneParentIsInactive"
+          [class.gd-form-fill-questionnaire-v2-list-item-markup]="item.data?.answerType === Constants.ANSWER_TYPES.MARKUP.value"
+          [ngSwitch]="item.type"
+          [style.paddingLeft.px]="item.level * 20"
+          [style.height]="viewOnly ? '4.5rem' : '6rem'">
+
+          <!-- Question -->
+          <div
+            *ngSwitchCase="FlattenType.QUESTION"
+            class="gd-form-fill-questionnaire-v2-list-item-question"
+            fxLayout="row" fxLayoutAlign="none center">
+
+            <!-- Collapse / Expand -->
+            <mat-icon
+              [style.visibility]="item.canCollapseOrExpand ? 'visible' : 'hidden'"
+              (click)="expandCollapse(item)">{{item.data.collapsed ? 'expand_more' : 'expand_less'}}</mat-icon>
+
+            <!-- Label -->
+            <div
+              class="gd-form-fill-questionnaire-v2-list-item-question-content"
+              fxFlex>
+              <!-- Number -->
+              <span
+                class="gd-form-fill-questionnaire-v2-list-item-question-content-number">{{item.no}}.</span>
+
+              <!-- Label -->
+              <span
+                class="gd-form-fill-questionnaire-v2-list-item-question-content-title">{{item.data.text}}</span>
+
+              <!-- Required ? -->
+              <span
+                *ngIf="item.data.required && item.data.answerType === Constants.ANSWER_TYPES.FILE_UPLOAD.value"
+                class="gd-form-fill-questionnaire-v2-list-item-question-content-required">*</span>
+            </div>
+
+            <!-- Buttons -->
+            <div
+              *ngIf="!viewOnly && item.data.multiAnswer && !item.data.inactive"
+              class="gd-form-fill-questionnaire-v2-list-item-question-buttons"
+              fxGrow="0">
+
+              <!-- Add answer -->
+              <button
+                type="button"
+                mat-icon-button
+                [matTooltip]="'LNG_QUESTIONNAIRE_BUTTON_ADD_MULTI_ANSWER' | translate"
+                (click)="addMultiAnswer(item)">
+                <mat-icon>playlist_add</mat-icon>
+              </button>
+
+            </div>
+
+          </div>
+
+          <!-- ANSWER MULTI DATE -->
+          <div
+            *ngSwitchCase="FlattenType.ANSWER_MULTI_DATE"
+            class="gd-form-fill-questionnaire-v2-list-item-answer-multi-date"
+            fxLayout="row" fxLayoutAlign="none center"
+            [style.paddingLeft.px]="item.level * 20">
+
+            <!-- Collapse / Expand -->
+            <!-- append padding and remove icon -->
+            <mat-icon
+              style="visibility: hidden">expand_more</mat-icon>
+
+            <!-- No -->
+            <span
+              class="gd-form-fill-questionnaire-v2-list-item-answer-number">{{item.no}}.</span>
+
+            <!-- Date -->
+            <div
+              class="gd-form-fill-questionnaire-v2-list-item-answer-multi-date-content"
+              fxFlex>
+              <app-form-date-v2
+                [(ngModel)]="value[item.parent.data.variable][item.index].date"
+                [name]="item.name"
+                [placeholder]="viewOnly ? undefined : 'LNG_QUESTIONNAIRE_LABEL_MULTI_ANSWER_DATE'"
+                autocomplete="off"
+                app-date-validator
+                [viewOnly]="viewOnly"
+                [required]="
+                  (
+                    !!value[item.parent.data.variable][item.index].value && (
+                      value[item.parent.data.variable][item.index].value.length === undefined ||
+                      value[item.parent.data.variable][item.index].value.length > 0
+                    )
+                  ) || value[item.parent.data.variable][item.index].value === 0"
+                (ngModelChange)="onChangeMultiDate(item)"></app-form-date-v2>
+            </div>
+
+            <!-- Buttons -->
+            <div
+              *ngIf="!viewOnly && !item.parent.data.inactive"
+              class="gd-form-fill-questionnaire-v2-list-item-answer-multi-date-buttons"
+              fxGrow="0">
+
+              <!-- Remove answer -->
+              <button
+                type="button"
+                mat-icon-button
+                color="warn"
+                [matTooltip]="'LNG_QUESTIONNAIRE_BUTTON_REMOVE' | translate"
+                (click)="removeMultiAnswer(item)">
+                <mat-icon>delete</mat-icon>
+              </button>
+
+            </div>
+
+          </div>
+
+          <!-- ANSWER -->
+          <div
+            *ngSwitchCase="FlattenType.ANSWER"
+            class="gd-form-fill-questionnaire-v2-list-item-answer"
+            [class.gd-form-fill-questionnaire-v2-list-item-answer-multiple]="item.parent.data.multiAnswer"
+            [class.gd-form-fill-questionnaire-v2-list-item-answer-file]="item.definition.type === FlattenAnswerDrawType.FILE"
+            fxLayout="row" fxLayoutAlign="none center">
+
+            <!-- Collapse / Expand -->
+            <!-- append padding and remove icon -->
+            <mat-icon
+              style="visibility: hidden">expand_more</mat-icon>
+
+            <!-- No -->
+            <span
+              class="gd-form-fill-questionnaire-v2-list-item-answer-number"
+              style="visibility: hidden">{{item.parent.no}}.</span>
+
+            <!-- Render answer accordingly to question type -->
+            <ng-container
+              [ngSwitch]="item.definition.type">
+
+              <!-- Single select -->
+              <app-form-select-single-v2
+                *ngSwitchCase="FlattenAnswerDrawType.SINGLE_SELECT"
+                [(ngModel)]="value[item.parent.data.variable][item.index].value"
+                [name]="item.name"
+                [placeholder]="viewOnly ? undefined : 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWER'"
+                [options]="item.definition.options"
+                [viewOnly]="viewOnly"
+                [required]="item.parent.data.required"
+                [clearable]="true"
+                (ngModelChange)="answersWithChildrenQuestionsChanged()"></app-form-select-single-v2>
+
+              <!-- Multiple select -->
+              <app-form-select-multiple-v2
+                *ngSwitchCase="FlattenAnswerDrawType.MULTIPLE_SELECT"
+                [(ngModel)]="value[item.parent.data.variable][item.index].value"
+                [name]="item.name"
+                [placeholder]="viewOnly ? undefined : 'LNG_QUESTIONNAIRE_LABEL_SELECT_ANSWERS'"
+                [options]="item.definition.options"
+                [viewOnly]="viewOnly"
+                [required]="item.parent.data.required"
+                (changedAndClosed)="answersWithChildrenQuestionsChanged()"></app-form-select-multiple-v2>
+
+              <!-- Text -->
+              <app-form-input-v2
+                *ngSwitchCase="FlattenAnswerDrawType.TEXT"
+                [(ngModel)]="value[item.parent.data.variable][item.index].value"
+                [name]="item.name"
+                [placeholder]="viewOnly ? undefined : 'LNG_QUESTIONNAIRE_LABEL_WRITE_ANSWER'"
+                autocomplete="off"
+                [viewOnly]="viewOnly"
+                [required]="item.parent.data.required"
+                (ngModelChange)="onChangeValue(item)"></app-form-input-v2>
+
+              <!-- Number -->
+              <app-form-number-v2
+                *ngSwitchCase="FlattenAnswerDrawType.NUMBER"
+                [(ngModel)]="value[item.parent.data.variable][item.index].value"
+                [name]="item.name"
+                [placeholder]="viewOnly ? undefined : 'LNG_QUESTIONNAIRE_LABEL_WRITE_NUMERIC_ANSWER'"
+                autocomplete="off"
+                [viewOnly]="viewOnly"
+                [required]="item.parent.data.required"
+                (ngModelChange)="onChangeValue(item)"></app-form-number-v2>
+
+              <!-- Date -->
+              <app-form-date-v2
+                *ngSwitchCase="FlattenAnswerDrawType.DATE"
+                [(ngModel)]="value[item.parent.data.variable][item.index].value"
+                [name]="item.name"
+                [placeholder]="viewOnly ? undefined : 'LNG_QUESTIONNAIRE_LABEL_SELECT_DATE'"
+                autocomplete="off"
+                app-date-validator
+                [viewOnly]="viewOnly"
+                [required]="item.parent.data.required"
+                (ngModelChange)="onChangeValue(item)"></app-form-date-v2>
+
+              <!-- File -->
+              <div
+                *ngSwitchCase="FlattenAnswerDrawType.FILE">
+
+                <!-- easy...hack to load data when item becomes visible for the first time -->
+                {{loadFileData(item)}}
+
+                <!-- Wait to retrieve attachment data -->
+                <mat-progress-spinner
+                  *ngIf="item.uploading || (value[item.parent.data.variable][item.index].value && !loadedAttachments[value[item.parent.data.variable][item.index].value].loaded); else finishedProcessing"
+                  diameter="24"
+                  mode="indeterminate"></mat-progress-spinner>
+
+                <!-- Data processed -->
+                <ng-template
+                  #finishedProcessing>
+
+                  <!-- Attachment info -->
+                  <input
+                    #uploaderInput
+                    hidden
+                    type="file"
+                    ng2FileSelect
+                    [uploader]="item.uploader"/>
+
+                  <!-- No file attachment ? -->
+                  <ng-container
+                    *ngIf="!value[item.parent.data.variable][item.index].value || !loadedAttachments[value[item.parent.data.variable][item.index].value].attachment; else displayAttachment">
+                    <span
+                      class="gd-form-fill-questionnaire-v2-list-item-answer-file-name gd-form-fill-questionnaire-v2-list-item-answer-file-name-no-file">{{viewOnly ? '—' : ('LNG_QUESTIONNAIRE_LABEL_FILE_UPLOAD' | translate)}}</span>
+                  </ng-container>
+
+                  <!-- Attachment info -->
+                  <ng-template
+                    #displayAttachment>
+
+                    <!-- Name -->
+                    <span
+                      class="gd-form-fill-questionnaire-v2-list-item-answer-file-name">{{loadedAttachments[value[item.parent.data.variable][item.index].value].attachment.name}}</span>
+
+                    <!-- Download -->
+                    <button
+                      type="button"
+                      mat-icon-button
+                      [matTooltip]="'LNG_QUESTIONNAIRE_BUTTON_DOWNLOAD' | translate"
+                      (click)="downloadAttachment(loadedAttachments[value[item.parent.data.variable][item.index].value].attachment)">
+                      <mat-icon>file_download</mat-icon>
+                    </button>
+
+                  </ng-template>
+
+                  <!-- Buttons -->
+                  <ng-container
+                    *ngIf="!viewOnly">
+
+                    <!-- Remove -->
+                    <button
+                      *ngIf="value[item.parent.data.variable][item.index].value"
+                      type="button"
+                      mat-icon-button
+                      [matTooltip]="'LNG_QUESTIONNAIRE_BUTTON_REMOVE' | translate"
+                      color="warn"
+                      (click)="removeAttachment(item, uploaderInput)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+
+                    <!-- Upload -->
+                    <button
+                      type="button"
+                      mat-icon-button
+                      [matTooltip]="(value[item.parent.data.variable][item.index].value && loadedAttachments[value[item.parent.data.variable][item.index].value]?.attachment ? 'LNG_QUESTIONNAIRE_BUTTON_REPLACE' : 'LNG_QUESTIONNAIRE_BUTTON_BROWSE') | translate"
+                      (click)="uploaderInput.click()">
+                      <mat-icon>file_upload</mat-icon>
+                    </button>
+
+                  </ng-container>
+
+                </ng-template>
+
+              </div>
+
+            </ng-container>
+
+          </div>
+
+        </div>
+      </cdk-virtual-scroll-viewport>
+    </ng-container>
+
+    <!-- No questions image -->
+    <ng-template
+      #noQuestions>
+      <div
+        fxLayout="column" fxLayoutAlign="center center"
+        class="gd-form-fill-questionnaire-v2-empty">
+
+        <!-- Image -->
+        <div
+          class="gd-form-fill-questionnaire-v2-empty-image"></div>
+
+        <!-- Message -->
+        <div
+          class="gd-form-fill-questionnaire-v2-empty-text">{{'LNG_QUESTIONNAIRE_LABEL_FILL_NO_QUESTIONS' | translate}}</div>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Legend -->
+  <div
+    *ngIf="flattenedQuestions?.length > 0 && !viewOnly"
+    class="gd-form-fill-questionnaire-v2-legend"
+    fxLayout="row" fxLayoutAlign="start center">
+
+    <!-- Header -->
+    <div
+      class="gd-form-fill-questionnaire-v2-legend-title">
+      {{'LNG_COMMON_LABEL_LEGEND' | translate}}
+    </div>
+
+    <!-- Items -->
+    <div
+      class="gd-form-fill-questionnaire-v2-legend-items"
+      fxLayout="row wrap" fxLayoutAlign="start center">
+      <!-- Add multiple answers -->
+      <div
+        class="gd-form-fill-questionnaire-v2-legend-items-item">
+        <mat-icon>playlist_add</mat-icon>
+        <span>{{'LNG_QUESTIONNAIRE_BUTTON_ADD_MULTI_ANSWER' | translate}}</span>
+      </div>
+
+      <!-- Delete multiple answer -->
+      <div
+        class="gd-form-fill-questionnaire-v2-legend-items-item">
+        <mat-icon>delete</mat-icon>
+        <span>{{'LNG_QUESTIONNAIRE_BUTTON_REMOVE' | translate}}</span>
+      </div>
+
+      <!-- Download file -->
+      <div
+        class="gd-form-fill-questionnaire-v2-legend-items-item">
+        <mat-icon>file_download</mat-icon>
+        <span>{{'LNG_QUESTIONNAIRE_BUTTON_DOWNLOAD' | translate}}</span>
+      </div>
+
+      <!-- Upload file -->
+      <div
+        class="gd-form-fill-questionnaire-v2-legend-items-item">
+        <mat-icon>file_upload</mat-icon>
+        <span>{{'LNG_QUESTIONNAIRE_BUTTON_BROWSE' | translate}}</span>
+      </div>
+
+    </div>
+
+  </div>
+
+</form>

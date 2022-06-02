@@ -1,0 +1,149 @@
+@import 'mixins';
+
+/* KPI Dashlet */
+.gd-dashlet-kpi {
+  background-color: var(--gd-background);
+  @include border-radius(0.4rem);
+  @include box-shadow(0 0.2rem 0.1rem -0.1rem rgb(0, 0, 0, 0.2),
+                      0 0.1rem 0.1rem 0 rgb(0, 0, 0, 0.14),
+                      0 0.1rem 0.3rem 0 rgb(0, 0, 0, 0.12));
+
+  /* KPI Dashlet - Top */
+  .gd-dashlet-kpi-top {
+    padding: 0.8rem 1.6rem;
+
+    /* KPI Dashlet - Top - Title */
+    .gd-dashlet-kpi-top-title {
+      color: var(--gd-primary);
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    /* KPI Dashlet - Top - Actions */
+    .gd-dashlet-kpi-top-actions {
+      .gd-dashlet-kpi-top-actions-counter {
+        color: var(--gd-secondary);
+
+        .mat-flat-button {
+          min-width: 0;
+          padding: 0.4rem;
+        }
+      }
+
+      .mat-icon-button {
+        font-size: 2rem;
+        height: 2.4rem;
+        min-width: 2.4rem;
+        padding: 0.4rem;
+        width: 2.4rem;
+
+        .mat-icon {
+          font-size: 1.6rem;
+          @include transition(all 0.24s ease-in-out 0s);
+        }
+      }
+    }
+  }
+
+  /* KPI Dashlet - Bottom */
+  .gd-dashlet-kpi-bottom {
+    padding: 0.8rem 1.6rem 1.6rem;
+
+    /* KPI Dashlet - Value */
+    .gd-dashlet-kpi-bottom-value {
+      border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+      padding: 0.8rem 0;
+
+      /* KPI Dashlet - Value - Left */
+      .gd-dashlet-kpi-bottom-value-left {
+        overflow: hidden;
+        width: calc(100% - 5rem);
+
+        /* KPI Dashlet - Value - Left - Text */
+        .gd-dashlet-kpi-bottom-value-left-text {
+          @include flex_align_items(center);
+          @include flex(flex);
+          @include flex_direction(row);
+
+          > span {
+            white-space: nowrap;
+          }
+        }
+
+        /* KPI Dashlet - Value - Left - Actions */
+        .mat-icon-button {
+          color: rgba(var(--gd-secondary-rgb), 0.5);
+          font-size: 2rem;
+          height: 2.4rem;
+          min-width: 2.4rem;
+          padding: 0.4rem;
+          @include transition(color 0.24s ease-in-out 0s);
+          width: 2.4rem;
+
+          &:hover {
+            color: var(--gd-secondary);
+          }
+
+          .mat-icon {
+            font-size: 2rem;
+          }
+        }
+
+        .gd-dashlet-kpi-bottom-value-left-actions {
+          padding: 0 0.8rem;
+          white-space: nowrap;
+
+          .mat-icon-button {
+            @include opacity(0);
+            visibility: hidden;
+          }
+        }
+      }
+
+      /* KPI Dashlet - Value - Right */
+      .gd-dashlet-kpi-bottom-value-right {
+        font-size: 1.6rem;
+        font-weight: 700;
+        min-width: 5rem;
+        text-align: right;
+      }
+
+      &:hover {
+        .gd-dashlet-kpi-bottom-value-left {
+          .gd-dashlet-kpi-bottom-value-left-text {
+            overflow: hidden;
+
+            > span {
+              &:last-child {
+                overflow: hidden;
+                text-overflow: ellipsis;
+              }
+            }
+          }
+
+          .gd-dashlet-kpi-bottom-value-left-actions {
+            .mat-icon-button {
+              @include opacity(1);
+              visibility: visible;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  /* KPI Dashlet - Expanded */
+  &.gd-dashlet-kpi-expanded {
+    height: 100%;
+
+    .gd-dashlet-kpi-top {
+      .gd-dashlet-kpi-top-actions {
+        .mat-icon-button {
+          .mat-icon {
+            @include rotate(180deg);
+          }
+        }
+      }
+    }
+  }
+}

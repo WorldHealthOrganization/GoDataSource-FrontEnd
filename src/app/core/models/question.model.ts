@@ -15,43 +15,21 @@ export class AnswerModel {
   order: number = 1;
   additionalQuestions: QuestionModel[];
 
-  // new flag - DON'T save this field
-  new: boolean;
-  clone: boolean;
+  // used by ui
+  collapsed: boolean;
 
-  constructor(
-    data = null,
-    keepFlags: boolean = false
-  ) {
+  constructor(data = null) {
     this.label = _.get(data, 'label');
     this.value = _.get(data, 'value');
     this.alert = _.get(data, 'alert');
     this.order = _.get(data, 'order');
 
-    if (keepFlags) {
-      this.new = _.get(data, 'new');
-      this.clone = _.get(data, 'clone');
-    }
-
     this.additionalQuestions = _.map(
       _.get(data, 'additionalQuestions', null),
       (lData: any) => {
-        return new QuestionModel(lData, keepFlags);
+        return new QuestionModel(lData);
       });
     if (_.isEmpty(this.additionalQuestions)) {
-      this.additionalQuestions = null;
-    }
-  }
-
-  get additionalQuestionsShow(): boolean {
-    return this.additionalQuestions !== null;
-  }
-  set additionalQuestionsShow(value: boolean) {
-    if (value) {
-      if (_.isEmpty(this.additionalQuestions)) {
-        this.additionalQuestions = [];
-      }
-    } else {
       this.additionalQuestions = null;
     }
   }
@@ -69,17 +47,10 @@ export class QuestionModel {
   answersDisplay: string;
   answers: AnswerModel[];
 
-  // new flag - DON'T save this field
-  new: boolean;
-  clone: boolean;
-  uuid: string;
-  // we use this just for displaying the order of questions
-  displayOrder: number;
+  // used by ui
+  collapsed: boolean;
 
-  constructor(
-    data = null,
-    keepFlags: boolean = false
-  ) {
+  constructor(data = null) {
     this.text = _.get(data, 'text');
     this.variable = _.get(data, 'variable');
     this.category = _.get(data, 'category');
@@ -90,16 +61,10 @@ export class QuestionModel {
     this.answerType = _.get(data, 'answerType');
     this.answersDisplay = _.get(data, 'answersDisplay', Constants.ANSWERS_DISPLAY.VERTICAL.value);
 
-    if (keepFlags) {
-      this.new = _.get(data, 'new');
-      this.clone = _.get(data, 'clone');
-      this.uuid = _.get(data, 'uuid');
-    }
-
     this.answers = _.map(
       _.get(data, 'answers', []),
       (lData: any) => {
-        return new AnswerModel(lData, keepFlags);
+        return new AnswerModel(lData);
       });
   }
 
@@ -257,21 +222,6 @@ export class QuestionModel {
         modelArrayProperties[`${questionnaireParentKey}${variable}[].${(isFlat && questionTypes[variable] === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value) ? 'value[]' : 'value'}`] = definition;
         modelArrayProperties[`${questionnaireParentKey}${variable}[].date`] = definition;
       }
-    });
-  }
-
-  /**
-     * Mark question as being new
-     */
-  markAsNew() {
-    // mark question as being new
-    this.new = true;
-
-    // mark sub questions as being new
-    _.each(this.answers, (answer) => {
-      _.each(answer.additionalQuestions, (question) => {
-        question.markAsNew();
-      });
     });
   }
 }

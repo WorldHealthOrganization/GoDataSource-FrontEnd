@@ -1,345 +1,578 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { UserModel, UserRoleModel, PhoneNumberType, UserSettings } from '../../../../core/models/user.model';
-import { UserDataService } from '../../../../core/services/data/user.data.service';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { DialogAnswerButton, HoverRowAction, HoverRowActionType } from '../../../../shared/components';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { UserRoleDataService } from '../../../../core/services/data/user-role.data.service';
-import { DialogAnswer } from '../../../../shared/components/dialog/dialog.component';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { Component, OnDestroy } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { catchError, share, tap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
-import { IBasicCount } from '../../../../core/models/basic-count.interface';
-import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { TeamModel } from '../../../../core/models/team.model';
-import { TeamDataService } from '../../../../core/services/data/team.data.service';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { PhoneNumberType, UserModel, UserRoleModel } from '../../../../core/models/user.model';
+import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 
 @Component({
   selector: 'app-user-list',
   templateUrl: './user-list.component.html'
 })
-export class UserListComponent extends ListComponent implements OnInit, OnDestroy {
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_LIST_USERS_TITLE', '.', true)
-  ];
-
-  // authenticated user
-  authUser: UserModel;
-
-  // constants
-  UserModel = UserModel;
-  PhoneNumberType = PhoneNumberType;
-  UserSettings = UserSettings;
-
-  // list of existing users
+export class UserListComponent extends ListComponent<UserModel> implements OnDestroy {
+  // list of existing teams mapped by user
   userTeamMap: {
     [userId: string]: TeamModel[]
-  } = {};
-  usersList$: Observable<UserModel[]>;
-  usersListCount$: Observable<IBasicCount>;
-  teamsList$: Observable<TeamModel[]>;
-
-  rolesList$: Observable<UserRoleModel[]>;
-  outbreaksListMap: any = {};
-  outbreaksList$: Observable<OutbreakModel[]>;
-  institutionsList$: Observable<LabelValuePair[]>;
-
-  recordActions: HoverRowAction[] = [
-    // View User
-    new HoverRowAction({
-      icon: 'visibility',
-      iconTooltip: 'LNG_PAGE_LIST_USERS_ACTION_VIEW_USER',
-      linkGenerator: (item: UserModel): string[] => {
-        return ['/users', item.id, 'view'];
-      },
-      visible: (item: UserModel): boolean => {
-        return item.id !== this.authUser.id &&
-                    UserModel.canView(this.authUser);
-      }
-    }),
-
-    // Modify User
-    new HoverRowAction({
-      icon: 'settings',
-      iconTooltip: 'LNG_PAGE_LIST_USERS_ACTION_MODIFY_USER',
-      linkGenerator: (item: UserModel): string[] => {
-        return ['/users', item.id, 'modify'];
-      },
-      visible: (item: UserModel): boolean => {
-        return item.id !== this.authUser.id &&
-                    UserModel.canModify(this.authUser);
-      }
-    }),
-
-    // Other actions
-    new HoverRowAction({
-      type: HoverRowActionType.MENU,
-      icon: 'moreVertical',
-      menuOptions: [
-        // Delete User
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_USERS_ACTION_DELETE_USER',
-          click: (item: UserModel) => {
-            this.deleteUser(item);
-          },
-          visible: (item: UserModel): boolean => {
-            return item.id !== this.authUser.id &&
-                            UserModel.canDelete(this.authUser);
-          },
-          class: 'mat-menu-item-delete'
-        })
-      ]
-    })
-  ];
+  };
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     private userDataService: UserDataService,
-    private authDataService: AuthDataService,
-    private snackbarService: SnackbarService,
-    private dialogService: DialogService,
-    private outbreakDataService: OutbreakDataService,
-    private userRoleDataService: UserRoleDataService,
-    private referenceDataDataService: ReferenceDataDataService,
-    private teamDataService: TeamDataService
+    private toastV2Service: ToastV2Service,
+    private activatedRoute: ActivatedRoute,
+    private dialogV2Service: DialogV2Service
   ) {
+    // parent
     super(listHelperService);
+
+    // map teams by user
+    this.userTeamMap = {};
+    ((this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).list || []).forEach((team) => {
+      // no need to continue ?
+      // no really necessary since we do the above filter
+      if (
+        !team.userIds ||
+        team.userIds.length < 1
+      ) {
+        return;
+      }
+
+      // go through users
+      team.userIds.forEach((userId) => {
+        // init array ?
+        if (!this.userTeamMap[userId]) {
+          this.userTeamMap[userId] = [];
+        }
+
+        // push team
+        this.userTeamMap[userId].push(team);
+      });
+    });
   }
 
   /**
-     * Component initialized
-     */
-  ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-    this.rolesList$ = this.userRoleDataService.getRolesList();
-
-    this.institutionsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.INSTITUTION_NAME);
-
-    this.outbreaksList$ = this.outbreakDataService
-      .getOutbreaksListReduced()
-      .pipe(
-        tap((outbreaks) => {
-          (outbreaks || []).forEach((outbreak) => {
-            this.outbreaksListMap[outbreak.id] = outbreak;
-          });
-        }),
-
-        // share
-        share()
-      );
-
-    // initialize pagination
-    this.initPaginator();
-    // ...and load the list of items
-    this.needsRefreshList(true);
-
-    // initialize Side Table Columns
-    this.initializeSideTableColumns();
-
-    // retrieve teams
-    if (TeamModel.canList(this.authUser)) {
-      this.retrieveTeams();
-    }
-  }
-
-  /**
-     * Release resources
-     */
+   * Release resources
+   */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
-     * Initialize Side Table Columns
-     */
-  initializeSideTableColumns() {
+  * Component initialized
+  */
+  initialized(): void {
+    // initialize pagination
+    this.initPaginator();
+
+    // ...and re-load the list when the Selected Outbreak is changed
+    this.needsRefreshList(true);
+  }
+
+  /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns() {
     // default table columns
     this.tableColumns = [
-      new VisibleColumnModel({
+      {
         field: 'lastName',
-        label: 'LNG_USER_FIELD_LABEL_LAST_NAME'
-      }),
-      new VisibleColumnModel({
+        label: 'LNG_USER_FIELD_LABEL_LAST_NAME',
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
         field: 'firstName',
-        label: 'LNG_USER_FIELD_LABEL_FIRST_NAME'
-      }),
-      new VisibleColumnModel({
+        label: 'LNG_USER_FIELD_LABEL_FIRST_NAME',
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
         field: 'email',
-        label: 'LNG_USER_FIELD_LABEL_EMAIL'
-      }),
-      new VisibleColumnModel({
+        label: 'LNG_USER_FIELD_LABEL_EMAIL',
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        },
+        sortable: true
+      },
+      {
         field: 'institutionName',
-        label: 'LNG_USER_FIELD_LABEL_INSTITUTION_NAME'
-      }),
-      new VisibleColumnModel({
-        field: 'telephoneNumbers',
-        label: 'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS'
-      }),
-      new VisibleColumnModel({
-        field: 'role',
-        label: 'LNG_USER_FIELD_LABEL_ROLES'
-      }),
-      new VisibleColumnModel({
-        field: 'activeOutbreak',
-        label: 'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK'
-      }),
-      new VisibleColumnModel({
-        field: 'availableOutbreaks',
-        label: 'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS'
-      })
+        label: 'LNG_USER_FIELD_LABEL_INSTITUTION_NAME',
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.institution as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          includeNoValue: true
+        }
+      },
+      {
+        field: `telephoneNumbers.${PhoneNumberType.PRIMARY_PHONE_NUMBER}`,
+        label: 'LNG_USER_FIELD_LABEL_TELEPHONE_NUMBERS',
+        format: {
+          type: (item: UserModel) => {
+            return item.telephoneNumbers && item.telephoneNumbers[PhoneNumberType.PRIMARY_PHONE_NUMBER] ?
+              item.telephoneNumbers[PhoneNumberType.PRIMARY_PHONE_NUMBER] :
+              '';
+          }
+        },
+        filter: {
+          type: V2FilterType.PHONE_NUMBER
+        }
+      },
+      {
+        field: 'roleIds',
+        label: 'LNG_USER_FIELD_LABEL_ROLES',
+        format: {
+          type: V2ColumnFormat.LINK_LIST
+        },
+        links: (item: UserModel) => item.roles?.length > 0 ?
+          item.roles.map((role) => {
+            return {
+              label: role.name,
+              href: UserRoleModel.canView(this.authUser) ?
+                `/user-roles/${role.id}/view` :
+                null
+            };
+          }) :
+          [],
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.userRole as IResolverV2ResponseModel<UserRoleModel>).options
+        }
+      },
+      {
+        field: 'activeOutbreakId',
+        label: 'LNG_USER_FIELD_LABEL_ACTIVE_OUTBREAK',
+        format: {
+          type: (user: UserModel) => {
+            return user.activeOutbreakId &&
+              (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[user.activeOutbreakId] ?
+              (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[user.activeOutbreakId].name :
+              '';
+          }
+        },
+        link: (user: UserModel) => {
+          return user.activeOutbreakId &&
+            OutbreakModel.canView(this.authUser) &&
+            (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[user.activeOutbreakId] ?
+            `/outbreaks/${user.activeOutbreakId}/view` :
+            undefined;
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options,
+          includeNoValue: true
+        }
+      },
+      {
+        field: 'outbreakIds',
+        label: 'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS',
+        format: {
+          type: V2ColumnFormat.LINK_LIST
+        },
+        links: (item: UserModel) => item.outbreakIds?.length > 0 ?
+          item.outbreakIds
+            .filter((outbreakId) => !!(this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[outbreakId])
+            .map((outbreakId) => {
+              return {
+                label: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map[outbreakId].name,
+                href: OutbreakModel.canView(this.authUser) ?
+                  `/outbreaks/${outbreakId}/view` :
+                  null
+              };
+            }) :
+          [],
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options
+        }
+      }
     ];
 
     // can see teams ?
     if (TeamModel.canList(this.authUser)) {
-      this.tableColumns.push(new VisibleColumnModel({
+      this.tableColumns.push({
         field: 'teams',
-        label: 'LNG_USER_FIELD_LABEL_TEAMS'
-      }));
+        label: 'LNG_USER_FIELD_LABEL_TEAMS',
+        format: {
+          type: V2ColumnFormat.LINK_LIST
+        },
+        links: (item: UserModel) => this.userTeamMap[item.id]?.length > 0 ?
+          this.userTeamMap[item.id].map((team) => {
+            return {
+              label: team.name,
+              href: TeamModel.canView(this.authUser) ?
+                `/teams/${team.id}/view` :
+                null
+            };
+          }) :
+          [],
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
+          search: (column: IV2Column) => {
+            // retrieve teams
+            const teamIds: string[] = (column.filter as IV2FilterMultipleSelect).value;
+
+            // determine user ids
+            const userIdsMap: {
+              [userId: string]: true
+            } = {};
+            (teamIds || []).forEach((teamId) => {
+              // noting to do ?
+              if ((this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[teamId]?.userIds?.length < 1) {
+                return;
+              }
+
+              // retrieve users
+              (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[teamId].userIds.forEach((userId) => {
+                userIdsMap[userId] = true;
+              });
+            });
+
+            // nothing to retrieve ?
+            const userIds: string[] = Object.keys(userIdsMap);
+            if (
+              teamIds?.length > 0 &&
+              userIds.length < 1
+            ) {
+              userIds.push('-1');
+            }
+
+            // filter
+            this.queryBuilder.filter.bySelect(
+              'id',
+              userIds,
+              true,
+              null
+            );
+
+            // refresh list
+            this.needsRefreshList();
+          }
+        }
+      });
     }
+
+    // rest of columns :)
+    this.tableColumns.push(
+      // actions
+      {
+        field: 'actions',
+        label: 'LNG_COMMON_LABEL_ACTIONS',
+        pinned: IV2ColumnPinned.RIGHT,
+        notResizable: true,
+        cssCellClass: 'gd-cell-no-focus',
+        format: {
+          type: V2ColumnFormat.ACTIONS
+        },
+        actions: [
+          // View User
+          {
+            type: V2ActionType.ICON,
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_LIST_USERS_ACTION_VIEW_USER',
+            action: {
+              link: (item: UserModel): string[] => {
+                return ['/users', item.id, 'view'];
+              }
+            },
+            visible: (item: UserModel): boolean => {
+              return item.id !== this.authUser.id &&
+                UserModel.canView(this.authUser);
+            }
+          },
+
+          // Modify User
+          {
+            type: V2ActionType.ICON,
+            icon: 'edit',
+            iconTooltip: 'LNG_PAGE_LIST_USERS_ACTION_MODIFY_USER',
+            action: {
+              link: (item: UserModel): string[] => {
+                return ['/users', item.id, 'modify'];
+              }
+            },
+            visible: (item: UserModel): boolean => {
+              return item.id !== this.authUser.id &&
+                UserModel.canModify(this.authUser);
+            }
+          },
+
+          // Other actions
+          {
+            type: V2ActionType.MENU,
+            icon: 'more_horiz',
+            menuOptions: [
+              // Delete User
+              {
+                label: {
+                  get: () => 'LNG_PAGE_LIST_USERS_ACTION_DELETE_USER'
+                },
+                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+                action: {
+                  click: (item: UserModel): void => {
+                    // determine what we need to delete
+                    this.dialogV2Service.showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_DELETE',
+                          data: () => ({
+                            name: item.name
+                          })
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_USER',
+                          data: () => ({
+                            firstName: item.firstName,
+                            lastName: item.lastName
+                          })
+                        }
+                      }
+                    }).subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // delete the user
+                      this.userDataService
+                        .deleteUser(item.id)
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            this.toastV2Service.error(err);
+
+                            // hide loading
+                            loading.close();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          // success
+                          this.toastV2Service.success('LNG_PAGE_LIST_USERS_ACTION_DELETE_USER_SUCCESS_MESSAGE');
+
+                          // hide loading
+                          loading.close();
+
+                          // reload data
+                          this.needsRefreshList(true);
+                        });
+                    });
+                  }
+                },
+                visible: (item: UserModel): boolean => {
+                  return item.id !== this.authUser.id &&
+                    UserModel.canDelete(this.authUser);
+                }
+              }
+            ]
+          }
+        ]
+      }
+    );
   }
 
   /**
-     * Re(load) the Users list
-     */
-  refreshList(finishCallback: (records: any[]) => void) {
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {
+    this.advancedFilters = UserModel.generateAdvancedFilters({
+      authUser: this.authUser,
+      options: {
+        institution: (this.activatedRoute.snapshot.data.institution as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        userRole: (this.activatedRoute.snapshot.data.userRole as IResolverV2ResponseModel<UserRoleModel>).options,
+        outbreak: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options,
+        team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options
+      }
+    });
+  }
+
+  /**
+   * Initialize table quick actions
+   */
+  protected initializeQuickActions(): void {
+    this.quickActions = {
+      type: V2ActionType.MENU,
+      label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
+      visible: (): boolean => {
+        return UserModel.canListWorkload(this.authUser);
+      },
+      menuOptions: [
+        // Onset report
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_USERS_ACTION_VIEW_USERS_WORKLOAD'
+          },
+          action: {
+            link: () => ['/users', 'workload']
+          },
+          visible: (): boolean => {
+            return UserModel.canListWorkload(this.authUser);
+          }
+        }
+      ]
+    };
+  }
+
+  /**
+   * Initialize table group actions
+   */
+  protected initializeGroupActions(): void {}
+
+  /**
+   * Initialize table add action
+   */
+  protected initializeAddAction(): void {
+    this.addAction = {
+      type: V2ActionType.ICON_LABEL,
+      label: 'LNG_COMMON_BUTTON_ADD',
+      icon: 'add_circle_outline',
+      action: {
+        link: (): string[] => ['/users', 'create']
+      },
+      visible: (): boolean => {
+        return UserModel.canCreate(this.authUser);
+      }
+    };
+  }
+
+  /**
+   * Initialize table grouped data
+   */
+  protected initializeGroupedData(): void {}
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
+    // set breadcrumbs
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
+        }
+      }, {
+        label: 'LNG_PAGE_LIST_USERS_TITLE',
+        action: null
+      }
+    ];
+  }
+
+  /**
+   * Fields retrieved from api to reduce payload size
+   */
+  protected refreshListFields(): string[] {
+    return [
+      'id',
+      'lastName',
+      'firstName',
+      'email',
+      'institutionName',
+      'telephoneNumbers',
+      'roleIds',
+      'roles',
+      'activeOutbreakId',
+      'outbreakIds'
+    ];
+  }
+
+  /**
+   * Re(load) the Users list
+   */
+  refreshList() {
     // get the list of existing users
-    this.usersList$ = this.userDataService
+    this.records$ = this.userDataService
       .getUsersList(this.queryBuilder)
       .pipe(
-        catchError((err) => {
-          this.snackbarService.showApiError(err);
-          finishCallback([]);
-          return throwError(err);
-        }),
-        tap(this.checkEmptyList.bind(this)),
-        tap((data: any[]) => {
-          finishCallback(data);
-        })
+        // should be the last pipe
+        takeUntil(this.destroyed$)
       );
   }
 
   /**
-     * Get total number of items, based on the applied filters
-     */
-  refreshListCount() {
+   * Get total number of items, based on the applied filters
+   */
+  refreshListCount(applyHasMoreLimit?: boolean) {
+    // reset
+    this.pageCount = undefined;
+
+    // set apply value
+    if (applyHasMoreLimit !== undefined) {
+      this.applyHasMoreLimit = applyHasMoreLimit;
+    }
+
     // remove paginator from query builder
     const countQueryBuilder = _.cloneDeep(this.queryBuilder);
     countQueryBuilder.paginator.clear();
     countQueryBuilder.sort.clear();
-    this.usersListCount$ = this.userDataService
+
+    // apply has more limit
+    if (this.applyHasMoreLimit) {
+      countQueryBuilder.flag(
+        'applyHasMoreLimit',
+        true
+      );
+    }
+
+    this.userDataService
       .getUsersCount(countQueryBuilder)
       .pipe(
         catchError((err) => {
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         }),
-        share()
-      );
-  }
 
-  deleteUser(user: UserModel) {
-    // show confirm dialog to confirm the action
-    this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_USER', user)
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          // delete the user
-          this.userDataService
-            .deleteUser(user.id)
-            .pipe(
-              catchError((err) => {
-                this.snackbarService.showApiError(err);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => {
-              this.snackbarService.showSuccess('LNG_PAGE_LIST_USERS_ACTION_DELETE_USER_SUCCESS_MESSAGE');
-
-              // reload data
-              this.needsRefreshList(true);
-            });
-        }
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      )
+      .subscribe((response) => {
+        this.pageCount = response;
       });
-  }
-
-  /**
-     * Retrieve teams
-     */
-  retrieveTeams(): void {
-    // retrieve teams
-    const qb = new RequestQueryBuilder();
-    qb.fields(
-      'id',
-      'name',
-      'userIds'
-    );
-    this.teamsList$ = this.teamDataService
-      .getTeamsList(qb)
-      .pipe(
-        tap((teams) => {
-          // go through each team and determine users
-          this.userTeamMap = {};
-          teams.forEach((team) => {
-            // no need to continue ?
-            // no really necessary since we do the above filter
-            if (
-              !team.userIds ||
-                            team.userIds.length < 1
-            ) {
-              return;
-            }
-
-            // go through users
-            team.userIds.forEach((userId) => {
-              // init array ?
-              if (!this.userTeamMap[userId]) {
-                this.userTeamMap[userId] = [];
-              }
-
-              // push team
-              this.userTeamMap[userId].push(team);
-            });
-          });
-        })
-      );
-  }
-
-  /**
-     * Filter by team
-     */
-  filterTeamField(teams: TeamModel[]): void {
-    // determine list of users that we need to retrieve
-    const usersToRetrieve: {
-      [idUser: string]: true
-    } = {};
-    if (teams) {
-      teams.forEach((team) => {
-        (team.userIds || []).forEach((userId) => {
-          usersToRetrieve[userId] = true;
-        });
-      });
-    }
-
-    // filter
-    this.filterBySelectField(
-      'id',
-      Object.keys(usersToRetrieve),
-      null
-    );
   }
 }

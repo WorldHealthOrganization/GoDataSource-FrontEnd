@@ -1,3 +1,4 @@
+<!--
 <app-topnav [activeOutbreakEditable]="false">
     <ng-container dynamic-section>
         <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
@@ -5,18 +6,19 @@
         </div>
     </ng-container>
 </app-topnav>
+-->
 
 <!-- Side filters -->
-<app-side-filters
-    [filterOptions]="availableSideFilters"
-    (filtersApplied)="applySideFilters($event)"
-    [savedFiltersType]="savedFiltersType">
-</app-side-filters>
+<!--<app-side-filters-->
+<!--    [filterOptions]="availableSideFilters"-->
+<!--    (filtersApplied)="applySideFilters($event)"-->
+<!--    [savedFiltersType]="savedFiltersType">-->
+<!--</app-side-filters>-->
 
-<app-total-number-of-records
-    [value]="entitiesListCount$ | async"
-    (showAll)="refreshListCount(false)">
-</app-total-number-of-records>
+<!--<app-total-number-of-records-->
+<!--    [value]="entitiesListCount$ | async"-->
+<!--    (showAll)="refreshListCount(false)">-->
+<!--</app-total-number-of-records>-->
 
 <div class="page-content form-section">
     <div class="form-content">
@@ -63,12 +65,12 @@
                         </mat-header-cell>
                         <mat-cell *matCellDef="let item;" fxFlex="60px">
 
-                            <app-form-checkbox
-                                #listCheckedIndividual
-                                [name]="'listCheckedIndividual[' + item.id + ']'"
-                                class="table-checkbox"
-                                (optionChanged)="checkedRecord(item, $event)">
-                            </app-form-checkbox>
+<!--                            <app-form-checkbox-->
+<!--                                #listCheckedIndividual-->
+<!--                                [name]="'listCheckedIndividual[' + item.id + ']'"-->
+<!--                                class="table-checkbox"-->
+<!--                                (optionChanged)="checkedRecord(item, $event)">-->
+<!--                            </app-form-checkbox>-->
 
                         </mat-cell>
                     </ng-container>
@@ -81,13 +83,13 @@
                                     {{'LNG_ENTITY_FIELD_LABEL_LAST_NAME' | translate}}
                                 </div>
                                 <div class="column-filter">
-                                    <app-form-input
-                                        name="lastNameFilter"
-                                        ngModel
-                                        [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                                        (optionChanged)="filterByTextField('lastName', $event)"
-                                        [displayFilterIcon]="true">
-                                    </app-form-input>
+<!--                                    <app-form-input-->
+<!--                                        name="lastNameFilter"-->
+<!--                                        ngModel-->
+<!--                                        [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                                        (optionChanged)="filterByTextField('lastName', $event)"-->
+<!--                                        [displayFilterIcon]="true">-->
+<!--                                    </app-form-input>-->
                                 </div>
                             </div>
                         </mat-header-cell>
@@ -105,13 +107,13 @@
                                     {{'LNG_ENTITY_FIELD_LABEL_FIRST_NAME' | translate}}
                                 </div>
                                 <div class="column-filter">
-                                    <app-form-input
-                                        name="firstNameFilter"
-                                        ngModel
-                                        [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                                        (optionChanged)="filterByTextField(['firstName', 'name'], $event)"
-                                        [displayFilterIcon]="true">
-                                    </app-form-input>
+<!--                                    <app-form-input-->
+<!--                                        name="firstNameFilter"-->
+<!--                                        ngModel-->
+<!--                                        [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                                        (optionChanged)="filterByTextField(['firstName', 'name'], $event)"-->
+<!--                                        [displayFilterIcon]="true">-->
+<!--                                    </app-form-input>-->
                                 </div>
                             </div>
                         </mat-header-cell>
@@ -129,13 +131,13 @@
                                     {{'LNG_ENTITY_FIELD_LABEL_VISUAL_ID' | translate}}
                                 </div>
                                 <div class="column-filter">
-                                    <app-form-input
-                                        name="visualIdFilter"
-                                        ngModel
-                                        [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                                        (optionChanged)="filterByTextField('visualId', $event)"
-                                        [displayFilterIcon]="true">
-                                    </app-form-input>
+<!--                                    <app-form-input-->
+<!--                                        name="visualIdFilter"-->
+<!--                                        ngModel-->
+<!--                                        [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                                        (optionChanged)="filterByTextField('visualId', $event)"-->
+<!--                                        [displayFilterIcon]="true">-->
+<!--                                    </app-form-input>-->
                                 </div>
                             </div>
                         </mat-header-cell>
@@ -153,17 +155,17 @@
                                     {{'LNG_ENTITY_FIELD_LABEL_GENDER' | translate}}
                                 </div>
                                 <div class="column-filter">
-                                    <app-form-select
-                                        name="genderFilter"
-                                        ngModel
-                                        [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                                        [options]="genderList$ | async"
-                                        (optionChanged)="filterBySelectField('gender', $event)"
-                                        multiple="true"
-                                        [allowSelectionOfDisabledItems]="true"
-                                        [displayInvisibleItems]="true"
-                                        [displayFilterIcon]="true">
-                                    </app-form-select>
+<!--                                    <app-form-select-->
+<!--                                        name="genderFilter"-->
+<!--                                        ngModel-->
+<!--                                        [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                                        [options]="genderList$ | async"-->
+<!--                                        (optionChanged)="filterBySelectField('gender', $event)"-->
+<!--                                        multiple="true"-->
+<!--                                        [allowSelectionOfDisabledItems]="true"-->
+<!--                                        [displayInvisibleItems]="true"-->
+<!--                                        [displayFilterIcon]="true">-->
+<!--                                    </app-form-select>-->
                                 </div>
                             </div>
                         </mat-header-cell>
@@ -178,18 +180,18 @@
                         <mat-header-cell *matHeaderCellDef>
                             <div class="table-header-cell">
                                 <div class="column-header">
-                                    {{'LNG_ENTITY_FIELD_LABEL_PLACE' | translate}}
+                                    {{'LNG_ADDRESS_FIELD_LABEL_LOCATION' | translate}}
                                 </div>
                                 <div class="column-filter location-drop-down-column-header-container">
-                                    <app-form-location-dropdown
-                                        name="locationFilter"
-                                        ngModel
-                                        [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-                                        (itemChanged)="filterByLocation($event)"
-                                        multiple="true"
-                                        app-reset-input-on-side-filter
-                                        [useOutbreakLocations]="true">
-                                    </app-form-location-dropdown>
+<!--                                    <app-form-location-dropdown-->
+<!--                                        name="locationFilter"-->
+<!--                                        ngModel-->
+<!--                                        [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"-->
+<!--                                        (itemChanged)="filterByLocation($event)"-->
+<!--                                        multiple="true"-->
+<!--                                        app-reset-input-on-side-filter-->
+<!--                                        [useOutbreakLocations]="true">-->
+<!--                                    </app-form-location-dropdown>-->
                                 </div>
                             </div>
                         </mat-header-cell>
@@ -203,40 +205,40 @@
                     <mat-row *matRowDef="let item; columns: fixedTableColumns"></mat-row>
                 </mat-table>
 
-                <div
-                    *ngIf="refreshingList"
-                    class="mat-table-loading-data">
-                    <mat-spinner></mat-spinner>
-                </div>
+<!--                <div-->
+<!--                    *ngIf="refreshingList"-->
+<!--                    class="mat-table-loading-data">-->
+<!--                    <mat-spinner></mat-spinner>-->
+<!--                </div>-->
 
-                <!-- No data -->
-                <div
-                    *ngIf="!refreshingList && isEmptyList"
-                    class="empty-table-text">
-                    {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
-                </div>
+<!--                &lt;!&ndash; No data &ndash;&gt;-->
+<!--                <div-->
+<!--                    *ngIf="!refreshingList && isEmptyList"-->
+<!--                    class="empty-table-text">-->
+<!--                    {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}-->
+<!--                </div>-->
 
-                <!-- Pages (need to be hidden and not ngIf, otherwise it makes a new duplicate request) -->
-                <app-mat-paginator-extended
-                    [hidden]="refreshingList || isEmptyList"
-                    [pageIndex]="pageIndex"
-                    [countData]="entitiesListCount$ | async"
-                    [pageSize]="pageSize"
-                    [pageSizeOptions]="pageSizeOptions"
-                    (page)="changePage($event)">
-                </app-mat-paginator-extended>
+<!--                &lt;!&ndash; Pages (need to be hidden and not ngIf, otherwise it makes a new duplicate request) &ndash;&gt;-->
+<!--                <app-mat-paginator-extended-->
+<!--                    [hidden]="refreshingList || isEmptyList"-->
+<!--                    [pageIndex]="pageIndex"-->
+<!--                    [countData]="entitiesListCount$ | async"-->
+<!--                    [pageSize]="pageSize"-->
+<!--                    [pageSizeOptions]="[]"-->
+<!--                    (page)="changePage($event)">-->
+<!--                </app-mat-paginator-extended>-->
 
             </mat-card>
         </form>
     </div>
     <div
         class="form-actions">
-        <button
-            mat-raised-button
-            color="accent"
-            (click)="switchWithSelectedRecord()"
-            [disabled]="!checkedAtLeastOneRecord">
-            {{ 'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_SET_SOURCE_BUTTON' | translate}}
-        </button>
+<!--        <button-->
+<!--            mat-raised-button-->
+<!--            color="accent"-->
+<!--            (click)="switchWithSelectedRecord()"-->
+<!--            [disabled]="!checkedAtLeastOneRecord">-->
+<!--            {{ 'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_SET_SOURCE_BUTTON' | translate}}-->
+<!--        </button>-->
     </div>
 </div>

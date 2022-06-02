@@ -1,11 +1,28 @@
 import { ModuleWithProviders } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { Routes, RouterModule, Route } from '@angular/router';
 import * as fromPages from './pages';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
-import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
+import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
+import { PermissionDataResolver } from '../../core/services/resolvers/data/permission.resolver';
+import { RolesCreateViewModifyComponent } from './pages';
+import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
+import { SelectedUserRoleDataResolver } from '../../core/services/resolvers/data/selected-user-role.resolver';
 
+// common base - create / view / modify
+const createViewModifyFoundation: Route = {
+  component: RolesCreateViewModifyComponent,
+  canActivate: [AuthGuard],
+  resolve: {
+    user: UserDataResolver,
+    permission: PermissionDataResolver,
+    userRole: SelectedUserRoleDataResolver
+  }
+};
+
+// routes
 const routes: Routes = [
   // Roles list
   {
@@ -16,17 +33,22 @@ const routes: Routes = [
       permissions: [
         PERMISSION.USER_ROLE_LIST
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      user: UserDataResolver,
+      permission: PermissionDataResolver
     }
   },
   // Create new Role
   {
     path: 'create',
-    component: fromPages.CreateRoleComponent,
-    canActivate: [AuthGuard],
+    ...createViewModifyFoundation,
     data: {
       permissions: [
         PERMISSION.USER_ROLE_CREATE
-      ]
+      ],
+      action: CreateViewModifyV2Action.CREATE
     },
     canDeactivate: [
       PageChangeConfirmationGuard
@@ -35,25 +57,23 @@ const routes: Routes = [
   // View Role
   {
     path: ':roleId/view',
-    component: fromPages.ModifyRoleComponent,
-    canActivate: [AuthGuard],
+    ...createViewModifyFoundation,
     data: {
       permissions: [
         PERMISSION.USER_ROLE_VIEW
       ],
-      action: ViewModifyComponentAction.VIEW
+      action: CreateViewModifyV2Action.VIEW
     }
   },
   // Modify Role
   {
     path: ':roleId/modify',
-    component: fromPages.ModifyRoleComponent,
-    canActivate: [AuthGuard],
+    ...createViewModifyFoundation,
     data: {
       permissions: [
         PERMISSION.USER_ROLE_MODIFY
       ],
-      action: ViewModifyComponentAction.MODIFY
+      action: CreateViewModifyV2Action.MODIFY
     },
     canDeactivate: [
       PageChangeConfirmationGuard

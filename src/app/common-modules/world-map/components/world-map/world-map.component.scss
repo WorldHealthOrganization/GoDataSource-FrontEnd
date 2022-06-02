@@ -1,0 +1,65 @@
+@import 'mixins';
+
+app-world-map {
+  @include flex(flex);
+  @include flex_direction(column);
+  height: 100%;
+  position: relative;
+
+  .app-world-map-container {
+    background-color: var(--gd-background);
+    height: 100%;
+    width: 100%;
+
+    &.full-screen-map {
+      height: 100vh; /* Fallback for browsers which cannot support Custom Properties */
+      height: calc(var(--vh, 1vh) * 100);
+      left: 0;
+      position: fixed;
+      top: 0;
+      width: 100vw;
+      z-index: 1100;
+    }
+
+    .world-map-full-screen {
+      position: absolute;
+      right: 0.8rem;
+      top: 0.8rem;
+      z-index: 9999;
+    }
+
+    #worldMap {
+      height: 100%;
+      width: 100%;
+    }
+  }
+
+  .app-world-map-disclaimer {
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    width: 100%;
+
+    .app-world-map-disclaimer-button {
+      margin: 0 0 0.8rem 0.8rem;
+    }
+
+    .app-world-map-disclaimer-content {
+      background: rgba(var(--gd-text-rgb), 0.75);
+      color: var(--gd-background);
+      padding: 1.6rem;
+
+      .app-world-map-disclaimer-text {
+        margin-bottom: 1.6rem;
+      }
+
+      .app-world-map-disclaimer-header {
+        font-weight: 700;
+      }
+
+      .app-world-map-disclaimer-no-wrap {
+        white-space: nowrap;
+      }
+    }
+  }
+}

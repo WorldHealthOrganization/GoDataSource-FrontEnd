@@ -1,10 +1,10 @@
-import { Component, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Constants } from '../../../../core/models/constants';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
-import { Subscription ,  Subscriber } from 'rxjs';
+import { Subscription,  Subscriber } from 'rxjs';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
@@ -16,9 +16,12 @@ import { FormatFunction } from 'c3';
   selector: 'app-contact-follow-up-overview-dashlet',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './contact-follow-up-overview-dashlet.component.html',
-  styleUrls: ['./contact-follow-up-overview-dashlet.component.less']
+  styleUrls: ['./contact-follow-up-overview-dashlet.component.scss']
 })
 export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestroy {
+  // detect changes
+  @Output() detectChanges = new EventEmitter<void>();
+
   chartData: any = [];
   chartDataCategories: any = [];
   chartDataColumns: any = [];
@@ -26,18 +29,38 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
   viewType = Constants.EPI_CURVE_VIEW_TYPE.MONTH.value;
   colorPattern: string[] = [];
 
-  showLabels: { format: { [prop: string]: FormatFunction }};
+  showLabels: { format: { [prop: string]: FormatFunction } };
 
   // constants
   Constants = Constants;
 
+  // expanded / collapsed ?
+  expandedOnce: boolean = false;
+  private _retrievedData: boolean;
+  private _expanded: boolean = false;
+  set expanded(expanded: boolean) {
+    // set data
+    this._expanded = expanded;
+
+    // set expanded once
+    if (this._expanded) {
+      this.expandedOnce = true;
+    }
+
+    // retrieve data if expanded and data not retrieved
+    this.refreshData();
+  }
+  get expanded(): boolean {
+    return this._expanded;
+  }
+
   // Global filters => Date
-  private _globalFilterDate: Moment;
-  @Input() set globalFilterDate(globalFilterDate: Moment) {
+  private _globalFilterDate: Moment | string;
+  @Input() set globalFilterDate(globalFilterDate: Moment | string) {
     this._globalFilterDate = globalFilterDate;
     this.refreshDataCaller.call();
   }
-  get globalFilterDate(): Moment {
+  get globalFilterDate(): Moment | string {
     return this._globalFilterDate;
   }
 
@@ -78,6 +101,7 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
      * Global Filters changed
      */
   protected refreshDataCaller = new DebounceTimeCaller(new Subscriber<void>(() => {
+    this._retrievedData = false;
     this.refreshData();
   }), 100);
 
@@ -222,7 +246,15 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
      * Refresh Data
      */
   refreshData() {
-    if ( this.outbreakId ) {
+    // not expanded ?
+    if (
+      !this.expanded ||
+      this._retrievedData
+    ) {
+      return;
+    }
+
+    if (this.outbreakId) {
       // release previous subscriber
       if (this.previousSubscriber) {
         this.previousSubscriber.unsubscribe();
@@ -239,7 +271,7 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
       if (this.globalFilterDate) {
         qb.filter.byEquality(
           'endDate',
-          this.globalFilterDate.clone().endOf('day').toISOString()
+          moment(this.globalFilterDate).clone().endOf('day').toISOString()
         );
       } else {
         qb.filter.byEquality(
@@ -268,7 +300,9 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
       }
 
       // get data - start Date will be set to start of outbreak
+      this._retrievedData = true;
       this.displayLoading = true;
+      this.detectChanges.emit();
       this.previousSubscriber = this.contactDataService
         .getContactsFollowedUpReport(this.outbreakId, qb)
         .subscribe((results) => {
@@ -281,6 +315,7 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
 
           // finished
           this.displayLoading = false;
+          this.detectChanges.emit();
         });
     }
   }

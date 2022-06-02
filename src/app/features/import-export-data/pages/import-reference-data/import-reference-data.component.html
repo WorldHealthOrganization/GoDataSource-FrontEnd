@@ -1,10 +1,7 @@
-<app-topnav>
-    <ng-container dynamic-section>
-        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
-    </ng-container>
-</app-topnav>
-
-<app-import-data
+<app-basic-page-v2
+  [breadcrumbs]="breadcrumbs"
+  pageTitle="LNG_PAGE_IMPORT_REFERENCE_DATA_TITLE">
+  <app-import-data
     [allowedExtensions]="allowedExtensions"
     [title]="'LNG_PAGE_IMPORT_REFERENCE_DATA_TITLE'"
     (finished)="finished()"
@@ -12,6 +9,6 @@
     [importDataUrl]="importDataUrl"
     [model]="ImportServerModelNames.REFERENCE_DATA"
     [requiredDestinationFields]="requiredDestinationFields"
-    [savedImportPage]="Constants.APP_IMPORT_PAGE.REFERENCE_DATA.value"
     [asyncImport]="true">
-</app-import-data>
+  </app-import-data>
+</app-basic-page-v2>

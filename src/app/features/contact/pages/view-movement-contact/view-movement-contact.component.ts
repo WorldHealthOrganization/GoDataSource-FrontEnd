@@ -1,5 +1,4 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -11,18 +10,19 @@ import { WorldMapMovementComponent } from '../../../../common-modules/world-map-
 import { EntityType } from '../../../../core/models/entity-type';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
+import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
 
 @Component({
   selector: 'app-view-movement-contact',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './view-movement-contact.component.html',
-  styleUrls: ['./view-movement-contact.component.less']
+  templateUrl: './view-movement-contact.component.html'
 })
 export class ViewMovementContactComponent implements OnInit {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  breadcrumbs: IV2Breadcrumb[] = [];
 
-  contactData: ContactModel = new ContactModel();
+  private _contactData: ContactModel = new ContactModel();
   movementAddresses: AddressModel[] = [];
 
   // loading data
@@ -34,7 +34,10 @@ export class ViewMovementContactComponent implements OnInit {
   ContactModel = ContactModel;
 
   // authenticated user details
-  authUser: UserModel;
+  private _authUser: UserModel;
+
+  // quick actions
+  quickActions: IV2ActionMenuLabel;
 
   /**
      * Constructor
@@ -51,7 +54,7 @@ export class ViewMovementContactComponent implements OnInit {
      */
   ngOnInit() {
     // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
+    this._authUser = this.authDataService.getAuthenticatedUser();
 
     this.route.params.subscribe((params: { contactId }) => {
       this.outbreakDataService
@@ -65,7 +68,7 @@ export class ViewMovementContactComponent implements OnInit {
               [contactData, movementData]: [ContactModel, AddressModel[]]
             ) => {
               // contact data
-              this.contactData = contactData;
+              this._contactData = contactData;
 
               // initialize page breadcrumbs
               this.initializeBreadcrumbs();
@@ -79,6 +82,27 @@ export class ViewMovementContactComponent implements OnInit {
 
     // initialize page breadcrumbs
     this.initializeBreadcrumbs();
+
+    // quick actions
+    this.quickActions = {
+      type: V2ActionType.MENU,
+      label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
+      visible: () => ContactModel.canExportMovementMap(this._authUser),
+      menuOptions: [
+        // Export map
+        {
+          label: {
+            get: () => 'LNG_PAGE_VIEW_MOVEMENT_CONTACT_EXPORT'
+          },
+          action: {
+            click: () => {
+              this.mapMovement.exportMovementMap(EntityType.CONTACT);
+            }
+          },
+          visible: () => ContactModel.canExportMovementMap(this._authUser)
+        }
+      ]
+    };
   }
 
   /**
@@ -86,44 +110,42 @@ export class ViewMovementContactComponent implements OnInit {
      */
   initializeBreadcrumbs() {
     // reset
-    this.breadcrumbs = [];
-
-    // contacts list page
-    if (ContactModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-      );
-    }
-
-    // contact breadcrumbs
-    if (this.contactData) {
-      // contacts view page
-      if (ContactModel.canView(this.authUser)) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel(
-            this.contactData.name,
-            `/contacts/${this.contactData.id}/view`
-          )
-        );
+    this.breadcrumbs = [{
+      label: 'LNG_COMMON_LABEL_HOME',
+      action: {
+        link: DashboardModel.canViewDashboard(this._authUser) ?
+          ['/dashboard'] :
+          ['/account/my-profile']
       }
+    }];
 
-      // current page
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel(
-          'LNG_PAGE_VIEW_MOVEMENT_CONTACT_TITLE',
-          '.',
-          true,
-          {},
-          this.contactData
-        )
-      );
+    // list page
+    if (ContactModel.canList(this._authUser)) {
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
+        action: {
+          link: ['/contacts']
+        }
+      });
     }
-  }
 
-  /**
-     * Export movement map for contact
-     */
-  exportContactMovementMap() {
-    this.mapMovement.exportMovementMap(EntityType.CONTACT);
+    // case breadcrumbs
+    if (this._contactData) {
+      // case view page
+      if (ContactModel.canView(this._authUser)) {
+        this.breadcrumbs.push({
+          label: this._contactData.name,
+          action: {
+            link: [`/contacts/${this._contactData.id}/view`]
+          }
+        });
+      }
+    }
+
+    // current page
+    this.breadcrumbs.push({
+      label: 'LNG_PAGE_VIEW_MOVEMENT_CONTACT_TITLE',
+      action: null
+    });
   }
 }

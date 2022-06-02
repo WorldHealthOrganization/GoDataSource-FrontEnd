@@ -16,18 +16,22 @@ import * as _ from 'lodash';
   ]
 })
 export class MinMaxValidatorDirective implements Validator {
+  // data
   @Input() minNumber: number;
   @Input() maxNumber: number;
 
+  /**
+   * Validate
+   */
   validate(control: AbstractControl): { [key: string]: any } {
     // do we need to validate min & max ?
     if (
       (
-        _.isEmpty(control.value) &&
-                !_.isNumber(control.value)
+        !control.value &&
+        control.value !== 0
       ) || (
         !_.isNumber(this.minNumber) &&
-                !_.isNumber(this.maxNumber)
+        !_.isNumber(this.maxNumber)
       )
     ) {
       return null;
@@ -36,7 +40,7 @@ export class MinMaxValidatorDirective implements Validator {
     // validate => min
     if (
       _.isNumber(this.minNumber) &&
-            control.value < this.minNumber
+      control.value < this.minNumber
     ) {
       return {
         minNumberValidator: {
@@ -48,7 +52,7 @@ export class MinMaxValidatorDirective implements Validator {
     // validate => min
     if (
       _.isNumber(this.maxNumber) &&
-            control.value > this.maxNumber
+      control.value > this.maxNumber
     ) {
       return {
         maxNumberValidator: {

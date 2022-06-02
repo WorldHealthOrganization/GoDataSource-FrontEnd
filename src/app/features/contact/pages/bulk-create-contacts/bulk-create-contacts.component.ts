@@ -1,10 +1,8 @@
 import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -19,9 +17,7 @@ import { DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, LocationSheet
 import * as Handsontable from 'handsontable';
 import { Constants } from '../../../../core/models/constants';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { throwError } from 'rxjs';
 import { catchError, map, share } from 'rxjs/operators';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { moment } from '../../../../core/helperClasses/x-moment';
@@ -31,16 +27,21 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { UserModel } from '../../../../core/models/user.model';
 import { TeamDataService } from '../../../../core/services/data/team.data.service';
 import { TeamModel } from '../../../../core/models/team.model';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { IV2ActionIconLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 
 @Component({
   selector: 'app-bulk-create-contacts',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './bulk-create-contacts.component.html',
-  styleUrls: ['./bulk-create-contacts.component.less']
+  styleUrls: ['./bulk-create-contacts.component.scss']
 })
 export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  breadcrumbs: IV2Breadcrumb[] = [];
 
   @ViewChild('inputForMakingFormDirty', { static: true }) inputForMakingFormDirty;
   @ViewChild('hotTableWrapper', { static: true }) hotTableWrapper: HotTableWrapperComponent;
@@ -84,6 +85,9 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     mask: string
   };
 
+  // action
+  actionButton: IV2ActionIconLabel;
+
   // subscribers
   outbreakSubscriber: Subscription;
 
@@ -94,18 +98,18 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
   teamList$: Observable<TeamModel[]>;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private contactDataService: ContactDataService,
     private entityDataService: EntityDataService,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private referenceDataDataService: ReferenceDataDataService,
     private i18nService: I18nService,
-    private dialogService: DialogService,
+    private dialogV2Service: DialogV2Service,
     private authDataService: AuthDataService,
     private teamDataService: TeamDataService
   ) {
@@ -113,8 +117,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
   }
 
   /**
-     * Component initialized
-     */
+   * Component initialized
+   */
   ngOnInit() {
     // get the authenticated user
     this.authUser = this.authDataService.getAuthenticatedUser();
@@ -161,7 +165,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
       .pipe(
         catchError((err) => {
           // show error message
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
 
           // navigate to Cases/Events listing page
           this.redirectToRelatedEntityList();
@@ -177,11 +181,23 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
 
         this.retrieveRelatedPerson();
       });
+
+    // action button
+    this.actionButton = {
+      type: V2ActionType.ICON_LABEL,
+      icon: '',
+      label: 'LNG_COMMON_BUTTON_SAVE',
+      action: {
+        click: () => {
+          this.addContacts();
+        }
+      }
+    };
   }
 
   /**
-     * Component destroyed
-     */
+   * Component destroyed
+   */
   ngOnDestroy() {
     // outbreak subscriber
     if (this.outbreakSubscriber) {
@@ -191,26 +207,39 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
   }
 
   /**
-     * Initialize breadcrumbs
-     */
+   * Initialize breadcrumbs
+   */
   initializeBreadcrumbs() {
     // reset
-    this.breadcrumbs = [];
+    this.breadcrumbs = [{
+      label: 'LNG_COMMON_LABEL_HOME',
+      action: {
+        link: DashboardModel.canViewDashboard(this.authUser) ?
+          ['/dashboard'] :
+          ['/account/my-profile']
+      }
+    }];
 
     // case or event?
     if (this.relatedEntityType === EntityType.CASE) {
       // case list
       if (CaseModel.canList(this.authUser)) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases'),
-        );
+        this.breadcrumbs.push({
+          label: 'LNG_PAGE_LIST_CASES_TITLE',
+          action: {
+            link: ['/cases']
+          }
+        });
       }
     } else if (this.relatedEntityType === EntityType.EVENT) {
       // event list
       if (EventModel.canList(this.authUser)) {
-        this.breadcrumbs.push(
-          new BreadcrumbItemModel('LNG_PAGE_LIST_EVENTS_TITLE', '/events'),
-        );
+        this.breadcrumbs.push({
+          label: 'LNG_PAGE_LIST_EVENTS_TITLE',
+          action: {
+            link: ['/events']
+          }
+        });
       }
     } else {
       // NOT SUPPORTED :)
@@ -218,24 +247,24 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
 
     // contacts list page
     if (ContactModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-      );
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
+        action: {
+          link: ['/contacts']
+        }
+      });
     }
 
     // current page breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        'LNG_PAGE_BULK_ADD_CONTACTS_TITLE',
-        '.',
-        true
-      )
-    );
+    this.breadcrumbs.push({
+      label: 'LNG_PAGE_BULK_ADD_CONTACTS_TITLE',
+      action: null
+    });
   }
 
   /**
-     * Configure 'Handsontable'
-     */
+   * Configure 'Handsontable'
+   */
   private configureSheetWidget() {
     // configure columns
     this.sheetColumns = [
@@ -418,8 +447,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
   }
 
   /**
-     * After changes
-     */
+   * After changes
+   */
   afterBecameDirty() {
     // no input to make dirty ?
     if (!this.inputForMakingFormDirty) {
@@ -431,14 +460,14 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
   }
 
   /**
-     * Retrieve information of related person (Case or Event)
-     */
+   * Retrieve information of related person (Case or Event)
+   */
   private retrieveRelatedPerson() {
     if (
       this.selectedOutbreak &&
-            this.selectedOutbreak.id &&
-            this.relatedEntityType &&
-            this.relatedEntityId
+      this.selectedOutbreak.id &&
+      this.relatedEntityType &&
+      this.relatedEntityId
     ) {
       // retrieve related person information
       this.entityDataService
@@ -446,7 +475,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         .pipe(
           catchError((err) => {
             // show error message
-            this.snackbarService.showApiError(err);
+            this.toastV2Service.error(err);
 
             // navigate to Cases/Events listing page
             this.redirectToRelatedEntityList();
@@ -462,21 +491,21 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
   }
 
   /**
-     * Check that we have related Person Type and ID
-     */
+   * Check that we have related Person Type and ID
+   */
   private validateRelatedEntity() {
     if (
       this.relatedEntityId &&
-            (
-              this.relatedEntityType === EntityType.CASE ||
-                this.relatedEntityType === EntityType.EVENT
-            )
+      (
+        this.relatedEntityType === EntityType.CASE ||
+        this.relatedEntityType === EntityType.EVENT
+      )
     ) {
       return true;
     }
 
     // related person data is wrong or missing
-    this.snackbarService.showSuccess('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_CASE_OR_EVENT_REQUIRED');
+    this.toastV2Service.success('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_CASE_OR_EVENT_REQUIRED');
 
     // navigate to Cases/Events listing page
     this.redirectToRelatedEntityList();
@@ -485,17 +514,17 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
   }
 
   /**
-     * Redirect to Cases or Events list, based on related Entity Type
-     */
+   * Redirect to Cases or Events list, based on related Entity Type
+   */
   private redirectToRelatedEntityList() {
     if (
       this.relatedEntityType === EntityType.CASE &&
-            CaseModel.canList(this.authUser)
+      CaseModel.canList(this.authUser)
     ) {
       this.router.navigate(['/cases']);
     } else if (
       this.relatedEntityType === EntityType.EVENT &&
-            EventModel.canList(this.authUser)
+      EventModel.canList(this.authUser)
     ) {
       this.router.navigate(['/events']);
     } else {
@@ -509,8 +538,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
   }
 
   /**
-     * Create new Contacts
-     */
+   * Create new Contacts
+   */
   addContacts() {
     // make sure we have the component used to validate & retrieve data
     if (!this.hotTableWrapper) {
@@ -518,7 +547,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     }
 
     // validate sheet
-    const loadingDialog = this.dialogService.showLoadingDialog();
+    const loadingDialog = this.dialogV2Service.showLoadingDialog();
     this.errorMessages = [];
     this.hotTableWrapper
       .validateTable()
@@ -533,7 +562,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
 
           // show error
           loadingDialog.close();
-          this.snackbarService.showError('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_INVALID_FIELDS');
+          this.toastV2Service.error('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_INVALID_FIELDS');
         } else {
           // collect data from table
           this.hotTableWrapper
@@ -546,7 +575,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
               if (_.isEmpty(dataResponse.data)) {
                 // show error
                 loadingDialog.close();
-                this.snackbarService.showError('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_NO_DATA');
+                this.toastV2Service.error('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_NO_DATA');
               } else {
                 // create contacts
                 this.contactDataService
@@ -614,7 +643,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                       });
 
                       // try to parse into more clear errors
-                      this.snackbarService.translateApiErrors(errors)
+                      this.toastV2Service.translateErrors(errors)
                         .subscribe((translatedErrors) => {
                           // transform errors
                           (translatedErrors || []).forEach((translatedError) => {
@@ -636,12 +665,12 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                         });
 
                       // display error
-                      this.snackbarService.showApiError(err);
+                      this.toastV2Service.error(err);
                       return throwError(err);
                     })
                   )
                   .subscribe(() => {
-                    this.snackbarService.showSuccess('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
+                    this.toastV2Service.success('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
 
                     // navigate to listing page
                     this.disableDirtyConfirm();

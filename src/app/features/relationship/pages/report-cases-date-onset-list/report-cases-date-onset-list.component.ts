@@ -1,275 +1,367 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { Observable } from 'rxjs';
-import { UserModel } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
-import { ReportCasesWithOnsetModel } from '../../../../core/models/report-cases-with-onset.model';
-import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
-import { EntityType } from '../../../../core/models/entity-type';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { catchError, tap } from 'rxjs/operators';
-import { Router } from '@angular/router';
-import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
+import { Component, OnDestroy } from '@angular/core';
+import { Params } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import * as _ from 'lodash';
-import { Subscription } from 'rxjs/internal/Subscription';
-import { throwError } from 'rxjs/internal/observable/throwError';
+import { takeUntil, tap } from 'rxjs/operators';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { CaseModel } from '../../../../core/models/case.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
+import { EntityType } from '../../../../core/models/entity-type';
+import { ReportCasesWithOnsetModel } from '../../../../core/models/report-cases-with-onset.model';
+import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 
 @Component({
   selector: 'app-report-cases-date-onset-list',
   templateUrl: './report-cases-date-onset-list.component.html'
 })
-export class ReportCasesDateOnsetListComponent extends ListComponent implements OnInit, OnDestroy {
-  // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
-
-  // authenticated user
-  authUser: UserModel;
-
-  outbreakSubscriber: Subscription;
-
-  // selected Outbreak
-  selectedOutbreak: OutbreakModel;
-
-  // list of secondary cases with onset date that is before the date of onset of the primary case
-  casesWithOnsetList$: Observable<ReportCasesWithOnsetModel[]>;
-
-  // provide constants to template
-  ReferenceDataCategory = ReferenceDataCategory;
-  EntityType = EntityType;
-
-  fixedTableColumns: string[] = [
-    'primaryCase.firstName',
-    'primaryCase.lastName',
-    'primaryCase.dateOfOnset',
-    'primaryCase.classification',
-    'secondaryCase.firstName',
-    'secondaryCase.lastName',
-    'secondaryCase.dateOfOnset',
-    'secondaryCase.classification'
-  ];
-
-  recordActions: HoverRowAction[] = [
-    // Other actions
-    new HoverRowAction({
-      type: HoverRowActionType.MENU,
-      icon: 'moreVertical',
-      menuOptions: [
-        // View people 1
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW',
-          menuOptionLabelTranslateData: (item: ReportCasesWithOnsetModel) => {
-            return item.primaryCase;
-          },
-          click: (item: ReportCasesWithOnsetModel) => {
-            this.router.navigate(['/cases', item.primaryCase.id, 'view'], {
-              queryParams: {
-                onset: true
-              }
-            });
-          },
-          visible: () => {
-            return CaseModel.canView(this.authUser);
-          }
-        }),
-
-        // View people 2
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW',
-          menuOptionLabelTranslateData: (item: ReportCasesWithOnsetModel) => {
-            return item.secondaryCase;
-          },
-          click: (item: ReportCasesWithOnsetModel) => {
-            this.router.navigate(['/cases', item.secondaryCase.id, 'view'], {
-              queryParams: {
-                onset: true
-              }
-            });
-          },
-          visible: () => {
-            return CaseModel.canView(this.authUser);
-          }
-        }),
-
-        // View relationship
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW_RELATIONSHIP',
-          click: (item: ReportCasesWithOnsetModel) => {
-            // #TODO TBD - if this is correct !?
-            const relationTypePath: string = _.find(item.relationship.persons, { id: item.primaryCase.id }).source ? 'contacts' : 'exposures';
-            this.router.navigate(['/relationships', EntityType.CASE, item.primaryCase.id, relationTypePath, item.relationship.id, 'view']);
-          },
-          visible: () => {
-            return RelationshipModel.canView(this.authUser);
-          }
-        }),
-
-        // Divider
-        new HoverRowAction({
-          type: HoverRowActionType.DIVIDER,
-          visible: () => {
-            return CaseModel.canView(this.authUser) ||
-                            RelationshipModel.canView(this.authUser);
-          }
-        }),
-
-        // Modify people 1
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY',
-          menuOptionLabelTranslateData: (item: ReportCasesWithOnsetModel) => {
-            return item.primaryCase;
-          },
-          click: (item: ReportCasesWithOnsetModel) => {
-            this.router.navigate(['/cases', item.primaryCase.id, 'modify'], {
-              queryParams: {
-                onset: true
-              }
-            });
-          },
-          visible: () => {
-            return this.authUser &&
-                            this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            CaseModel.canModify(this.authUser);
-          }
-        }),
-
-        // Modify people 2
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY',
-          menuOptionLabelTranslateData: (item: ReportCasesWithOnsetModel) => {
-            return item.secondaryCase;
-          },
-          click: (item: ReportCasesWithOnsetModel) => {
-            this.router.navigate(['/cases', item.secondaryCase.id, 'modify'], {
-              queryParams: {
-                onset: true
-              }
-            });
-          },
-          visible: () => {
-            return this.authUser &&
-                            this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            CaseModel.canModify(this.authUser);
-          }
-        }),
-
-        // Modify relationship
-        new HoverRowAction({
-          menuOptionLabel: 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY_RELATIONSHIP',
-          click: (item: ReportCasesWithOnsetModel) => {
-            // #TODO TBD - if this is correct !?
-            const relationTypePath: string = _.find(item.relationship.persons, { id: item.primaryCase.id }).source ? 'contacts' : 'exposures';
-            this.router.navigate(['/relationships', EntityType.CASE, item.primaryCase.id, relationTypePath, item.relationship.id, 'modify']);
-          },
-          visible: () => {
-            return this.authUser &&
-                            this.selectedOutbreak &&
-                            this.authUser.activeOutbreakId === this.selectedOutbreak.id &&
-                            RelationshipModel.canModify(this.authUser);
-          }
-        })
-      ]
-    })
-  ];
-
+export class ReportCasesDateOnsetListComponent extends ListComponent<ReportCasesWithOnsetModel> implements OnDestroy {
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
-    private router: Router,
-    private snackbarService: SnackbarService,
-    private authDataService: AuthDataService,
-    private outbreakDataService: OutbreakDataService,
-    private relationshipDataService: RelationshipDataService
+    private relationshipDataService: RelationshipDataService,
+    private translateService: TranslateService
   ) {
-    super(listHelperService);
-  }
-
-  /**
-     * Component initialized
-     */
-  ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
-    // subscribe to the Selected Outbreak Subject stream
-    this.outbreakSubscriber = this.outbreakDataService
-      .getSelectedOutbreakSubject()
-      .subscribe((selectedOutbreak: OutbreakModel) => {
-        this.selectedOutbreak = selectedOutbreak;
-
-        // refresh
-        this.needsRefreshList(true);
-      });
-
-    // initialize breadcrumbs
-    this.initializeBreadcrumbs();
-  }
-
-  /**
-     * Component destroyed
-     */
-  ngOnDestroy() {
-    // release parent resources
-    super.ngOnDestroy();
-
-    // outbreak subscriber
-    if (this.outbreakSubscriber) {
-      this.outbreakSubscriber.unsubscribe();
-      this.outbreakSubscriber = null;
-    }
-  }
-
-  /**
-     * Initialize breadcrumbs
-     */
-  private initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // cases list
-    if (CaseModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_TITLE', '/cases')
-      );
-    }
-
-    // current page
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel('LNG_PAGE_LIST_CASES_DATE_ONSET_TITLE', '', true)
+    super(
+      listHelperService,
+      true
     );
   }
 
   /**
-     * Re(load) the Cases list, based on the applied filter, sort criterias
-     */
-  refreshList(finishCallback: (records: any[]) => void) {
-    if (this.selectedOutbreak) {
-      // retrieve the list
-      this.casesWithOnsetList$ = this.relationshipDataService
-        .getCasesWithDateOnsetBeforePrimaryCase(this.selectedOutbreak.id)
-        .pipe(
-          catchError((err) => {
-            this.snackbarService.showApiError(err);
-            finishCallback([]);
-            return throwError(err);
-          }),
-          tap(this.checkEmptyList.bind(this)),
-          tap((data: any[]) => {
-            finishCallback(data);
-          })
-        );
-    } else {
-      finishCallback([]);
-    }
+   * Component destroyed
+   */
+  ngOnDestroy() {
+    // release parent resources
+    super.onDestroy();
   }
+
+  /**
+   * Selected outbreak was changed
+   */
+  selectedOutbreakChanged(): void {
+    // initialize pagination
+    this.initPaginator();
+
+    // ...and re-load the list when the Selected Outbreak is changed
+    this.needsRefreshList(true);
+  }
+
+  /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {
+    this.tableColumns = [
+      {
+        field: 'primaryCase.firstName',
+        label: `${this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_PRIMARY')} ${this.translateService.instant('LNG_CASE_FIELD_LABEL_FIRST_NAME')}`
+      },
+      {
+        field: 'primaryCase.lastName',
+        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_PRIMARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_LAST_NAME') }`
+      },
+      {
+        field: 'primaryCase.dateOfOnset',
+        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_PRIMARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_DATE_OF_ONSET') }`,
+        format: {
+          type: V2ColumnFormat.DATE
+        }
+      },
+      {
+        field: 'primaryCase.classification',
+        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_PRIMARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_CLASSIFICATION') }`
+      },
+      {
+        field: 'secondaryCase.firstName',
+        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_SECONDARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_FIRST_NAME') }`
+      },
+      {
+        field: 'secondaryCase.lastName',
+        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_SECONDARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_LAST_NAME') }`
+      },
+      {
+        field: 'secondaryCase.dateOfOnset',
+        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_SECONDARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_DATE_OF_ONSET') }`,
+        format: {
+          type: V2ColumnFormat.DATE
+        }
+      },
+      {
+        field: 'secondaryCase.classification',
+        label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_SECONDARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_CLASSIFICATION') }`
+      },
+
+      // actions
+      {
+        field: 'actions',
+        label: 'LNG_COMMON_LABEL_ACTIONS',
+        pinned: IV2ColumnPinned.RIGHT,
+        notResizable: true,
+        cssCellClass: 'gd-cell-no-focus',
+        format: {
+          type: V2ColumnFormat.ACTIONS
+        },
+        actions: [
+          // Other actions
+          {
+            type: V2ActionType.MENU,
+            icon: 'more_horiz',
+            menuOptions: [
+              // View people 1
+              {
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW',
+                  data: (item: ReportCasesWithOnsetModel) => {
+                    return {
+                      name: item.primaryCase.name
+                    };
+                  }
+                },
+                action: {
+                  link: (item: ReportCasesWithOnsetModel) => {
+                    return ['/cases', item.primaryCase.id, 'view'];
+                  },
+                  linkQueryParams: (): Params => {
+                    return {
+                      onset: true
+                    };
+                  }
+                },
+                visible: () => {
+                  return CaseModel.canView(this.authUser);
+                }
+              },
+
+              // View people 2
+              {
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW',
+                  data: (item: ReportCasesWithOnsetModel) => {
+                    return {
+                      name: item.secondaryCase.name
+                    };
+                  }
+                },
+                action: {
+                  link: (item: ReportCasesWithOnsetModel) => {
+                    return ['/cases', item.secondaryCase.id, 'view'];
+                  },
+                  linkQueryParams: (): Params => {
+                    return {
+                      onset: true
+                    };
+                  }
+                },
+                visible: () => {
+                  return CaseModel.canView(this.authUser);
+                }
+              },
+
+              // View relationship
+              {
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW_RELATIONSHIP'
+                },
+                action: {
+                  link: (item: ReportCasesWithOnsetModel) => {
+                    // #TODO TBD - if this is correct !? (old comment)
+                    const relationTypePath: string = _.find(item.relationship.persons, { id: item.primaryCase.id }).source ? 'contacts' : 'exposures';
+                    return ['/relationships', EntityType.CASE, item.primaryCase.id, relationTypePath, item.relationship.id, 'view'];
+                  }
+                },
+                visible: () => {
+                  return RelationshipModel.canView(this.authUser);
+                }
+              },
+
+              // Divider
+              {
+                visible: () => {
+                  return CaseModel.canView(this.authUser) ||
+                    RelationshipModel.canView(this.authUser);
+                }
+              },
+
+              // Modify people 1
+              {
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY',
+                  data: (item: ReportCasesWithOnsetModel) => {
+                    return {
+                      name: item.primaryCase.name
+                    };
+                  }
+                },
+                action: {
+                  link: (item: ReportCasesWithOnsetModel) => {
+                    return ['/cases', item.primaryCase.id, 'modify'];
+                  },
+                  linkQueryParams: (): Params => {
+                    return {
+                      onset: true
+                    };
+                  }
+                },
+                visible: () => {
+                  return this.selectedOutbreakIsActive &&
+                    CaseModel.canModify(this.authUser);
+                }
+              },
+
+              // Modify people 2
+              {
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY',
+                  data: (item: ReportCasesWithOnsetModel) => {
+                    return {
+                      name: item.secondaryCase.name
+                    };
+                  }
+                },
+                action: {
+                  link: (item: ReportCasesWithOnsetModel) => {
+                    return ['/cases', item.secondaryCase.id, 'modify'];
+                  },
+                  linkQueryParams: (): Params => {
+                    return {
+                      onset: true
+                    };
+                  }
+                },
+                visible: () => {
+                  return this.selectedOutbreakIsActive &&
+                    CaseModel.canModify(this.authUser);
+                }
+              },
+
+              // Modify relationship
+              {
+                label: {
+                  get: () => 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY_RELATIONSHIP'
+                },
+                action: {
+                  link: (item: ReportCasesWithOnsetModel) => {
+                    // #TODO TBD - if this is correct !? (old comment)
+                    const relationTypePath: string = _.find(item.relationship.persons, { id: item.primaryCase.id }).source ? 'contacts' : 'exposures';
+                    return ['/relationships', EntityType.CASE, item.primaryCase.id, relationTypePath, item.relationship.id, 'modify'];
+                  }
+                },
+                visible: () => {
+                  return this.selectedOutbreakIsActive &&
+                    RelationshipModel.canModify(this.authUser);
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ];
+  }
+
+  /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
+   * Initialize table quick actions
+   */
+  protected initializeQuickActions(): void {}
+
+  /**
+   * Initialize table group actions
+   */
+  protected initializeGroupActions(): void {}
+
+  /**
+   * Initialize table add action
+   */
+  protected initializeAddAction(): void {}
+
+  /**
+   * Initialize table grouped data
+   */
+  protected initializeGroupedData(): void {}
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
+        }
+      }
+    ];
+
+    // cases list
+    if (CaseModel.canList(this.authUser)) {
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_CASES_TITLE',
+        action: {
+          link: ['/cases']
+        }
+      });
+    }
+
+    // current page
+    this.breadcrumbs.push(
+      {
+        label: 'LNG_PAGE_LIST_CASES_DATE_ONSET_TITLE',
+        action: null
+      }
+    );
+  }
+
+  /**
+   * Fields retrieved from api to reduce payload size
+   */
+  protected refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the Cases list, based on the applied filter, sort criterias
+   */
+  refreshList() {
+    // retrieve the list
+    this.records$ = this.relationshipDataService
+      .getCasesWithDateOnsetBeforePrimaryCase(this.selectedOutbreak.id)
+      .pipe(
+        // update page count
+        tap((casesWithOnset: ReportCasesWithOnsetModel[]) => {
+          this.pageCount = {
+            count: casesWithOnset.length,
+            hasMore: false
+          };
+        }),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
+  }
+
+  /**
+   * Get total number of items, based on the applied filters
+   */
+  refreshListCount(): void {}
 }

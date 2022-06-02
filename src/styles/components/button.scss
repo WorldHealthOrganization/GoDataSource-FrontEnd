@@ -1,0 +1,121 @@
+/* Buttons */
+button.mat-flat-button,
+a.mat-flat-button {
+  background-color: var(--gd-primary);
+  color: var(--gd-background);
+  font-family: $gd-font-family;
+  font-size: $gd-font-size;
+  font-weight: 500;
+  line-height: 2rem;
+  min-width: 3.6rem;
+  padding: 0.8rem 1.6rem;
+
+  .mat-button-focus-overlay {
+    background: var(--gd-background);
+  }
+
+  /* Button disabled */
+  &.mat-button-disabled,
+  &.mat-button-disabled.mat-button-disabled {
+    background-color: rgba(var(--gd-primary-rgb), 0.25);
+    color: var(--gd-background);
+
+    &:hover {
+      .mat-button-focus-overlay {
+        @include opacity(0);
+      }
+    }
+  }
+
+  /* Button hover */
+  &:hover {
+    .mat-button-focus-overlay {
+      @include opacity(0.1);
+    }
+  }
+
+  /* Primary button */
+  &.mat-primary {
+    background-color: var(--gd-primary);
+    color: var(--gd-background);
+
+    &.mat-button-disabled {
+      background-color: rgba(var(--gd-primary-rgb), 0.25);
+      color: var(--gd-background);
+    }
+
+    .mat-spinner,
+    .mat-progress-spinner {
+      &.mat-primary,
+      &.mat-accent {
+        circle {
+          stroke: var(--gd-background);
+        }
+      }
+
+      &.mat-warn {
+        circle {
+          stroke: var(--gd-warning);
+        }
+      }
+    }
+  }
+
+  /* Secondary button */
+  &.mat-secondary {
+    background-color: rgba(var(--gd-secondary-rgb), 0.35);
+    color: var(--gd-text);
+
+    &.mat-button-disabled {
+      background-color: rgba(var(--gd-secondary-rgb), 0.25);
+      color: var(--gd-secondary);
+    }
+  }
+
+  /* Accent button */
+  &.mat-accent {
+    background-color: var(--gd-success);
+    color: var(--gd-background);
+
+    &.mat-button-disabled {
+      background-color: rgba(var(--gd-success-rgb), 0.25);
+      color: var(--gd-background);
+    }
+  }
+
+  /* Warn button */
+  &.mat-warn {
+    background-color: var(--gd-danger);
+    color: var(--gd-background);
+
+    &.mat-button-disabled {
+      background-color: rgba(var(--gd-danger-rgb), 0.25);
+      color: var(--gd-background);
+    }
+  }
+
+  /* Text button */
+  &.mat-text {
+    background-color: transparent;
+    color: var(--gd-primary);
+
+    &.mat-button-disabled {
+      background-color: transparent;
+      color: var(--gd-secondary);
+    }
+  }
+
+  .mat-button-wrapper {
+    @include flex(flex);
+    @include flex_align_items(center);
+    @include flex_direction(row);
+    gap: 0.8rem;
+  }
+
+  .mat-icon {
+    font-size: 1.6rem;
+    height: auto;
+    line-height: 1;
+    width: auto;
+  }
+}

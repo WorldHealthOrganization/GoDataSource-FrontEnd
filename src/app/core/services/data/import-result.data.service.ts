@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
-import { EventModel } from '../../models/event.model';
 import { IBasicCount } from '../../models/basic-count.interface';
 import { ImportResultModel } from '../../models/import-result.model';
 
@@ -22,7 +21,7 @@ export class ImportResultDataService {
      */
   getImportResultsList(
     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
-  ): Observable<EventModel[]> {
+  ): Observable<ImportResultModel[]> {
     const filter = queryBuilder.buildQuery();
     return this.modelHelper.mapObservableListToModel(
       this.http.get(`import-results?filter=${filter}`),

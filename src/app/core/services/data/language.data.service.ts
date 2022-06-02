@@ -1,69 +1,41 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { LanguageModel, LanguageTokenDetails, LanguageTokenModel } from '../../models/language.model';
-import { CacheKey, CacheService } from '../helper/cache.service';
 import * as _ from 'lodash';
 import { localLanguages } from '../../../i18n';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
-import { map, share, tap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { moment, Moment } from '../../helperClasses/x-moment';
 import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class LanguageDataService {
-
-  languageList$: Observable<any>;
-
+  /**
+   * Constructor
+   */
   constructor(
     private http: HttpClient,
-    private modelHelper: ModelHelperService,
-    private cacheService: CacheService
-  ) {
-    this.languageList$ = this.http.get('languages').pipe(share());
-  }
+    private modelHelper: ModelHelperService
+  ) {}
 
   /**
-     * Retrieve the list of Languages
-     * @returns {Observable<LanguageModel[]>}
-     */
-  getLanguagesList(qb: RequestQueryBuilder = null): Observable<LanguageModel[]> {
+   * Retrieve the list of Languages
+   */
+  getLanguagesList(qb: RequestQueryBuilder = new RequestQueryBuilder()): Observable<LanguageModel[]> {
     // retrieve languages
-    if (qb) {
-      // get languages list from API
-      const filter = qb.buildQuery();
-      return this.modelHelper
-        .mapObservableListToModel(
-          this.http.get(`languages?filter=${filter}`),
-          LanguageModel
-        );
-    }
-
-    // get languages list from cache
-    const languagesList = this.cacheService.get(CacheKey.LANGUAGES);
-    if (languagesList) {
-      return of(languagesList);
-    } else {
-      // get languages list from API
-      return this.modelHelper
-        .mapObservableListToModel(
-          this.languageList$,
-          LanguageModel
-        )
-        .pipe(
-          tap((languages) => {
-            // cache the list
-            this.cacheService.set(CacheKey.LANGUAGES, languages);
-          })
-        );
-    }
+    const filter = qb.buildQuery();
+    return this.modelHelper
+      .mapObservableListToModel(
+        this.http.get(`languages?filter=${filter}`),
+        LanguageModel
+      );
   }
 
   /**
-     * Return total number of languages
-     * @returns {Observable<IBasicCount>}
-     */
+   * Return total number of languages
+   */
   getLanguagesCount(
     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
   ): Observable<IBasicCount> {
@@ -72,16 +44,14 @@ export class LanguageDataService {
   }
 
   /**
-     * Retrieve a Language
-     * @returns {Observable<LanguageModel>}
-     */
+   * Retrieve a Language
+   */
   getLanguage(languageId: string): Observable<LanguageModel> {
     // get the list of languages and find the one with the given ID
-    return this.getLanguagesList()
-      .pipe(
-        map((languages: LanguageModel[]) => {
-          return _.find(languages, {id: languageId});
-        })
+    return this.modelHelper
+      .mapObservableToModel(
+        this.http.get(`languages/${languageId}`),
+        LanguageModel
       );
   }
 
@@ -100,13 +70,10 @@ export class LanguageDataService {
   }
 
   /**
-     * Retrieve the list of tokens for a given language
-     * @param {LanguageModel} lang
-     * @param updatedSince
-     * @returns {Observable<LanguageTokenDetails>}
-     */
+   * Retrieve the list of tokens for a given language
+   */
   getLanguageTokens(
-    lang: LanguageModel,
+    languageId: string,
     updatedSince?: Moment
   ): Observable<LanguageTokenDetails> {
     // retrieve only token and translation fields to reduce the payload
@@ -121,13 +88,13 @@ export class LanguageDataService {
     const filter = qb.buildQuery();
 
     return this.modelHelper.mapObservableToModel(
-      this.http.get(`languages/${lang.id}/language-tokens?filter=${filter}`),
+      this.http.get(`languages/${languageId}/language-tokens?filter=${filter}`),
       LanguageTokenDetails
     )
       .pipe(
         map((tokenData: LanguageTokenDetails) => {
           // get the local language tokens
-          const localLanguageTokens = _.get(this.getLocalLanguageTokens(), lang.id, []);
+          const localLanguageTokens = _.get(this.getLocalLanguageTokens(), languageId, []);
 
           // merge local tokens with the tokens received from server
           tokenData.tokens = [...tokenData.tokens, ...localLanguageTokens as any[]];

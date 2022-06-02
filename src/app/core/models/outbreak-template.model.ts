@@ -4,13 +4,17 @@ import { IPermissionBasic, IPermissionCloneable, IPermissionOutbreakTemplate, IP
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { Constants } from './constants';
+import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
+import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { BaseModel } from './base.model';
 
 export class OutbreakTemplateModel
-implements
-        IPermissionBasic,
-        IPermissionQuestionnaire,
-        IPermissionOutbreakTemplate,
-        IPermissionCloneable {
+  extends BaseModel
+  implements
+    IPermissionBasic,
+    IPermissionQuestionnaire,
+    IPermissionOutbreakTemplate,
+    IPermissionCloneable {
   id: string;
   name: string;
   description: string;
@@ -37,6 +41,71 @@ implements
   generateFollowUpsKeepTeamAssignment: boolean;
   generateFollowUpsTeamAssignmentAlgorithm: string;
   generateFollowUpsDateOfLastContact: boolean;
+
+  /**
+   * Advanced filters
+   */
+  static generateAdvancedFilters(data: {
+    options: {
+      disease: ILabelValuePairModel[],
+      followUpGenerationTeamAssignmentAlgorithm: ILabelValuePairModel[],
+      yesNo: ILabelValuePairModel[]
+    }
+  }): V2AdvancedFilter[] {
+    // initialize
+    const advancedFilters: V2AdvancedFilter[] = [
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'name',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'description',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DESCRIPTION',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'disease',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DISEASE',
+        options: data.options.disease,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'generateFollowUpsTeamAssignmentAlgorithm',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM',
+        options: data.options.followUpGenerationTeamAssignmentAlgorithm,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'generateFollowUpsOverwriteExisting',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_OVERWRITE_EXISTING',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'generateFollowUpsKeepTeamAssignment',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'generateFollowUpsDateOfLastContact',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT',
+        options: data.options.yesNo,
+        sortable: true
+      }
+    ];
+
+    // finished
+    return advancedFilters;
+  }
 
   /**
      * Static Permissions - IPermissionBasic
@@ -69,6 +138,8 @@ implements
      * Constructor
      */
   constructor(data = null) {
+    super(data);
+
     this.id = _.get(data, 'id');
     this.name = _.get(data, 'name');
     this.description = _.get(data, 'description');

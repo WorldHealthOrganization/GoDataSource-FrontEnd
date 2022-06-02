@@ -1,0 +1,78 @@
+<!-- Actions -->
+<div
+  fxFlex fxLayout="row" fxLayoutGap="0.8rem"
+  class="gd-list-table-actions">
+
+  <!-- Render each action -->
+  <ng-container
+    *ngFor="let action of actions">
+    <!-- Visible ? -->
+    <span
+      *ngIf="!action.visible || action.visible(data)"
+      class="gd-list-table-actions-action">
+
+      <!-- Icon Type -->
+      <a
+        *ngIf="action.type === V2ActionType.ICON; else menuAction"
+        class="gd-list-table-actions-action-icon {{action.cssClasses ? action.cssClasses(data) : ''}}"
+        mat-icon-button
+        [routerLink]="action.action.link && (!action.disable || !action.disable(data)) ? action.action.link(data) : undefined"
+        [queryParams]="action.action.linkQueryParams ? action.action.linkQueryParams(data) : undefined"
+        [matTooltip]="action.iconTooltip | translate"
+        [disabled]="action.disable && action.disable(data)"
+        (click)="action.action.click && (!action.disable || !action.disable(data)) ? action.action.click(data) : undefined">
+        <mat-icon>{{action.icon}}</mat-icon>
+      </a>
+
+      <!-- Not icon - Menu -->
+      <ng-template
+        #menuAction>
+
+        <!-- Menu -->
+        <!-- IMPORTANT: Menu of type label isn't supported in table -->
+        <button
+          type="button"
+          mat-icon-button
+          [matTooltip]="action.iconTooltip | translate"
+          [disabled]="action.disable && action.disable(data)"
+          [matMenuTriggerFor]="menu">
+          <mat-icon>{{action.icon}}</mat-icon>
+        </button>
+
+        <!-- Floating menu -->
+        <mat-menu
+          #menu="matMenu"
+          class="gd-list-table-actions-action-menu">
+          <ng-container
+            *ngFor="let menuOption of action.menuOptions">
+            <ng-container
+              *ngIf="!menuOption.visible || menuOption.visible(data)">
+
+              <!-- Child Menu link -->
+              <a
+                *ngIf="menuOption.label; else divider"
+                mat-menu-item
+                class="gd-list-table-actions-action-menu-button {{menuOption.cssClasses ? menuOption.cssClasses(data) : ''}}"
+                [routerLink]="menuOption.action.link && (!menuOption.disable || !menuOption.disable(data)) ? menuOption.action.link(data) : undefined"
+                [queryParams]="menuOption.action.linkQueryParams ? menuOption.action.linkQueryParams(data) : undefined"
+                [disabled]="menuOption.disable && menuOption.disable(data)"
+                (click)="menuOption.action.click && (!menuOption.disable || !menuOption.disable(data)) ? menuOption.action.click(data) : undefined">
+                {{menuOption.label.get(data) | translate:(menuOption.label.data ? menuOption.label.data(data) : undefined)}}
+              </a>
+
+              <!-- Divider -->
+              <ng-template
+                #divider>
+                <mat-divider></mat-divider>
+              </ng-template>
+
+            </ng-container>
+          </ng-container>
+        </mat-menu>
+
+      </ng-template>
+
+    </span>
+  </ng-container>
+
+</div>

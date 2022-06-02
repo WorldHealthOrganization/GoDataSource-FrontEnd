@@ -1,10 +1,8 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { TeamFollowupsPerDayModel } from '../../../../core/models/team-followups-per-day.model';
 import { Constants } from '../../../../core/models/constants';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -16,9 +14,10 @@ import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { TeamModel } from '../../../../core/models/team.model';
 import { catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs/internal/observable/throwError';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { UserModel } from '../../../../core/models/user.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
 
 interface ITeamMap {
   id: string;
@@ -32,11 +31,9 @@ interface ITeamMap {
   templateUrl: './team-workload.component.html',
   styleUrls: ['./team-workload.component.less']
 })
-export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDestroy {
+export class TeamWorkloadComponent extends ListComponent<any> implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
-
-  selectedOutbreak: OutbreakModel;
+  breadcrumbs: IV2Breadcrumb[] = [];
 
   dates: string[] = [];
   teamsDataShow: ITeamMap[] = [];
@@ -56,9 +53,6 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
       maxRange: 0
     };
 
-  // authenticated user
-  authUser: UserModel;
-
   // Slider Date Filter Value
   sliderDateFilterValue: FormDateRangeSliderData;
 
@@ -71,10 +65,9 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
     protected listHelperService: ListHelperService,
     private outbreakDataService: OutbreakDataService,
     private followUpsDataService: FollowUpsDataService,
-    private snackbarService: SnackbarService,
+    private toastV2Service: ToastV2Service,
     private i18nService: I18nService,
-    private teamDataService: TeamDataService,
-    private authDataService: AuthDataService
+    private teamDataService: TeamDataService
   ) {
     super(
       listHelperService,
@@ -86,9 +79,6 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     // get teams
     this.displayLoading = true;
     this.teamDataService
@@ -138,27 +128,11 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
   }
 
   /**
-     * Initialize breadcrumbs
-     */
-  private initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // add list breadcrumb only if we have permission
-    if (TeamModel.canList(this.authUser)) {
-      this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_LIST_TEAMS_TITLE', '/teams'));
-    }
-
-    // workload breadcrumb
-    this.breadcrumbs.push(new BreadcrumbItemModel('LNG_PAGE_TEAMS_WORKLOAD_TITLE', '.', true));
-  }
-
-  /**
      * Remove component resources
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
 
     if (this.getSelectedOutbreakSubject) {
       this.getSelectedOutbreakSubject.unsubscribe();
@@ -167,9 +141,87 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
   }
 
   /**
-     * Refresh list
-     */
-  refreshList(finishCallback: (records: any[]) => void) {
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {}
+
+  /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
+   * Initialize table quick actions
+   */
+  protected initializeQuickActions(): void {}
+
+  /**
+   * Initialize table group actions
+   */
+  protected initializeGroupActions(): void {}
+
+  /**
+   * Initialize table add action
+   */
+  protected initializeAddAction(): void {}
+
+  /**
+   * Initialize table grouped data
+   */
+  protected initializeGroupedData(): void {}
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
+    // reset
+    this.breadcrumbs = [{
+      label: 'LNG_COMMON_LABEL_HOME',
+      action: {
+        link: DashboardModel.canViewDashboard(this.authUser) ?
+          ['/dashboard'] :
+          ['/account/my-profile']
+      }
+    }];
+
+    // list page
+    if (TeamModel.canList(this.authUser)) {
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_TEAMS_TITLE',
+        action: {
+          link: ['/teams']
+        }
+      });
+    }
+
+    // current page
+    this.breadcrumbs.push({
+      label: 'LNG_PAGE_TEAMS_WORKLOAD_TITLE',
+      action: null
+    });
+  }
+
+  /**
+   * Fields retrieved from api to reduce payload size
+   */
+  protected refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Refresh list
+   */
+  refreshList() {
     if (
       this.selectedOutbreak &&
             !_.isEmpty(this.teamsData)
@@ -204,8 +256,7 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
               // hide loading
               this.displayLoading = false;
 
-              this.snackbarService.showApiError(err);
-              finishCallback([]);
+              this.toastV2Service.error(err);
               return throwError(err);
             })
           )
@@ -215,23 +266,14 @@ export class TeamWorkloadComponent extends ListComponent implements OnInit, OnDe
 
             // format data
             this.formatData(metricTeamsFollowups);
-
-            // finished
-            finishCallback([]);
           });
       } else {
         // hide loading
         this.displayLoading = false;
-
-        // finished
-        finishCallback([]);
       }
     } else {
       // hide loading
       this.displayLoading = false;
-
-      // finished
-      finishCallback([]);
     }
   }
 

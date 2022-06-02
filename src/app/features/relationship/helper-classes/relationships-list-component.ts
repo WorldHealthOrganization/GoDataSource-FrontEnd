@@ -1,14 +1,12 @@
 import { ListComponent } from '../../../core/helperClasses/list-component';
 import { Directive, OnDestroy, OnInit } from '@angular/core';
 import { EntityType } from '../../../core/models/entity-type';
-import { UserModel } from '../../../core/models/user.model';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { CaseModel } from '../../../core/models/case.model';
 import { ContactModel } from '../../../core/models/contact.model';
 import { EventModel } from '../../../core/models/event.model';
 import { RelationshipType } from '../../../core/enums/relationship-type.enum';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
 import { EntityDataService } from '../../../core/services/data/entity.data.service';
 import { throwError } from 'rxjs';
@@ -20,7 +18,7 @@ import { ContactOfContactModel } from '../../../core/models/contact-of-contact.m
  * Relationship list
  */
 @Directive()
-export abstract class RelationshipsListComponent extends ListComponent implements OnInit, OnDestroy {
+export abstract class RelationshipsListComponent extends ListComponent<CaseModel | ContactModel | EventModel> implements OnInit, OnDestroy {
   // Entities Map for specific data
   entityMap: {
     [entityType: string]: {
@@ -128,10 +126,6 @@ export abstract class RelationshipsListComponent extends ListComponent implement
       }
     };
 
-  // authenticated user
-  authUser: UserModel;
-  // selected outbreak
-  selectedOutbreak: OutbreakModel;
   // route params
   entityType: EntityType;
   entityId: string;
@@ -140,13 +134,12 @@ export abstract class RelationshipsListComponent extends ListComponent implement
   relationshipType: RelationshipType;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     protected router: Router,
     protected route: ActivatedRoute,
-    protected authDataService: AuthDataService,
     protected outbreakDataService: OutbreakDataService,
     protected entityDataService: EntityDataService
   ) {
@@ -154,27 +147,24 @@ export abstract class RelationshipsListComponent extends ListComponent implement
   }
 
   /**
-     * Called when the following data is loaded:
-     *      this.relationshipType
-     *      this.entityType
-     *      this.entityId
-     *      this.selectedOutbreak
-     */
+   * Called when the following data is loaded:
+   *      this.relationshipType
+   *      this.entityType
+   *      this.entityId
+   *      this.selectedOutbreak
+   */
   abstract onDataInitialized();
 
   /**
-     * Called when person data is loaded (in addition to the initial data):
-     *      this.entity
-     */
+   * Called when person data is loaded (in addition to the initial data):
+   *      this.entity
+   */
   abstract onPersonLoaded();
 
   /**
-     * Component initialized
-     */
+   * Component initialized
+   */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     // get relationship type
     this.route.data.subscribe((routeData) => {
       this.relationshipType = routeData.relationshipType;
@@ -202,11 +192,11 @@ export abstract class RelationshipsListComponent extends ListComponent implement
   }
 
   /**
-     * Release resources
-     */
+   * Release resources
+   */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
   }
 
   /**
@@ -215,9 +205,9 @@ export abstract class RelationshipsListComponent extends ListComponent implement
   private checkInitData() {
     if (
       this.relationshipType &&
-            this.entityType &&
-            this.entityId &&
-            this.selectedOutbreak
+      this.entityType &&
+      this.entityId &&
+      this.selectedOutbreak
     ) {
       // all data is loaded; let component do its job
       this.onDataInitialized();
@@ -228,15 +218,15 @@ export abstract class RelationshipsListComponent extends ListComponent implement
   }
 
   /**
-     * Load person data
-     */
+   * Load person data
+   */
   private loadPerson() {
     // get person data
     this.entityDataService
       .getEntity(this.entityType, this.selectedOutbreak.id, this.entityId)
       .pipe(
         catchError((err) => {
-          this.listHelperService.snackbarService.showApiError(err);
+          this.listHelperService.toastV2Service.error(err);
 
           // Entity not found; navigate back to Entities list
           this.router.navigate([this.entityMap[this.entityType].link]);
@@ -253,8 +243,8 @@ export abstract class RelationshipsListComponent extends ListComponent implement
   }
 
   /**
-     * Relationships list page title, based on relationship type (Exposures or Contacts?)
-     */
+   * Relationships list page title, based on relationship type (Exposures or Contacts?)
+   */
   get relationshipsListPageTitle(): string {
     return this.relationshipType === RelationshipType.EXPOSURE ?
       'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE' :
@@ -262,57 +252,57 @@ export abstract class RelationshipsListComponent extends ListComponent implement
   }
 
   /**
-     * Route path for specific relationships type (exposures or contacts)
-     */
+   * Route path for specific relationships type (exposures or contacts)
+   */
   get relationshipTypeRoutePath(): string {
     return this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures';
   }
 
   /**
-     * Check if we're allowed to view event / case / contact relationships'
-     */
+   * Check if we're allowed to view event / case / contact relationships'
+   */
   get entityCanView(): boolean {
     return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].view(this.authUser);
   }
 
   /**
-     * Check if we're allowed to create event / case / contact relationships'
-     */
+   * Check if we're allowed to create event / case / contact relationships'
+   */
   get entityCanCreate(): boolean {
     return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].create(this.authUser);
   }
 
   /**
-     * Check if we're allowed to modify event / case / contact relationships'
-     */
+   * Check if we're allowed to modify event / case / contact relationships'
+   */
   get entityCanModify(): boolean {
     return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].modify(this.authUser);
   }
 
   /**
-     * Check if we're allowed to delete event / case / contact relationships'
-     */
+   * Check if we're allowed to delete event / case / contact relationships'
+   */
   get entityCanDelete(): boolean {
     return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].delete(this.authUser);
   }
 
   /**
-     * Check if we're allowed to share event / case / contact relationships'
-     */
+   * Check if we're allowed to share event / case / contact relationships'
+   */
   get entityCanShare(): boolean {
     return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].share(this.authUser);
   }
 
   /**
-     * Check if we're allowed to change person source of a relationship
-     */
+   * Check if we're allowed to change person source of a relationship
+   */
   get entityCanChangeSource(): boolean {
     return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].changeSource(this.authUser);
   }
 
   /**
-     * Check if we're allowed to bulk delete relationships
-     */
+   * Check if we're allowed to bulk delete relationships
+   */
   get entityCanBulkDelete(): boolean {
     return this.entityType && this.entityMap[this.entityType] && this.entityMap[this.entityType].can[this.relationshipTypeRoutePath].bulkDelete(this.authUser);
   }

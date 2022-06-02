@@ -1,0 +1,20 @@
+<app-create-view-modify-v2
+  [action]="action"
+  allowEdit="true"
+  [loadingPage]="loadingPage"
+  [loadingItemData]="loadingItemData"
+  [breadcrumbs]="breadcrumbs"
+  [pageTitle]="pageTitle"
+  [pageTitleData]="pageTitleData"
+  [itemID]="itemData?.id"
+  [tabData]="tabData"
+  listTitle="LNG_PAGE_LIST_USERS_TITLE"
+  [expandListRecords$]="expandListRecords$"
+  [expandListColumnRenderer]="expandListColumnRenderer"
+  [expandListAdvancedFilterType]="Constants.APP_PAGE.USERS.value"
+  [expandListAdvancedFilters]="expandListAdvancedFilters"
+  [expandListQueryFields]="expandListQueryFields"
+  expandListAdvancedFiltersCacheKey="/users"
+  (expandListRefreshData)="refreshExpandList($event)"
+  (expandListChangeRecord)="expandListChangeRecord($event)">
+</app-create-view-modify-v2>

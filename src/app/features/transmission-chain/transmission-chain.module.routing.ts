@@ -4,6 +4,21 @@ import * as fromPages from './pages';
 import { PERMISSION } from '../../core/models/permission.model';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PermissionExpression } from '../../core/models/user.model';
+import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
+import { ClassificationDataResolver } from '../../core/services/resolvers/data/classification.resolver';
+import { OccupationDataResolver } from '../../core/services/resolvers/data/occupation.resolver';
+import { OutcomeDataResolver } from '../../core/services/resolvers/data/outcome.resolver';
+import { GenderDataResolver } from '../../core/services/resolvers/data/gender.resolver';
+import { ClusterDataResolver } from '../../core/services/resolvers/data/cluster.resolver';
+import { LabSequenceResultDataResolver } from '../../core/services/resolvers/data/lab-sequence-result.resolver';
+import { CotNodeLabelDataResolver } from '../../core/services/resolvers/data/cot-node-label.resolver';
+import { CotNodeColorDataResolver } from '../../core/services/resolvers/data/cot-node-color.resolver';
+import { CotNodeIconDataResolver } from '../../core/services/resolvers/data/cot-node-icon.resolver';
+import { CotNodeShapeDataResolver } from '../../core/services/resolvers/data/cot-node-shape.resolver';
+import { CotEdgeLabelDataResolver } from '../../core/services/resolvers/data/cot-edge-label.resolver';
+import { CotEdgeIconDataResolver } from '../../core/services/resolvers/data/cot-edge-icon.resolver';
+import { CotEdgeColorDataResolver } from '../../core/services/resolvers/data/cot-edge-color.resolver';
+import { CotSnapshotStatusDataResolver } from '../../core/services/resolvers/data/cot-snapshot-status.resolver';
 
 const routes: Routes = [
   // Transmission Chains Graph
@@ -22,6 +37,21 @@ const routes: Routes = [
           PERMISSION.COT_VIEW_TIMELINE_NETWORK_DATE_OF_REPORTING
         ]
       })
+    },
+    resolve: {
+      classification: ClassificationDataResolver,
+      occupation: OccupationDataResolver,
+      outcome: OutcomeDataResolver,
+      gender: GenderDataResolver,
+      cluster: ClusterDataResolver,
+      labSequenceResult: LabSequenceResultDataResolver,
+      cotNodeLabel: CotNodeLabelDataResolver,
+      cotNodeColor: CotNodeColorDataResolver,
+      cotNodeIcon: CotNodeIconDataResolver,
+      cotNodeShape: CotNodeShapeDataResolver,
+      cotEdgeLabel: CotEdgeLabelDataResolver,
+      cotEdgeIcon: CotEdgeIconDataResolver,
+      cotEdgeColor: CotEdgeColorDataResolver
     }
   },
   // Transmission Chains List
@@ -33,6 +63,9 @@ const routes: Routes = [
       permissions: [
         PERMISSION.COT_LIST
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver
     }
   },
   // Case Count Map
@@ -44,6 +77,13 @@ const routes: Routes = [
       permissions: [
         PERMISSION.COT_VIEW_CASE_COUNT_MAP
       ]
+    },
+    resolve: {
+      classification: ClassificationDataResolver,
+      occupation: OccupationDataResolver,
+      outcome: OutcomeDataResolver,
+      gender: GenderDataResolver,
+      cluster: ClusterDataResolver
     }
   },
 
@@ -56,6 +96,10 @@ const routes: Routes = [
       permissions: [
         PERMISSION.COT_LIST
       ]
+    },
+    resolve: {
+      cotSnapshotStatus: CotSnapshotStatusDataResolver,
+      yesNoAll: YesNoAllDataResolver
     }
   }
 ];

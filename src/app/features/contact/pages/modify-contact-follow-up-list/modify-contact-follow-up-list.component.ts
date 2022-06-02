@@ -1,15 +1,12 @@
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as _ from 'lodash';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { NgForm } from '@angular/forms';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { Observable, throwError } from 'rxjs';
@@ -25,6 +22,8 @@ import { Constants } from '../../../../core/models/constants';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 
 @Component({
   selector: 'app-modify-contact-follow-ups-list',
@@ -34,7 +33,7 @@ import { moment } from '../../../../core/helperClasses/x-moment';
 })
 export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges implements OnInit {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs: BreadcrumbItemModel[] = [];
 
   // selected outbreak
   selectedOutbreak: OutbreakModel;
@@ -78,8 +77,8 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     private route: ActivatedRoute,
     private followUpsDataService: FollowUpsDataService,
     private outbreakDataService: OutbreakDataService,
-    private snackbarService: SnackbarService,
-    private dialogService: DialogService,
+    private toastV2Service: ToastV2Service,
+    private dialogV2Service: DialogV2Service,
     private formHelper: FormHelperService,
     private referenceDataDataService: ReferenceDataDataService,
     private teamDataService: TeamDataService,
@@ -105,7 +104,7 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     this.route.queryParams
       .subscribe((queryParams: { followUpsIds }) => {
         if (_.isEmpty(queryParams.followUpsIds)) {
-          this.snackbarService.showError('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ERROR_NO_FOLLOW_UPS_SELECTED');
+          this.toastV2Service.error('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ERROR_NO_FOLLOW_UPS_SELECTED');
 
           // No entities selected
           this.disableDirtyConfirm();
@@ -133,27 +132,27 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
      * Initialize breadcrumbs
      */
   initializeBreadcrumbs() {
-    // reset
-    this.breadcrumbs = [];
-
-    // contacts list page
-    if (ContactModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
-      );
-    }
-
-    // follow-ups list page
-    if (FollowUpModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '/contacts/follow-ups')
-      );
-    }
-
-    // current page
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TITLE', '.', true)
-    );
+    // // reset
+    // this.breadcrumbs = [];
+    //
+    // // contacts list page
+    // if (ContactModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel('LNG_PAGE_LIST_CONTACTS_TITLE', '/contacts')
+    //   );
+    // }
+    //
+    // // follow-ups list page
+    // if (FollowUpModel.canList(this.authUser)) {
+    //   this.breadcrumbs.push(
+    //     new BreadcrumbItemModel('LNG_PAGE_LIST_FOLLOW_UPS_TITLE', '/contacts/follow-ups')
+    //   );
+    // }
+    //
+    // // current page
+    // this.breadcrumbs.push(
+    //   new BreadcrumbItemModel('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TITLE', '.', true)
+    // );
   }
 
   /**
@@ -257,7 +256,7 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     const dirtyFields: any = this.getFormDirtyFields(stepForms);
 
     if (_.isEmpty(dirtyFields)) {
-      this.snackbarService.showSuccess('LNG_FORM_WARNING_NO_CHANGES');
+      this.toastV2Service.success('LNG_FORM_WARNING_NO_CHANGES');
       return;
     }
 
@@ -278,7 +277,7 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
     });
 
     // start modifying follow-ups
-    const loadingDialog = this.dialogService.showLoadingDialog();
+    const loadingDialog = this.dialogV2Service.showLoadingDialog();
     this.followUpsDataService
       .bulkModifyFollowUps(
         this.selectedOutbreak.id,
@@ -289,14 +288,14 @@ export class ModifyContactFollowUpListComponent extends ConfirmOnFormChanges imp
         catchError((err) => {
           loadingDialog.close();
 
-          this.snackbarService.showApiError(err);
+          this.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
         loadingDialog.close();
 
-        this.snackbarService.showSuccess('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE');
+        this.toastV2Service.success('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ACTION_MODIFY_MULTIPLE_FOLLOW_UPS_SUCCESS_MESSAGE');
 
         // navigate to listing page
         this.disableDirtyConfirm();

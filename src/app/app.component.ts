@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, HostListener, OnInit, ViewContainerRef, ViewEncapsulation } from '@angular/core';
 import { I18nService } from './core/services/helper/i18n.service';
 import { SystemSettingsDataService } from './core/services/data/system-settings.data.service';
 import { SystemSettingsVersionModel } from './core/models/system-settings-version.model';
@@ -14,34 +14,25 @@ export class AppComponent implements OnInit {
   systemSettingsVersion: SystemSettingsVersionModel;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private i18nService: I18nService,
-    private systemSettingsDataService: SystemSettingsDataService
-  ) {}
+    private systemSettingsDataService: SystemSettingsDataService,
+    // used by ngx color picker - to display as popup
+    // ngx-color-picker.mjs:1352 You are using cpUseRootViewContainer, but the root component is not exposing viewContainerRef!Please expose it by adding 'public vcRef: ViewContainerRef' to the constructor.
+    public viewContainerRef: ViewContainerRef
+  ) {
+    // update once
+    this.updateVHOnWindowResize();
+  }
 
   /**
-     * Component initialized
-     */
+   * Component initialized
+   */
   ngOnInit() {
     // load the default language
     this.i18nService.loadUserLanguage().subscribe();
-
-    // used by OpenLayers
-    // The script below is only needed for old environments like Internet Explorer and Android 4.x
-    const script = document.createElement('script');
-    script.type = 'text/javascript';
-    script.src = 'https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL';
-    document.head.appendChild(script);
-
-    // used by OpenLayers
-    // css
-    const style = document.createElement('link');
-    style.rel = 'stylesheet';
-    style.type = 'text/css';
-    style.href = 'https://openlayers.org/en/v5.3.0/css/ol.css';
-    document.head.appendChild(style);
 
     // determine if this is a demo or production instance
     this.systemSettingsDataService
@@ -49,5 +40,15 @@ export class AppComponent implements OnInit {
       .subscribe((systemSettingsVersion) => {
         this.systemSettingsVersion = systemSettingsVersion;
       });
+  }
+
+  /**
+   * Update vh
+   * - fix for mobile height not being determined properly
+   */
+  @HostListener('window:resize')
+  private updateVHOnWindowResize(): void {
+    const vh: number = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
   }
 }

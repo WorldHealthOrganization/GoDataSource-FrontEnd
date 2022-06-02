@@ -1,4 +1,4 @@
-import { Directive, forwardRef, Attribute } from '@angular/core';
+import { Directive, forwardRef, Input } from '@angular/core';
 import { Validator, AbstractControl, NG_VALIDATORS } from '@angular/forms';
 
 /**
@@ -16,21 +16,27 @@ import { Validator, AbstractControl, NG_VALIDATORS } from '@angular/forms';
   ]
 })
 export class TriggerValidationForValidatorDirective implements Validator {
-  constructor(
-    @Attribute('app-trigger-validation-for') public target: string
-  ) {
-  }
+  // input
+  @Input() triggerValidationFor: string;
 
-  validate(control: AbstractControl): { [key: string]: any } {
+  /**
+   * Validate
+   */
+  validate(control: AbstractControl): null {
+    // nothing to do ?
+    if (!this.triggerValidationFor) {
+      return null;
+    }
 
     // get the target control
-    const targetControl = control.root.get(this.target);
+    const targetControl = control.root.get(this.triggerValidationFor);
 
     // trigger validation
     if (targetControl) {
       targetControl.updateValueAndValidity();
     }
 
+    // finished
     return null;
   }
 }

@@ -1,8 +1,4 @@
 import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { UserModel } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -12,9 +8,8 @@ import { PeoplePossibleDuplicateGroupModel, PeoplePossibleDuplicateModel } from 
 import { EntityType } from '../../../../core/models/entity-type';
 import { AddressModel } from '../../../../core/models/address.model';
 import { FormControl, NgForm } from '@angular/forms';
-import { Router } from '@angular/router';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
-import { catchError, share, tap } from 'rxjs/operators';
+import { catchError, share } from 'rxjs/operators';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
@@ -23,18 +18,21 @@ import { EventModel } from '../../../../core/models/event.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { IV2ActionIconLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 
 @Component({
   selector: 'app-duplicate-records-list',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './duplicate-records-list.component.html',
-  styleUrls: ['./duplicate-records-list.component.less']
+  styleUrls: ['./duplicate-records-list.component.scss']
 })
-export class DuplicateRecordsListComponent extends ListComponent implements OnInit, OnDestroy {
+export class DuplicateRecordsListComponent extends ListComponent<any> implements OnInit, OnDestroy {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [
-    new BreadcrumbItemModel('LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE', '.', true)
-  ];
+  breadcrumbs: IV2Breadcrumb[] = [];
 
   outbreakSubscriber: Subscription;
 
@@ -42,12 +40,6 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
   EntityType = EntityType;
   AddressModel = AddressModel;
   EntityModel = EntityModel;
-
-  // authenticated user
-  authUser: UserModel;
-
-  // contacts outbreak
-  selectedOutbreak: OutbreakModel;
 
   // duplicates
   duplicatesList: PeoplePossibleDuplicateModel;
@@ -67,26 +59,38 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
     'address'
   ];
 
+  // action
+  actionButton: IV2ActionIconLabel;
+
   /**
      * Constructor
      */
   constructor(
     protected listHelperService: ListHelperService,
-    private router: Router,
-    private authDataService: AuthDataService,
-    private snackbarService: SnackbarService,
-    private outbreakDataService: OutbreakDataService
+    private toastV2Service: ToastV2Service,
+    private outbreakDataService: OutbreakDataService,
+    private dialogV2Service: DialogV2Service
   ) {
+    // parent
     super(listHelperService);
+
+    // action button
+    this.actionButton = {
+      type: V2ActionType.ICON_LABEL,
+      icon: '',
+      label: 'LNG_COMMON_BUTTON_REFRESH_LIST',
+      action: {
+        click: () => {
+          this.needsRefreshList(true);
+        }
+      }
+    };
   }
 
   /**
      * Component initialized
      */
   ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
-
     // subscribe to the Selected Outbreak
     this.outbreakSubscriber = this.outbreakDataService
       .getSelectedOutbreakSubject()
@@ -105,7 +109,7 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
      */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
 
     // outbreak subscriber
     if (this.outbreakSubscriber) {
@@ -115,54 +119,118 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
   }
 
   /**
-     * Re(load) the list
-     */
-  refreshList(finishCallback: (records: any[]) => void) {
-    if (this.selectedOutbreak) {
-      // retrieve the list
-      this.duplicatesList = null;
-      this.outbreakDataService
-        .getPeoplePossibleDuplicates(this.selectedOutbreak.id, this.queryBuilder)
-        .pipe(
-          catchError((err) => {
-            this.snackbarService.showApiError(err);
-            finishCallback([]);
-            return throwError(err);
-          }),
-          tap((duplicatesList) => {
-            this.checkEmptyList(duplicatesList.groups);
-          })
-        )
-        .subscribe((duplicatesList) => {
-          this.duplicatesList = duplicatesList;
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {}
 
-          // finished
-          finishCallback([]);
-        });
-    } else {
-      finishCallback([]);
+  /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
+   * Initialize table quick actions
+   */
+  protected initializeQuickActions(): void {}
+
+  /**
+   * Initialize table group actions
+   */
+  protected initializeGroupActions(): void {}
+
+  /**
+   * Initialize table add action
+   */
+  protected initializeAddAction(): void {}
+
+  /**
+   * Initialize table grouped data
+   */
+  protected initializeGroupedData(): void {}
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
+    // set breadcrumbs
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
+        }
+      }, {
+        label: 'LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE',
+        action: null
+      }
+    ];
+  }
+
+  /**
+   * Fields retrieved from api to reduce payload size
+   */
+  protected refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the list
+   */
+  refreshList() {
+    // check
+    if (!this.selectedOutbreak?.id) {
+      return;
     }
+
+    // retrieve the list
+    this.duplicatesList = null;
+    this.outbreakDataService
+      .getPeoplePossibleDuplicates(this.selectedOutbreak.id, this.queryBuilder)
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        })
+      )
+      .subscribe((duplicatesList) => {
+        this.duplicatesList = duplicatesList;
+      });
   }
 
   /**
      * Get total number of items, based on the applied filters
      */
   refreshListCount() {
-    if (this.selectedOutbreak) {
-      // remove paginator from query builder
-      const countQueryBuilder = _.cloneDeep(this.queryBuilder);
-      countQueryBuilder.paginator.clear();
-      countQueryBuilder.sort.clear();
-      this.duplicatesListCount$ = this.outbreakDataService
-        .getPeoplePossibleDuplicatesCount(this.selectedOutbreak.id, countQueryBuilder)
-        .pipe(
-          catchError((err) => {
-            this.snackbarService.showApiError(err);
-            return throwError(err);
-          }),
-          share()
-        );
+    // check
+    if (!this.selectedOutbreak?.id) {
+      return;
     }
+
+    // remove paginator from query builder
+    const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+    countQueryBuilder.paginator.clear();
+    countQueryBuilder.sort.clear();
+    this.duplicatesListCount$ = this.outbreakDataService
+      .getPeoplePossibleDuplicatesCount(this.selectedOutbreak.id, countQueryBuilder)
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        }),
+        share()
+      );
   }
 
   /**
@@ -251,24 +319,26 @@ export class DuplicateRecordsListComponent extends ListComponent implements OnIn
 
     // we shouldn't be able to merge two types...
     if (types.length > 1) {
-      this.snackbarService.showError('LNG_PAGE_LIST_DUPLICATE_RECORDS_MERGE_NOT_SUPPORTED');
+      this.toastV2Service.error('LNG_PAGE_LIST_DUPLICATE_RECORDS_MERGE_NOT_SUPPORTED');
       return;
     }
 
     // check if we have write access to any of the present types
     if (types.length < 1) {
-      this.snackbarService.showError('LNG_PAGE_LIST_DUPLICATE_RECORDS_NO_WRITE_ACCESS');
+      this.toastV2Service.error('LNG_PAGE_LIST_DUPLICATE_RECORDS_NO_WRITE_ACCESS');
       return;
     }
 
     // redirect to merge page
-    this.router.navigate(
-      ['/duplicated-records', EntityModel.getLinkForEntityType(types[0]), 'merge'], {
-        queryParams: {
-          ids: JSON.stringify(mergeIds)
-        }
-      }
-    );
+    // #TODO - remove show loading
+    this.dialogV2Service.showLoadingDialog();
+    // this.router.navigate(
+    //   ['/duplicated-records', EntityModel.getLinkForEntityType(types[0]), 'merge'], {
+    //     queryParams: {
+    //       ids: JSON.stringify(mergeIds)
+    //     }
+    //   }
+    // );
   }
 
   /**

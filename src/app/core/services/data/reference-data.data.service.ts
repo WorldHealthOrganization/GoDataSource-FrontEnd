@@ -42,7 +42,7 @@ export class ReferenceDataDataService {
     this.referenceDataListMap$ = this.getCategoriesList()
       .pipe(
         mergeMap((categories: ReferenceDataCategoryModel[]) => {
-          return this.getEntries()
+          return this.getEntries(new RequestQueryBuilder())
             .pipe(
               map((referenceData: ReferenceDataEntryModel[]) => {
                 // map entries by category id
@@ -102,7 +102,7 @@ export class ReferenceDataDataService {
       .pipe(
         map((entries) => {
           // find the category
-          return _.find(entries, {id: categoryId});
+          return _.find(entries, { id: categoryId });
         })
       );
   }
@@ -133,9 +133,16 @@ export class ReferenceDataDataService {
   /**
      * Retrieve reference data entries
      */
-  getEntries(): Observable<ReferenceDataEntryModel[]> {
-    // sort entries
+  getEntries(
+    queryBuilder: RequestQueryBuilder
+  ): Observable<ReferenceDataEntryModel[]> {
+    // create query
     const qb = new RequestQueryBuilder();
+
+    // merge our request
+    qb.merge(queryBuilder);
+
+    // sort entries
     qb.sort.by('order', RequestSortDirection.ASC);
 
     // retrieve created user & modified user information
@@ -149,32 +156,7 @@ export class ReferenceDataDataService {
     return this.modelHelper.mapObservableListToModel(
       this.http.get(`reference-data?filter=${filter}`),
       ReferenceDataEntryModel
-    )
-      .pipe(
-        map((entries: ReferenceDataEntryModel[]) => {
-          return entries
-            .sort((a, b) => {
-              if (
-                !_.isNumber(a.order) &&
-                                !_.isNumber(b.order)
-              ) {
-                // order by name
-                return (this.i18nService.instant(a.value) <= this.i18nService.instant(b.value)) ? -1 : 1;
-              }
-
-              if (!_.isNumber(a.order)) {
-                return 1;
-              }
-
-              if (!_.isNumber(b.order)) {
-                return -1;
-              }
-
-              // order by 'order' field
-              return a.order - b.order;
-            });
-        })
-      );
+    );
   }
 
   /**

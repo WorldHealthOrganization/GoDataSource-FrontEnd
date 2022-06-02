@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
 import { ImportDataExtension } from '../../components/import-data/model';
 import { LanguageModel } from '../../../../core/models/language.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
 
 @Component({
   selector: 'app-import-language-tokens',
@@ -14,7 +14,7 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
 })
 export class ImportLanguageTokensComponent implements OnInit {
   // breadcrumbs
-  breadcrumbs: BreadcrumbItemModel[] = [];
+  breadcrumbs: IV2Breadcrumb[] = [];
 
   authUser: UserModel;
 
@@ -24,30 +24,27 @@ export class ImportLanguageTokensComponent implements OnInit {
 
   importFileUrl: string;
 
-  languageId: string;
+  // language
+  language: LanguageModel;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
-    private cacheService: CacheService,
     private router: Router,
-    protected route: ActivatedRoute,
+    protected activatedRoute: ActivatedRoute,
     private authDataService: AuthDataService,
     private redirectService: RedirectService
-  ) {}
+  ) {
+    // get data
+    this.language = activatedRoute.snapshot.data.language;
+    this.importFileUrl = `/languages/${this.language.id}/language-tokens/import`;
+  }
 
   /**
-     * Component initialized
-     */
+   * Component initialized
+   */
   ngOnInit() {
-    this.route.params
-      .subscribe((params: { languageId }) => {
-        // set import URL
-        this.languageId = params.languageId;
-        this.importFileUrl = `/languages/${this.languageId}/language-tokens/import`;
-      });
-
     // get the authenticated user
     this.authUser = this.authDataService.getAuthenticatedUser();
 
@@ -60,38 +57,52 @@ export class ImportLanguageTokensComponent implements OnInit {
      */
   initializeBreadcrumbs() {
     // reset
-    this.breadcrumbs = [];
+    this.breadcrumbs = [{
+      label: 'LNG_COMMON_LABEL_HOME',
+      action: {
+        link: DashboardModel.canViewDashboard(this.authUser) ?
+          ['/dashboard'] :
+          ['/account/my-profile']
+      }
+    }];
 
     // add list breadcrumb only if we have permission
     if (LanguageModel.canList(this.authUser)) {
-      this.breadcrumbs.push(
-        new BreadcrumbItemModel('LNG_PAGE_LIST_LANGUAGES_TITLE', '/languages')
-      );
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_LANGUAGES_TITLE',
+        action: {
+          link: ['/languages']
+        }
+      });
     }
 
-    // import breadcrumb
-    this.breadcrumbs.push(
-      new BreadcrumbItemModel(
-        'LNG_PAGE_IMPORT_LANGUAGE_TOKENS_TITLE',
-        '.',
-        true
-      )
-    );
+    // add list breadcrumb only if we have permission
+    if (LanguageModel.canView(this.authUser)) {
+      this.breadcrumbs.push({
+        label: this.language.name,
+        action: {
+          link: ['/languages', this.language.id, 'view']
+        }
+      });
+    }
+
+    // current page
+    this.breadcrumbs.push({
+      label: 'LNG_PAGE_IMPORT_LANGUAGE_TOKENS_TITLE',
+      action: null
+    });
   }
 
   /**
      * Finished import
      */
   finished() {
-    // remove cached languages
-    this.cacheService.remove(CacheKey.LANGUAGES);
-
     // redirect
     if (LanguageModel.canList(this.authUser)) {
       this.router.navigate(['/languages']);
     } else {
       // fallback
-      this.redirectService.to([`/import-export-data/language-data/${this.languageId}/import-tokens`]);
+      this.redirectService.to([`/import-export-data/language-data/${this.language.id}/import-tokens`]);
     }
   }
 }

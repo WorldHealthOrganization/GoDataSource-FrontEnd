@@ -1143,9 +1143,6 @@ export class TransmissionChainBarsService {
         // reset position to the beg of the cell
         lineEndX = initialLineStartY;
 
-        // we might want to extend this behaviour, to move it on Y when X is full..
-        // #TODO
-
         // force break so we don't do an infinite while
         break;
       }

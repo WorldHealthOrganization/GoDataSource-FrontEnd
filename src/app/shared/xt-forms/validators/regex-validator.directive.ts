@@ -37,9 +37,9 @@ export class RegexValidatorDirective implements Validator {
     // we don't validate empty, that is required's job...
     if (
       control.value === '' ||
-            control.value === undefined ||
-            control.value === null ||
-            !this.regexExpr
+      control.value === undefined ||
+      control.value === null ||
+      !this.regexExpr
     ) {
       return;
     }
