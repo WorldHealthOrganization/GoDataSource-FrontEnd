@@ -9,6 +9,7 @@ import { UserDataResolver } from '../../core/services/resolvers/data/user.resolv
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 import { SelectedHelpCategoryDataResolver } from '../../core/services/resolvers/data/selected-help-category.resolver';
+import { HelpCategoryDataResolver } from '../../core/services/resolvers/data/help-category.resolver';
 
 // create / view / modify
 const createViewModifyFoundation: Route = {
@@ -19,6 +20,7 @@ const createViewModifyFoundation: Route = {
   }
 };
 
+// routes
 const routes: Routes = [
   // Help view / search
   {
@@ -27,9 +29,8 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     // NO permissions required, only to be authenticated
     resolve: {
-      yesNoAll: YesNoAllDataResolver
-      // TODO: Left for helpCategory resolver
-      // helpCategory: HelpCategoryDataResolver
+      yesNoAll: YesNoAllDataResolver,
+      helpCategory: HelpCategoryDataResolver
     }
   },
   // Help view single item

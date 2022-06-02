@@ -1,32 +1,28 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ViewModifyComponent } from '../../../../core/helperClasses/view-modify-component';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { DialogService } from '../../../../core/services/helper/dialog.service';
+import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 
 @Component({
   selector: 'app-view-help-item',
-  encapsulation: ViewEncapsulation.None,
   templateUrl: './view-help.component.html',
-  styleUrls: ['./view-help.component.less']
 })
 export class ViewHelpComponent extends ViewModifyComponent implements OnInit {
-  // // breadcrumbs
-  // breadcrumbs: BreadcrumbItemModel[] = [
-  //   new BreadcrumbItemModel('LNG_PAGE_GLOBAL_HELP_TITLE', '/help'),
-  //   new BreadcrumbItemModel(
-  //     'LNG_PAGE_VIEW_HELP_ITEM_TITLE',
-  //     '.',
-  //     true,
-  //     {},
-  //     {}
-  //   )
-  // ];
+  // breadcrumbs
+  breadcrumbs: IV2Breadcrumb[] = [];
 
   helpItemData: HelpItemModel = new HelpItemModel();
   itemId: string;
   categoryId: string;
+
+  // authenticated user details
+  authUser: UserModel;
 
   /**
      * Constructor
@@ -34,7 +30,8 @@ export class ViewHelpComponent extends ViewModifyComponent implements OnInit {
   constructor(
     protected route: ActivatedRoute,
     private helpDataService: HelpDataService,
-    protected dialogService: DialogService
+    protected dialogService: DialogService,
+    private authDataService: AuthDataService
   ) {
     super(
       route,
@@ -46,6 +43,9 @@ export class ViewHelpComponent extends ViewModifyComponent implements OnInit {
      * Component initialized
      */
   ngOnInit() {
+    // get the authenticated user
+    this.authUser = this.authDataService.getAuthenticatedUser();
+
     // show loading
     this.showLoadingDialog(false);
 
@@ -63,5 +63,37 @@ export class ViewHelpComponent extends ViewModifyComponent implements OnInit {
             this.hideLoadingDialog();
           });
       });
+
+    // initialize page breadcrumbs
+    this.initializeBreadcrumbs();
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs() {
+    // reset
+    this.breadcrumbs = [{
+      label: 'LNG_COMMON_LABEL_HOME',
+      action: {
+        link: DashboardModel.canViewDashboard(this.authUser) ?
+          ['/dashboard'] :
+          ['/account/my-profile']
+      }
+    }];
+
+    // list page
+    this.breadcrumbs.push({
+      label: 'LNG_PAGE_GLOBAL_HELP_TITLE',
+      action: {
+        link: ['/help']
+      }
+    });
+
+    // current page breadcrumb
+    this.breadcrumbs.push({
+      label: 'LNG_PAGE_VIEW_HELP_ITEM_TITLE',
+      action: null
+    });
   }
 }

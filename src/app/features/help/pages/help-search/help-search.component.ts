@@ -9,6 +9,11 @@ import { HelpDataService } from '../../../../core/services/data/help.data.servic
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { TranslateService } from '@ngx-translate/core';
+import { V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { ActivatedRoute } from '@angular/router';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { HelpCategoryModel } from '../../../../core/models/help-category.model';
 
 @Component({
   selector: 'app-help-search',
@@ -26,7 +31,9 @@ export class HelpSearchComponent extends ListComponent<HelpItemModel> implements
    */
   constructor(
     protected listHelperService: ListHelperService,
-    private helpDataService: HelpDataService
+    private helpDataService: HelpDataService,
+    private translateService: TranslateService,
+    private activatedRoute: ActivatedRoute
   ) {
     super(
       listHelperService,
@@ -68,17 +75,18 @@ export class HelpSearchComponent extends ListComponent<HelpItemModel> implements
         sortable: true
       },
       {
-        field: 'name',
+        field: 'categoryId',
         label: 'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY',
         format: {
-          type: 'category.name'
+          type: (item) => item.category?.name ?
+            this.translateService.instant(item.category.name) :
+            ''
         },
-        sortable: true
-        // TODO: Needs helpCategory resolver
-        // filter: {
-        //   type: V2FilterType.MULTIPLE_SELECT,
-        //   options: (this.activatedRoute.snapshot.data.helpCategory as IResolverV2ResponseModel<HelpCategoryModel>).options
-        // }
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.helpCategory as IResolverV2ResponseModel<HelpCategoryModel>).options
+        }
       },
 
       // actions
