@@ -17,6 +17,9 @@ import { RelationshipPersonDataResolver } from '../../core/services/resolvers/da
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 import * as fromPages from './pages';
+import { GenderDataResolver } from '../../core/services/resolvers/data/gender.resolver';
+import { RiskDataResolver } from '../../core/services/resolvers/data/risk.resolver';
+import { ClassificationDataResolver } from '../../core/services/resolvers/data/classification.resolver';
 
 const relationshipTypeChildrenRoutes = [
   // Relationships list
@@ -53,6 +56,14 @@ const relationshipTypeChildrenRoutes = [
         PERMISSION.OUTBREAK_VIEW,
         PERMISSION.RELATIONSHIP_CREATE
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      entity: RelationshipPersonDataResolver,
+      gender: GenderDataResolver,
+      risk: RiskDataResolver,
+      classification: ClassificationDataResolver,
+      personType: PersonTypeDataResolver
     }
   },
   // Create relationships (2): Create relationships form
