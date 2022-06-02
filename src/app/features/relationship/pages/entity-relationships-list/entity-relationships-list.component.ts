@@ -18,7 +18,6 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
-import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
@@ -165,23 +164,26 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
             'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_SHARE_SELECTED_CONTACTS'
         },
         action: {
-          click: (selected: string[]) => {
+          click: (_selected: string[]) => {
+            // #TODO
+            // - disabled until implemented page
+            this.dialogV2Service.showLoadingDialog();
             // determine list of model ids
-            const selectedRecords: string[] = _.map(selected, (idRelationship: string) => this._relationshipsListRecordsMap[idRelationship].model.id)
-              .filter((record, index, self) => {
-                // keep only unique dates
-                return self.indexOf(record) === index;
-              });
-
-            // redirect to next step
-            this.router.navigate(
-              [`/relationships/${this._entity.type}/${this._entity.id}/${this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'}/share`],
-              {
-                queryParams: {
-                  selectedTargetIds: JSON.stringify(selectedRecords)
-                }
-              }
-            );
+            // const selectedRecords: string[] = _.map(selected, (idRelationship: string) => this._relationshipsListRecordsMap[idRelationship].model.id)
+            //   .filter((record, index, self) => {
+            //     // keep only unique dates
+            //     return self.indexOf(record) === index;
+            //   });
+            //
+            // // redirect to next step
+            // this.router.navigate(
+            //   [`/relationships/${this._entity.type}/${this._entity.id}/${this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'}/share`],
+            //   {
+            //     queryParams: {
+            //       selectedTargetIds: JSON.stringify(selectedRecords)
+            //     }
+            //   }
+            // );
           }
         },
         visible: (): boolean => {
@@ -199,25 +201,29 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
           get: () => 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_CHANGE_SOURCE'
         },
         action: {
-          click: (selected: string[]) => {
-            // pass the selected target persons for not including them in available peoples
-            const selectedTargetPersons = {};
-            _.forEach(this._relationshipsListRecordsMap, (model) => {
-              const targetPerson: RelationshipPersonModel = _.find(model.relationship.persons, 'target');
-              selectedTargetPersons[targetPerson.id] = true;
-            });
+          click: (_selected: string[]) => {
+            // #TODO
+            // - disabled until implemented page
+            this.dialogV2Service.showLoadingDialog();
 
-            // redirect
-            this.router.navigate(
-              [`/relationships/${this._entity.type}/${this._entity.id}/${this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'}/switch`],
-              {
-                queryParams: {
-                  selectedTargetIds: JSON.stringify(selected),
-                  selectedPersonsIds: JSON.stringify(Object.keys(selectedTargetPersons)),
-                  entityType: JSON.stringify(this._entity.type)
-                }
-              }
-            );
+            // // pass the selected target persons for not including them in available peoples
+            // const selectedTargetPersons = {};
+            // _.forEach(this._relationshipsListRecordsMap, (model) => {
+            //   const targetPerson: RelationshipPersonModel = _.find(model.relationship.persons, 'target');
+            //   selectedTargetPersons[targetPerson.id] = true;
+            // });
+            //
+            // // redirect
+            // this.router.navigate(
+            //   [`/relationships/${this._entity.type}/${this._entity.id}/${this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'}/switch`],
+            //   {
+            //     queryParams: {
+            //       selectedTargetIds: JSON.stringify(selected),
+            //       selectedPersonsIds: JSON.stringify(Object.keys(selectedTargetPersons)),
+            //       entityType: JSON.stringify(this._entity.type)
+            //     }
+            //   }
+            // );
           }
         },
         visible: (): boolean => {
