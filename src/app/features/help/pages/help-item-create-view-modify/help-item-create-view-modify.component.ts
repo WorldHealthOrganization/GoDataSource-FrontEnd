@@ -139,6 +139,17 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
       }
     });
 
+    // help items list page
+    if (HelpItemModel.canList(this.authUser)) {
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_HELP_ITEMS_TITLE',
+        action: {
+          link: [`/help/categories/${this.selectedCategory.id}/items`]
+        }
+      });
+    }
+
+    // create / view / modify
     if (this.isCreate) {
       this.breadcrumbs.push({
         label: 'LNG_PAGE_CREATE_HELP_ITEM_TITLE',

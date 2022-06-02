@@ -30,7 +30,10 @@ export class HelpCategoriesListComponent extends ListComponent<HelpCategoryModel
     private i18nService: I18nService,
     private dialogV2Service: DialogV2Service
   ) {
-    super(listHelperService);
+    super(
+      listHelperService,
+      true
+    );
   }
 
   /**

@@ -36,7 +36,10 @@ export class HelpItemsListComponent extends ListComponent<HelpItemModel> impleme
     private i18nService: I18nService,
     private dialogV2Service: DialogV2Service
   ) {
-    super(listHelperService);
+    super(
+      listHelperService,
+      true
+    );
 
     // Retrieve category
     this._selectedCategory = this.activatedRoute.snapshot.data.selectedCategory;
@@ -398,6 +401,7 @@ export class HelpItemsListComponent extends ListComponent<HelpItemModel> impleme
   protected refreshListFields(): string[] {
     return [
       'id',
+      'categoryId',
       'title',
       'comment',
       'approved',
