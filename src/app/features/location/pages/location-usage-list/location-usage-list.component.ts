@@ -267,9 +267,6 @@ export class LocationUsageListComponent extends ListComponent<any> implements On
       .getLocationUsage(this._locationId)
       .pipe(
         map((locationUsage: LocationUsageModel) => {
-          // remove keys if we don't have rights
-          // #TODO - not sure if this is how it should be... (OLD COMMENT)
-
           // follow-ups
           if (!FollowUpModel.canList(this.authUser)) {
             locationUsage.followUp = [];
