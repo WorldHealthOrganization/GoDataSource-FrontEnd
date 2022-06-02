@@ -1,0 +1,20 @@
+<app-create-view-modify-v2
+  [action]="action"
+  [allowEdit]="true"
+  [loadingPage]="loadingPage"
+  [loadingItemData]="loadingItemData"
+  [breadcrumbs]="breadcrumbs"
+  [pageTitle]="pageTitle"
+  [pageTitleData]="pageTitleData"
+  [itemID]="itemData?.id"
+  [tabData]="tabData"
+  listTitle="LNG_PAGE_LIST_HELP_ITEMS_TITLE"
+  [expandListRecords$]="expandListRecords$"
+  [expandListColumnRenderer]="expandListColumnRenderer"
+  [expandListAdvancedFilterType]="undefined"
+  [expandListAdvancedFilters]="expandListAdvancedFilters"
+  [expandListQueryFields]="expandListQueryFields"
+  expandListAdvancedFiltersCacheKey="'/help/categories/' + this.selectedCategory.id"
+  (expandListRefreshData)="refreshExpandList($event)"
+  (expandListChangeRecord)="expandListChangeRecord($event)">
+</app-create-view-modify-v2>

@@ -4,8 +4,9 @@ import {
   HelpCategoryCreateViewModifyComponent
 } from './help-category-create-view-modify/help-category-create-view-modify.component';
 import { HelpItemsListComponent } from './help-items-list/help-items-list.component';
-import { CreateHelpItemComponent } from './create-help-item/create-help-item.component';
-import { ModifyHelpItemComponent } from './modify-help-item/modify-help-item.component';
+import {
+  HelpItemCreateViewModifyComponent
+} from './help-item-create-view-modify/help-item-create-view-modify.component';
 import { HelpSearchComponent } from './help-search/help-search.component';
 import { ViewHelpComponent } from './view-help/view-help.component';
 
@@ -13,8 +14,7 @@ import { ViewHelpComponent } from './view-help/view-help.component';
 export * from './help-categories-list/help-categories-list.component';
 export * from './help-category-create-view-modify/help-category-create-view-modify.component';
 export * from './help-items-list/help-items-list.component';
-export * from './create-help-item/create-help-item.component';
-export * from './modify-help-item/modify-help-item.component';
+export * from './help-item-create-view-modify/help-item-create-view-modify.component';
 export * from './help-search/help-search.component';
 export * from './view-help/view-help.component';
 
@@ -23,8 +23,7 @@ export const pageComponents: any[] = [
   HelpCategoriesListComponent,
   HelpCategoryCreateViewModifyComponent,
   HelpItemsListComponent,
-  CreateHelpItemComponent,
-  ModifyHelpItemComponent,
+  HelpItemCreateViewModifyComponent,
   HelpSearchComponent,
   ViewHelpComponent
 ];

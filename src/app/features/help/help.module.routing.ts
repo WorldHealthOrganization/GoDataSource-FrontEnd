@@ -1,9 +1,8 @@
 import { ModuleWithProviders } from '@angular/core';
-import { Routes, RouterModule, Route } from '@angular/router';
+import { Route, RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
 import { PERMISSION } from '../../core/models/permission.model';
 import * as fromPages from './pages';
-import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PageChangeConfirmationGuard } from '../../core/services/guards/page-change-confirmation-guard.service';
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
@@ -11,11 +10,20 @@ import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-
 import { SelectedHelpCategoryDataResolver } from '../../core/services/resolvers/data/selected-help-category.resolver';
 
 // create / view / modify
-const createViewModifyFoundation: Route = {
+const createViewModifyFoundationHelpCategory: Route = {
   component: fromPages.HelpCategoryCreateViewModifyComponent,
   canActivate: [AuthGuard],
   resolve: {
     user: UserDataResolver
+  }
+};
+
+const createViewModifyFoundationHelpItem: Route = {
+  component: fromPages.HelpItemCreateViewModifyComponent,
+  canActivate: [AuthGuard],
+  resolve: {
+    user: UserDataResolver,
+    category: SelectedHelpCategoryDataResolver
   }
 };
 
@@ -51,7 +59,7 @@ const routes: Routes = [
   // Create Help Category
   {
     path: 'categories/create',
-    ...createViewModifyFoundation,
+    ...createViewModifyFoundationHelpCategory,
     data: {
       permissions: [
         PERMISSION.HELP_CATEGORY_CREATE
@@ -65,7 +73,7 @@ const routes: Routes = [
   // View Help Category
   {
     path: 'categories/:categoryId/view',
-    ...createViewModifyFoundation,
+    ...createViewModifyFoundationHelpCategory,
     data: {
       permissions: [
         PERMISSION.HELP_CATEGORY_VIEW
@@ -76,7 +84,7 @@ const routes: Routes = [
   // Modify Help Category
   {
     path: 'categories/:categoryId/modify',
-    ...createViewModifyFoundation,
+    ...createViewModifyFoundationHelpCategory,
     data: {
       permissions: [
         PERMISSION.HELP_CATEGORY_MODIFY
@@ -106,12 +114,12 @@ const routes: Routes = [
   // Create Help Item
   {
     path: 'categories/:categoryId/items/create',
-    component: fromPages.CreateHelpItemComponent,
-    canActivate: [AuthGuard],
+    ...createViewModifyFoundationHelpItem,
     data: {
       permissions: [
         PERMISSION.HELP_CATEGORY_ITEM_CREATE
-      ]
+      ],
+      action: CreateViewModifyV2Action.CREATE
     },
     canDeactivate: [
       PageChangeConfirmationGuard
@@ -120,25 +128,23 @@ const routes: Routes = [
   // View Help Item
   {
     path: 'categories/:categoryId/items/:itemId/view',
-    component: fromPages.ModifyHelpItemComponent,
-    canActivate: [AuthGuard],
+    ...createViewModifyFoundationHelpItem,
     data: {
       permissions: [
         PERMISSION.HELP_CATEGORY_ITEM_VIEW
       ],
-      action: ViewModifyComponentAction.VIEW
+      action: CreateViewModifyV2Action.VIEW
     }
   },
   // Modify Help Item
   {
     path: 'categories/:categoryId/items/:itemId/modify',
-    component: fromPages.ModifyHelpItemComponent,
-    canActivate: [AuthGuard],
+    ...createViewModifyFoundationHelpItem,
     data: {
       permissions: [
         PERMISSION.HELP_CATEGORY_ITEM_MODIFY
       ],
-      action: ViewModifyComponentAction.MODIFY
+      action: CreateViewModifyV2Action.MODIFY
     },
     canDeactivate: [
       PageChangeConfirmationGuard
