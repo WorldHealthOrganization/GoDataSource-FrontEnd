@@ -11,7 +11,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 
 @Component({
   selector: 'app-view-help-item',
-  templateUrl: './view-help.component.html',
+  templateUrl: './view-help.component.html'
 })
 export class ViewHelpComponent extends ViewModifyComponent implements OnInit {
   // breadcrumbs
