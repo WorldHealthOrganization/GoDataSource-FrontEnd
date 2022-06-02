@@ -1833,7 +1833,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           // search
           this.queryBuilder.filter.byEquality(
             'teamId',
-            item.label
+            item.data
           );
         }
 
@@ -1874,7 +1874,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               // group data
               const values: {
                 label: string,
-                value: number
+                value: number,
+                data: any
               }[] = [];
               Object.keys(countResponse.team || {}).forEach((teamId) => {
                 let teamLabel;
@@ -1886,9 +1887,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                   teamLabel = '—';
                 }
 
+                // add to teams
                 values.push({
                   label: teamLabel,
-                  value: countResponse.team[teamId].count
+                  value: countResponse.team[teamId].count,
+                  data: teamId
                 });
               });
 
@@ -1899,7 +1902,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                   label: item.label,
                   bgColor: Constants.DEFAULT_BACKGROUND_COLOR_NODES_CHAINS,
                   textColor: Constants.DEFAULT_COLOR_CHAINS,
-                  value: item.value.toLocaleString('en')
+                  value: item.value.toLocaleString('en'),
+                  data: item.data
                 };
               });
 
