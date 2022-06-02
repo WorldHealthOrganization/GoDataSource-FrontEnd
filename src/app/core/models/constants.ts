@@ -67,7 +67,6 @@ export class Constants {
   // pagination defaults and configuration
   static PAGE_SIZE_OPTIONS = [50, 100, 500, 1000];
   static DEFAULT_PAGE_SIZE = 50;
-  static DEFAULT_USAGE_MAX_RECORDS_DISPLAYED = 10;
 
   // static gender
   static readonly GENDER_MALE = 'LNG_REFERENCE_DATA_CATEGORY_GENDER_MALE';

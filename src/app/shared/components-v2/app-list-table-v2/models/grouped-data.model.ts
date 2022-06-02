@@ -10,6 +10,7 @@ export interface IV2GroupedDataValue {
 
   // optional
   active?: boolean;
+  data?: any;
 }
 
 /**

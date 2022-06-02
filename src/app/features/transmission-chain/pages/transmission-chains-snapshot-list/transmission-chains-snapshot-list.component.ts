@@ -341,6 +341,12 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent<CotSn
       );
     }
 
+    // created by current user
+    countQueryBuilder.filter.byEquality(
+      'createdBy',
+      this.authUser.id
+    );
+
     // count
     this.transmissionChainDataService
       .getSnapshotsCount(

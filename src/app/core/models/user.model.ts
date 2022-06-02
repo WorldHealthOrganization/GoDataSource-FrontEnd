@@ -20,6 +20,7 @@ export enum UserSettings {
   EVENT_FIELDS = 'eventFields',
   EVENT_WITHOUT_RELATIONSHIPS_FIELDS = 'eventWithoutRelationshipsFields',
   LOCATION_FIELDS = 'locationFields',
+  LOCATION_USAGE_FIELDS = 'locationUsageFields',
   LAB_RESULTS_FIELDS = 'labResults',
   RELATIONSHIP_FIELDS = 'relationshipFields',
   OUTBREAK_FIELDS = 'outbreakFields',

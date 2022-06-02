@@ -1457,7 +1457,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                           type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
                           name: 'groupBy',
                           placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON',
-                          options: [(Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE) as any],
+                          options: [
+                            (Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE) as any,
+                            (Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.CASE) as any
+                          ],
                           value: Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE.value,
                           validators: {
                             required: () => true
@@ -1833,7 +1836,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           // search
           this.queryBuilder.filter.byEquality(
             'teamId',
-            item.label
+            item.data
           );
         }
 
@@ -1874,7 +1877,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               // group data
               const values: {
                 label: string,
-                value: number
+                value: number,
+                data: any
               }[] = [];
               Object.keys(countResponse.team || {}).forEach((teamId) => {
                 let teamLabel;
@@ -1886,9 +1890,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                   teamLabel = '—';
                 }
 
+                // add to teams
                 values.push({
                   label: teamLabel,
-                  value: countResponse.team[teamId].count
+                  value: countResponse.team[teamId].count,
+                  data: teamId
                 });
               });
 
@@ -1899,7 +1905,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                   label: item.label,
                   bgColor: Constants.DEFAULT_BACKGROUND_COLOR_NODES_CHAINS,
                   textColor: Constants.DEFAULT_COLOR_CHAINS,
-                  value: item.value.toLocaleString('en')
+                  value: item.value.toLocaleString('en'),
+                  data: item.data
                 };
               });
 
