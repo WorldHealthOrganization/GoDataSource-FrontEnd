@@ -32,20 +32,15 @@ import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import {
-  IV2SideDialogConfigButtonType,
-  IV2SideDialogConfigInputDate,
-  IV2SideDialogConfigInputDateRange,
-  IV2SideDialogConfigInputNumber,
-  IV2SideDialogConfigInputSingleDropdown,
-  IV2SideDialogConfigInputText,
-  IV2SideDialogConfigInputToggle,
-  IV2SideDialogConfigInputToggleCheckbox,
+  IV2SideDialogConfigButtonType, IV2SideDialogConfigInputDate,
+  IV2SideDialogConfigInputDateRange, IV2SideDialogConfigInputNumber,
+  IV2SideDialogConfigInputSingleDropdown, IV2SideDialogConfigInputText,
+  IV2SideDialogConfigInputToggle, IV2SideDialogConfigInputToggleCheckbox,
   V2SideDialogConfigInputType
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { FollowUpPage } from '../../typings/follow-up-page';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
-import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
   selector: 'app-daily-follow-ups-list',
@@ -579,7 +574,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             iconTooltip: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_VIEW_FOLLOW_UP',
             action: {
               link: (item: FollowUpModel): string[] => {
-                return ['/contacts', item.personId, 'follow-ups', item.id, item.person?.type === EntityType.CASE ? 'history' : 'view'];
+                return ['/contacts', item.personId, 'follow-ups', item.id, 'view'];
               },
               linkQueryParams: (): Params => {
                 return {

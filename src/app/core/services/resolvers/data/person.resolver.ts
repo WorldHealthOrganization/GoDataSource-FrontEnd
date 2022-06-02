@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { ToastV2Service } from '../../helper/toast-v2.service';
 import { CaseModel } from '../../../models/case.model';
 import { ContactModel } from '../../../models/contact.model';
@@ -72,7 +72,18 @@ export class PersonDataResolver implements Resolve<CaseModel | ContactModel | Ev
       request = this.contactDataService.getContactsList(
         this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID),
         qb
-      );
+      ).pipe(switchMap((data) => {
+        // found ?
+        if (data?.length > 0) {
+          return of(data);
+        }
+
+        // check cases
+        return this.caseDataService.getCasesList(
+          this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID),
+          qb
+        );
+      }));
     } else if (
       route.params.caseId ||
       route.queryParams.caseId
