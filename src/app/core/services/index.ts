@@ -134,6 +134,7 @@ import { SelectedHelpCategoryDataResolver } from './resolvers/data/selected-help
 import { InvestigationStatusDataResolver } from './resolvers/data/investigation-status.resolver';
 import { SelectedLanguageDataResolver } from './resolvers/data/selected-language.resolver';
 import { LocationTreeDataResolver } from './resolvers/data/location-tree.resolver';
+import { SelectedUserRoleDataResolver } from './resolvers/data/selected-user-role.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -204,6 +205,7 @@ export const services: any[] = [
   SelectedHelpCategoryDataResolver,
   SelectedLanguageDataResolver,
   SelectedOutbreakDataResolver,
+  SelectedUserRoleDataResolver,
   SyncPackageExportTypeDataResolver,
   SyncPackageModuleDataResolver,
   SyncPackageStatusDataResolver,

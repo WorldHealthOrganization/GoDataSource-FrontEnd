@@ -9,6 +9,7 @@ import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-
 import { PermissionDataResolver } from '../../core/services/resolvers/data/permission.resolver';
 import { RolesCreateViewModifyComponent } from './pages';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
+import { SelectedUserRoleDataResolver } from '../../core/services/resolvers/data/selected-user-role.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -16,7 +17,8 @@ const createViewModifyFoundation: Route = {
   canActivate: [AuthGuard],
   resolve: {
     user: UserDataResolver,
-    permission: PermissionDataResolver
+    permission: PermissionDataResolver,
+    userRole: SelectedUserRoleDataResolver
   }
 };
 

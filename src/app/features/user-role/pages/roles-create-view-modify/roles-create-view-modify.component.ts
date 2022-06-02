@@ -33,6 +33,9 @@ import { UserRoleHelper } from '../../../../core/helperClasses/user-role.helper'
   templateUrl: './roles-create-view-modify.component.html'
 })
 export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<UserRoleModel> implements OnDestroy {
+  // clone role
+  private _cloneRole: UserRoleModel;
+
   /**
    * Constructor
    */
@@ -47,6 +50,7 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
     renderer2: Renderer2,
     redirectService: RedirectService
   ) {
+    // parent
     super(
       toastV2Service,
       renderer2,
@@ -54,6 +58,25 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
       activatedRoute,
       authDataService
     );
+
+    // clone role ?
+    if (this.isCreate) {
+      // get data
+      this._cloneRole = activatedRoute.snapshot.data.userRole;
+
+      // cleanup
+      if (this._cloneRole) {
+        delete this._cloneRole.id;
+        delete this._cloneRole.name;
+        delete this._cloneRole.createdBy;
+        delete this._cloneRole.createdAt;
+        delete this._cloneRole.updatedBy;
+        delete this._cloneRole.updatedAt;
+        delete this._cloneRole.deleted;
+        delete this._cloneRole.deletedAt;
+        delete this._cloneRole.users;
+      }
+    }
   }
 
   /**
@@ -68,7 +91,7 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
    * Create new item model if needed
    */
   protected createNewItem(): UserRoleModel {
-    return new UserRoleModel();
+    return new UserRoleModel(this._cloneRole);
   }
 
   /**
