@@ -1457,7 +1457,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                           type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
                           name: 'groupBy',
                           placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON',
-                          options: [(Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE) as any],
+                          options: [
+                            (Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE) as any,
+                            (Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.CASE) as any
+                          ],
                           value: Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE.value,
                           validators: {
                             required: () => true
