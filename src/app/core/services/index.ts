@@ -135,12 +135,17 @@ import { InvestigationStatusDataResolver } from './resolvers/data/investigation-
 import { SelectedLanguageDataResolver } from './resolvers/data/selected-language.resolver';
 import { LocationTreeDataResolver } from './resolvers/data/location-tree.resolver';
 import { SelectedUserRoleDataResolver } from './resolvers/data/selected-user-role.resolver';
-import { HelpCategoriesDataResolver } from './resolvers/data/help-categories-data-resolver.service';
+import { SelectedEntitiesDataResolver } from './resolvers/data/selected-entities.resolver';
+import { HelpCategoryDataResolver } from './resolvers/data/help-category.resolver';
+import { AuditLogActionDataResolver } from './resolvers/data/audit-log-action.resolver';
+import { AuditLogModuleDataResolver } from './resolvers/data/audit-log-module.resolver';
 
 // export the list of services
 export const services: any[] = [
   // resolver services
   AddressTypeDataResolver,
+  AuditLogActionDataResolver,
+  AuditLogModuleDataResolver,
   BackupModuleDataResolver,
   BackupStatusDataResolver,
   BackupTypesDataResolver,
@@ -169,7 +174,7 @@ export const services: any[] = [
   FollowUpGenerationTeamAssignmentAlgorithmDataResolver,
   GanttChartTypeDataResolver,
   GenderDataResolver,
-  HelpCategoriesDataResolver,
+  HelpCategoryDataResolver,
   IconDataResolver,
   InstitutionDataResolver,
   InvestigationStatusDataResolver,
@@ -204,6 +209,7 @@ export const services: any[] = [
   SavedImportMappingDataResolver,
   SecurityQuestionDataResolver,
   SelectedClusterDataResolver,
+  SelectedEntitiesDataResolver,
   SelectedHelpCategoryDataResolver,
   SelectedLanguageDataResolver,
   SelectedOutbreakDataResolver,

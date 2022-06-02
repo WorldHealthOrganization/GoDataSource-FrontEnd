@@ -1,16 +1,15 @@
 import { Injectable } from '@angular/core';
-import { HelpCategoryModel } from '../../../models/help-category.model';
-import { HelpDataService } from '../../data/help.data.service';
-import { ToastV2Service } from '../../helper/toast-v2.service';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { AuthDataService } from '../../data/auth.data.service';
+import { ToastV2Service } from '../../helper/toast-v2.service';
 import { IMapResolverV2, IResolverV2ResponseModel } from './models/resolver-response.model';
 import { RequestQueryBuilder, RequestSortDirection } from '../../../helperClasses/request-query-builder';
-
+import { AuthDataService } from '../../data/auth.data.service';
+import { HelpCategoryModel } from '../../../models/help-category.model';
+import { HelpDataService } from '../../data/help.data.service';
 
 @Injectable()
-export class HelpCategoriesDataResolver implements IMapResolverV2<HelpCategoryModel> {
+export class HelpCategoryDataResolver implements IMapResolverV2<HelpCategoryModel> {
   /**
    * Constructor
    */
@@ -23,7 +22,7 @@ export class HelpCategoriesDataResolver implements IMapResolverV2<HelpCategoryMo
   /**
    * Retrieve data
    */
-  resolve(): Observable<IResolverV2ResponseModel<HelpCategoryModel>>  {
+  resolve(): Observable<IResolverV2ResponseModel<HelpCategoryModel>> {
     // user doesn't have rights ?
     if (!HelpCategoryModel.canList(this.authDataService.getAuthenticatedUser())) {
       return of({
@@ -44,7 +43,7 @@ export class HelpCategoriesDataResolver implements IMapResolverV2<HelpCategoryMo
     qb.sort
       .by('name', RequestSortDirection.ASC);
 
-    // retrieve records
+    // retrieve users
     return this.helpDataService
       .getHelpCategoryList(qb)
       .pipe(

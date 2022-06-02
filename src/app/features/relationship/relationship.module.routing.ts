@@ -1,7 +1,6 @@
 import { ModuleWithProviders } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { Route, RouterModule, Routes } from '@angular/router';
 import { RelationshipType } from '../../core/enums/relationship-type.enum';
-import { ViewModifyComponentAction } from '../../core/helperClasses/view-modify-component';
 import { PERMISSION } from '../../core/models/permission.model';
 import { PermissionExpression } from '../../core/models/user.model';
 import { AuthGuard } from '../../core/services/guards/auth-guard.service';
@@ -17,7 +16,32 @@ import { RelationshipPersonDataResolver } from '../../core/services/resolvers/da
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 import * as fromPages from './pages';
+import { GenderDataResolver } from '../../core/services/resolvers/data/gender.resolver';
+import { RiskDataResolver } from '../../core/services/resolvers/data/risk.resolver';
+import { ClassificationDataResolver } from '../../core/services/resolvers/data/classification.resolver';
+import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
+import { SelectedOutbreakDataResolver } from '../../core/services/resolvers/data/selected-outbreak.resolver';
+import { SelectedEntitiesDataResolver } from '../../core/services/resolvers/data/selected-entities.resolver';
 
+// create - view - modify relationship
+const createViewModifyRelationship: Route = {
+  component: fromPages.RelationshipsCreateViewModifyComponent,
+  canActivate: [AuthGuard],
+  resolve: {
+    outbreak: SelectedOutbreakDataResolver,
+    entity: RelationshipPersonDataResolver,
+    certaintyLevel: CertaintyLevelDataResolver,
+    exposureType: ExposureTypeDataResolver,
+    exposureFrequency: ExposureFrequencyDataResolver,
+    exposureDuration: ExposureDurationDataResolver,
+    contextOfTransmission: ContextOfTransmissionDataResolver,
+    cluster: ClusterDataResolver,
+    user: UserDataResolver,
+    selectedEntities: SelectedEntitiesDataResolver
+  }
+};
+
+// routes
 const relationshipTypeChildrenRoutes = [
   // Relationships list
   {
@@ -53,22 +77,15 @@ const relationshipTypeChildrenRoutes = [
         PERMISSION.OUTBREAK_VIEW,
         PERMISSION.RELATIONSHIP_CREATE
       ]
-    }
-  },
-  // Create relationships (2): Create relationships form
-  {
-    path: 'create',
-    component: fromPages.CreateEntityRelationshipComponent,
-    canActivate: [AuthGuard],
-    data: {
-      permissions: [
-        PERMISSION.OUTBREAK_VIEW,
-        PERMISSION.RELATIONSHIP_CREATE
-      ]
     },
-    canDeactivate: [
-      PageChangeConfirmationGuard
-    ]
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      entity: RelationshipPersonDataResolver,
+      gender: GenderDataResolver,
+      risk: RiskDataResolver,
+      classification: ClassificationDataResolver,
+      personType: PersonTypeDataResolver
+    }
   },
   // Share selected relationships (1): Select people to share with
   {
@@ -118,30 +135,43 @@ const relationshipTypeChildrenRoutes = [
       })
     }
   },
+  // Create relationships
+  {
+    path: 'create',
+    ...createViewModifyRelationship,
+    data: {
+      permissions: [
+        PERMISSION.OUTBREAK_VIEW,
+        PERMISSION.RELATIONSHIP_CREATE
+      ],
+      action: CreateViewModifyV2Action.CREATE
+    },
+    canDeactivate: [
+      PageChangeConfirmationGuard
+    ]
+  },
   // View Relationship
   {
     path: ':relationshipId/view',
-    component: fromPages.ModifyEntityRelationshipComponent,
-    canActivate: [AuthGuard],
+    ...createViewModifyRelationship,
     data: {
       permissions: [
         PERMISSION.OUTBREAK_VIEW,
         PERMISSION.RELATIONSHIP_VIEW
       ],
-      action: ViewModifyComponentAction.VIEW
+      action: CreateViewModifyV2Action.VIEW
     }
   },
   // Modify Relationship
   {
     path: ':relationshipId/modify',
-    component: fromPages.ModifyEntityRelationshipComponent,
-    canActivate: [AuthGuard],
+    ...createViewModifyRelationship,
     data: {
       permissions: [
         PERMISSION.OUTBREAK_VIEW,
         PERMISSION.RELATIONSHIP_MODIFY
       ],
-      action: ViewModifyComponentAction.MODIFY
+      action: CreateViewModifyV2Action.MODIFY
     },
     canDeactivate: [
       PageChangeConfirmationGuard
