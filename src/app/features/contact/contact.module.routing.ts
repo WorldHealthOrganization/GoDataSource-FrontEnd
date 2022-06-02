@@ -335,13 +335,14 @@ const routes: Routes = [
   },
   // View History Follow Up
   {
-    path: ':contactId/follow-ups/:followUpId/history',
+    path: ':caseId/follow-ups/:followUpId/history',
     ...followUpFoundation,
     data: {
       permissions: [
         PERMISSION.FOLLOW_UP_VIEW
       ],
-      action: CreateViewModifyV2Action.VIEW
+      action: CreateViewModifyV2Action.VIEW,
+      isHistory: true
     }
   },
   // Modify list of Follow Ups

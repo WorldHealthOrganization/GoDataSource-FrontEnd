@@ -33,6 +33,7 @@ import { catchError, takeUntil } from 'rxjs/operators';
 import { TeamModel } from '../../../../core/models/team.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
+import { AppMessages } from '../../../../core/enums/app-messages.enum';
 
 /**
  * Component
@@ -44,6 +45,9 @@ import { EntityFollowUpHelperService } from '../../../../core/services/helper/en
 export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent<FollowUpModel> implements OnDestroy {
   // entity
   private _entityData: ContactModel | CaseModel;
+
+  // history ?
+  isHistory: boolean;
 
   /**
    * Constructor
@@ -71,6 +75,18 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
 
     // retrieve data
     this._entityData = activatedRoute.snapshot.data.entityData;
+    this.isHistory = !!activatedRoute.snapshot.data.isHistory;
+
+    // display history follow-ups ?
+    if (this.isHistory) {
+      this.toastV2Service.notice(
+        'LNG_PAGE_MODIFY_FOLLOW_UP_REGISTERED_AS_CONTACT_MESSAGE',
+        {
+          personName: this._entityData.name
+        },
+        AppMessages.APP_MESSAGE_HISTORY_FOLLOW_UPS
+      );
+    }
   }
 
   /**
@@ -79,6 +95,9 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
   ngOnDestroy(): void {
     // parent
     super.onDestroy();
+
+    // remove global notifications
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_HISTORY_FOLLOW_UPS);
   }
 
   /**
@@ -436,7 +455,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
           link: () => ['/contacts', `${this._entityData.id}`, 'follow-ups', this.itemData?.id, 'view']
         }
       },
-      modify: {
+      modify: this.isHistory ? undefined : {
         link: {
           link: () => ['/contacts', `${this._entityData.id}`, 'follow-ups', this.itemData?.id, 'modify']
         },
