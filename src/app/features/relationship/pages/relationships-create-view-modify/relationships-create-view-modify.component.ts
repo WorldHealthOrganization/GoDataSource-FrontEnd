@@ -53,6 +53,9 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
   // relationship models for create
   private _createRelationships: RelationshipModel[];
   private _createEntities: (CaseModel | ContactModel | EventModel | ContactOfContactModel)[];
+  private _createEntitiesMap: {
+    [id: string]: CaseModel | ContactModel | EventModel | ContactOfContactModel
+  } = {};
 
   /**
    * Constructor
@@ -86,7 +89,15 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     if (this.isCreate) {
       // initialize
       this._createEntities = (this.activatedRoute.snapshot.data.selectedEntities as IResolverV2ResponseModel<CaseModel | ContactModel | EventModel | ContactOfContactModel>).list;
-      this._createRelationships = (this._createEntities || []).map(() => new RelationshipModel());
+      this._createRelationships =  [];
+      this._createEntitiesMap = {};
+      (this._createEntities || []).forEach((item) => {
+        // initialize new relationship
+        this._createRelationships.push(new RelationshipModel());
+
+        // map entity for easy access
+        this._createEntitiesMap[item.id] = item;
+      });
 
       // something went wrong, we should have at least one relationship model on create
       if (this._createRelationships.length < 1) {
@@ -591,7 +602,9 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
 
             // set target person
             relationshipData.persons = [{
-              id: personId
+              id: this.relationshipType === RelationshipType.CONTACT ?
+                personId :
+                this._entity.id
             }];
 
             // add request
@@ -599,8 +612,12 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
               this.relationshipDataService
                 .createRelationship(
                   this.selectedOutbreak.id,
-                  this._entity.type,
-                  this._entity.id,
+                  this.relationshipType === RelationshipType.CONTACT ?
+                    this._entity.type :
+                    this._createEntitiesMap[personId].type,
+                  this.relationshipType === RelationshipType.CONTACT ?
+                    this._entity.id :
+                    personId,
                   relationshipData
                 )
             );
