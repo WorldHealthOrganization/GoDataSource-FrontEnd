@@ -1,23 +1,21 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { Component, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { LocationDataService } from '../../../../core/services/data/location.data.service';
+import { map, takeUntil, tap } from 'rxjs/operators';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { CaseModel } from '../../../../core/models/case.model';
+import { ContactModel } from '../../../../core/models/contact.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { EventModel } from '../../../../core/models/event.model';
+import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { LocationUsageModel, UsageDetails, UsageDetailsItem } from '../../../../core/models/location-usage.model';
 import { LocationModel } from '../../../../core/models/location.model';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import * as _ from 'lodash';
-import { Constants } from '../../../../core/models/constants';
-import { HoverRowAction } from '../../../../shared/components';
-import { EventModel } from '../../../../core/models/event.model';
-import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs/internal/observable/throwError';
-import { FollowUpModel } from '../../../../core/models/follow-up.model';
-import { ContactModel } from '../../../../core/models/contact.model';
-import { CaseModel } from '../../../../core/models/case.model';
+import { LocationDataService } from '../../../../core/services/data/location.data.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { Subscription } from 'rxjs/internal/Subscription';
-import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 
 @Component({
   selector: 'app-location-usage-list',
@@ -25,132 +23,140 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   templateUrl: './location-usage-list.component.html',
   styleUrls: ['./location-usage-list.component.less']
 })
-export class LocationUsageListComponent extends ListComponent<any> implements OnInit, OnDestroy {
-  // breadcrumbs
-  // breadcrumbs: BreadcrumbItemModel[] = [];
-
+export class LocationUsageListComponent extends ListComponent<any> implements OnDestroy {
+  // location
   locationId: string;
   locationData: LocationModel;
 
-  usageDetailsList: UsageDetailsItem[];
-  usageDetailsListMore: {
-    displayed: number,
-    total: number
-  };
-
-  fixedTableColumns: string[] = [
-    'type',
-    'name',
-    'outbreakName'
-  ];
-
-  // selected outbreak
-  outbreakSubscriber: Subscription;
-
-  recordActions: HoverRowAction[] = [
-    // View Item
-    new HoverRowAction({
-      icon: 'visibility',
-      iconTooltip: 'LNG_PAGE_ACTION_VIEW',
-      disabledTooltip: 'LNG_PAGE_LIST_USAGE_LOCATIONS_NOT_SELECTED_OUTBREAK',
-      linkGenerator: (item: UsageDetailsItem): string[] => {
-        return [item.viewUrl];
-      },
-      visible: (item: UsageDetailsItem): boolean => {
-        return item.typePermissions &&
-                    item.typePermissions.canView(this.authUser) &&
-                    !!item.outbreakId &&
-                    !!item.outbreakName;
-      },
-      disable: (item: UsageDetailsItem): boolean => {
-        return !this.selectedOutbreak ||
-                    item.outbreakId !== this.selectedOutbreak.id;
-      }
-    }),
-
-    // Modify Item
-    new HoverRowAction({
-      icon: 'settings',
-      iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
-      disabledTooltip: 'LNG_PAGE_LIST_USAGE_LOCATIONS_NOT_SELECTED_OUTBREAK',
-      linkGenerator: (item: UsageDetailsItem): string[] => {
-        return [item.modifyUrl];
-      },
-      visible: (item: UsageDetailsItem): boolean => {
-        return item.typePermissions &&
-                    item.typePermissions.canModify(this.authUser) &&
-                    !!item.outbreakId &&
-                    item.outbreakId === this.authUser.activeOutbreakId;
-      },
-      disable: (item: UsageDetailsItem): boolean => {
-        return !this.selectedOutbreak ||
-                    item.outbreakId !== this.selectedOutbreak.id;
-      }
-    })
-  ];
-
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
-    private toastV2Service: ToastV2Service,
     private locationDataService: LocationDataService,
-    private outbreakDataService: OutbreakDataService,
-    protected route: ActivatedRoute
+    protected activatedRoute: ActivatedRoute,
+    public i18nService: I18nService
   ) {
     super(listHelperService);
-  }
-
-  /**
-     * Component initialized
-     */
-  ngOnInit() {
-    // subscribe to the Selected Outbreak Subject stream
-    this.outbreakSubscriber = this.outbreakDataService
-      .getSelectedOutbreakSubject()
-      .subscribe((selectedOutbreak: OutbreakModel) => {
-        this.selectedOutbreak = selectedOutbreak;
-      });
 
     // get location for which we need to retrieve usages
-    this.route.params.subscribe((params: { locationId }) => {
-      this.locationId = params.locationId;
+    this.locationId = this.activatedRoute.snapshot.params.locationId;
 
-      // retrieve location
-      this.locationDataService
-        .getLocation(this.locationId)
-        .subscribe((location: LocationModel) => {
-          // location data
-          this.locationData = location;
+    // retrieve location
+    this.locationDataService
+      .getLocation(this.locationId)
+      .subscribe((location: LocationModel) => {
+        // location data
+        this.locationData = location;
 
-          // update breadcrumbs
-          this.initializeBreadcrumbs();
+        // update breadcrumbs
+        this.initializeBreadcrumbs();
 
-          // get usage list
-          this.needsRefreshList(true);
-        });
-    });
+        // get usage list
+        this.needsRefreshList(true);
+      });
   }
 
   /**
-     * Release resources
-     */
+   * Release resources
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
+  }
 
-    // release subscriber
-    if (this.outbreakSubscriber) {
-      this.outbreakSubscriber.unsubscribe();
-      this.outbreakSubscriber = null;
-    }
+  /**
+   * Component initialized
+   */
+  initialized(): void {
+    // initialize pagination
+    this.initPaginator();
+
+    // ...and re-load the list when the Selected Outbreak is changed
+    this.needsRefreshList(true);
   }
 
   /**
    * Initialize Side Table Columns
    */
-  protected initializeTableColumns(): void {}
+  protected initializeTableColumns(): void {
+    // default table columns
+    this.tableColumns = [
+      {
+        field: 'typeLabel',
+        label: 'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_TYPE'
+      },
+      {
+        field: 'name',
+        label: 'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_NAME'
+      },
+      {
+        field: 'outbreakName',
+        label: 'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_OUTBREAK'
+      },
+
+      // actions
+      {
+        field: 'actions',
+        label: 'LNG_COMMON_LABEL_ACTIONS',
+        pinned: IV2ColumnPinned.RIGHT,
+        notResizable: true,
+        cssCellClass: 'gd-cell-no-focus',
+        format: {
+          type: V2ColumnFormat.ACTIONS
+        },
+        actions: [
+          // View Case
+          {
+            type: V2ActionType.ICON,
+            icon: 'visibility',
+            iconTooltip: 'LNG_PAGE_ACTION_VIEW',
+            // TODO: Needs disabledTooltip
+            // disabledTooltip: 'LNG_PAGE_LIST_USAGE_LOCATIONS_NOT_SELECTED_OUTBREAK',
+            action: {
+              link: (item: UsageDetailsItem): string[] => {
+                return [item.viewUrl];
+              }
+            },
+            visible: (item: UsageDetailsItem): boolean => {
+              return item.typePermissions &&
+                item.typePermissions.canView(this.authUser) &&
+                !!item.outbreakId &&
+                !!item.outbreakName;
+            },
+            disable: (item: UsageDetailsItem): boolean => {
+              return !this.selectedOutbreak ||
+              item.outbreakId !== this.selectedOutbreak.id;
+            }
+          },
+
+          // Modify Case
+          {
+            type: V2ActionType.ICON,
+            icon: 'edit',
+            iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
+            // TODO: Needs disabledTooltip
+            // disabledTooltip: 'LNG_PAGE_LIST_USAGE_LOCATIONS_NOT_SELECTED_OUTBREAK',
+            action: {
+              link: (item: UsageDetailsItem): string[] => {
+                return [item.modifyUrl];
+              }
+            },
+            visible: (item: UsageDetailsItem): boolean => {
+              return item.typePermissions &&
+                item.typePermissions.canModify(this.authUser) &&
+                !!item.outbreakId &&
+                item.outbreakId === this.authUser.activeOutbreakId;
+            },
+            disable: (item: UsageDetailsItem): boolean => {
+              return !this.selectedOutbreak ||
+                item.outbreakId !== this.selectedOutbreak.id;
+            }
+          }
+        ]
+      }
+    ];
+  }
 
   /**
    * Initialize process data
@@ -188,35 +194,36 @@ export class LocationUsageListComponent extends ListComponent<any> implements On
   protected initializeGroupedData(): void {}
 
   /**
-     * Initialize breadcrumbs
-     */
-  // initializeBreadcrumbs() {
-  //   // reset
-  //   this.breadcrumbs = [];
-  //
-  //   // add list breadcrumb only if we have permission
-  //   if (LocationModel.canList(this.authUser)) {
-  //     this.breadcrumbs.push(
-  //       new BreadcrumbItemModel('LNG_PAGE_LIST_LOCATIONS_TITLE', '/locations')
-  //     );
-  //   }
-  //
-  //   // usage breadcrumb
-  //   this.breadcrumbs.push(
-  //     new BreadcrumbItemModel(
-  //       'LNG_PAGE_LIST_USAGE_LOCATIONS_TITLE',
-  //       '.',
-  //       true,
-  //       {},
-  //       this.locationData
-  //     )
-  //   );
-  // }
-
-  /**
    * Initialize breadcrumbs
    */
-  initializeBreadcrumbs(): void {
+  protected initializeBreadcrumbs(): void {
+    // set breadcrumbs
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
+        }
+      }
+    ];
+
+    // add list breadcrumb only if we have permission
+    if (LocationModel.canList(this.authUser)) {
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_LOCATIONS_TITLE',
+        action: {
+          link: ['/locations']
+        }
+      });
+    }
+
+    // usage breadcrumb
+    this.breadcrumbs.push({
+      label: this.i18nService.instant('LNG_PAGE_LIST_USAGE_LOCATIONS_TITLE', this.locationData ? { name: this.locationData.name } : '?'),
+      action: null
+    });
   }
 
   /**
@@ -231,69 +238,57 @@ export class LocationUsageListComponent extends ListComponent<any> implements On
    */
   refreshList() {
     if (this.locationId) {
-      // retrieve outbreaks
-      this.outbreakDataService
-        .getOutbreaksListReduced()
+      // retrieve usages of a location
+      this.records$ = this.locationDataService
+        .getLocationUsage(this.locationId)
         .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            return throwError(err);
-          })
-        )
-        .subscribe((outbreaks: OutbreakModel[]) => {
-          // map outbreaks to id / model
-          const outbreaksMapped: {
-            [ id: string ]: OutbreakModel
-          } = _.transform(
-            outbreaks,
-            (result, outbreak: OutbreakModel) => {
-              result[outbreak.id] = outbreak;
-            },
-            {}
-          );
+          map((locationUsage: LocationUsageModel) => {
+            // remove keys if we don't have rights
+            // #TODO - not sure if this is how it should be... (OLD COMMENT)
 
-          // retrieve usages of a location
-          this.locationDataService
-            .getLocationUsage(this.locationId)
-            .pipe(
-              catchError((err) => {
-                this.toastV2Service.error(err);
-                return throwError(err);
-              })
-            )
-            .subscribe((locationUsage: LocationUsageModel) => {
-              // remove keys if we don't have rights
-              // #TODO - not sure if this is how it should be...
+            // follow-ups
+            if (!FollowUpModel.canList(this.authUser)) {
+              locationUsage.followUp = [];
+            }
 
-              // follow-ups
-              if (!FollowUpModel.canList(this.authUser)) {
-                locationUsage.followUp = [];
-              }
+            // events
+            if (!EventModel.canList(this.authUser)) {
+              locationUsage.event = [];
+            }
 
-              // events
-              if (!EventModel.canList(this.authUser)) {
-                locationUsage.event = [];
-              }
+            // contacts
+            if (!ContactModel.canList(this.authUser)) {
+              locationUsage.contact = [];
+            }
 
-              // contacts
-              if (!ContactModel.canList(this.authUser)) {
-                locationUsage.contact = [];
-              }
+            // cases
+            if (!CaseModel.canList(this.authUser)) {
+              locationUsage.case = [];
+            }
 
-              // cases
-              if (!CaseModel.canList(this.authUser)) {
-                locationUsage.case = [];
-              }
+            // create usage list
+            return new UsageDetails(locationUsage, (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).map).items;
+          }),
 
-              // create usage list
-              const usageData: UsageDetails = new UsageDetails(locationUsage, outbreaksMapped);
-              this.usageDetailsListMore = usageData.items.length > Constants.DEFAULT_USAGE_MAX_RECORDS_DISPLAYED ? {
-                displayed: Constants.DEFAULT_USAGE_MAX_RECORDS_DISPLAYED,
-                total: usageData.items.length
-              } : null;
-              this.usageDetailsList = usageData.items.slice(0, Constants.DEFAULT_USAGE_MAX_RECORDS_DISPLAYED);
-            });
-        });
+          // update page count
+          tap((usageDetails: []) => {
+            this.pageCount = {
+              count: usageDetails.length,
+              hasMore: false
+            };
+          }),
+
+          // TODO: Should be deleted?
+          // Constants.DEFAULT_USAGE_MAX_RECORDS_DISPLAYED,
+
+          // should be the last pipe
+          takeUntil(this.destroyed$)
+        );
     }
   }
+
+  /**
+ * Get total number of items, based on the applied filters
+ */
+  refreshListCount() {}
 }
