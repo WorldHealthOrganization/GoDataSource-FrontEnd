@@ -1634,6 +1634,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                     return;
                   }
 
+                  // cleanup
+                  this.queryBuilder.filter.removePathCondition('date');
+                  this.queryBuilder.filter.removePathCondition('or.date');
+                  this.queryBuilder.filter.removePathCondition('or.statusId');
+
                   // filter
                   const date = (response.data.map.date as IV2SideDialogConfigInputDate).value;
                   this.queryBuilder.filter.where({
