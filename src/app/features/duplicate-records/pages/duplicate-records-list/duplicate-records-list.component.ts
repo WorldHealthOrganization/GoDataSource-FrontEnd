@@ -22,7 +22,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IV2ActionIconLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-duplicate-records-list',
@@ -69,7 +69,7 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
     protected listHelperService: ListHelperService,
     private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
-    private dialogV2Service: DialogV2Service
+    private router: Router
   ) {
     // parent
     super(listHelperService);
@@ -330,15 +330,13 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
     }
 
     // redirect to merge page
-    // #TODO - remove show loading
-    this.dialogV2Service.showLoadingDialog();
-    // this.router.navigate(
-    //   ['/duplicated-records', EntityModel.getLinkForEntityType(types[0]), 'merge'], {
-    //     queryParams: {
-    //       ids: JSON.stringify(mergeIds)
-    //     }
-    //   }
-    // );
+    this.router.navigate(
+      ['/duplicated-records', EntityModel.getLinkForEntityType(types[0]), 'merge'], {
+        queryParams: {
+          ids: JSON.stringify(mergeIds)
+        }
+      }
+    );
   }
 
   /**

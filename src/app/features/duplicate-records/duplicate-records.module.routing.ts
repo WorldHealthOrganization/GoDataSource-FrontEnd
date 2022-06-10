@@ -6,6 +6,10 @@ import { PageChangeConfirmationGuard } from '../../core/services/guards/page-cha
 import { GenderDataResolver } from '../../core/services/resolvers/data/gender.resolver';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 import * as fromPages from './pages';
+import { SelectedOutbreakDataResolver } from '../../core/services/resolvers/data/selected-outbreak.resolver';
+import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
+import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+
 
 // Not Duplicates List - Cases / Contacts / Contacts of Contacts
 const noDuplicatesListFoundation: Route = {
@@ -14,6 +18,15 @@ const noDuplicatesListFoundation: Route = {
   resolve: {
     yesNoAll: YesNoAllDataResolver,
     gender: GenderDataResolver
+  }
+};
+
+const createViewModifyFoundation: Route = {
+  component: fromPages.CaseMergeDuplicateRecordsCreateViewModifyComponent,
+  canActivate: [AuthGuard],
+  resolve: {
+    outbreak: SelectedOutbreakDataResolver,
+    users: UserDataResolver
   }
 };
 
@@ -31,12 +44,12 @@ const routes: Routes = [
   // Case - Merge
   {
     path: 'cases/merge',
-    component: fromPages.CaseMergeDuplicateRecordsComponent,
-    canActivate: [AuthGuard],
+    ...createViewModifyFoundation,
     data: {
       permissions: [
         PERMISSION.DUPLICATE_MERGE_CASES
-      ]
+      ],
+      action: CreateViewModifyV2Action.MODIFY
     },
     canDeactivate: [
       PageChangeConfirmationGuard
