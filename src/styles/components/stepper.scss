@@ -125,6 +125,8 @@
       &.gd-create-view-modify-bottom-content-edit-questionnaire,
       &.gd-create-view-modify-bottom-content-fill-questionnaire {
         height: calc(100% - 6.9rem);
+        margin-right: 0;
+        padding: 0;
       }
     }
 

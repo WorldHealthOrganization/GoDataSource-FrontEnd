@@ -26,6 +26,10 @@ app-world-map {
       right: 0.8rem;
       top: 0.8rem;
       z-index: 9999;
+
+      .gd-form-toggle-checkbox-v2 {
+        background: var(--gd-background);
+      }
     }
 
     #worldMap {
