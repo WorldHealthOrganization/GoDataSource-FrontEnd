@@ -1639,8 +1639,27 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                   this.queryBuilder.filter.removePathCondition('or.date');
                   this.queryBuilder.filter.removePathCondition('or.statusId');
 
-                  // filter
+                  // get data
                   const date = (response.data.map.date as IV2SideDialogConfigInputDate).value;
+                  const dateColumn = this.tableColumns.find(column => column.field === 'date');
+
+                  // set date column filter
+                  (dateColumn.filter.value as any).startDate = moment(date).startOf('day');
+                  (dateColumn.filter.value as any).enddate = moment(date).endOf('day');
+
+                  // TODO: Needs table column headers refresh, couldn't find the method to refresh it..
+                  // this.tableColumns.
+                  // dateColumn.filter.
+                  // this.initializeTableColumns();
+                  // this.applyTableColumnFilters();
+                  // this.update
+                  // this.clearHeaderFilters();
+                  // this.needsRefreshList(false, false, true);
+                  // this.checkListFilters();
+                  // dateColumn.filter.search()
+
+
+                  // filter
                   this.queryBuilder.filter.where({
                     or: [{
                       date: {
