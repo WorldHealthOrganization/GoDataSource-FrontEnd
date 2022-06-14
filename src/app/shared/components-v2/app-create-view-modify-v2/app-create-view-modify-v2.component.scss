@@ -50,6 +50,9 @@
               color: var(--gd-primary-alt);
               font-size: 1.8rem;
               font-weight: 500;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
 
               @include breakpoint('gt-lg') {
                 text-orientation: upright;
@@ -403,10 +406,7 @@
               }
             }
 
-            &.gd-create-view-modify-bottom-section-content-input-has-textarea {
-              width: 100%;
-            }
-
+            &.gd-create-view-modify-bottom-section-content-input-has-textarea,
             &.gd-create-view-modify-bottom-section-content-input-has-select-groups {
               width: 100%;
             }
@@ -639,6 +639,14 @@
                       }
                     }
                   }
+                }
+              }
+            }
+
+            &.gd-create-view-modify-bottom-section-content-input-has-address {
+              .gd-create-view-modify-bottom-section-content-input-list-multiple-rows {
+                > * {
+                  margin-bottom: 1.6rem;
                 }
               }
             }

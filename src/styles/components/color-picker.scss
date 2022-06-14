@@ -1,0 +1,45 @@
+/* Color Picker */
+color-picker {
+  .color-picker {
+    background-color: var(--gd-background);
+    border: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.5);
+    @include border-radius(0.4rem);
+    font-family: $gd-font-family;
+
+    .arrow {
+      &.arrow-right,
+      &.arrow-right-bottom,
+      &.arrow-bottom-right {
+        border-color: transparent rgba(var(--gd-secondary-rgb), 0.5) transparent transparent;
+        border-width: 0.8rem 1rem;
+      }
+    }
+
+    .saturation-lightness {
+      @include border-radius(0.4rem 0.4rem 0 0);
+    }
+
+    .value-text,
+    .hex-text,
+    .rgba-text,
+    .hsla-text,
+    .cmyk-text {
+      .box {
+        input {
+          border: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.5);
+          @include border-radius(0.4rem);
+          color: var(--gd-text);
+          font-size: 1.4rem;
+          height: auto;
+          padding: 0.4rem;
+          text-transform: uppercase;
+        }
+  
+        div {
+          color: var(--gd-text);
+          font-size: 1.2rem;
+        }
+      }
+    }
+  }
+}
