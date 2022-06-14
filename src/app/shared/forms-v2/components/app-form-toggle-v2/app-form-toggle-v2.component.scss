@@ -44,10 +44,23 @@
         }
       }
 
-      .mat-button-toggle-focus-overlay {
-        background-color: rgba(var(--gd-primary-rgb), 0.15);
-        @include opacity(0);
-        @include transition(all 0.24s ease-in-out 0s);
+      .mat-button-toggle-focus-overlay,
+      .mat-ripple {
+        display: none;
+      }
+
+      &.mat-button-toggle-disabled {
+        background: rgba(var(--gd-secondary-rgb), 0.15);
+        border-color: rgba(var(--gd-secondary-rgb), 0.5);
+        color: var(--gd-secondary);
+  
+        .mat-button-toggle-button {
+          .mat-button-toggle-label-content {
+            .mat-icon {
+              color: var(--gd-secondary);
+            }
+          }
+        }
       }
 
       &.mat-button-toggle-checked {
@@ -62,21 +75,18 @@
           }
         }
 
-        &:hover {
-          .mat-button-toggle-focus-overlay {
-            @include opacity(0);
+        &.mat-button-toggle-disabled {
+          background: rgba(var(--gd-primary-rgb), 0.25);
+          color: var(--gd-background);
+    
+          .mat-button-toggle-button {
+            .mat-button-toggle-label-content {
+              .mat-icon {
+                color: var(--gd-background);
+              }
+            }
           }
         }
-      }
-
-      &:hover {
-        .mat-button-toggle-focus-overlay {
-          @include opacity(1);
-        }
-      }
-
-      .mat-ripple {
-        display: none;
       }
     }
   }

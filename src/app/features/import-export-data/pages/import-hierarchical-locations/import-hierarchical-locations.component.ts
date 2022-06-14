@@ -1,14 +1,13 @@
 import { Component } from '@angular/core';
-import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { Router } from '@angular/router';
-import { ImportDataExtension } from '../../components/import-data/model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { LocationModel } from '../../../../core/models/location.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
-import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { CaseModel } from '../../../../core/models/case.model';
+import { ImportDataExtension } from '../../components/import-data/model';
 
 @Component({
   selector: 'app-import-hierarchical-locations',
@@ -55,16 +54,6 @@ export class ImportHierarchicalLocationsComponent {
           ['/account/my-profile']
       }
     }];
-
-    // add list breadcrumb only if we have permission
-    if (CaseModel.canList(this.authUser)) {
-      this.breadcrumbs.push({
-        label: 'LNG_PAGE_LIST_CASES_TITLE',
-        action: {
-          link: ['/cases']
-        }
-      });
-    }
 
     // add list breadcrumb only if we have permission
     if (LocationModel.canList(this.authUser)) {

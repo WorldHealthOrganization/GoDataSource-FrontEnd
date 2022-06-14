@@ -12,8 +12,8 @@ export const EnglishUsLang = {
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
 
+    'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_VIEW': 'View question',
     'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DATE': 'Print date'
-
 
 
     /**
