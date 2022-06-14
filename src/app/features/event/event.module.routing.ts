@@ -16,6 +16,7 @@ import { ExposureFrequencyDataResolver } from '../../core/services/resolvers/dat
 import { ExposureDurationDataResolver } from '../../core/services/resolvers/data/exposure-duration.resolver';
 import { ContextOfTransmissionDataResolver } from '../../core/services/resolvers/data/context-of-transmission.resolver';
 import { CertaintyLevelDataResolver } from '../../core/services/resolvers/data/certainty-level.resolver';
+import { EventCategoryDataResolver } from '../../core/services/resolvers/data/event-category.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -32,7 +33,8 @@ const createViewModifyFoundation: Route = {
     exposureFrequency: ExposureFrequencyDataResolver,
     exposureDuration: ExposureDurationDataResolver,
     contextOfTransmission: ContextOfTransmissionDataResolver,
-    yesNoAll: YesNoAllDataResolver
+    yesNoAll: YesNoAllDataResolver,
+    eventCategory: EventCategoryDataResolver
   }
 };
 
@@ -50,7 +52,8 @@ const routes: Routes = [
     },
     resolve: {
       user: UserDataResolver,
-      yesNoAll: YesNoAllDataResolver
+      yesNoAll: YesNoAllDataResolver,
+      eventCategory: EventCategoryDataResolver
     }
   },
   // Create Event

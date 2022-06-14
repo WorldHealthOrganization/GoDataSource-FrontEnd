@@ -26,6 +26,7 @@ export class EventModel
   name: string;
   date: string | Moment;
   dateApproximate: boolean;
+  eventCategory: string;
   description: string;
   address: AddressModel;
   type: EntityType = EntityType.EVENT;
@@ -49,7 +50,8 @@ export class EventModel
    */
   static generateAdvancedFilters(data: {
     options: {
-      user: ILabelValuePairModel[]
+      user: ILabelValuePairModel[],
+      eventCategory: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -65,6 +67,12 @@ export class EventModel
         field: 'date',
         label: 'LNG_EVENT_FIELD_LABEL_DATE',
         sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'eventCategory',
+        label: 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY',
+        options: data.options.eventCategory
       },
       {
         type: V2AdvancedFilterType.TEXT,
@@ -178,6 +186,7 @@ export class EventModel
     this.name = _.get(data, 'name');
     this.date = _.get(data, 'date');
     this.dateApproximate = _.get(data, 'dateApproximate');
+    this.eventCategory = _.get(data, 'eventCategory');
     this.description = _.get(data, 'description');
     this.dateOfReporting = _.get(data, 'dateOfReporting');
     this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
