@@ -206,7 +206,7 @@
               <button
                 type="button"
                 mat-icon-button
-                [matTooltip]="'LNG_COMMON_BUTTON_UPDATE' | translate"
+                [matTooltip]="(viewOnly ? 'LNG_COMMON_BUTTON_VIEW' : 'LNG_COMMON_BUTTON_UPDATE') | translate"
                 (click)="viewEditAnswer(item.data, item.parent.data)">
                 <mat-icon>{{viewOnly ? 'visibility' : 'edit'}}</mat-icon>
               </button>
