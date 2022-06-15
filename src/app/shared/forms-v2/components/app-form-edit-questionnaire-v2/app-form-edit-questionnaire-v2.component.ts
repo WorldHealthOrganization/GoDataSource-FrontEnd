@@ -723,10 +723,12 @@ export class AppFormEditQuestionnaireV2Component
     this.dialogV2Service
       .showSideDialog({
         title: {
-          get: () => this.viewOnly ? 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_VIEW'
-            : modifyQuestion ?
-              'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_MODIFY' :
-              'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW'
+          get: () => this.viewOnly ?
+            'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_VIEW' : (
+              modifyQuestion ?
+                'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_MODIFY' :
+                'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW'
+            )
         },
         hideInputFilter: true,
         dontCloseOnBackdrop: true,
