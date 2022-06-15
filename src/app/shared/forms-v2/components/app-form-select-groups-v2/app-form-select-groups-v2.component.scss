@@ -182,7 +182,6 @@
                         color: var(--gd-danger);
                         font-size: 1.6rem;
                         height: 1.6rem;
-                        margin-right: 0.8rem;
                         width: 1.6rem;
                       }
                     }
@@ -373,23 +372,11 @@
       }
     }
   }
-}
 
-/* Requirements */
-.gd-form-select-groups-v2-panel {
-  .mat-option {
-    .select-group-option-info-right {
-      padding-left: 17px;
-      color: #777;
-      font-size: 12px;
-      width: 100%;
-      text-align: right;
-
-      .select-group-option-info-right-content {
-        display: inline-block;
-        text-align: left;
-        white-space: normal;
-      }
+  .gd-form-select-groups-v2-viewonly {
+    .gd-form-select-groups-v2-viewonly-label {
+      color: var(--gd-secondary);
+      white-space: nowrap;
     }
   }
 }

@@ -22,6 +22,7 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
 
 /**
  * Component
@@ -357,7 +358,11 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
                   this.itemData.outbreakIds = value;
                 }
               },
-              options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+              options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              // TODO: In the old design input fields were hidden not deactivated. Should we implement "visible: (): boolean => {}"?
+              disabled: (): boolean => {
+                return !OutbreakModel.canList(this.authUser);
+              }
             },
             {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
@@ -371,7 +376,11 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
                   this.itemData.activeOutbreakId = value;
                 }
               },
-              options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+              options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              // TODO: In the old design input fields were hidden not deactivated. Should we implement "visible: (): boolean => {}"?
+              disabled: (): boolean => {
+                return !OutbreakModel.canList(this.authUser);
+              }
             }
           ]
         },
