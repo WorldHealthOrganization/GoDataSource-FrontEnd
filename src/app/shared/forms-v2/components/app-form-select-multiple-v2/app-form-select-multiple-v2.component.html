@@ -61,7 +61,7 @@
 
             <!-- separator -->
             <ng-container
-              *ngIf="selectedIndex > 0">, </ng-container>
+              *ngIf="selectedIndex > 0">{{!disabled ? ', ' : ''}}</ng-container>
 
             <!-- Icon -->
             <mat-icon
