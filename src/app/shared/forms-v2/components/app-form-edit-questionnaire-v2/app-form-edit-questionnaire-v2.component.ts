@@ -331,12 +331,18 @@ export class AppFormEditQuestionnaireV2Component
           array: questions
         },
         canCollapseOrExpand: question.answers?.length > 0,
-        no: `${noPrefix}${noPrefix ? '.' : ''}${no}`
+        no: question.answerType !== Constants.ANSWER_TYPES.MARKUP.value ?
+          `${noPrefix}${noPrefix ? '.' : ''}${no}` :
+          undefined
       };
 
       // add to list
       this.flattenedQuestions.push(flattenedQuestion);
-      no++;
+
+      // count only if not markup
+      if (question.answerType !== Constants.ANSWER_TYPES.MARKUP.value) {
+        no++;
+      }
 
       // add to children list
       if (parent) {
