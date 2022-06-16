@@ -529,9 +529,6 @@ export class DashboardComponent implements OnDestroy {
   // @ViewChild('kpiSection') private kpiSection: ElementRef;
   // @ViewChildren('kpiSectionGroup') private kpiSectionGroup: QueryList<MatExpansionPanel>;
   //
-  // // subscribers
-  // outbreakSubscriber: Subscription;
-  //
   // Constants = Constants;
   //
   // epiCurveViewType;
@@ -562,12 +559,6 @@ export class DashboardComponent implements OnDestroy {
   //    * Component initialized
   //    */
   // ngOnInit() {
-  //   // map kpi groups
-  //   this.kpiGroupsMap = {};
-  //   this.kpiGroups.forEach((group) => {
-  //     this.kpiGroupsMap[group.id] = group;
-  //   });
-  //
   //   this.caseClassificationsList$ = this.referenceDataDataService
   //     .getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION)
   //     .pipe(
@@ -590,169 +581,7 @@ export class DashboardComponent implements OnDestroy {
   //     .subscribe((outbreaksCount) => {
   //       this.noOutbreaksInSystem = !outbreaksCount.count;
   //     });
-  //
-  //   this.outbreakSubscriber = this.outbreakDataService
-  //     .getSelectedOutbreakSubject()
-  //     .subscribe((selectedOutbreak: OutbreakModel) => {
-  //       if (selectedOutbreak && selectedOutbreak.id) {
-  //         this.selectedOutbreak = selectedOutbreak;
-  //         this.casesByClassificationAndLocationReportUrl = `/outbreaks/${this.selectedOutbreak.id}/cases/per-classification-per-location-level-report/download/`;
-  //         this.contactsFollowupSuccessRateReportUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/per-location-level-tracing-report/download/`;
-  //       }
-  //     });
-  //
-  //   // set default epi curve
-  //   if (DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(this.authUser)) {
-  //     this.epiCurveViewType = Constants.EPI_CURVE_TYPES.CLASSIFICATION.value;
-  //   } else if (DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(this.authUser)) {
-  //     this.epiCurveViewType = Constants.EPI_CURVE_TYPES.OUTCOME.value;
-  //   } else if (DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(this.authUser)) {
-  //     this.epiCurveViewType = Constants.EPI_CURVE_TYPES.REPORTING.value;
-  //   } else {
-  //     // NOT SUPPORTED
-  //   }
-  //
-  //   // initialize Side Filters
-  //   this.initializeSideFilters();
   // }
-  //
-  // /**
-  //    * Component destroyed
-  //    */
-  // ngOnDestroy() {
-  //   // outbreak subscriber
-  //   if (this.outbreakSubscriber) {
-  //     this.outbreakSubscriber.unsubscribe();
-  //     this.outbreakSubscriber = null;
-  //   }
-  // }
-  //
-  // /**
-  //    * Initialize Side Filters
-  //    */
-  // private initializeSideFilters() {
-  //   // set available side filters
-  //   this.availableSideFilters = [
-  //     new FilterModel({
-  //       fieldName: 'locationId',
-  //       fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION',
-  //       type: FilterType.LOCATION,
-  //       required: true,
-  //       multipleOptions: false,
-  //       value: this.globalFilterLocationId
-  //     }),
-  //     new FilterModel({
-  //       fieldName: 'date',
-  //       fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE',
-  //       type: FilterType.DATE,
-  //       required: true,
-  //       maxDate: moment(),
-  //       value: this.globalFilterDate
-  //     }),
-  //     new FilterModel({
-  //       fieldName: 'classificationId',
-  //       fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_CLASSIFICATION',
-  //       type: FilterType.MULTISELECT,
-  //       required: true,
-  //       options$: this.caseClassificationsList$,
-  //       value: this.globalFilterClassificationId
-  //     })
-  //   ];
-  // }
-  //
-  // private initializeDashlets() {
-  //   const userDashboardSettings: UserSettingsDashboardModel = this.authUser.getSettings(UserSettings.DASHBOARD);
-  //   _.each(this.kpiGroups, (group) => {
-  //     _.each(group.dashlets, (dashlet) => {
-  //       // add the dashlet to the list (if it's not already existing)
-  //       userDashboardSettings.addDashletIfNotExists(new DashletSettingsModel({
-  //         name: dashlet,
-  //         kpiGroup: group.id
-  //       }));
-  //     });
-  //   });
-  //
-  //   // Update dashlets order based on authenticated user's settings
-  //   this.refreshDashletsOrder();
-  // }
-  //
-  // /**
-  //    * Update dashlets order based on authenticated user's settings
-  //    */
-  // private refreshDashletsOrder() {
-  //   const dashboardSettings = this.authUser.getSettings(UserSettings.DASHBOARD);
-  //   _.each(this.kpiGroups, (group) => {
-  //     group.dashlets.sort((a, b) => {
-  //       const dashletA = dashboardSettings.getDashlet(a);
-  //       const dashletB = dashboardSettings.getDashlet(b);
-  //
-  //       if (dashletA && dashletB) {
-  //         return dashletA.order - dashletB.order;
-  //       } else {
-  //         return 1;
-  //       }
-  //     });
-  //   });
-  // }
-  //
-  // /**
-  //    * Persist user's settings for the dashboard
-  //    */
-  // private persistUserDashboardSettings(): Observable<any> {
-  //   return this.authDataService.updateSettingsForCurrentUser({
-  //     [UserSettings.DASHBOARD]: this.authUser.getSettings(UserSettings.DASHBOARD)
-  //   });
-  // }
-  //
-  // /**
-  //    * Check if a dashlet is visible for current user
-  //    * @param name
-  //    */
-  // isDashletVisible(name: string): boolean {
-  //   return _.get(
-  //     this.authUser.getSettings(UserSettings.DASHBOARD).getDashlet(name),
-  //     'visible',
-  //     true
-  //   );
-  // }
-  //
-  // /**
-  //    * Hide a dashlet for current user
-  //    * @param name
-  //    */
-  // hideDashlet(name: string) {
-  //   this.authUser.getSettings(UserSettings.DASHBOARD).hideDashlet(name);
-  //
-  //   this.refreshDashletsOrder();
-  //
-  //   // persist changes
-  //   this.persistUserDashboardSettings().subscribe();
-  // }
-  //
-  // moveDashletBefore(name: string) {
-  //   this.authUser.getSettings(UserSettings.DASHBOARD).moveDashletBefore(name);
-  //
-  //   this.refreshDashletsOrder();
-  //
-  //   // persist changes
-  //   this.persistUserDashboardSettings().subscribe();
-  // }
-  //
-  // moveDashletAfter(name: string) {
-  //   this.authUser.getSettings(UserSettings.DASHBOARD).moveDashletAfter(name);
-  //
-  //   this.refreshDashletsOrder();
-  //
-  //   // persist changes
-  //   this.persistUserDashboardSettings().subscribe();
-  // }
-  //
-  // showAllDashlets(kpiGroup: string) {
-  //   this.authUser.getSettings(UserSettings.DASHBOARD).showAllDashlets(kpiGroup);
-  //   // persist changes
-  //   this.persistUserDashboardSettings().subscribe();
-  // }
-  //
   //
   // /**
   //    * Generate KPIs report
@@ -794,43 +623,6 @@ export class DashboardComponent implements OnDestroy {
   //       });
   //   });
   // }
-  //
-  //
-  // /**
-  //    * Apply side filters
-  //    * @param data
-  //    */
-  // applySideFilters(filters: AppliedFilterModel[]) {
-  //   // retrieve date & location filters
-  //   // retrieve location filter
-  //   const dateFilter: AppliedFilterModel = _.find(filters, { filter: { fieldName: 'date' } });
-  //   const locationFilter: AppliedFilterModel = _.find(filters, { filter: { fieldName: 'locationId' } });
-  //   const classificationFilter: AppliedFilterModel = _.find(filters, { filter: { fieldName: 'classificationId' } });
-  //
-  //   // set filters
-  //   this.globalFilterDate = _.isEmpty(dateFilter.value) ? undefined : moment(dateFilter.value);
-  //   this.globalFilterLocationId = _.isEmpty(locationFilter.value) ? undefined : locationFilter.value;
-  //   this.globalFilterClassificationId = _.isEmpty(classificationFilter.value) ? undefined : classificationFilter.value;
-  // }
-  //
-  // /**
-  //    * Display loading dialog
-  //    */
-  // showLoadingDialog() {
-  //   this.loadingDialog = this.dialogService.showLoadingDialog();
-  // }
-  //
-  // /**
-  //    * Hide loading dialog
-  //    */
-  // closeLoadingDialog() {
-  //   if (this.loadingDialog) {
-  //     this.loadingDialog.close();
-  //     this.loadingDialog = null;
-  //   }
-  // }
-  //
-  //
   //
   // /**
   //    * Check if we have kpi group access
