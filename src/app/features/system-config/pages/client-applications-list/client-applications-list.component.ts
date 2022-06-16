@@ -473,11 +473,7 @@ export class ClientApplicationsListComponent
           .pipe(
             // throw error
             catchError(() => {
-              subscriber.next({
-                isValid: false,
-                errMsg: 'LNG_FORM_VALIDATION_ERROR_FIELD_URL'
-              });
-              subscriber.complete();
+              // if request fails then error should be handled by subscribe (else branch)
               return of([]);
             }),
 
@@ -485,16 +481,18 @@ export class ClientApplicationsListComponent
             takeUntil(this.destroyed$)
           )
           .subscribe((versionData: any) => {
-            if (_.get(versionData, 'version')) {
+            // handle
+            if (versionData.version) {
               subscriber.next(true);
-              subscriber.complete();
             } else {
               subscriber.next({
                 isValid: false,
                 errMsg: 'LNG_FORM_VALIDATION_ERROR_FIELD_URL'
               });
-              subscriber.complete();
             }
+
+            // finished
+            subscriber.complete();
           });
       }
     });
