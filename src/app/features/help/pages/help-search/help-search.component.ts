@@ -1,5 +1,4 @@
 import { Component, OnDestroy } from '@angular/core';
-import * as _ from 'lodash';
 import { Observable } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -14,6 +13,8 @@ import { V2FilterType } from '../../../../shared/components-v2/app-list-table-v2
 import { ActivatedRoute } from '@angular/router';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputText, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 
 @Component({
   selector: 'app-help-search',
@@ -23,8 +24,8 @@ export class HelpSearchComponent extends ListComponent<HelpItemModel> implements
   // help items
   helpItemsList$: Observable<HelpItemModel[]>;
 
-  // TODO: Left for help search bar inspiration
-  searchedTerm: string = '';
+  // search by
+  private _searchedTerm: string = '';
 
   /**
    * Constructor
@@ -33,15 +34,13 @@ export class HelpSearchComponent extends ListComponent<HelpItemModel> implements
     protected listHelperService: ListHelperService,
     private helpDataService: HelpDataService,
     private translateService: TranslateService,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private dialogV2Service: DialogV2Service
   ) {
     super(
       listHelperService,
       true
     );
-
-    // TODO: Needs helpCategory resolver
-    // this.helpCategoriesList$ = this.helpDataService.getHelpCategoryList();
   }
 
   /**
@@ -132,7 +131,62 @@ export class HelpSearchComponent extends ListComponent<HelpItemModel> implements
   /**
    * Initialize table quick actions
    */
-  protected initializeQuickActions(): void {}
+  protected initializeQuickActions(): void {
+    this.quickActions = {
+      type: V2ActionType.MENU,
+      label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
+      menuOptions: [
+        // Search
+        {
+          label: {
+            get: () => 'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'
+          },
+          action: {
+            click: () => {
+              this.dialogV2Service
+                .showSideDialog({
+                  title: {
+                    get: () => 'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'
+                  },
+                  hideInputFilter: true,
+                  inputs: [{
+                    type: V2SideDialogConfigInputType.TEXT,
+                    name: 'searchedTerm',
+                    placeholder: 'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER',
+                    value: this._searchedTerm
+                  }],
+                  bottomButtons: [{
+                    type: IV2SideDialogConfigButtonType.OTHER,
+                    label: 'LNG_COMMON_BUTTON_APPLY',
+                    color: 'primary'
+                  }, {
+                    type: IV2SideDialogConfigButtonType.CANCEL,
+                    label: 'LNG_COMMON_BUTTON_CANCEL',
+                    color: 'text'
+                  }]
+                })
+                .subscribe((response) => {
+                  // cancelled ?
+                  if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+                    // finished
+                    return;
+                  }
+
+                  // close dialog
+                  response.handler.hide();
+
+                  // set data
+                  this._searchedTerm = (response.data.map.searchedTerm as IV2SideDialogConfigInputText).value;
+
+                  // refresh list
+                  this.needsRefreshList();
+                });
+            }
+          }
+        }
+      ]
+    };
+  }
 
   /**
    * Initialize table group actions
@@ -189,15 +243,18 @@ export class HelpSearchComponent extends ListComponent<HelpItemModel> implements
     // remove paginator
     this.queryBuilder.paginator.clear();
 
+    // only approved
     this.queryBuilder.filter.where({ approved: true }, true);
+
     // retrieve the list of items
-    if (_.isEmpty(this.searchedTerm)) {
+    if (!this._searchedTerm) {
       this.queryBuilder.filter.remove('token');
       this.helpItemsList$ = this.helpDataService.getHelpItemsList(this.queryBuilder);
     } else {
-      this.helpItemsList$ = this.helpDataService.getHelpItemsListSearch(this.queryBuilder, this.searchedTerm);
+      this.helpItemsList$ = this.helpDataService.getHelpItemsListSearch(this.queryBuilder, this._searchedTerm);
     }
 
+    // retrieve data
     this.records$ = this.helpItemsList$
       .pipe(
         // update page count
@@ -217,16 +274,4 @@ export class HelpSearchComponent extends ListComponent<HelpItemModel> implements
    * Get total number of items, based on the applied filters
    */
   refreshListCount() { }
-
-  // TODO: Left for help search bar inspiration
-  /**
-   * Filter the list by a text field
-   * @param {string} value
-   */
-  filterByTextFieldHelpSearch(value: string) {
-    this.searchedTerm = value;
-
-    // refresh list
-    this.needsRefreshList();
-  }
 }
