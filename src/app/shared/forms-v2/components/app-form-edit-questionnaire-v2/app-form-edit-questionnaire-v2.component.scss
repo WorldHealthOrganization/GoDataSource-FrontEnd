@@ -15,6 +15,10 @@
     height: calc(100% - 10.8rem);
     min-height: 30rem;
 
+    @media only screen and (max-height: 599px) {
+      min-height: 7rem;
+    }
+
     @include breakpoint('lt-md') {
       height: calc(100% - 13rem);
     }

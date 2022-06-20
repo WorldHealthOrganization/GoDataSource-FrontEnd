@@ -5,7 +5,7 @@ import {
   Host,
   Input, OnDestroy,
   Optional, Renderer2,
-  SkipSelf, ViewChild
+  SkipSelf, ViewChild, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
@@ -17,6 +17,7 @@ import { AppFormInputV2LibraryButtons } from '../app-form-input-v2/definitions/a
 @Component({
   selector: 'app-form-ngx-wig-v2',
   templateUrl: './app-form-ngx-wig-v2.component.html',
+  styleUrls: ['./app-form-ngx-wig-v2.component.scss'],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
     useExisting: forwardRef(() => AppFormNgxWigV2Component),
@@ -26,6 +27,7 @@ import { AppFormInputV2LibraryButtons } from '../app-form-input-v2/definitions/a
     multi: true,
     useClass: AppFormInputV2LibraryButtons
   }],
+  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppFormNgxWigV2Component
