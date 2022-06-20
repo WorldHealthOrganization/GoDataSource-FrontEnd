@@ -159,6 +159,12 @@ export class AppFormEditQuestionnaireV2Component
    * Set value
    */
   writeValue(value: QuestionModel[]): void {
+    // start with all questions collapsed
+    this.collapseExpandAllQuestions(
+      value,
+      true
+    );
+
     // set value
     super.writeValue(value);
 
@@ -174,9 +180,41 @@ export class AppFormEditQuestionnaireV2Component
   }
 
   /**
+   * Collapse / Expand questions and Answers
+   */
+  collapseExpandAllQuestions(
+    items: QuestionModel[] | AnswerModel[],
+    collapsed: boolean
+  ): void {
+    // nothing to collapse ?
+    if (!items?.length) {
+      return;
+    }
+
+    // go through questions / answers and their children and collapse / expand them
+    items.forEach((item) => {
+      // collapse
+      item.collapsed = collapsed;
+
+      // go through children
+      if (item instanceof QuestionModel) {
+        this.collapseExpandAllQuestions(
+          item.answers,
+          collapsed
+        );
+      } else {
+        this.collapseExpandAllQuestions(
+          item.additionalQuestions,
+          collapsed
+        );
+      }
+    });
+  }
+
+  /**
    * Convert non flat value to flat value
    */
-  private nonFlatToFlat(): void {
+  nonFlatToFlat(): void {
     // flatten
     this.flattenedQuestions = [];
     this.flatten(
