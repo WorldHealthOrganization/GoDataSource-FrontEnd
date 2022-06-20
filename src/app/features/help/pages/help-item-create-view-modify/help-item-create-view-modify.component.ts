@@ -264,14 +264,18 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
               },
               disabled: () => !this.isModify
             },
-            // TODO wysiwyg field for:  this.item.content
-            //  see app-form-ngx-wig;
-            //  old html:
-            // <app-form-ngx-wig
-            // name="content"
-            //   [(ngModel)]="helpItemData.content"
-            // buttons="list1, list2, _, bold, underline, italic, _, linkCustom, insertImageCustom">
-            //   </app-form-ngx-wig>
+            {
+              type: CreateViewModifyV2TabInputType.WYSIWYG,
+              name: 'content',
+              value: {
+                get: () => this.itemData.content ?
+                  this.translateService.instant(this.itemData.content) :
+                  this.itemData.content,
+                set: (value) => {
+                  this.itemData.content = value;
+                }
+              }
+            },
             {
               type: CreateViewModifyV2TabInputType.TEXTAREA,
               name: 'comment',
