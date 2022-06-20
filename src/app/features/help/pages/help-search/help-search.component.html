@@ -18,6 +18,7 @@
   [filtersApplied]="filtersApplied"
   [advancedFilterType]="undefined"
   [advancedFilters]="advancedFilters"
+  paginatorDisabled="true"
   (refreshData)="needsRefreshList(true)"
   (refreshDataCount)="refreshListCount()"
   (pageChange)="changePage($event)"
@@ -26,40 +27,3 @@
   (resetHeaderFilters)="resetFiltersToSideFilters()"
   (advancedFilterBy)="applySideFilters($event)">
 </app-list-table-v2>
-
-
-
-
-<!--
-<app-topnav>
-    <ng-container dynamic-section>
-        <div fxLayout="row" fxFlex fxLayoutAlign="space-between center">
-            <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
-
-            <div class="topnav-actions">
-              TODO: What should we do with this button?
-                <button
-                    *ngIf="HelpCategoryModel.canList(authUser)"
-                    mat-raised-button color="accent"
-                    [routerLink]="'./categories'">
-                    {{'LNG_PAGE_GLOBAL_HELP_BUTTON_MANAGE_CATEGORIES' | translate}}
-                </button>
-            </div>
-        </div>
-    </ng-container>
-</app-topnav>
--->
-
-<!-- 
-<mat-card class="page-section page-content">
-    TODO: Needed help search bar above table  
-    <div>
-        <app-form-input
-            name="helpSearchFilter"
-            [(ngModel)]="searchedTerm"
-            [placeholder]="'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER' | translate"
-            (optionChanged)="filterByTextFieldHelpSearch($event)"
-            [displayFilterIcon]="true">
-        </app-form-input>
-    </div>
-</mat-card> -->
