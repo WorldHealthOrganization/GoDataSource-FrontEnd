@@ -11,8 +11,8 @@ export const EnglishUsLang = {
      */
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
-    'LNG_USER_FIELD_CANT_SET_ALL_OUTBREAKS': 'You need \'Outbreak - list for dropdowns\' permission to set all outbreaks',
-    'LNG_USER_FIELD_CANT_SET_ACTIVE_OUTBREAK': 'You need \'Outbreak - list for dropdowns\' permission to set active outbreak'
+    'LNG_USER_FIELD_CANT_SET_ALL_OUTBREAKS': 'You need \'Outbreak - list\' permission to set all outbreaks',
+    'LNG_USER_FIELD_CANT_SET_ACTIVE_OUTBREAK': 'You need \'Outbreak - list\' permission to set active outbreak'
 
 
 
