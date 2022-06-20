@@ -54,7 +54,6 @@
 
         <!-- multiple select ? -->
         <div
-          *ngIf="options.length > 0"
           fxLayout="row wrap"
           class="gd-form-select-multiple-v2-panel-inner">
           <ng-container
@@ -184,7 +183,7 @@
         class="gd-form-select-multiple-v2-viewonly-value">
         <!-- Has value -->
         <ng-container
-          *ngIf="value?.length > 0 && options.length > 0; else noValue">
+          *ngIf="value?.length > 0; else noValue">
           <ng-container
             *ngFor="let selectedValue of value; let selectedIndex = index">
 

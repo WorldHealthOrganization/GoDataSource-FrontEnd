@@ -362,6 +362,10 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
               // TODO: In the old design input fields were hidden not deactivated. Should we implement "visible: (): boolean => {}"?
               disabled: (): boolean => {
                 return !OutbreakModel.canList(this.authUser);
+              },
+              replace: {
+                condition: () => !OutbreakModel.canList(this.authUser),
+                html: this.translateService.instant('LNG_USER_FIELD_CANT_SET_ALL_OUTBREAKS')
               }
             },
             {
@@ -380,6 +384,10 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
               // TODO: In the old design input fields were hidden not deactivated. Should we implement "visible: (): boolean => {}"?
               disabled: (): boolean => {
                 return !OutbreakModel.canList(this.authUser);
+              },
+              replace: {
+                condition: () => !OutbreakModel.canList(this.authUser),
+                html: this.translateService.instant('LNG_USER_FIELD_CANT_SET_ACTIVE_OUTBREAK')
               }
             }
           ]
