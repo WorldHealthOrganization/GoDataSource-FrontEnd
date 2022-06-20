@@ -18,6 +18,7 @@
   [filtersApplied]="filtersApplied"
   [advancedFilterType]="undefined"
   [advancedFilters]="advancedFilters"
+  paginatorDisabled="true"
   (refreshData)="needsRefreshList(true)"
   (refreshDataCount)="refreshListCount()"
   (pageChange)="changePage($event)"
@@ -50,9 +51,9 @@
 </app-topnav>
 -->
 
-<!-- 
+<!--
 <mat-card class="page-section page-content">
-    TODO: Needed help search bar above table  
+    TODO: Needed help search bar above table
     <div>
         <app-form-input
             name="helpSearchFilter"

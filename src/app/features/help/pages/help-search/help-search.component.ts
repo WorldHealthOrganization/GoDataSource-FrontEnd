@@ -57,7 +57,7 @@ export class HelpSearchComponent extends ListComponent<HelpItemModel> implements
    */
   initialized(): void {
     // initialize pagination
-    this.initPaginator();
+    // this page doesn't have pagination
 
     // ...and re-load the list when the Selected Outbreak is changed
     this.needsRefreshList(true);
@@ -186,6 +186,9 @@ export class HelpSearchComponent extends ListComponent<HelpItemModel> implements
    * Re(load) the items list
    */
   refreshList() {
+    // remove paginator
+    this.queryBuilder.paginator.clear();
+
     this.queryBuilder.filter.where({ approved: true }, true);
     // retrieve the list of items
     if (_.isEmpty(this.searchedTerm)) {
@@ -211,8 +214,8 @@ export class HelpSearchComponent extends ListComponent<HelpItemModel> implements
   }
 
   /**
-* Get total number of items, based on the applied filters
-*/
+   * Get total number of items, based on the applied filters
+   */
   refreshListCount() { }
 
   // TODO: Left for help search bar inspiration
