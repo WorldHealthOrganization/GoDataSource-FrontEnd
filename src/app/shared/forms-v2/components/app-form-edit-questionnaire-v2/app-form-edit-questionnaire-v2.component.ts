@@ -159,6 +159,12 @@ export class AppFormEditQuestionnaireV2Component
    * Set value
    */
   writeValue(value: QuestionModel[]): void {
+    // start with all questions collapsed
+    this.collapseExpandAllQuestions(
+      value,
+      true
+    );
+
     // set value
     super.writeValue(value);
 
@@ -174,9 +180,41 @@ export class AppFormEditQuestionnaireV2Component
   }
 
   /**
+   * Collapse / Expand questions and Answers
+   */
+  collapseExpandAllQuestions(
+    items: QuestionModel[] | AnswerModel[],
+    collapsed: boolean
+  ): void {
+    // nothing to collapse ?
+    if (!items?.length) {
+      return;
+    }
+
+    // go through questions / answers and their children and collapse / expand them
+    items.forEach((item) => {
+      // collapse
+      item.collapsed = collapsed;
+
+      // go through children
+      if (item instanceof QuestionModel) {
+        this.collapseExpandAllQuestions(
+          item.answers,
+          collapsed
+        );
+      } else {
+        this.collapseExpandAllQuestions(
+          item.additionalQuestions,
+          collapsed
+        );
+      }
+    });
+  }
+
+  /**
    * Convert non flat value to flat value
    */
-  private nonFlatToFlat(): void {
+  nonFlatToFlat(): void {
     // flatten
     this.flattenedQuestions = [];
     this.flatten(
@@ -331,12 +369,18 @@ export class AppFormEditQuestionnaireV2Component
           array: questions
         },
         canCollapseOrExpand: question.answers?.length > 0,
-        no: `${noPrefix}${noPrefix ? '.' : ''}${no}`
+        no: question.answerType !== Constants.ANSWER_TYPES.MARKUP.value ?
+          `${noPrefix}${noPrefix ? '.' : ''}${no}` :
+          undefined
       };
 
       // add to list
       this.flattenedQuestions.push(flattenedQuestion);
-      no++;
+
+      // count only if not markup
+      if (question.answerType !== Constants.ANSWER_TYPES.MARKUP.value) {
+        no++;
+      }
 
       // add to children list
       if (parent) {
@@ -723,9 +767,12 @@ export class AppFormEditQuestionnaireV2Component
     this.dialogV2Service
       .showSideDialog({
         title: {
-          get: () => modifyQuestion ?
-            'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_MODIFY' :
-            'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW'
+          get: () => this.viewOnly ?
+            'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_VIEW' : (
+              modifyQuestion ?
+                'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_MODIFY' :
+                'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW'
+            )
         },
         hideInputFilter: true,
         dontCloseOnBackdrop: true,
@@ -1049,9 +1096,12 @@ export class AppFormEditQuestionnaireV2Component
     this.dialogV2Service
       .showSideDialog({
         title: {
-          get: () => modifyAnswer ?
-            'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_MODIFY' :
-            'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW'
+          get: () => this.viewOnly ?
+            'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_VIEW' : (
+              modifyAnswer ?
+                'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_MODIFY' :
+                'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW'
+            )
         },
         hideInputFilter: true,
         dontCloseOnBackdrop: true,

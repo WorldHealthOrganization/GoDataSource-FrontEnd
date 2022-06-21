@@ -1,8 +1,8 @@
 @import 'mixins';
 @import 'font';
 
-/* Input number */
-.gd-form-number-v2 {
+/* Form Color */
+.gd-form-color-v2 {
   @include flex(flex);
   width: 100%;
 
@@ -12,10 +12,6 @@
     font-size: $gd-font-size;
     line-height: $gd-line-height;
 
-    .gd-dashlet-kpi-bottom-value-left-text & {
-      margin: 0 0.8rem;
-    }
-
     .mat-form-field-wrapper {
       margin: 0;
       padding-bottom: 0;
@@ -24,11 +20,7 @@
         margin-top: 0;
         padding: 0 1.6rem;
 
-        .gd-dashlet-kpi-bottom-value-left-text & {
-          padding: 0 0.8rem;
-        }
-
-        /* Input number borders */
+        /* Form color borders */
         .mat-form-field-outline {
           color: var(--gd-secondary);
           top: 0;
@@ -52,7 +44,7 @@
           }
         }
 
-        /* Input number borders on focus */
+        /* Form color borders on focus */
         .mat-form-field-outline-thick {
           color: var(--gd-primary);
 
@@ -75,44 +67,31 @@
           }
         }
 
-        /* Form input prefix */
+        /* Form color prefix */
         .mat-form-field-prefix {
           left: -0.4rem;
           top: 0.5rem;
 
-          .mat-icon {
-            color: rgba(var(--gd-text-rgb), 0.75);
-            font-size: 2rem;
-            line-height: 1;
-            text-align: center;
-          }
-
-          .mat-icon-button {
-            font-size: 1.6rem;
-            height: 2.4rem;
-            width: 2.4rem;
+          > div {
+            @include border-radius(0.4rem);
+            display: block;
+            height: 2rem;
+            margin-right: 0.8rem;
+            width: 2rem;
           }
         }
 
-        /* Input number middle */
+        /* Form color middle */
         .mat-form-field-infix {
           border-top: 0 none;
           @include flex(flex);
           padding: 0.8rem 0;
           width: 10rem;
 
-          .gd-dashlet-kpi-bottom-value-left-text & {
-            padding: 0.4rem 0;
-            width: 5rem;
-          }
-
           input {
             line-height: 2.4rem;
             margin-top: 0;
-
-            .gd-dashlet-kpi-bottom-value-left-text & {
-              line-height: $gd-line-height;
-            }
+            text-transform: uppercase;
           }
 
           .mat-input-element {
@@ -131,9 +110,40 @@
             }
           }
         }
+
+        /* Form color suffix */
+        .mat-form-field-suffix {
+          @include flex(flex);
+          @include flex_align_items(center);
+          top: 0.3rem;
+
+          .mat-progress-spinner {
+            margin-right: 0.4rem;
+          }
+
+          .mat-icon {
+            color: rgba(var(--gd-text-rgb), 0.75);
+            font-size: 1.6rem;
+            height: 1.6rem;
+            line-height: 1;
+            text-align: center;
+          }
+
+          .mat-icon-button {
+            font-size: 1.6rem;
+            height: 2.4rem;
+            min-width: 0;
+            padding: 0;
+            width: 2.4rem;
+
+            + .mat-icon-button {
+              margin-left: 0.4rem;
+            }
+          }
+        }
       }
 
-      /* Form input error */
+      /* Form color error */
       .mat-form-field-subscript-wrapper {
         font-size: 1.2rem;
         line-height: 1;
@@ -143,17 +153,13 @@
         position: static;
         top: 0;
 
-        .gd-dashlet-kpi-bottom-value-left-text & {
-          min-height: 0;
-        }
-
         .mat-error {
           color: var(--gd-danger);
         }
       }
     }
 
-    /* Input number focused */
+    /* Form input focused */
     &:focus,
     &.mat-focused,
     &.mat-form-field-should-float {
@@ -172,7 +178,7 @@
       }
     }
 
-    /* Input number disabled */
+    /* Form color disabled */
     &.mat-form-field-disabled {
       .mat-form-field-wrapper {
         .mat-form-field-flex {
@@ -182,6 +188,12 @@
             color: rgba(var(--gd-secondary-rgb), 0.5);
           }
 
+          .mat-form-field-prefix {
+            .mat-icon {
+              color: var(--gd-secondary);
+            }
+          }
+  
           .mat-form-field-infix {
             .mat-form-field-label-wrapper {
               .mat-form-field-label {
@@ -189,11 +201,17 @@
               }
             }
           }
+  
+          .mat-form-field-suffix {
+            .mat-icon {
+              color: var(--gd-secondary);
+            }
+          }
         }
       }
     }
 
-    /* Input number invalid */
+    /* Form color invalid */
     &.mat-form-field-invalid {
       .mat-form-field-wrapper {
         .mat-form-field-flex {
@@ -215,20 +233,25 @@
     }
   }
 
-  .gd-form-number-v2-viewonly {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-
-    .gd-form-number-v2-viewonly-label {
+  .gd-form-color-v2-viewonly {
+    .gd-form-color-v2-viewonly-label {
       color: var(--gd-secondary);
       white-space: nowrap;
     }
 
-    .gd-form-number-v2-viewonly-value {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+    .gd-form-color-v2-viewonly-value {
+      @include flex_align_items(center);
+      @include flex(flex);
+      @include flex_direction(row);
+      text-transform: uppercase;
+
+      > div {
+        @include border-radius(0.4rem);
+        display: block;
+        height: 2rem;
+        margin-right: 0.8rem;
+        width: 2rem;
+      }
     }
   }
 }

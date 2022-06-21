@@ -139,6 +139,7 @@ import { SelectedEntitiesDataResolver } from './resolvers/data/selected-entities
 import { HelpCategoryDataResolver } from './resolvers/data/help-category.resolver';
 import { AuditLogActionDataResolver } from './resolvers/data/audit-log-action.resolver';
 import { AuditLogModuleDataResolver } from './resolvers/data/audit-log-module.resolver';
+import { EventCategoryDataResolver } from './resolvers/data/event-category.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -170,6 +171,7 @@ export const services: any[] = [
   ExposureDurationDataResolver,
   ExposureFrequencyDataResolver,
   ExposureTypeDataResolver,
+  EventCategoryDataResolver,
   FinalFollowUpStatusDataResolver,
   FollowUpGenerationTeamAssignmentAlgorithmDataResolver,
   GanttChartTypeDataResolver,

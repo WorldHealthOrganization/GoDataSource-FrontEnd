@@ -76,7 +76,7 @@ export class ReferenceDataCategoriesListComponent
             return {
               label: this.i18nService.instant(entry.value),
               href: ReferenceDataEntryModel.canView(this.authUser) ?
-                `/reference-data/${ item.id }/${ item.id }/view` :
+                `/reference-data/${item.id}/${entry.id}/view` :
                 null
             };
           }) :

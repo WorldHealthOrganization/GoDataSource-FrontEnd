@@ -30,7 +30,6 @@ import { FormLocationIdentifierComponent } from './form-location-identifier/form
 import { FormCaseQuickComponent } from './form-case-quick/form-case-quick.component';
 import { FormEventQuickComponent } from './form-event-quick/form-event-quick.component';
 import { ListItemLabelComponent } from './list-item-label/list-item-label.component';
-import { FormNgxWigComponent } from './form-ngx-wig/form-ngx-wig.component';
 import { FormVaccinesListComponent } from './form-vaccines-list/form-vaccines-list.component';
 import { HotTableWrapperComponent } from './hot-table-wrapper/hot-table-wrapper.component';
 import { FormContactOfContactQuickComponent } from './form-contact-of-contact-quick/form-contact-of-contact-quick.component';
@@ -65,7 +64,6 @@ export const components: any[] = [
   FormEventQuickComponent,
   FormLocationIdentifierListComponent,
   FormLocationIdentifierComponent,
-  FormNgxWigComponent,
   FormVaccinesListComponent,
   HotTableWrapperComponent,
 
