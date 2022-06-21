@@ -11,10 +11,13 @@ export const EnglishUsLang = {
      */
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
+    'LNG_USER_FIELD_CANT_SET_ALL_OUTBREAKS': 'You need \'Outbreak - list\' permission to set all outbreaks',
+    'LNG_USER_FIELD_CANT_SET_ACTIVE_OUTBREAK': 'You need \'Outbreak - list\' permission to set active outbreak',
     'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_VIEW': 'View question',
     'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_VIEW': 'View answer',
     'LNG_QUESTIONNAIRE_TEMPLATE_EXPAND_ALL': 'Expand all',
     'LNG_QUESTIONNAIRE_TEMPLATE_COLLAPSE_ALL': 'Collapse all'
+
 
 
     /**
