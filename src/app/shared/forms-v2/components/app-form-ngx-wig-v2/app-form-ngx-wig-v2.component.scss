@@ -1,0 +1,74 @@
+@import 'mixins';
+@import 'font';
+
+/* WYSIWYG */
+.app-form-ngx-wig-v2 {
+  .ng-wig {
+    margin-bottom: 1.6rem;
+  }
+
+  .nw-toolbar {
+    background: rgba(var(--gd-secondary-rgb), 0.1);
+    border: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.5);
+    @include border-radius(0.4rem 0.4rem 0 0);
+    color: var(--gd-text);
+    font-family: $gd-font-family;
+    font-size: $gd-font-size;
+  }
+
+  .nw-toolbar__item {
+    border-right: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.5);
+    vertical-align: middle;
+  }
+
+  .nw-button {
+    @include border-radius(0);
+    @include flex_align_items(center);
+    @include flex(flex);
+    @include flex_direction(row);
+    @include flex_justify(center);
+    height: 3rem;
+    line-height: 3rem;
+    width: 3rem;
+
+    &:focus {
+      background: rgba(var(--gd-primary-rgb), 0.25);
+      border: 0 none;
+    }
+
+    .icon {
+      background-position: center;
+      background-size: 1.4rem;
+      @include flex_align_items(center);
+      @include flex(flex);
+      @include flex_direction(row);
+      @include flex_justify(center);
+      height: 2rem;
+      vertical-align: middle;
+      width: 2rem;
+    }
+  }
+
+  .nw-editor-container {
+    border: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.5);
+    border-top: 0 none;
+    @include border-radius(0 0 0.4rem 0.4rem);
+  }
+
+  .nw-editor {
+    background: var(--gd-background);
+    @include border-radius(0 0 0.4rem 0.4rem);
+    height: 30rem;
+  }
+
+  .nw-editor__res {
+    padding: 0.8rem;
+  }
+
+  .app-form-ngx-wig-v2-viewonly-value {
+    border: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.5);
+    @include border-radius(0.4rem);
+    padding: 0.8rem;
+    width: 100%;
+  }
+}

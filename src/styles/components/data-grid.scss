@@ -354,6 +354,7 @@
             text-transform: uppercase;
 
             span {
+              @include border-radius(0.4rem);
               height: 2rem;
               margin-right: 0.8rem;
               width: 2rem;

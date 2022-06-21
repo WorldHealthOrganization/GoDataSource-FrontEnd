@@ -59,7 +59,7 @@
           [class.gd-form-edit-questionnaire-v2-item-markup]="item.data.answerType === Constants.ANSWER_TYPES.MARKUP.value"
           cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".gd-form-edit-questionnaire-v2-list-{{name}}" [cdkDragData]="item" [cdkDragDisabled]="viewOnly" (cdkDragStarted)="dragStarted($event)"
           [ngSwitch]="item.type"
-          [style.paddingLeft.px]="item.level * 20"
+          [style.paddingLeft.px]="item.level * 28"
           style="height: 4.5rem">
 
           <!-- Custom drag&drop placeholder -->
@@ -75,6 +75,22 @@
             <mat-icon
               [style.visibility]="item.canCollapseOrExpand ? 'visible' : 'hidden'"
               (click)="expandCollapse(item)">{{item.data.collapsed ? 'expand_more' : 'expand_less'}}</mat-icon>
+
+            <!-- Expand All -->
+            <mat-icon
+              *ngIf="item.canCollapseOrExpand && !item.data.collapsed"
+              [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_EXPAND_ALL' | translate"
+              (click)="collapseExpandAllQuestions(item.data.answers, false); nonFlatToFlat()">
+              expand
+            </mat-icon>
+
+            <!-- Collapse All -->
+            <mat-icon
+              *ngIf="item.canCollapseOrExpand && !item.data.collapsed"
+              [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_COLLAPSE_ALL' | translate"
+              (click)="collapseExpandAllQuestions(item.data.answers, true); nonFlatToFlat()">
+              compress
+            </mat-icon>
 
             <!-- Sort -->
             <mat-icon
@@ -152,7 +168,8 @@
 
                 <!-- Required -->
                 <span
-                  *ngIf="item.data.required">
+                  *ngIf="item.data.required"
+                  class="required">
                   {{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED' | translate}}
                 </span>
 
@@ -169,26 +186,6 @@
             <div
               class="gd-form-edit-questionnaire-v2-item-question-buttons"
               fxGrow="0">
-
-              <!-- Expand All -->
-              <button
-                *ngIf="item.canCollapseOrExpand && !item.data.collapsed"
-                type="button"
-                mat-icon-button
-                [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_EXPAND_ALL' | translate"
-                (click)="collapseExpandAllQuestions(item.data.answers, false); nonFlatToFlat()">
-                <mat-icon>expand_more</mat-icon>
-              </button>
-
-              <!-- Collapse All -->
-              <button
-                *ngIf="item.canCollapseOrExpand && !item.data.collapsed"
-                type="button"
-                mat-icon-button
-                [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_COLLAPSE_ALL' | translate"
-                (click)="collapseExpandAllQuestions(item.data.answers, true); nonFlatToFlat()">
-                <mat-icon>expand_less</mat-icon>
-              </button>
 
               <!-- Add answer -->
               <button
@@ -234,6 +231,22 @@
             <mat-icon
               [style.visibility]="item.canCollapseOrExpand ? 'visible' : 'hidden'"
               (click)="expandCollapse(item)">{{item.data.collapsed ? 'expand_more' : 'expand_less'}}</mat-icon>
+            
+            <!-- Expand All -->
+            <mat-icon
+              *ngIf="item.canCollapseOrExpand && !item.data.collapsed"
+              [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_EXPAND_ALL' | translate"
+              (click)="collapseExpandAllQuestions(item.data.additionalQuestions, false); nonFlatToFlat()">
+              expand
+            </mat-icon>
+
+            <!-- Collapse All -->
+            <mat-icon
+              *ngIf="item.canCollapseOrExpand && !item.data.collapsed"
+              [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_COLLAPSE_ALL' | translate"
+              (click)="collapseExpandAllQuestions(item.data.additionalQuestions, true); nonFlatToFlat()">
+              compress
+            </mat-icon>
 
             <!-- Sort -->
             <mat-icon
@@ -269,26 +282,6 @@
             <div
               class="gd-form-edit-questionnaire-v2-item-answer-buttons"
               fxGrow="0">
-
-              <!-- Expand All -->
-              <button
-                *ngIf="item.canCollapseOrExpand && !item.data.collapsed"
-                type="button"
-                mat-icon-button
-                [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_EXPAND_ALL' | translate"
-                (click)="collapseExpandAllQuestions(item.data.additionalQuestions, false); nonFlatToFlat()">
-                <mat-icon>expand_more</mat-icon>
-              </button>
-
-              <!-- Collapse All -->
-              <button
-                *ngIf="item.canCollapseOrExpand && !item.data.collapsed"
-                type="button"
-                mat-icon-button
-                [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_COLLAPSE_ALL' | translate"
-                (click)="collapseExpandAllQuestions(item.data.additionalQuestions, true); nonFlatToFlat()">
-                <mat-icon>expand_less</mat-icon>
-              </button>
 
               <!-- Add question -->
               <button
