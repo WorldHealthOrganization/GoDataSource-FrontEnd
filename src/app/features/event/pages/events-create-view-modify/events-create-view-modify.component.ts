@@ -383,6 +383,17 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
               }
             }
           }, {
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: 'endDate',
+            placeholder: () => 'LNG_EVENT_FIELD_LABEL_END_DATE',
+            description: () => 'LNG_EVENT_FIELD_LABEL_END_DATE_DESCRIPTION',
+            value: {
+              get: () => this.itemData.endDate,
+              set: (value) => {
+                this.itemData.endDate = value;
+              }
+            }
+          }, {
             type: CreateViewModifyV2TabInputType.TEXTAREA,
             name: 'description',
             placeholder: () => 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',

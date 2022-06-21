@@ -365,7 +365,7 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
               },
               replace: {
                 condition: () => !OutbreakModel.canList(this.authUser),
-                html: this.translateService.instant('LNG_USER_FIELD_CANT_SET_ALL_OUTBREAKS')
+                html: this.translateService.instant('LNG_USER_FIELD_LABEL_CANT_SET_ALL_OUTBREAKS')
               }
             },
             {
@@ -387,7 +387,7 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
               },
               replace: {
                 condition: () => !OutbreakModel.canList(this.authUser),
-                html: this.translateService.instant('LNG_USER_FIELD_CANT_SET_ACTIVE_OUTBREAK')
+                html: this.translateService.instant('LNG_USER_FIELD_LABEL_CANT_SET_ACTIVE_OUTBREAK')
               }
             }
           ]
