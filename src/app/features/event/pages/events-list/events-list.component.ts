@@ -124,6 +124,17 @@ export class EventsListComponent
         }
       },
       {
+        field: 'endDate',
+        label: 'LNG_EVENT_FIELD_LABEL_END_DATE',
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        sortable: true,
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
         field: 'description',
         label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
         sortable: true,
@@ -1092,6 +1103,7 @@ export class EventsListComponent
                         { label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS', value: 'numberOfContacts' },
                         { label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING', value: 'dateOfReporting' },
                         { label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', value: 'isDateOfReportingApproximate' },
+                        { label: 'LNG_EVENT_FIELD_LABEL_END_DATE', value: 'endDate' },
                         { label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUserId' },
                         { label: 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY', value: 'eventCategory' }
                       ]
@@ -1263,6 +1275,7 @@ export class EventsListComponent
       'name',
       'date',
       'eventCategory',
+      'endDate',
       'description',
       'address',
       'responsibleUserId',

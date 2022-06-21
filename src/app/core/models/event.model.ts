@@ -33,6 +33,7 @@ export class EventModel
   dateOfReporting: string | Moment;
   isDateOfReportingApproximate: boolean;
   outbreakId: string;
+  endDate: string | Moment;
 
   numberOfContacts: number;
   numberOfExposures: number;
@@ -96,6 +97,11 @@ export class EventModel
         field: 'isDateOfReportingApproximate',
         label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
         sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'endDate',
+        label: 'LNG_EVENT_FIELD_LABEL_END_DATE'
       },
       {
         type: V2AdvancedFilterType.RANGE_NUMBER,
@@ -191,6 +197,7 @@ export class EventModel
     this.dateOfReporting = _.get(data, 'dateOfReporting');
     this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
     this.outbreakId = _.get(data, 'outbreakId');
+    this.endDate = _.get(data, 'endDate');
 
     this.numberOfContacts = _.get(data, 'numberOfContacts');
     this.numberOfExposures = _.get(data, 'numberOfExposures');
