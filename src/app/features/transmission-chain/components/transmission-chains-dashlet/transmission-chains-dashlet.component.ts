@@ -2647,7 +2647,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     // do we have required data ?
     if (
       !this.selectedOutbreak ||
-            !this.selectedOutbreak.id
+      !this.selectedOutbreak.id
     ) {
       // finished
       finishedCallback();
@@ -2820,7 +2820,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         (snapshots || []).forEach((snapshot) => {
           if (
             this.snapshotOptionsMap &&
-                        this.snapshotOptionsMap[snapshot.id]
+            this.snapshotOptionsMap[snapshot.id]
           ) {
             // update status so we don't retrieve it again
             this.snapshotOptionsMap[snapshot.id].snapshot.status = snapshot.status;
