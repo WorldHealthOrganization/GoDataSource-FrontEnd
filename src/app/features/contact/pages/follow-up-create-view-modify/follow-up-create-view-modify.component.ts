@@ -80,7 +80,8 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
     // display history follow-ups ?
     if (this._entityData?.type === EntityType.CASE) {
       this.toastV2Service.notice(
-        this.isHistory ? 'LNG_PAGE_MODIFY_FOLLOW_UP_REGISTERED_AS_CONTACT_MESSAGE' :
+        this.isHistory ?
+          'LNG_PAGE_MODIFY_FOLLOW_UP_REGISTERED_AS_CONTACT_MESSAGE' :
           'LNG_PAGE_MODIFY_FOLLOW_UP_FIELD_LABEL_FOLLOW_UP_WITH_INFO',
         {
           personName: this._entityData.name
