@@ -1,7 +1,7 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-import { Observable, Subscriber, throwError } from 'rxjs';
+import { Observable, of, Subscriber, throwError } from 'rxjs';
 import { catchError, map, takeUntil, tap } from 'rxjs/operators';
 import { environment } from '../../../../../environments/environment';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
@@ -472,29 +472,27 @@ export class ClientApplicationsListComponent
           .getAPIVersion(apiURL)
           .pipe(
             // throw error
-            catchError((err) => {
-              subscriber.next({
-                isValid: false,
-                errMsg: 'LNG_FORM_VALIDATION_ERROR_FIELD_URL'
-              });
-              subscriber.complete();
-              return throwError(err);
+            catchError(() => {
+              // if request fails then error should be handled by subscribe (else branch)
+              return of([]);
             }),
 
             // should be the last pipe
             takeUntil(this.destroyed$)
           )
           .subscribe((versionData: any) => {
-            if (_.get(versionData, 'version')) {
+            // handle
+            if (versionData.version) {
               subscriber.next(true);
-              subscriber.complete();
             } else {
               subscriber.next({
                 isValid: false,
                 errMsg: 'LNG_FORM_VALIDATION_ERROR_FIELD_URL'
               });
-              subscriber.complete();
             }
+
+            // finished
+            subscriber.complete();
           });
       }
     });

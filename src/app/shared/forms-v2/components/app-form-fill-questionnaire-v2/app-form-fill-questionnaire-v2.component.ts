@@ -425,7 +425,9 @@ export class AppFormFillQuestionnaireV2Component
         oneParentIsInactive,
         canCollapseOrExpand: question.answers?.length > 0,
         questionRow: accumulator.length,
-        no: `${noPrefix}${noPrefix ? '.' : ''}${no}`,
+        no: question.answerType !== Constants.ANSWER_TYPES.MARKUP.value ?
+          `${noPrefix}${noPrefix ? '.' : ''}${no}` :
+          undefined,
         collapsed,
         usedAnswers: [],
         pendingAnswers: {}
@@ -433,7 +435,11 @@ export class AppFormFillQuestionnaireV2Component
 
       // add to list
       accumulator.push(flattenedQuestion);
-      no++;
+
+      // count only if not markup
+      if (question.answerType !== Constants.ANSWER_TYPES.MARKUP.value) {
+        no++;
+      }
 
       // process question type
       switch (question.answerType) {

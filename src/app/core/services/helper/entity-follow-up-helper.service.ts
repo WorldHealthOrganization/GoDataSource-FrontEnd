@@ -845,7 +845,7 @@ export class EntityFollowUpHelperService {
         type: V2AdvancedFilterType.SELECT,
         field: 'targeted',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
-        options: data.options.team
+        options: data.options.yesNoAll
       },
       {
         type: V2AdvancedFilterType.SELECT,
