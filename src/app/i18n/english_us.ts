@@ -11,7 +11,10 @@ export const EnglishUsLang = {
      */
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
-
+    'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_WHAT_TO_DO': 'Do you want to create a new chain of transmission, replace the most recent snapshot or display the most recent one?',
+    'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CREATE_NEW': 'Create new',
+    'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_REPLACE_MOST_RECENT': 'Replace most recent',
+    'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_LOAD_MOST_RECENT': 'Load most recent'
 
 
     /**
@@ -41,5 +44,6 @@ export const EnglishUsLang = {
     // LNG_PAGE_DASHBOARD_EPI_CURVE_TITLE_DESCRIPTION
     // LNG_FOLLOW_UP_FIELD_LABEL_FILL_LOCATION_NO_LOCATION
     // LNG_PAGE_LIST_USAGE_LOCATIONS_LABEL_MORE_RECORDS
+    // LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_APPLY_SETTINGS
   }
 };

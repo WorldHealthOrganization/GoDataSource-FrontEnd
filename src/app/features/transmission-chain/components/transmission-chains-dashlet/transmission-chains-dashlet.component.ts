@@ -64,6 +64,7 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import { TransmissionChainFilters } from '../../classes/filter';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import * as FileSaver from 'file-saver';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 
 @Component({
   selector: 'app-transmission-chains-dashlet',
@@ -108,7 +109,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   selectedChainPageIndex: number = null;
 
   // page size
-  pageSize: number = 250;
+  pageSize: number = 500;
 
   // luster icon map
   clusterIconMap: {
@@ -731,6 +732,77 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                   this.retrieveSnapshotsList(() => {
                     // hide loading
                     loadingDialog.close();
+
+                    // show chose dialog ?
+                    if (this.snapshotOptions?.length > 0) {
+                      // display dialog with what to do
+                      this.dialogV2Service
+                        .showBottomDialog({
+                          config: {
+                            title: {
+                              get: () => 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE'
+                            },
+                            message: {
+                              get: () => 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_WHAT_TO_DO'
+                            }
+                          },
+                          dontCloseOnBackdrop: true,
+                          bottomButtons: [
+                            {
+                              type: IV2BottomDialogConfigButtonType.OTHER,
+                              label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CREATE_NEW',
+                              key: 'create',
+                              color: 'primary'
+                            }, {
+                              type: IV2BottomDialogConfigButtonType.OTHER,
+                              label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_REPLACE_MOST_RECENT',
+                              key: 'replace_most_recent',
+                              color: 'primary'
+                            }, {
+                              type: IV2BottomDialogConfigButtonType.OTHER,
+                              label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_LOAD_MOST_RECENT',
+                              key: 'load_most_recent',
+                              color: 'primary'
+                            }, {
+                              type: IV2BottomDialogConfigButtonType.CANCEL,
+                              label: 'LNG_DIALOG_CONFIRM_BUTTON_CANCEL',
+                              color: 'text'
+                            }
+                          ]
+                        })
+                        .subscribe((bottomResponse) => {
+                          // cancel ?
+                          if (bottomResponse.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                            // finished - nothing to do...everything will be done manually by user
+                            return;
+                          }
+
+                          // take action accordingly
+                          if (bottomResponse.button.key === 'create') {
+                            // create new
+                            this.createNewSnapshot();
+
+                            // finished
+                            return;
+                          } else if (bottomResponse.button.key === 'replace_most_recent') {
+                            // replace most recent
+                            this.createNewSnapshot(this.snapshotOptions[0].value);
+
+                            // finished
+                            return;
+                          }
+
+                          // load most recent
+                          this.selectedSnapshot = this.snapshotOptions[0].value;
+                          this.loadChainsOfTransmission(
+                            undefined,
+                            0
+                          );
+                        });
+                    } else {
+                      // nothing to show - go directly to generate snapshot
+                      this.createNewSnapshot();
+                    }
                   });
                 }
               }
@@ -961,152 +1033,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           },
           action: {
             click: () => {
-              this.dialogV2Service
-                .showSideDialog({
-                  title: {
-                    get: () => 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_SETTINGS'
-                  },
-                  hideInputFilter: true,
-                  width: '50rem',
-                  inputs: [
-                    {
-                      type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
-                      name: 'showEvents',
-                      placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_EVENTS_LABEL',
-                      value: this.filters.showEvents
-                    }, {
-                      type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
-                      name: 'showContacts',
-                      placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_LABEL',
-                      value: this.filters.showContacts,
-                      change: (data) => {
-                        // nothing to do ?
-                        const checked = (data.map.showContacts as IV2SideDialogConfigInputToggleCheckbox).value;
-                        if (!checked) {
-                          (data.map.includeContactsOfContacts as IV2SideDialogConfigInputToggleCheckbox).value = false;
-                        }
-                      }
-                    }, {
-                      type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
-                      name: 'includeContactsOfContacts',
-                      placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_OF_CONTACTS',
-                      value: this.filters.includeContactsOfContacts,
-                      disabled: (data) => {
-                        return !(data.map.showContacts as IV2SideDialogConfigInputToggleCheckbox).value;
-                      }
-                    }, {
-                      type: V2SideDialogConfigInputType.DATE,
-                      name: 'dateGlobalFilter',
-                      placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DATE',
-                      tooltip: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DESCRIPTION',
-                      value: this.dateGlobalFilter
-                    }, {
-                      type: V2SideDialogConfigInputType.DIVIDER,
-                      placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTERS_TITLE'
-                    }, {
-                      type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
-                      name: 'classificationId',
-                      placeholder: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-                      options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                      values: this.filters.classificationId
-                    }, {
-                      type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
-                      name: 'occupation',
-                      placeholder: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
-                      options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                      values: this.filters.occupation
-                    }, {
-                      type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
-                      name: 'outcomeId',
-                      placeholder: 'LNG_CASE_FIELD_LABEL_OUTCOME',
-                      options: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                      values: this.filters.outcomeId
-                    }, {
-                      type: V2SideDialogConfigInputType.TEXT,
-                      name: 'firstName',
-                      placeholder: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
-                      value: this.filters.firstName
-                    }, {
-                      type: V2SideDialogConfigInputType.TEXT,
-                      name: 'lastName',
-                      placeholder: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
-                      value: this.filters.lastName
-                    }, {
-                      type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
-                      name: 'gender',
-                      placeholder: 'LNG_CASE_FIELD_LABEL_GENDER',
-                      options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                      values: this.filters.gender
-                    }, {
-                      type: V2SideDialogConfigInputType.LOCATION_MULTIPLE,
-                      name: 'locationIds',
-                      placeholder: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
-                      useOutbreakLocations: true,
-                      values: this.filters.locationIds
-                    }, {
-                      type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
-                      name: 'clusterIds',
-                      placeholder: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
-                      options: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ClusterModel>).options,
-                      values: this.filters.clusterIds
-                    }, {
-                      type: V2SideDialogConfigInputType.DIVIDER,
-                      placeholder: 'LNG_ENTITY_FIELD_LABEL_AGE'
-                    }, {
-                      type: V2SideDialogConfigInputType.NUMBER_RANGE,
-                      name: 'age',
-                      value: this.filters.age
-                    }, {
-                      type: V2SideDialogConfigInputType.DIVIDER,
-                      placeholder: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE'
-                    }, {
-                      type: V2SideDialogConfigInputType.DATE_RANGE,
-                      name: 'date',
-                      value: this.filters.date
-                    }
-                  ],
-                  bottomButtons: [{
-                    type: IV2SideDialogConfigButtonType.OTHER,
-                    label: 'LNG_COMMON_BUTTON_CREATE',
-                    color: 'primary'
-                  }, {
-                    type: IV2SideDialogConfigButtonType.CANCEL,
-                    label: 'LNG_COMMON_BUTTON_CANCEL',
-                    color: 'text'
-                  }]
-                })
-                .subscribe((response) => {
-                  // cancelled ?
-                  if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
-                    // finished
-                    return;
-                  }
-
-                  // update filters
-                  this.filters.showEvents = (response.data.map.showEvents as IV2SideDialogConfigInputToggleCheckbox).value;
-                  this.filters.showContacts = (response.data.map.showContacts as IV2SideDialogConfigInputToggleCheckbox).value;
-                  this.filters.includeContactsOfContacts = (response.data.map.includeContactsOfContacts as IV2SideDialogConfigInputToggleCheckbox).value;
-                  const date = (response.data.map.dateGlobalFilter as IV2SideDialogConfigInputDate).value;
-                  this.dateGlobalFilter = typeof date === 'string' ?
-                    date :
-                    (date ? date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : undefined);
-                  this.filters.classificationId = (response.data.map.classificationId as IV2SideDialogConfigInputMultiDropdown).values;
-                  this.filters.occupation = (response.data.map.occupation as IV2SideDialogConfigInputMultiDropdown).values;
-                  this.filters.outcomeId = (response.data.map.outcomeId as IV2SideDialogConfigInputMultiDropdown).values;
-                  this.filters.firstName = (response.data.map.firstName as IV2SideDialogConfigInputText).value;
-                  this.filters.lastName = (response.data.map.lastName as IV2SideDialogConfigInputText).value;
-                  this.filters.gender = (response.data.map.gender as IV2SideDialogConfigInputMultiDropdown).values;
-                  this.filters.locationIds = (response.data.map.locationIds as IV2SideDialogConfigInputMultipleLocation).values;
-                  this.filters.clusterIds = (response.data.map.clusterIds as IV2SideDialogConfigInputMultiDropdown).values;
-                  this.filters.age = (response.data.map.age as IV2SideDialogConfigInputNumberRange).value;
-                  this.filters.date = (response.data.map.date as IV2SideDialogConfigInputDateRange).value;
-
-                  // close
-                  response.handler.hide();
-
-                  // generate graph
-                  this.generateChainsOfTransmission();
-                });
+              this.createNewSnapshot();
             }
           },
           visible: () => {
@@ -1199,9 +1126,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Display chains of transmission
-     */
-  generateChainsOfTransmission() {
+   * Display chains of transmission
+   */
+  private generateChainsOfTransmission(snapshotName: string) {
     // if there is no outbreak then we can't continue
     if (
       !this.selectedOutbreak ||
@@ -1211,215 +1138,177 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // snapshot settings
-    this.dialogV2Service
-      .showSideDialog({
-        title: {
-          get: () => 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_APPLY_SETTINGS'
-        },
-        hideInputFilter: true,
-        width: '50rem',
-        inputs: [{
-          type: V2SideDialogConfigInputType.TEXT,
-          name: 'snapshotName',
-          placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_NAME',
-          value: undefined,
-          validators: {
-            required: () => true
-          }
-        }],
-        bottomButtons: [{
-          type: IV2SideDialogConfigButtonType.OTHER,
-          label: 'LNG_COMMON_BUTTON_CREATE',
-          color: 'primary',
-          disabled: (_data, handler): boolean => {
-            return !handler.form || handler.form.invalid;
-          }
-        }, {
-          type: IV2SideDialogConfigButtonType.CANCEL,
-          label: 'LNG_COMMON_BUTTON_CANCEL',
-          color: 'text'
-        }]
-      })
-      .subscribe((response) => {
-        // cancelled ?
-        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
-          // finished
-          return;
-        }
+    // close settings panel
+    this.showFilters = false;
+    this.showGraphConfiguration = false;
+    this.showSnapshotFilters = false;
 
-        // close
-        response.handler.hide();
+    // create queryBuilder for filters
+    const requestQueryBuilder = new RequestQueryBuilder();
+    requestQueryBuilder.filter.firstLevelConditions();
 
-        // close settings panel
-        this.showFilters = false;
-        this.showGraphConfiguration = false;
-        this.showSnapshotFilters = false;
+    // retrieve only specific fields so we don't retrieve huge amounts of data that won't be used since we don't have pagination here
+    requestQueryBuilder.fields(
+      // edges
+      'edges.id',
+      'edges.persons',
+      'edges.certaintyLevelId',
+      'edges.socialRelationshipTypeId',
+      'edges.socialRelationshipDetail',
+      'edges.exposureTypeId',
+      'edges.exposureFrequencyId',
+      'edges.exposureDurationId',
+      'edges.contactDate',
+      'edges.clusterId',
 
-        // snapshot name
-        const snapshotName: string = (response.data.map.snapshotName as IV2SideDialogConfigInputText).value;
+      // nodes
+      'nodes.id',
+      'nodes.type',
+      'nodes.date',
+      'nodes.dateOfOnset',
+      'nodes.dateOfLastContact',
+      'nodes.dateOfReporting',
+      'nodes.classification',
+      'nodes.name',
+      'nodes.firstName',
+      'nodes.middleName',
+      'nodes.lastName',
+      'nodes.riskLevel',
+      'nodes.gender',
+      'nodes.occupation',
+      'nodes.outcomeId',
+      'nodes.age',
+      'nodes.dob',
+      'nodes.address',
+      'nodes.addresses',
+      'nodes.visualId',
+      'nodes.classification',
+      'nodes.isDateOfOnsetApproximate',
 
-        // create queryBuilder for filters
-        const requestQueryBuilder = new RequestQueryBuilder();
-        requestQueryBuilder.filter.firstLevelConditions();
+      // node lab results
+      'nodes.labResults'
+    );
 
-        // retrieve only specific fields so we don't retrieve huge amounts of data that won't be used since we don't have pagination here
-        requestQueryBuilder.fields(
-          // edges
-          'edges.id',
-          'edges.persons',
-          'edges.certaintyLevelId',
-          'edges.socialRelationshipTypeId',
-          'edges.socialRelationshipDetail',
-          'edges.exposureTypeId',
-          'edges.exposureFrequencyId',
-          'edges.exposureDurationId',
-          'edges.contactDate',
-          'edges.clusterId',
+    // do we have chainIncludesPerson filters ?
+    if (this.personId) {
+      // include custom person builder that will handle these filters
+      const chainIncludesPersonRequestQueryBuilder: RequestQueryBuilder = requestQueryBuilder.addChildQueryBuilder('chainIncludesPerson');
+      chainIncludesPersonRequestQueryBuilder.filter.byEquality(
+        'id',
+        this.personId
+      );
+    }
 
-          // nodes
-          'nodes.id',
-          'nodes.type',
-          'nodes.date',
-          'nodes.dateOfOnset',
-          'nodes.dateOfLastContact',
-          'nodes.dateOfReporting',
-          'nodes.classification',
-          'nodes.name',
-          'nodes.firstName',
-          'nodes.middleName',
-          'nodes.lastName',
-          'nodes.riskLevel',
-          'nodes.gender',
-          'nodes.occupation',
-          'nodes.outcomeId',
-          'nodes.age',
-          'nodes.dob',
-          'nodes.address',
-          'nodes.addresses',
-          'nodes.visualId',
-          'nodes.classification',
-          'nodes.isDateOfOnsetApproximate',
+    // add filter for size ( under where )
+    if (this.sizeOfChainsFilter) {
+      requestQueryBuilder.filter.byEquality(
+        'size',
+        typeof this.sizeOfChainsFilter === 'string' ?
+          _.parseInt(this.sizeOfChainsFilter) :
+          this.sizeOfChainsFilter
+      );
+    }
 
-          // node lab results
-          'nodes.labResults'
-        );
+    // global date - see state in time
+    if (this.dateGlobalFilter) {
+      requestQueryBuilder.filter.byEquality(
+        'endDate',
+        moment(this.dateGlobalFilter).toISOString()
+      );
+    }
 
-        // do we have chainIncludesPerson filters ?
-        if (this.personId) {
-          // include custom person builder that will handle these filters
-          const chainIncludesPersonRequestQueryBuilder: RequestQueryBuilder = requestQueryBuilder.addChildQueryBuilder('chainIncludesPerson');
-          chainIncludesPersonRequestQueryBuilder.filter.byEquality(
-            'id',
-            this.personId
-          );
-        }
+    // add flags
+    if (this.filters.showContacts) {
+      // we need contact chains as well
+      requestQueryBuilder.filter.flag('includeContacts', 1);
+      requestQueryBuilder.filter.flag('noContactChains', false);
 
-        // add filter for size ( under where )
-        if (this.sizeOfChainsFilter) {
-          requestQueryBuilder.filter.byEquality(
-            'size',
-            typeof this.sizeOfChainsFilter === 'string' ?
-              _.parseInt(this.sizeOfChainsFilter) :
-              this.sizeOfChainsFilter
-          );
-        }
+      // this flag is working only if 'showContacts' is true
+      if (this.filters.includeContactsOfContacts) {
+        requestQueryBuilder.filter.flag('includeContactsOfContacts', 1);
+      }
+    }
 
-        // global date - see state in time
-        if (this.dateGlobalFilter) {
-          requestQueryBuilder.filter.byEquality(
-            'endDate',
-            moment(this.dateGlobalFilter).toISOString()
-          );
-        }
+    // person query
+    const personQuery = requestQueryBuilder.addChildQueryBuilder('person');
 
-        // add flags
-        if (this.filters.showContacts) {
-          // we need contact chains as well
-          requestQueryBuilder.filter.flag('includeContacts', 1);
-          requestQueryBuilder.filter.flag('noContactChains', false);
+    // discarded cases
+    // handled by API
+    // NOTHING to do here
 
-          // this flag is working only if 'showContacts' is true
-          if (this.filters.includeContactsOfContacts) {
-            requestQueryBuilder.filter.flag('includeContactsOfContacts', 1);
-          }
-        }
+    // attach other filters ( locations & classifications & others... )
+    if (!_.isEmpty(this.filters)) {
+      // include custom person builder that will handle these filters
+      const filterObject = new TransmissionChainFilters(this.filters);
+      filterObject.attachConditionsToRequestQueryBuilder(personQuery);
 
-        // person query
-        const personQuery = requestQueryBuilder.addChildQueryBuilder('person');
-
-        // discarded cases
-        // handled by API
-        // NOTHING to do here
-
-        // attach other filters ( locations & classifications & others... )
-        if (!_.isEmpty(this.filters)) {
-          // include custom person builder that will handle these filters
-          const filterObject = new TransmissionChainFilters(this.filters);
-          filterObject.attachConditionsToRequestQueryBuilder(personQuery);
-
-          // attach classification conditions to parent qb as well ( besides personQuery )
-          // isolated classification
-          if (!_.isEmpty(filterObject.classificationId)) {
-            requestQueryBuilder.filter.where({
-              or: [
-                {
-                  type: {
-                    neq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE'
-                  }
-                }, {
-                  type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
-                  classification: {
-                    inq: filterObject.classificationId
-                  }
-                }
-              ]
-            });
-          }
-
-          // attach cluster condition
-          if (!_.isEmpty(filterObject.clusterIds)) {
-            requestQueryBuilder.filter.where({
-              clusterId: {
-                inq: filterObject.clusterIds
+      // attach classification conditions to parent qb as well ( besides personQuery )
+      // isolated classification
+      if (!_.isEmpty(filterObject.classificationId)) {
+        requestQueryBuilder.filter.where({
+          or: [
+            {
+              type: {
+                neq: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE'
               }
-            });
+            }, {
+              type: 'LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE',
+              classification: {
+                inq: filterObject.classificationId
+              }
+            }
+          ]
+        });
+      }
+
+      // attach cluster condition
+      if (!_.isEmpty(filterObject.clusterIds)) {
+        requestQueryBuilder.filter.where({
+          clusterId: {
+            inq: filterObject.clusterIds
           }
-        }
+        });
+      }
+    }
 
-        // display loading
-        const loadingDialog = this.dialogV2Service.showLoadingDialog();
+    // display loading
+    const loadingDialog = this.dialogV2Service.showLoadingDialog();
 
-        // get chain data and convert to graph nodes
-        this.transmissionChainDataService
-          .calculateIndependentTransmissionChains(
-            this.selectedOutbreak.id,
-            snapshotName,
-            requestQueryBuilder
-          )
-          .pipe(
-            catchError((err) => {
-              // display error message
-              this.toastV2Service.error(err);
+    // get chain data and convert to graph nodes
+    this.transmissionChainDataService
+      .calculateIndependentTransmissionChains(
+        this.selectedOutbreak.id,
+        snapshotName,
+        requestQueryBuilder
+      )
+      .pipe(
+        catchError((err) => {
+          // display error message
+          this.toastV2Service.error(err);
 
-              // finished
-              loadingDialog.close();
-              return throwError(err);
-            })
-          )
-          .subscribe((data) => {
-            // display message
-            this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_GENERATE_SNAPSHOT_IN_PROGRESS');
+          // finished
+          loadingDialog.close();
+          return throwError(err);
+        })
+      )
+      .subscribe((data) => {
+        // display message
+        this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_GENERATE_SNAPSHOT_IN_PROGRESS');
 
-            // select snapshot
-            this.selectedSnapshot = data.transmissionChainId;
+        // select snapshot
+        this.selectedSnapshot = data.transmissionChainId;
 
-            // update list of snapshots
-            this.retrieveSnapshotsList(() => {
-              // finished
-              loadingDialog.close();
-            });
-          });
+        // update list of snapshots
+        this.retrieveSnapshotsList(() => {
+          // display graph
+          this.loadChainsOfTransmission(
+            undefined,
+            0
+          );
+
+          // finished
+          loadingDialog.close();
+        });
       });
   }
 
@@ -2641,8 +2530,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Retrieve snapshots list
-     */
+   * Retrieve snapshots list
+   */
   retrieveSnapshotsList(finishedCallback: () => void): void {
     // do we have required data ?
     if (
@@ -2708,10 +2597,12 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         });
 
         // trigger periodic update of snapshots that are still in progress
-        this.checkAgainForInProgressSnapshots();
+        this.checkAgainForInProgressSnapshots(finishedCallback);
 
         // finished
-        finishedCallback();
+        if (!this.selectedSnapshot) {
+          finishedCallback();
+        }
       });
   }
 
@@ -2758,20 +2649,20 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   /**
      * Trigger periodic update of snapshots that are still in progress
      */
-  private checkAgainForInProgressSnapshots(): void {
+  private checkAgainForInProgressSnapshots(finishedCallback: () => void): void {
     // stop any update snapshot request we might have pending
     this.stopUpdateSnapshotsInProgress();
 
     // update
     this._updateSnapshotsTimer = setTimeout(() => {
-      this.updateSnapshotsInProgress();
+      this.updateSnapshotsInProgress(finishedCallback);
     }, 3000);
   }
 
   /**
      * Update snapshots status that are still in progress
      */
-  private updateSnapshotsInProgress(): void {
+  private updateSnapshotsInProgress(finishedCallback: () => void): void {
     // stop any update snapshot request we might have pending
     this.stopUpdateSnapshotsInProgress();
 
@@ -2780,6 +2671,15 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     _.each(this.snapshotOptionsMap, (snapshotOptionsMapItem) => {
       if (snapshotOptionsMapItem.snapshot.status === Constants.COT_SNAPSHOT_STATUSES.LNG_COT_STATUS_IN_PROGRESS.value) {
         inProgressSnapshots.push(snapshotOptionsMapItem.snapshot.id);
+      } else {
+        // our snapshot finished ?
+        if (snapshotOptionsMapItem.snapshot.id === this.selectedSnapshot) {
+          // finished creating snapshot
+          finishedCallback();
+
+          // no need to call later - NOOP
+          finishedCallback = () => {};
+        }
       }
     });
 
@@ -2832,7 +2732,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         });
 
         // check again if we have anything else to retrieve
-        this.checkAgainForInProgressSnapshots();
+        this.checkAgainForInProgressSnapshots(finishedCallback);
       });
   }
 
@@ -2927,7 +2827,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   /**
      * Retrieve snapshot / refresh graph
      */
-  loadChainsOfTransmission(advancedFiltersResponse?: IV2SideDialogAdvancedFiltersResponse): void {
+  loadChainsOfTransmission(
+    advancedFiltersResponse?: IV2SideDialogAdvancedFiltersResponse,
+    specificPage?: number
+  ): void {
     // do cleanup
     if (advancedFiltersResponse) {
       const usedMap: {
@@ -3002,7 +2905,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       }
 
       // reset the page number
-      this.selectedChainPageIndex = null;
+      this.selectedChainPageIndex = specificPage !== undefined ?
+        specificPage :
+        null;
 
       // update view
       this.updateView();
@@ -3016,7 +2921,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     this.chainGroup = undefined;
     this.chainPages = undefined;
     this.chainPagesOptions = undefined;
-    this.selectedChainPageIndex = null;
+    this.selectedChainPageIndex = specificPage !== undefined ?
+      specificPage :
+      null;
     this.chainGroupId = this.selectedSnapshot;
     this.transmissionChainDataService
       .getCalculatedIndependentTransmissionChains(
@@ -3068,7 +2975,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           // check if we have location
           if (
             mainAddress &&
-                        mainAddress.locationId
+            mainAddress.locationId
           ) {
             locationIdsToRetrieve[mainAddress.locationId] = true;
           }
@@ -3299,6 +3206,197 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           `${fileName}.png`
         );
         loadingDialog.close();
+      });
+  }
+
+  /**
+   * Create new snapshot
+   */
+  private createNewSnapshot(deleteSnapshotId?: string): void {
+    this.dialogV2Service
+      .showSideDialog({
+        title: {
+          get: () => 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_SETTINGS'
+        },
+        hideInputFilter: true,
+        width: '50rem',
+        inputs: [
+          {
+            type: V2SideDialogConfigInputType.TEXT,
+            name: 'snapshotName',
+            placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_NAME',
+            value: this.authUser.name,
+            validators: {
+              required: () => true
+            }
+          }, {
+            type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+            name: 'showEvents',
+            placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_EVENTS_LABEL',
+            value: this.filters.showEvents
+          }, {
+            type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+            name: 'showContacts',
+            placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_LABEL',
+            value: this.filters.showContacts,
+            change: (data) => {
+              // nothing to do ?
+              const checked = (data.map.showContacts as IV2SideDialogConfigInputToggleCheckbox).value;
+              if (!checked) {
+                (data.map.includeContactsOfContacts as IV2SideDialogConfigInputToggleCheckbox).value = false;
+              }
+            }
+          }, {
+            type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+            name: 'includeContactsOfContacts',
+            placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_OF_CONTACTS',
+            value: this.filters.includeContactsOfContacts,
+            disabled: (data) => {
+              return !(data.map.showContacts as IV2SideDialogConfigInputToggleCheckbox).value;
+            }
+          }, {
+            type: V2SideDialogConfigInputType.DATE,
+            name: 'dateGlobalFilter',
+            placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DATE',
+            tooltip: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DESCRIPTION',
+            value: this.dateGlobalFilter
+          }, {
+            type: V2SideDialogConfigInputType.DIVIDER,
+            placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTERS_TITLE'
+          }, {
+            type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
+            name: 'classificationId',
+            placeholder: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+            options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            values: this.filters.classificationId
+          }, {
+            type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
+            name: 'occupation',
+            placeholder: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
+            options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            values: this.filters.occupation
+          }, {
+            type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
+            name: 'outcomeId',
+            placeholder: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+            options: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            values: this.filters.outcomeId
+          }, {
+            type: V2SideDialogConfigInputType.TEXT,
+            name: 'firstName',
+            placeholder: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
+            value: this.filters.firstName
+          }, {
+            type: V2SideDialogConfigInputType.TEXT,
+            name: 'lastName',
+            placeholder: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
+            value: this.filters.lastName
+          }, {
+            type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
+            name: 'gender',
+            placeholder: 'LNG_CASE_FIELD_LABEL_GENDER',
+            options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            values: this.filters.gender
+          }, {
+            type: V2SideDialogConfigInputType.LOCATION_MULTIPLE,
+            name: 'locationIds',
+            placeholder: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
+            useOutbreakLocations: true,
+            values: this.filters.locationIds
+          }, {
+            type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
+            name: 'clusterIds',
+            placeholder: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+            options: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ClusterModel>).options,
+            values: this.filters.clusterIds
+          }, {
+            type: V2SideDialogConfigInputType.DIVIDER,
+            placeholder: 'LNG_ENTITY_FIELD_LABEL_AGE'
+          }, {
+            type: V2SideDialogConfigInputType.NUMBER_RANGE,
+            name: 'age',
+            value: this.filters.age
+          }, {
+            type: V2SideDialogConfigInputType.DIVIDER,
+            placeholder: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE'
+          }, {
+            type: V2SideDialogConfigInputType.DATE_RANGE,
+            name: 'date',
+            value: this.filters.date
+          }
+        ],
+        bottomButtons: [{
+          type: IV2SideDialogConfigButtonType.OTHER,
+          label: 'LNG_COMMON_BUTTON_CREATE',
+          color: 'primary',
+          disabled: (_data, handler): boolean => {
+            return !handler.form || handler.form.invalid;
+          }
+        }, {
+          type: IV2SideDialogConfigButtonType.CANCEL,
+          label: 'LNG_COMMON_BUTTON_CANCEL',
+          color: 'text'
+        }]
+      })
+      .subscribe((response) => {
+        // cancelled ?
+        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+          // finished
+          return;
+        }
+
+        // generate new snapshot
+        const generateSnapshot = () => {
+          // update filters
+          this.filters.showEvents = (response.data.map.showEvents as IV2SideDialogConfigInputToggleCheckbox).value;
+          this.filters.showContacts = (response.data.map.showContacts as IV2SideDialogConfigInputToggleCheckbox).value;
+          this.filters.includeContactsOfContacts = (response.data.map.includeContactsOfContacts as IV2SideDialogConfigInputToggleCheckbox).value;
+          const date = (response.data.map.dateGlobalFilter as IV2SideDialogConfigInputDate).value;
+          this.dateGlobalFilter = typeof date === 'string' ?
+            date :
+            (date ? date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : undefined);
+          this.filters.classificationId = (response.data.map.classificationId as IV2SideDialogConfigInputMultiDropdown).values;
+          this.filters.occupation = (response.data.map.occupation as IV2SideDialogConfigInputMultiDropdown).values;
+          this.filters.outcomeId = (response.data.map.outcomeId as IV2SideDialogConfigInputMultiDropdown).values;
+          this.filters.firstName = (response.data.map.firstName as IV2SideDialogConfigInputText).value;
+          this.filters.lastName = (response.data.map.lastName as IV2SideDialogConfigInputText).value;
+          this.filters.gender = (response.data.map.gender as IV2SideDialogConfigInputMultiDropdown).values;
+          this.filters.locationIds = (response.data.map.locationIds as IV2SideDialogConfigInputMultipleLocation).values;
+          this.filters.clusterIds = (response.data.map.clusterIds as IV2SideDialogConfigInputMultiDropdown).values;
+          this.filters.age = (response.data.map.age as IV2SideDialogConfigInputNumberRange).value;
+          this.filters.date = (response.data.map.date as IV2SideDialogConfigInputDateRange).value;
+
+          // close
+          response.handler.hide();
+
+          // generate graph
+          this.generateChainsOfTransmission((response.data.map.snapshotName as IV2SideDialogConfigInputText).value);
+        };
+
+        // do we need to delete previous first ?
+        if (deleteSnapshotId) {
+          this.transmissionChainDataService
+            .deleteSnapshot(
+              this.selectedOutbreak.id,
+              deleteSnapshotId
+            )
+            .pipe(
+              catchError((err) => {
+                // show error
+                this.toastV2Service.error(err);
+
+                // send error down the road
+                return throwError(err);
+              })
+            )
+            .subscribe(() => {
+              // generate snapshot
+              generateSnapshot();
+            });
+        } else {
+          // generate snapshot
+          generateSnapshot();
+        }
       });
   }
 }
