@@ -140,6 +140,7 @@ import { HelpCategoryDataResolver } from './resolvers/data/help-category.resolve
 import { AuditLogActionDataResolver } from './resolvers/data/audit-log-action.resolver';
 import { AuditLogModuleDataResolver } from './resolvers/data/audit-log-module.resolver';
 import { EventCategoryDataResolver } from './resolvers/data/event-category.resolver';
+import { FollowUpGroupByDataResolver } from './resolvers/data/follow-up-group-by.resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -174,6 +175,7 @@ export const services: any[] = [
   EventCategoryDataResolver,
   FinalFollowUpStatusDataResolver,
   FollowUpGenerationTeamAssignmentAlgorithmDataResolver,
+  FollowUpGroupByDataResolver,
   GanttChartTypeDataResolver,
   GenderDataResolver,
   HelpCategoryDataResolver,

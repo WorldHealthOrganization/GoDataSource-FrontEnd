@@ -298,6 +298,10 @@ export class Constants {
     CASE_COUNT_MAP: {
       label: 'LNG_APP_PAGE_CASE_COUNT_MAP',
       value: 'LNG_APP_PAGE_CASE_COUNT_MAP'
+    },
+    FOLLOW_UP_DASHBOARD: {
+      label: 'LNG_APP_PAGE_FOLLOW_UP_DASHBOARD',
+      value: 'LNG_APP_PAGE_FOLLOW_UP_DASHBOARD'
     }
   };
 

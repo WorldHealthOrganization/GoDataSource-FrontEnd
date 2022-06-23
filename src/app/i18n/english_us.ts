@@ -14,7 +14,9 @@ export const EnglishUsLang = {
     'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_WHAT_TO_DO': 'Do you want to create a new chain of transmission, replace the most recent snapshot or display the most recent one?',
     'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CREATE_NEW': 'Create new',
     'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_REPLACE_MOST_RECENT': 'Replace most recent',
-    'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_LOAD_MOST_RECENT': 'Load most recent'
+    'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_LOAD_MOST_RECENT': 'Load most recent',
+    'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_START_DATE': 'Start date',
+    'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_END_DATE': 'End date'
 
 
     /**

@@ -38,6 +38,7 @@ import { LabTestResultDataResolver } from '../../core/services/resolvers/data/la
 import { LabProgressDataResolver } from '../../core/services/resolvers/data/lab-progress.resolver';
 import { LabSequenceLaboratoryDataResolver } from '../../core/services/resolvers/data/lab-sequence-laboratory.resolver';
 import { LabSequenceResultDataResolver } from '../../core/services/resolvers/data/lab-sequence-result.resolver';
+import { FollowUpGroupByDataResolver } from '../../core/services/resolvers/data/follow-up-group-by.resolver';
 
 // Follow-ups list from a - contact / case
 const viewFollowUpsListFoundation: Route = {
@@ -292,6 +293,12 @@ const routes: Routes = [
       permissions: [
         PERMISSION.FOLLOW_UP_LIST_RANGE
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
+      team: TeamDataResolver,
+      followUpGroupBy: FollowUpGroupByDataResolver
     }
   },
   // Create Follow Up

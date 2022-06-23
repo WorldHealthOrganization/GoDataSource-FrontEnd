@@ -327,6 +327,7 @@
 
       <!-- Visible columns -->
       <button
+        *ngIf="hasUserSettings"
         type="button"
         mat-icon-button
         [matTooltip]="'LNG_SIDE_COLUMNS_SECTION_COLUMNS_TO_DISPLAY_TITLE' | translate"
