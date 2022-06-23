@@ -11,7 +11,8 @@ export const EnglishUsLang = {
      */
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
-
+    'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_START_DATE': 'Start date',
+    'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_END_DATE': 'End date'
 
 
     /**

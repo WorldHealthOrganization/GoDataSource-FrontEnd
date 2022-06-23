@@ -11,4 +11,5 @@ export interface ILabelValuePairModel {
   icon?: string;
   iconUrl?: string;
   infos?: IInfoIcon[];
+  color?: string;
 }
