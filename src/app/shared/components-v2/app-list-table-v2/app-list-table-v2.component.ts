@@ -16,7 +16,9 @@ import {
   IV2ColumnBasicFormat,
   IV2ColumnButton,
   IV2ColumnColor,
-  IV2ColumnIconMaterial, IV2ColumnIconURL,
+  IV2ColumnHTML,
+  IV2ColumnIconMaterial,
+  IV2ColumnIconURL,
   IV2ColumnLinkList,
   IV2ColumnPinned,
   IV2ColumnStatus,
@@ -32,12 +34,7 @@ import { IV2GroupedData, IV2GroupedDataValue } from './models/grouped-data.model
 import { IBasicCount } from '../../../core/models/basic-count.interface';
 import { PageEvent } from '@angular/material/paginator';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
-import {
-  IV2SideDialogConfigButtonType,
-  IV2SideDialogConfigInputCheckbox,
-  V2SideDialogConfigInput,
-  V2SideDialogConfigInputType
-} from '../app-side-dialog-v2/models/side-dialog-config.model';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputCheckbox, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../app-side-dialog-v2/models/side-dialog-config.model';
 import { UserModel, UserSettings } from '../../../core/models/user.model';
 import { AuthDataService } from '../../../core/services/data/auth.data.service';
 import { catchError } from 'rxjs/operators';
@@ -280,6 +277,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // update columns definitions
     this.updateColumnDefinitions();
   }
+  get hasUserSettings(): boolean {
+    return !!this._pageSettingsKey;
+  }
 
   // info values - used to display additional information relevant for this page
   private _infos: string[];
@@ -323,9 +323,23 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     this._suffixLegendsHTML = [];
     if (suffixLegends?.length > 0) {
       suffixLegends.forEach((item) => {
-        this._suffixLegendsHTML.push({
-          html: `<span class="gd-list-table-bottom-left-legend-title">${this.translateService.instant(item.label)}</span><span class="gd-list-table-bottom-left-legend-item">${item.value}</span>`
-        });
+        // simple item ?
+        if (Array.isArray(item.value)) {
+          // create html
+          let html: string = `<span class="gd-list-table-bottom-left-legend-title">${this.translateService.instant(item.label)}</span>`;
+          (item.value as ILabelValuePairModel[]).forEach((subItem) => {
+            html += `<span class="gd-list-table-bottom-left-legend-item">${this.renderStatusForm({ type: IV2ColumnStatusFormType.SQUARE, color: subItem.color }, false)} ${this.translateService.instant(subItem.label)}</span>`;
+          });
+
+          // add legend
+          this._suffixLegendsHTML.push({
+            html
+          });
+        } else {
+          this._suffixLegendsHTML.push({
+            html: `<span class="gd-list-table-bottom-left-legend-title">${this.translateService.instant(item.label)}</span><span class="gd-list-table-bottom-left-legend-item">${item.value}</span>`
+          });
+        }
       });
     }
   }
@@ -452,7 +466,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // update filter visibility
     const authUser: UserModel = this.authDataService.getAuthenticatedUser();
-    const filterVisibility: boolean | undefined = authUser.getSettings(this._pageSettingsKeyHeaderFilter);
+    const filterVisibility: boolean | undefined = this._pageSettingsKeyHeaderFilter ?
+      authUser.getSettings(this._pageSettingsKeyHeaderFilter) :
+      undefined;
     this._showHeaderFilters = filterVisibility === undefined || filterVisibility;
 
     // update table size
@@ -590,10 +606,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     this.legends = [];
 
     // nothing to do ?
-    if (
-      !this._columns ||
-      !this._pageSettingsKey
-    ) {
+    if (!this._columns) {
       // reset
       this._agTable.api.setColumnDefs(undefined);
 
@@ -622,16 +635,22 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     if (overwriteVisibleColumns) {
       visibleColumns = overwriteVisibleColumns;
     } else {
-      visibleColumns = authUser.getSettings(this._pageSettingsKey);
+      visibleColumns = this._pageSettingsKey ?
+        authUser.getSettings(this._pageSettingsKey) :
+        undefined;
       visibleColumns = visibleColumns ? visibleColumns : [];
     }
 
     // left pinned columns
-    leftPinnedColumns = authUser.getSettings(this._pageSettingsKeyLPinned);
+    leftPinnedColumns = this._pageSettingsKeyLPinned ?
+      authUser.getSettings(this._pageSettingsKeyLPinned) :
+      undefined;
     leftPinnedColumns = leftPinnedColumns ? leftPinnedColumns : [];
 
     // right pinned columns
-    rightPinnedColumns = authUser.getSettings(this._pageSettingsKeyRPinned);
+    rightPinnedColumns = this._pageSettingsKeyRPinned ?
+      authUser.getSettings(this._pageSettingsKeyRPinned) :
+      undefined;
     rightPinnedColumns = rightPinnedColumns ? rightPinnedColumns : [];
 
     // mark visible columns if we have any
@@ -795,7 +814,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           return this.formatValue(valueFormat);
         },
         cellRenderer: this.handleCellRenderer(column),
-        suppressMovable: column.format && column.format.type === V2ColumnFormat.ACTIONS,
+        suppressMovable: (column.format && column.format.type === V2ColumnFormat.ACTIONS) || !!(column as any).notMovable,
         headerComponent: AppListTableV2ColumnHeaderComponent
       });
 
@@ -949,6 +968,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           case V2ColumnFormat.BUTTON:
           case V2ColumnFormat.ACTIONS:
           case V2ColumnFormat.LINK_LIST:
+          case V2ColumnFormat.HTML:
 
             // nothing to do here
             return null;
@@ -1142,6 +1162,21 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
               item.label
             )
             .join(' / ');
+        };
+      }
+
+      // html
+      const htmlColumn: IV2ColumnHTML = column as IV2ColumnHTML;
+      if (
+        htmlColumn.format &&
+        htmlColumn.format.type === V2ColumnFormat.HTML
+      ) {
+        return (params: ValueFormatterParams) => {
+          // html
+          return htmlColumn.html(
+            params.data,
+            htmlColumn
+          );
         };
       }
 
@@ -1725,6 +1760,11 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    * Save header filter visibility
    */
   private saveHeaderFilterVisibility(): void {
+    // nothing to do ?
+    if (!this._pageSettingsKeyHeaderFilter) {
+      return;
+    }
+
     // display loading spinner while saving
     this.savingHeaderFilterVisibility = true;
 
