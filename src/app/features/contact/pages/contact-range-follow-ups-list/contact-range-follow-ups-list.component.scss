@@ -1,41 +1,43 @@
-// #TODO
+@import 'mixins';
+
 .gd-follow-up-dashboard-date-column-cell {
-  // #TODO
-  display: flex;
-  width: 100%;
-  height: 1.6rem;
-  flex-direction: row;
-  white-space: nowrap;
-  box-sizing: border-box;
+  @include flex(flex);
+  @include flex_direction(row);
   gap: 0.2rem;
+  height: 2.2rem;
+  white-space: nowrap;
+  width: 100%;
 
   .gd-list-table-link {
-    // #TODO
-    flex: 1 1;
-    box-sizing: border-box;
-
-    &:hover {
-      border: 1px solid #000;
-    }
+    @include flex_val(1 1);
 
     .gd-follow-up-dashboard-date-column-cell-follow-up {
-      // #TODO
-      display: flex;
-      width: 100%;
+      @include border-radius(0.4rem);
+      @include flex(flex);
+      @include flex_align_items(center);
+      @include flex_justify(center);
       height: 100%;
+      @include transition(0.24s ease-in-out 0s);
+      width: 100%;
 
       .gd-follow-up-dashboard-date-column-cell-follow-up-alerted {
-        // #TODO
-        // bell img..must resize...to fit ...
-        width: 1.2rem;
-        background-color: transparent;
+        background-color: var(--gd-background);
+        @include border-radius(0.4rem);
+        height: 1.6rem;
+        pointer-events: none;  // needs pointer events so links work okay...not to load all data
+        width: auto;
+      }
+    }
+  }
 
-        // !!!!!IMPORTANT
-        // !!!!!IMPORTANT
-        // !!!!!IMPORTANT
-        // !!!!!IMPORTANT
-        // needs pointer events so links work okay...not to load all data
-        pointer-events: none;
+  &:hover {
+    .gd-list-table-link {
+      .gd-follow-up-dashboard-date-column-cell-follow-up {
+        @include opacity(0.5);
+
+        &:hover {
+          @include opacity(1);
+        }
       }
     }
   }

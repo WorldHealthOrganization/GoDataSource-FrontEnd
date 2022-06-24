@@ -101,6 +101,10 @@
           padding: 0.8rem 0;
           width: 10rem;
 
+          @include breakpoint('xxs') {
+            width: 8rem;
+          }
+
           .gd-dashlet-kpi-bottom-value-left-text & {
             padding: 0.4rem 0;
             width: 5rem;
