@@ -653,6 +653,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
               this.showGraphConfiguration = false;
               this.showSnapshotFilters = false;
               this.mustLoadChain = true;
+              this.chainGroupId = undefined;
 
               // when we have data
               if (
