@@ -117,7 +117,7 @@ export class ContactRangeFollowUpsListComponent
 
     // additional information
     this.suffixLegends = [{
-      label: 'CONTACT_DAILY_FOLLOW_UP_STATUS',
+      label: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE',
       value: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options.map((option) => Object.assign(
         {},
         option, {
