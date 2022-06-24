@@ -31,6 +31,7 @@ import { IV2BottomDialogConfigButtonType } from '../../../shared/components-v2/a
 import { TranslateService } from '@ngx-translate/core';
 import { IBasicCount } from '../../models/basic-count.interface';
 import { V2AdvancedFilter, V2AdvancedFilterType } from '../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { v4 as uuid } from 'uuid';
 
 /**
  * From ?
@@ -318,6 +319,49 @@ export class EntityHelperService {
               handler.loading.hide();
             });
         }
+      })
+      .subscribe();
+  }
+
+  /**
+   * Entity dialog
+   */
+  showEntityDetailsDialog(
+    title: string,
+    entity: CaseModel | ContactModel | EventModel | ContactOfContactModel | RelationshipModel
+  ): void  {
+    // retrieve entity details
+    let data: ILabelValuePairModel[] = [];
+    if (entity instanceof RelationshipModel) {
+      data = this.lightRelationship(entity);
+    } else {
+      data = this.lightEntity(entity);
+    }
+
+    // construct inputs
+    const inputs: V2SideDialogConfigInput[] = [];
+    data.forEach((item) => {
+      inputs.push({
+        type: V2SideDialogConfigInputType.KEY_VALUE,
+        name: uuid(),
+        placeholder: item.label,
+        value: item.value
+      });
+    });
+
+    // display dialog
+    this.dialogV2Service
+      .showSideDialog({
+        title: {
+          get: () => title
+        },
+        inputs,
+        width: '65rem',
+        bottomButtons: [{
+          type: IV2SideDialogConfigButtonType.CANCEL,
+          label: 'LNG_COMMON_BUTTON_CANCEL',
+          color: 'text'
+        }]
       })
       .subscribe();
   }

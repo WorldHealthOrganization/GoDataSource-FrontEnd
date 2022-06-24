@@ -64,6 +64,8 @@ import { ImportExportDataService } from '../../../../core/services/data/import-e
 import * as FileSaver from 'file-saver';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { SavedFilterData } from '../../../../core/models/saved-filters.model';
+import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
+import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 
 @Component({
   selector: 'app-transmission-chains-dashlet',
@@ -520,7 +522,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     private activatedRoute: ActivatedRoute,
     private authDataService: AuthDataService,
     private importExportDataService: ImportExportDataService,
-    private elementRef: ElementRef
+    private elementRef: ElementRef,
+    private entityHelperService: EntityHelperService,
+    private relationshipDataService: RelationshipDataService
   ) {}
 
   /**
@@ -1971,38 +1975,38 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             caseClassificationToColorMap[(entity.model as CaseModel).classification] :
             Constants.DEFAULT_COLOR_CHAINS,
           data: entity,
-          selected: (_mapComponent: WorldMapComponent, _mark: WorldMapMarker) => {
+          selected: (_mapComponent: WorldMapComponent, mark: WorldMapMarker) => {
             // display entity information ( case / contact / event )
-            // #TODO
-            this.dialogV2Service.showLoadingDialog();
-            // const loadingDialog = this.dialogV2Service.showLoadingDialog();
-            // const localEntity: EntityModel = mark.data;
-            // this.entityDataService
-            //   .getEntity(localEntity.type, this.selectedOutbreak.id, localEntity.model.id)
-            //   .pipe(
-            //     catchError((err) => {
-            //       this.toastV2Service.error(err);
-            //       loadingDialog.close();
-            //       return throwError(err);
-            //     })
-            //   )
-            //   .subscribe((_entityData: CaseModel | EventModel | ContactModel) => {
-            //     // hide loading dialog
-            //     loadingDialog.close();
-            //
-            //     // show node information
-            //     this.dialogService.showCustomDialog(
-            //       ViewCotNodeDialogComponent,
-            //       {
-            //         ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
-            //         ...{
-            //           data: {
-            //             entity: entityData
-            //           }
-            //         }
-            //       }
-            //     );
-            //   });
+            const loadingDialog = this.dialogV2Service.showLoadingDialog();
+            const localEntity: EntityModel = mark.data;
+            this.entityDataService
+              .getEntity(
+                localEntity.type,
+                this.selectedOutbreak.id,
+                localEntity.model.id
+              )
+              .pipe(
+                catchError((err) => {
+                  this.toastV2Service.error(err);
+                  loadingDialog.close();
+                  return throwError(err);
+                })
+              )
+              .subscribe((entityData: CaseModel | EventModel | ContactModel) => {
+                // hide loading dialog
+                loadingDialog.close();
+
+                // display data
+                this.entityHelperService.showEntityDetailsDialog(
+                  this.i18nService.instant(
+                    'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_TITLE',
+                    {
+                      type: this.i18nService.instant(entityData.type)
+                    }
+                  ),
+                  entityData
+                );
+              });
           }
         });
 
@@ -2107,43 +2111,34 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             lineWidth: 5,
             offsetX: -(markerCircleRadius * 2 + 3),
             data: relationship,
-            selected: (_mapComponent: WorldMapComponent, _path: WorldMapPath) => {
+            selected: (_mapComponent: WorldMapComponent, path: WorldMapPath) => {
               // display relationship information
-              // #TODO
-              this.dialogV2Service.showLoadingDialog();
-              // const loadingDialog = this.dialogV2Service.showLoadingDialog();
-              // const localRelationship: RelationshipModel = path.data;
-              // this.relationshipDataService
-              //   .getEntityRelationship(
-              //     this.selectedOutbreak.id,
-              //     localRelationship.sourcePerson.type,
-              //     localRelationship.sourcePerson.id,
-              //     localRelationship.id
-              //   )
-              //   .pipe(
-              //     catchError((err) => {
-              //       this.toastV2Service.error(err);
-              //       loadingDialog.close();
-              //       return throwError(err);
-              //     })
-              //   )
-              //   .subscribe((_relationshipData) => {
-              //     // hide loading dialog
-              //     loadingDialog.close();
-              //
-              //     // show edge information
-              //     this.dialogService.showCustomDialog(
-              //       ViewCotEdgeDialogComponent,
-              //       {
-              //         ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
-              //         ...{
-              //           data: {
-              //             relationship: relationshipData
-              //           }
-              //         }
-              //       }
-              //     );
-              //   });
+              const loadingDialog = this.dialogV2Service.showLoadingDialog();
+              const localRelationship: RelationshipModel = path.data;
+              this.relationshipDataService
+                .getEntityRelationship(
+                  this.selectedOutbreak.id,
+                  localRelationship.sourcePerson.type,
+                  localRelationship.sourcePerson.id,
+                  localRelationship.id
+                )
+                .pipe(
+                  catchError((err) => {
+                    this.toastV2Service.error(err);
+                    loadingDialog.close();
+                    return throwError(err);
+                  })
+                )
+                .subscribe((relationshipData) => {
+                  // hide loading dialog
+                  loadingDialog.close();
+
+                  // display data
+                  this.entityHelperService.showEntityDetailsDialog(
+                    this.i18nService.instant('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_TITLE'),
+                    relationshipData
+                  );
+                });
             }
           }));
         }

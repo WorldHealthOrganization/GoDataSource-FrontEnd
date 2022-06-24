@@ -1,27 +1,13 @@
-import {
-  Component,
-  EventEmitter,
-  HostListener,
-  Input,
-  OnDestroy,
-  OnInit,
-  Output,
-  ViewEncapsulation
-} from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import * as _ from 'lodash';
 import Map from 'ol/Map';
 import View from 'ol/View';
 import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
-import {
-  Cluster,
-  TileArcGISRest,
-  Vector as VectorSource,
-  XYZ
-} from 'ol/source';
+import { Cluster, TileArcGISRest, Vector as VectorSource, XYZ } from 'ol/source';
 import VectorTileLayer from 'ol/layer/VectorTile';
 import VectorTileSource from 'ol/source/VectorTile';
 import MVT from 'ol/format/MVT';
-import { transform, addCommon as addCommonProjections } from 'ol/proj';
+import { addCommon as addCommonProjections, transform } from 'ol/proj';
 import Feature from 'ol/Feature';
 import { LineString, Point } from 'ol/geom';
 import { Circle as CircleStyle, Fill, Icon, Stroke, Style, Text } from 'ol/style';
@@ -30,13 +16,12 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Constants } from '../../../../core/models/constants';
 import { Observable, Subscriber, Subscription } from 'rxjs';
 import { v4 as uuid } from 'uuid';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogButton, DialogComponent, DialogConfiguration, DialogField, DialogFieldType } from '../../../../shared/components';
-import { MatDialogRef } from '@angular/material/dialog';
 import { applyStyle } from 'ol-mapbox-style';
 import RenderFeature from 'ol/render/Feature';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { AuthenticatedComponent } from '../../../../core/components/authenticated/authenticated.component';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { IV2SideDialogConfigButtonType, IV2SideDialogHandler, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 
 /**
  * Point used for rendering purposes
@@ -396,14 +381,15 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   @Output() fullScreenToggle = new EventEmitter<any>();
 
   // group dialog
-  groupDataDialogHandler: MatDialogRef<DialogComponent>;
+  groupDataDialogHandler: IV2SideDialogHandler;
+  groupDataDialogHandlerLoading: boolean = false;
 
   /**
      * Constructor
      */
   constructor(
     private outbreakDataService: OutbreakDataService,
-    private dialogService: DialogService,
+    private dialogV2Service: DialogV2Service,
     private toastV2Service: ToastV2Service
   ) {}
 
@@ -1410,6 +1396,29 @@ export class WorldMapComponent implements OnInit, OnDestroy {
      * @param items
      */
   private displayChoseFromGroupDialog(items: (WorldMapPath | WorldMapMarker)[]) {
+    // wait for dialog to load ?
+    if (this.groupDataDialogHandlerLoading) {
+      // call later
+      setTimeout(() => {
+        this.displayChoseFromGroupDialog(items);
+      }, 200);
+
+      // finished
+      return;
+    }
+
+    // dialog already visible ?
+    if (this.groupDataDialogHandler) {
+      this.groupDataDialogHandler.data.inputs.forEach((input) => {
+        if (
+          input.data instanceof WorldMapPath ||
+          input.data instanceof WorldMapMarker
+        ) {
+          items.push(input.data);
+        }
+      });
+    }
+
     // only one item in the list, then we need to display it
     if (items.length < 2) {
       const item: WorldMapPath | WorldMapMarker = items[0];
@@ -1434,35 +1443,40 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     });
 
     // construct list of markers & relationships
-    const fieldList: DialogField[] = [];
+    const fieldList: V2SideDialogConfigInput[] = [];
 
     // do we have any markers ?
     if (!_.isEmpty(markers)) {
       // markers section title
       if (this.groupMarkerTitle) {
-        fieldList.push(new DialogField({
-          name: '_',
-          fieldType: DialogFieldType.SECTION_TITLE,
+        fieldList.push({
+          type: V2SideDialogConfigInputType.DIVIDER,
           placeholder: this.groupMarkerTitle
-        }));
+        });
       }
 
       // add markers to the list
-      markers.forEach((item: WorldMapMarker) => {
-        fieldList.push(new DialogField({
-          name: '_',
-          fieldType: DialogFieldType.ACTION,
-          placeholder: item.label,
-          actionData: item,
-          actionCallback: (marker: WorldMapMarker) => {
-            if (marker.selected) {
-              marker.selected(
+      markers.forEach((marker: WorldMapMarker) => {
+        fieldList.push({
+          type: V2SideDialogConfigInputType.BUTTON,
+          name: uuid(),
+          placeholder: marker.label,
+          color: 'text',
+          data: marker,
+          click: (_data, handler, item) => {
+            if (item.data.selected) {
+              // close dialog
+              this.groupDataDialogHandler = undefined;
+              handler.hide();
+
+              // select
+              item.data.selected(
                 this,
-                marker
+                item.data
               );
             }
           }
-        }));
+        });
       });
     }
 
@@ -1470,29 +1484,36 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     if (!_.isEmpty(paths)) {
       // paths section title
       if (this.groupPathTitle) {
-        fieldList.push(new DialogField({
-          name: '_',
-          fieldType: DialogFieldType.SECTION_TITLE,
-          placeholder: this.groupPathTitle
-        }));
+        if (this.groupMarkerTitle) {
+          fieldList.push({
+            type: V2SideDialogConfigInputType.DIVIDER,
+            placeholder: this.groupPathTitle
+          });
+        }
       }
 
       // add paths to the list
-      paths.forEach((item: WorldMapPath) => {
-        fieldList.push(new DialogField({
-          name: '_',
-          fieldType: DialogFieldType.ACTION,
-          placeholder: item.label,
-          actionData: item,
-          actionCallback: (path: WorldMapPath) => {
-            if (path.selected) {
-              path.selected(
+      paths.forEach((path: WorldMapPath) => {
+        fieldList.push({
+          type: V2SideDialogConfigInputType.BUTTON,
+          name: uuid(),
+          placeholder: path.label,
+          color: 'text',
+          data: path,
+          click: (_data, handler, item) => {
+            if (item.data.selected) {
+              // close dialog
+              this.groupDataDialogHandler = undefined;
+              handler.hide();
+
+              // select
+              item.data.selected(
                 this,
-                path
+                item.data
               );
             }
           }
-        }));
+        });
       });
     }
 
@@ -1500,31 +1521,43 @@ export class WorldMapComponent implements OnInit, OnDestroy {
 
     // display dialog if necessary
     if (this.groupDataDialogHandler) {
-      this.groupDataDialogHandler.componentInstance.addFields(
-        fieldList
-      );
+      // update fields
+      this.groupDataDialogHandler.update.inputs(fieldList);
     } else {
       // display dialog to choose item from list
-      this.groupDataDialogHandler = this.dialogService
-        .showInputDialog(new DialogConfiguration({
-          message: 'LNG_PAGE_WORLD_MAP_GROUP_DIALOG_TITLE',
-          buttons: [
-            new DialogButton({
-              label: 'LNG_COMMON_BUTTON_CLOSE',
-              clickCallback: (dialogHandler: MatDialogRef<DialogComponent>) => {
-                dialogHandler.close();
-              }
-            })
-          ],
-          fieldsList: fieldList
-        }));
-
-      // display dialog
-      this.groupDataDialogHandler
-        .afterClosed()
-        .subscribe(() => {
+      this.groupDataDialogHandlerLoading = true;
+      this.dialogV2Service
+        .showSideDialog({
+          title: {
+            get: () => 'LNG_PAGE_WORLD_MAP_GROUP_DIALOG_TITLE'
+          },
+          width: '60rem',
+          bottomButtons: [{
+            type: IV2SideDialogConfigButtonType.CANCEL,
+            label: 'LNG_COMMON_BUTTON_CLOSE',
+            color: 'text'
+          }],
+          inputs: fieldList,
+          initialized: (handler) => {
+            this.groupDataDialogHandlerLoading = false;
+            this.groupDataDialogHandler = handler;
+          }
+        })
+        .subscribe((response) => {
           // group dialog closed
           this.groupDataDialogHandler = undefined;
+
+          // cancelled ?
+          if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+            // finished
+            return;
+          }
+
+          // clear all
+          this.toastV2Service.clearHistory();
+
+          // close popup
+          response.handler.hide();
         });
     }
   }
