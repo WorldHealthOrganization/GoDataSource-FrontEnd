@@ -638,175 +638,172 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           this.outbreakSubscriber = null;
         }
 
-        // wait for data to bind
-        setTimeout(() => {
-          // loading data
-          const loadingDialog = this.dialogV2Service.showLoadingDialog();
-          this.outbreakSubscriber = this.outbreakDataService
-            .getSelectedOutbreakSubject()
-            .subscribe((selectedOutbreak: OutbreakModel) => {
-              // set outbreak
-              this.selectedOutbreak = selectedOutbreak;
+        // loading data
+        const loadingDialog = this.dialogV2Service.showLoadingDialog();
+        this.outbreakSubscriber = this.outbreakDataService
+          .getSelectedOutbreakSubject()
+          .subscribe((selectedOutbreak: OutbreakModel) => {
+            // set outbreak
+            this.selectedOutbreak = selectedOutbreak;
 
-              // reset filters
-              this.selectedSnapshot = this.selectedSnapshotCreateKey;
-              this.selectedChainPageIndex = null;
-              this.chainGroup = undefined;
-              this.chainPages = undefined;
-              this.chainPagesOptions = undefined;
-              this.showGraphConfiguration = false;
-              this.showSnapshotFilters = false;
-              this.mustLoadChain = true;
-              this.chainGroupId = undefined;
+            // reset filters
+            this.selectedSnapshot = this.selectedSnapshotCreateKey;
+            this.selectedChainPageIndex = null;
+            this.chainGroup = undefined;
+            this.chainPages = undefined;
+            this.chainPagesOptions = undefined;
+            this.showGraphConfiguration = false;
+            this.showSnapshotFilters = false;
+            this.mustLoadChain = true;
+            this.chainGroupId = undefined;
 
-              // when we have data
-              if (
-                this.selectedOutbreak &&
-                                this.selectedOutbreak.id
-              ) {
-                // load person if selected
-                if (this.personId) {
-                  this.entityDataService
-                    .getEntity(this.selectedEntityType, this.selectedOutbreak.id, this.personId)
-                    .subscribe((entity) => {
-                      this.personName = entity.name;
-                    });
-                }
-
-                // load clusters list
-                this.clusterDataService
-                  .getClusterList(this.selectedOutbreak.id)
-                  .subscribe((clusters) => {
-                    this.clusterOptions = clusters;
-
-                    this.legend.clustersList = {};
-                    this.clusterIconMap = {};
-                    _.forEach(clusters, (cluster) => {
-                      this.legend.clustersList[cluster.id] = cluster.name;
-                      if (cluster.icon) {
-                        this.clusterIconMap[cluster.id] = cluster.icon;
-                      }
-                    });
+            // when we have data
+            if (
+              this.selectedOutbreak &&
+              this.selectedOutbreak.id
+            ) {
+              // load person if selected
+              if (this.personId) {
+                this.entityDataService
+                  .getEntity(this.selectedEntityType, this.selectedOutbreak.id, this.personId)
+                  .subscribe((entity) => {
+                    this.personName = entity.name;
                   });
+              }
 
-                // load snapshot if selected
-                if (this.snapshotId) {
-                  // hide the snapshot list
-                  this.showSnapshots = false;
+              // load clusters list
+              this.clusterDataService
+                .getClusterList(this.selectedOutbreak.id)
+                .subscribe((clusters) => {
+                  this.clusterOptions = clusters;
 
-                  // show contacts and contacts of contacts
-                  this.showContacts = this.showPersonContacts;
-                  this.showContactsOfContacts = this.showPersonContactsOfContacts;
+                  this.legend.clustersList = {};
+                  this.clusterIconMap = {};
+                  _.forEach(clusters, (cluster) => {
+                    this.legend.clustersList[cluster.id] = cluster.name;
+                    if (cluster.icon) {
+                      this.clusterIconMap[cluster.id] = cluster.icon;
+                    }
+                  });
+                });
 
-                  // set the selected snapshot
-                  this.selectedSnapshot = this.snapshotId;
+              // load snapshot if selected
+              if (this.snapshotId) {
+                // hide the snapshot list
+                this.showSnapshots = false;
 
-                  // retrieve snapshot
-                  this.transmissionChainDataService
-                    .getSnapshot(this.selectedOutbreak.id, this.snapshotId)
-                    .subscribe((entity) => {
-                      // create option
-                      const option: LabelValuePair = new LabelValuePair(
-                        this.getSnapshotOptionLabel(entity),
-                        entity.id
-                      );
+                // show contacts and contacts of contacts
+                this.showContacts = this.showPersonContacts;
+                this.showContactsOfContacts = this.showPersonContactsOfContacts;
 
-                      // map snapshot for easy access
-                      this.snapshotOptionsMap[entity.id] = {
-                        snapshot: entity,
-                        option: option
-                      };
+                // set the selected snapshot
+                this.selectedSnapshot = this.snapshotId;
 
-                      // hide loading
-                      loadingDialog.close();
+                // retrieve snapshot
+                this.transmissionChainDataService
+                  .getSnapshot(this.selectedOutbreak.id, this.snapshotId)
+                  .subscribe((entity) => {
+                    // create option
+                    const option: LabelValuePair = new LabelValuePair(
+                      this.getSnapshotOptionLabel(entity),
+                      entity.id
+                    );
 
-                      // display graph
-                      this.loadChainsOfTransmission(
-                        undefined,
-                        0
-                      );
-                    });
-                } else {
-                  // retrieve snapshots
-                  this.retrieveSnapshotsList(() => {
+                    // map snapshot for easy access
+                    this.snapshotOptionsMap[entity.id] = {
+                      snapshot: entity,
+                      option: option
+                    };
+
                     // hide loading
                     loadingDialog.close();
 
-                    // show chose dialog ?
-                    if (this.snapshotOptions?.length > 1) {
-                      // display dialog with what to do
-                      this.dialogV2Service
-                        .showBottomDialog({
-                          config: {
-                            title: {
-                              get: () => 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE'
-                            },
-                            message: {
-                              get: () => 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_WHAT_TO_DO'
-                            }
-                          },
-                          dontCloseOnBackdrop: true,
-                          bottomButtons: [
-                            {
-                              type: IV2BottomDialogConfigButtonType.OTHER,
-                              label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CREATE_NEW',
-                              key: 'create',
-                              color: 'primary'
-                            }, {
-                              type: IV2BottomDialogConfigButtonType.OTHER,
-                              label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_REPLACE_MOST_RECENT',
-                              key: 'replace_most_recent',
-                              color: 'primary'
-                            }, {
-                              type: IV2BottomDialogConfigButtonType.OTHER,
-                              label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_LOAD_MOST_RECENT',
-                              key: 'load_most_recent',
-                              color: 'primary'
-                            }, {
-                              type: IV2BottomDialogConfigButtonType.CANCEL,
-                              label: 'LNG_DIALOG_CONFIRM_BUTTON_CANCEL',
-                              color: 'text'
-                            }
-                          ]
-                        })
-                        .subscribe((bottomResponse) => {
-                          // cancel ?
-                          if (bottomResponse.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                            // finished - nothing to do...everything will be done manually by user
-                            return;
-                          }
-
-                          // take action accordingly
-                          if (bottomResponse.button.key === 'create') {
-                            // create new
-                            this.createNewSnapshot();
-
-                            // finished
-                            return;
-                          } else if (bottomResponse.button.key === 'replace_most_recent') {
-                            // replace most recent
-                            this.createNewSnapshot(this.snapshotOptions[1].value);
-
-                            // finished
-                            return;
-                          }
-
-                          // load most recent
-                          this.selectedSnapshot = this.snapshotOptions[1].value;
-                          this.loadChainsOfTransmission(
-                            undefined,
-                            0
-                          );
-                        });
-                    } else {
-                      // nothing to show - go directly to generate snapshot
-                      this.createNewSnapshot();
-                    }
+                    // display graph
+                    this.loadChainsOfTransmission(
+                      undefined,
+                      0
+                    );
                   });
-                }
+              } else {
+                // retrieve snapshots
+                this.retrieveSnapshotsList(() => {
+                  // hide loading
+                  loadingDialog.close();
+
+                  // show chose dialog ?
+                  if (this.snapshotOptions?.length > 1) {
+                    // display dialog with what to do
+                    this.dialogV2Service
+                      .showBottomDialog({
+                        config: {
+                          title: {
+                            get: () => 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_TITLE'
+                          },
+                          message: {
+                            get: () => 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_WHAT_TO_DO'
+                          }
+                        },
+                        dontCloseOnBackdrop: true,
+                        bottomButtons: [
+                          {
+                            type: IV2BottomDialogConfigButtonType.OTHER,
+                            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CREATE_NEW',
+                            key: 'create',
+                            color: 'primary'
+                          }, {
+                            type: IV2BottomDialogConfigButtonType.OTHER,
+                            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_REPLACE_MOST_RECENT',
+                            key: 'replace_most_recent',
+                            color: 'primary'
+                          }, {
+                            type: IV2BottomDialogConfigButtonType.OTHER,
+                            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_LOAD_MOST_RECENT',
+                            key: 'load_most_recent',
+                            color: 'primary'
+                          }, {
+                            type: IV2BottomDialogConfigButtonType.CANCEL,
+                            label: 'LNG_DIALOG_CONFIRM_BUTTON_CANCEL',
+                            color: 'text'
+                          }
+                        ]
+                      })
+                      .subscribe((bottomResponse) => {
+                        // cancel ?
+                        if (bottomResponse.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                          // finished - nothing to do...everything will be done manually by user
+                          return;
+                        }
+
+                        // take action accordingly
+                        if (bottomResponse.button.key === 'create') {
+                          // create new
+                          this.createNewSnapshot();
+
+                          // finished
+                          return;
+                        } else if (bottomResponse.button.key === 'replace_most_recent') {
+                          // replace most recent
+                          this.createNewSnapshot(this.snapshotOptions[1].value);
+
+                          // finished
+                          return;
+                        }
+
+                        // load most recent
+                        this.selectedSnapshot = this.snapshotOptions[1].value;
+                        this.loadChainsOfTransmission(
+                          undefined,
+                          0
+                        );
+                      });
+                  } else {
+                    // nothing to show - go directly to generate snapshot
+                    this.createNewSnapshot();
+                  }
+                });
               }
-            });
-        });
+            }
+          });
       });
 
     // update breadcrumbs
@@ -817,8 +814,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Component destroyed
-     */
+   * Component destroyed
+   */
   ngOnDestroy() {
     // outbreak subscriber
     if (this.outbreakSubscriber) {
@@ -2004,7 +2001,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                       type: this.i18nService.instant(entityData.type)
                     }
                   ),
-                  entityData
+                  entityData,
+                  this.selectedOutbreak
                 );
               });
           }
@@ -2136,7 +2134,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                   // display data
                   this.entityHelperService.showEntityDetailsDialog(
                     this.i18nService.instant('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_TITLE'),
-                    relationshipData
+                    relationshipData,
+                    this.selectedOutbreak
                   );
                 });
             }

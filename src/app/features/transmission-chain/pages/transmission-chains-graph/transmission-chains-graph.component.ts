@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { Constants } from '../../../../core/models/constants';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ActivatedRoute } from '@angular/router';
@@ -26,6 +26,9 @@ import { ContactOfContactModel } from '../../../../core/models/contact-of-contac
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { TransmissionChainsDashletComponent } from '../../components/transmission-chains-dashlet/transmission-chains-dashlet.component';
 
 enum NodeAction {
   MODIFY_PERSON = 'modify-person',
@@ -41,6 +44,8 @@ enum NodeAction {
   styleUrls: ['./transmission-chains-graph.component.less']
 })
 export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
+  @ViewChild('cotDashletChild', { static: false }) cotDashletChild: TransmissionChainsDashletComponent;
+
   outbreakSubscriber: Subscription;
 
   // authenticated user
@@ -94,7 +99,9 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     private relationshipDataService: RelationshipDataService,
     private contactDataService: ContactDataService,
     private contactsOfContactsDataService: ContactsOfContactsDataService,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private entityHelperService: EntityHelperService,
+    private i18nService: I18nService
   ) {}
 
   /**
@@ -173,8 +180,8 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Node tap / click
-     */
+   * Node tap / click
+   */
   onNodeTap(entity: GraphNodeModel) {
     // not really of expected format ?
     if (
@@ -185,156 +192,154 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     }
 
     // retrieve entity info
-    this.dialogV2Service.showLoadingDialog();
-    // #TODO
-    // const loadingDialog = this.dialogV2Service.showLoadingDialog();
-    // this.entityDataService
-    //   .getEntity(entity.type, this.selectedOutbreak.id, entity.id)
-    //   .pipe(
-    //     catchError((err) => {
-    //       this.toastV2Service.error(err);
-    //       loadingDialog.close();
-    //       return throwError(err);
-    //     })
-    //   )
-    //   .subscribe((entityData: CaseModel | EventModel | ContactModel | ContactOfContactModel) => {
-    //     if (entityData.type !== EntityType.CONTACT_OF_CONTACT) {
-    //       this.entityDataService
-    //         .checkEntityRelationshipsCount(
-    //           this.selectedOutbreak.id,
-    //           entityData.type,
-    //           entityData.id
-    //         )
-    //         .pipe(
-    //           catchError((err) => {
-    //             this.toastV2Service.error(err);
-    //             loadingDialog.close();
-    //             return throwError(err);
-    //           })
-    //         )
-    //         .subscribe((relationshipCount: { count: number }) => {
-    //           // set the flag for displaying personal chain of transmission link
-    //           this.displayPersonChainOfTransmissionLink = relationshipCount.count > 0;
-    //
-    //           // hide loading dialog
-    //           loadingDialog.close();
-    //
-    //           if (this.editMode) {
-    //             this.selectedRelationship = undefined;
-    //             // add node to selected persons list
-    //             this.selectedNodes.addNode(entityData);
-    //
-    //             // check if we can swap nodes
-    //             this.canSwapRelationshipPersons = this.canSwapSelectedNodes();
-    //
-    //             // focus boxes
-    //             setTimeout(() => {
-    //               this.domService.scrollItemIntoView(
-    //                 '.selected-node-details'
-    //               );
-    //             });
-    //           } else {
-    //             // show node information
-    //             this.dialogService.showCustomDialog(
-    //               ViewCotNodeDialogComponent,
-    //               {
-    //                 ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
-    //                 ...{
-    //                   data: {
-    //                     entity: entityData,
-    //                     displayPersonalCotLink: this.displayPersonChainOfTransmissionLink,
-    //                     snapshotId: this.cotDashletChild.selectedSnapshot,
-    //                     showPersonContacts: this.cotDashletChild.showContacts,
-    //                     showPersonContactsOfContacts: this.cotDashletChild.showContactsOfContacts
-    //                   }
-    //                 }
-    //               }
-    //             );
-    //           }
-    //         });
-    //     } else {
-    //       // hide loading dialog
-    //       loadingDialog.close();
-    //
-    //       // reset relationship swap persons
-    //       this.canSwapRelationshipPersons = false;
-    //
-    //       if (this.editMode) {
-    //         this.selectedRelationship = undefined;
-    //         // add node to selected persons list
-    //         this.selectedNodes.addNode(entityData);
-    //
-    //         // focus boxes
-    //         setTimeout(() => {
-    //           this.domService.scrollItemIntoView(
-    //             '.selected-node-details'
-    //           );
-    //         });
-    //       } else {
-    //         // show node information
-    //         this.dialogService.showCustomDialog(
-    //           ViewCotNodeDialogComponent,
-    //           {
-    //             ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
-    //             ...{
-    //               data: {
-    //                 entity: entityData
-    //               }
-    //             }
-    //           }
-    //         );
-    //       }
-    //     }
-    //   });
+    const loadingDialog = this.dialogV2Service.showLoadingDialog();
+    this.entityDataService
+      .getEntity(entity.type, this.selectedOutbreak.id, entity.id)
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          loadingDialog.close();
+          return throwError(err);
+        })
+      )
+      .subscribe((entityData: CaseModel | EventModel | ContactModel | ContactOfContactModel) => {
+        if (entityData.type !== EntityType.CONTACT_OF_CONTACT) {
+          this.entityDataService
+            .checkEntityRelationshipsCount(
+              this.selectedOutbreak.id,
+              entityData.type,
+              entityData.id
+            )
+            .pipe(
+              catchError((err) => {
+                this.toastV2Service.error(err);
+                loadingDialog.close();
+                return throwError(err);
+              })
+            )
+            .subscribe((relationshipCount: { count: number }) => {
+              // set the flag for displaying personal chain of transmission link
+              this.displayPersonChainOfTransmissionLink = relationshipCount.count > 0;
+
+              // hide loading dialog
+              loadingDialog.close();
+
+              if (this.editMode) {
+                // #TODO
+                // this.selectedRelationship = undefined;
+                // // add node to selected persons list
+                // this.selectedNodes.addNode(entityData);
+                //
+                // // check if we can swap nodes
+                // this.canSwapRelationshipPersons = this.canSwapSelectedNodes();
+                //
+                // // focus boxes
+                // setTimeout(() => {
+                //   this.domService.scrollItemIntoView(
+                //     '.selected-node-details'
+                //   );
+                // });
+              } else {
+                // show node information
+                this.entityHelperService.showEntityDetailsDialog(
+                  this.i18nService.instant(
+                    'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_TITLE',
+                    {
+                      type: this.i18nService.instant(entityData.type)
+                    }
+                  ),
+                  entityData,
+                  this.selectedOutbreak, {
+                    displayPersonalCotLink: this.displayPersonChainOfTransmissionLink,
+                    snapshotId: this.cotDashletChild.selectedSnapshot,
+                    showPersonContacts: this.cotDashletChild.showContacts,
+                    showPersonContactsOfContacts: this.cotDashletChild.showContactsOfContacts
+                  }
+                );
+              }
+            });
+        } else {
+          // hide loading dialog
+          loadingDialog.close();
+
+          // reset relationship swap persons
+          this.canSwapRelationshipPersons = false;
+
+          if (this.editMode) {
+            // #TODO
+            // this.selectedRelationship = undefined;
+            // // add node to selected persons list
+            // this.selectedNodes.addNode(entityData);
+            //
+            // // focus boxes
+            // setTimeout(() => {
+            //   this.domService.scrollItemIntoView(
+            //     '.selected-node-details'
+            //   );
+            // });
+          } else {
+            // show node information
+            this.entityHelperService.showEntityDetailsDialog(
+              this.i18nService.instant(
+                'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_TITLE',
+                {
+                  type: this.i18nService.instant(entityData.type)
+                }
+              ),
+              entityData,
+              this.selectedOutbreak
+            );
+          }
+        }
+      });
   }
 
   /**
-     * Edge tap / click
-     */
-  onEdgeTap(_relationship: GraphEdgeModel) {
+   * Edge tap / click
+   */
+  onEdgeTap(relationship: GraphEdgeModel) {
     // retrieve relationship info
-    this.dialogV2Service.showLoadingDialog();
-    // #TODO
-    // const loadingDialog = this.dialogV2Service.showLoadingDialog();
-    // this.relationshipDataService
-    //   .getEntityRelationship(this.selectedOutbreak.id, relationship.sourceType, relationship.source, relationship.id)
-    //   .pipe(
-    //     catchError((err) => {
-    //       this.toastV2Service.error(err);
-    //       loadingDialog.close();
-    //       return throwError(err);
-    //     })
-    //   )
-    //   .subscribe((relationshipData) => {
-    //     // hide loading dialog
-    //     loadingDialog.close();
-    //
-    //     if (this.editMode) {
-    //       this.resetNodes();
-    //
-    //       this.selectedRelationship = relationshipData;
-    //
-    //       // focus box
-    //       setTimeout(() => {
-    //         this.domService.scrollItemIntoView(
-    //           '.selected-relationship-details'
-    //         );
-    //       });
-    //     } else {
-    //       // show edge information
-    //       this.dialogService.showCustomDialog(
-    //         ViewCotEdgeDialogComponent,
-    //         {
-    //           ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
-    //           ...{
-    //             data: {
-    //               relationship: relationshipData
-    //             }
-    //           }
-    //         }
-    //       );
-    //     }
-    //   });
+    const loadingDialog = this.dialogV2Service.showLoadingDialog();
+    this.relationshipDataService
+      .getEntityRelationship(
+        this.selectedOutbreak.id,
+        relationship.sourceType,
+        relationship.source,
+        relationship.id)
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          loadingDialog.close();
+          return throwError(err);
+        })
+      )
+      .subscribe((relationshipData) => {
+        // hide loading dialog
+        loadingDialog.close();
+
+        if (this.editMode) {
+          // #TODO
+          // this.resetNodes();
+          //
+          // this.selectedRelationship = relationshipData;
+          //
+          // // focus box
+          // setTimeout(() => {
+          //   this.domService.scrollItemIntoView(
+          //     '.selected-relationship-details'
+          //   );
+          // });
+        } else {
+          // show edge information
+          this.entityHelperService.showEntityDetailsDialog(
+            this.i18nService.instant('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_TITLE'),
+            relationshipData,
+            this.selectedOutbreak, {
+              showResourceViewPageLink: true
+            }
+          );
+        }
+      });
   }
 
   removeSelectedNode(index) {

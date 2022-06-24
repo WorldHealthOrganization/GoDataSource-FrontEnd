@@ -1,14 +1,15 @@
 <!-- Chains of transmission -->
 <app-transmission-chains-dashlet
-    [sizeOfChainsFilter]="sizeOfChainsFilter"
-    [snapshotId]="snapshotId"
-    [showPersonContacts]="showPersonContacts"
-    [showPersonContactsOfContacts]="showPersonContactsOfContacts"
-    [personId]="personId"
-    [selectedEntityType]="selectedEntityType"
-    (nodeTapped)="onNodeTap($event)"
-    (edgeTapped)="onEdgeTap($event)"
-    (changeEditMode)="onEditModeChange($event)">
+  #cotDashletChild
+  [sizeOfChainsFilter]="sizeOfChainsFilter"
+  [snapshotId]="snapshotId"
+  [showPersonContacts]="showPersonContacts"
+  [showPersonContactsOfContacts]="showPersonContactsOfContacts"
+  [personId]="personId"
+  [selectedEntityType]="selectedEntityType"
+  (nodeTapped)="onNodeTap($event)"
+  (edgeTapped)="onEdgeTap($event)"
+  (changeEditMode)="onEditModeChange($event)">
 </app-transmission-chains-dashlet>
 
 

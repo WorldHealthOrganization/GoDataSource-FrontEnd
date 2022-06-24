@@ -328,7 +328,16 @@ export class EntityHelperService {
    */
   showEntityDetailsDialog(
     title: string,
-    entity: CaseModel | ContactModel | EventModel | ContactOfContactModel | RelationshipModel
+    entity: CaseModel | ContactModel | EventModel | ContactOfContactModel | RelationshipModel,
+    selectedOutbreak: OutbreakModel,
+    config?: {
+      displayPersonalCotLink: boolean,
+      snapshotId: string,
+      showPersonContacts: boolean,
+      showPersonContactsOfContacts: boolean
+    } | {
+      showResourceViewPageLink: boolean
+    }
   ): void  {
     // retrieve entity details
     let data: ILabelValuePairModel[] = [];
@@ -348,6 +357,77 @@ export class EntityHelperService {
         value: item.value
       });
     });
+
+    // additional inputs - entity view
+    if (
+      entity instanceof CaseModel ||
+      entity instanceof ContactModel ||
+      entity instanceof EventModel || (
+        entity instanceof ContactOfContactModel &&
+        selectedOutbreak.isContactsOfContactsActive
+      )
+    ) {
+      inputs.push({
+        type: V2SideDialogConfigInputType.LINK,
+        name: uuid(),
+        placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE',
+        link: () => [
+          EntityModel.getLinkForEntityType(entity.type),
+          entity.id,
+          'view'
+        ]
+      });
+    }
+
+    // additional inputs - entity cot
+    const entityConfig = config as {
+      displayPersonalCotLink: boolean,
+      snapshotId: string,
+      showPersonContacts: boolean,
+      showPersonContactsOfContacts: boolean
+    };
+    if (
+      (
+        entity instanceof CaseModel ||
+        entity instanceof ContactModel ||
+        entity instanceof EventModel
+      ) &&
+      entityConfig?.displayPersonalCotLink
+    ) {
+      inputs.push({
+        type: V2SideDialogConfigInputType.LINK,
+        name: uuid(),
+        placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_CHAIN_OF_TRANSMISSION',
+        link: () => ['/transmission-chains'],
+        linkQueryParams: () => ({
+          personId: entity.id,
+          selectedEntityType: entity.type,
+          snapshotId: entityConfig?.snapshotId,
+          showPersonContacts: entityConfig?.showPersonContacts,
+          showPersonContactsOfContacts: entityConfig?.showPersonContactsOfContacts,
+        })
+      });
+    }
+
+    // additional inputs - entity cot
+    const relationshipConfig = config as {
+      showResourceViewPageLink: boolean
+    };
+    if (
+      entity instanceof RelationshipModel &&
+      relationshipConfig?.showResourceViewPageLink &&
+      entity.sourcePerson
+    ) {
+      // determine relationship link
+      inputs.push({
+        type: V2SideDialogConfigInputType.LINK,
+        name: uuid(),
+        placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_FULL_RESOURCE',
+        link: () => [
+          `/relationships/${entity.sourcePerson.type}/${entity.sourcePerson.id}/contacts/${entity.id}/view`
+        ]
+      });
+    }
 
     // display dialog
     this.dialogV2Service
