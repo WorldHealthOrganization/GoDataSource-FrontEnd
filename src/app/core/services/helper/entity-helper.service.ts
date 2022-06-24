@@ -404,7 +404,7 @@ export class EntityHelperService {
           selectedEntityType: entity.type,
           snapshotId: entityConfig?.snapshotId,
           showPersonContacts: entityConfig?.showPersonContacts,
-          showPersonContactsOfContacts: entityConfig?.showPersonContactsOfContacts,
+          showPersonContactsOfContacts: entityConfig?.showPersonContactsOfContacts
         })
       });
     }
