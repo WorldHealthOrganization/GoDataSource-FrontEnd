@@ -29,6 +29,7 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { TransmissionChainsDashletComponent } from '../../components/transmission-chains-dashlet/transmission-chains-dashlet.component';
+import { DomService } from '../../../../core/services/helper/dom.service';
 
 enum NodeAction {
   MODIFY_PERSON = 'modify-person',
@@ -87,8 +88,8 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   NodeAction = NodeAction;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private authDataService: AuthDataService,
     protected toastV2Service: ToastV2Service,
@@ -101,7 +102,8 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     private contactsOfContactsDataService: ContactsOfContactsDataService,
     private dialogV2Service: DialogV2Service,
     private entityHelperService: EntityHelperService,
-    private i18nService: I18nService
+    private i18nService: I18nService,
+    private domService: DomService
   ) {}
 
   /**
@@ -225,20 +227,19 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
               loadingDialog.close();
 
               if (this.editMode) {
-                // #TODO
-                // this.selectedRelationship = undefined;
-                // // add node to selected persons list
-                // this.selectedNodes.addNode(entityData);
-                //
-                // // check if we can swap nodes
-                // this.canSwapRelationshipPersons = this.canSwapSelectedNodes();
-                //
-                // // focus boxes
-                // setTimeout(() => {
-                //   this.domService.scrollItemIntoView(
-                //     '.selected-node-details'
-                //   );
-                // });
+                this.selectedRelationship = undefined;
+                // add node to selected persons list
+                this.selectedNodes.addNode(entityData);
+
+                // check if we can swap nodes
+                this.canSwapRelationshipPersons = this.canSwapSelectedNodes();
+
+                // focus boxes
+                setTimeout(() => {
+                  this.domService.scrollItemIntoView(
+                    '.selected-node-details'
+                  );
+                });
               } else {
                 // show node information
                 this.entityHelperService.showEntityDetailsDialog(
@@ -266,17 +267,16 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
           this.canSwapRelationshipPersons = false;
 
           if (this.editMode) {
-            // #TODO
-            // this.selectedRelationship = undefined;
-            // // add node to selected persons list
-            // this.selectedNodes.addNode(entityData);
-            //
-            // // focus boxes
-            // setTimeout(() => {
-            //   this.domService.scrollItemIntoView(
-            //     '.selected-node-details'
-            //   );
-            // });
+            this.selectedRelationship = undefined;
+            // add node to selected persons list
+            this.selectedNodes.addNode(entityData);
+
+            // focus boxes
+            setTimeout(() => {
+              this.domService.scrollItemIntoView(
+                '.selected-node-details'
+              );
+            });
           } else {
             // show node information
             this.entityHelperService.showEntityDetailsDialog(
@@ -318,17 +318,16 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
         loadingDialog.close();
 
         if (this.editMode) {
-          // #TODO
-          // this.resetNodes();
-          //
-          // this.selectedRelationship = relationshipData;
-          //
-          // // focus box
-          // setTimeout(() => {
-          //   this.domService.scrollItemIntoView(
-          //     '.selected-relationship-details'
-          //   );
-          // });
+          this.resetNodes();
+
+          this.selectedRelationship = relationshipData;
+
+          // focus box
+          setTimeout(() => {
+            this.domService.scrollItemIntoView(
+              '.selected-relationship-details'
+            );
+          });
         } else {
           // show edge information
           this.entityHelperService.showEntityDetailsDialog(
