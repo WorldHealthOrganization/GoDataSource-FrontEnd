@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { IConvertChainToGraphElements, TransmissionChainDataService } from '../../../../core/services/data/transmission-chain.data.service';
@@ -66,6 +66,7 @@ import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v
 import { SavedFilterData } from '../../../../core/models/saved-filters.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
+import { determineRenderMode, RenderMode } from '../../../../core/enums/render-mode.enum';
 
 @Component({
   selector: 'app-transmission-chains-dashlet',
@@ -75,6 +76,9 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 })
 export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   static wheelSensitivity: number = 0.3;
+
+  // render mode
+  renderMode: RenderMode = RenderMode.FULL;
 
   // breadcrumbs
   breadcrumbs: IV2Breadcrumb[] = [];
@@ -525,12 +529,19 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     private elementRef: ElementRef,
     private entityHelperService: EntityHelperService,
     private relationshipDataService: RelationshipDataService
-  ) {}
+  ) {
+    // update render mode
+    this.updateRenderMode();
+  }
 
   /**
-     * Component initialized
-     */
+   * Component initialized
+   */
   ngOnInit() {
+    // start legend & options collapsed ?
+    this.legendCollapsed = this.renderMode === RenderMode.SMALL;
+    this.chainOptionsCollapsed = this.renderMode === RenderMode.SMALL;
+
     // authenticated user
     this.authUser = this.authDataService.getAuthenticatedUser();
 
@@ -3373,6 +3384,15 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         0
       );
     });
+  }
+
+  /**
+   * Update website render mode
+   */
+  @HostListener('window:resize')
+  private updateRenderMode(): void {
+    // determine render mode
+    this.renderMode = determineRenderMode();
   }
 }
 
