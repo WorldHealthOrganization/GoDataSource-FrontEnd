@@ -60,6 +60,7 @@
       <button
         type="button"
         mat-flat-button
+        color="secondary"
         [disabled]="!selectedSnapshot || selectedSnapshot === selectedSnapshotCreateKey"
         (click)="showAdvancedFilters()">
         <mat-icon>filter_alt</mat-icon>
@@ -71,6 +72,7 @@
         *ngIf="TransmissionChainModel.canExportGraphs(authUser)"
         type="button"
         mat-flat-button
+        color="secondary"
         [disabled]="!selectedSnapshot || selectedSnapshot === selectedSnapshotCreateKey"
         (click)="transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value ? exportGeospatialMap() : exportChainsOfTransmission()">
         <mat-icon>auto_awesome_motion</mat-icon>
@@ -82,6 +84,7 @@
         *ngIf="TransmissionChainModel.canList(authUser)"
         type="button"
         mat-flat-button
+        color="secondary"
         [routerLink]="['/transmission-chains', 'snapshots']">
         <mat-icon>auto_awesome_motion</mat-icon>
         {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOTS' | translate}}
@@ -198,21 +201,24 @@
 
 <!-- Content -->
 <mat-card
-  class="gd-basic-content">
+  class="gd-basic-content"
+  [class.gd-geospatial-map]="transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value">
 
   <!-- Configure snapshot -->
   <div
     *ngIf="chainGroup &&
       !mustLoadChain &&
       selectedChainPageIndex !== null"
-    class="chains-of-transmission-top-bar"
+    class="gd-cot-options {{ fullScreen ? 'gd-cot-options-fullscreen' : '' }}"
     fxLayout="column">
 
     <!-- Title & Collapse / Expand -->
     <div
-      fxLayout="row">
+      class="gd-cot-options-title-bar"
+      fxLayout="row" fxLayoutAlign="start center">
       <!-- Title -->
       <div
+        class="gd-cot-options-title-bar-title"
         fxFlex>
         {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_CHAIN_OPTIONS' | translate}}
       </div>
@@ -220,7 +226,8 @@
       <!-- Collapse / Expand -->
       <button
         fxGrow="0"
-        [class.gd-cot-chain-options-expanded]="!chainOptionsCollapsed"
+        class="gd-cot-options-title-bar-button"
+        [class.gd-cot-options-expanded]="!chainOptionsCollapsed"
         type="button"
         mat-icon-button
         (click)="chainOptionsCollapsed = !chainOptionsCollapsed">
@@ -229,8 +236,9 @@
     </div>
 
     <!-- Content -->
-    <ng-container
-      *ngIf="!chainOptionsCollapsed">
+    <div
+      *ngIf="!chainOptionsCollapsed"
+      class="gd-cot-options-content">
       <!-- dropdown with view types -->
       <app-form-select-single-v2
         name="chainView"
@@ -282,7 +290,8 @@
       <!-- Toggles -->
       <div
         *ngIf="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0"
-        class="graph-actions {{ fullScreen ? 'graph-actions-full-screen' : '' }} {{ transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value ? 'graph-actions-geo-map' : '' }}" fxLayout="row" fxLayoutGap="1.6rem">
+        class="graph-actions {{ fullScreen ? 'graph-actions-full-screen' : '' }} {{ transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value ? 'graph-actions-geo-map' : '' }}"
+        fxLayout="row" fxLayout.xs="column" fxLayoutGap="0.8rem" fxLayoutAlign="space-between center">
 
         <!-- Toggle Edit mode -->
         <app-form-toggle-checkbox-v2
@@ -309,13 +318,228 @@
           (ngModelChange)="onFullScreenToggle($event)">
         </app-form-toggle-checkbox-v2>
       </div>
-    </ng-container>
+    </div>
   </div>
+
+  <!-- legend -->
+  <ng-container
+    *ngIf="chainGroup && !mustLoadChain && selectedChainPageIndex !== null">
+    <div
+      *ngIf="legend && (transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0)"
+      class="gd-cot-legend"
+      [class.gd-cot-legend-fullscreen]="fullScreen"
+      [class.gd-cot-legend-expanded]="!legendCollapsed">
+
+      <!-- Title & Collapse / Expand -->
+      <div
+        class="gd-cot-legend-title-bar"
+        fxLayout="row" fxLayoutAlign="start center">
+        <!-- Title -->
+        <div
+          class="gd-cot-legend-title-bar-title"
+          fxFlex>
+          {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_LEGEND' | translate}}
+        </div>
+
+        <!-- Collapse / Expand -->
+        <button
+          fxGrow="0"
+          class="gd-cot-legend-title-bar-button"
+          [class.gd-cot-legend-title-bar-button-expanded]="!legendCollapsed"
+          type="button"
+          mat-icon-button
+          (click)="legendCollapsed = !legendCollapsed">
+          <mat-icon>expand_more</mat-icon>
+        </button>
+      </div>
+
+      <!-- Legend content -->
+      <div
+        *ngIf="!legendCollapsed"
+        class="gd-cot-legend-content">
+        <!-- Filter Match -->
+        <div
+          class="legend-name"
+          fxLayout="row" fxLayoutAlign="start center">
+
+          <!-- Circle -->
+          <div
+            fxGrow="0"
+            class="matches-filter"
+            [style.borderColor]="Constants.DEFAULT_GRAPH_NODE_MATCH_FILTER_COLOR">
+            <!-- Placeholder -->
+          </div>
+
+          <!-- details -->
+          <div
+            fxFlex>
+            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_MATCH_FILTER_TITLE' | translate}}
+          </div>
+
+          <!-- help -->
+          <app-fancy-tooltip
+            fxGrow="0"
+            tooltip="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_MATCH_FILTER_TITLE_DESCRIPTION"></app-fancy-tooltip>
+        </div>
+
+        <!-- node color -->
+        <div *ngIf="legend.nodeColorKeys && legend.nodeColorKeys.length"
+            class="legend-name">
+          {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE' | translate}}
+          <div class="legend-field-name">{{legend.nodeColorLabel | translate}}:</div>
+        </div>
+        <div
+          *ngFor="let nodeColorItem of legend.nodeColorKeys" class="legend-item">
+          <div
+            class="legend-color"
+            [style.background-color]="legend.nodeColor[nodeColorItem]">
+          </div>
+          <div>
+            {{nodeColorItem | translate}}
+          </div>
+        </div>
+
+        <!-- node name color -->
+        <div *ngIf="legend.nodeNameColorKeys && legend.nodeNameColorKeys.length"
+            class="legend-name">
+          {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE' | translate}}
+          <div class="legend-field-name">{{legend.nodeNameColorLabel | translate}}:</div>
+        </div>
+        <div
+          *ngFor="let nodeNameColorItem of legend.nodeNameColorKeys" class="legend-item">
+          <div
+            class="legend-color"
+            [style.background-color]="legend.nodeNameColor[nodeNameColorItem]">
+          </div>
+          <div>
+            {{nodeNameColorItem | translate}}
+          </div>
+          <div *ngIf="transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
+                      || transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
+                      || transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value">
+            - {{legend.nodeNameColorAdditionalInfo[nodeNameColorItem] | translate}}
+          </div>
+        </div>
+
+        <!-- edge color -->
+        <div *ngIf="legend.edgeColorKeys && legend.edgeColorKeys.length"
+            class="legend-name">
+          {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE' | translate}}
+          <div class="legend-field-name">{{legend.edgeColorLabel | translate}}:</div>
+        </div>
+        <div
+          *ngFor="let edgeColorItem of legend.edgeColorKeys" class="legend-item">
+          <div
+            class="legend-color"
+            [style.background-color]="legend.edgeColor[edgeColorItem]">
+          </div>
+          <div>
+            {{legend.clustersList && legend.clustersList[edgeColorItem] ? legend.clustersList[edgeColorItem] : (edgeColorItem | translate)}}
+          </div>
+        </div>
+
+        <!-- node icon -->
+        <div *ngIf="legend.nodeIconKeys && legend.nodeIconKeys.length"
+            class="legend-name">
+          {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_ICON_TITLE' | translate}}
+          <div class="legend-field-name">{{legend.nodeIconLabel | translate}}:</div>
+        </div>
+        <div
+          *ngFor="let nodeIconItem of legend.nodeIconKeys" class="legend-item">
+          <div
+            class="legend-icon"
+            [style.background-image]="'url(' + legend.nodeIcon[nodeIconItem] + ')'">
+          </div>
+          <div>
+            {{nodeIconItem | translate}}
+          </div>
+        </div>
+
+        <!-- node shape -->
+        <div *ngIf="legend.nodeShapeKeys && legend.nodeShapeKeys.length"
+            class="legend-name">
+          {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SHAPE_TITLE' | translate}}
+          <div class="legend-field-name">{{legend.nodeShapeLabel | translate}}:</div>
+        </div>
+        <div
+          *ngFor="let nodeShapeItem of legend.nodeShapeKeys" class="legend-item">
+          <span class="xt-icon">{{legend.nodeShape[nodeShapeItem]}}</span>
+          <div>
+            {{nodeShapeItem | translate}}
+          </div>
+        </div>
+
+        <!-- edge icon -->
+        <div *ngIf="legend.edgeIconKeys && legend.edgeIconKeys.length"
+            class="legend-name">
+          {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_ICON_TITLE' | translate}}
+          <div class="legend-field-name">{{legend.edgeIconLabel | translate}}:</div>
+        </div>
+        <div
+          *ngFor="let edgeIconItem of legend.edgeIconKeys" class="legend-item">
+                  <span
+                    [class]="legend.edgeIcon[edgeIconItem].class">
+                      {{ legend.edgeIcon[edgeIconItem].icon }}
+                  </span>
+          <div>
+            {{legend.clustersList && legend.clustersList[edgeIconItem] ? legend.clustersList[edgeIconItem] : (edgeIconItem | translate)}}
+          </div>
+        </div>
+
+        <!-- lab result sequence color -->
+        <ng-container
+          *ngIf="showLabResultsSeqData">
+          <div *ngIf="legend.labSequenceColorKeys && legend.labSequenceColorKeys.length"
+              class="legend-name">
+            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_COLOR_TITLE' | translate}}
+          </div>
+          <div
+            class="legend-item"
+            fxLayout="row" fxLayoutAlign="start center">
+            <div
+              fxGrow="0"
+              class="legend-color"
+              [style.background-color]="Constants.DEFAULT_GRAPH_NODE_HAS_MORE_LAB_SEQ_COLOR">
+            </div>
+            <div
+              fxFlex>
+              {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_HAS_MORE_COLOR_TITLE' | translate}}
+            </div>
+
+            <!-- help -->
+            <app-fancy-tooltip
+              fxGrow="0"
+              tooltip="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_HAS_MORE_COLOR_TITLE_DESCRIPTION"></app-fancy-tooltip>
+          </div>
+          <hr />
+          <div
+            *ngFor="let labSequenceColorItem of legend.labSequenceColorKeys" class="legend-item">
+            <div
+              class="legend-color"
+              [style.background-color]="legend.labSequenceColor[labSequenceColorItem]">
+            </div>
+            <div>
+              {{labSequenceColorItem | translate}}
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </ng-container>
 
   <!-- Nothing to display ? -->
   <div
-    *ngIf="showSnapshots && !mustLoadChain && chainGroupId && chainGroupId === selectedSnapshot && chainPages && chainPages.length < 1">
-    {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NOTHING_TO_DISPLAY' | translate }}
+    *ngIf="showSnapshots && !mustLoadChain && chainGroupId && chainGroupId === selectedSnapshot && chainPages && chainPages.length < 1"
+    fxLayout="column" fxLayoutAlign="center center"
+    class="gd-cot-no-data">
+
+    <!-- Image -->
+    <div
+      class="gd-cot-no-data-image"></div>
+
+    <!-- Message -->
+    <div
+      class="gd-cot-no-data-text">{{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NOTHING_TO_DISPLAY' | translate }}</div>
   </div>
 
   <!-- Graph -->
@@ -323,205 +547,8 @@
     *ngIf="chainGroup &&
       !mustLoadChain &&
       selectedChainPageIndex !== null"
-    class="cytoscape-graph-element">
+    class="gd-cot-graph">
     <div class="cytoscape-graph-container">
-      <!-- legend -->
-      <div
-        *ngIf="legend && (transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0)"
-        class="graph-legend {{ fullScreen ? 'full-screen-graph-legend' : '' }}">
-
-        <!-- Title & Collapse / Expand -->
-        <div
-          fxLayout="row">
-          <!-- Title -->
-          <div
-            fxFlex>
-            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_LEGEND' | translate}}
-          </div>
-
-          <!-- Collapse / Expand -->
-          <button
-            fxGrow="0"
-            [class.gd-cot-legend-expanded]="!legendCollapsed"
-            type="button"
-            mat-icon-button
-            (click)="legendCollapsed = !legendCollapsed">
-            <mat-icon>expand_more</mat-icon>
-          </button>
-        </div>
-
-        <!-- Legend content -->
-        <ng-container
-          *ngIf="!legendCollapsed">
-          <!-- Filter Match -->
-          <div
-            class="legend-name"
-            fxLayout="row" fxLayoutAlign="start center">
-
-            <!-- Circle -->
-            <div
-              fxGrow="0"
-              class="matches-filter"
-              [style.borderColor]="Constants.DEFAULT_GRAPH_NODE_MATCH_FILTER_COLOR">
-              <!-- Placeholder -->
-            </div>
-
-            <!-- details -->
-            <div
-              fxFlex>
-              {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_MATCH_FILTER_TITLE' | translate}}
-            </div>
-
-            <!-- help -->
-            <app-fancy-tooltip
-              fxGrow="0"
-              tooltip="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_MATCH_FILTER_TITLE_DESCRIPTION"></app-fancy-tooltip>
-          </div>
-
-          <!-- node color -->
-          <div *ngIf="legend.nodeColorKeys && legend.nodeColorKeys.length"
-               class="legend-name">
-            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE' | translate}}
-            <div class="legend-field-name">{{legend.nodeColorLabel | translate}}:</div>
-          </div>
-          <div
-            *ngFor="let nodeColorItem of legend.nodeColorKeys" class="legend-item">
-            <div
-              class="legend-color"
-              [style.background-color]="legend.nodeColor[nodeColorItem]">
-            </div>
-            <div>
-              {{nodeColorItem | translate}}
-            </div>
-          </div>
-
-          <!-- node name color -->
-          <div *ngIf="legend.nodeNameColorKeys && legend.nodeNameColorKeys.length"
-               class="legend-name">
-            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE' | translate}}
-            <div class="legend-field-name">{{legend.nodeNameColorLabel | translate}}:</div>
-          </div>
-          <div
-            *ngFor="let nodeNameColorItem of legend.nodeNameColorKeys" class="legend-item">
-            <div
-              class="legend-color"
-              [style.background-color]="legend.nodeNameColor[nodeNameColorItem]">
-            </div>
-            <div>
-              {{nodeNameColorItem | translate}}
-            </div>
-            <div *ngIf="transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value
-                        || transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value
-                        || transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value">
-              - {{legend.nodeNameColorAdditionalInfo[nodeNameColorItem] | translate}}
-            </div>
-          </div>
-
-          <!-- edge color -->
-          <div *ngIf="legend.edgeColorKeys && legend.edgeColorKeys.length"
-               class="legend-name">
-            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE' | translate}}
-            <div class="legend-field-name">{{legend.edgeColorLabel | translate}}:</div>
-          </div>
-          <div
-            *ngFor="let edgeColorItem of legend.edgeColorKeys" class="legend-item">
-            <div
-              class="legend-color"
-              [style.background-color]="legend.edgeColor[edgeColorItem]">
-            </div>
-            <div>
-              {{legend.clustersList && legend.clustersList[edgeColorItem] ? legend.clustersList[edgeColorItem] : (edgeColorItem | translate)}}
-            </div>
-          </div>
-
-          <!-- node icon -->
-          <div *ngIf="legend.nodeIconKeys && legend.nodeIconKeys.length"
-               class="legend-name">
-            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_ICON_TITLE' | translate}}
-            <div class="legend-field-name">{{legend.nodeIconLabel | translate}}:</div>
-          </div>
-          <div
-            *ngFor="let nodeIconItem of legend.nodeIconKeys" class="legend-item">
-            <div
-              class="legend-icon"
-              [style.background-image]="'url(' + legend.nodeIcon[nodeIconItem] + ')'">
-            </div>
-            <div>
-              {{nodeIconItem | translate}}
-            </div>
-          </div>
-
-          <!-- node shape -->
-          <div *ngIf="legend.nodeShapeKeys && legend.nodeShapeKeys.length"
-               class="legend-name">
-            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SHAPE_TITLE' | translate}}
-            <div class="legend-field-name">{{legend.nodeShapeLabel | translate}}:</div>
-          </div>
-          <div
-            *ngFor="let nodeShapeItem of legend.nodeShapeKeys" class="legend-item">
-            <span class="xt-icon">{{legend.nodeShape[nodeShapeItem]}}</span>
-            <div>
-              {{nodeShapeItem | translate}}
-            </div>
-          </div>
-
-          <!-- edge icon -->
-          <div *ngIf="legend.edgeIconKeys && legend.edgeIconKeys.length"
-               class="legend-name">
-            {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_ICON_TITLE' | translate}}
-            <div class="legend-field-name">{{legend.edgeIconLabel | translate}}:</div>
-          </div>
-          <div
-            *ngFor="let edgeIconItem of legend.edgeIconKeys" class="legend-item">
-                    <span
-                      [class]="legend.edgeIcon[edgeIconItem].class">
-                        {{ legend.edgeIcon[edgeIconItem].icon }}
-                    </span>
-            <div>
-              {{legend.clustersList && legend.clustersList[edgeIconItem] ? legend.clustersList[edgeIconItem] : (edgeIconItem | translate)}}
-            </div>
-          </div>
-
-          <!-- lab result sequence color -->
-          <ng-container
-            *ngIf="showLabResultsSeqData">
-            <div *ngIf="legend.labSequenceColorKeys && legend.labSequenceColorKeys.length"
-                 class="legend-name">
-              {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_COLOR_TITLE' | translate}}
-            </div>
-            <div
-              class="legend-item"
-              fxLayout="row" fxLayoutAlign="start center">
-              <div
-                fxGrow="0"
-                class="legend-color"
-                [style.background-color]="Constants.DEFAULT_GRAPH_NODE_HAS_MORE_LAB_SEQ_COLOR">
-              </div>
-              <div
-                fxFlex>
-                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_HAS_MORE_COLOR_TITLE' | translate}}
-              </div>
-
-              <!-- help -->
-              <app-fancy-tooltip
-                fxGrow="0"
-                tooltip="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_HAS_MORE_COLOR_TITLE_DESCRIPTION"></app-fancy-tooltip>
-            </div>
-            <hr />
-            <div
-              *ngFor="let labSequenceColorItem of legend.labSequenceColorKeys" class="legend-item">
-              <div
-                class="legend-color"
-                [style.background-color]="legend.labSequenceColor[labSequenceColorItem]">
-              </div>
-              <div>
-                {{labSequenceColorItem | translate}}
-              </div>
-            </div>
-          </ng-container>
-        </ng-container>
-      </div>
-
       <div
         class="graph-inner-container"
         [fxShow]="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value">
@@ -529,16 +556,17 @@
         <div
           class="cy-zoom-buttons {{ fullScreen ? 'cy-zoom-buttons-full-screen' : '' }}">
           <button
-            mat-raised-button
+            mat-flat-button
             class="cy-zoom-button"
+            color="secondary"
             [disableRipple]="true"
             (click)="zoomInGraph()">
             +
           </button>
-          <br />
           <button
-            mat-raised-button
+            mat-flat-button
             class="cy-zoom-button"
+            color="secondary"
             [disableRipple]="true"
             (click)="zoomOutGraph()">
             -
