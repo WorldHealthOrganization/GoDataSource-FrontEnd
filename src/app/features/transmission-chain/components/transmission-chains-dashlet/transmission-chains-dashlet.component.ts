@@ -41,7 +41,6 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { AuthenticatedComponent } from '../../../../core/components/authenticated/authenticated.component';
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { IV2ActionIconLabel, IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import {
   IV2SideDialogAdvancedFiltersResponse,
@@ -58,13 +57,13 @@ import {
   V2SideDialogConfigInputType
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { V2AdvancedFilter, V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import { AppBasicPageV2Component } from '../../../../shared/components-v2/app-basic-page-v2/app-basic-page-v2.component';
+import { V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { TransmissionChainFilters } from '../../classes/filter';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import * as FileSaver from 'file-saver';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { SavedFilterData } from '../../../../core/models/saved-filters.model';
 
 @Component({
   selector: 'app-transmission-chains-dashlet',
@@ -74,9 +73,6 @@ import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v
 })
 export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   static wheelSensitivity: number = 0.3;
-
-  // basic page component
-  @ViewChild('basicPage') basicPage: AppBasicPageV2Component;
 
   // breadcrumbs
   breadcrumbs: IV2Breadcrumb[] = [];
@@ -101,6 +97,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   Constants = Constants;
   WorldMapMarkerLayer = WorldMapMarkerLayer;
   ClusterModel = ClusterModel;
+  TransmissionChainModel = TransmissionChainModel;
 
   // chain pages
   chainPageSize: number;
@@ -116,11 +113,15 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     [clusterId: string]: string
   } = {};
 
+  // applied filters
+  advancedFiltersApplied: SavedFilterData;
+
   selectedOutbreak: OutbreakModel;
   chainGroupId: string;
+  chainOptionsCollapsed: boolean = false;
+  legendCollapsed: boolean = false;
   chainGroup: TransmissionChainGroupModel;
   graphElements: IConvertChainToGraphElements;
-  showFilters: boolean = false;
   showGraphConfiguration: boolean = false;
   filters: TransmissionChainFilters = new TransmissionChainFilters();
   showEvents: boolean = true;
@@ -264,7 +265,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       option: LabelValuePair
     }
   } = {};
-  selectedSnapshot: string;
+  selectedSnapshotCreateKey: string = 'create';
+  selectedSnapshot: string = this.selectedSnapshotCreateKey;
 
   // cytoscape-graph.component data
   style: any;
@@ -282,8 +284,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       [id: string]: number
     }
   } = {};
-    // show/hide legend?
-  showLegend: boolean = true;
   // toggle edit mode
   editMode: boolean = false;
   // toggle full screen
@@ -503,15 +503,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     labSeqResult?: string[]
   } = {};
 
-  // quick actions
-  quickActions: IV2ActionMenuLabel;
-
-  // advanced filters
-  advancedFilters: V2AdvancedFilter[];
-
-  // action
-  actionButton: IV2ActionIconLabel;
-
   /**
    * Constructor
    */
@@ -528,7 +519,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     private clusterDataService: ClusterDataService,
     private activatedRoute: ActivatedRoute,
     private authDataService: AuthDataService,
-    private importExportDataService: ImportExportDataService
+    private importExportDataService: ImportExportDataService,
+    private elementRef: ElementRef
   ) {}
 
   /**
@@ -653,8 +645,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
               this.selectedOutbreak = selectedOutbreak;
 
               // reset filters
-              this.showFilters = false;
-              this.selectedSnapshot = undefined;
+              this.selectedSnapshot = this.selectedSnapshotCreateKey;
               this.selectedChainPageIndex = null;
               this.chainGroup = undefined;
               this.chainPages = undefined;
@@ -725,7 +716,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                       loadingDialog.close();
 
                       // display graph
-                      this.loadChainsOfTransmission();
+                      this.loadChainsOfTransmission(
+                        undefined,
+                        0
+                      );
                     });
                 } else {
                   // retrieve snapshots
@@ -734,7 +728,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                     loadingDialog.close();
 
                     // show chose dialog ?
-                    if (this.snapshotOptions?.length > 0) {
+                    if (this.snapshotOptions?.length > 1) {
                       // display dialog with what to do
                       this.dialogV2Service
                         .showBottomDialog({
@@ -786,14 +780,14 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                             return;
                           } else if (bottomResponse.button.key === 'replace_most_recent') {
                             // replace most recent
-                            this.createNewSnapshot(this.snapshotOptions[0].value);
+                            this.createNewSnapshot(this.snapshotOptions[1].value);
 
                             // finished
                             return;
                           }
 
                           // load most recent
-                          this.selectedSnapshot = this.snapshotOptions[0].value;
+                          this.selectedSnapshot = this.snapshotOptions[1].value;
                           this.loadChainsOfTransmission(
                             undefined,
                             0
@@ -813,275 +807,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     // update breadcrumbs
     this.initializeBreadcrumbs();
 
-    // advanced filters
-    this.advancedFilters = [{
-      type: V2AdvancedFilterType.TEXT,
-      field: 'firstName',
-      label: 'LNG_PAGE_GRAPH_SNAPSHOT_FILTER_FIRST_NAME_LABEL',
-      allowedComparators: [
-        _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.TEXT], { value: V2AdvancedFilterComparatorType.CONTAINS_TEXT })
-      ],
-      filterBy: (
-        _qb,
-        filter
-      ) => {
-        this.snapshotFilters.firstName = filter.value ?
-          filter.value :
-          undefined;
-      }
-    }, {
-      type: V2AdvancedFilterType.TEXT,
-      field: 'lastName',
-      label: 'LNG_PAGE_GRAPH_SNAPSHOT_FILTER_LAST_NAME_LABEL',
-      allowedComparators: [
-        _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.TEXT], { value: V2AdvancedFilterComparatorType.CONTAINS_TEXT })
-      ],
-      filterBy: (
-        _qb,
-        filter
-      ) => {
-        this.snapshotFilters.lastName = filter.value ?
-          filter.value :
-          undefined;
-      }
-    }, {
-      type: V2AdvancedFilterType.MULTISELECT,
-      field: 'labSeqResult',
-      label: 'LNG_PAGE_GRAPH_SNAPSHOT_FILTER_LAB_SEQ_RESULT_LABEL',
-      options: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-      allowedComparators: [
-        _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
-      ],
-      filterBy: (
-        _qb,
-        filter
-      ) => {
-        this.snapshotFilters.labSeqResult = filter.value ?
-          filter.value :
-          undefined;
-      }
-    }];
-
-    // action button
-    this.actionButton = {
-      type: V2ActionType.ICON_LABEL,
-      icon: '',
-      label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_GRAPH',
-      action: {
-        click: () => {
-          this.dialogV2Service.showSideDialog({
-            title: {
-              get: () => 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_GRAPH'
-            },
-            hideInputFilter: true,
-            width: '50rem',
-            inputs: [
-              {
-                type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
-                name: 'showEvents',
-                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_EVENTS_LABEL',
-                value: this.showEvents
-              }, {
-                type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
-                name: 'showContacts',
-                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_LABEL',
-                value: this.showContacts,
-                change: (data) => {
-                  // nothing to do ?
-                  const checked = (data.map.showContacts as IV2SideDialogConfigInputToggleCheckbox).value;
-                  if (!checked) {
-                    (data.map.includeContactsOfContacts as IV2SideDialogConfigInputToggleCheckbox).value = false;
-                  }
-                },
-                visible: () => {
-                  return !this.snapshotOptionsMap || !this.selectedSnapshot || !this.snapshotOptionsMap[this.selectedSnapshot] || !this.snapshotOptionsMap[this.selectedSnapshot].snapshot.showContacts;
-                }
-              }, {
-                type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
-                name: 'includeContactsOfContacts',
-                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_OF_CONTACTS',
-                value: this.showContactsOfContacts,
-                disabled: (data) => {
-                  return !(data.map.showContacts as IV2SideDialogConfigInputToggleCheckbox).value;
-                },
-                visible: () => {
-                  return !this.snapshotOptionsMap || !this.selectedSnapshot || !this.snapshotOptionsMap[this.selectedSnapshot] || !this.snapshotOptionsMap[this.selectedSnapshot].snapshot.showContactsOfContacts;
-                }
-              }, {
-                type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
-                name: 'showLabResultsSeqData',
-                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_LAB_RESULTS_SEQUENCE_DATA',
-                value: this.showLabResultsSeqData
-              }, {
-                type: V2SideDialogConfigInputType.DIVIDER,
-                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SETTINGS_TITLE'
-              }, {
-                type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
-                name: 'nodeLabelCriteria',
-                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_TITLE',
-                options: (this.activatedRoute.snapshot.data.cotNodeLabel as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-                value: this.colorCriteria.nodeLabelCriteria
-              }, {
-                type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
-                name: 'nodeNameColorCriteria',
-                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE',
-                options: (this.activatedRoute.snapshot.data.cotNodeColor as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-                value: this.colorCriteria.nodeNameColorCriteria
-              }, {
-                type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
-                name: 'nodeColorCriteria',
-                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE',
-                options: (this.activatedRoute.snapshot.data.cotNodeColor as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-                value: this.colorCriteria.nodeColorCriteria
-              }, {
-                type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
-                name: 'nodeIconCriteria',
-                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_ICON_TITLE',
-                options: (this.activatedRoute.snapshot.data.cotNodeIcon as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-                value: this.colorCriteria.nodeIconCriteria
-              }, {
-                type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
-                name: 'nodeShapeCriteria',
-                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SHAPE_TITLE',
-                options: (this.activatedRoute.snapshot.data.cotNodeShape as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-                value: this.colorCriteria.nodeShapeCriteria
-              }, {
-                type: V2SideDialogConfigInputType.DIVIDER,
-                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_SETTINGS_TITLE'
-              }, {
-                type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
-                name: 'edgeLabelCriteria',
-                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_LABEL_TITLE',
-                options: (this.activatedRoute.snapshot.data.cotEdgeLabel as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-                value: this.colorCriteria.edgeLabelCriteria,
-                change: (data) => {
-                  if ((data.map.edgeLabelCriteria as IV2SideDialogConfigInputSingleDropdown).value !== Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value) {
-                    (data.map.edgeIconCriteria as IV2SideDialogConfigInputSingleDropdown).value = Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.NONE.value;
-                  }
-                }
-              }, {
-                type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
-                name: 'edgeIconCriteria',
-                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_ICON_TITLE',
-                options: (this.activatedRoute.snapshot.data.cotEdgeIcon as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-                value: this.colorCriteria.edgeIconCriteria,
-                change: (data) => {
-                  if ((data.map.edgeIconCriteria as IV2SideDialogConfigInputSingleDropdown).value !== Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.NONE.value) {
-                    (data.map.edgeLabelCriteria as IV2SideDialogConfigInputSingleDropdown).value = Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value;
-                  }
-                }
-              }, {
-                type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
-                name: 'edgeColorCriteria',
-                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE',
-                options: (this.activatedRoute.snapshot.data.cotEdgeColor as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-                value: this.colorCriteria.edgeColorCriteria
-              }
-            ],
-            bottomButtons: [{
-              type: IV2SideDialogConfigButtonType.OTHER,
-              label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_LOAD_SNAPSHOT',
-              color: 'primary'
-            }, {
-              type: IV2SideDialogConfigButtonType.CANCEL,
-              label: 'LNG_COMMON_BUTTON_CANCEL',
-              color: 'text'
-            }]
-          }).subscribe((response) => {
-            // cancelled ?
-            if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
-              // finished
-              return;
-            }
-
-            // update
-            this.showEvents = (response.data.map.showEvents as IV2SideDialogConfigInputToggleCheckbox).value;
-            this.showContacts = (response.data.map.showContacts as IV2SideDialogConfigInputToggleCheckbox).value;
-            this.showContactsOfContacts = (response.data.map.includeContactsOfContacts as IV2SideDialogConfigInputToggleCheckbox).value;
-            this.showLabResultsSeqData = (response.data.map.showLabResultsSeqData as IV2SideDialogConfigInputToggleCheckbox).value;
-            this.colorCriteria.nodeLabelCriteria = (response.data.map.nodeLabelCriteria as IV2SideDialogConfigInputSingleDropdown).value;
-            this.colorCriteria.nodeNameColorCriteria = (response.data.map.nodeNameColorCriteria as IV2SideDialogConfigInputSingleDropdown).value;
-            this.colorCriteria.nodeColorCriteria = (response.data.map.nodeColorCriteria as IV2SideDialogConfigInputSingleDropdown).value;
-            this.colorCriteria.nodeIconCriteria = (response.data.map.nodeIconCriteria as IV2SideDialogConfigInputSingleDropdown).value;
-            this.colorCriteria.nodeShapeCriteria = (response.data.map.nodeShapeCriteria as IV2SideDialogConfigInputSingleDropdown).value;
-            this.colorCriteria.edgeLabelCriteria = (response.data.map.edgeLabelCriteria as IV2SideDialogConfigInputSingleDropdown).value;
-            this.colorCriteria.edgeIconCriteria = (response.data.map.edgeIconCriteria as IV2SideDialogConfigInputSingleDropdown).value;
-            this.colorCriteria.edgeColorCriteria = (response.data.map.edgeColorCriteria as IV2SideDialogConfigInputSingleDropdown).value;
-
-            // close
-            response.handler.hide();
-
-            // load chain
-            this.loadChainsOfTransmission();
-          });
-        }
-      },
-      visible: () => {
-        return !this.showGraphConfiguration && this.selectedSnapshot && this.chainGroup && this.chainGroupId === this.selectedSnapshot;
-      }
-    };
-
-    // quick actions
-    this.quickActions = {
-      type: V2ActionType.MENU,
-      label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
-      menuOptions: [
-        // Create snapshot
-        {
-          label: {
-            get: () => 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_SETTINGS'
-          },
-          action: {
-            click: () => {
-              this.createNewSnapshot();
-            }
-          },
-          visible: () => {
-            return this.selectedOutbreak?.id === this.authUser?.activeOutbreakId;
-          }
-        },
-
-        // Divider
-        {
-          visible: (): boolean => {
-            return this.selectedOutbreak?.id === this.authUser?.activeOutbreakId && (
-              TransmissionChainModel.canExportGraphs(this.authUser) ||
-              TransmissionChainModel.canList(this.authUser)
-            );
-          }
-        },
-
-        // export
-        {
-          label: {
-            get: () => this.transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value ?
-              'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT' :
-              'LNG_PAGE_TRANSMISSION_CHAINS_GEO_MAP_EXPORT'
-          },
-          action: {
-            click: () => {
-              if (this.transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value) {
-                this.exportChainsOfTransmission();
-              } else {
-                this.exportGeospatialMap();
-              }
-            }
-          },
-          visible: () => TransmissionChainModel.canExportGraphs(this.authUser)
-        },
-
-        // snapshots list
-        {
-          label: {
-            get: () => 'LNG_PAGE_LIST_ASYNC_COT_TITLE'
-          },
-          action: {
-            link: () => ['/transmission-chains', 'snapshots']
-          },
-          visible: () => TransmissionChainModel.canList(this.authUser)
-        }
-      ]
-    };
+    // update table size
+    this.resizeTable();
   }
 
   /**
@@ -1139,7 +866,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     }
 
     // close settings panel
-    this.showFilters = false;
     this.showGraphConfiguration = false;
     this.showSnapshotFilters = false;
 
@@ -1310,36 +1036,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           loadingDialog.close();
         });
       });
-  }
-
-  /**
-     * Show filters
-     */
-  showFiltersHideGraphConf(): void {
-    this.showFilters = true;
-    this.showGraphConfiguration = false;
-    this.mustLoadChain = true;
-    this.showSnapshotFilters = false;
-  }
-
-  /**
-     * Show graph configuration
-     */
-  showGraphConfigurationHideFilters(): void {
-    this.showFilters = false;
-    this.showSnapshotFilters = false;
-    this.showGraphConfiguration = true;
-    this.mustLoadChain = true;
-  }
-
-  /**
-     * Show snapshot filters
-     */
-  showSnapshotFiltersConf(): void {
-    this.showFilters = false;
-    this.showSnapshotFilters = true;
-    this.showGraphConfiguration = false;
-    this.mustLoadChain = true;
   }
 
   /**
@@ -1903,9 +1599,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
       // render
       this.renderGraph();
-
-      // update
-      this.basicPage.detectChanges();
     });
   }
 
@@ -2576,7 +2269,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       )
       .subscribe((snapshots) => {
         // format snapshots
-        this.snapshotOptions = [];
+        this.snapshotOptions = [new LabelValuePair(
+          'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_OPTION_CREATE_NEW',
+          this.selectedSnapshotCreateKey
+        )];
         this.snapshotOptionsMap = {};
         (snapshots || []).forEach((snapshot) => {
           // create option
@@ -2597,10 +2293,13 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         });
 
         // trigger periodic update of snapshots that are still in progress
-        this.checkAgainForInProgressSnapshots(finishedCallback);
+        this.checkAgainForInProgressSnapshots(this.selectedSnapshot === this.selectedSnapshotCreateKey ? (() => {}) : finishedCallback);
 
         // finished
-        if (!this.selectedSnapshot) {
+        if (
+          !this.selectedSnapshot ||
+          this.selectedSnapshot === this.selectedSnapshotCreateKey
+        ) {
           finishedCallback();
         }
       });
@@ -2828,8 +2527,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
      * Retrieve snapshot / refresh graph
      */
   loadChainsOfTransmission(
-    advancedFiltersResponse?: IV2SideDialogAdvancedFiltersResponse,
-    specificPage?: number
+    advancedFiltersResponse: IV2SideDialogAdvancedFiltersResponse,
+    specificPage: number
   ): void {
     // do cleanup
     if (advancedFiltersResponse) {
@@ -2868,7 +2567,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     }
 
     // hide filters & confs
-    this.showFilters = false;
     this.showGraphConfiguration = false;
     this.showSnapshotFilters = false;
 
@@ -2905,7 +2603,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       }
 
       // reset the page number
-      this.selectedChainPageIndex = specificPage !== undefined ?
+      this.selectedChainPageIndex = specificPage !== undefined && this.chainPages.length > specificPage ?
         specificPage :
         null;
 
@@ -2921,9 +2619,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     this.chainGroup = undefined;
     this.chainPages = undefined;
     this.chainPagesOptions = undefined;
-    this.selectedChainPageIndex = specificPage !== undefined ?
-      specificPage :
-      null;
+    this.selectedChainPageIndex = null;
     this.chainGroupId = this.selectedSnapshot;
     this.transmissionChainDataService
       .getCalculatedIndependentTransmissionChains(
@@ -3004,6 +2700,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
               data: item
             };
           });
+          this.selectedChainPageIndex = specificPage !== undefined && this.chainPages.length > specificPage ?
+            specificPage :
+            null;
 
           // preselect show contacts & show contact of contacts
           this.showContacts = this.snapshotOptionsMap[this.selectedSnapshot].snapshot.showContacts;
@@ -3058,6 +2757,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                   data: item
                 };
               });
+              this.selectedChainPageIndex = specificPage !== undefined && this.chainPages.length > specificPage ?
+                specificPage :
+                null;
 
               // preselect show contacts & show contact of contacts
               this.showContacts = this.snapshotOptionsMap[this.selectedSnapshot].snapshot.showContacts;
@@ -3100,7 +2802,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   /**
    * Export chains of transmission as pdf
    */
-  private exportChainsOfTransmission(): void {
+  exportChainsOfTransmission(): void {
     // open dialog to choose the split factor
     this.dialogV2Service
       .showSideDialog({
@@ -3188,7 +2890,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   /**
    * Export geospatial map
    */
-  private exportGeospatialMap(): void {
+  exportGeospatialMap(): void {
     // world map visible ?
     if (!this.worldMap) {
       this.toastV2Service.notice('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EXPORT_NOTHING_TO_EXPORT');
@@ -3212,7 +2914,17 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   /**
    * Create new snapshot
    */
-  private createNewSnapshot(deleteSnapshotId?: string): void {
+  createNewSnapshot(deleteSnapshotId?: string): void {
+    // can't create snapshots when not on active outbreak
+    if (this.selectedOutbreak?.id !== this.authUser?.activeOutbreakId) {
+      // show message
+      this.toastV2Service.notice('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_NOT_ACTIVE_OUTBREAK');
+
+      // finished
+      return;
+    }
+
+    // show side dialog
     this.dialogV2Service
       .showSideDialog({
         title: {
@@ -3398,6 +3110,274 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           generateSnapshot();
         }
       });
+  }
+
+  /**
+   * Should update height of table
+   */
+  resizeTable(): void {
+    // local variables
+    let margins;
+
+    // determine top part used space
+    let topHeight: number = 0;
+    const top = this.elementRef.nativeElement.querySelector('.gd-basic-top');
+    if (top) {
+      // add height
+      topHeight += top.offsetHeight;
+
+      // get top margins
+      margins = getComputedStyle(top);
+      if (margins) {
+        // top margin
+        if (margins.marginTop) {
+          topHeight += parseInt(margins.marginTop, 10);
+        }
+
+        // bottom margin
+        if (margins.marginBottom) {
+          topHeight += parseInt(margins.marginBottom, 10);
+        }
+      }
+    }
+
+    // set table height
+    const table = this.elementRef.nativeElement.querySelector('.gd-basic-content');
+    if (table) {
+      // set main table height - mat card
+      table.style.height = `calc(100% - ${topHeight}px)`;
+    }
+  }
+
+  /**
+   * Show advanced filters
+   */
+  showAdvancedFilters(): void {
+    // show advanced filters dialog
+    this.dialogV2Service
+      .showAdvancedFiltersDialog(
+        Constants.APP_PAGE.COT_GRAPH.value,
+        [{
+          type: V2AdvancedFilterType.TEXT,
+          field: 'firstName',
+          label: 'LNG_PAGE_GRAPH_SNAPSHOT_FILTER_FIRST_NAME_LABEL',
+          allowedComparators: [
+            _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.TEXT], { value: V2AdvancedFilterComparatorType.CONTAINS_TEXT })
+          ],
+          filterBy: (
+            _qb,
+            filter
+          ) => {
+            this.snapshotFilters.firstName = filter.value ?
+              filter.value :
+              undefined;
+          }
+        }, {
+          type: V2AdvancedFilterType.TEXT,
+          field: 'lastName',
+          label: 'LNG_PAGE_GRAPH_SNAPSHOT_FILTER_LAST_NAME_LABEL',
+          allowedComparators: [
+            _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.TEXT], { value: V2AdvancedFilterComparatorType.CONTAINS_TEXT })
+          ],
+          filterBy: (
+            _qb,
+            filter
+          ) => {
+            this.snapshotFilters.lastName = filter.value ?
+              filter.value :
+              undefined;
+          }
+        }, {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'labSeqResult',
+          label: 'LNG_PAGE_GRAPH_SNAPSHOT_FILTER_LAB_SEQ_RESULT_LABEL',
+          options: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          allowedComparators: [
+            _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
+          ],
+          filterBy: (
+            _qb,
+            filter
+          ) => {
+            this.snapshotFilters.labSeqResult = filter.value ?
+              filter.value :
+              undefined;
+          }
+        }],
+        this.advancedFiltersApplied,
+        {
+          operatorHide: true
+        }
+      )
+      .subscribe((response) => {
+        // cancelled ?
+        if (!response) {
+          return;
+        }
+
+        // set data
+        this.advancedFiltersApplied = response.filtersApplied;
+
+        // emit the Request Query Builder
+        this.loadChainsOfTransmission(
+          response,
+          0
+        );
+      });
+  }
+
+  /**
+   * Configure graph
+   */
+  configureGraph(): void {
+    this.dialogV2Service.showSideDialog({
+      title: {
+        get: () => 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_GRAPH'
+      },
+      hideInputFilter: true,
+      width: '50rem',
+      inputs: [
+        {
+          type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+          name: 'showEvents',
+          placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_EVENTS_LABEL',
+          value: this.showEvents
+        }, {
+          type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+          name: 'showContacts',
+          placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_LABEL',
+          value: this.showContacts,
+          change: (data) => {
+            // nothing to do ?
+            const checked = (data.map.showContacts as IV2SideDialogConfigInputToggleCheckbox).value;
+            if (!checked) {
+              (data.map.includeContactsOfContacts as IV2SideDialogConfigInputToggleCheckbox).value = false;
+            }
+          },
+          visible: () => {
+            return !this.snapshotOptionsMap || !this.selectedSnapshot || !this.snapshotOptionsMap[this.selectedSnapshot] || !this.snapshotOptionsMap[this.selectedSnapshot].snapshot.showContacts;
+          }
+        }, {
+          type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+          name: 'includeContactsOfContacts',
+          placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_OF_CONTACTS',
+          value: this.showContactsOfContacts,
+          disabled: (data) => {
+            return !(data.map.showContacts as IV2SideDialogConfigInputToggleCheckbox).value;
+          },
+          visible: () => {
+            return !this.snapshotOptionsMap || !this.selectedSnapshot || !this.snapshotOptionsMap[this.selectedSnapshot] || !this.snapshotOptionsMap[this.selectedSnapshot].snapshot.showContactsOfContacts;
+          }
+        }, {
+          type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+          name: 'showLabResultsSeqData',
+          placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_LAB_RESULTS_SEQUENCE_DATA',
+          value: this.showLabResultsSeqData
+        }, {
+          type: V2SideDialogConfigInputType.DIVIDER,
+          placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SETTINGS_TITLE'
+        }, {
+          type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+          name: 'nodeLabelCriteria',
+          placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LABEL_TITLE',
+          options: (this.activatedRoute.snapshot.data.cotNodeLabel as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          value: this.colorCriteria.nodeLabelCriteria
+        }, {
+          type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+          name: 'nodeNameColorCriteria',
+          placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_NAME_COLOR_TITLE',
+          options: (this.activatedRoute.snapshot.data.cotNodeColor as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          value: this.colorCriteria.nodeNameColorCriteria
+        }, {
+          type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+          name: 'nodeColorCriteria',
+          placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_COLOR_TITLE',
+          options: (this.activatedRoute.snapshot.data.cotNodeColor as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          value: this.colorCriteria.nodeColorCriteria
+        }, {
+          type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+          name: 'nodeIconCriteria',
+          placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_ICON_TITLE',
+          options: (this.activatedRoute.snapshot.data.cotNodeIcon as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          value: this.colorCriteria.nodeIconCriteria
+        }, {
+          type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+          name: 'nodeShapeCriteria',
+          placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_SHAPE_TITLE',
+          options: (this.activatedRoute.snapshot.data.cotNodeShape as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          value: this.colorCriteria.nodeShapeCriteria
+        }, {
+          type: V2SideDialogConfigInputType.DIVIDER,
+          placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_SETTINGS_TITLE'
+        }, {
+          type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+          name: 'edgeLabelCriteria',
+          placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_LABEL_TITLE',
+          options: (this.activatedRoute.snapshot.data.cotEdgeLabel as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          value: this.colorCriteria.edgeLabelCriteria,
+          change: (data) => {
+            if ((data.map.edgeLabelCriteria as IV2SideDialogConfigInputSingleDropdown).value !== Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value) {
+              (data.map.edgeIconCriteria as IV2SideDialogConfigInputSingleDropdown).value = Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.NONE.value;
+            }
+          }
+        }, {
+          type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+          name: 'edgeIconCriteria',
+          placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_ICON_TITLE',
+          options: (this.activatedRoute.snapshot.data.cotEdgeIcon as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          value: this.colorCriteria.edgeIconCriteria,
+          change: (data) => {
+            if ((data.map.edgeIconCriteria as IV2SideDialogConfigInputSingleDropdown).value !== Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.NONE.value) {
+              (data.map.edgeLabelCriteria as IV2SideDialogConfigInputSingleDropdown).value = Constants.TRANSMISSION_CHAIN_EDGE_LABEL_CRITERIA_OPTIONS.NONE.value;
+            }
+          }
+        }, {
+          type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+          name: 'edgeColorCriteria',
+          placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_COLOR_TITLE',
+          options: (this.activatedRoute.snapshot.data.cotEdgeColor as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+          value: this.colorCriteria.edgeColorCriteria
+        }
+      ],
+      bottomButtons: [{
+        type: IV2SideDialogConfigButtonType.OTHER,
+        label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_LOAD_SNAPSHOT',
+        color: 'primary'
+      }, {
+        type: IV2SideDialogConfigButtonType.CANCEL,
+        label: 'LNG_COMMON_BUTTON_CANCEL',
+        color: 'text'
+      }]
+    }).subscribe((response) => {
+      // cancelled ?
+      if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+        // finished
+        return;
+      }
+
+      // update
+      this.showEvents = (response.data.map.showEvents as IV2SideDialogConfigInputToggleCheckbox).value;
+      this.showContacts = (response.data.map.showContacts as IV2SideDialogConfigInputToggleCheckbox).value;
+      this.showContactsOfContacts = (response.data.map.includeContactsOfContacts as IV2SideDialogConfigInputToggleCheckbox).value;
+      this.showLabResultsSeqData = (response.data.map.showLabResultsSeqData as IV2SideDialogConfigInputToggleCheckbox).value;
+      this.colorCriteria.nodeLabelCriteria = (response.data.map.nodeLabelCriteria as IV2SideDialogConfigInputSingleDropdown).value;
+      this.colorCriteria.nodeNameColorCriteria = (response.data.map.nodeNameColorCriteria as IV2SideDialogConfigInputSingleDropdown).value;
+      this.colorCriteria.nodeColorCriteria = (response.data.map.nodeColorCriteria as IV2SideDialogConfigInputSingleDropdown).value;
+      this.colorCriteria.nodeIconCriteria = (response.data.map.nodeIconCriteria as IV2SideDialogConfigInputSingleDropdown).value;
+      this.colorCriteria.nodeShapeCriteria = (response.data.map.nodeShapeCriteria as IV2SideDialogConfigInputSingleDropdown).value;
+      this.colorCriteria.edgeLabelCriteria = (response.data.map.edgeLabelCriteria as IV2SideDialogConfigInputSingleDropdown).value;
+      this.colorCriteria.edgeIconCriteria = (response.data.map.edgeIconCriteria as IV2SideDialogConfigInputSingleDropdown).value;
+      this.colorCriteria.edgeColorCriteria = (response.data.map.edgeColorCriteria as IV2SideDialogConfigInputSingleDropdown).value;
+
+      // close
+      response.handler.hide();
+
+      // load chain
+      this.loadChainsOfTransmission(
+        undefined,
+        0
+      );
+    });
   }
 }
 

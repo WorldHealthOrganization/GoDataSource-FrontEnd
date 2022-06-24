@@ -357,6 +357,16 @@ export class TransmissionChainDataService {
       });
     }
 
+    // re-label pages
+    pages.forEach((page) => {
+      page.pageLabel = this.i18nService.instant(
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE_LABEL_FORMAT', {
+          no: page.pageLabel,
+          total: pages.length
+        }
+      );
+    });
+
     // finished
     return pages;
   }
