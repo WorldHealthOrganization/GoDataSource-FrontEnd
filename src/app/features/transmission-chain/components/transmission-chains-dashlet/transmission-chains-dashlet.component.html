@@ -201,14 +201,15 @@
 
 <!-- Content -->
 <mat-card
-  class="gd-basic-content">
+  class="gd-basic-content"
+  [class.gd-geospatial-map]="transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value">
 
   <!-- Configure snapshot -->
   <div
     *ngIf="chainGroup &&
       !mustLoadChain &&
       selectedChainPageIndex !== null"
-    class="gd-cot-options"
+    class="gd-cot-options {{ fullScreen ? 'gd-cot-options-fullscreen' : '' }}"
     fxLayout="column">
 
     <!-- Title & Collapse / Expand -->
@@ -289,7 +290,8 @@
       <!-- Toggles -->
       <div
         *ngIf="transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0"
-        class="graph-actions {{ fullScreen ? 'graph-actions-full-screen' : '' }} {{ transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value ? 'graph-actions-geo-map' : '' }}" fxLayout="row" fxLayoutGap="0.8rem" fxLayoutAlign="space-between center">
+        class="graph-actions {{ fullScreen ? 'graph-actions-full-screen' : '' }} {{ transmissionChainViewType === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value ? 'graph-actions-geo-map' : '' }}"
+        fxLayout="row" fxLayout.xs="column" fxLayoutGap="0.8rem" fxLayoutAlign="space-between center">
 
         <!-- Toggle Edit mode -->
         <app-form-toggle-checkbox-v2
@@ -324,7 +326,9 @@
     *ngIf="chainGroup && !mustLoadChain && selectedChainPageIndex !== null">
     <div
       *ngIf="legend && (transmissionChainViewType !== Constants.TRANSMISSION_CHAIN_VIEW_TYPES.GEOSPATIAL_MAP.value || markers.length > 0)"
-      class="gd-cot-legend {{ fullScreen ? 'gd-cot-legend-fullscreen' : '' }}">
+      class="gd-cot-legend"
+      [class.gd-cot-legend-fullscreen]="fullScreen"
+      [class.gd-cot-legend-expanded]="!legendCollapsed">
 
       <!-- Title & Collapse / Expand -->
       <div
@@ -341,7 +345,7 @@
         <button
           fxGrow="0"
           class="gd-cot-legend-title-bar-button"
-          [class.gd-cot-legend-expanded]="!legendCollapsed"
+          [class.gd-cot-legend-title-bar-button-expanded]="!legendCollapsed"
           type="button"
           mat-icon-button
           (click)="legendCollapsed = !legendCollapsed">

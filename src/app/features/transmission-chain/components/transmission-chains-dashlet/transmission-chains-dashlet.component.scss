@@ -69,6 +69,7 @@ app-transmission-chains-dashlet {
   .gd-basic-content {
     @include breakpoint('xs') {
       height: auto !important;
+      overflow: hidden;
     }
 
     /* No data */
@@ -108,6 +109,10 @@ app-transmission-chains-dashlet {
         position: relative;
       }
 
+      &.gd-cot-options-fullscreen {
+        position: fixed;
+      }
+
       .gd-cot-options-title-bar {
         padding: 0.8rem 1.6rem;
 
@@ -142,11 +147,27 @@ app-transmission-chains-dashlet {
 
         .gd-form-toggle-v2 {
           margin-bottom: 1.6rem;
+
+          .mat-button-toggle-group {
+            @include breakpoint('xxs') {
+              @include flex_direction(column);
+            }
+          }
+        }
+
+        app-form-toggle-checkbox-v2 {
+          @include breakpoint('xxs') {
+            width: 100%;
+          }
         }
 
         > .mat-flat-button {
           margin-bottom: 1.6rem;
           width: 100%;
+
+          @include breakpoint('xxs') {
+            white-space: normal;
+          }
         }
       }
     }
@@ -158,9 +179,9 @@ app-transmission-chains-dashlet {
       @include border-radius(0.4rem);
       font-size: 1.2rem;
       height: auto;
-      max-height: calc(100% - 3.2rem);
+      max-height: calc(100% - 10rem);
       max-width: 30rem;
-      overflow-y: auto;
+      overflow: hidden;
       position: absolute;
       right: 1.6rem;
       top: 1.6rem;
@@ -199,7 +220,7 @@ app-transmission-chains-dashlet {
             @include transition(all 0.24s ease-in-out 0s);
           }
 
-          &.gd-cot-legend-expanded {
+          &.gd-cot-legend-title-bar-button-expanded {
             .mat-icon {
               @include rotate(180deg);
             }
@@ -209,6 +230,9 @@ app-transmission-chains-dashlet {
 
       .gd-cot-legend-content {
         border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+        height: auto;
+        max-height: calc(100% - 5.2rem);
+        overflow-y: auto;
         padding: 0.8rem 1.6rem 1.6rem;
 
         .legend-name {
@@ -271,6 +295,18 @@ app-transmission-chains-dashlet {
           width: 1.6rem;
         }
       }
+
+      &.gd-cot-legend-expanded {
+        @include breakpoint('gt-xs') {
+          height: 100%;
+        }
+
+        .gd-cot-legend-content {
+          @include breakpoint('xs') {
+            max-height: 35rem;
+          }
+        }
+      }
     }
 
     /* Graph element */
@@ -292,9 +328,7 @@ app-transmission-chains-dashlet {
         z-index: 9999;
   
         &.cy-zoom-buttons-full-screen {
-          left: 0;
           position: fixed;
-          top: 0;
         }
   
         .cy-zoom-button {
@@ -319,7 +353,6 @@ app-transmission-chains-dashlet {
   
       .cytoscape-graph-container {
         height: 100%;
-        position: relative;
   
         .graph-inner-container {
           height: 100%;
@@ -373,18 +406,80 @@ app-transmission-chains-dashlet {
   
     /* Graph map */
     .geospatial-map-container {
-      height: calc(100% + 1.6rem);
+      height: 100%;
   
       app-world-map {
-        margin: 0 -1.6rem -1.6rem;
+        .world-map-full-screen {
+          right: 32.4rem;
+          top: 1.6rem;
+        }
+      }
+
+      .ol-zoom {
+        left: 39.4rem;
+        top: 1.6rem;
       }
     }
   
     /* Graph timeline */
     .timeline-info-buttons {
-      bottom: 2.4rem;
-      left: 2.4rem;
+      bottom: 0.8rem;
+      left: 4rem;
       position: absolute;
+
+      @include breakpoint('xxs') {
+        @include flex_direction(column !important);
+      }
+
+      > .mat-flat-button {
+        @include breakpoint('xxs') {
+          white-space: normal;
+        }
+      }
+    }
+
+    &.gd-geospatial-map {
+      @include breakpoint('xs') {
+        height: 100% !important;
+      }
+
+      .gd-cot-options,
+      .gd-cot-legend {
+        @include breakpoint('sm') {
+          max-width: 25rem;
+        }
+      }
+
+      .gd-cot-graph {
+        @include breakpoint('xs') {
+          height: calc(100% - 15.6rem);
+          margin-top: 4.8rem;
+        }
+      }
+
+      .geospatial-map-container {
+        app-world-map {
+          .world-map-full-screen {
+            @include breakpoint('sm') {
+              right: 27.4rem;
+            }
+
+            @include breakpoint('xs') {
+              right: 1.6rem;
+            }
+          }
+        }
+
+        .ol-zoom {
+          @include breakpoint('sm') {
+            left: 27.4rem;
+          }
+
+          @include breakpoint('xs') {
+            left: 1.6rem;
+          }
+        }
+      }
     }
   }
 }
