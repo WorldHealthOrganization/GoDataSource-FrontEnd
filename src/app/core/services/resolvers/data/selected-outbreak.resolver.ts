@@ -18,6 +18,6 @@ export class SelectedOutbreakDataResolver implements Resolve<OutbreakModel> {
    */
   resolve(): Observable<OutbreakModel> {
     // retrieve user information
-    return this.outbreakDataService.getSelectedOutbreak();
+    return this.outbreakDataService.determineSelectedOutbreak(true);
   }
 }
