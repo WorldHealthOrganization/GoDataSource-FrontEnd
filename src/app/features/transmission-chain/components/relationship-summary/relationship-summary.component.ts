@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { UserModel } from '../../../../core/models/user.model';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -14,6 +13,8 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 
 @Component({
   selector: 'app-relationship-summary',
@@ -78,20 +79,21 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
   RelationshipModel = RelationshipModel;
 
   selectedOutbreak: OutbreakModel;
-  relationshipData: LabelValuePair[] = [];
+  relationshipData: ILabelValuePairModel[] = [];
 
   relationshipLink: string;
 
   canReverseRelation: boolean = true;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private authDataService: AuthDataService,
     private relationshipDataService: RelationshipDataService,
     private outbreakDataService: OutbreakDataService,
-    private dialogService: DialogService
+    private dialogService: DialogService,
+    private entityHelperService: EntityHelperService
   ) {}
 
   ngOnChanges(changes: SimpleChanges) {
@@ -171,9 +173,8 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
       });
   }
 
-  updateRelationshipData(_relationship: RelationshipModel) {
-    // #TODO - new design
-    // this.relationshipData = this.relationshipDataService.getLightObjectDisplay(relationship);
+  updateRelationshipData(relationship: RelationshipModel) {
+    this.relationshipData = this.entityHelperService.lightRelationship(relationship);
   }
 
   onRemove() {
