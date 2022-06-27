@@ -449,7 +449,7 @@ export class EntityHelperService {
   /**
    * Get light entity
    */
-  private lightEntity(
+  lightEntity(
     entity: CaseModel | EventModel | ContactModel | ContactOfContactModel
   ): ILabelValuePairModel[] {
     // create list of fields to display
@@ -578,7 +578,7 @@ export class EntityHelperService {
   /**
    * Get light relationship
    */
-  private lightRelationship(
+  lightRelationship(
     relationship: RelationshipModel
   ): ILabelValuePairModel[] {
     // determine source and target
