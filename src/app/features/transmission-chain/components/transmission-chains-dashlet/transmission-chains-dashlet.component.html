@@ -529,7 +529,7 @@
 
   <!-- Nothing to display ? -->
   <div
-    *ngIf="showSnapshots && !mustLoadChain && chainGroupId && chainGroupId === selectedSnapshot && chainPages && chainPages.length < 1"
+    *ngIf="mustLoadChain || !chainPages || chainPages.length < 1"
     fxLayout="column" fxLayoutAlign="center center"
     class="gd-cot-no-data">
 
