@@ -34,14 +34,18 @@ app-transmission-chains-dashlet {
 
           .mat-form-field {
             background: var(--gd-background);
-            min-width: 25rem;
+            min-width: 35rem;
 
-            @include breakpoint('md') {
-              min-width: 20rem;
+            @include breakpoint('lg') {
+              min-width: 30rem;
             }
 
-            @include breakpoint('sm') {
-              min-width: 15rem;
+            @include breakpoint('lt-md') {
+              min-width: 24rem;
+            }
+
+            @media only screen and (min-width: 960px) and (max-width: 1023px) {
+              min-width: 17rem;
             }
 
             .mat-form-field-wrapper {
@@ -297,7 +301,7 @@ app-transmission-chains-dashlet {
       }
 
       &.gd-cot-legend-expanded {
-        @include breakpoint('gt-xs') {
+        @media only screen and (min-width: 768px) and (max-height: 1024px) {
           height: 100%;
         }
 
