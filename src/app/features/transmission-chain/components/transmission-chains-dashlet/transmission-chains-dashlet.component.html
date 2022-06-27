@@ -264,7 +264,7 @@
         name="chainColaRenderMethod"
         [(ngModel)]="renderMethod"
         [options]="renderMethodOptions"
-        (ngModelChange)="mustLoadChain = true">
+        (ngModelChange)="mustLoadChain = true; loadChainsOfTransmission(undefined, 0)">
       </app-form-toggle-v2>
 
       <!-- Pages -->
