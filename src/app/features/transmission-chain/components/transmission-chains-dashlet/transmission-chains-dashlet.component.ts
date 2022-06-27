@@ -44,7 +44,7 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import {
   IV2SideDialogAdvancedFiltersResponse,
-  IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigButtonType, IV2SideDialogConfigInputAccordion,
   IV2SideDialogConfigInputDate,
   IV2SideDialogConfigInputDateRange,
   IV2SideDialogConfigInputMultiDropdown,
@@ -53,7 +53,7 @@ import {
   IV2SideDialogConfigInputNumberRange,
   IV2SideDialogConfigInputSingleDropdown,
   IV2SideDialogConfigInputText,
-  IV2SideDialogConfigInputToggleCheckbox,
+  IV2SideDialogConfigInputToggleCheckbox, V2SideDialogConfigInput,
   V2SideDialogConfigInputType
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
@@ -763,13 +763,13 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                             color: 'primary'
                           }, {
                             type: IV2BottomDialogConfigButtonType.OTHER,
-                            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_REPLACE_MOST_RECENT',
-                            key: 'replace_most_recent',
+                            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_LOAD_MOST_RECENT',
+                            key: 'load_most_recent',
                             color: 'primary'
                           }, {
                             type: IV2BottomDialogConfigButtonType.OTHER,
-                            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_LOAD_MOST_RECENT',
-                            key: 'load_most_recent',
+                            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_REPLACE_MOST_RECENT',
+                            key: 'replace_most_recent',
                             color: 'primary'
                           }, {
                             type: IV2BottomDialogConfigButtonType.CANCEL,
@@ -2934,7 +2934,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     this.dialogV2Service
       .showSideDialog({
         title: {
-          get: () => 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_SETTINGS'
+          get: () => deleteSnapshotId ?
+            'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_REFRESH_TITLE' :
+            'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_SETTINGS'
         },
         hideInputFilter: true,
         width: '50rem',
@@ -2979,73 +2981,87 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             tooltip: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DESCRIPTION',
             value: this.dateGlobalFilter
           }, {
-            type: V2SideDialogConfigInputType.DIVIDER,
-            placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTERS_TITLE'
-          }, {
-            type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
-            name: 'classificationId',
-            placeholder: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
-            options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            values: this.filters.classificationId
-          }, {
-            type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
-            name: 'occupation',
-            placeholder: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
-            options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            values: this.filters.occupation
-          }, {
-            type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
-            name: 'outcomeId',
-            placeholder: 'LNG_CASE_FIELD_LABEL_OUTCOME',
-            options: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            values: this.filters.outcomeId
-          }, {
-            type: V2SideDialogConfigInputType.TEXT,
-            name: 'firstName',
-            placeholder: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
-            value: this.filters.firstName
-          }, {
-            type: V2SideDialogConfigInputType.TEXT,
-            name: 'lastName',
-            placeholder: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
-            value: this.filters.lastName
-          }, {
-            type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
-            name: 'gender',
-            placeholder: 'LNG_CASE_FIELD_LABEL_GENDER',
-            options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            values: this.filters.gender
-          }, {
-            type: V2SideDialogConfigInputType.LOCATION_MULTIPLE,
-            name: 'locationIds',
-            placeholder: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
-            useOutbreakLocations: true,
-            values: this.filters.locationIds
-          }, {
-            type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
-            name: 'clusterIds',
-            placeholder: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
-            options: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ClusterModel>).options,
-            values: this.filters.clusterIds
-          }, {
-            type: V2SideDialogConfigInputType.DIVIDER,
-            placeholder: 'LNG_ENTITY_FIELD_LABEL_AGE'
-          }, {
-            type: V2SideDialogConfigInputType.NUMBER_RANGE,
-            name: 'age',
-            value: this.filters.age
-          }, {
-            type: V2SideDialogConfigInputType.DIVIDER,
-            placeholder: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE'
-          }, {
-            type: V2SideDialogConfigInputType.DATE_RANGE,
-            name: 'date',
-            value: this.filters.date
+            type: V2SideDialogConfigInputType.ACCORDION,
+            name: 'filters',
+            placeholder: '',
+            cssClasses: 'gd-no-max-height',
+            panels: [
+              {
+                type: V2SideDialogConfigInputType.ACCORDION_PANEL,
+                name: 'filters-panel',
+                placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTERS_TITLE',
+                inputs: [
+                  {
+                    type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
+                    name: 'classificationId',
+                    placeholder: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+                    options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                    values: this.filters.classificationId
+                  }, {
+                    type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
+                    name: 'occupation',
+                    placeholder: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
+                    options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                    values: this.filters.occupation
+                  }, {
+                    type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
+                    name: 'outcomeId',
+                    placeholder: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+                    options: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                    values: this.filters.outcomeId
+                  }, {
+                    type: V2SideDialogConfigInputType.TEXT,
+                    name: 'firstName',
+                    placeholder: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
+                    value: this.filters.firstName
+                  }, {
+                    type: V2SideDialogConfigInputType.TEXT,
+                    name: 'lastName',
+                    placeholder: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
+                    value: this.filters.lastName
+                  }, {
+                    type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
+                    name: 'gender',
+                    placeholder: 'LNG_CASE_FIELD_LABEL_GENDER',
+                    options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                    values: this.filters.gender
+                  }, {
+                    type: V2SideDialogConfigInputType.LOCATION_MULTIPLE,
+                    name: 'locationIds',
+                    placeholder: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
+                    useOutbreakLocations: true,
+                    values: this.filters.locationIds
+                  }, {
+                    type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
+                    name: 'clusterIds',
+                    placeholder: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+                    options: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ClusterModel>).options,
+                    values: this.filters.clusterIds
+                  }, {
+                    type: V2SideDialogConfigInputType.DIVIDER,
+                    placeholder: 'LNG_ENTITY_FIELD_LABEL_AGE'
+                  }, {
+                    type: V2SideDialogConfigInputType.NUMBER_RANGE,
+                    name: 'age',
+                    value: this.filters.age
+                  }, {
+                    type: V2SideDialogConfigInputType.DIVIDER,
+                    placeholder: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE'
+                  }, {
+                    type: V2SideDialogConfigInputType.DATE_RANGE,
+                    name: 'date',
+                    value: this.filters.date
+                  }
+                ]
+              }
+            ]
           }
         ],
         bottomButtons: [{
           type: IV2SideDialogConfigButtonType.OTHER,
-          label: 'LNG_COMMON_BUTTON_CREATE',
+          label: deleteSnapshotId ?
+            'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_REFRESH' :
+            'LNG_COMMON_BUTTON_CREATE',
           color: 'primary',
           disabled: (_data, handler): boolean => {
             return !handler.form || handler.form.invalid;
@@ -3073,16 +3089,26 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
           this.dateGlobalFilter = typeof date === 'string' ?
             date :
             (date ? date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : undefined);
-          this.filters.classificationId = (response.data.map.classificationId as IV2SideDialogConfigInputMultiDropdown).values;
-          this.filters.occupation = (response.data.map.occupation as IV2SideDialogConfigInputMultiDropdown).values;
-          this.filters.outcomeId = (response.data.map.outcomeId as IV2SideDialogConfigInputMultiDropdown).values;
-          this.filters.firstName = (response.data.map.firstName as IV2SideDialogConfigInputText).value;
-          this.filters.lastName = (response.data.map.lastName as IV2SideDialogConfigInputText).value;
-          this.filters.gender = (response.data.map.gender as IV2SideDialogConfigInputMultiDropdown).values;
-          this.filters.locationIds = (response.data.map.locationIds as IV2SideDialogConfigInputMultipleLocation).values;
-          this.filters.clusterIds = (response.data.map.clusterIds as IV2SideDialogConfigInputMultiDropdown).values;
-          this.filters.age = (response.data.map.age as IV2SideDialogConfigInputNumberRange).value;
-          this.filters.date = (response.data.map.date as IV2SideDialogConfigInputDateRange).value;
+
+          // panel filters - map inputs
+          const panelMap: {
+            [name: string]: V2SideDialogConfigInput
+          } = {};
+          (response.data.map.filters as IV2SideDialogConfigInputAccordion).panels[0].inputs.forEach((panelInput) => {
+            panelMap[panelInput.name] = panelInput;
+          });
+
+          // panel filters - update panel filters
+          this.filters.classificationId = (panelMap.classificationId as IV2SideDialogConfigInputMultiDropdown).values;
+          this.filters.occupation = (panelMap.occupation as IV2SideDialogConfigInputMultiDropdown).values;
+          this.filters.outcomeId = (panelMap.outcomeId as IV2SideDialogConfigInputMultiDropdown).values;
+          this.filters.firstName = (panelMap.firstName as IV2SideDialogConfigInputText).value;
+          this.filters.lastName = (panelMap.lastName as IV2SideDialogConfigInputText).value;
+          this.filters.gender = (panelMap.gender as IV2SideDialogConfigInputMultiDropdown).values;
+          this.filters.locationIds = (panelMap.locationIds as IV2SideDialogConfigInputMultipleLocation).values;
+          this.filters.clusterIds = (panelMap.clusterIds as IV2SideDialogConfigInputMultiDropdown).values;
+          this.filters.age = (panelMap.age as IV2SideDialogConfigInputNumberRange).value;
+          this.filters.date = (panelMap.date as IV2SideDialogConfigInputDateRange).value;
 
           // close
           response.handler.hide();
