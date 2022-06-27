@@ -763,13 +763,13 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                             color: 'primary'
                           }, {
                             type: IV2BottomDialogConfigButtonType.OTHER,
-                            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_REPLACE_MOST_RECENT',
-                            key: 'replace_most_recent',
+                            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_LOAD_MOST_RECENT',
+                            key: 'load_most_recent',
                             color: 'primary'
                           }, {
                             type: IV2BottomDialogConfigButtonType.OTHER,
-                            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_LOAD_MOST_RECENT',
-                            key: 'load_most_recent',
+                            label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_REPLACE_MOST_RECENT',
+                            key: 'replace_most_recent',
                             color: 'primary'
                           }, {
                             type: IV2BottomDialogConfigButtonType.CANCEL,
@@ -2934,7 +2934,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     this.dialogV2Service
       .showSideDialog({
         title: {
-          get: () => 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_SETTINGS'
+          get: () => deleteSnapshotId ?
+            'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_REFRESH_TITLE' :
+            'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_CONFIGURE_SETTINGS'
         },
         hideInputFilter: true,
         width: '50rem',
@@ -3045,7 +3047,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         ],
         bottomButtons: [{
           type: IV2SideDialogConfigButtonType.OTHER,
-          label: 'LNG_COMMON_BUTTON_CREATE',
+          label: deleteSnapshotId ?
+            'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_BUTTON_REFRESH' :
+            'LNG_COMMON_BUTTON_CREATE',
           color: 'primary',
           disabled: (_data, handler): boolean => {
             return !handler.form || handler.form.invalid;
