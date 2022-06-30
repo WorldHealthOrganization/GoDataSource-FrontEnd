@@ -53,6 +53,9 @@ export class AppFormSelectSingleV2Component
   // sort disabled
   @Input() sortDisabled: boolean;
 
+  // scroll to top when showing options popup ?
+  @Input() optionsPopupScrollToTop: boolean;
+
   // loading
   @Input() loading: boolean;
 
@@ -178,15 +181,28 @@ export class AppFormSelectSingleV2Component
    * vScroll to see the first selected item
    */
   vScrollToFirstSelectedOption(): void {
+    // nothing to do ?
+    if (!this.cdkVirtualScrollViewport) {
+      return;
+    }
+
+    // scroll to top ?
+    if (this.optionsPopupScrollToTop) {
+      // scroll
+      this.cdkVirtualScrollViewport.scrollToOffset(0);
+      this.changeDetectorRef.detectChanges();
+
+      // finished
+      return;
+    }
+
     // scroll to item ?
-    if (
-      this.value &&
-      this.cdkVirtualScrollViewport
-    ) {
+    if (this.value) {
       // determine value to search
       const index: number = this.filteredOptions.findIndex((option) => option.value === this.value);
       if (index > -1) {
         this.cdkVirtualScrollViewport.scrollToIndex(index);
+        this.changeDetectorRef.detectChanges();
       }
     }
   }
