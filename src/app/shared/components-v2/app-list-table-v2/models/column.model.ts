@@ -45,6 +45,7 @@ export interface IV2ColumnBasic {
   exclude?: (IV2Column) => boolean;
   pinned?: IV2ColumnPinned | boolean;
   notResizable?: boolean;
+  notMovable?: boolean;
   link?: (any) => string;
   cssCellClass?: string;
   sortable?: boolean;
@@ -66,7 +67,8 @@ export enum V2ColumnFormat {
   COLOR,
   ICON_URL,
   ICON_MATERIAL,
-  LINK_LIST
+  LINK_LIST,
+  HTML
 }
 
 /**
@@ -168,6 +170,7 @@ export interface IV2ColumnButton {
   exclude?: (IV2Column) => boolean;
   pinned?: IV2ColumnPinned | boolean;
   notResizable?: boolean;
+  notMovable?: boolean;
   cssCellClass?: string;
   sortable?: boolean;
   filter?: V2Filter;
@@ -256,6 +259,7 @@ export interface IV2ColumnStatus {
 
   // optional
   notVisible?: boolean;
+  notMovable?: boolean;
   exclude?: (IV2Column) => boolean;
   pinned?: IV2ColumnPinned | boolean;
   cssCellClass?: string;
@@ -283,6 +287,32 @@ export interface IV2ColumnLinkList {
   exclude?: (IV2Column) => boolean;
   pinned?: IV2ColumnPinned | boolean;
   notResizable?: boolean;
+  notMovable?: boolean;
+  cssCellClass?: string;
+  filter?: V2Filter;
+
+  // never
+  sortable?: never;
+}
+
+/**
+ * HTML column
+ */
+export interface IV2ColumnHTML {
+  // required
+  format: Omit<IV2ColumnBasicFormatType, 'type'> & {
+    type: V2ColumnFormat.HTML
+  };
+  field: string;
+  label: string;
+  html: (data: any, column: IV2ColumnHTML) => string;
+
+  // optional
+  notVisible?: boolean;
+  exclude?: (IV2Column) => boolean;
+  pinned?: IV2ColumnPinned | boolean;
+  notResizable?: boolean;
+  notMovable?: boolean;
   cssCellClass?: string;
   filter?: V2Filter;
 
@@ -294,7 +324,7 @@ export interface IV2ColumnLinkList {
  * Column
  */
 export type IV2Column = IV2ColumnBasic | IV2ColumnButton | IV2ColumnAge | IV2ColumnDate | IV2ColumnDatetime | IV2ColumnBoolean | IV2ColumnColor
-| IV2ColumnIconURL | IV2ColumnIconMaterial | IV2ColumnAction | IV2ColumnStatus | IV2ColumnLinkList;
+| IV2ColumnIconURL | IV2ColumnIconMaterial | IV2ColumnAction | IV2ColumnStatus | IV2ColumnLinkList | IV2ColumnHTML;
 
 /**
  * Filter handler
