@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { TeamModel } from '../../../../core/models/team.model';
 import { ContactModel } from '../../../../core/models/contact.model';
@@ -20,28 +20,22 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
   selector: 'app-contact-follow-ups-bulk-modify',
   templateUrl: './contact-follow-ups-bulk-modify.component.html'
 })
 export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyComponent<FollowUpModel> implements OnDestroy {
-  // selected follow-ups ids
-  selectedFollowUpsIds: string[];
-  // selected follow-ups to be modified
+  // data
   selectedFollowUps: FollowUpModel[] = [];
-
   futureFollowUps: boolean = false;
-
-  // selected contacts
   selectedContacts: (ContactModel | CaseModel)[] = [];
-
-  // follow-up dates
   followUpDates: string[] = [];
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -59,26 +53,11 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
       activatedRoute,
       authDataService
     );
-    // read route query params
-    this.activatedRoute.queryParams
-      .subscribe((queryParams: { followUpsIds }) => {
-        if (_.isEmpty(queryParams.followUpsIds)) {
-          this.toastV2Service.error('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ERROR_NO_FOLLOW_UPS_SELECTED');
-
-          // No entities selected
-          this.disableDirtyConfirm();
-          this.router.navigate(['/contacts/follow-ups']);
-        } else {
-          this.selectedFollowUpsIds = JSON.parse(queryParams.followUpsIds);
-
-          this.loadFollowUps();
-        }
-      });
   }
 
   /**
-  * Release resources
-  */
+   * Release resources
+   */
   ngOnDestroy(): void {
     // parent
     super.onDestroy();
@@ -95,8 +74,77 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
   * Retrieve item
   */
   protected retrieveItem(): Observable<FollowUpModel> {
-    // TODO: Can this workaround be improved?
-    return of(null);
+    return new Observable<FollowUpModel>((subscriber) => {
+      // retrieve follow-ups information
+      const qb: RequestQueryBuilder = new RequestQueryBuilder();
+
+      // bring specific follow-ups
+      qb.filter.bySelect(
+        'id',
+        JSON.parse(this.activatedRoute.snapshot.queryParams.followUpsIds),
+        true,
+        null
+      );
+
+      // retrieve follow-ups and contact details
+      this.followUpsDataService
+        .getFollowUpsList(
+          this.selectedOutbreak.id,
+          qb
+        )
+        .pipe(
+          catchError((err) => {
+            // hide loading
+            subscriber.error(err);
+
+            // send error down the road
+            return throwError(err);
+          })
+        )
+        .subscribe((followUps: FollowUpModel[]) => {
+          // follow-up data
+          this.selectedFollowUps = followUps;
+
+          // check if we have future follow-ups
+          // & determine selected contacts
+          // & determine selected follow-up dates
+          this.followUpDates = [];
+          this.selectedContacts = [];
+          for (const followUp of this.selectedFollowUps) {
+            // add contact to list
+            if (
+              followUp.person &&
+              followUp.person.id &&
+              !this.selectedContacts.find((item) => item.id === followUp.person.id)
+            ) {
+              this.selectedContacts.push(followUp.person);
+            }
+
+            // add follow-up date
+            if (followUp.date) {
+              const date: string = moment(followUp.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+              if (!this.followUpDates.find((item) => item === date)) {
+                this.followUpDates.push(date);
+              }
+            }
+
+            // has future follow-ups ?
+            if (Constants.isDateInTheFuture(followUp.date)) {
+              this.futureFollowUps = true;
+            }
+          }
+
+          // sort dates
+          this.followUpDates = _.sortBy(
+            this.followUpDates,
+            (item1, item2) => moment(item1).diff(moment(item2))
+          );
+
+          // finished - no item to edit
+          subscriber.next(null);
+          subscriber.complete();
+        });
+    });
   }
 
   /**
@@ -190,57 +238,99 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
    * Details tabs
    */
   private initializeDetailTab(): ICreateViewModifyV2Tab {
-    // view / modify ?
-    if (!this.isCreate) {
-      return {
-        // Details
-        type: CreateViewModifyV2TabInputType.TAB,
-        label: 'LNG_COMMON_LABEL_DETAILS',
-        sections: [
-          // inputs
-          {
-            type: CreateViewModifyV2TabInputType.SECTION,
-            label: null,
-            inputs: [
-              {
-                type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-                name: 'targeted',
-                placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
-                description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION',
-                options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
-                value: {
-                  get: () => null,
-                  set: () => null
-                }
-              },
-              {
-                type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-                name: 'statusId',
-                placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
-                description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID_DESCRIPTION',
-                options: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-                value: {
-                  get: () => null,
-                  set: () => null
-                },
-                disabled: () => this.futureFollowUps
-              },
-              {
-                type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-                name: 'teamId',
-                placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
-                description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM_DESCRIPTION',
-                options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
-                value: {
-                  get: () => null,
-                  set: () => null
-                }
+    // modify ?
+    return {
+      // Details
+      type: CreateViewModifyV2TabInputType.TAB,
+      label: 'LNG_COMMON_LABEL_DETAILS',
+      sections: [
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: null,
+          inputs: [
+            // warnings
+            {
+              type: CreateViewModifyV2TabInputType.LABEL,
+              value: {
+                get: () => 'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_MODIFY_DATA_INFO_LABEL'
               }
-            ]
-          }
-        ]
-      };
-    }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.LABEL,
+              value: {
+                get: () => 'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_MODIFY_DATA_IN_THE_FUTURE_LABEL'
+              },
+              visible: () => {
+                return this.futureFollowUps;
+              }
+            },
+
+            // contacts
+            {
+              type: CreateViewModifyV2TabInputType.LINK_LIST,
+              label: {
+                get: () => 'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_SELECTED_CONTACTS'
+              },
+              links: this.selectedContacts.map((person) => ({
+                label: person.name,
+                action: {
+                  link: () => [
+                    person.type === EntityType.CASE ? '/cases' : '/contacts',
+                    person.id,
+                    'view'
+                  ]
+                }
+              }))
+            },
+
+            // dates
+            {
+              type: CreateViewModifyV2TabInputType.LABEL_LIST,
+              label: {
+                get: () => 'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_FOLLOW_UPS_DATES'
+              },
+              labels: this.followUpDates
+            },
+
+            // inputs
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'targeted',
+              placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED',
+              description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION',
+              options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+              value: {
+                get: () => null,
+                set: () => null
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'statusId',
+              placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
+              description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID_DESCRIPTION',
+              options: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              value: {
+                get: () => null,
+                set: () => null
+              },
+              disabled: () => this.futureFollowUps
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'teamId',
+              placeholder: () => 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
+              description: () => 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM_DESCRIPTION',
+              options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
+              value: {
+                get: () => null,
+                set: () => null
+              }
+            }
+          ]
+        }
+      ]
+    };
   }
 
   /**
@@ -284,6 +374,16 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
         return followUp.id;
       });
 
+      // something went wrong ?
+      if (selectedFollowUpIds.length < 1) {
+        // show error
+        this.toastV2Service.error('LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_ERROR_NO_FOLLOW_UPS_SELECTED');
+
+        // don't do anything
+        return;
+      }
+
+      // create query
       const qb: RequestQueryBuilder = new RequestQueryBuilder();
       qb.filter.where({
         id: {
@@ -340,69 +440,4 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
    * Refresh expand list
    */
   refreshExpandList(): void {}
-
-  /**
-     * Load follow-ups
-     */
-  private loadFollowUps() {
-    if (
-      this.selectedFollowUpsIds &&
-            this.selectedOutbreak
-    ) {
-      // retrieve follow-ups information
-      const qb: RequestQueryBuilder = new RequestQueryBuilder();
-
-      // bring specific follow-ups
-      qb.filter.bySelect(
-        'id',
-        this.selectedFollowUpsIds,
-        true,
-        null
-      );
-
-      // retrieve follow-ups and contact details
-      this.followUpsDataService.getFollowUpsList(
-        this.selectedOutbreak.id,
-        qb
-      ).subscribe((followUps: FollowUpModel[]) => {
-        // follow-up data
-        this.selectedFollowUps = followUps;
-
-        // check if we have future follow-ups
-        // & determine selected contacts
-        // & determine selected follow-up dates
-        this.followUpDates = [];
-        this.selectedContacts = [];
-        for (const followUp of this.selectedFollowUps) {
-          // add contact to list
-          if (
-            followUp.person &&
-                        followUp.person.id &&
-                        !this.selectedContacts.find((item) => item.id === followUp.person.id)
-          ) {
-            this.selectedContacts.push(followUp.person);
-          }
-
-          // add follow-up date
-          if (followUp.date) {
-            const date: string = moment(followUp.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-            if (!this.followUpDates.find((item) => item === date)) {
-              this.followUpDates.push(date);
-            }
-          }
-
-          // has future follow-ups ?
-          if (Constants.isDateInTheFuture(followUp.date)) {
-            this.futureFollowUps = true;
-          }
-        }
-
-        // sort dates
-        this.followUpDates = _.sortBy(
-          this.followUpDates,
-          (item1, item2) => moment(item1).diff(moment(item2))
-        );
-      });
-    }
-  }
 }
