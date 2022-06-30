@@ -41,6 +41,7 @@ import {
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { FollowUpPage } from '../../typings/follow-up-page';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
+import { IV2DateRange } from '../../../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
 
 @Component({
   selector: 'app-daily-follow-ups-list',
@@ -1644,20 +1645,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                   const dateColumn = this.tableColumns.find(column => column.field === 'date');
 
                   // set date column filter
-                  (dateColumn.filter.value as any).startDate = moment(date).startOf('day');
-                  (dateColumn.filter.value as any).enddate = moment(date).endOf('day');
-
-                  // TODO: Needs table column headers refresh, couldn't find the method to refresh it..
-                  // this.tableColumns.
-                  // dateColumn.filter.
-                  // this.initializeTableColumns();
-                  // this.applyTableColumnFilters();
-                  // this.update
-                  // this.clearHeaderFilters();
-                  // this.needsRefreshList(false, false, true);
-                  // this.checkListFilters();
-                  // dateColumn.filter.search()
-
+                  (dateColumn.filter.value as IV2DateRange) = {
+                    startDate: moment(date).startOf('day'),
+                    endDate: moment(date).endOf('day')
+                  };
 
                   // filter
                   this.queryBuilder.filter.where({
@@ -1685,11 +1676,14 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                     }]
                   });
 
-                  // close dialog
-                  response.handler.hide();
-
                   // refresh
                   this.needsRefreshList(true);
+
+                  // force table refresh columns
+                  this.tableV2Component.updateColumnDefinitions();
+
+                  // close dialog
+                  response.handler.hide();
                 });
             }
           }
