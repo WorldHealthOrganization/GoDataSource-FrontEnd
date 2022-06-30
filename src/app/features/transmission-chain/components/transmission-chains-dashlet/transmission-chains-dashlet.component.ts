@@ -501,12 +501,16 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   snapshotFilters: {
     firstName?: string,
     lastName?: string,
-    labSeqResult?: string[]
+    labSeqResult?: string[],
+    classification?: string[],
+    occupation?: string[]
   } = {};
   snapshotFiltersClone: {
     firstName?: string,
     lastName?: string,
-    labSeqResult?: string[]
+    labSeqResult?: string[],
+    classification?: string[],
+    occupation?: string[]
   } = {};
 
   /**
@@ -2561,6 +2565,12 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       if (!usedMap['labSeqResultLNG_PAGE_GRAPH_SNAPSHOT_FILTER_LAB_SEQ_RESULT_LABEL']) {
         this.snapshotFilters.labSeqResult = undefined;
       }
+      if (!usedMap['classificationLNG_CASE_FIELD_LABEL_CLASSIFICATION']) {
+        this.snapshotFilters.classification = undefined;
+      }
+      if (!usedMap['occupationLNG_CONTACT_FIELD_LABEL_OCCUPATION']) {
+        this.snapshotFilters.occupation = undefined;
+      }
     }
 
     // do we have required data ?
@@ -3232,6 +3242,38 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             filter
           ) => {
             this.snapshotFilters.labSeqResult = filter.value ?
+              filter.value :
+              undefined;
+          }
+        }, {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'classification',
+          label: 'LNG_CASE_FIELD_LABEL_CLASSIFICATION',
+          options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          allowedComparators: [
+            _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
+          ],
+          filterBy: (
+            _qb,
+            filter
+          ) => {
+            this.snapshotFilters.classification = filter.value ?
+              filter.value :
+              undefined;
+          }
+        }, {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'occupation',
+          label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
+          options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          allowedComparators: [
+            _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
+          ],
+          filterBy: (
+            _qb,
+            filter
+          ) => {
+            this.snapshotFilters.occupation = filter.value ?
               filter.value :
               undefined;
           }

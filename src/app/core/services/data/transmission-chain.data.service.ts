@@ -150,15 +150,23 @@ export class TransmissionChainDataService {
     snapshotFilters: {
       firstName?: string,
       lastName?: string,
-      labSeqResult?: string[]
+      labSeqResult?: string[],
+      classification?: string[],
+      occupation?: string[]
     }
   ): ITransmissionChainGroupPageModel[] {
     // must filter
     const mustFilterSnapshot: boolean = snapshotFilters && (
       !!snapshotFilters.firstName ||
-            !!snapshotFilters.lastName || (
+      !!snapshotFilters.lastName || (
         snapshotFilters.labSeqResult &&
-                snapshotFilters.labSeqResult.length > 0
+        snapshotFilters.labSeqResult.length > 0
+      ) || (
+        snapshotFilters.classification &&
+        snapshotFilters.classification.length > 0
+      ) || (
+        snapshotFilters.occupation &&
+        snapshotFilters.occupation.length > 0
       )
     );
 
@@ -179,6 +187,12 @@ export class TransmissionChainDataService {
     let snapshotFiltersLabSeqResult: {
       [labSeqResult: string]: true
     };
+    let snapshotFiltersClassification: {
+      [classification: string]: true
+    };
+    let snapshotFiltersOccupation: {
+      [occupation: string]: true
+    };
     if (mustFilterSnapshot) {
       // filter value
       snapshotFiltersFirstName = snapshotFilters.firstName ? snapshotFilters.firstName.toLowerCase() : null;
@@ -188,11 +202,35 @@ export class TransmissionChainDataService {
       snapshotFiltersLabSeqResult = null;
       if (
         snapshotFilters.labSeqResult &&
-                snapshotFilters.labSeqResult.length > 0
+        snapshotFilters.labSeqResult.length > 0
       ) {
         snapshotFiltersLabSeqResult = {};
         snapshotFilters.labSeqResult.forEach((resultId) => {
           snapshotFiltersLabSeqResult[resultId] = true;
+        });
+      }
+
+      // classification
+      snapshotFiltersClassification = null;
+      if (
+        snapshotFilters.classification &&
+        snapshotFilters.classification.length > 0
+      ) {
+        snapshotFiltersClassification = {};
+        snapshotFilters.classification.forEach((classification) => {
+          snapshotFiltersClassification[classification] = true;
+        });
+      }
+
+      // occupation
+      snapshotFiltersOccupation = null;
+      if (
+        snapshotFilters.occupation &&
+        snapshotFilters.occupation.length > 0
+      ) {
+        snapshotFiltersOccupation = {};
+        snapshotFilters.occupation.forEach((occupation) => {
+          snapshotFiltersOccupation[occupation] = true;
         });
       }
     }
@@ -210,15 +248,27 @@ export class TransmissionChainDataService {
       if (
         mustFilterSnapshot && (
           !snapshotFiltersFirstName ||
-                    nodeData.model.name.toLowerCase().indexOf(snapshotFiltersFirstName) > -1
+          nodeData.model.name.toLowerCase().indexOf(snapshotFiltersFirstName) > -1
         ) && (
           !snapshotFiltersLastName ||
-                    nodeData.model.name.toLowerCase().indexOf(snapshotFiltersLastName) > -1
+          nodeData.model.name.toLowerCase().indexOf(snapshotFiltersLastName) > -1
         ) && (
           !snapshotFiltersLabSeqResult || (
             nodeData.labResults &&
-                        nodeData.labResults.length > 0 &&
-                        nodeData.labResults.findIndex((item) => item.sequence && snapshotFiltersLabSeqResult[item.sequence.resultId]) > -1
+            nodeData.labResults.length > 0 &&
+            nodeData.labResults.findIndex((item) => item.sequence && snapshotFiltersLabSeqResult[item.sequence.resultId]) > -1
+          )
+        ) && (
+          !snapshotFiltersClassification || (
+            nodeData.model instanceof CaseModel &&
+            nodeData.model.classification &&
+            snapshotFiltersClassification[nodeData.model.classification]
+          )
+        ) && (
+          !snapshotFiltersOccupation || (
+            !(nodeData.model instanceof EventModel) &&
+            nodeData.model.occupation &&
+            snapshotFiltersOccupation[nodeData.model.occupation]
           )
         )
       ) {
@@ -244,9 +294,9 @@ export class TransmissionChainDataService {
           // not a proper relationship ?
           if (
             !chainRel.entityIds ||
-                        chainRel.entityIds.length !== 2 ||
-                        !chainGroup.nodesMap[chainRel.entityIds[0]] ||
-                        !chainGroup.nodesMap[chainRel.entityIds[1]]
+            chainRel.entityIds.length !== 2 ||
+            !chainGroup.nodesMap[chainRel.entityIds[0]] ||
+            !chainGroup.nodesMap[chainRel.entityIds[1]]
           ) {
             // jump over
             continue;
@@ -255,7 +305,7 @@ export class TransmissionChainDataService {
           // must add chain to list of display ?
           if (
             chainGroup.nodesMap[chainRel.entityIds[0]].matchesFilter ||
-                        chainGroup.nodesMap[chainRel.entityIds[1]].matchesFilter
+            chainGroup.nodesMap[chainRel.entityIds[1]].matchesFilter
           ) {
             // add chain to the list
             chainGroupChains.push(chainInfo);
@@ -337,7 +387,7 @@ export class TransmissionChainDataService {
     currentPageIndex = pages.length - 1;
     if (
       currentPageIndex > -1 &&
-            pages[currentPageIndex].totalSize < pageSize
+      pages[currentPageIndex].totalSize < pageSize
     ) {
       const size: number = pageSize - pages[currentPageIndex].totalSize;
       pages[currentPageIndex].totalSize += size;
