@@ -386,6 +386,9 @@
                   [class.gd-create-view-modify-bottom-section-content-input-has-fill-questionnaire]="input.type === CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE"
                   [class.gd-create-view-modify-bottom-section-content-input-has-select-groups]="input.type === CreateViewModifyV2TabInputType.SELECT_GROUPS"
                   [class.gd-create-view-modify-bottom-section-content-input-has-wysiwyg]="input.type === CreateViewModifyV2TabInputType.WYSIWYG"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-label]="input.type === CreateViewModifyV2TabInputType.LABEL"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-link-list]="input.type === CreateViewModifyV2TabInputType.LINK_LIST"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-label-list]="input.type === CreateViewModifyV2TabInputType.LABEL_LIST"
                   [ngSwitch]="input.type">
 
                   <!-- Edit questionnaire -->
@@ -1174,6 +1177,70 @@
                     {{input.value.get() | translate}}
                   </div>
 
+                  <!-- Link List -->
+                  <div
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.LINK_LIST"
+                    fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem"
+                    class="gd-create-view-modify-bottom-section-content-input-link-list">
+
+                    <!-- Label -->
+                    <div
+                      class="gd-create-view-modify-bottom-section-content-input-link-list-label">
+                      {{input.label.get() | translate}}
+                    </div>
+
+                    <!-- Links -->
+                    <div
+                      class="gd-create-view-modify-bottom-section-content-input-link-list-links">
+                      <ng-container
+                        *ngFor="let link of input.links; let linkIndex = index;">
+
+                        <!-- Separator -->
+                        <span
+                          *ngIf="linkIndex > 0"
+                          class="gd-create-view-modify-bottom-section-content-input-link-list-links-separator">, </span>
+
+                        <!-- Link -->
+                        <a
+                          class="gd-create-view-modify-bottom-section-content-input-link-list-links-link"
+                          [routerLink]="link.action.link()"
+                          [queryParams]="link.action.queryParams ? link.action.queryParams() : undefined">{{link.label | translate}}</a>
+
+                      </ng-container>
+                    </div>
+                  </div>
+
+                  <!-- Label List -->
+                  <div
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.LABEL_LIST"
+                    fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem"
+                    class="gd-create-view-modify-bottom-section-content-input-label-list">
+
+                    <!-- Label -->
+                    <div
+                      class="gd-create-view-modify-bottom-section-content-input-label-list-label">
+                      {{input.label.get() | translate}}
+                    </div>
+
+                    <!-- Labels -->
+                    <div
+                      class="gd-create-view-modify-bottom-section-content-input-label-list-labels">
+                      <ng-container
+                        *ngFor="let label of input.labels; let labelIndex = index;">
+
+                        <!-- Separator -->
+                        <span
+                          *ngIf="labelIndex > 0"
+                          class="gd-create-view-modify-bottom-section-content-input-label-list-labels-separator">, </span>
+
+                        <!-- Label -->
+                        <span
+                          class="gd-create-view-modify-bottom-section-content-input-label-list-labels-label">{{label | translate}}</span>
+
+                      </ng-container>
+                    </div>
+                  </div>
+
                   <!-- List -->
                   <div
                     *ngSwitchCase="CreateViewModifyV2TabInputType.LIST">
@@ -1307,7 +1374,10 @@
                       <ng-container
                         *ngFor="let input of section.inputs">
                         <ng-container
-                          *ngTemplateOutlet="inputRender; context: { input, parentName: '', parentItemIndex: undefined, parentInput: undefined }"></ng-container>
+                          *ngIf="!input.visible || input.visible()">
+                          <ng-container
+                            *ngTemplateOutlet="inputRender; context: { input, parentName: '', parentItemIndex: undefined, parentInput: undefined }"></ng-container>
+                        </ng-container>
                       </ng-container>
 
                     </div>

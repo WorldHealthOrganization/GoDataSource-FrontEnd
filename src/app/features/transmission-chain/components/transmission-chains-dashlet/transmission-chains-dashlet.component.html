@@ -33,7 +33,7 @@
         [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOTS' | translate"
         [options]="snapshotOptions"
         sortDisabled="true"
-        (ngModelChange)="mustLoadChain = true; showEvents = true; showContacts = false; showContactsOfContacts = false; showSnapshotFilters = false; snapshotFilters = {}; advancedFiltersApplied = undefined;">
+        (ngModelChange)="mustLoadChain = true; showEvents = true; showContacts = false; showContactsOfContacts = false; showSnapshotFilters = false; snapshotFilters = {}; advancedFiltersApplied = undefined; chainGroupId = undefined;">
       </app-form-select-single-v2>
 
       <!-- Create / Load snapshot -->
