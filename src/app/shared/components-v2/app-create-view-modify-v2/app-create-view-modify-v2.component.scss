@@ -408,8 +408,17 @@
 
             &.gd-create-view-modify-bottom-section-content-input-has-textarea,
             &.gd-create-view-modify-bottom-section-content-input-has-select-groups,
-            &.gd-create-view-modify-bottom-section-content-input-has-wysiwyg {
+            &.gd-create-view-modify-bottom-section-content-input-has-wysiwyg,
+            &.gd-create-view-modify-bottom-section-content-input-has-label,
+            &.gd-create-view-modify-bottom-section-content-input-has-label-list,
+            &.gd-create-view-modify-bottom-section-content-input-has-link-list {
               width: 100%;
+            }
+
+            &.gd-create-view-modify-bottom-section-content-input-has-label,
+            &.gd-create-view-modify-bottom-section-content-input-has-label-list,
+            &.gd-create-view-modify-bottom-section-content-input-has-link-list {
+              margin-bottom: 1.6rem;
             }
 
             &.gd-create-view-modify-bottom-section-content-input-has-address {
