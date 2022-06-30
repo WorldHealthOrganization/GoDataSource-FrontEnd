@@ -11,7 +11,10 @@ export const EnglishUsLang = {
      */
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
-    'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DATE': 'Print date'
+    'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DATE': 'Print date',
+    'LNG_ASYNC_COT_FIELD_LABEL_SNAPSHOT_DATETIME': 'Snapshot date / time',
+    'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DATE': 'Situation as of',
+    'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_NAME_DESCRIPTION': 'Date / time will be added to the snapshot name at the time of saving'
 
 
 
