@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { ActivatedRoute } from '@angular/router';
@@ -25,6 +25,10 @@ import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import * as FileSaver from 'file-saver';
+import { AppCasesKpiDashletComponent } from '../../components/app-cases-kpi-dashlet/app-cases-kpi-dashlet.component';
+import { AppContactsKpiDashletComponent } from '../../components/app-contacts-kpi-dashlet/app-contacts-kpi-dashlet.component';
+import { AppCotKpiDashletComponent } from '../../components/app-cot-kpi-dashlet/app-cot-kpi-dashlet.component';
+import * as domtoimage from 'dom-to-image';
 
 @Component({
   selector: 'app-dashboard',
@@ -33,6 +37,12 @@ import * as FileSaver from 'file-saver';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent implements OnDestroy {
+  // children dashlets
+  @ViewChild('kpiSection', { static: false }) private _kpiSection: ElementRef;
+  @ViewChild('kpiCases', { static: false }) private _kpiCases: AppCasesKpiDashletComponent;
+  @ViewChild('kpiContacts', { static: false }) private _kpiContacts: AppContactsKpiDashletComponent;
+  @ViewChild('kpiCOT', { static: false }) private _kpiCOT: AppCotKpiDashletComponent;
+
   // quick actions
   quickActions: IV2ActionMenuLabel;
 
@@ -210,7 +220,13 @@ export class DashboardComponent implements OnDestroy {
         DashboardModel.canExportContactFollowUpSuccessRateReport(this._authUser) ||
         DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(this._authUser) ||
         DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(this._authUser) ||
-        DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(this._authUser)
+        DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(this._authUser) || (
+          DashboardModel.canExportKpi(this._authUser) && (
+            this.visibleDashlets.KPICases ||
+            this.visibleDashlets.KPIContacts ||
+            this.visibleDashlets.KPICOT
+          )
+        )
       ),
       menuOptions: [
         // Export case classification per location report
@@ -380,6 +396,63 @@ export class DashboardComponent implements OnDestroy {
             }
           },
           visible: () => DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(this._authUser)
+        },
+
+        // Export KPI
+        {
+          label: {
+            get: () => 'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL'
+          },
+          action: {
+            click: () => {
+              // display error message if we try to render empty item
+              if (
+                !this._kpiCases.dashlet.expanded &&
+                !this._kpiContacts.dashlet.expanded &&
+                !this._kpiCOT.dashlet.expanded
+              ) {
+                // err
+                this.toastV2Service.error('LNG_PAGE_DASHBOARD_KPIS_ELEMENTS_NOT_VISIBLE_ERROR_MSG');
+
+                // finished
+                return;
+              }
+
+              // convert dom container to image
+              const loading = this.dialogV2Service.showLoadingDialog();
+              setTimeout(() => {
+                (domtoimage as any)
+                  .toPng(
+                    this._kpiSection.nativeElement, {
+                      filter: (node) => {
+                        return node.tagName !== 'A';
+                      }
+                    }
+                  )
+                  .then((dataUrl) => {
+                    const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
+                    this.importExportDataService
+                      .exportImageToPdf({ image: dataBase64, responseType: 'blob', splitFactor: 1 })
+                      .pipe(
+                        catchError((err) => {
+                          this.toastV2Service.error(err);
+                          loading.close();
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe((blob) => {
+                        this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL');
+                        loading.close();
+                      });
+                  });
+              });
+            }
+          },
+          visible: () => DashboardModel.canExportKpi(this._authUser) && (
+            this.visibleDashlets.KPICases ||
+            this.visibleDashlets.KPIContacts ||
+            this.visibleDashlets.KPICOT
+          )
         }
       ]
     };
@@ -501,141 +574,4 @@ export class DashboardComponent implements OnDestroy {
       `${fileName}.${extension}`
     );
   }
-
-  // // provide constants to template
-  // DashboardDashlet = DashboardDashlet;
-  // DashboardModel = DashboardModel;
-  //
-  // selectedOutbreak: OutbreakModel;
-  //
-  // // flag if there aren't any outbreaks in the system
-  // noOutbreaksInSystem: boolean = false;
-  //
-  // // constants
-  // ExportDataExtension = ExportDataExtension;
-  //
-  // casesByClassificationAndLocationReportUrl: string = '';
-  // contactsFollowupSuccessRateReportUrl: string = '';
-  //
-  // loadingDialog: LoadingDialogModel;
-  //
-  // // available side filters
-  // availableSideFilters: FilterModel[] = [];
-  //
-  // globalFilterDate: Moment = moment();
-  // globalFilterLocationId: string;
-  // globalFilterClassificationId: string[] = [];
-  //
-  // @ViewChild('kpiSection') private kpiSection: ElementRef;
-  // @ViewChildren('kpiSectionGroup') private kpiSectionGroup: QueryList<MatExpansionPanel>;
-  //
-  // Constants = Constants;
-  //
-  // epiCurveViewType;
-  // epiCurveViewTypes$: Observable<any[]>;
-  //
-  // caseClassificationsList$: Observable<LabelValuePair[]>;
-  //
-  // /**
-  //    * Constructor
-  //    */
-  // constructor(
-  //   private authDataService: AuthDataService,
-  //   private outbreakDataService: OutbreakDataService,
-  //   private domService: DomService,
-  //   private importExportDataService: ImportExportDataService,
-  //   private i18nService: I18nService,
-  //   private genericDataService: GenericDataService,
-  //   private dialogService: DialogService,
-  //   protected toastV2Service: ToastV2Service,
-  //   private systemSettingsDataService: SystemSettingsDataService,
-  //   private referenceDataDataService: ReferenceDataDataService
-  // ) {
-  //   // get the authenticated user
-  //   this.authUser = this.authDataService.getAuthenticatedUser();
-  // }
-  //
-  // /**
-  //    * Component initialized
-  //    */
-  // ngOnInit() {
-  //   this.caseClassificationsList$ = this.referenceDataDataService
-  //     .getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION)
-  //     .pipe(
-  //       map((records: LabelValuePair[]) => {
-  //         return _.filter(
-  //           records,
-  //           (record: LabelValuePair) => {
-  //             return record.value !== Constants.CASE_CLASSIFICATION.NOT_A_CASE;
-  //           }
-  //         );
-  //       }),
-  //       share()
-  //     );
-  //
-  //   this.initializeDashlets();
-  //
-  //   // get Outbreaks list to check if there are any in the system
-  //   this.outbreakDataService
-  //     .getOutbreaksCount()
-  //     .subscribe((outbreaksCount) => {
-  //       this.noOutbreaksInSystem = !outbreaksCount.count;
-  //     });
-  // }
-  //
-  // /**
-  //    * Generate KPIs report
-  //    */
-  // generateKpisReport() {
-  //   // display error message if we try to render empty item
-  //   let atLeastOneIsExpanded: boolean = false;
-  //   this.kpiSectionGroup.forEach((item) => {
-  //     if (item.expanded) {
-  //       atLeastOneIsExpanded = true;
-  //     }
-  //   });
-  //   if (!atLeastOneIsExpanded) {
-  //     this.toastV2Service.error('LNG_PAGE_DASHBOARD_KPIS_ELEMENTS_NOT_VISIBLE_ERROR_MSG');
-  //     return;
-  //   }
-  //
-  //   // display loading
-  //   this.showLoadingDialog();
-  //
-  //   // convert dom container to image
-  //   setTimeout(() => {
-  //     (domtoimage as any).toPng(this.kpiSection.nativeElement)
-  //       .then((dataUrl) => {
-  //         const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
-  //
-  //         this.importExportDataService
-  //           .exportImageToPdf({ image: dataBase64, responseType: 'blob', splitFactor: 1 })
-  //           .pipe(
-  //             catchError((err) => {
-  //               this.toastV2Service.error(err);
-  //               this.closeLoadingDialog();
-  //               return throwError(err);
-  //             })
-  //           )
-  //           .subscribe((blob) => {
-  //             this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL');
-  //           });
-  //       });
-  //   });
-  // }
-  //
-  // /**
-  //    * Check if we have kpi group access
-  //    */
-  // hasKpiAccess(): boolean {
-  //   // check if there is at least one group that has access
-  //   for (const group of this.kpiGroups) {
-  //     if (group.hasAccess(this.authUser)) {
-  //       return true;
-  //     }
-  //   }
-  //
-  //   // we don't have access
-  //   return false;
-  // }
 }

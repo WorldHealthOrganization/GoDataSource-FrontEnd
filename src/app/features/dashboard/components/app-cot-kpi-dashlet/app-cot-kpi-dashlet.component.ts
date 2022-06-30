@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, ViewChild } from '@angular/core';
 import { AppDashletV2 } from '../../helperClasses/app-dashlet-v2';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -11,6 +11,7 @@ import { TransmissionChainDataService } from '../../../../core/services/data/tra
 import { MetricIndependentTransmissionChainsModel } from '../../../../core/models/metrics/metric-independent-transmission-chains.model';
 import { Constants } from '../../../../core/models/constants';
 import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
+import { AppKpiDashletComponent } from '../app-kpi-dashlet/app-kpi-dashlet.component';
 
 @Component({
   selector: 'app-cot-kpi-dashlet',
@@ -19,6 +20,9 @@ import { TransmissionChainModel } from '../../../../core/models/transmission-cha
 })
 export class AppCotKpiDashletComponent
   extends AppDashletV2 implements OnDestroy {
+  // kpi dashlet
+  @ViewChild(AppKpiDashletComponent, { static: false }) dashlet: AppKpiDashletComponent;
+
   /**
    * Constructor
    */
