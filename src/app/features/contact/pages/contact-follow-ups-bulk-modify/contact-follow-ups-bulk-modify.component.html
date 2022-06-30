@@ -1,11 +1,16 @@
-<!--
-<app-topnav [activeOutbreakEditable]="false">
-    <ng-container dynamic-section>
-        <app-breadcrumbs [items]="breadcrumbs"></app-breadcrumbs>
-    </ng-container>
-</app-topnav>
--->
+<app-create-view-modify-v2
+  [action]="action"
+  [allowEdit]="selectedOutbreakIsActive"
+  [loadingPage]="loadingPage"
+  [loadingItemData]="loadingItemData"
+  [breadcrumbs]="breadcrumbs"
+  [pageTitle]="pageTitle"
+  [pageTitleData]="pageTitleData"
+  [tabData]="tabData"
+  >
+</app-create-view-modify-v2>
 
+<!-- 
 <div class="page-content">
 
     <mat-horizontal-stepper
@@ -13,7 +18,8 @@
         #stepper
         (selectionChange)="onChangeStep([followDetailsForm])"
     >
-        <!-- Details step -->
+    // TODO: Old UI shows contacts to be modified and their dates, new tab section inputs may be needed
+        <!~~ Details step ~~>
         <mat-step [stepControl]="followDetailsForm">
             <form #followDetailsForm="ngForm" fxLayout="column">
                 <ng-template matStepLabel>
@@ -39,72 +45,18 @@
                         [followUpDates]="followUpDates">
                     </app-selected-follow-up-dates>
                 </mat-card>
-
-                <mat-card class="page-section">
-                    <div fxLayout="column">
-                        <div fxLayout="row" fxLayoutGap="20px">
-                            <app-form-select
-                                #targetedInput
-                                name="targeted"
-                                ngModel
-                                [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED' | translate"
-                                tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TARGETED_DESCRIPTION"
-                                [options]="yesNoOptionsList$ | async"
-                                optionLabelKey="label"
-                                optionValueKey="value"
-                                (optionChanged)="onTargetedChangeValue($event)">
-                            </app-form-select>
-
-                            <app-form-select
-                                name="statusId"
-                                ngModel
-                                [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID' | translate"
-                                tooltip="LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID_DESCRIPTION"
-                                [options]="dailyStatusTypeOptions$ | async"
-                                optionLabelKey="label"
-                                optionValueKey="value"
-                                [disabled]="futureFollowUps">
-                            </app-form-select>
-
-                            <app-form-select
-                                #teamInput
-                                name="teamId"
-                                ngModel
-                                [placeholder]="'LNG_FOLLOW_UP_FIELD_LABEL_TEAM' | translate"
-                                tooltip="LNG_FOLLOW_UP_FIELD_LABEL_TEAM_DESCRIPTION"
-                                [options]="teamsList$ | async"
-                                optionLabelKey="name"
-                                optionValueKey="id"
-                                (optionChanged)="onTeamChangeValue($event)">
-                            </app-form-select>
-
-                            <div fxFlex><!--Placeholder--></div>
-
-                        </div>
-                    </div>
-                </mat-card>
-
-                <div class="stepper-navigation-buttons">
-                    <button mat-raised-button color="accent" matStepperNext>
-                        {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
-                    </button>
-                </div>
             </form>
         </mat-step>
 
-        <!-- Final step -->
+        <!~~ Final step ~~>
         <mat-step>
-            <ng-template matStepLabel>
-                {{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}
-            </ng-template>
-
             <mat-card class="page-section">
                 <div fxLayout="column" fxLayoutGap="5px" class="info-container">
                     <div>
                         {{ 'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_MODIFY_DATA_INFO_LABEL' | translate }}
                     </div>
                 </div>
-
+                // TODO: Old UI shows changes that are about to made, modify finalStep or new tab may be needed
                 <app-selected-contacts-list
                     [persons]="selectedContacts">
                 </app-selected-contacts-list>
@@ -174,4 +126,4 @@
             </div>
         </mat-step>
     </mat-horizontal-stepper>
-</div>
+</div> -->
