@@ -2,7 +2,7 @@
 import { ContactsListComponent } from './contacts-list/contacts-list.component';
 import { ViewMovementContactComponent } from './view-movement-contact/view-movement-contact.component';
 import { ViewChronologyContactComponent } from './view-chronology-contact/view-chronology-contact.component';
-import { ModifyContactFollowUpListComponent } from './modify-contact-follow-up-list/modify-contact-follow-up-list.component';
+import { ContactFollowUpsBulkModifyComponent } from './contact-follow-ups-bulk-modify/contact-follow-ups-bulk-modify.component';
 import { BulkCreateContactsComponent } from './bulk-create-contacts/bulk-create-contacts.component';
 import { ContactDailyFollowUpsListComponent } from './contact-daily-follow-ups-list/contact-daily-follow-ups-list.component';
 import { ContactRangeFollowUpsListComponent } from './contact-range-follow-ups-list/contact-range-follow-ups-list.component';
@@ -17,7 +17,7 @@ export * from './bulk-create-contacts/bulk-create-contacts.component';
 export * from './bulk-modify-contacts/bulk-modify-contacts.component';
 export * from './view-movement-contact/view-movement-contact.component';
 export * from './view-chronology-contact/view-chronology-contact.component';
-export * from './modify-contact-follow-up-list/modify-contact-follow-up-list.component';
+export * from './contact-follow-ups-bulk-modify/contact-follow-ups-bulk-modify.component';
 export * from './contact-daily-follow-ups-list/contact-daily-follow-ups-list.component';
 export * from './contact-range-follow-ups-list/contact-range-follow-ups-list.component';
 export * from './individual-contact-follow-ups-list/individual-contact-follow-ups-list.component';
@@ -36,6 +36,6 @@ export const pageComponents: any[] = [
 
   ContactDailyFollowUpsListComponent,
   ContactRangeFollowUpsListComponent,
-  ModifyContactFollowUpListComponent,
+  ContactFollowUpsBulkModifyComponent,
   IndividualContactFollowUpsListComponent
 ];
