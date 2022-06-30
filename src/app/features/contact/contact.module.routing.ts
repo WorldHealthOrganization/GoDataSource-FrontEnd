@@ -355,12 +355,19 @@ const routes: Routes = [
   // Modify list of Follow Ups
   {
     path: 'follow-ups/modify-list',
-    component: fromPages.ModifyContactFollowUpListComponent,
+    component: fromPages.ContactFollowUpsBulkModifyComponent,
     canActivate: [AuthGuard],
     data: {
       permissions: [
         PERMISSION.FOLLOW_UP_BULK_MODIFY
-      ]
+      ],
+      action: CreateViewModifyV2Action.MODIFY
+    },
+    resolve: {
+      outbreak: SelectedOutbreakDataResolver,
+      yesNo: YesNoDataResolver,
+      dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
+      team: TeamDataResolver
     },
     canDeactivate: [
       PageChangeConfirmationGuard
