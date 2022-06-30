@@ -2955,7 +2955,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             type: V2SideDialogConfigInputType.TEXT,
             name: 'snapshotName',
             placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_NAME',
-            value: this.authUser.name,
+            value: deleteSnapshotId ?
+              this.snapshotOptionsMap[deleteSnapshotId].snapshot.name :
+              this.authUser.name,
             validators: {
               required: () => true
             }
@@ -2968,7 +2970,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
             name: 'showContacts',
             placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_LABEL',
-            value: this.filters.showContacts,
+            value: deleteSnapshotId ?
+              this.snapshotOptionsMap[deleteSnapshotId].snapshot.showContacts :
+              this.filters.showContacts,
             change: (data) => {
               // nothing to do ?
               const checked = (data.map.showContacts as IV2SideDialogConfigInputToggleCheckbox).value;
@@ -2980,7 +2984,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
             name: 'includeContactsOfContacts',
             placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_SHOW_CONTACTS_OF_CONTACTS',
-            value: this.filters.includeContactsOfContacts,
+            value: deleteSnapshotId ?
+              this.snapshotOptionsMap[deleteSnapshotId].snapshot.showContactsOfContacts :
+              this.filters.includeContactsOfContacts,
             disabled: (data) => {
               return !(data.map.showContacts as IV2SideDialogConfigInputToggleCheckbox).value;
             }
