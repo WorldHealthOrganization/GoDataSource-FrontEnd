@@ -204,12 +204,14 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
       // create or update
       createOrUpdate: this.initializeProcessData(),
       redirectAfterCreateUpdate: (data: OutbreakTemplateModel) => {
-        // redirect to view
-        this.router.navigate([
-          '/outbreak-templates',
-          data.id,
-          'view'
-        ]);
+        if (!this.isModify) {
+          // redirect to view
+          this.router.navigate([
+            '/outbreak-templates',
+            data.id,
+            'view'
+          ]);
+        }
       }
     };
   }
