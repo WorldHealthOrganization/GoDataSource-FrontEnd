@@ -2955,6 +2955,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             type: V2SideDialogConfigInputType.TEXT,
             name: 'snapshotName',
             placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_NAME',
+            tooltip: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_NAME_DESCRIPTION',
             value: deleteSnapshotId ?
               this.snapshotOptionsMap[deleteSnapshotId].snapshot.name :
               this.authUser.name,
