@@ -10,6 +10,8 @@ export const EnglishUsLang = {
      * Example group
      */
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
+    // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
+    'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DATE': 'Print date'
 
 
 

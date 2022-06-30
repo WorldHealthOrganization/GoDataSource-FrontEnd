@@ -28,15 +28,15 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
-import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2FilterDate, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import {
   IV2SideDialogConfigButtonType, IV2SideDialogConfigInputDate,
   IV2SideDialogConfigInputDateRange, IV2SideDialogConfigInputNumber,
   IV2SideDialogConfigInputSingleDropdown, IV2SideDialogConfigInputText,
   IV2SideDialogConfigInputToggle, IV2SideDialogConfigInputToggleCheckbox,
-  V2SideDialogConfigInputType
+  IV2SideDialogData, V2SideDialogConfigInputType
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { FollowUpPage } from '../../typings/follow-up-page';
@@ -49,6 +49,12 @@ import { TopnavComponent } from '../../../../core/components/topnav/topnav.compo
 export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpModel> implements OnDestroy {
   // case
   caseData: CaseModel;
+
+  // print follow-up
+  printFollowUpsDialogExtraAPIData = {
+    startDate: moment().startOf('day'),
+    endDate: moment().endOf('day')
+  };
 
   // redirect from team workload ?
   private _workloadData: {
@@ -198,7 +204,53 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             } : {
               startDate: moment().startOf('day'),
               endDate: moment().endOf('day')
+            },
+          search: (column: IV2Column) => {
+            const startDate = (column.filter as IV2FilterDate).value.startDate;
+            const endDate = (column.filter as IV2FilterDate).value.endDate;
+
+            if (startDate) {
+              this.printFollowUpsDialogExtraAPIData = {
+                startDate: moment((column.filter as IV2FilterDate).value.startDate).startOf('day'),
+                endDate: moment((column.filter as IV2FilterDate).value.startDate).endOf('day')
+              };
             }
+
+            // cleanup
+            this.queryBuilder.filter.removePathCondition('or.date');
+
+            // generate query
+            let operator: string;
+            let valueToCompare: any;
+            if (startDate && endDate) {
+              operator = 'between';
+              valueToCompare = [
+                moment(startDate).startOf('day'),
+                moment(endDate).endOf('day')
+              ];
+            } else if (startDate && endDate === null) {
+              operator = 'gte';
+              valueToCompare = moment(startDate).startOf('day');
+            } else if (startDate === null && endDate) {
+              operator = 'lte';
+              valueToCompare = moment(endDate).endOf('day');
+            }
+
+            // filter
+            if (startDate || endDate) {
+              this.queryBuilder.filter.where({
+                or: [
+                  {
+                    date: {
+                      [operator]: valueToCompare
+                    }
+                  }]
+              });
+            }
+
+            // refresh
+            this.needsRefreshList();
+          }
         }
       },
       {
@@ -1466,8 +1518,26 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                           validators: {
                             required: () => true
                           }
+                        },
+                        {
+                          type: V2SideDialogConfigInputType.DATE,
+                          name: 'printDate',
+                          placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DATE',
+                          value: this.printFollowUpsDialogExtraAPIData.startDate,
+                          change: (data: IV2SideDialogData) => {
+                            this.printFollowUpsDialogExtraAPIData.startDate = moment((data.map.printDate as IV2SideDialogConfigInputDate).value).startOf('day');
+                            this.printFollowUpsDialogExtraAPIData.endDate = moment((data.map.printDate as IV2SideDialogConfigInputDate).value).endOf('day');
+                          },
+                          validators: {
+                            required: () => true
+                          }
                         }
                       ]
+                    },
+                    extraFormData: {
+                      append: {
+                        date: this.printFollowUpsDialogExtraAPIData
+                      }
                     }
                   }
                 });
@@ -1564,8 +1634,32 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                     return;
                   }
 
-                  // filter
+                  // cleanup
+                  this.queryBuilder.filter.removePathCondition('date');
+                  this.queryBuilder.filter.removePathCondition('or.date');
+                  this.queryBuilder.filter.removePathCondition('or.statusId');
+
+                  // get data
                   const date = (response.data.map.date as IV2SideDialogConfigInputDate).value;
+                  const dateColumn = this.tableColumns.find(column => column.field === 'date');
+
+                  // set date column filter
+                  (dateColumn.filter.value as any).startDate = moment(date).startOf('day');
+                  (dateColumn.filter.value as any).enddate = moment(date).endOf('day');
+
+                  // TODO: Needs table column headers refresh, couldn't find the method to refresh it..
+                  // this.tableColumns.
+                  // dateColumn.filter.
+                  // this.initializeTableColumns();
+                  // this.applyTableColumnFilters();
+                  // this.update
+                  // this.clearHeaderFilters();
+                  // this.needsRefreshList(false, false, true);
+                  // this.checkListFilters();
+                  // dateColumn.filter.search()
+
+
+                  // filter
                   this.queryBuilder.filter.where({
                     or: [{
                       date: {
