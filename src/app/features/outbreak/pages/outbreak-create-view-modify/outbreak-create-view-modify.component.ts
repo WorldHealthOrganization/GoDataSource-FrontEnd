@@ -233,12 +233,14 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
       // create or update
       createOrUpdate: this.initializeProcessData(),
       redirectAfterCreateUpdate: (data: OutbreakModel) => {
-        // redirect to view
-        this.router.navigate([
-          '/outbreaks',
-          data.id,
-          'view'
-        ]);
+        if (!this.isModify) {
+          // redirect to view
+          this.router.navigate([
+            '/outbreaks',
+            data.id,
+            'view'
+          ]);
+        }
       }
     };
   }
