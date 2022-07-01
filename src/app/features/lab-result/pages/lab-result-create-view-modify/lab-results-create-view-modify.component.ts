@@ -150,6 +150,18 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       }
     ];
 
+    // lab results list
+    if (LabResultModel.canList(this.authUser)) {
+      this.breadcrumbs.push(
+        {
+          label: 'LNG_PAGE_LIST_LAB_RESULTS_TITLE',
+          action: {
+            link: ['/lab-results']
+          }
+        }
+      );
+    }
+
     // entity list
     if (
       this._personType === EntityType.CONTACT &&
@@ -213,7 +225,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       ) {
         this.breadcrumbs.push(
           {
-            label: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE',
+            label: `${this.translateService.instant(this.entityData.name)} ${this.translateService.instant('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE')}`,
             action: this.entityData.deleted ? null : {
               link: [`/lab-results/contacts/${this.entityData.id}`]
             }
@@ -225,7 +237,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       ) {
         this.breadcrumbs.push(
           {
-            label: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE',
+            label: `${this.translateService.instant(this.entityData.name)} ${this.translateService.instant('LNG_PAGE_LIST_ENTITY_LAB_RESULTS_TITLE')}`,
             action: this.entityData.deleted ? null : {
               link: [`/lab-results/cases/${this.entityData.id}`]
             }
