@@ -90,11 +90,6 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
         label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
         sortable: true,
         pinned: IV2ColumnPinned.LEFT,
-        format: {
-          type: (item: CaseModel | ContactModel | EventModel | ContactOfContactModel): string => {
-            return item.type === EntityType.EVENT ? item.name : item.lastName;
-          }
-        },
         filter: {
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH
