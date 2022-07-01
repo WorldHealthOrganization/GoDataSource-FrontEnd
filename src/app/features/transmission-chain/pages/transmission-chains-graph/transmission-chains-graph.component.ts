@@ -30,6 +30,7 @@ import { EntityHelperService } from '../../../../core/services/helper/entity-hel
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { TransmissionChainsDashletComponent } from '../../components/transmission-chains-dashlet/transmission-chains-dashlet.component';
 import { DomService } from '../../../../core/services/helper/dom.service';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 
 enum NodeAction {
   MODIFY_PERSON = 'modify-person',
@@ -398,32 +399,57 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     );
   }
 
-  deleteSelectedPerson(_person: (CaseModel | ContactModel | EventModel)) {
-    // #TODO
-    // this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_CASE', { name: person.name })
-    //   .subscribe((answer: DialogAnswer) => {
-    //     if (answer.button === DialogAnswerButton.Yes) {
-    //       // delete person
-    //       this.entityDataService
-    //         .deleteEntity(person.type, this.selectedOutbreak.id, person.id)
-    //         .pipe(
-    //           catchError((err) => {
-    //             this.toastV2Service.error(err);
-    //
-    //             return throwError(err);
-    //           })
-    //         )
-    //         .subscribe(() => {
-    //           this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_DELETE_PERSON_SUCCESS_MESSAGE');
-    //
-    //           // reset form
-    //           this.resetFormModels();
-    //
-    //           // reset selected nodes
-    //           this.resetNodes();
-    //         });
-    //     }
-    //   });
+  /**
+   * Delete selected person
+   */
+  deleteSelectedPerson(person: (CaseModel | ContactModel | EventModel)) {
+    this.dialogV2Service
+      .showConfirmDialog({
+        config: {
+          title: {
+            get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
+          },
+          message: {
+            get: () => 'LNG_DIALOG_CONFIRM_DELETE_CASE',
+            data: () => ({
+              name: person.name
+            })
+          }
+        }
+      })
+      .subscribe((response) => {
+        // canceled ?
+        if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+          // finished
+          return;
+        }
+
+        // delete person
+        const loadingDialog = this.dialogV2Service.showLoadingDialog();
+        this.entityDataService
+          .deleteEntity(
+            person.type,
+            this.selectedOutbreak.id,
+            person.id
+          )
+          .pipe(
+            catchError((err) => {
+              this.toastV2Service.error(err);
+              loadingDialog.close();
+              return throwError(err);
+            })
+          )
+          .subscribe(() => {
+            this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_DELETE_PERSON_SUCCESS_MESSAGE');
+            loadingDialog.close();
+
+            // reset form
+            this.resetFormModels();
+
+            // reset selected nodes
+            this.resetNodes();
+          });
+      });
   }
 
   resetFormModels() {
@@ -707,37 +733,58 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
      * Delete selected relationship
      */
   deleteSelectedRelationship() {
-    // #TODO
-    // this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP_CHAIN_OF_TRANSMISSION')
-    //   .subscribe((answer: DialogAnswer) => {
-    //     if (answer.button === DialogAnswerButton.Yes) {
-    //       const sourcePerson = _.find(this.selectedRelationship.persons, person => person.source === true);
-    //       // delete relationship
-    //       this.relationshipDataService
-    //         .deleteRelationship(this.selectedOutbreak.id, sourcePerson.type, sourcePerson.id, this.selectedRelationship.id)
-    //         .pipe(
-    //           catchError((err) => {
-    //             this.toastV2Service.error(err);
-    //             return throwError(err);
-    //           })
-    //         )
-    //         .subscribe(() => {
-    //           this.toastV2Service.success('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
-    //
-    //           // reset selected relationship
-    //           this.selectedRelationship = undefined;
-    //
-    //           // reset form
-    //           this.resetFormModels();
-    //
-    //           // reset selected nodes
-    //           this.resetNodes();
-    //
-    //           // reset node action
-    //           this.currentNodeAction = null;
-    //         });
-    //     }
-    //   });
+    this.dialogV2Service
+      .showConfirmDialog({
+        config: {
+          title: {
+            get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
+          },
+          message: {
+            get: () => 'LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP_CHAIN_OF_TRANSMISSION'
+          }
+        }
+      })
+      .subscribe((response) => {
+        // canceled ?
+        if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+          // finished
+          return;
+        }
+
+        // delete relationship
+        const loadingDialog = this.dialogV2Service.showLoadingDialog();
+        const sourcePerson = _.find(this.selectedRelationship.persons, person => person.source === true);
+        this.relationshipDataService
+          .deleteRelationship(
+            this.selectedOutbreak.id,
+            sourcePerson.type,
+            sourcePerson.id,
+            this.selectedRelationship.id
+          )
+          .pipe(
+            catchError((err) => {
+              this.toastV2Service.error(err);
+              loadingDialog.close();
+              return throwError(err);
+            })
+          )
+          .subscribe(() => {
+            this.toastV2Service.success('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
+            loadingDialog.close();
+
+            // reset selected relationship
+            this.selectedRelationship = undefined;
+
+            // reset form
+            this.resetFormModels();
+
+            // reset selected nodes
+            this.resetNodes();
+
+            // reset node action
+            this.currentNodeAction = null;
+          });
+      });
   }
 
   /**
