@@ -1,115 +1,101 @@
 <form #groupForm="ngForm">
-    <div fxLayout="column" fxFlex>
-        <div fxLayout="row" fxLayoutGap="20px">
-            <app-form-date-v2
-                [name]="name + '[contactDate]'"
-                [(ngModel)]="relationship.contactDate"
-                [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE' | translate"
-                tooltip="LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_DESCRIPTION"
-                [disabled]="disabled"
-                [required]="required"
-                (ngModelChange)="onChange()"
-                [maxDate]="currentDate"
-                app-date-validator
-                [dateSameOrBefore]="currentDate"
-                [dateSameOrAfter]="minimumDate"
-                [minDate]="minimumDate">
-            </app-form-date-v2>
+  <app-form-date-v2
+    [name]="name + '[contactDate]'"
+    [(ngModel)]="relationship.contactDate"
+    [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE' | translate"
+    tooltip="LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_DESCRIPTION"
+    [disabled]="disabled"
+    [required]="required"
+    (ngModelChange)="onChange()"
+    [maxDate]="currentDate"
+    app-date-validator
+    [dateSameOrBefore]="currentDate"
+    [dateSameOrAfter]="minimumDate"
+    [minDate]="minimumDate">
+  </app-form-date-v2>
 
-            <app-form-toggle-checkbox-v2
-                [name]="name + '[contactDateEstimated]'"
-                [(ngModel)]="relationship.contactDateEstimated"
-                [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED' | translate"
-                tooltip="LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED_DESCRIPTION"
-                [disabled]="disabled"
-                (ngModelChange)="onChange()">
-            </app-form-toggle-checkbox-v2>
-        </div>
+  <app-form-toggle-checkbox-v2
+    [name]="name + '[contactDateEstimated]'"
+    [(ngModel)]="relationship.contactDateEstimated"
+    [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED' | translate"
+    tooltip="LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED_DESCRIPTION"
+    [disabled]="disabled"
+    (ngModelChange)="onChange()">
+  </app-form-toggle-checkbox-v2>
 
-        <div fxLayout="row" fxLayoutGap="20px">
-            <app-form-select-single-v2
-                [name]="name + '[certaintyLevelId]'"
-                [(ngModel)]="relationship.certaintyLevelId"
-                [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL' | translate"
-                tooltip="LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL_DESCRIPTION"
-                [options]="certaintyLevelOptions"
-                [disabled]="disabled"
-                [required]="required"
-                (ngModelChange)="onChange()">
-            </app-form-select-single-v2>
+  <app-form-select-single-v2
+    [name]="name + '[certaintyLevelId]'"
+    [(ngModel)]="relationship.certaintyLevelId"
+    [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL' | translate"
+    tooltip="LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL_DESCRIPTION"
+    [options]="certaintyLevelOptions"
+    [disabled]="disabled"
+    [required]="required"
+    (ngModelChange)="onChange()">
+  </app-form-select-single-v2>
 
-            <div fxFlex><!-- placeholder --></div>
-        </div>
+  <app-form-select-single-v2
+    [name]="name + '[exposureTypeId]'"
+    [(ngModel)]="relationship.exposureTypeId"
+    [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE' | translate"
+    tooltip="LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE_DESCRIPTION"
+    [options]="exposureTypeOptions"
+    [disabled]="disabled"
+    [required]="false"
+    (ngModelChange)="onChange()">
+  </app-form-select-single-v2>
 
-        <div fxLayout="row" fxLayoutGap="20px">
-            <app-form-select-single-v2
-                [name]="name + '[exposureTypeId]'"
-                [(ngModel)]="relationship.exposureTypeId"
-                [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE' | translate"
-                tooltip="LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE_DESCRIPTION"
-                [options]="exposureTypeOptions"
-                [disabled]="disabled"
-                [required]="false"
-                (ngModelChange)="onChange()">
-            </app-form-select-single-v2>
+  <app-form-select-single-v2
+    [name]="name + '[exposureFrequencyId]'"
+    [(ngModel)]="relationship.exposureFrequencyId"
+    [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY' | translate"
+    tooltip="LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY_DESCRIPTION"
+    [options]="exposureFrequencyOptions"
+    [disabled]="disabled"
+    [required]="false"
+    (ngModelChange)="onChange()">
+  </app-form-select-single-v2>
 
-            <app-form-select-single-v2
-                [name]="name + '[exposureFrequencyId]'"
-                [(ngModel)]="relationship.exposureFrequencyId"
-                [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY' | translate"
-                tooltip="LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY_DESCRIPTION"
-                [options]="exposureFrequencyOptions"
-                [disabled]="disabled"
-                [required]="false"
-                (ngModelChange)="onChange()">
-            </app-form-select-single-v2>
-        </div>
+  <app-form-select-single-v2
+    [name]="name + '[exposureDurationId]'"
+    [(ngModel)]="relationship.exposureDurationId"
+    [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION' | translate"
+    tooltip="LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION_DESCRIPTION"
+    [options]="exposureDurationOptions"
+    [disabled]="disabled"
+    [required]="false"
+    (ngModelChange)="onChange()">
+  </app-form-select-single-v2>
 
-        <div fxLayout="row" fxLayoutGap="20px">
-            <app-form-select-single-v2
-                [name]="name + '[exposureDurationId]'"
-                [(ngModel)]="relationship.exposureDurationId"
-                [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION' | translate"
-                tooltip="LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION_DESCRIPTION"
-                [options]="exposureDurationOptions"
-                [disabled]="disabled"
-                [required]="false"
-                (ngModelChange)="onChange()">
-            </app-form-select-single-v2>
+  <app-form-select-single-v2
+    [name]="name + '[clusterId]'"
+    [(ngModel)]="relationship.clusterId"
+    [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER' | translate"
+    tooltip="LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER_DESCRIPTION"
+    [options]="clusterOptions"
+    [disabled]="disabled"
+    required="false"
+    (ngModelChange)="onChange()">
+  </app-form-select-single-v2>
 
-            <app-form-select-single-v2
-                [name]="name + '[clusterId]'"
-                [(ngModel)]="relationship.clusterId"
-                [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER' | translate"
-                tooltip="LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER_DESCRIPTION"
-                [options]="clusterOptions"
-                [disabled]="disabled"
-                required="false"
-                (ngModelChange)="onChange()">
-            </app-form-select-single-v2>
-        </div>
+  <app-form-select-single-v2
+    [name]="name + '[socialRelationshipTypeId]'"
+    [(ngModel)]="relationship.socialRelationshipTypeId"
+    [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_RELATION' | translate"
+    tooltip="LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DESCRIPTION"
+    [options]="socialRelationshipOptions"
+    [disabled]="disabled"
+    required="false"
+    (ngModelChange)="onChange()">
+  </app-form-select-single-v2>
 
-        <div fxLayout="row" fxLayoutGap="20px">
-            <app-form-select-single-v2
-                [name]="name + '[socialRelationshipTypeId]'"
-                [(ngModel)]="relationship.socialRelationshipTypeId"
-                [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_RELATION' | translate"
-                tooltip="LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DESCRIPTION"
-                [options]="socialRelationshipOptions"
-                [disabled]="disabled"
-                required="false"
-                (ngModelChange)="onChange()">
-            </app-form-select-single-v2>
-
-            <app-form-input-v2
-                [name]="name + '[socialRelationshipDetail]'"
-                [(ngModel)]="relationship.socialRelationshipDetail"
-                [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP' | translate"
-                tooltip="LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_DESCRIPTION"
-                [disabled]="disabled"
-                required="false"
-                (ngModelChange)="onChange()">
-            </app-form-input-v2>
-        </div>
-    </div>
+  <app-form-input-v2
+    [name]="name + '[socialRelationshipDetail]'"
+    [(ngModel)]="relationship.socialRelationshipDetail"
+    [placeholder]="'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP' | translate"
+    tooltip="LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_DESCRIPTION"
+    [disabled]="disabled"
+    required="false"
+    (ngModelChange)="onChange()">
+  </app-form-input-v2>
 </form>

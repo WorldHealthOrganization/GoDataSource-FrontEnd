@@ -24,6 +24,7 @@ import { ExposureTypeDataResolver } from '../../core/services/resolvers/data/exp
 import { ExposureFrequencyDataResolver } from '../../core/services/resolvers/data/exposure-frequency.resolver';
 import { ExposureDurationDataResolver } from '../../core/services/resolvers/data/exposure-duration.resolver';
 import { ContextOfTransmissionDataResolver } from '../../core/services/resolvers/data/context-of-transmission.resolver';
+import { RiskDataResolver } from '../../core/services/resolvers/data/risk.resolver';
 
 const routes: Routes = [
   // Transmission Chains Graph
@@ -61,7 +62,8 @@ const routes: Routes = [
       exposureType: ExposureTypeDataResolver,
       exposureFrequency: ExposureFrequencyDataResolver,
       exposureDuration: ExposureDurationDataResolver,
-      contextOfTransmission: ContextOfTransmissionDataResolver
+      contextOfTransmission: ContextOfTransmissionDataResolver,
+      risk: RiskDataResolver
     }
   },
   // Transmission Chains List
