@@ -4,7 +4,7 @@ import { throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
@@ -289,6 +289,22 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
         ]
       }
     ];
+
+    // add lat & lng for specific categories
+    if (
+      this.category.id === ReferenceDataCategory.INSTITUTION_NAME ||
+      this.category.id === ReferenceDataCategory.LAB_NAME ||
+      this.category.id === ReferenceDataCategory.LAB_SEQUENCE_LABORATORY
+    ) {
+      this.tableColumns.push({
+        field: 'geoLocation.lat',
+        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_GEO_LOCATION_LAT'
+      },
+      {
+        field: 'geoLocation.lng',
+        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_GEO_LOCATION_LNG'
+      });
+    }
   }
 
   /**
