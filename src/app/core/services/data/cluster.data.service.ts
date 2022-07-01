@@ -185,17 +185,7 @@ export class ClusterDataService {
     clusterId: string,
     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
   ): Observable<(CaseModel | ContactModel | EventModel | ContactOfContactModel)[]> {
-
-    const qb = new RequestQueryBuilder();
-    // include relation for Events
-    qb.include('location', true);
-    // include relation for Cases / Contacts
-    qb.include('locations', true);
-
-    qb.merge(queryBuilder);
-
-    const filter = qb.buildQuery();
-
+    const filter = queryBuilder.buildQuery();
     return this.http.get(`/outbreaks/${outbreakId}/clusters/${clusterId}/people?filter=${filter}`)
       .pipe(
         map((peopleList) => {
