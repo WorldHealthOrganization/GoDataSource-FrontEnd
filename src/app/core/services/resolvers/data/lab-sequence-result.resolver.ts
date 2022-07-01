@@ -40,7 +40,8 @@ export class LabSequenceResultDataResolver implements IMapResolverV2<ReferenceDa
               label: item.value,
               value: item.id,
               iconUrl: item.iconUrl,
-              data: item
+              data: item,
+              disabled: !item.active
             });
           });
 

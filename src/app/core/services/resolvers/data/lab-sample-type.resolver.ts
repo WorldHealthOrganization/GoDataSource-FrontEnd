@@ -40,7 +40,8 @@ export class LabSampleTypeDataResolver implements IMapResolverV2<ReferenceDataEn
               label: item.value,
               value: item.id,
               iconUrl: item.iconUrl,
-              data: item
+              data: item,
+              disabled: !item.active
             });
           });
 

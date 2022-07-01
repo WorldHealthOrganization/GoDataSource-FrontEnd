@@ -40,7 +40,8 @@ export class DocumentTypeDataResolver implements IMapResolverV2<ReferenceDataEnt
               label: item.value,
               value: item.id,
               iconUrl: item.iconUrl,
-              data: item
+              data: item,
+              disabled: !item.active
             });
           });
 
