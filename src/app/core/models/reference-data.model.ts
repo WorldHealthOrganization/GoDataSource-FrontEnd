@@ -122,6 +122,7 @@ export class ReferenceDataEntryModel
   category: ReferenceDataCategoryModel;
   colorCode: string;
   order: number;
+  geoLocation: { lat: number, lng: number };
 
   private _iconId: string;
   iconUrl: string;
@@ -160,6 +161,7 @@ export class ReferenceDataEntryModel
     this.colorCode = _.get(data, 'colorCode');
     this.iconId = _.get(data, 'iconId');
     this.order = _.get(data, 'order');
+    this.geoLocation = _.get(data, 'geoLocation', {});
 
     // add category
     const categoryData = _.get(data, 'category');
