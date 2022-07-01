@@ -124,6 +124,9 @@ export class AppFormSelectSingleV2Component
     return this.allOptions;
   }
 
+  // allow disabled options to be selected ?
+  @Input() allowDisabledToBeSelected: boolean = false;
+
   // vscroll handler
   @ViewChild('cdkVirtualScrollViewport') cdkVirtualScrollViewport: CdkVirtualScrollViewport;
 

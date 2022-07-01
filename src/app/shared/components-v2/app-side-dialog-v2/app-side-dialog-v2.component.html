@@ -545,6 +545,7 @@
                               [name]="filter.name"
                               placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
                               [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.options"
+                              allowDisabledToBeSelected="true"
                               required="true">
                             </app-form-select-single-v2>
 
@@ -556,6 +557,7 @@
                               [name]="filter.name"
                               placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
                               [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.options"
+                              allowDisabledToBeSelected="true"
                               [required]="!input.optionsAsLabelValueMap[filter.filterBy.value].data.optional">
                             </app-form-select-multiple-v2>
 

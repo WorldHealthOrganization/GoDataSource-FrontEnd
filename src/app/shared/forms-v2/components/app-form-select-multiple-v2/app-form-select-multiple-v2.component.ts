@@ -177,6 +177,9 @@ export class AppFormSelectMultipleV2Component
     return this.allOptions;
   }
 
+  // allow disabled options to be selected ?
+  @Input() allowDisabledToBeSelected: boolean = false;
+
   // toggle all
   toggleAllCheckboxChecked: boolean = false;
 

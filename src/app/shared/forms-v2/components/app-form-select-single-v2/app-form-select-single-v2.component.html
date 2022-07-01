@@ -96,7 +96,7 @@
         <mat-option
           *cdkVirtualFor="let option of filteredOptions; templateCacheSize: 0"
           [value]="option.value"
-          [disabled]="option.disabled">
+          [disabled]="!allowDisabledToBeSelected && option.disabled">
 
           <!-- Icon & Label -->
           <div
