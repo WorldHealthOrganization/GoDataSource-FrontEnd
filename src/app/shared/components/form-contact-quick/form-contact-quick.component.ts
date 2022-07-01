@@ -63,7 +63,6 @@ export class FormContactQuickComponent extends GroupBase<ContactModel> implement
   ];
 
   visualIDTooltip: string;
-
   visualIdSuffixIconButtons: IAppFormIconButtonV2[] = [{
     icon: 'refresh',
     tooltip: 'LNG_PAGE_ACTION_REFRESH_VISUAL_ID_DESCRIPTION',
@@ -136,17 +135,6 @@ export class FormContactQuickComponent extends GroupBase<ContactModel> implement
      */
   get contact(): ContactModel {
     return this.value;
-  }
-
-  /**
-     * Generate visual ID for contact
-     */
-  generateVisualId() {
-    if (!_.isEmpty(this.selectedOutbreak.contactIdMask)) {
-      this.contact.visualId = ContactModel.generateContactIDMask(this.selectedOutbreak.contactIdMask);
-      this.groupForm.controls.visualId.markAsDirty();
-      this.onChange();
-    }
   }
 
   /**
