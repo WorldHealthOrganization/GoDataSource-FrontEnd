@@ -41,7 +41,8 @@ export class PersonTypeDataResolver implements IMapResolverV2<ReferenceDataEntry
               value: item.id,
               iconUrl: item.iconUrl,
               data: item,
-              disabled: !item.active
+              disabled: !item.active,
+              order: item.order
             });
           });
 

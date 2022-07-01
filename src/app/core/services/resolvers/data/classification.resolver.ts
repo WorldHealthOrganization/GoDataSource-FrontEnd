@@ -41,7 +41,8 @@ export class ClassificationDataResolver implements IMapResolverV2<ReferenceDataE
               value: item.id,
               iconUrl: item.iconUrl,
               data: item,
-              disabled: !item.active
+              disabled: !item.active,
+              order: item.order
             });
           });
 

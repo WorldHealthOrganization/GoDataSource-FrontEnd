@@ -41,7 +41,8 @@ export class LabSequenceLaboratoryDataResolver implements IMapResolverV2<Referen
               value: item.id,
               iconUrl: item.iconUrl,
               data: item,
-              disabled: !item.active
+              disabled: !item.active,
+              order: item.order
             });
           });
 

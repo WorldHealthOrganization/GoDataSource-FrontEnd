@@ -41,7 +41,8 @@ export class ExposureDurationDataResolver implements IMapResolverV2<ReferenceDat
               value: item.id,
               iconUrl: item.iconUrl,
               data: item,
-              disabled: !item.active
+              disabled: !item.active,
+              order: item.order
             });
           });
 

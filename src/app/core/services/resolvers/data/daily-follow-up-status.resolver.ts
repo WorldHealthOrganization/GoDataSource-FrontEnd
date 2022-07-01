@@ -41,7 +41,8 @@ export class DailyFollowUpStatusDataResolver implements IMapResolverV2<Reference
               value: item.id,
               iconUrl: item.iconUrl,
               data: item,
-              disabled: !item.active
+              disabled: !item.active,
+              order: item.order
             });
           });
 

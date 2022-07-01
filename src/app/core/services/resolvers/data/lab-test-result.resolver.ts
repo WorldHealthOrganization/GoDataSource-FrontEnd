@@ -41,7 +41,8 @@ export class LabTestResultDataResolver implements IMapResolverV2<ReferenceDataEn
               value: item.id,
               iconUrl: item.iconUrl,
               data: item,
-              disabled: !item.active
+              disabled: !item.active,
+              order: item.order
             });
           });
 

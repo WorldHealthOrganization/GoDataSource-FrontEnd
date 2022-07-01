@@ -41,7 +41,8 @@ export class DiseaseDataResolver implements IMapResolverV2<ReferenceDataEntryMod
               value: item.id,
               iconUrl: item.iconUrl,
               data: item,
-              disabled: !item.active
+              disabled: !item.active,
+              order: item.order
             });
           });
 
