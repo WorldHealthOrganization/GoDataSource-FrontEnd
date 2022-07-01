@@ -39,7 +39,6 @@ export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnIn
 
   // selected outbreak
   selectedOutbreak: OutbreakModel;
-  displayRefresh: boolean = false;
 
   visualIDTooltip: string;
 
@@ -119,10 +118,6 @@ export class FormCaseQuickComponent extends GroupBase<CaseModel> implements OnIn
       .getSelectedOutbreakSubject()
       .subscribe((selectedOutbreak: OutbreakModel) => {
         this.selectedOutbreak = selectedOutbreak;
-        // if case id mask is not empty show refresh case id mask button
-        if (!_.isEmpty(this.selectedOutbreak.caseIdMask)) {
-          this.displayRefresh = true;
-        }
 
         // set visual ID translate data
         this.visualIDTooltip = this.translateService.instant(

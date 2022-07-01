@@ -1,125 +1,162 @@
 <form #groupForm="ngForm">
-    <div fxLayout="column" fxFlex>
-        <div fxLayout="row" fxLayoutGap="20px">
-            <app-form-input
-                name="firstName"
-                [(ngModel)]="contact.firstName"
-                [placeholder]="'LNG_CONTACT_FIELD_LABEL_FIRST_NAME' | translate"
-                tooltip="LNG_CONTACT_FIELD_LABEL_FIRST_NAME_DESCRIPTION"
-                required="true"
-                (optionChanged)="onChange()"
-                maxlength="200">
-            </app-form-input>
+  <div fxLayout="column" fxLayoutGap="20px" fxFlex>
 
-            <app-form-input
-                name="lastName"
-                [(ngModel)]="contact.lastName"
-                [placeholder]="'LNG_CONTACT_FIELD_LABEL_LAST_NAME' | translate"
-                tooltip="LNG_CONTACT_FIELD_LABEL_LAST_NAME_DESCRIPTION"
-                (optionChanged)="onChange()"
-                maxlength="200">
-            </app-form-input>
-        </div>
+    <app-form-input-v2
+      name="firstName"
+      [(ngModel)]="contact.firstName"
+      [placeholder]="'LNG_CONTACT_FIELD_LABEL_FIRST_NAME' | translate"
+      tooltip="LNG_CONTACT_FIELD_LABEL_FIRST_NAME_DESCRIPTION"
+      required="true"
+      (ngModelChange)="onChange()"
+      maxlength="200">
+    </app-form-input-v2>
 
-        <div fxLayout="row" fxLayoutGap="20px">
-            <app-form-datepicker
-                name="dateOfReporting"
-                [(ngModel)]="contact.dateOfReporting"
-                [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING'| translate"
-                tooltip="LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION"
-                required="true"
-                (optionChanged)="onChange()"
-                [maxDate]="currentDate"
-                app-date-validator
-                [dateSameOrBefore]="currentDate">
-            </app-form-datepicker>
+    <app-form-input-v2
+      name="lastName"
+      [(ngModel)]="contact.lastName"
+      [placeholder]="'LNG_CONTACT_FIELD_LABEL_LAST_NAME' | translate"
+      tooltip="LNG_CONTACT_FIELD_LABEL_LAST_NAME_DESCRIPTION"
+      (ngModelChange)="onChange()"
+      maxlength="200">
+    </app-form-input-v2>
 
-            <app-form-select
-                name="gender"
-                [(ngModel)]="contact.gender"
-                [placeholder]="'LNG_CONTACT_FIELD_LABEL_GENDER' | translate"
-                tooltip="LNG_CONTACT_FIELD_LABEL_GENDER_DESCRIPTION"
-                (optionChanged)="onChange()"
-                [options]="genderList$ | async">
-            </app-form-select>
-        </div>
+    <app-form-date-v2
+      name="dateOfReporting"
+      [(ngModel)]="contact.dateOfReporting"
+      [placeholder]="'LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING'| translate"
+      tooltip="LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION"
+      required="true"
+      (ngModelChange)="onChange()"
+      [maxDate]="currentDate"
+      app-date-validator
+      [dateSameOrBefore]="currentDate">
+    </app-form-date-v2>
 
-        <div fxLayout="row" fxLayoutGap="20px">
-            <app-form-select
-                name="occupation"
-                [(ngModel)]="contact.occupation"
-                [placeholder]="'LNG_CONTACT_FIELD_LABEL_OCCUPATION' | translate"
-                tooltip="LNG_CONTACT_FIELD_LABEL_OCCUPATION_DESCRIPTION"
-                (optionChanged)="onChange()"
-                [options]="occupationsList$ | async"
-                [enableFilterOptions]="true">
-            </app-form-select>
+    <app-form-select-single-v2
+      name="gender"
+      [(ngModel)]="contact.gender"
+      [placeholder]="'LNG_CONTACT_FIELD_LABEL_GENDER' | translate"
+      tooltip="LNG_CONTACT_FIELD_LABEL_GENDER_DESCRIPTION"
+      (ngModelChange)="onChange()"
+      [options]="genderOptions">
+    </app-form-select-single-v2>
 
-            <div fxFlex><!-- placeholder --></div>
-        </div>
+    <app-form-select-single-v2
+      name="occupation"
+      [(ngModel)]="contact.occupation"
+      [placeholder]="'LNG_CONTACT_FIELD_LABEL_OCCUPATION' | translate"
+      tooltip="LNG_CONTACT_FIELD_LABEL_OCCUPATION_DESCRIPTION"
+      (ngModelChange)="onChange()"
+      [options]="occupationsOptions">
+    </app-form-select-single-v2>
 
-        <div fxLayout="row" fxLayoutGap="5px">
-            <app-form-age-dob
-                fxFlex
-                name="ageDob"
-                [(ngModel)]="contact.age"
-                (optionChanged)="onChange()"
-                ageButtonLabel="LNG_CONTACT_FIELD_LABEL_AGE_BUTTON"
-                dobButtonLabel="LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH_BUTTON"
-                dobPlaceholder="LNG_CONTACT_FIELD_LABEL_DOB"
-                dobTooltip="LNG_CONTACT_FIELD_LABEL_DOB_DESCRIPTION"
-                ageTooltip="LNG_CONTACT_FIELD_LABEL_AGE_DESCRIPTION">
-            </app-form-age-dob>
-        </div>
+    <!-- Age / Dob -->
+    <div>
+      <!-- Age / Dob option -->
+      <div
+        fxFlex="calc(50% - 0.8rem)" fxFlex.xs="calc(100% - 0.8rem)">
+        <app-form-toggle-v2
+          [(ngModel)]="ageChecked"
+          [name]="FormHelperService.IGNORE_FIELD_PREFIX + 'ageDob'"
+          [options]="ageDOBOptions"
+          (ngModelChange)="onChange()"></app-form-toggle-v2>
+      </div>
 
-        <div fxLayout="row" fxLayoutGap="20px">
+      <!-- Age -->
+      <div
+        *ngIf="ageChecked; else dob"
+        fxFlex="calc(50% - 0.8rem)" fxFlex.xs="calc(100% - 0.8rem)" fxLayout="row" fxLayoutGap="1.6rem">
 
-            <app-form-input
-                name="visualId"
-                [(ngModel)]="contact.visualId"
-                [placeholder]="'LNG_CONTACT_FIELD_LABEL_VISUAL_ID' | translate"
-                tooltip="LNG_CASE_FIELD_LABEL_VISUAL_ID_DESCRIPTION"
-                [tooltipTranslateData]="visualIDTranslateData"
-                [displayRefresh]="displayRefresh"
-                (refresh)="generateVisualId()"
-                (optionChanged)="onChange()">
-            </app-form-input>
+        <!-- Years -->
+        <app-form-number-v2
+          *ngIf="ageTypeYears; else months"
+          fxFlex="calc(50% - 0.8rem)"
+          [(ngModel)]="contact.age.years"
+          name="age[years]"
+          placeholder="LNG_AGE_FIELD_LABEL_YEARS"
+          app-min-max-validator
+          [minNumber]="0"
+          [min]="0"
+          [maxNumber]="Constants.DEFAULT_AGE_MAX_YEARS"
+          [max]="Constants.DEFAULT_AGE_MAX_YEARS"
+          (ngModelChange)="onChange()">
+        </app-form-number-v2>
 
-        </div>
+        <!-- Months -->
+        <ng-template
+          #months>
+          <app-form-number-v2
+            fxFlex="calc(50% - 0.8rem)" fxFlex.xs="calc(100% - 0.8rem)"
+            [(ngModel)]="contact.age.months"
+            name="age[months]"
+            placeholder="LNG_AGE_FIELD_LABEL_MONTHS"
+            app-min-max-validator
+            [minNumber]="0"
+            [min]="0"
+            [maxNumber]="11"
+            [max]="11"
+            (ngModelChange)="onChange()">
+          </app-form-number-v2>
+        </ng-template>
 
-        <div fxLayout="row" fxLayoutGap="20px">
-            <app-form-select
-                fxFlex="25"
-                name="riskLevel"
-                [(ngModel)]="contact.riskLevel"
-                [placeholder]="'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL' | translate"
-                tooltip="LNG_CONTACT_FIELD_LABEL_RISK_LEVEL_DESCRIPTION"
-                (optionChanged)="onChange()"
-                [options]="riskLevelsList$ | async">
-            </app-form-select>
+        <!-- Type -->
+        <app-form-select-single-v2
+          fxFlex="calc(50% - 0.8rem)"
+          [(ngModel)]="ageTypeYears"
+          [name]="FormHelperService.IGNORE_FIELD_PREFIX + 'ageDobType'"
+          placeholder="LNG_AGE_FIELD_LABEL_TYPE"
+          [options]="ageTypeOptions"
+          (ngModelChange)="ageTypeYears ? (contact.age.months = 0) : (contact.age.years = 0); onChange()"></app-form-select-single-v2>
 
-            <app-form-textarea
-                name="riskReason"
-                [(ngModel)]="contact.riskReason"
-                [placeholder]="'LNG_CONTACT_FIELD_LABEL_RISK_REASON' | translate"
-                tooltip="LNG_CONTACT_FIELD_LABEL_RISK_REASON_DESCRIPTION"
-                [minRows]="1"
-                (optionChanged)="onChange()">
-            </app-form-textarea>
-        </div>
+      </div>
 
-        <div fxLayout="row" fxLayoutGap="20px">
-
-            <app-form-select
-                name="followUp.status"
-                [(ngModel)]="contact.followUp.status"
-                [placeholder]="'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS' | translate"
-                tooltip="LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION"
-                (optionChanged)="onChange()"
-                [options]="finalFollowUpStatus$ | async">
-            </app-form-select>
-
-            <div fxFlex><!-- placeholder --></div>
-        </div>
+      <!-- Dob -->
+      <ng-template
+        #dob>
+        <app-form-date-v2
+          fxFlex="calc(50% - 0.8rem)" fxFlex.xs="calc(100% - 0.8rem)"
+          [(ngModel)]="contact.dob"
+          name="dob"
+          placeholder="LNG_ENTITY_FIELD_LABEL_DOB"
+          (ngModelChange)="onChange()"></app-form-date-v2>
+      </ng-template>
     </div>
+
+    <app-form-input-v2
+      name="visualId"
+      [(ngModel)]="contact.visualId"
+      [placeholder]="'LNG_CONTACT_FIELD_LABEL_VISUAL_ID' | translate"
+      [tooltip]="visualIDTooltip"
+      [suffixIconButtons]="visualIdSuffixIconButtons"
+      (ngModelChange)="onChange()">
+    </app-form-input-v2>
+
+    <app-form-select-single-v2
+      fxFlex="25"
+      name="riskLevel"
+      [(ngModel)]="contact.riskLevel"
+      [placeholder]="'LNG_CONTACT_FIELD_LABEL_RISK_LEVEL' | translate"
+      tooltip="LNG_CONTACT_FIELD_LABEL_RISK_LEVEL_DESCRIPTION"
+      (ngModelChange)="onChange()"
+      [options]="riskOptions">
+    </app-form-select-single-v2>
+
+    <app-form-textarea-v2
+      name="riskReason"
+      [(ngModel)]="contact.riskReason"
+      [placeholder]="'LNG_CONTACT_FIELD_LABEL_RISK_REASON' | translate"
+      tooltip="LNG_CONTACT_FIELD_LABEL_RISK_REASON_DESCRIPTION"
+      (ngModelChange)="onChange()">
+    </app-form-textarea-v2>
+
+    <app-form-select-single-v2
+      name="followUp.status"
+      [(ngModel)]="contact.followUp.status"
+      [placeholder]="'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS' | translate"
+      tooltip="LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS_DESCRIPTION"
+      (ngModelChange)="onChange()"
+      [options]="finalFollowUpStatusOptions">
+    </app-form-select-single-v2>
+
+  </div>
 </form>
