@@ -2,9 +2,9 @@ import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
 import { throwError } from 'rxjs/internal/observable/throwError';
-import { catchError, takeUntil } from 'rxjs/operators';
+import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { AddressModel } from '../../../../core/models/address.model';
+import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { Constants } from '../../../../core/models/constants';
@@ -20,9 +20,13 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
+import { of } from 'rxjs';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { LocationModel } from '../../../../core/models/location.model';
+import { LocationDataService } from '../../../../core/services/data/location.data.service';
 
 @Component({
   selector: 'app-clusters-people-list',
@@ -40,7 +44,8 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
     private activatedRoute: ActivatedRoute,
     private clusterDataService: ClusterDataService,
     private toastV2Service: ToastV2Service,
-    private i18nService: I18nService
+    private i18nService: I18nService,
+    private locationDataService: LocationDataService
   ) {
     // parent
     super(listHelperService);
@@ -90,11 +95,6 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
         label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
         sortable: true,
         pinned: IV2ColumnPinned.LEFT,
-        format: {
-          type: (item: CaseModel | ContactModel | EventModel | ContactOfContactModel): string => {
-            return item.type === EntityType.EVENT ? item.name : item.lastName;
-          }
-        },
         filter: {
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH
@@ -151,7 +151,36 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
           type: V2FilterType.ADDRESS_MULTIPLE_LOCATION,
           address: filterAddressModel,
           field: 'addresses',
-          fieldIsArray: true
+          fieldIsArray: true,
+          search: (column: IV2Column) => {
+            // cleanup
+            this.queryBuilder.filter.removePathCondition('$or');
+
+            // filter ?
+            if (column.filter.address.filterLocationIds?.length > 0) {
+              this.queryBuilder.filter.where({
+                $or: [
+                  {
+                    'address.parentLocationIdFilter': {
+                      $in: column.filter.address.filterLocationIds
+                    }
+                  }, {
+                    addresses: {
+                      $elemMatch: {
+                        typeId: AddressType.CURRENT_ADDRESS,
+                        parentLocationIdFilter: {
+                          $in: column.filter.address.filterLocationIds
+                        }
+                      }
+                    }
+                  }
+                ]
+              });
+            }
+
+            // refresh list
+            this.needsRefreshList();
+          }
         },
         link: (data) => {
           return data.mainAddress?.location?.name ?
@@ -164,13 +193,6 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
         format: {
           type: 'mainAddress.addressLine1'
-        },
-        filter: {
-          type: V2FilterType.ADDRESS_FIELD,
-          address: filterAddressModel,
-          addressField: 'addressLine1',
-          field: 'addresses',
-          fieldIsArray: true
         }
       },
       {
@@ -360,6 +382,7 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
       'age',
       'gender',
       'riskLevel',
+      'address',
       'addresses',
       'type',
       'locations'
@@ -377,6 +400,74 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
         this.queryBuilder
       )
       .pipe(
+        switchMap((data) => {
+          // determine locations that we need to retrieve
+          const locationsIdsMap: {
+            [locationId: string]: true
+          } = {};
+          data.forEach((item) => {
+            const addresses: AddressModel[] = item instanceof EventModel ?
+              [item.address] :
+              item.addresses;
+            (addresses || []).forEach((address) => {
+              // nothing to add ?
+              if (!address?.locationId) {
+                return;
+              }
+
+              // add location to list
+              locationsIdsMap[address.locationId] = true;
+            });
+          });
+
+          // determine ids
+          const locationIds: string[] = Object.keys(locationsIdsMap);
+
+          // nothing to retrieve ?
+          if (locationIds.length < 1) {
+            return of(data);
+          }
+
+          // construct location query builder
+          const qb = new RequestQueryBuilder();
+          qb.filter.bySelect(
+            'id',
+            locationIds,
+            false,
+            null
+          );
+
+          // retrieve locations
+          return this.locationDataService
+            .getLocationsList(qb)
+            .pipe(
+              map((locations) => {
+                // map locations
+                const locationsMap: {
+                  [locationId: string]: LocationModel
+                } = {};
+                locations.forEach((location) => {
+                  locationsMap[location.id] = location;
+                });
+
+                // set locations
+                data.forEach((item) => {
+                  const addresses: AddressModel[] = item instanceof EventModel ?
+                    [item.address] :
+                    item.addresses;
+                  (addresses || []).forEach((address) => {
+                    address.location = address.locationId && locationsMap[address.locationId] ?
+                      locationsMap[address.locationId] :
+                      address.location;
+                  });
+                });
+
+                // finished
+                return data;
+              })
+            );
+        }),
+
         // should be the last pipe
         takeUntil(this.destroyed$)
       );
