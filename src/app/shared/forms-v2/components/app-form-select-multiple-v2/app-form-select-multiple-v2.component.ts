@@ -148,6 +148,31 @@ export class AppFormSelectMultipleV2Component
       // sort
       this.allOptions
         .sort((item1, item2) => {
+          // compare
+          if (
+            typeof item1.order === 'number' &&
+            typeof item2.order === 'number'
+          ) {
+            // equal ?
+            if (item1.order === item2.order) {
+              return item1.label.toLowerCase().localeCompare(item2.label.toLowerCase());
+            }
+
+            // finished
+            return item1.order - item2.order;
+          } else if (
+            typeof item1.order === 'number' &&
+            !item2.order
+          ) {
+            return -1;
+          } else if (
+            !item1.order &&
+            typeof item2.order === 'number'
+          ) {
+            return 1;
+          }
+
+          // finished
           return item1.label.toLowerCase().localeCompare(item2.label.toLowerCase());
         });
 
@@ -176,6 +201,9 @@ export class AppFormSelectMultipleV2Component
   get options(): ILabelValuePairModel[] {
     return this.allOptions;
   }
+
+  // allow disabled options to be selected ?
+  @Input() allowDisabledToBeSelected: boolean = false;
 
   // toggle all
   toggleAllCheckboxChecked: boolean = false;
