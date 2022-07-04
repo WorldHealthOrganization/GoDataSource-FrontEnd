@@ -43,7 +43,7 @@ enum NodeAction {
   selector: 'app-transmission-chains-graph',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './transmission-chains-graph.component.html',
-  styleUrls: ['./transmission-chains-graph.component.less']
+  styleUrls: ['./transmission-chains-graph.component.scss']
 })
 export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   @ViewChild('cotDashletChild', { static: false }) cotDashletChild: TransmissionChainsDashletComponent;
@@ -238,7 +238,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
                 // focus boxes
                 setTimeout(() => {
                   this.domService.scrollItemIntoView(
-                    '.selected-node-details'
+                    '.transmission-chain-edit-mode'
                   );
                 });
               } else {
@@ -275,7 +275,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             // focus boxes
             setTimeout(() => {
               this.domService.scrollItemIntoView(
-                '.selected-node-details'
+                '.transmission-chain-edit-mode'
               );
             });
           } else {

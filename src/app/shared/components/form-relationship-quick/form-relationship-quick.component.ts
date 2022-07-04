@@ -18,7 +18,7 @@ import { IResolverV2ResponseModel } from '../../../core/services/resolvers/data/
   selector: 'app-form-relationship-quick',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './form-relationship-quick.component.html',
-  styleUrls: ['./form-relationship-quick.component.less'],
+  styleUrls: ['./form-relationship-quick.component.scss'],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
     useExisting: FormRelationshipQuickComponent,
