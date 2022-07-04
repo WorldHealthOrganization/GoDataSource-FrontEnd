@@ -19,7 +19,7 @@ import { TranslateService } from '@ngx-translate/core';
   selector: 'app-form-contact-quick',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './form-contact-quick.component.html',
-  styleUrls: ['./form-contact-quick.component.less'],
+  styleUrls: ['./form-contact-quick.component.scss'],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
     useExisting: FormContactQuickComponent,

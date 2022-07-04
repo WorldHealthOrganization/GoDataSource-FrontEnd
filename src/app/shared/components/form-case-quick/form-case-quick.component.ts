@@ -19,7 +19,7 @@ import { FormHelperService } from '../../../core/services/helper/form-helper.ser
   selector: 'app-form-case-quick',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './form-case-quick.component.html',
-  styleUrls: ['./form-case-quick.component.less'],
+  styleUrls: ['./form-case-quick.component.scss'],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
     useExisting: FormCaseQuickComponent,

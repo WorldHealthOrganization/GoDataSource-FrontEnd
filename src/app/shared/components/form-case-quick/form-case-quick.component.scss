@@ -1,0 +1,49 @@
+@import 'mixins';
+
+app-form-case-quick {
+  height: 100%;
+
+  form {
+    padding: 0.8rem;
+
+    .section-title {
+      color: var(--gd-secondary);
+      display: block;
+      font-size: 1.2rem;
+      letter-spacing: 0.05rem;
+      margin: 0 0 1.6rem;
+      text-transform: uppercase;
+    }
+
+    > div {
+      > * {
+        width: calc(33.3333% - 0.8rem);
+  
+        @include breakpoint('xl') {
+          width: calc(50% - 0.8rem);
+        }
+  
+        @include breakpoint('sm') {
+          width: calc(50% - 0.8rem);
+        }
+  
+        @include breakpoint('xs') {
+          width: 100%;
+        }
+      }
+
+      > .dob {
+        width: calc(66.6667% - 0.8rem);
+
+        @include breakpoint('lt-xl') {
+          @include flex_val(1 1 100% !important);
+          width: 100%;
+        }
+      }
+
+      > app-form-textarea-v2 {
+        width: 100%;
+      }
+    }
+  }
+}

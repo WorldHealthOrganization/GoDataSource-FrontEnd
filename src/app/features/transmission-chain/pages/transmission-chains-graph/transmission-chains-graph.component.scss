@@ -1,0 +1,165 @@
+@import 'mixins';
+
+.transmission-chain-edit-mode {
+  margin-top: 1.6rem;
+
+  .person-summary-container {
+    @include breakpoint('gt-lg') {
+      max-width: 45rem;
+      width: 100%;
+    }
+
+    &:not(.multiple-selected) {
+      @media only screen and (min-width: 960px) and (max-width: 1599px) {
+        max-width: 45rem;
+        width: 100%;
+      }
+    }
+
+    &.multiple-selected {
+      @media only screen and (min-width: 960px) and (max-width: 1599px) {
+        @include flex_val(1 1 calc(50% - 0.8rem) !important);
+        min-width: calc(50% - 0.8rem) !important;
+        width: calc(50% - 0.8rem);
+      }
+
+      + .multiple-selected {
+        @media only screen and (min-width: 960px) and (max-width: 1599px) {
+          margin-right: 0 !important;
+        }
+      }
+    }
+  }
+
+  .selected-relationship-details {
+    @media only screen and (min-width: 960px) {
+      max-width: 60rem;
+      width: 100%;
+    }
+
+    @media only screen and (max-width: 959px) {
+      max-width: 100%;
+      width: 100%;
+    }
+
+    &.selected-relationship-edit {
+      @media only screen and (min-width: 960px) and (max-width: 1599px) {
+        max-width: 40rem;
+        width: 100%;
+      }
+    }
+  }
+
+  .create-relationship {
+    @include breakpoint('lt-lg') {
+      @include flex_val(1 1 100% !important);
+      margin-top: 1.6rem;
+      width: 100%;
+    }
+  
+    @media only screen and (max-width: 959px) {
+      margin-top: 0;
+    }
+  
+    .create-relationship-header {
+      border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+      padding: 0.8rem;
+  
+      h1 {
+        color: var(--gd-primary-alt);
+        font-size: 1.8rem;
+        font-weight: 500;
+      }
+    }
+  
+    .create-relationship-content {
+      height: 100%;
+  
+      > div {
+        height: 100%;
+      }
+    }
+  
+    .create-relationship-content-inner {
+      padding: 0.8rem;
+  
+      .person-role {
+        color: var(--gd-secondary);
+      }
+    }
+  
+    .create-relationship-footer {
+      border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+      padding: 0.8rem;
+    }
+  }
+
+  .create-contact {
+    @include breakpoint('lt-lg') {
+      @include flex_val(1 1 100% !important);
+      margin-top: 1.6rem;
+      width: 100%;
+    }
+  
+    @media only screen and (max-width: 959px) {
+      margin-top: 0;
+    }
+  
+    .create-contact-header {
+      border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+      padding: 0.8rem;
+  
+      h1 {
+        color: var(--gd-primary-alt);
+        font-size: 1.8rem;
+        font-weight: 500;
+      }
+    }
+  
+    .create-contact-content {
+      height: 100%;
+      padding-top: 0.8rem;
+
+      > div {
+        height: 100%;
+      }
+    }
+
+    .section-title {
+      color: var(--gd-secondary);
+      display: block;
+      font-size: 1.2rem;
+      letter-spacing: 0.05rem;
+      padding: 0 0.8rem;
+      text-transform: uppercase;
+    }
+  
+    .create-contact-footer {
+      border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+      padding: 0.8rem;
+      width: 100%;
+    }
+  }
+
+  .modify-person {
+    @media only screen and (max-width: 959px) {
+      @include flex_val(1 1 100% !important);
+    }
+
+    .modify-person-header {
+      border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+      padding: 0.8rem;
+  
+      h1 {
+        color: var(--gd-primary-alt);
+        font-size: 1.8rem;
+        font-weight: 500;
+      }
+    }
+  
+    .modify-person-footer {
+      border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+      padding: 0.8rem;
+    }
+  }
+}

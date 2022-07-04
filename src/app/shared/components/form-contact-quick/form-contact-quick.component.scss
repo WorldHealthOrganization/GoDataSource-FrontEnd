@@ -1,0 +1,38 @@
+@import 'mixins';
+
+app-form-contact-quick {
+  height: 100%;
+
+  form {
+    padding: 1.6rem 0.8rem 0.8rem;
+
+    > * {
+      width: calc(33.3333% - 0.8rem);
+
+      @include breakpoint('xl') {
+        width: calc(50% - 0.8rem);
+      }
+
+      @include breakpoint('sm') {
+        width: calc(50% - 0.8rem);
+      }
+
+      @include breakpoint('xs') {
+        width: 100%;
+      }
+    }
+
+    > .dob {
+      width: calc(66.6667% - 0.8rem);
+
+      @include breakpoint('lt-xl') {
+        @include flex_val(1 1 100% !important);
+        width: 100%;
+      }
+    }
+
+    > app-form-textarea-v2 {
+      width: 100%;
+    }
+  }
+}

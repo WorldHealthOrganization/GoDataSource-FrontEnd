@@ -20,7 +20,7 @@ import { EntityHelperService } from '../../../../core/services/helper/entity-hel
   selector: 'app-relationship-summary',
   templateUrl: './relationship-summary.component.html',
   encapsulation: ViewEncapsulation.None,
-  styleUrls: ['./relationship-summary.component.less']
+  styleUrls: ['./relationship-summary.component.scss']
 })
 export class RelationshipSummaryComponent implements OnInit, OnChanges {
   @Input() relationship: RelationshipModel;
