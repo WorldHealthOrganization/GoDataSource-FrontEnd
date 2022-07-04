@@ -206,6 +206,16 @@
                 <mat-icon>{{viewOnly ? 'visibility' : 'edit'}}</mat-icon>
               </button>
 
+              <!-- Clone question -->
+              <button
+                *ngIf="!viewOnly && item.data.answerType !== Constants.ANSWER_TYPES.MARKUP.value"
+                type="button"
+                mat-icon-button
+                [matTooltip]="'LNG_COMMON_BUTTON_CLONE' | translate"
+                (click)="cloneItem(item)">
+                <mat-icon>content_copy</mat-icon>
+              </button>
+
               <!-- Delete question -->
               <button
                 *ngIf="!viewOnly"
@@ -231,7 +241,7 @@
             <mat-icon
               [style.visibility]="item.canCollapseOrExpand ? 'visible' : 'hidden'"
               (click)="expandCollapse(item)">{{item.data.collapsed ? 'expand_more' : 'expand_less'}}</mat-icon>
-            
+
             <!-- Expand All -->
             <mat-icon
               *ngIf="item.canCollapseOrExpand && !item.data.collapsed"
@@ -300,6 +310,16 @@
                 [matTooltip]="(viewOnly ? 'LNG_COMMON_BUTTON_VIEW' : 'LNG_COMMON_BUTTON_UPDATE') | translate"
                 (click)="viewEditAnswer(item.data, item.parent.data)">
                 <mat-icon>{{viewOnly ? 'visibility' : 'edit'}}</mat-icon>
+              </button>
+
+              <!-- Clone answer -->
+              <button
+                *ngIf="!viewOnly"
+                type="button"
+                mat-icon-button
+                [matTooltip]="'LNG_COMMON_BUTTON_CLONE' | translate"
+                (click)="cloneItem(item)">
+                <mat-icon>content_copy</mat-icon>
               </button>
 
               <!-- Delete answer -->
@@ -436,6 +456,14 @@
         class="gd-form-edit-questionnaire-v2-legend-items-item">
         <mat-icon>edit</mat-icon>
         <span>{{'LNG_COMMON_BUTTON_UPDATE' | translate}}</span>
+      </div>
+
+      <!-- Clone question / answer -->
+      <div
+        *ngIf="!viewOnly"
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        <mat-icon>content_copy</mat-icon>
+        <span>{{'LNG_COMMON_BUTTON_CLONE' | translate}}</span>
       </div>
 
       <!-- Delete -->

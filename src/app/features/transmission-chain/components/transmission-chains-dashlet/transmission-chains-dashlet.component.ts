@@ -838,6 +838,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       this.outbreakSubscriber = null;
     }
 
+    // hide message
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_UNRESPONSIVE_EDIT_COT);
+
     // not full screen anymore
     AuthenticatedComponent.FULL_SCREEN = false;
 
@@ -1733,7 +1736,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       // hide message
       this.toastV2Service.hide(AppMessages.APP_MESSAGE_UNRESPONSIVE_EDIT_COT);
     }
-
   }
 
   /**

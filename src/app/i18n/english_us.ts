@@ -14,7 +14,11 @@ export const EnglishUsLang = {
     'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DATE': 'Print date',
     'LNG_ASYNC_COT_FIELD_LABEL_SNAPSHOT_DATETIME': 'Snapshot date / time',
     'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_FILTER_DATE': 'Situation as of',
-    'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_NAME_DESCRIPTION': 'Date / time will be added to the snapshot name at the time of saving'
+    'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOT_NAME_DESCRIPTION': 'Date / time will be added to the snapshot name at the time of saving',
+    'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CLONING': 'Cloning {{type}} "{{item}}"',
+    'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLES': 'Question variables',
+    'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TYPE_QUESTION': 'question',
+    'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TYPE_ANSWER': 'answer'
 
 
 
