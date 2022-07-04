@@ -1226,65 +1226,422 @@ export class AppFormEditQuestionnaireV2Component
    * Clone question / answer
    */
   cloneItem(item: IFlattenNode): void {
-    // info which question is cloned
-    const inputs: V2SideDialogConfigInput[] = [];
-    inputs.push({
-      type: V2SideDialogConfigInputType.HTML,
-      name: 'details',
-      cssClasses: 'gd-form-edit-questionnaire-v2-details',
-      placeholder: this.translateService.instant(
-        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CLONING', {
-          item: item.data instanceof QuestionModel ?
-            item.data.text :
-            item.data.label
-        }
-      )
-    });
+    // display loading - if we need to create a lot of inputs..it takes a bit of time
+    const loading = this.dialogV2Service.showLoadingDialog();
 
-    // title
-    inputs.push({
-      type: V2SideDialogConfigInputType.DIVIDER,
-      placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLES'
-    });
+    // display side dialog / clone
+    setTimeout(() => {
+      // hide loading dialog
+      loading.close();
 
-    // construct inputs list
-    // #TODO
-
-    // show dialog
-    this.dialogV2Service
-      .showSideDialog({
-        title: {
-          get: () => 'LNG_COMMON_BUTTON_CLONE'
-        },
-        hideInputFilter: true,
-        dontCloseOnBackdrop: true,
-        width: '60rem',
-        inputs,
-        bottomButtons: [
-          {
-            type: IV2SideDialogConfigButtonType.OTHER,
-            label: 'LNG_COMMON_BUTTON_CLONE',
-            color: 'primary',
-            key: 'apply',
-            disabled: (_data, handler): boolean => {
-              return !handler.form || handler.form.invalid;
-            }
-          }, {
-            type: IV2SideDialogConfigButtonType.CANCEL,
-            label: 'LNG_COMMON_BUTTON_CANCEL',
-            color: 'text'
+      // info which question is cloned
+      const inputs: V2SideDialogConfigInput[] = [];
+      inputs.push({
+        type: V2SideDialogConfigInputType.HTML,
+        name: 'details',
+        cssClasses: 'gd-form-edit-questionnaire-v2-details',
+        placeholder: this.translateService.instant(
+          'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CLONING', {
+            type: this.translateService.instant(
+              item.data instanceof QuestionModel ?
+                'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TYPE_QUESTION' :
+                'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TYPE_ANSWER'
+            ),
+            item: item.data instanceof QuestionModel ?
+              item.data.text :
+              item.data.label
           }
-        ]
-      })
-      .subscribe((response) => {
-        // cancelled ?
-        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
-          // finished
+        )
+      });
+
+      // update used question variables
+      let usedQuestionVariables: {
+        [variable: string]: true
+      } = {};
+      const deepAddVariables = (questions: QuestionModel[]) => {
+        // nothing to do ?
+        if (!questions?.length) {
           return;
         }
 
-        // #TODO
+        // go through questions
+        questions.forEach((question) => {
+          // no need to enter variable for markup
+          if (
+            question.answerType === Constants.ANSWER_TYPES.MARKUP.value ||
+            !question.variable
+          ) {
+            return;
+          }
+
+          // add variable
+          usedQuestionVariables[question.variable.toLowerCase()] = true;
+
+          // go through answers
+          if (question.answers?.length > 0) {
+            question.answers.forEach((answer) => {
+              deepAddVariables(answer.additionalQuestions);
+            });
+          }
+        });
+      };
+      const refreshQuestionVariables = () => {
+        // reset
+        usedQuestionVariables = {};
+
+        // attach existing variables
+        deepAddVariables(this.value);
+
+        // attach clone variables
+        inputs.forEach((input) => {
+          // nothing to do ?
+          if (
+            !(input.data instanceof QuestionModel) ||
+            !(input as IV2SideDialogConfigInputText).value
+          ) {
+            return;
+          }
+
+          // attach variable
+          usedQuestionVariables[(input as IV2SideDialogConfigInputText).value.toLowerCase()] = true;
+        });
+      };
+
+      // construct inputs list
+      const createQuestionInputs = (
+        questions: QuestionModel[],
+        prefix: string,
+        isFirst: boolean,
+        title: string
+      ) => {
+        // nothing to do ?
+        if (!questions?.length) {
+          return;
+        }
+
+        // go through questions
+        let questionIndex: number = 0;
+        questions.forEach((question) => {
+          // no need to enter variable for markup
+          if (question.answerType === Constants.ANSWER_TYPES.MARKUP.value) {
+            return;
+          }
+
+          // determine question no
+          questionIndex++;
+          const questionNo: string = isFirst ?
+            prefix :
+            `${prefix ? `${prefix}.` : ''}${questionIndex}`;
+
+          // add divider
+          inputs.push({
+            type: V2SideDialogConfigInputType.DIVIDER
+          });
+
+          // add answer title ?
+          if (!!title) {
+            inputs.push({
+              type: V2SideDialogConfigInputType.DIVIDER,
+              placeholder: title,
+              placeholderMultipleLines: !!title
+            });
+          }
+
+          // add variable
+          inputs.push(
+            // question
+            {
+              type: V2SideDialogConfigInputType.TEXT,
+              name: `${question.variable}[text]`,
+              placeholder: `${this.translateService.instant('LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_TEXT')} ${questionNo}`,
+              value: question.text,
+              validators: {
+                required: () => true
+              }
+            },
+
+            // variable
+            {
+              type: V2SideDialogConfigInputType.TEXT,
+              name: `${question.variable}[variable]`,
+              placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLE',
+              value: undefined,
+              data: question,
+              change: () => {
+                // update unique variables
+                refreshQuestionVariables();
+              },
+              validators: {
+                required: () => true,
+                notInObject: () => ({
+                  values: usedQuestionVariables,
+                  err: 'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_DUPLICATE_VARIABLE'
+                })
+              }
+            }
+          );
+
+          // go through answers
+          if (question.answers?.length > 0) {
+            question.answers.forEach((answer) => {
+              createQuestionInputs(
+                answer.additionalQuestions,
+                questionNo,
+                false,
+                answer.label
+              );
+            });
+          }
+        });
+      };
+
+      // if first is an answer then we need to make sure answer value is unique too
+      if (item.data instanceof AnswerModel) {
+        // determine current answer values
+        const usedAnswerValues: {
+          [variable: string]: true
+        } = {};
+        (item.parent.data as QuestionModel).answers.forEach((answer) => {
+          usedAnswerValues[(answer.value || '').toLowerCase()] = true;
+        });
+
+        // append answer model
+        inputs.push(
+          // answer
+          {
+            type: V2SideDialogConfigInputType.TEXT,
+            name: 'answer[label]',
+            placeholder: this.translateService.instant('LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_LABEL'),
+            value: item.data.label,
+            validators: {
+              required: () => true
+            }
+          },
+
+          // value
+          {
+            type: V2SideDialogConfigInputType.TEXT,
+            name: 'answer[value]',
+            placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_VALUE',
+            value: undefined,
+            validators: {
+              required: () => true,
+              notInObject: () => ({
+                values: usedAnswerValues,
+                err: 'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_DUPLICATE_ANSWER_VALUE'
+              })
+            }
+          }
+        );
+      }
+
+      // variables
+      inputs.push({
+        type: V2SideDialogConfigInputType.DIVIDER,
+        placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLES'
       });
+
+      // retrieve unique variables
+      refreshQuestionVariables();
+
+      // start cloning questions
+      createQuestionInputs(
+        item.data instanceof QuestionModel ?
+          [item.data] :
+          item.data.additionalQuestions,
+        item.data instanceof QuestionModel ?
+          item.no :
+          '',
+        item.data instanceof QuestionModel,
+        item.data instanceof QuestionModel ?
+          '' :
+          item.data.label
+      );
+
+      // show dialog
+      this.dialogV2Service
+        .showSideDialog({
+          title: {
+            get: () => 'LNG_COMMON_BUTTON_CLONE'
+          },
+          hideInputFilter: true,
+          dontCloseOnBackdrop: true,
+          width: '60rem',
+          inputs,
+          bottomButtons: [
+            {
+              type: IV2SideDialogConfigButtonType.OTHER,
+              label: 'LNG_COMMON_BUTTON_CLONE',
+              color: 'primary',
+              key: 'apply',
+              disabled: (_data, handler): boolean => {
+                return !handler.form || handler.form.invalid;
+              }
+            }, {
+              type: IV2SideDialogConfigButtonType.CANCEL,
+              label: 'LNG_COMMON_BUTTON_CANCEL',
+              color: 'text'
+            }
+          ]
+        })
+        .subscribe((response) => {
+          // cancelled ?
+          if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+            // finished
+            return;
+          }
+
+          // clone questions
+          const cloneQuestions = (
+            questionsToClone: QuestionModel[]
+          ): QuestionModel[] => {
+            // clone
+            const accumulator: QuestionModel[] = [];
+            questionsToClone.forEach((question) => {
+              // markup ?
+              if (question.answerType === Constants.ANSWER_TYPES.MARKUP.value) {
+                // clone markup question
+                const clonedQuestion: QuestionModel = new QuestionModel();
+                clonedQuestion.text = question.text;
+                clonedQuestion.variable = uuid();
+                clonedQuestion.category = question.category;
+                clonedQuestion.required = question.required;
+                clonedQuestion.inactive = question.inactive;
+                clonedQuestion.multiAnswer = question.multiAnswer;
+                clonedQuestion.answerType = question.answerType;
+                clonedQuestion.answersDisplay = question.answersDisplay;
+                clonedQuestion.order = accumulator.length;
+
+                // attach
+                accumulator.push(clonedQuestion);
+
+                // finished
+                return;
+              }
+
+              // clone question
+              const clonedQuestion: QuestionModel = new QuestionModel();
+              clonedQuestion.text = (response.data.map[`${question.variable}[text]`] as IV2SideDialogConfigInputText).value;
+              clonedQuestion.variable = (response.data.map[`${question.variable}[variable]`] as IV2SideDialogConfigInputText).value;
+              clonedQuestion.category = question.category;
+              clonedQuestion.required = question.required;
+              clonedQuestion.inactive = question.inactive;
+              clonedQuestion.multiAnswer = question.multiAnswer;
+              clonedQuestion.answerType = question.answerType;
+              clonedQuestion.answersDisplay = question.answersDisplay;
+              clonedQuestion.order = accumulator.length;
+
+              // attach
+              accumulator.push(clonedQuestion);
+
+              // has answers ?
+              if (question.answers?.length > 0) {
+                question.answers.forEach((answer) => {
+                  // create answer
+                  const clonedAnswer = new AnswerModel();
+                  clonedAnswer.label = answer.label;
+                  clonedAnswer.value = answer.value;
+                  clonedAnswer.alert = answer.alert;
+                  clonedAnswer.order = answer.order;
+
+                  // attach
+                  clonedQuestion.answers = clonedQuestion.answers || [];
+                  clonedQuestion.answers.push(clonedAnswer);
+
+                  // has children questions ?
+                  if (answer.additionalQuestions?.length > 0) {
+                    clonedAnswer.additionalQuestions = cloneQuestions(answer.additionalQuestions);
+                  }
+                });
+              }
+            });
+
+            // finished
+            return accumulator;
+          };
+
+          // if answer we need to add answer to question
+          if (item.data instanceof AnswerModel) {
+            // create answer
+            const answer = new AnswerModel();
+            answer.label = (response.data.map['answer[label]'] as IV2SideDialogConfigInputText).value;
+            answer.value = (response.data.map['answer[value]'] as IV2SideDialogConfigInputText).value;
+            answer.alert = item.data.alert;
+            answer.order = (item.parent.data as QuestionModel).answers.length;
+
+            // add answer
+            (item.parent.data as QuestionModel).answers.push(answer);
+
+            // clone questions
+            answer.additionalQuestions = item.data.additionalQuestions?.length > 0 ?
+              cloneQuestions(item.data.additionalQuestions) :
+              null;
+
+            // scroll item
+            this.scrollToItem(answer);
+          } else {
+            // determine accumulator
+            const acc: QuestionModel[] = item.parent ?
+              (item.parent.data as AnswerModel).additionalQuestions :
+              this.value;
+
+            // question
+            // clone question
+            const clonedQuestion: QuestionModel = new QuestionModel();
+            clonedQuestion.text = (response.data.map[`${item.data.variable}[text]`] as IV2SideDialogConfigInputText).value;
+            clonedQuestion.variable = (response.data.map[`${item.data.variable}[variable]`] as IV2SideDialogConfigInputText).value;
+            clonedQuestion.category = item.data.category;
+            clonedQuestion.required = item.data.required;
+            clonedQuestion.inactive = item.data.inactive;
+            clonedQuestion.multiAnswer = item.data.multiAnswer;
+            clonedQuestion.answerType = item.data.answerType;
+            clonedQuestion.answersDisplay = item.data.answersDisplay;
+            clonedQuestion.order = acc.length;
+
+            // attach
+            acc.push(clonedQuestion);
+
+            // clone answers
+            if (item.data.answers?.length > 0) {
+              item.data.answers.forEach((answer) => {
+                // create answer
+                const clonedAnswer = new AnswerModel();
+                clonedAnswer.label = answer.label;
+                clonedAnswer.value = answer.value;
+                clonedAnswer.alert = answer.alert;
+                clonedAnswer.order = answer.order;
+
+                // attach
+                clonedQuestion.answers = clonedQuestion.answers || [];
+                clonedQuestion.answers.push(clonedAnswer);
+
+                // has children questions ?
+                if (answer.additionalQuestions?.length > 0) {
+                  clonedAnswer.additionalQuestions = cloneQuestions(answer.additionalQuestions);
+                }
+              });
+            }
+
+            // scroll item
+            this.scrollToItem(clonedQuestion);
+          }
+
+          // close popup
+          response.handler.hide();
+
+          // flatten
+          this.nonFlatToFlat();
+
+          // trigger on change
+          this.onChange(this.value);
+
+          // mark dirty
+          this.control?.markAsDirty();
+
+          // update ui
+          this.detectChanges();
+        });
+    }, 200);
   }
 
   /**

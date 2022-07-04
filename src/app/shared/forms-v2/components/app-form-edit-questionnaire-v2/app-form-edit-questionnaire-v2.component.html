@@ -208,7 +208,7 @@
 
               <!-- Clone question -->
               <button
-                *ngIf="!viewOnly"
+                *ngIf="!viewOnly && item.data.answerType !== Constants.ANSWER_TYPES.MARKUP.value"
                 type="button"
                 mat-icon-button
                 [matTooltip]="'LNG_COMMON_BUTTON_CLONE' | translate"
