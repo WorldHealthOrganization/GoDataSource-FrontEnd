@@ -159,6 +159,36 @@ export class AppFormEditQuestionnaireV2Component
    * Set value
    */
   writeValue(value: QuestionModel[]): void {
+    // translate all questions and answers
+    const translateQuestions = (questions: QuestionModel[]) => {
+      // nothing to do ?
+      if (!questions?.length) {
+        return;
+      }
+
+      // translate questions
+      questions.forEach((question) => {
+        // translate
+        question.text = question.text ?
+          this.translateService.instant(question.text) :
+          question.text;
+
+        // translate answers
+        (question.answers || []).forEach((answer) => {
+          // translate
+          answer.label = answer.label ?
+            this.translateService.instant(answer.label) :
+            answer.label;
+
+          // translate sub questions
+          translateQuestions(answer.additionalQuestions);
+        });
+      });
+    };
+
+    // translate
+    translateQuestions(value);
+
     // start with all questions collapsed
     this.collapseExpandAllQuestions(
       value,
@@ -344,11 +374,6 @@ export class AppFormEditQuestionnaireV2Component
     // go through each question
     let no: number = 1;
     questions.forEach((question, questionIndex) => {
-      // translate
-      question.text = question.text ?
-        this.translateService.instant(question.text) :
-        question.text;
-
       // set order
       question.order = questionIndex;
 
@@ -393,11 +418,6 @@ export class AppFormEditQuestionnaireV2Component
         !question.collapsed
       ) {
         (question.answers || []).forEach((answer, answerIndex) => {
-          // translate
-          answer.label = answer.label ?
-            this.translateService.instant(answer.label) :
-            answer.label;
-
           // set order
           answer.order = answerIndex;
 
