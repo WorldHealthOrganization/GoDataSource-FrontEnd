@@ -97,6 +97,14 @@ const relationshipTypeChildrenRoutes = [
         PERMISSION.OUTBREAK_VIEW,
         PERMISSION.RELATIONSHIP_SHARE
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      entity: RelationshipPersonDataResolver,
+      gender: GenderDataResolver,
+      risk: RiskDataResolver,
+      classification: ClassificationDataResolver,
+      personType: PersonTypeDataResolver
     }
   },
   // Share selected relationships (2): Create relationships form

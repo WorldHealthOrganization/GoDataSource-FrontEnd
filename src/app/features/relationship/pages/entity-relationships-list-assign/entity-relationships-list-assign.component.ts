@@ -1,59 +1,42 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { Observable } from 'rxjs';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
-import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { catchError, map, share } from 'rxjs/operators';
-import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
-import { UserSettings } from '../../../../core/models/user.model';
-import { throwError } from 'rxjs/internal/observable/throwError';
-import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { takeUntil } from 'rxjs/operators';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
+import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
+import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
+import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2FilterType, V2FilterTextType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { TranslateService } from '@ngx-translate/core';
+import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 
 @Component({
   selector: 'app-entity-relationships-list-assign',
   templateUrl: './entity-relationships-list-assign.component.html'
 })
-export class EntityRelationshipsListAssignComponent extends RelationshipsListComponent implements OnInit, OnDestroy {
-  // breadcrumbs: BreadcrumbItemModel[] = [];
-
-  // entities list relationships
-  entitiesList$: Observable<(CaseModel | ContactModel | EventModel | ContactOfContactModel)[]>;
-  entitiesListCount$: Observable<IBasicCount>;
-
-  // available side filters
-  availableSideFilters: any[];
-  // values for side filter
-  savedFiltersType = Constants.APP_PAGE.PEOPLE_TO_SHARE_RELATIONSHIPS_WITH.value;
-
-  // constants
-  UserSettings = UserSettings;
-
-  // reference data
-  genderList$: Observable<any[]>;
-  personTypesList$: Observable<any[]>;
-  personTypesListMap: { [id: string]: ReferenceDataEntryModel };
-  riskLevelsList$: Observable<any[]>;
-  caseClassificationsList$: Observable<any[]>;
-
-  // provide constants to template
-  Constants = Constants;
-  ReferenceDataCategory = ReferenceDataCategory;
-  EntityType = EntityType;
-
+export class EntityRelationshipsListAssignComponent extends ListComponent<CaseModel | ContactModel | EventModel | ContactOfContactModel> implements OnDestroy {
+  // entity
+  private _entity: CaseModel | ContactModel | EventModel | ContactOfContactModel;
+  // relationship type
+  relationshipType: RelationshipType;
+  // selected records ids
   selectedTargetIds: string[] = [];
+  // provide constants to template
+  RelationshipType = RelationshipType;
 
   /**
      * Constructor
@@ -61,125 +44,211 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
   constructor(
     protected listHelperService: ListHelperService,
     protected router: Router,
-    protected route: ActivatedRoute,
+    protected activatedRoute: ActivatedRoute,
     protected outbreakDataService: OutbreakDataService,
     protected entityDataService: EntityDataService,
+    protected entityHelperService: EntityHelperService,
+    protected translateService: TranslateService,
     private toastV2Service: ToastV2Service,
-    private genericDataService: GenericDataService,
-    private referenceDataDataService: ReferenceDataDataService
+    private genericDataService: GenericDataService
   ) {
     super(
-      listHelperService, router, route,
-      outbreakDataService, entityDataService
+      listHelperService
     );
-  }
 
-  /**
-     * Component initialized
-     */
-  ngOnInit() {
-    super.ngOnInit();
+    // disable select outbreak
+    TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = true;
 
-    // reference data
-    this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
-    this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).pipe(share());
-    this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION).pipe(share());
-    const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).pipe(share());
-    this.personTypesList$ = personTypes$
-      .pipe(
-        map((data: ReferenceDataCategoryModel) => {
-          return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
-            new LabelValuePair(entry.value, entry.id)
-          );
-        })
-      );
-    personTypes$.subscribe((personTypeCategory: ReferenceDataCategoryModel) => {
-      this.personTypesListMap = _.transform(
-        personTypeCategory.entries,
-        (result, entry: ReferenceDataEntryModel) => {
-          // groupBy won't work here since groupBy will put an array instead of one value
-          result[entry.id] = entry;
-        },
-        {}
-      );
-    });
+    // retreive entity related data
+    this._entity = this.activatedRoute.snapshot.data.entity;
+    this.relationshipType = this.activatedRoute.snapshot.data.relationshipType;
 
-    // side filters
-    this.generateSideFilters();
-
-    if (_.isEmpty(this.route.snapshot.queryParams.selectedTargetIds)) {
+    // get selected records ids
+    if (_.isEmpty(this.activatedRoute.snapshot.queryParams.selectedTargetIds)) {
       this.toastV2Service.error('LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES');
       this.router.navigate(['..']);
     } else {
-      this.selectedTargetIds = JSON.parse(this.route.snapshot.queryParams.selectedTargetIds);
-
-      this.onDataInitialized();
+      this.selectedTargetIds = JSON.parse(this.activatedRoute.snapshot.queryParams.selectedTargetIds);
     }
 
-    // initialize Side Table Columns
-    this.initializeTableColumns();
+    // clear queryBuilder
+    this.clearQueryBuilder();
   }
 
   /**
-     * Release resources
-     */
+  * Component destroyed
+  */
   ngOnDestroy() {
     // release parent resources
-    super.ngOnDestroy();
+    super.onDestroy();
+
+    // enable select outbreak
+    TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = false;
+  }
+
+  /**
+ * Selected outbreak was changed
+ */
+  selectedOutbreakChanged(): void {
+    // initialize pagination
+    this.initPaginator();
+
+    // ...and re-load the list when the Selected Outbreak is changed
+    this.needsRefreshList(true);
   }
 
   /**
      * Initialize Side Table Columns
      */
-  initializeTableColumns() {
+  protected initializeTableColumns() {
     // default table columns
-    // this.tableColumns = [
-    //   new VisibleColumnModel({
-    //     field: 'checkbox',
-    //     required: true,
-    //     excludeFromSave: true
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'lastName',
-    //     label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'firstName',
-    //     label: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'visualId',
-    //     label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'age',
-    //     label: 'LNG_ENTITY_FIELD_LABEL_AGE'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'gender',
-    //     label: 'LNG_ENTITY_FIELD_LABEL_GENDER'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'riskLevel',
-    //     label: 'LNG_ENTITY_FIELD_LABEL_RISK'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'classification',
-    //     label: 'LNG_ENTITY_FIELD_LABEL_CLASSIFICATION'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'dateOfOnset',
-    //     label: 'LNG_ENTITY_FIELD_LABEL_DATE_OF_ONSET'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'place',
-    //     label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION'
-    //   }),
-    //   new VisibleColumnModel({
-    //     field: 'address',
-    //     label: 'LNG_ENTITY_FIELD_LABEL_ADDRESS'
-    //   })
-    // ];
+    this.tableColumns = [
+      {
+        field: 'lastName',
+        label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
+        sortable: true,
+        pinned: IV2ColumnPinned.LEFT,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'firstName',
+        label: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
+        sortable: true,
+        pinned: IV2ColumnPinned.LEFT,
+        format: {
+          type: (item) => item.type === EntityType.EVENT ? item.name : item.firstName
+        },
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'visualId',
+        label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'statuses',
+        label: 'LNG_COMMON_LABEL_STATUSES',
+        format: {
+          type: V2ColumnFormat.STATUS
+        },
+        notResizable: true,
+        pinned: true,
+        legends: [
+          // person type
+          {
+            title: 'LNG_ENTITY_FIELD_LABEL_TYPE',
+            items: this.activatedRoute.snapshot.data.personType.list.map((item) => {
+              return {
+                form: {
+                  type: IV2ColumnStatusFormType.CIRCLE,
+                  color: item.getColorCode()
+                },
+                label: item.id
+              };
+            })
+          }
+        ],
+        forms: (_column, data): V2ColumnStatusForm[] => {
+          // construct list of forms that we need to display
+          const forms: V2ColumnStatusForm[] = [];
+
+          // person type
+          if (
+            data.type &&
+            this.activatedRoute.snapshot.data.personType.map[data.type]
+          ) {
+            forms.push({
+              type: IV2ColumnStatusFormType.CIRCLE,
+              color: this.activatedRoute.snapshot.data.personType.map[data.type].getColorCode(),
+              tooltip: this.translateService.instant(data.type)
+            });
+          }
+
+          // finished
+          return forms;
+        }
+      },
+      {
+        field: 'age',
+        label: 'LNG_ENTITY_FIELD_LABEL_AGE',
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.AGE
+        },
+        filter: {
+          type: V2FilterType.AGE_RANGE,
+          min: 0,
+          max: Constants.DEFAULT_AGE_MAX_YEARS
+        }
+      },
+      {
+        field: 'gender',
+        label: 'LNG_ENTITY_FIELD_LABEL_GENDER',
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        }
+      },
+      {
+        field: 'riskLevel',
+        label: 'LNG_ENTITY_FIELD_LABEL_RISK',
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        }
+      },
+      {
+        field: 'classification',
+        label: 'LNG_ENTITY_FIELD_LABEL_CLASSIFICATION',
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        }
+      },
+      {
+        field: 'dateOfOnset',
+        label: 'LNG_ENTITY_FIELD_LABEL_DATE_OF_ONSET',
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
+        field: 'place',
+        label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
+        format: {
+          type: 'mainAddress.location.name'
+        },
+        link: (data) => {
+          return data.mainAddress?.location?.name ?
+            `/locations/${ data.mainAddress.location.id }/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'address',
+        label: 'LNG_ENTITY_FIELD_LABEL_ADDRESS',
+        format: {
+          type: 'mainAddress.fullAddress'
+        }
+      }
+    ];
   }
 
   /**
@@ -195,7 +264,61 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
   /**
    * Initialize Table Advanced Filters
    */
-  protected initializeTableAdvancedFilters(): void {}
+  protected initializeTableAdvancedFilters(): void {
+    this.advancedFilters = [
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'type',
+        label: 'LNG_ENTITY_FIELD_LABEL_TYPE',
+        options: this.activatedRoute.snapshot.data.personType.options,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'firstName',
+        label: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'lastName',
+        label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'gender',
+        label: 'LNG_ENTITY_FIELD_LABEL_GENDER',
+        options: this.activatedRoute.snapshot.data.gender.options,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_AGE,
+        field: 'age',
+        label: 'LNG_ENTITY_FIELD_LABEL_AGE',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.ADDRESS,
+        field: 'addresses',
+        label: 'LNG_ENTITY_FIELD_LABEL_ADDRESS',
+        isArray: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dob',
+        label: 'LNG_ENTITY_FIELD_LABEL_DOB',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'riskLevel',
+        label: 'LNG_ENTITY_FIELD_LABEL_RISK',
+        options: this.activatedRoute.snapshot.data.risk.options,
+        sortable: true
+      }
+    ];
+  }
 
   /**
    * Initialize table quick actions
@@ -218,41 +341,55 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
   protected initializeGroupedData(): void {}
 
   /**
-     * @Overrides parent method
-     */
-  onDataInitialized() {
+   * Initialize breadcrumbs
+   */
+  protected initializeBreadcrumbs(): void {
     if (
-      !this.selectedTargetIds ||
-            !this.entityType ||
-            !this.entityId ||
-            !this.selectedOutbreak ||
-            !this.relationshipType
+      this.relationshipType &&
+      this._entity
     ) {
-      return;
+      const assignRelationshipsPageTitle = this.relationshipType === RelationshipType.EXPOSURE ?
+        'LNG_PAGE_LIST_ENTITY_ASSIGN_EXPOSURES_TITLE' :
+        'LNG_PAGE_LIST_ENTITY_ASSIGN_CONTACTS_TITLE';
+
+      this.breadcrumbs = [
+        {
+          label: this.entityHelperService.entityMap[this._entity.type].label,
+          action: {
+            link: [this.entityHelperService.entityMap[this._entity.type].link]
+          }
+        },
+        {
+          label: this._entity.name,
+          action: {
+            link: [`${ this.entityHelperService.entityMap[this._entity.type].link }/${ this._entity.id }/view`]
+          }
+        },
+        {
+          label: this.relationshipType === RelationshipType.EXPOSURE ?
+            'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE' :
+            'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE',
+          action: {
+            link: [`/relationships/${ this._entity.type }/${ this._entity.id }/${ this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures' }`]
+          }
+        },
+        {
+          label: assignRelationshipsPageTitle,
+          action: null
+        }
+      ];
     }
-
-    // initialize breadcrumbs
-    this.initializeBreadcrumbs();
-
-    // initialize query builder
-    this.clearQueryBuilder();
-
-    // initialize pagination
-    this.initPaginator();
-    // ...and (re)load the list
-    this.needsRefreshList(true);
   }
 
   /**
-     * @Overrides parent method
-     */
-  onPersonLoaded() {
-    // (re)initialize breadcrumbs
-    this.initializeBreadcrumbs();
+   * Fields retrieved from api to reduce payload size
+   */
+  protected refreshListFields(): string[] {
+    return [];
   }
 
   /**
-     * @Overrides parent method
+     * Set query builder
      */
   clearQueryBuilder() {
     // clear query builder
@@ -260,7 +397,7 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
 
     // apply default criterias
     // exclude root person and selected exposures from the list
-    const excludeEntityIds = [this.entityId, ...this.selectedTargetIds];
+    const excludeEntityIds = [this._entity.id, ...this.selectedTargetIds];
     this.queryBuilder.filter.where({
       id: {
         'nin': excludeEntityIds
@@ -270,7 +407,7 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
     // get available entities
     const availableTypes: EntityType[] = this.genericDataService
       .getAvailableRelatedEntityTypes(
-        this.entityType,
+        this._entity.type,
         this.relationshipType,
         Constants.APP_PAGE.PEOPLE_TO_SHARE_RELATIONSHIPS_WITH.value
       );
@@ -282,63 +419,23 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
     });
   }
 
-  // private initializeBreadcrumbs() {
-  //   if (
-  //     this.relationshipType &&
-  //           this.entity
-  //   ) {
-  //     const assignRelationshipsPageTitle = this.relationshipType === RelationshipType.EXPOSURE ?
-  //       'LNG_PAGE_LIST_ENTITY_ASSIGN_EXPOSURES_TITLE' :
-  //       'LNG_PAGE_LIST_ENTITY_ASSIGN_CONTACTS_TITLE';
-  //
-  //     this.breadcrumbs = [
-  //       new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
-  //       new BreadcrumbItemModel(
-  //         this.entity.name,
-  //         `${this.entityMap[this.entityType].link}/${this.entityId}/view`
-  //       ),
-  //       new BreadcrumbItemModel(
-  //         this.relationshipsListPageTitle,
-  //         `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`
-  //       ),
-  //       new BreadcrumbItemModel(assignRelationshipsPageTitle, null, true)
-  //     ];
-  //   }
-  // }
-
-  /**
-   * Initialize breadcrumbs
-   */
-  initializeBreadcrumbs(): void {
-  }
-
-  /**
-   * Fields retrieved from api to reduce payload size
-   */
-  protected refreshListFields(): string[] {
-    return [];
-  }
-
   /**
    * Re(load) the available Entities list, based on the applied filter, sort criterias
    */
   refreshList() {
     if (
-      this.entityType &&
-            this.entityId &&
-            this.selectedOutbreak
+      this._entity &&
+      this.selectedOutbreak
     ) {
       // retrieve the list of Relationships
-      this.entitiesList$ = this.entityDataService
+      this.records$ = this.entityDataService
         .getEntitiesList(
           this.selectedOutbreak.id,
           this.queryBuilder
         )
         .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            return throwError(err);
-          })
+          // should be the last pipe
+          takeUntil(this.destroyed$)
         );
     }
   }
@@ -347,146 +444,39 @@ export class EntityRelationshipsListAssignComponent extends RelationshipsListCom
      * Get total number of items, based on the applied filters
      */
   refreshListCount(applyHasMoreLimit?: boolean) {
-    if (
-      this.entityType &&
-            this.entityId &&
-            this.selectedOutbreak
-    ) {
-      // set apply value
-      if (applyHasMoreLimit !== undefined) {
-        this.applyHasMoreLimit = applyHasMoreLimit;
-      }
+    // reset
+    this.pageCount = undefined;
 
-      // remove paginator from query builder
-      const countQueryBuilder = _.cloneDeep(this.queryBuilder);
-      countQueryBuilder.paginator.clear();
-      countQueryBuilder.sort.clear();
-
-      // apply has more limit
-      if (this.applyHasMoreLimit) {
-        countQueryBuilder.flag(
-          'applyHasMoreLimit',
-          true
-        );
-      }
-
-      // count
-      this.entitiesListCount$ = this.entityDataService
-        .getEntitiesCount(this.selectedOutbreak.id, countQueryBuilder)
-        .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            return throwError(err);
-          }),
-          share()
-        );
+    // set apply value
+    if (applyHasMoreLimit !== undefined) {
+      this.applyHasMoreLimit = applyHasMoreLimit;
     }
-  }
 
-  private generateSideFilters() {
-    // this.availableSideFilters = [
-    //   new FilterModel({
-    //     fieldName: 'type',
-    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_TYPE',
-    //     type: FilterType.MULTISELECT,
-    //     options$: this.personTypesList$,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'firstName',
-    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
-    //     type: FilterType.TEXT,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'lastName',
-    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
-    //     type: FilterType.TEXT,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'gender',
-    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_GENDER',
-    //     type: FilterType.MULTISELECT,
-    //     options$: this.genderList$,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'age',
-    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_AGE',
-    //     type: FilterType.RANGE_AGE,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'addresses',
-    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_ADDRESS',
-    //     type: FilterType.ADDRESS,
-    //     addressFieldIsArray: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'dob',
-    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_DOB',
-    //     type: FilterType.RANGE_DATE,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'riskLevel',
-    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_RISK',
-    //     type: FilterType.MULTISELECT,
-    //     options$: this.riskLevelsList$,
-    //     sortable: true
-    //   })
-    // ];
-  }
+    // remove paginator from query builder
+    const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+    countQueryBuilder.paginator.clear();
+    countQueryBuilder.sort.clear();
 
-  /**
-     * @Overrides parent method
-     */
-  public sortBy(
-    data: any,
-    objectDetailsSort?: {
-      [property: string]: string[]
+    // apply has more limit
+    if (this.applyHasMoreLimit) {
+      countQueryBuilder.flag(
+        'applyHasMoreLimit',
+        true
+      );
     }
-  ) {
-    const property = _.get(data, 'active');
-    const direction = _.get(data, 'direction');
 
-    if (
-      property === 'firstName' &&
-            direction
-    ) {
-      // remove previous sort columns, we can sort only by one column at a time
-      this.queryBuilder.sort.clear();
-
-      // retrieve Side filters
-      // let queryBuilder;
-      // if (
-      //   this.sideFilter &&
-      //   (queryBuilder = this.sideFilter.getQueryBuilder())
-      // ) {
-      //   this.queryBuilder.sort.merge(queryBuilder.sort);
-      // }
-
-      // apply sort
-      this.queryBuilder.sort.by('firstName', direction);
-      this.queryBuilder.sort.by('name', direction);
-
-      // refresh list
-      this.needsRefreshList(false, false);
-    } else {
-      // call method from parent class
-      super.sortBy(data, objectDetailsSort);
-    }
+    // count
+    this.entityDataService
+      .getEntitiesCount(this.selectedOutbreak.id, countQueryBuilder)
+      .pipe(
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      ).subscribe((response) => {
+        this.pageCount = response;
+      });
   }
 
-  /**
-     * Retrieve Person Type color
-     */
-  getPersonTypeColor(personType: string) {
-    const personTypeData = _.get(this.personTypesListMap, personType);
-    return _.get(personTypeData, 'colorCode', '');
-  }
-
+  // TODO: Left as inspiration for "Select" anc "Cancel" buttons
   selectEntities() {
     // // get list of selected ids
     // const selectedRecords: false | string[] = this.validateCheckedRecords();

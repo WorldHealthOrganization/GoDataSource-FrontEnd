@@ -164,26 +164,23 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
             'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_GROUP_ACTION_SHARE_SELECTED_CONTACTS'
         },
         action: {
-          click: (_selected: string[]) => {
-            // #TODO
-            // - disabled until implemented page
-            this.dialogV2Service.showLoadingDialog();
+          click: (selected: string[]) => {
             // determine list of model ids
-            // const selectedRecords: string[] = _.map(selected, (idRelationship: string) => this._relationshipsListRecordsMap[idRelationship].model.id)
-            //   .filter((record, index, self) => {
-            //     // keep only unique dates
-            //     return self.indexOf(record) === index;
-            //   });
-            //
-            // // redirect to next step
-            // this.router.navigate(
-            //   [`/relationships/${this._entity.type}/${this._entity.id}/${this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'}/share`],
-            //   {
-            //     queryParams: {
-            //       selectedTargetIds: JSON.stringify(selectedRecords)
-            //     }
-            //   }
-            // );
+            const selectedRecords: string[] = _.map(selected, (idRelationship: string) => this._relationshipsListRecordsMap[idRelationship].model.id)
+              .filter((record, index, self) => {
+                // keep only unique dates
+                return self.indexOf(record) === index;
+              });
+
+            // redirect to next step
+            this.router.navigate(
+              [`/relationships/${this._entity.type}/${this._entity.id}/${this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'}/share`],
+              {
+                queryParams: {
+                  selectedTargetIds: JSON.stringify(selectedRecords)
+                }
+              }
+            );
           }
         },
         visible: (): boolean => {
