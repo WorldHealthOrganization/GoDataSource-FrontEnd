@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
   selector: 'app-form-event-quick',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './form-event-quick.component.html',
-  styleUrls: ['./form-event-quick.component.less'],
+  styleUrls: ['./form-event-quick.component.scss'],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
     useExisting: FormEventQuickComponent,
