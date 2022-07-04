@@ -1223,6 +1223,71 @@ export class AppFormEditQuestionnaireV2Component
   }
 
   /**
+   * Clone question / answer
+   */
+  cloneItem(item: IFlattenNode): void {
+    // info which question is cloned
+    const inputs: V2SideDialogConfigInput[] = [];
+    inputs.push({
+      type: V2SideDialogConfigInputType.HTML,
+      name: 'details',
+      cssClasses: 'gd-form-edit-questionnaire-v2-details',
+      placeholder: this.translateService.instant(
+        'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CLONING', {
+          item: item.data instanceof QuestionModel ?
+            item.data.text :
+            item.data.label
+        }
+      )
+    });
+
+    // title
+    inputs.push({
+      type: V2SideDialogConfigInputType.DIVIDER,
+      placeholder: 'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_VARIABLES'
+    });
+
+    // construct inputs list
+    // #TODO
+
+    // show dialog
+    this.dialogV2Service
+      .showSideDialog({
+        title: {
+          get: () => 'LNG_COMMON_BUTTON_CLONE'
+        },
+        hideInputFilter: true,
+        dontCloseOnBackdrop: true,
+        width: '60rem',
+        inputs,
+        bottomButtons: [
+          {
+            type: IV2SideDialogConfigButtonType.OTHER,
+            label: 'LNG_COMMON_BUTTON_CLONE',
+            color: 'primary',
+            key: 'apply',
+            disabled: (_data, handler): boolean => {
+              return !handler.form || handler.form.invalid;
+            }
+          }, {
+            type: IV2SideDialogConfigButtonType.CANCEL,
+            label: 'LNG_COMMON_BUTTON_CANCEL',
+            color: 'text'
+          }
+        ]
+      })
+      .subscribe((response) => {
+        // cancelled ?
+        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+          // finished
+          return;
+        }
+
+        // #TODO
+      });
+  }
+
+  /**
    * Update website render mode
    */
   @HostListener('window:resize')
