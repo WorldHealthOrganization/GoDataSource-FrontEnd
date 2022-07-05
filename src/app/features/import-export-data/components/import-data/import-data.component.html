@@ -1030,9 +1030,9 @@
                                 </mat-cell>
                             </ng-container>
 
-                            <mat-header-row *matHeaderRowDef="[]"></mat-header-row>
+                            <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
                             <mat-row
-                                *matRowDef="let item; columns: []">
+                                *matRowDef="let item; columns: visibleTableColumns">
                             </mat-row>
                         </mat-table>
 
