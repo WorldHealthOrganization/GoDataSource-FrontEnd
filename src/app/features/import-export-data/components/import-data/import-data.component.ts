@@ -126,6 +126,13 @@ export class ImportDataComponent
     ]
   };
 
+  visibleTableColumns: string[] = [
+    'recordNo',
+    'error.message',
+    'error.details',
+    'data'
+  ];
+
   // Allowed extensions
   private _allowedExtensions: string[];
   @Input() set allowedExtensions(extensions: string[]) {
@@ -3519,8 +3526,8 @@ export class ImportDataComponent
   }
 
   /**
-     * See error details
-     */
+   * See error details
+   */
   seeErrorDetails(errJson: any): void {
     this.dialogV2Service
       .showSideDialog({
@@ -3531,12 +3538,14 @@ export class ImportDataComponent
 
         // hide search bar
         hideInputFilter: true,
+        width: '100rem',
 
         // inputs
         inputs: [
           {
             type: V2SideDialogConfigInputType.HTML,
             name: 'error',
+            cssClasses: 'gd-no-max-height',
             placeholder: `<code><pre>${JSON.stringify(errJson, null, 1)}</pre></code>`
           }
         ],
@@ -3553,8 +3562,8 @@ export class ImportDataComponent
   }
 
   /**
-     * See record data
-     */
+   * See record data
+   */
   seeRecordData(
     file: any,
     save: any
@@ -3568,36 +3577,38 @@ export class ImportDataComponent
 
         // hide search bar
         hideInputFilter: true,
+        width: '100rem',
 
         // inputs
         inputs: [
           {
             type: V2SideDialogConfigInputType.HTML,
             name: 'message',
+            cssClasses: 'gd-no-max-height',
             placeholder: `
-                    <div style="display: flex; flex-direction: row; box-sizing: border-box; max-height: 300px; padding-bottom: 5px;">
-                        <div style="flex: 1 1 0%; box-sizing: border-box; overflow: auto; font-weight: bold;">
-                            ${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_FILE_TITLE')}
-                        </div>
-                        <div style="display: flex; width: 10px;"></div>
-                        <div style="flex: 1 1 0%; box-sizing: border-box; overflow: auto; font-weight: bold;">
-                            ${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_MODEL_TITLE')}
-                        </div>
-                    </div>
-                    <div style="display: flex; flex-direction: row; box-sizing: border-box; max-height: 300px;">
-                        <div style="flex: 1 1 0%; box-sizing: border-box; overflow: auto;">
-                            <code>
-                                <pre>${JSON.stringify(file, null, 1)}</pre>
-                            </code>
-                        </div>
-                        <div style="display: flex; width: 10px;"></div>
-                        <div style="flex: 1 1 0%; box-sizing: border-box; overflow: auto;">
-                            <code>
-                                <pre>${JSON.stringify(save, null, 1)}</pre>
-                            </code>
-                        </div>
-                    </div>
-                `
+              <div style="display: flex; flex-direction: row; box-sizing: border-box; max-height: 300px; padding-bottom: 5px;">
+                  <div style="flex: 1 1 0%; box-sizing: border-box; overflow: auto; font-weight: bold;">
+                      ${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_FILE_TITLE')}
+                  </div>
+                  <div style="display: flex; width: 10px;"></div>
+                  <div style="flex: 1 1 0%; box-sizing: border-box; overflow: auto; font-weight: bold;">
+                      ${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_MODEL_TITLE')}
+                  </div>
+              </div>
+              <div style="display: flex; flex-direction: row; box-sizing: border-box; max-height: 300px;">
+                  <div style="flex: 1 1 0%; box-sizing: border-box; overflow: auto;">
+                      <code>
+                          <pre>${JSON.stringify(file, null, 1)}</pre>
+                      </code>
+                  </div>
+                  <div style="display: flex; width: 10px;"></div>
+                  <div style="flex: 1 1 0%; box-sizing: border-box; overflow: auto;">
+                      <code>
+                          <pre>${JSON.stringify(save, null, 1)}</pre>
+                      </code>
+                  </div>
+              </div>
+            `
           }
         ],
 
