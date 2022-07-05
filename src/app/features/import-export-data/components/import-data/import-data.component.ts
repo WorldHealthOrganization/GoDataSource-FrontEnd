@@ -3467,12 +3467,13 @@ export class ImportDataComponent
     // do we have import log id, there is no point in continuing otherwise ?
     if (
       !this.asyncResponse ||
-            !this.asyncResponse.importLogId
+      !this.asyncResponse.importLogId
     ) {
       return;
     }
 
     // retrieve only import results from a specific import
+    this.queryBuilder.paginator.limit = 100;
     this.queryBuilder.filter.byEquality(
       'importLogId',
       this.asyncResponse.importLogId,
@@ -3506,7 +3507,7 @@ export class ImportDataComponent
     // do we have import log id, there is no point in continuing otherwise ?
     if (
       !this.asyncResponse ||
-            !this.asyncResponse.importLogId
+      !this.asyncResponse.importLogId
     ) {
       return;
     }
