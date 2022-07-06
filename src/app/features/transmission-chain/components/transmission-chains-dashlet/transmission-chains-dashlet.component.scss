@@ -22,6 +22,10 @@ app-transmission-chains-dashlet {
     
       /* Page top buttons */
       .gd-basic-top-title-buttons-buttons {
+        &:empty {
+          display: none !important;
+        }
+
         @include breakpoint('xs') {
           @include flex_wrap(wrap);
           margin-top: 1.6rem;
