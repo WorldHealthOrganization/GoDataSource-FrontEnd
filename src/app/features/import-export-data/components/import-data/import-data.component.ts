@@ -3546,7 +3546,6 @@ export class ImportDataComponent
           {
             type: V2SideDialogConfigInputType.HTML,
             name: 'error',
-            cssClasses: 'gd-no-max-height',
             placeholder: `<code><pre>${JSON.stringify(errJson, null, 1)}</pre></code>`
           }
         ],
@@ -3585,7 +3584,6 @@ export class ImportDataComponent
           {
             type: V2SideDialogConfigInputType.HTML,
             name: 'message',
-            cssClasses: 'gd-no-max-height',
             placeholder: `
               <div style="display: flex; flex-direction: row;">
                   <div style="flex: 1 1 0%; overflow: auto; font-weight: bold; padding-bottom: 8px;">
