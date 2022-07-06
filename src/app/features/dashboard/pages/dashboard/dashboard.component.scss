@@ -41,6 +41,10 @@
 
       /* Page top buttons */
       .gd-basic-top-title-buttons-buttons {
+        &:empty {
+          display: none !important;
+        }
+
         @include breakpoint('xxs') {
           margin-top: 1.6rem;
         }

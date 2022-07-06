@@ -105,7 +105,7 @@ interface IImportErrorDetailsProcessedImported {
   selector: 'app-import-data',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './import-data.component.html',
-  styleUrls: ['./import-data.component.less']
+  styleUrls: ['./import-data.component.scss']
 })
 export class ImportDataComponent
   extends ListComponent<any>
@@ -3587,23 +3587,23 @@ export class ImportDataComponent
             name: 'message',
             cssClasses: 'gd-no-max-height',
             placeholder: `
-              <div style="display: flex; flex-direction: row; box-sizing: border-box; max-height: 300px; padding-bottom: 5px;">
-                  <div style="flex: 1 1 0%; box-sizing: border-box; overflow: auto; font-weight: bold;">
+              <div style="display: flex; flex-direction: row;">
+                  <div style="flex: 1 1 0%; overflow: auto; font-weight: bold; padding-bottom: 8px;">
                       ${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_FILE_TITLE')}
                   </div>
-                  <div style="display: flex; width: 10px;"></div>
-                  <div style="flex: 1 1 0%; box-sizing: border-box; overflow: auto; font-weight: bold;">
+                  <div style="display: flex; width: 16px;"></div>
+                  <div style="flex: 1 1 0%; overflow: auto; font-weight: bold; padding-bottom: 8px;">
                       ${this.i18nService.instant('LNG_PAGE_IMPORT_DATA_BUTTON_ERR_RECORD_DETAILS_MODEL_TITLE')}
                   </div>
               </div>
-              <div style="display: flex; flex-direction: row; box-sizing: border-box; max-height: 300px;">
-                  <div style="flex: 1 1 0%; box-sizing: border-box; overflow: auto;">
+              <div style="display: flex; flex-direction: row;">
+                  <div style="flex: 1 1 0%; overflow: auto;">
                       <code>
                           <pre>${JSON.stringify(file, null, 1)}</pre>
                       </code>
                   </div>
-                  <div style="display: flex; width: 10px;"></div>
-                  <div style="flex: 1 1 0%; box-sizing: border-box; overflow: auto;">
+                  <div style="display: flex; width: 16px;"></div>
+                  <div style="flex: 1 1 0%; overflow: auto;">
                       <code>
                           <pre>${JSON.stringify(save, null, 1)}</pre>
                       </code>
