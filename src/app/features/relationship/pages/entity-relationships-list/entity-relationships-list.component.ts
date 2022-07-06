@@ -24,6 +24,7 @@ import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { UserModel } from '../../../../core/models/user.model';
+import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
 
 @Component({
   selector: 'app-entity-relationships-list',
@@ -198,29 +199,24 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
           get: () => 'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_CHANGE_SOURCE'
         },
         action: {
-          click: (_selected: string[]) => {
-            // #TODO
-            // - disabled until implemented page
-            this.dialogV2Service.showLoadingDialog();
+          click: (selected: string[]) => {
+            // pass the selected target persons for not including them in available peoples
+            const selectedTargetPersons = {};
+            _.forEach(this._relationshipsListRecordsMap, (model) => {
+              const targetPerson: RelationshipPersonModel = _.find(model.relationship.persons, 'target');
+              selectedTargetPersons[targetPerson.id] = true;
+            });
 
-            // // pass the selected target persons for not including them in available peoples
-            // const selectedTargetPersons = {};
-            // _.forEach(this._relationshipsListRecordsMap, (model) => {
-            //   const targetPerson: RelationshipPersonModel = _.find(model.relationship.persons, 'target');
-            //   selectedTargetPersons[targetPerson.id] = true;
-            // });
-            //
-            // // redirect
-            // this.router.navigate(
-            //   [`/relationships/${this._entity.type}/${this._entity.id}/${this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'}/switch`],
-            //   {
-            //     queryParams: {
-            //       selectedTargetIds: JSON.stringify(selected),
-            //       selectedPersonsIds: JSON.stringify(Object.keys(selectedTargetPersons)),
-            //       entityType: JSON.stringify(this._entity.type)
-            //     }
-            //   }
-            // );
+            // redirect
+            this.router.navigate(
+              [`/relationships/${this._entity.type}/${this._entity.id}/${this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'}/switch`],
+              {
+                queryParams: {
+                  selectedTargetIds: JSON.stringify(selected),
+                  selectedPersonsIds: JSON.stringify(Object.keys(selectedTargetPersons))
+                }
+              }
+            );
           }
         },
         visible: (): boolean => {

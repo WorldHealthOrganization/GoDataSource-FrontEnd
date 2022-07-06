@@ -141,6 +141,12 @@ const relationshipTypeChildrenRoutes = [
           })
         ]
       })
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      gender: GenderDataResolver,
+      personType: PersonTypeDataResolver,
+      entity: RelationshipPersonDataResolver
     }
   },
   // Create relationships
