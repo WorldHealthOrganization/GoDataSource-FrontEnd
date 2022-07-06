@@ -161,10 +161,18 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
               this.queryBuilder.filter.where({
                 $or: [
                   {
+                    type: EntityType.EVENT,
                     'address.parentLocationIdFilter': {
                       $in: column.filter.address.filterLocationIds
                     }
                   }, {
+                    type: {
+                      $in: [
+                        EntityType.CASE,
+                        EntityType.CONTACT,
+                        EntityType.CONTACT_OF_CONTACT
+                      ]
+                    },
                     addresses: {
                       $elemMatch: {
                         typeId: AddressType.CURRENT_ADDRESS,

@@ -838,6 +838,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       this.outbreakSubscriber = null;
     }
 
+    // hide message
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_UNRESPONSIVE_EDIT_COT);
+
     // not full screen anymore
     AuthenticatedComponent.FULL_SCREEN = false;
 
@@ -1733,7 +1736,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       // hide message
       this.toastV2Service.hide(AppMessages.APP_MESSAGE_UNRESPONSIVE_EDIT_COT);
     }
-
   }
 
   /**
@@ -2437,6 +2439,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             // update name and enable / disable option
             this.snapshotOptionsMap[snapshot.id].option.disabled = this.snapshotOptionsMap[snapshot.id].snapshot.status !== Constants.COT_SNAPSHOT_STATUSES.LNG_COT_STATUS_SUCCESS.value;
             this.snapshotOptionsMap[snapshot.id].option.label = this.getSnapshotOptionLabel(snapshot);
+
+            // force re-render
+            this.snapshotOptions = [...this.snapshotOptions];
           }
         });
 

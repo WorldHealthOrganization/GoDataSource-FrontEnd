@@ -9,7 +9,6 @@ import { FormRelationshipComponent } from './form-relationship/form-relationship
 import { CountedItemsListComponent } from './counted-items-list/counted-items-list.component';
 import { YesNoLabelComponent } from './yes-no-label/yes-no-label.component';
 import { ReferenceDataLabelComponent } from './reference-data-label/reference-data-label.component';
-import { FormInputListComponent } from './form-input-list/form-input-list.component';
 import { ChronologyComponent } from './chronology/chronology.component';
 import { LocationBreadcrumbsComponent } from './location-breadcrumbs/location-breadcrumbs.component';
 import { FormAgeComponent } from './form-age/form-age.component';
@@ -50,7 +49,6 @@ export const components: any[] = [
   FormDocumentListComponent,
   FormRangeComponent,
   FormRelationshipComponent,
-  FormInputListComponent,
   FormAgeComponent,
   FormAgeDobComponent,
   FormRelationshipQuickComponent,

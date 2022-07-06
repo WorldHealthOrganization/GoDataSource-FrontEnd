@@ -1,9 +1,8 @@
 <form #groupForm="ngForm">
-  <div fxLayout="column" fxLayoutGap="20px" fxFlex>
-    <span class="section-title">
-      {{'LNG_FORM_CASE_QUICK_LABEL_PERSONAL' | translate}}
-    </span>
-
+  <span class="section-title">
+    {{'LNG_FORM_CASE_QUICK_LABEL_PERSONAL' | translate}}
+  </span>
+  <div fxLayout="row wrap" fxLayout.xs="column" fxLayoutGap="0.8rem" fxLayoutGap.xs="0">
     <app-form-input-v2
       name="firstName"
       [(ngModel)]="case.firstName"
@@ -65,10 +64,10 @@
     </app-form-input-v2>
 
     <!-- Age / Dob -->
-    <div>
+    <div class="dob" fxFlex fxLayout="row" fxLayout.lt-lg="column" fxLayoutGap="0.8rem" fxLayoutGap.lt-lg="1.6rem">
       <!-- Age / Dob option -->
       <div
-        fxFlex="calc(50% - 0.8rem)" fxFlex.xs="calc(100% - 0.8rem)">
+        fxFlex>
         <app-form-toggle-v2
           [(ngModel)]="ageChecked"
           [name]="FormHelperService.IGNORE_FIELD_PREFIX + 'ageDob'"
@@ -79,7 +78,7 @@
       <!-- Age -->
       <div
         *ngIf="ageChecked; else dob"
-        fxFlex="calc(50% - 0.8rem)" fxFlex.xs="calc(100% - 0.8rem)" fxLayout="row" fxLayoutGap="1.6rem">
+        fxFlex fxLayout="row" fxLayoutGap="0.8rem">
 
         <!-- Years -->
         <app-form-number-v2
@@ -152,11 +151,13 @@
       tooltip="LNG_CASE_FIELD_LABEL_RISK_REASON_DESCRIPTION"
       (ngModelChange)="onChange()">
     </app-form-textarea-v2>
+  </div>
 
-    <span class="section-title">
-      {{'LNG_FORM_CASE_QUICK_LABEL_EPIDEMIOLOGY' | translate}}
-    </span>
+  <span class="section-title">
+    {{'LNG_FORM_CASE_QUICK_LABEL_EPIDEMIOLOGY' | translate}}
+  </span>
 
+  <div fxLayout="row wrap" fxLayout.xs="column" fxLayoutGap="0.8rem" fxLayoutGap.xs="0">
     <app-form-select-single-v2
       name="classification"
       [(ngModel)]="case.classification"

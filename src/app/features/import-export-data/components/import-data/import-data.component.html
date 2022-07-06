@@ -922,20 +922,29 @@
                     <!-- Errors table -->
                     <div class="page-section">
                         <!-- Reset Filters -->
-                        <div class="reset-filters">
+                        <div class="table-top-buttons" fxLayout="row" fxLayoutGap="0.8rem" fxLayoutAlign="end center">
                             <button
                                 type="button"
-                                mat-raised-button
+                                mat-flat-button
                                 color="primary"
                                 (click)="resetFiltersToSideFilters()">
                                 {{ 'LNG_COMMON_BUTTON_RESET_FILTERS' | translate }}
                             </button>
                             <button
                                 type="button"
-                                mat-raised-button
+                                mat-flat-button
                                 color="primary"
                                 (click)="needsRefreshList(true)">
                                 {{ 'LNG_COMMON_BUTTON_REFRESH_LIST' | translate }}
+                            </button>
+                            <!-- Try again button -->
+                            <!-- #TODO - to be removed since this one is kinda useless -->
+                            <button
+                                mat-flat-button
+                                color="primary"
+                                type="button"
+                                (click)="tryAgain()">
+                                {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_TRY_AGAIN' | translate }}
                             </button>
                         </div>
 
@@ -1020,9 +1029,9 @@
                                     <ng-container
                                         *ngIf="item.data && item.data.file && item.data.save">
                                         <button
-                                            mat-raised-button
-                                            color="primary"
+                                            mat-flat-button
                                             type="button"
+                                            color="secondary"
                                             (click)="seeRecordData(item.data.file, item.data.save)">
                                             {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_SEE_RECORD_DATA' | translate }}
                                         </button>
@@ -1030,9 +1039,9 @@
                                 </mat-cell>
                             </ng-container>
 
-                            <mat-header-row *matHeaderRowDef="[]"></mat-header-row>
+                            <mat-header-row *matHeaderRowDef="visibleTableColumns"></mat-header-row>
                             <mat-row
-                                *matRowDef="let item; columns: []">
+                                *matRowDef="let item; columns: visibleTableColumns">
                             </mat-row>
                         </mat-table>
 
@@ -1041,17 +1050,5 @@
 
             </ng-template>
         </ng-template>
-
-        <!-- Try again button -->
-        <!-- #TODO - to be removed since this one is kinda useless -->
-        <div fxLayout="row" fxLayoutAlign="end">
-            <button
-                mat-flat-button
-                color="primary"
-                type="button"
-                (click)="tryAgain()">
-                {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_TRY_AGAIN' | translate }}
-            </button>
-        </div>
     </ng-container>
 </div>

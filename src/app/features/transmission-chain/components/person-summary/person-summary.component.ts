@@ -14,7 +14,7 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
   selector: 'app-person-summary',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './person-summary.component.html',
-  styleUrls: ['./person-summary.component.less']
+  styleUrls: ['./person-summary.component.scss']
 })
 export class PersonSummaryComponent implements OnInit {
   @Input() person: CaseModel | ContactModel | EventModel | ContactOfContactModel;

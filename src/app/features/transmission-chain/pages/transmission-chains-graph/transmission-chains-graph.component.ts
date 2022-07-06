@@ -43,7 +43,7 @@ enum NodeAction {
   selector: 'app-transmission-chains-graph',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './transmission-chains-graph.component.html',
-  styleUrls: ['./transmission-chains-graph.component.less']
+  styleUrls: ['./transmission-chains-graph.component.scss']
 })
 export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   @ViewChild('cotDashletChild', { static: false }) cotDashletChild: TransmissionChainsDashletComponent;
@@ -238,7 +238,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
                 // focus boxes
                 setTimeout(() => {
                   this.domService.scrollItemIntoView(
-                    '.selected-node-details'
+                    '.transmission-chain-edit-mode'
                   );
                 });
               } else {
@@ -275,7 +275,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             // focus boxes
             setTimeout(() => {
               this.domService.scrollItemIntoView(
-                '.selected-node-details'
+                '.transmission-chain-edit-mode'
               );
             });
           } else {
@@ -461,27 +461,36 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Create a new Relationship between 2 selected nodes
-     * @param form
-     */
+   * Create a new Relationship between 2 selected nodes
+   */
   createRelationship(form: NgForm) {
-    // get forms fields
-    const fields = this.formHelper.getFields(form);
+    // submit to validate form
+    form.ngSubmit.emit();
 
-    if (!this.formHelper.validateForm(form)) {
+    // validate
+    if (!form.valid) {
+      // show message
+      this.toastV2Service.notice('LNG_FORM_ERROR_FORM_INVALID');
+
+      // finished
       return;
     }
+
+    // get forms fields
+    const fields = this.formHelper.getFields(form);
 
     // get source and target persons
     const sourcePerson = this.selectedNodes.sourceNode;
     const targetPerson = this.selectedNodes.targetNode;
+
+    // show loading
+    const loading = this.dialogV2Service.showLoadingDialog();
 
     // prepare relationship data
     const relationshipData = fields.relationship;
     relationshipData.persons = [{
       id: targetPerson.id
     }];
-
     this.relationshipDataService
       .createRelationship(
         this.selectedOutbreak.id,
@@ -492,10 +501,12 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
+          loading.close();
           return throwError(err);
         })
       )
       .subscribe(() => {
+        loading.close();
         this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE');
 
         // reset form
@@ -510,17 +521,23 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Create a new Contact for a selected node (Case or Event)
-     * @param form
-     * @param entityType
-     */
+   * Create a new Contact for a selected node (Case or Event)
+   */
   createContact(form: NgForm) {
-    // get forms fields
-    const fields = this.formHelper.getFields(form);
+    // submit to validate form
+    form.ngSubmit.emit();
 
-    if (!this.formHelper.validateForm(form)) {
+    // validate
+    if (!form.valid) {
+      // show message
+      this.toastV2Service.notice('LNG_FORM_ERROR_FORM_INVALID');
+
+      // finished
       return;
     }
+
+    // get forms fields
+    const fields = this.formHelper.getFields(form);
 
     // contact fields
     const contactFields = fields.contact;
@@ -528,6 +545,9 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     const relationshipFields = fields.relationship;
     // get source person
     const sourcePerson = this.selectedNodes.sourceNode;
+
+    // show loading
+    const loading = this.dialogV2Service.showLoadingDialog();
 
     // add the new Contact
     this.contactDataService
@@ -549,6 +569,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             .pipe(
               catchError((err) => {
                 // display error message
+                loading.close();
                 this.toastV2Service.error(err);
 
                 // rollback - remove contact
@@ -562,11 +583,13 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             );
         }),
         catchError((err) => {
+          loading.close();
           this.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
+        loading.close();
         this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
 
         // reset form
@@ -580,13 +603,24 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
       });
   }
 
+  /**
+   * Create contact of contacts
+   */
   createContactOfContact(form: NgForm) {
-    // get forms fields
-    const fields = this.formHelper.getFields(form);
+    // submit to validate form
+    form.ngSubmit.emit();
 
-    if (!this.formHelper.validateForm(form)) {
+    // validate
+    if (!form.valid) {
+      // show message
+      this.toastV2Service.notice('LNG_FORM_ERROR_FORM_INVALID');
+
+      // finished
       return;
     }
+
+    // get forms fields
+    const fields = this.formHelper.getFields(form);
 
     // contact of contact fields
     const contactOfContactFields = fields.contact;
@@ -594,6 +628,9 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     const relationshipFields = fields.relationship;
     // get source person
     const sourcePerson = this.selectedNodes.sourceNode;
+
+    // show loading
+    const loading = this.dialogV2Service.showLoadingDialog();
 
     // add the new Contact of Contact
     this.contactsOfContactsDataService
@@ -615,6 +652,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             .pipe(
               catchError((err) => {
                 // display error message
+                loading.close();
                 this.toastV2Service.error(err);
 
                 // rollback - remove contact
@@ -628,11 +666,13 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             );
         }),
         catchError((err) => {
+          loading.close();
           this.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
+        loading.close();
         this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_SUCCESS_MESSAGE');
 
         // reset form
@@ -647,30 +687,49 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Create a new Contact for a selected node (Case or Event)
-     * @param form
-     */
+   * Create a new Contact for a selected node (Case or Event)
+   */
   modifyPerson(form: NgForm) {
-    if (!this.formHelper.validateForm(form)) {
+    // submit to validate form
+    form.ngSubmit.emit();
+
+    // validate
+    if (!form.valid) {
+      // show message
+      this.toastV2Service.notice('LNG_FORM_ERROR_FORM_INVALID');
+
+      // finished
       return;
     }
 
     // get forms fields
     const dirtyFields: any = this.formHelper.getDirtyFields(form);
+    if (_.isEmpty(dirtyFields)) {
+      // show message
+      this.toastV2Service.success('LNG_FORM_WARNING_NO_CHANGES');
+
+      // finished
+      return;
+    }
 
     // get person being modified
     const person: (CaseModel | ContactModel | EventModel | ContactOfContactModel) = this.selectedNodes.nodes[0];
+
+    // show loading
+    const loading = this.dialogV2Service.showLoadingDialog();
 
     // modify person
     this.entityDataService
       .modifyEntity(person.type, this.selectedOutbreak.id, person.id, dirtyFields)
       .pipe(
         catchError((err) => {
+          loading.close();
           this.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
+        loading.close();
         this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_SUCCESS_MESSAGE');
 
         // reset form
@@ -685,16 +744,34 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Modify a selected relationship relationship
-     * @param {NgForm} form
-     */
+   * Modify a selected relationship
+   */
   modifyRelationship(form: NgForm) {
-    if (!this.formHelper.validateForm(form)) {
+    // submit to validate form
+    form.ngSubmit.emit();
+
+    // validate
+    if (!form.valid) {
+      // show message
+      this.toastV2Service.notice('LNG_FORM_ERROR_FORM_INVALID');
+
+      // finished
       return;
     }
 
     // get forms fields
     const dirtyFields: any = this.formHelper.getDirtyFields(form);
+    if (_.isEmpty(dirtyFields)) {
+      // show message
+      this.toastV2Service.success('LNG_FORM_WARNING_NO_CHANGES');
+
+      // finished
+      return;
+    }
+
+    // show loading
+    const loading = this.dialogV2Service.showLoadingDialog();
+
     // create source person
     const sourcePerson = _.find(this.selectedRelationship.persons, person => person.source === true);
     this.relationshipDataService
@@ -707,12 +784,13 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
       )
       .pipe(
         catchError((err) => {
+          loading.close();
           this.toastV2Service.error(err);
-
           return throwError(err);
         })
       )
       .subscribe(() => {
+        loading.close();
         this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE');
 
         // reset selected relationship
