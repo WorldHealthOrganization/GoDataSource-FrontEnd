@@ -1,137 +1,256 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
+import { Component, OnDestroy } from '@angular/core';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, throwError } from 'rxjs/index';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
-import { catchError, map, share } from 'rxjs/internal/operators';
+import { catchError, takeUntil } from 'rxjs/internal/operators';
 import * as _ from 'lodash';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { Constants } from '../../../../core/models/constants';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
-import { AddressType } from '../../../../core/models/address.model';
-import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { AddressModel } from '../../../../core/models/address.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { GenericDataService } from '../../../../core/services/data/generic.data.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
+import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
+import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
+import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2FilterType, V2FilterTextType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { TranslateService } from '@ngx-translate/core';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { throwError } from 'rxjs';
 
 @Component({
   selector: 'app-available-entities-for-switch-list',
   templateUrl: './available-entities-for-switch-list.component.html'
 })
-export class AvailableEntitiesForSwitchListComponent extends RelationshipsListComponent implements OnInit, OnDestroy {
-  entitiesList$: Observable<(CaseModel | ContactModel | EventModel | ContactOfContactModel)[]>;
-  entitiesListCount$: Observable<IBasicCount>;
-  entityType: EntityType;
+export class AvailableEntitiesForSwitchListComponent extends ListComponent<CaseModel | ContactModel | EventModel | ContactOfContactModel> implements OnDestroy {
+  // entity
+  private _entity: CaseModel | ContactModel | EventModel | ContactOfContactModel;
+  // selected records
+  private _selectedRecords: string[];
 
+  // relationship type
+  relationshipType: RelationshipType;
   // available side filters
-  availableSideFilters: any[]; // FilterModel[];
   selectedRecordsIds: string[];
   selectedPeopleIds: string[];
 
-  // saved filters type
-  savedFiltersType = Constants.APP_PAGE.AVAILABLE_ENTITIES_FOR_SWITCH.value;
-
-  // reference data
-  genderList$: Observable<any[]>;
-  personTypesList$: Observable<any[]>;
-  personTypesListMap: { [id: string]: ReferenceDataEntryModel };
-
-  // provide constants to template
-  Constants = Constants;
-  ReferenceDataCategory = ReferenceDataCategory;
-  EntityType = EntityType;
-
-  fixedTableColumns: string[] = [
-    'radio',
-    'lastName',
-    'firstName',
-    'visualId',
-    'gender',
-    'place'
-  ];
-
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     protected router: Router,
-    protected route: ActivatedRoute,
+    protected activatedRoute: ActivatedRoute,
     protected outbreakDataService: OutbreakDataService,
     protected entityDataService: EntityDataService,
+    protected entityHelperService: EntityHelperService,
+    protected translateService: TranslateService,
     private toastV2Service: ToastV2Service,
     private relationshipDataService: RelationshipDataService,
-    private referenceDataDataService: ReferenceDataDataService,
-    private genericDataService: GenericDataService
+    private genericDataService: GenericDataService,
+    private dialogV2Service: DialogV2Service
+
   ) {
     // parent
     super(
-      listHelperService, router, route,
-      outbreakDataService, entityDataService
+      listHelperService
     );
 
+    // disable select outbreak
+    TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = true;
+
+    // retreive entity related data
+    this._entity = this.activatedRoute.snapshot.data.entity;
+    this.relationshipType = this.activatedRoute.snapshot.data.relationshipType;
+
+    // initialize query builder
+    this.clearQueryBuilder();
+
+    // read route query params
+    if (_.isEmpty(this.activatedRoute.snapshot.queryParams.selectedTargetIds)) {
+      this.toastV2Service.error('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_NO_CONTACTS_SELECTED');
+      this.router.navigate(['/contacts/follow-ups']);
+    } else {
+      this.selectedRecordsIds = JSON.parse(this.activatedRoute.snapshot.queryParams.selectedTargetIds);
+      this.selectedPeopleIds = JSON.parse(this.activatedRoute.snapshot.queryParams.selectedPersonsIds);
+    }
+
+    // #TODO: Old comment
     // disable multi select for current list component
     // this.checkedIsMultiSelect = false;
   }
 
   /**
-     * Component initialized
-     */
-  ngOnInit() {
-    super.ngOnInit();
+   * Component destroyed
+   */
+  ngOnDestroy() {
+    // release parent resources
+    super.onDestroy();
 
-    // reference data
-    this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
-    const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).pipe(share());
-    this.personTypesList$ = personTypes$
-      .pipe(
-        map((data: ReferenceDataCategoryModel) => {
-          return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
-            new LabelValuePair(entry.value, entry.id)
-          );
-        })
-      );
-    personTypes$.subscribe((personTypeCategory: ReferenceDataCategoryModel) => {
-      this.personTypesListMap = _.transform(
-        personTypeCategory.entries,
-        (result, entry: ReferenceDataEntryModel) => {
-          // groupBy won't work here since groupBy will put an array instead of one value
-          result[entry.id] = entry;
-        },
-        {}
-      );
-    });
-
-    // side filters
-    this.generateSideFilters();
+    // enable select outbreak
+    TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = false;
   }
 
   /**
-     * Release resources
-     */
-  ngOnDestroy() {
-    // release parent resources
-    super.ngOnDestroy();
+   * Selected outbreak was changed
+   */
+  selectedOutbreakChanged(): void {
+    // initialize pagination
+    this.initPaginator();
+
+    // ...and re-load the list when the Selected Outbreak is changed
+    this.needsRefreshList(true);
   }
 
   /**
    * Initialize Side Table Columns
    */
-  protected initializeTableColumns(): void {}
+  protected initializeTableColumns(): void {
+    // address model used to search by phone number, address line, postal code, city....
+    const filterAddressModel: AddressModel = new AddressModel({
+      geoLocationAccurate: ''
+    });
+
+    // default table columns
+    this.tableColumns = [
+      {
+        field: 'lastName',
+        label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
+        sortable: true,
+        pinned: IV2ColumnPinned.LEFT,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'firstName',
+        label: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
+        sortable: true,
+        pinned: IV2ColumnPinned.LEFT,
+        format: {
+          type: (item) => item.type === EntityType.EVENT ? item.name : item.firstName
+        },
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'visualId',
+        label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'statuses',
+        label: 'LNG_COMMON_LABEL_STATUSES',
+        format: {
+          type: V2ColumnFormat.STATUS
+        },
+        notResizable: true,
+        pinned: true,
+        legends: [
+          // person type
+          {
+            title: 'LNG_ENTITY_FIELD_LABEL_TYPE',
+            items: this.activatedRoute.snapshot.data.personType.list.map((item) => {
+              return {
+                form: {
+                  type: IV2ColumnStatusFormType.CIRCLE,
+                  color: item.getColorCode()
+                },
+                label: item.id
+              };
+            })
+          }
+        ],
+        forms: (_column, data): V2ColumnStatusForm[] => {
+          // construct list of forms that we need to display
+          const forms: V2ColumnStatusForm[] = [];
+
+          // person type
+          if (
+            data.type &&
+            this.activatedRoute.snapshot.data.personType.map[data.type]
+          ) {
+            forms.push({
+              type: IV2ColumnStatusFormType.CIRCLE,
+              color: this.activatedRoute.snapshot.data.personType.map[data.type].getColorCode(),
+              tooltip: this.translateService.instant(data.type)
+            });
+          }
+
+          // finished
+          return forms;
+        }
+      },
+      {
+        field: 'gender',
+        label: 'LNG_ENTITY_FIELD_LABEL_GENDER',
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        }
+      },
+      {
+        field: 'place',
+        label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
+        format: {
+          type: 'mainAddress.location.name'
+        },
+        filter: {
+          type: V2FilterType.ADDRESS_MULTIPLE_LOCATION,
+          address: filterAddressModel,
+          field: 'addresses',
+          fieldIsArray: true
+        },
+        link: (data) => {
+          return data.mainAddress?.location?.name ?
+            `/locations/${ data.mainAddress.location.id }/view` :
+            undefined;
+        }
+      }
+    ];
+  }
 
   /**
    * Initialize process data
    */
-  protected initializeProcessSelectedData(): void {}
+  protected initializeProcessSelectedData(): void {
+    // update selected
+    this.processSelectedData = [
+      // all selected records were not deleted ?
+      {
+        key: 'updateSelected',
+        process: (
+          _dataMap,
+          selected
+        ) => {
+          // update selected
+          this._selectedRecords = selected;
+        }
+      }
+    ];
+  }
 
   /**
    * Initialize table infos
@@ -141,7 +260,40 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
   /**
    * Initialize Table Advanced Filters
    */
-  protected initializeTableAdvancedFilters(): void {}
+  protected initializeTableAdvancedFilters(): void {
+    this.advancedFilters = [
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'firstName',
+        label: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'lastName',
+        label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'visualId',
+        label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID'
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'gender',
+        label: 'LNG_ENTITY_FIELD_LABEL_GENDER',
+        options: this.activatedRoute.snapshot.data.gender.options,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.ADDRESS,
+        field: 'addresses',
+        label: 'LNG_ENTITY_FIELD_LABEL_ADDRESS',
+        isArray: true
+      }
+    ];
+  }
 
   /**
    * Initialize table quick actions
@@ -151,12 +303,97 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
   /**
    * Initialize table group actions
    */
-  protected initializeGroupActions(): void {}
+  protected initializeGroupActions(): void {
+    // trick to display checkboxes
+    this.groupActions = [
+      {
+        visible: () => false
+      }
+    ];
+  }
 
   /**
    * Initialize table add action
    */
-  protected initializeAddAction(): void {}
+  protected initializeAddAction(): void {
+    this.addAction = {
+      type: V2ActionType.ICON_LABEL,
+      label: 'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_SET_SOURCE_BUTTON',
+      icon: 'add_circle_outline',
+      action: {
+        click: () => {
+          // get the selected record
+          const selectedRecordId = this._selectedRecords[0];
+          if (!selectedRecordId) {
+            return;
+          }
+
+          // create query builder for relationships
+          const qb = new RequestQueryBuilder();
+
+          // filter
+          qb.filter.where({
+            id: {
+              inq: this.selectedRecordsIds
+            }
+          });
+
+          // display confirm dialog
+          this.dialogV2Service.showConfirmDialog({
+            config: {
+              title: {
+                get: () => 'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_CHANGE_SOURCE_TITLE'
+              },
+              message: {
+                get: () => 'LNG_DIALOG_CONFIRM_CHANGE_SOURCE'
+              }
+            }
+          }).subscribe((response) => {
+            // canceled ?
+            if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+              // finished
+              return;
+            }
+
+            // show loading
+            const loading = this.dialogV2Service.showLoadingDialog();
+
+            this.relationshipDataService
+              .bulkChangeSource(
+                this.selectedOutbreak.id,
+                selectedRecordId,
+                qb
+              )
+              .pipe(
+                catchError((err) => {
+                  // show error
+                  this.toastV2Service.error(err);
+
+                  // hide loading
+                  loading.close();
+
+                  // send error down the road
+                  return throwError(err);
+                })
+              )
+              .subscribe(() => {
+                // success
+                this.toastV2Service.success('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_ACTION_SET_SOURCE_SUCCESS_MESSAGE');
+
+                // hide loading
+                loading.close();
+
+                // redirect
+                this.router.navigate(['/relationships', this._entity.type, selectedRecordId, 'contacts']);
+              });
+          });
+        }
+      },
+      disable: () => {
+        return !this._selectedRecords?.length;
+      }
+    };
+  }
 
   /**
    * Initialize table grouped data
@@ -164,53 +401,14 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
   protected initializeGroupedData(): void {}
 
   /**
-     * @Overrides parent method
-     */
-  onDataInitialized() {
-    // initialize breadcrumbs
-    this.initializeBreadcrumbs();
-
-    // initialize query builder
-    this.clearQueryBuilder();
-
-    // initialize pagination
-    this.initPaginator();
-    // ...and (re)load the list
-    this.needsRefreshList(true);
-  }
-
-  /**
-     * Get queryParams for further use
-     */
-  getQueryParams() {
-    // read route query params
-    if (_.isEmpty(this.route.snapshot.queryParams.selectedTargetIds)) {
-      this.toastV2Service.error('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_NO_CONTACTS_SELECTED');
-      this.router.navigate(['/contacts/follow-ups']);
-    } else {
-      this.selectedRecordsIds = JSON.parse(this.route.snapshot.queryParams.selectedTargetIds);
-      this.selectedPeopleIds = JSON.parse(this.route.snapshot.queryParams.selectedPersonsIds);
-      this.entityType = JSON.parse(this.route.snapshot.queryParams.entityType);
-    }
-  }
-
-  /**
-     * @Overrides parent method
-     */
-  onPersonLoaded() {
-    // (re)initialize breadcrumbs
-    this.initializeBreadcrumbs();
-  }
-
-  /**
-     * @Overrides parent method
-     */
+   * clear query builder
+   */
   clearQueryBuilder() {
     // clear query builder
     this.queryBuilder.clear();
     // retrieve only available entity types
     const availableTypes: EntityType[] = this.genericDataService.getAvailableRelatedEntityTypes(
-      this.entityType,
+      this._entity.type,
       this.relationshipType,
       Constants.APP_PAGE.AVAILABLE_ENTITIES_FOR_SWITCH.value
     );
@@ -221,30 +419,45 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
     });
   }
 
-  // private initializeBreadcrumbs() {
-  //   if (
-  //     this.relationshipType &&
-  //           this.entity
-  //   ) {
-  //     this.breadcrumbs = [
-  //       new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
-  //       new BreadcrumbItemModel(
-  //         this.entity.name,
-  //         `${this.entityMap[this.entityType].link}/${this.entityId}/view`
-  //       ),
-  //       new BreadcrumbItemModel(
-  //         this.relationshipsListPageTitle,
-  //         `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`
-  //       ),
-  //       new BreadcrumbItemModel('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_TITLE', null, true)
-  //     ];
-  //   }
-  // }
-
   /**
    * Initialize breadcrumbs
    */
-  initializeBreadcrumbs(): void {
+  protected initializeBreadcrumbs(): void {
+    // set breadcrumbs
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
+        }
+      },
+      {
+        label: this.entityHelperService.entityMap[this._entity.type].label,
+        action: {
+          link: [this.entityHelperService.entityMap[this._entity.type].link]
+        }
+      },
+      {
+        label: this._entity.name,
+        action: {
+          link: [`${ this.entityHelperService.entityMap[this._entity.type].link }/${ this._entity.id }/view`]
+        }
+      },
+      {
+        label: this.relationshipType === RelationshipType.EXPOSURE ?
+          'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE' :
+          'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE',
+        action: {
+          link: [`/relationships/${ this._entity.type }/${ this._entity.id }/${ this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures' }`]
+        }
+      },
+      {
+        label: 'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_TITLE',
+        action: null
+      }
+    ];
   }
 
   /**
@@ -259,11 +472,10 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
    */
   refreshList() {
     if (
-      this.entityType &&
-            this.entityId &&
+      this._entity.type &&
+            this._entity.id &&
             this.selectedOutbreak
     ) {
-      this.getQueryParams();
       // create queryBuilder
       const qb = new RequestQueryBuilder();
       qb.merge(this.queryBuilder);
@@ -278,38 +490,36 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
       qb.include('locations', true);
 
       // retrieve the list of Relationships
-      this.entitiesList$ = this.relationshipDataService
+      this.records$ = this.relationshipDataService
         .getEntityAvailablePeople(
           this.selectedOutbreak.id,
-          this.entityType,
-          this.entityId,
+          this._entity.type,
+          this._entity.id,
           qb
         )
         .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            return throwError(err);
-          })
+          // should be the last pipe
+          takeUntil(this.destroyed$)
         );
     }
   }
 
   /**
-     * Get total number of items, based on the applied filters
-     */
-  refreshListCount(applyHasMoreLimit?: boolean) {
+   * Get total number of items, based on the applied filters
+   */
+  refreshListCount(applyHasMoreLimit?: boolean): void {
+    // reset
+    this.pageCount = undefined;
+
     if (
-      this.entityType &&
-            this.entityId &&
+      this._entity.type &&
+            this._entity.id &&
             this.selectedOutbreak
     ) {
       // set apply value
       if (applyHasMoreLimit !== undefined) {
         this.applyHasMoreLimit = applyHasMoreLimit;
       }
-
-      // get ...
-      this.getQueryParams();
 
       // create queryBuilder
       const qb = new RequestQueryBuilder();
@@ -330,151 +540,19 @@ export class AvailableEntitiesForSwitchListComponent extends RelationshipsListCo
       }
 
       // count
-      this.entitiesListCount$ = this.relationshipDataService
+      this.relationshipDataService
         .getEntityAvailablePeopleCount(
           this.selectedOutbreak.id,
-          this.entityType,
-          this.entityId,
+          this._entity.type,
+          this._entity.id,
           qb
         )
         .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            return throwError(err);
-          }),
-          share()
-        );
+          // should be the last pipe
+          takeUntil(this.destroyed$)
+        ).subscribe((response) => {
+          this.pageCount = response;
+        });
     }
-  }
-
-  private generateSideFilters() {
-    // this.availableSideFilters = [
-    //   new FilterModel({
-    //     fieldName: 'firstName',
-    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
-    //     type: FilterType.TEXT,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'lastName',
-    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
-    //     type: FilterType.TEXT,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'visualId',
-    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID',
-    //     type: FilterType.TEXT
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'gender',
-    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_GENDER',
-    //     type: FilterType.MULTISELECT,
-    //     options$: this.genderList$,
-    //     sortable: true
-    //   }),
-    //   new FilterModel({
-    //     fieldName: 'addresses',
-    //     fieldLabel: 'LNG_ENTITY_FIELD_LABEL_ADDRESS',
-    //     type: FilterType.ADDRESS,
-    //     addressFieldIsArray: true
-    //   })
-    // ];
-  }
-
-  /**
-     * Retrieve Person Type color
-     */
-  getPersonTypeColor(personType: string) {
-    const personTypeData = _.get(this.personTypesListMap, personType);
-    return _.get(personTypeData, 'colorCode', '');
-  }
-
-  /**
-     * Switch cases with selected entity
-     */
-  switchWithSelectedRecord() {
-    // // get the selected record
-    // const selectedRecordId = this.checkedRecords[0];
-    // if (!selectedRecordId) {
-    //   return;
-    // }
-    //
-    // // create query builder for relationships
-    // const qb = new RequestQueryBuilder();
-    //
-    // // filter
-    // qb.filter.where({
-    //   id: {
-    //     inq: this.selectedRecordsIds
-    //   }
-    // });
-    //
-    // // display loading
-    // const loadingDialog = this.dialogService.showLoadingDialog();
-    // this.dialogService
-    //   .showConfirm('LNG_DIALOG_CONFIRM_CHANGE_SOURCE')
-    //   .subscribe((answer: DialogAnswer) => {
-    //     if (answer.button === DialogAnswerButton.Yes) {
-    //       this.relationshipDataService
-    //         .bulkChangeSource(
-    //           this.selectedOutbreak.id,
-    //           selectedRecordId,
-    //           qb
-    //         )
-    //         .pipe(
-    //           catchError((err) => {
-    //             // hide dialog
-    //             loadingDialog.close();
-    //
-    //             this.toastV2Service.error(err);
-    //             return throwError(err);
-    //           })
-    //         )
-    //         .subscribe(() => {
-    //           // hide dialog
-    //           loadingDialog.close();
-    //
-    //           // saved
-    //           this.toastV2Service.success('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_ACTION_SET_SOURCE_SUCCESS_MESSAGE');
-    //
-    //           // redirect
-    //           this.router.navigate(['/relationships', this.entityType, selectedRecordId, 'contacts']);
-    //         });
-    //     } else {
-    //       // hide dialog
-    //       loadingDialog.close();
-    //     }
-    //   });
-  }
-
-  /**
-     * Filter by locations selected in location-drop-down
-     * @param locations
-     */
-  filterByLocation(locations) {
-    // remove previous condition
-    this.queryBuilder.filter.remove('addresses');
-    if (!_.isEmpty(locations)) {
-      // mapping all the locations to get the ids
-      const locationsIds = _.map(locations, (location) => {
-        return location.id;
-      });
-
-      // build query
-      this.queryBuilder.filter.where({
-        addresses: {
-          elemMatch: {
-            typeId: AddressType.CURRENT_ADDRESS,
-            parentLocationIdFilter: {
-              $in: locationsIds
-            }
-          }
-        }
-      });
-    }
-
-    // refresh list
-    this.needsRefreshList();
   }
 }
