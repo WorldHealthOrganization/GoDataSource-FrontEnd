@@ -228,7 +228,7 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
       redirectAfterCreateUpdate: () => {
         // update - redirect to view
         this.router.navigate([
-          '/contacts/follow-ups'
+          `/contacts/contact-related-follow-ups/${this.activatedRoute.snapshot.queryParams.entityId}`
         ]);
       }
     };
