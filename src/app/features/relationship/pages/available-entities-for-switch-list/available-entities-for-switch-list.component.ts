@@ -89,7 +89,7 @@ export class AvailableEntitiesForSwitchListComponent extends ListComponent<CaseM
       this.selectedPeopleIds = JSON.parse(this.activatedRoute.snapshot.queryParams.selectedPersonsIds);
     }
 
-    // TODO: Old comment
+    // #TODO: Old comment
     // disable multi select for current list component
     // this.checkedIsMultiSelect = false;
   }

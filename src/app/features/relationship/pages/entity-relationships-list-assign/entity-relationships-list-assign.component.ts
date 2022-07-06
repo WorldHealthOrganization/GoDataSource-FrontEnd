@@ -23,6 +23,8 @@ import { V2FilterType, V2FilterTextType } from '../../../../shared/components-v2
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { TranslateService } from '@ngx-translate/core';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
 
 @Component({
   selector: 'app-entity-relationships-list-assign',
@@ -31,6 +33,9 @@ import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-
 export class EntityRelationshipsListAssignComponent extends ListComponent<CaseModel | ContactModel | EventModel | ContactOfContactModel> implements OnDestroy {
   // entity
   private _entity: CaseModel | ContactModel | EventModel | ContactOfContactModel;
+  // selected records
+  private _selectedRecords: string[];
+
   // relationship type
   relationshipType: RelationshipType;
   // selected records ids
@@ -39,8 +44,8 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
   RelationshipType = RelationshipType;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     protected router: Router,
@@ -98,8 +103,8 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
   }
 
   /**
-     * Initialize Side Table Columns
-     */
+   * Initialize Side Table Columns
+   */
   protected initializeTableColumns() {
     // default table columns
     this.tableColumns = [
@@ -254,7 +259,22 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
   /**
    * Initialize process data
    */
-  protected initializeProcessSelectedData(): void {}
+  protected initializeProcessSelectedData(): void {
+    // update selected
+    this.processSelectedData = [
+      // all selected records were not deleted ?
+      {
+        key: 'updateSelected',
+        process: (
+          _dataMap,
+          selected
+        ) => {
+          // update selected
+          this._selectedRecords = selected;
+        }
+      }
+    ];
+  }
 
   /**
    * Initialize table infos
@@ -328,12 +348,44 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
   /**
    * Initialize table group actions
    */
-  protected initializeGroupActions(): void {}
+  protected initializeGroupActions(): void {
+    // trick to display checkboxes
+    this.groupActions = [
+      {
+        visible: () => false
+      }
+    ];
+  }
 
   /**
    * Initialize table add action
    */
-  protected initializeAddAction(): void {}
+  protected initializeAddAction(): void {
+    this.addAction = {
+      type: V2ActionType.ICON_LABEL,
+      label: 'LNG_COMMON_BUTTON_SELECT',
+      icon: 'add_circle_outline',
+      action: {
+        link: (): string[] => [
+          '/relationships',
+          this._entity.type,
+          this._entity.id,
+          this.relationshipType === RelationshipType.CONTACT ?
+            'contacts' :
+            'exposures',
+          'share',
+          'create-bulk'
+        ],
+        linkQueryParams: () => ({
+          selectedSourceIds: JSON.stringify(this._selectedRecords),
+          selectedTargetIds: JSON.stringify(this.selectedTargetIds)
+        })
+      },
+      disable: () => {
+        return !this._selectedRecords?.length;
+      }
+    };
+  }
 
   /**
    * Initialize table grouped data
@@ -352,7 +404,16 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
         'LNG_PAGE_LIST_ENTITY_ASSIGN_EXPOSURES_TITLE' :
         'LNG_PAGE_LIST_ENTITY_ASSIGN_CONTACTS_TITLE';
 
+      // set breadcrumbs
       this.breadcrumbs = [
+        {
+          label: 'LNG_COMMON_LABEL_HOME',
+          action: {
+            link: DashboardModel.canViewDashboard(this.authUser) ?
+              ['/dashboard'] :
+              ['/account/my-profile']
+          }
+        },
         {
           label: this.entityHelperService.entityMap[this._entity.type].label,
           action: {
@@ -389,8 +450,8 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
   }
 
   /**
-     * Set query builder
-     */
+   * Set query builder
+   */
   clearQueryBuilder() {
     // clear query builder
     this.queryBuilder.clear();
@@ -441,8 +502,8 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
   }
 
   /**
-     * Get total number of items, based on the applied filters
-     */
+   * Get total number of items, based on the applied filters
+   */
   refreshListCount(applyHasMoreLimit?: boolean) {
     // reset
     this.pageCount = undefined;
@@ -474,25 +535,5 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
       ).subscribe((response) => {
         this.pageCount = response;
       });
-  }
-
-  // TODO: Left as inspiration for "Select" anc "Cancel" buttons
-  selectEntities() {
-    // // get list of selected ids
-    // const selectedRecords: false | string[] = this.validateCheckedRecords();
-    // if (!selectedRecords) {
-    //   return;
-    // }
-    //
-    // // redirect to next step
-    // this.router.navigate(
-    //   [`/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/share/create-bulk`],
-    //   {
-    //     queryParams: {
-    //       selectedSourceIds: JSON.stringify(selectedRecords),
-    //       selectedTargetIds: JSON.stringify(this.selectedTargetIds)
-    //     }
-    //   }
-    // );
   }
 }
