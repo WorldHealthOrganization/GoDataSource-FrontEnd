@@ -20,13 +20,13 @@ export * from './relationships-create-view-modify/relationships-create-view-modi
 
 // export the list of all page components
 export const pageComponents: any[] = [
+  AvailableEntitiesForSwitchListComponent,
   AvailableEntitiesListComponent,
+  EntityRelationshipsListAssignComponent,
   EntityRelationshipsListComponent,
   ReportCasesDateOnsetListComponent,
   ReportRelationshipsLongPeriodListComponent,
   RelationshipsCreateViewModifyComponent,
 
-  EntityRelationshipsListAssignComponent,
-  CreateEntityRelationshipBulkComponent,
-  AvailableEntitiesForSwitchListComponent
+  CreateEntityRelationshipBulkComponent
 ];

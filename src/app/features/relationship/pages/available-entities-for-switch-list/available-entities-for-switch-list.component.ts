@@ -45,7 +45,7 @@ export class AvailableEntitiesForSwitchListComponent extends ListComponent<CaseM
   // relationship type
   relationshipType: RelationshipType;
   // available side filters
-  selectedRecordsIds: string[];
+  selectedTargetIds: string[];
   selectedPeopleIds: string[];
 
   /**
@@ -85,13 +85,9 @@ export class AvailableEntitiesForSwitchListComponent extends ListComponent<CaseM
       this.toastV2Service.error('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_SWITCH_RELATIONSHIP_NO_CONTACTS_SELECTED');
       this.router.navigate(['/contacts/follow-ups']);
     } else {
-      this.selectedRecordsIds = JSON.parse(this.activatedRoute.snapshot.queryParams.selectedTargetIds);
+      this.selectedTargetIds = JSON.parse(this.activatedRoute.snapshot.queryParams.selectedTargetIds);
       this.selectedPeopleIds = JSON.parse(this.activatedRoute.snapshot.queryParams.selectedPersonsIds);
     }
-
-    // #TODO: Old comment
-    // disable multi select for current list component
-    // this.checkedIsMultiSelect = false;
   }
 
   /**
@@ -334,7 +330,7 @@ export class AvailableEntitiesForSwitchListComponent extends ListComponent<CaseM
           // filter
           qb.filter.where({
             id: {
-              inq: this.selectedRecordsIds
+              inq: this.selectedTargetIds
             }
           });
 

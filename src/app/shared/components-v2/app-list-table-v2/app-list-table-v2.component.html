@@ -352,7 +352,7 @@
     [class.gd-list-table-data-88]="showHeaderFilters"
     [modules]="modules"
     rowHeight="40"
-    rowSelection="multiple"
+    [rowSelection]="groupActionsSingleRecord ? 'single' : 'multiple'"
     suppressRowClickSelection="true"
     suppressPropertyNamesCheck="true"
     enableCellTextSelection="true"
