@@ -155,7 +155,8 @@ export class AppFormSelectMultipleV2Component
           ) {
             // equal ?
             if (item1.order === item2.order) {
-              return item1.label.toLowerCase().localeCompare(item2.label.toLowerCase());
+              return (item1.label ? this.translateService.instant(item1.label) : '')
+                .localeCompare((item2.label ? this.translateService.instant(item2.label) : ''));
             }
 
             // finished
@@ -173,7 +174,8 @@ export class AppFormSelectMultipleV2Component
           }
 
           // finished
-          return item1.label.toLowerCase().localeCompare(item2.label.toLowerCase());
+          return (item1.label ? this.translateService.instant(item1.label) : '')
+            .localeCompare((item2.label ? this.translateService.instant(item2.label) : ''));
         });
 
       // add no value if missing

@@ -16,6 +16,9 @@ import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v
 import * as _ from 'lodash';
 import { TranslateService } from '@ngx-translate/core';
 import { IconModel } from '../../../../core/models/icon.model';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSortList, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
   selector: 'app-reference-data-category-entries-list',
@@ -330,9 +333,25 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
       type: V2ActionType.MENU,
       label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
       visible: (): boolean => {
-        return IconModel.canList(this.authUser);
+        return ReferenceDataEntryModel.canModify(this.authUser) ||
+          IconModel.canList(this.authUser);
       },
       menuOptions: [
+        // Sort options
+        {
+          label: {
+            get: () => 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ORDER_ENTRIES'
+          },
+          action: {
+            click: () => {
+              this.orderEntries();
+            }
+          },
+          visible: (): boolean => {
+            return ReferenceDataEntryModel.canModify(this.authUser);
+          }
+        },
+
         // Manage Icons
         {
           label: {
@@ -488,6 +507,136 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
       )
       .subscribe((response) => {
         this.pageCount = response;
+      });
+  }
+
+  /**
+   * Order entries
+   */
+  private orderEntries(): void {
+    // show dialog
+    this.dialogV2Service
+      .showSideDialog({
+        title: {
+          get: () => 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ORDER_ENTRIES'
+        },
+        hideInputFilter: true,
+        width: '60rem',
+        inputs: [{
+          type: V2SideDialogConfigInputType.DIVIDER,
+          placeholder: this.category.name
+        }, {
+          type: V2SideDialogConfigInputType.SORT_LIST,
+          name: 'sortItems',
+          items: []
+        }],
+        bottomButtons: [{
+          type: IV2SideDialogConfigButtonType.OTHER,
+          label: 'LNG_COMMON_BUTTON_APPLY',
+          color: 'primary'
+        }, {
+          type: IV2SideDialogConfigButtonType.CANCEL,
+          label: 'LNG_COMMON_BUTTON_CANCEL',
+          color: 'text'
+        }],
+        initialized: (handler) => {
+          // display loading
+          handler.loading.show();
+
+          // create qb
+          const qb = new RequestQueryBuilder();
+          qb.filter.byEquality(
+            'categoryId',
+            this.category.id
+          );
+
+          // retrieve only id, name & order
+          qb.fields(
+            'id',
+            'value',
+            'order'
+          );
+
+          // get the outbreak template to clone
+          this.referenceDataDataService
+            .getEntries(qb)
+            .pipe(
+              catchError((err) => {
+                // error
+                this.toastV2Service.error(err);
+
+                // hide loading
+                handler.hide();
+
+                // send it further
+                return throwError(err);
+              })
+            )
+            .subscribe((entries) => {
+              // sort items by order, followed by name
+              entries.sort((item1, item2) => {
+                // compare
+                if (
+                  typeof item1.order === 'number' &&
+                  typeof item2.order === 'number'
+                ) {
+                  // equal ?
+                  if (item1.order === item2.order) {
+                    return (item1.value ? this.translateService.instant(item1.value) : '')
+                      .localeCompare((item2.value ? this.translateService.instant(item2.value) : ''));
+                  }
+
+                  // finished
+                  return item1.order - item2.order;
+                } else if (
+                  typeof item1.order === 'number' &&
+                  !item2.order
+                ) {
+                  return -1;
+                } else if (
+                  !item1.order &&
+                  typeof item2.order === 'number'
+                ) {
+                  return 1;
+                }
+
+                // finished
+                return (item1.value ? this.translateService.instant(item1.value) : '')
+                  .localeCompare((item2.value ? this.translateService.instant(item2.value) : ''));
+              });
+
+              // create list of items that we need to sort
+              const items: ILabelValuePairModel[] = [];
+              entries.forEach((item) => {
+                items.push({
+                  label: item.value,
+                  value: item.id
+                });
+              });
+
+              // update sort items
+              (handler.data.map.sortItems as IV2SideDialogConfigInputSortList).items = items;
+
+              // hide loading
+              handler.loading.hide();
+
+              // update order
+              // #TODO
+
+              // refresh list
+              // #TODO
+            });
+        }
+      })
+      .subscribe((response) => {
+        // cancelled ?
+        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+          // finished
+          return;
+        }
+
+        // close dialog
+        response.handler.hide();
       });
   }
 }

@@ -416,6 +416,41 @@
 
             </div>
 
+            <!-- Sort List -->
+            <div
+              *ngSwitchCase="V2SideDialogConfigInputType.SORT_LIST"
+              fxLayout="column" fxLayoutGap="1.6rem"
+              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-sort-list {{input.cssClasses}}">
+
+              <cdk-virtual-scroll-viewport
+                class="gd-app-side-dialog-v2-content-middle-item-input-sort-list-{{input.name}}"
+                cdkDropList [cdkDropListData]="input.items" (cdkDropListDropped)="dropItem($event, input)"
+                minBufferPx="1024"
+                maxBufferPx="1024"
+                [itemSize]="45"
+
+                style="height: 300px">
+
+                <!-- Item -->
+                <div
+                  *cdkVirtualFor="let item of input.items; templateCacheSize: 0"
+                  cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".gd-app-side-dialog-v2-content-middle-item-input-sort-list-{{input.name}}" [cdkDragData]="item" (cdkDragStarted)="dragStarted($event)"
+                  style="height: 4.5rem">
+
+                  <!-- Sort -->
+                  <mat-icon
+                    cdkDragHandle
+                    (mousedown)="notInvalidDragZone()">drag_indicator</mat-icon>
+
+                  <!-- Label -->
+                  <div>{{item.label | translate}}</div>
+
+                </div>
+
+              </cdk-virtual-scroll-viewport>
+
+            </div>
+
             <!-- Filter list -->
             <div
               *ngSwitchCase="V2SideDialogConfigInputType.FILTER_LIST"
