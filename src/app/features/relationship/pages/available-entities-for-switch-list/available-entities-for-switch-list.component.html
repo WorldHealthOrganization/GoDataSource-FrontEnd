@@ -6,12 +6,13 @@
   [breadcrumbs]="breadcrumbs"
   [quickActions]="quickActions"
   [groupActions]="groupActions"
+  groupActionsSingleRecord="true"
   [addAction]="addAction"
   [groupedData]="groupedData"
   [pageCount]="pageCount"
   [pageSize]="pageSize"
   [pageIndex]="pageIndex"
-  [pageSettingsKey]="UserSettings.RELATIONSHIP_FIELDS"
+  [pageSettingsKey]="UserSettings.SWITCH_RELATIONSHIP_FIELDS"
   [sortColumn]="tableSortBy"
   [infos]="infos"
   [suffixLegends]="suffixLegends"
@@ -26,4 +27,3 @@
   (resetHeaderFilters)="resetFiltersToSideFilters()"
   (advancedFilterBy)="applySideFilters($event)">
 </app-list-table-v2>
-<!-- #TODO: [pageSettingsKey] needs UserSettings fields -->

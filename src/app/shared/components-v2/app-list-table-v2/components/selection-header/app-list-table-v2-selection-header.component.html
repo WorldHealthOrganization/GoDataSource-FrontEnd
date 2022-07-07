@@ -2,6 +2,7 @@
   class="gd-list-table-selection-header">
   <!-- Menu -->
   <button
+    *ngIf="action.menuOptions?.length > 0"
     #menuTrigger="matMenuTrigger"
     class="gd-list-table-selection-header-button"
     [class.gd-list-table-selection-header-button-expanded]="menuTrigger.menuOpen"

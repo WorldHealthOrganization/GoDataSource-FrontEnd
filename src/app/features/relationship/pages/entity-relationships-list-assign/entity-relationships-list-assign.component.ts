@@ -64,7 +64,7 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
     // disable select outbreak
     TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = true;
 
-    // retreive entity related data
+    // retrieve entity related data
     this._entity = this.activatedRoute.snapshot.data.entity;
     this.relationshipType = this.activatedRoute.snapshot.data.relationshipType;
 
@@ -484,21 +484,16 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
    * Re(load) the available Entities list, based on the applied filter, sort criterias
    */
   refreshList() {
-    if (
-      this._entity &&
-      this.selectedOutbreak
-    ) {
-      // retrieve the list of Relationships
-      this.records$ = this.entityDataService
-        .getEntitiesList(
-          this.selectedOutbreak.id,
-          this.queryBuilder
-        )
-        .pipe(
-          // should be the last pipe
-          takeUntil(this.destroyed$)
-        );
-    }
+    // retrieve the list of Relationships
+    this.records$ = this.entityDataService
+      .getEntitiesList(
+        this.selectedOutbreak.id,
+        this.queryBuilder
+      )
+      .pipe(
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
   }
 
   /**

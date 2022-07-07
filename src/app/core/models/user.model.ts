@@ -36,6 +36,7 @@ export enum UserSettings {
   REF_DATA_CAT_FIELDS = 'refDataCategoriesFields',
   REF_DATA_CAT_ENTRIES_FIELDS = 'refDataCatEntriesFields',
   SHARE_RELATIONSHIPS = 'shareRelationships',
+  SWITCH_RELATIONSHIP_FIELDS = 'switchRelationshipsFields',
   USER_ROLE_FIELDS = 'userRoleFields',
   ENTITY_NOT_DUPLICATES_FIELDS = 'entityNotDuplicatesFields',
   USER_FIELDS = 'userFields',
