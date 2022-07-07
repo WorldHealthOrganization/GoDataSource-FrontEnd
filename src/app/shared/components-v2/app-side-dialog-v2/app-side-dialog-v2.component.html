@@ -424,16 +424,15 @@
 
               <cdk-virtual-scroll-viewport
                 #cdkViewport
-                class="gd-app-side-dialog-v2-content-middle-item-input-sort-list-{{input.name}}"
-                cdkDropList [cdkDropListData]="input.items" (cdkDropListDropped)="dropItem($event, input)"
-                minBufferPx="1024"
-                maxBufferPx="1024"
+                cdkDropList [cdkDropListData]="input.items" [cdkDropListSortPredicate]="canDrop" (cdkDropListDropped)="dropItem($event, input)"
+                [minBufferPx]="maxBufferPx ? maxBufferPx : bufferToRender"
+                [maxBufferPx]="maxBufferPx ? maxBufferPx : bufferToRender"
                 [itemSize]="45">
 
                 <!-- Item -->
                 <div
                   *cdkVirtualFor="let item of input.items; templateCacheSize: 0; let sortItemIndex = index"
-                  cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".gd-app-side-dialog-v2-content-middle-item-input-sort-list-{{input.name}}" [cdkDragData]="item" (cdkDragStarted)="dragStarted($event)"
+                  cdkDrag cdkDragLockAxis="y" [cdkDragData]="item" (cdkDragStarted)="dragStarted($event)"
                   class="gd-app-side-dialog-v2-content-middle-item-input-sort-list-item"
                   fxLayout="row" fxLayoutAlign="start center"
                   style="height: 4.5rem">
