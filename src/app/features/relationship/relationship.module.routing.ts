@@ -116,7 +116,17 @@ const relationshipTypeChildrenRoutes = [
       permissions: [
         PERMISSION.OUTBREAK_VIEW,
         PERMISSION.RELATIONSHIP_SHARE
-      ]
+      ],
+      action: CreateViewModifyV2Action.MODIFY
+    },
+    resolve: {
+      outbreak: SelectedOutbreakDataResolver,
+      certainty: CertaintyLevelDataResolver,
+      exposureType: ExposureTypeDataResolver,
+      exposureFrequency: ExposureFrequencyDataResolver,
+      exposureDuration: ExposureDurationDataResolver,
+      context: ContextOfTransmissionDataResolver,
+      cluster: ClusterDataResolver
     },
     canDeactivate: [
       PageChangeConfirmationGuard
