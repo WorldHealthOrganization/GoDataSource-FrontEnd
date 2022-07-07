@@ -313,7 +313,8 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
           },
           linkQueryParams: (selected: string[]): Params => {
             return {
-              followUpsIds: JSON.stringify(selected)
+              followUpsIds: JSON.stringify(selected),
+              entityId: this.entityData.id
             };
           }
         },
