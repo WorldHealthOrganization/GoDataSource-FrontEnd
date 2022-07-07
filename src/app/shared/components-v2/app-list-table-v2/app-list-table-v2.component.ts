@@ -162,6 +162,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   // group actions
   @Input() groupActions: V2ActionMenuItem[];
+  @Input() groupActionsSingleRecord: boolean;
 
   // add button
   @Input() addAction: IV2ActionIconLabel;
@@ -688,7 +689,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     const columnDefs: IExtendedColDef[] = [];
 
     // attach items selection column only if we have group actions
-    if (this.groupActions?.length > 0) {
+    if (
+      this.groupActions?.length > 0 ||
+      this.groupActionsSingleRecord
+    ) {
       columnDefs.push({
         pinned: IV2ColumnPinned.LEFT,
         headerName: '',
@@ -709,46 +713,49 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           actions: [{
             type: V2ActionType.MENU,
             icon: 'expand_more',
-            menuOptions: [
-              {
-                label: {
-                  get: () => 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL'
-                },
-                action: {
-                  click: () => {
-                    this._agTable.api.selectAll();
+            menuOptions: this.groupActionsSingleRecord ?
+              [
+                ...(this.groupActions ? this.groupActions : [])
+              ] : [
+                {
+                  label: {
+                    get: () => 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL'
+                  },
+                  action: {
+                    click: () => {
+                      this._agTable.api.selectAll();
+                    }
+                  },
+                  visible: (): boolean => {
+                    return this._agTable.api.getDisplayedRowCount() > 0 &&
+                      this._agTable.api.getSelectedNodes().length < this._agTable.api.getDisplayedRowCount();
                   }
                 },
-                visible: (): boolean => {
-                  return this._agTable.api.getDisplayedRowCount() > 0 &&
-                    this._agTable.api.getSelectedNodes().length < this._agTable.api.getDisplayedRowCount();
-                }
-              },
-              {
-                label: {
-                  get: () => 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL'
-                },
-                action: {
-                  click: () => {
-                    this._agTable.api.deselectAll();
+                {
+                  label: {
+                    get: () => 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_UNCHECK_ALL'
+                  },
+                  action: {
+                    click: () => {
+                      this._agTable.api.deselectAll();
+                    }
+                  },
+                  visible: (): boolean => {
+                    return this._agTable.api.getDisplayedRowCount() > 0 &&
+                      this._agTable.api.getSelectedNodes().length > 0;
                   }
                 },
-                visible: (): boolean => {
-                  return this._agTable.api.getDisplayedRowCount() > 0 &&
-                    this._agTable.api.getSelectedNodes().length > 0;
-                }
-              },
-              {
-                // divider
-                visible: (): boolean => {
-                  return this._agTable.api.getDisplayedRowCount() > 0 && (
-                    this._agTable.api.getSelectedNodes().length < this._agTable.api.getDisplayedRowCount() ||
-                    this._agTable.api.getSelectedNodes().length > 0
-                  );
-                }
-              },
-              ...(this.groupActions ? this.groupActions : [])
-            ]
+                {
+                  // divider
+                  visible: (): boolean => {
+                    return this._agTable.api.getDisplayedRowCount() > 0 && (
+                      this._agTable.api.getSelectedNodes().length < this._agTable.api.getDisplayedRowCount() ||
+                      this._agTable.api.getSelectedNodes().length > 0
+                    );
+                  }
+                },
+                ...(this.groupActions ? this.groupActions : [])
+              ]
           }]
         }
       });
