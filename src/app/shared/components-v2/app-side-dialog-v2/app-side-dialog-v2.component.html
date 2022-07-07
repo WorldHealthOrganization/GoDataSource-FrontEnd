@@ -423,27 +423,35 @@
               class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-sort-list {{input.cssClasses}}">
 
               <cdk-virtual-scroll-viewport
+                #cdkViewport
                 class="gd-app-side-dialog-v2-content-middle-item-input-sort-list-{{input.name}}"
                 cdkDropList [cdkDropListData]="input.items" (cdkDropListDropped)="dropItem($event, input)"
                 minBufferPx="1024"
                 maxBufferPx="1024"
-                [itemSize]="45"
-
-                style="height: 300px">
+                [itemSize]="45">
 
                 <!-- Item -->
                 <div
                   *cdkVirtualFor="let item of input.items; templateCacheSize: 0"
                   cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".gd-app-side-dialog-v2-content-middle-item-input-sort-list-{{input.name}}" [cdkDragData]="item" (cdkDragStarted)="dragStarted($event)"
+                  class="gd-app-side-dialog-v2-content-middle-item-input-sort-list-item"
+                  fxLayout="row" fxLayoutAlign="start center"
                   style="height: 4.5rem">
+
+                  <!-- Custom drag&drop placeholder -->
+                  <div class="gd-drag-custom-placeholder" *cdkDragPlaceholder></div>
 
                   <!-- Sort -->
                   <mat-icon
                     cdkDragHandle
-                    (mousedown)="notInvalidDragZone()">drag_indicator</mat-icon>
+                    (mousedown)="notInvalidDragZone()"
+                    class="gd-app-side-dialog-v2-content-middle-item-input-sort-list-item-icon">drag_indicator</mat-icon>
 
                   <!-- Label -->
-                  <div>{{item.label | translate}}</div>
+                  <div
+                    class="gd-app-side-dialog-v2-content-middle-item-input-sort-list-item-label">
+                    {{item.label | translate}}
+                  </div>
 
                 </div>
 
@@ -929,6 +937,7 @@
         <div
           *ngFor="let input of config?.inputs"
           class="gd-app-side-dialog-v2-content-middle-item"
+          [class.gd-app-side-dialog-v2-content-middle-item-has-sort-list]="input.type === V2SideDialogConfigInputType.SORT_LIST"
           [hidden]="filteredInputs === false || (filteredInputs && !filteredInputs[input.name] && !filteredForceParent[input.name])">
           <ng-template
             [ngTemplateOutlet]="commonPart"
