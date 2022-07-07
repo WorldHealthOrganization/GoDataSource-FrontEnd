@@ -689,7 +689,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     const columnDefs: IExtendedColDef[] = [];
 
     // attach items selection column only if we have group actions
-    if (this.groupActions?.length > 0) {
+    if (
+      this.groupActions?.length > 0 ||
+      this.groupActionsSingleRecord
+    ) {
       columnDefs.push({
         pinned: IV2ColumnPinned.LEFT,
         headerName: '',
@@ -711,7 +714,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
             type: V2ActionType.MENU,
             icon: 'expand_more',
             menuOptions: this.groupActionsSingleRecord ?
-              [] : [
+              [
+                ...(this.groupActions ? this.groupActions : [])
+              ] : [
                 {
                   label: {
                     get: () => 'LNG_LIST_PAGES_BUTTON_BULK_ACTIONS_CHECK_ALL'

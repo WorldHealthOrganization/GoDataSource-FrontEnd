@@ -299,14 +299,7 @@ export class AvailableEntitiesForSwitchListComponent extends ListComponent<CaseM
   /**
    * Initialize table group actions
    */
-  protected initializeGroupActions(): void {
-    // trick to display checkboxes
-    this.groupActions = [
-      {
-        visible: () => false
-      }
-    ];
-  }
+  protected initializeGroupActions(): void {}
 
   /**
    * Initialize table add action
