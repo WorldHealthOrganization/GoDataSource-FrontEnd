@@ -428,8 +428,7 @@
                 cdkDropList [cdkDropListData]="input.items" (cdkDropListDropped)="dropItem($event, input)"
                 minBufferPx="1024"
                 maxBufferPx="1024"
-                [itemSize]="45"
-                [style.height.px]="input.items.length * 45">
+                [itemSize]="45">
 
                 <!-- Item -->
                 <div
@@ -938,6 +937,7 @@
         <div
           *ngFor="let input of config?.inputs"
           class="gd-app-side-dialog-v2-content-middle-item"
+          [class.gd-app-side-dialog-v2-content-middle-item-has-sort-list]="input.type === V2SideDialogConfigInputType.SORT_LIST"
           [hidden]="filteredInputs === false || (filteredInputs && !filteredInputs[input.name] && !filteredForceParent[input.name])">
           <ng-template
             [ngTemplateOutlet]="commonPart"

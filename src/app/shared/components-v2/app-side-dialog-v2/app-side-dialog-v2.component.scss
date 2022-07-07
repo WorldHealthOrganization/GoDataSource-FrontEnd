@@ -589,7 +589,18 @@
           }
 
           /* Sort List */
+          &.gd-app-side-dialog-v2-content-middle-item-has-sort-list {
+            height: calc(100% - 3.4rem);
+          }
+
           .gd-app-side-dialog-v2-content-middle-item-input-sort-list {
+            height: 100%;
+            margin: 0 -1.6rem;
+
+            .cdk-virtual-scroll-viewport {
+              height: 100%;
+            }
+
             .gd-drag-custom-placeholder {
               height: 3rem;
             }
@@ -597,6 +608,7 @@
             .gd-app-side-dialog-v2-content-middle-item-input-sort-list-item {
               @include flex(inline-flex);
               @include flex_align_items(center);
+              padding: 0 1.6rem;
 
               .gd-app-side-dialog-v2-content-middle-item-input-sort-list-item-icon {
                 color: rgba(var(--gd-secondary-rgb), 0.5);
