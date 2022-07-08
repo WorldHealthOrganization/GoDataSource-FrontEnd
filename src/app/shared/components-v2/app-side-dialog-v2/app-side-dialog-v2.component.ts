@@ -26,9 +26,8 @@ import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model
 import { RequestFilterOperator, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/bottom-dialog-config.model';
-import { CdkDrag, CdkDragDrop, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CdkDragStart } from '@angular/cdk/drag-drop/drag-events';
-import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 
 /**
  * Component
@@ -53,9 +52,6 @@ export class AppSideDialogV2Component implements OnDestroy {
     // update handler
     this.dialogHandler.form = this._form;
   }
-
-  // viewport
-  @ViewChild('cdkViewport') cdkViewport: CdkVirtualScrollViewport;
 
   // invalid drag zone
   private _isInvalidDragEvent: boolean = true;
@@ -300,21 +296,6 @@ export class AppSideDialogV2Component implements OnDestroy {
 
   // subscriptions
   locationSubscription: SubscriptionLike;
-
-  // check if we can drop element to the selected position
-  readonly bufferToRender: number = 1024;
-  maxBufferPx: number;
-  canDrop: (
-    index: number,
-    drag: CdkDrag,
-    drop: CdkDropList
-  ) => boolean = (): boolean => {
-      // make sure we have everything visible
-      this.maxBufferPx = this.cdkViewport.measureScrollOffset() + this.bufferToRender;
-
-      // check if allowed
-      return true;
-    };
 
   /**
    * Constructor
@@ -888,25 +869,17 @@ export class AppSideDialogV2Component implements OnDestroy {
     event: CdkDragDrop<any[]>,
     input: IV2SideDialogConfigInputSortList
   ): void {
-    // reset
-    this.maxBufferPx = undefined;
-
     // stop ?
     if (this._isInvalidDragEvent) {
       return;
     }
 
-    // drag indexes
-    const scrollRange = this.cdkViewport.getRenderedRange();
-    const previousIndex: number = event.previousIndex + scrollRange.start;
-    const currentIndex: number = event.currentIndex + scrollRange.start;
-
     // disable drag
     this._isInvalidDragEvent = true;
     moveItemInArray(
       input.items,
-      previousIndex,
-      currentIndex
+      event.previousIndex,
+      event.currentIndex
     );
 
     // force rerender

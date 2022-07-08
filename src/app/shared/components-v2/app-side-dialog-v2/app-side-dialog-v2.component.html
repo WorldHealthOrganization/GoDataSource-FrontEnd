@@ -420,41 +420,33 @@
             <div
               *ngSwitchCase="V2SideDialogConfigInputType.SORT_LIST"
               fxLayout="column" fxLayoutGap="1.6rem"
-              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-sort-list {{input.cssClasses}}">
+              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-sort-list {{input.cssClasses}}"
+              cdkDropList [cdkDropListData]="input.items" (cdkDropListDropped)="dropItem($event, input)">
 
-              <cdk-virtual-scroll-viewport
-                #cdkViewport
-                cdkDropList [cdkDropListData]="input.items" [cdkDropListSortPredicate]="canDrop" (cdkDropListDropped)="dropItem($event, input)"
-                [minBufferPx]="maxBufferPx ? maxBufferPx : bufferToRender"
-                [maxBufferPx]="maxBufferPx ? maxBufferPx : bufferToRender"
-                [itemSize]="45">
+              <!-- Item -->
+              <div
+                *ngFor="let item of input.items"
+                cdkDrag cdkDragLockAxis="y" [cdkDragData]="item" (cdkDragStarted)="dragStarted($event)"
+                class="gd-app-side-dialog-v2-content-middle-item-input-sort-list-item"
+                fxLayout="row" fxLayoutAlign="start center"
+                style="height: 4.5rem">
 
-                <!-- Item -->
+                <!-- Custom drag&drop placeholder -->
+                <div class="gd-drag-custom-placeholder" *cdkDragPlaceholder></div>
+
+                <!-- Sort -->
+                <mat-icon
+                  cdkDragHandle
+                  (mousedown)="notInvalidDragZone()"
+                  class="gd-app-side-dialog-v2-content-middle-item-input-sort-list-item-icon">drag_indicator</mat-icon>
+
+                <!-- Label -->
                 <div
-                  *cdkVirtualFor="let item of input.items; templateCacheSize: 0"
-                  cdkDrag cdkDragLockAxis="y" [cdkDragData]="item" (cdkDragStarted)="dragStarted($event)"
-                  class="gd-app-side-dialog-v2-content-middle-item-input-sort-list-item"
-                  fxLayout="row" fxLayoutAlign="start center"
-                  style="height: 4.5rem">
-
-                  <!-- Custom drag&drop placeholder -->
-                  <div class="gd-drag-custom-placeholder" *cdkDragPlaceholder></div>
-
-                  <!-- Sort -->
-                  <mat-icon
-                    cdkDragHandle
-                    (mousedown)="notInvalidDragZone()"
-                    class="gd-app-side-dialog-v2-content-middle-item-input-sort-list-item-icon">drag_indicator</mat-icon>
-
-                  <!-- Label -->
-                  <div
-                    class="gd-app-side-dialog-v2-content-middle-item-input-sort-list-item-label">
-                    {{item.label | translate}}
-                  </div>
-
+                  class="gd-app-side-dialog-v2-content-middle-item-input-sort-list-item-label">
+                  {{item.label | translate}}
                 </div>
 
-              </cdk-virtual-scroll-viewport>
+              </div>
 
             </div>
 
