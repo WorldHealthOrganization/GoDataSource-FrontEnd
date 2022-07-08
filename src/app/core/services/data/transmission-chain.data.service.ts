@@ -760,17 +760,17 @@ export class TransmissionChainDataService {
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.VISUAL_ID.value) {
             if (
               node.type !== EntityType.EVENT &&
-                            !(node.model instanceof EventModel)
+              !(node.model instanceof EventModel)
             ) {
               nodeData.label = node.model.visualId ? node.model.visualId : '';
             } else {
-              nodeData.label = '';
+              nodeData.label = node.model.name;
             }
             // visual id and location
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.ID_AND_LOCATION.value) {
             if (
               node.type !== EntityType.EVENT &&
-                            !(node.model instanceof EventModel)
+              !(node.model instanceof EventModel)
             ) {
               if (node.model.visualId) {
                 nodeData.label = node.model.visualId;
@@ -778,14 +778,23 @@ export class TransmissionChainDataService {
               const mainAddr = node.model.mainAddress;
               if (
                 mainAddr &&
-                                mainAddr.locationId &&
-                                locationsListMap[mainAddr.locationId] &&
-                                locationsListMap[mainAddr.locationId].name
+                mainAddr.locationId &&
+                locationsListMap[mainAddr.locationId] &&
+                locationsListMap[mainAddr.locationId].name
               ) {
                 nodeData.label = (node.model.visualId ? nodeData.label + ' - ' : '') + locationsListMap[mainAddr.locationId].name;
               }
             } else {
-              nodeData.label = '';
+              nodeData.label = node.model.name;
+              const mainAddr = node.model.mainAddress;
+              if (
+                mainAddr &&
+                mainAddr.locationId &&
+                locationsListMap[mainAddr.locationId] &&
+                locationsListMap[mainAddr.locationId].name
+              ) {
+                nodeData.label = (node.model.name ? nodeData.label + ' - ' : '') + locationsListMap[mainAddr.locationId].name;
+              }
             }
             // concatenated details
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.CONCATENATED_DETAILS.value) {
