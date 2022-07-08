@@ -506,22 +506,39 @@ export class AppFormEditQuestionnaireV2Component
     const inputs: V2SideDialogConfigInput[] = [];
 
     // determine current question variables
-    const usedVariables: {
+    const usedQuestionVariables: {
       [variable: string]: true
     } = {};
-    this.flattenedQuestions.forEach((item) => {
-      // not important ?
-      if (
-        item.type === FlattenType.ANSWER ||
-        item.data === modifyQuestion ||
-        !(item.data as QuestionModel).variable
-      ) {
+    const deepAddVariables = (questions: QuestionModel[]) => {
+      // nothing to do ?
+      if (!questions?.length) {
         return;
       }
 
-      // remember variable
-      usedVariables[(item.data as QuestionModel).variable.toLowerCase()] = true;
-    });
+      // go through questions
+      questions.forEach((question) => {
+        // no need to enter variable for markup
+        if (
+          question.answerType === Constants.ANSWER_TYPES.MARKUP.value ||
+          !question.variable
+        ) {
+          return;
+        }
+
+        // add variable
+        usedQuestionVariables[question.variable.toLowerCase()] = true;
+
+        // go through answers
+        if (question.answers?.length > 0) {
+          question.answers.forEach((answer) => {
+            deepAddVariables(answer.additionalQuestions);
+          });
+        }
+      });
+    };
+
+    // determine current question variables
+    deepAddVariables(this.value);
 
     // details ?
     if (add) {
@@ -674,10 +691,10 @@ export class AppFormEditQuestionnaireV2Component
           validators: {
             required: () => !modifyQuestion,
             notNumber: () => !modifyQuestion,
-            notInObject: () => !modifyQuestion ?
+            notInObject: () => modifyQuestion ?
               undefined :
               {
-                values: usedVariables,
+                values: usedQuestionVariables,
                 err: 'LNG_PAGE_MODIFY_OUTBREAK_QUESTIONNAIRE_ERROR_DUPLICATE_VARIABLE'
               },
             noSpace: () => true
