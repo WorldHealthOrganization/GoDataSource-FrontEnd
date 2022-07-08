@@ -398,13 +398,16 @@ export class EntityHelperService {
         type: V2SideDialogConfigInputType.LINK,
         name: uuid(),
         placeholder: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_CHAIN_OF_TRANSMISSION',
-        link: () => ['/transmission-chains'],
+        link: () => ['/redirect'],
         linkQueryParams: () => ({
-          personId: entity.id,
-          selectedEntityType: entity.type,
-          snapshotId: entityConfig?.snapshotId,
-          showPersonContacts: entityConfig?.showPersonContacts,
-          showPersonContactsOfContacts: entityConfig?.showPersonContactsOfContacts
+          path: JSON.stringify(['/transmission-chains']),
+          data: JSON.stringify({
+            personId: entity.id,
+            selectedEntityType: entity.type,
+            snapshotId: entityConfig?.snapshotId,
+            showPersonContacts: entityConfig?.showPersonContacts,
+            showPersonContactsOfContacts: entityConfig?.showPersonContactsOfContacts
+          })
         })
       });
     }
