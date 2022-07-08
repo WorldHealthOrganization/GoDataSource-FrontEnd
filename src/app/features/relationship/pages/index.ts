@@ -22,11 +22,10 @@ export * from './relationships-create-view-modify/relationships-create-view-modi
 export const pageComponents: any[] = [
   AvailableEntitiesForSwitchListComponent,
   AvailableEntitiesListComponent,
+  CreateEntityRelationshipBulkComponent,
   EntityRelationshipsListAssignComponent,
   EntityRelationshipsListComponent,
   ReportCasesDateOnsetListComponent,
   ReportRelationshipsLongPeriodListComponent,
-  RelationshipsCreateViewModifyComponent,
-
-  CreateEntityRelationshipBulkComponent
+  RelationshipsCreateViewModifyComponent
 ];
