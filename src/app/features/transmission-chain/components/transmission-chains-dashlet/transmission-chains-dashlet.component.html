@@ -27,7 +27,7 @@
 
       <!-- Snapshots -->
       <app-form-select-single-v2
-        [disabled]="!showSnapshots"
+        *ngIf="showSnapshots"
         name="snapshotsList"
         [(ngModel)]="selectedSnapshot"
         [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOTS' | translate"
@@ -39,6 +39,7 @@
 
       <!-- Create / Load snapshot -->
       <button
+        *ngIf="showSnapshots"
         type="button"
         mat-flat-button
         color="primary"
@@ -49,6 +50,7 @@
 
       <!-- Refresh chain -->
       <button
+        *ngIf="showSnapshots"
         type="button"
         mat-flat-button
         color="primary"
