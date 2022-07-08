@@ -276,7 +276,8 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
    * Initialize tabs - Personal
    */
   private initializeTabsPersonal(): ICreateViewModifyV2Tab {
-    return {
+    // create tab
+    const tab: ICreateViewModifyV2Tab = {
       type: CreateViewModifyV2TabInputType.TAB,
       label: this.isCreate ?
         'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_TAB_PERSONAL_TITLE' :
@@ -337,7 +338,11 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
 
                   // reset pregnancy ?
                   if (this.itemData.gender === Constants.GENDER_MALE) {
-                    this.itemData.pregnancyStatus = undefined;
+                    // reset
+                    this.itemData.pregnancyStatus = null;
+
+                    // make sure we update pregnancy too
+                    tab.form.controls['pregnancyStatus'].markAsDirty();
                   }
                 }
               }
@@ -583,6 +588,9 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
         }
       ]
     };
+
+    // finished
+    return tab;
   }
 
   /**
