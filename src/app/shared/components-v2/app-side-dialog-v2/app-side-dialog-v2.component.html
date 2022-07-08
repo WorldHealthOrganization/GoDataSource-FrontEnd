@@ -428,11 +428,7 @@
                 *ngFor="let item of input.items"
                 cdkDrag cdkDragLockAxis="y" [cdkDragData]="item" (cdkDragStarted)="dragStarted($event)"
                 class="gd-app-side-dialog-v2-content-middle-item-input-sort-list-item"
-                fxLayout="row" fxLayoutAlign="start center"
-                style="height: 4.5rem">
-
-                <!-- Custom drag&drop placeholder -->
-                <div class="gd-drag-custom-placeholder" *cdkDragPlaceholder></div>
+                fxLayout="row" fxLayoutAlign="start center">
 
                 <!-- Sort -->
                 <mat-icon
