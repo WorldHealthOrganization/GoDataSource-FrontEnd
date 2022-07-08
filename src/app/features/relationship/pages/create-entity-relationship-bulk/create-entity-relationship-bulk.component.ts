@@ -438,15 +438,6 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
    * Initialize breadcrumbs
    */
   protected initializeBreadcrumbs() {
-    // add new breadcrumb: page title
-    const relationshipsListPageTitle = this.relationshipType === RelationshipType.EXPOSURE ?
-      'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE' :
-      'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE';
-
-    const assignRelationshipsPageTitle = this.relationshipType === RelationshipType.EXPOSURE ?
-      'LNG_PAGE_LIST_ENTITY_ASSIGN_EXPOSURES_TITLE' :
-      'LNG_PAGE_LIST_ENTITY_ASSIGN_CONTACTS_TITLE';
-
     // reset breadcrumbs
     this.breadcrumbs = [
       {
@@ -470,13 +461,17 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
         }
       },
       {
-        label: relationshipsListPageTitle,
+        label: this.relationshipType === RelationshipType.EXPOSURE ?
+          'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE' :
+          'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE',
         action: {
           link: [`/relationships/${ this.entityType }/${ this.entityId }/${ this.relationshipTypeRoutePath }`]
         }
       },
       {
-        label: assignRelationshipsPageTitle,
+        label: this.relationshipType === RelationshipType.EXPOSURE ?
+          'LNG_PAGE_LIST_ENTITY_ASSIGN_EXPOSURES_TITLE' :
+          'LNG_PAGE_LIST_ENTITY_ASSIGN_CONTACTS_TITLE',
         action: {
           link: [`/relationships/${ this.entityType }/${ this.entityId }/${ this.relationshipTypeRoutePath }/share`],
           linkQueryParams: {
