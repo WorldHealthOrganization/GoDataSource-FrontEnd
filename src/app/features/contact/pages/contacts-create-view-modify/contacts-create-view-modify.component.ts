@@ -458,6 +458,9 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
                       // set value
                       this.itemData.age = this.itemData.age || new AgeModel();
                       this.itemData.age.years = value;
+
+                      // reset
+                      this.itemData.dob = null;
                     }
                   },
                   months: {
@@ -466,13 +469,34 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
                       // set value
                       this.itemData.age = this.itemData.age || new AgeModel();
                       this.itemData.age.months = value;
+
+                      // reset
+                      this.itemData.dob = null;
                     }
                   }
                 },
                 dob: {
                   get: () => this.itemData.dob,
                   set: (value) => {
+                    // set value
                     this.itemData.dob = value;
+
+                    // update age
+                    if (
+                      this.itemData.dob &&
+                      (this.itemData.dob as Moment).isValid()
+                    ) {
+                      // add age object if we don't have one
+                      this.itemData.age = this.itemData.age || new AgeModel();
+
+                      // add data
+                      const now = moment();
+                      this.itemData.age.years = now.diff(this.itemData.dob, 'years');
+                      this.itemData.age.months = this.itemData.age.years < 1 ? now.diff(this.itemData.dob, 'months') : 0;
+                    } else {
+                      this.itemData.age.months = 0;
+                      this.itemData.age.years = 0;
+                    }
                   }
                 }
               }
