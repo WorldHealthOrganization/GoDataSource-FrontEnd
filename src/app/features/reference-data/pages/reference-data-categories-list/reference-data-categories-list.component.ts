@@ -82,6 +82,15 @@ export class ReferenceDataCategoriesListComponent
           }) :
           []
       },
+      {
+        field: 'entriesCount',
+        label: 'LNG_REFERENCE_DATA_CATEGORY_FIELD_LABEL_ENTRIES_COUNT',
+        format: {
+          type: (item: ReferenceDataCategoryModel) => item.entries?.length ?
+            item.entries.length.toString() :
+            '0'
+        }
+      },
 
       // actions
       {
