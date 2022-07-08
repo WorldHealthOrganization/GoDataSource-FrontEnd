@@ -686,30 +686,33 @@ export class TransmissionChainDataService {
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.AGE.value) {
             if (
               node.type !== EntityType.EVENT &&
-                            !(node.model instanceof EventModel) &&
-                            !_.isEmpty(node.model.age)
+              !(node.model instanceof EventModel)
             ) {
-              if (node.model.age.months > 0) {
-                nodeData.label = node.model.age.months + ' ' + monthsLabel;
+              if (!_.isEmpty(node.model.age)) {
+                if (node.model.age.months > 0) {
+                  nodeData.label = node.model.age.months + ' ' + monthsLabel;
+                } else {
+                  nodeData.label = node.model.age.years + ' ' + yearsLabel;
+                }
               } else {
-                nodeData.label = node.model.age.years + ' ' + yearsLabel;
+                nodeData.label = '';
               }
             } else {
-              nodeData.label = '';
+              nodeData.label = node.model.name;
             }
             // date of onset and event date
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.DATE_OF_ONSET_AND_EVENT_DATE.value) {
             if (
               node.type === EntityType.EVENT &&
-                            node.model instanceof EventModel &&
-                            node.model.date
+              node.model instanceof EventModel &&
+              node.model.date
             ) {
               nodeData.label = moment(node.model.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
             }
             if (
               node.type === EntityType.CASE &&
-                            node.model instanceof CaseModel &&
-                            node.model.dateOfOnset
+              node.model instanceof CaseModel &&
+              node.model.dateOfOnset
             ) {
               nodeData.label = moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
             }
@@ -717,21 +720,21 @@ export class TransmissionChainDataService {
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
             if (
               node.type !== EntityType.EVENT &&
-                            !(node.model instanceof EventModel)
+              !(node.model instanceof EventModel)
             ) {
               nodeData.label = colorCriteria.nodeLabelValues[node.model.gender];
             } else {
-              nodeData.label = '';
+              nodeData.label = node.model.name;
             }
             // occupation
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.OCCUPATION.value) {
             if (
               node.type !== EntityType.EVENT &&
-                            !(node.model instanceof EventModel)
+              !(node.model instanceof EventModel)
             ) {
               nodeData.label = colorCriteria.nodeLabelValues[node.model.occupation];
             } else {
-              nodeData.label = '';
+              nodeData.label = node.model.name;
             }
             // location
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.LOCATION.value) {
@@ -740,12 +743,14 @@ export class TransmissionChainDataService {
               const mainAddr = node.model.mainAddress;
               if (
                 mainAddr &&
-                                mainAddr.locationId &&
-                                locationsListMap[mainAddr.locationId] &&
-                                locationsListMap[mainAddr.locationId].name
+                mainAddr.locationId &&
+                locationsListMap[mainAddr.locationId] &&
+                locationsListMap[mainAddr.locationId].name
               ) {
                 nodeData.label = locationsListMap[mainAddr.locationId].name;
               }
+            } else {
+              nodeData.label = node.model.name;
             }
             // initials
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.INITIALS.value) {
@@ -754,23 +759,23 @@ export class TransmissionChainDataService {
               const lastNameInitial = node.model.lastName && node.model.lastName.trim() ? node.model.lastName.trim().slice(0, 1) : '';
               nodeData.label = lastNameInitial + ' ' + firstNameInitial;
             } else {
-              nodeData.label = '';
+              nodeData.label = node.model.name;
             }
             // visual id
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.VISUAL_ID.value) {
             if (
               node.type !== EntityType.EVENT &&
-                            !(node.model instanceof EventModel)
+              !(node.model instanceof EventModel)
             ) {
               nodeData.label = node.model.visualId ? node.model.visualId : '';
             } else {
-              nodeData.label = '';
+              nodeData.label = node.model.name;
             }
             // visual id and location
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.ID_AND_LOCATION.value) {
             if (
               node.type !== EntityType.EVENT &&
-                            !(node.model instanceof EventModel)
+              !(node.model instanceof EventModel)
             ) {
               if (node.model.visualId) {
                 nodeData.label = node.model.visualId;
@@ -778,20 +783,29 @@ export class TransmissionChainDataService {
               const mainAddr = node.model.mainAddress;
               if (
                 mainAddr &&
-                                mainAddr.locationId &&
-                                locationsListMap[mainAddr.locationId] &&
-                                locationsListMap[mainAddr.locationId].name
+                mainAddr.locationId &&
+                locationsListMap[mainAddr.locationId] &&
+                locationsListMap[mainAddr.locationId].name
               ) {
                 nodeData.label = (node.model.visualId ? nodeData.label + ' - ' : '') + locationsListMap[mainAddr.locationId].name;
               }
             } else {
-              nodeData.label = '';
+              nodeData.label = node.model.name;
+              const mainAddr = node.model.mainAddress;
+              if (
+                mainAddr &&
+                mainAddr.locationId &&
+                locationsListMap[mainAddr.locationId] &&
+                locationsListMap[mainAddr.locationId].name
+              ) {
+                nodeData.label = (node.model.name ? nodeData.label + ' - ' : '') + locationsListMap[mainAddr.locationId].name;
+              }
             }
             // concatenated details
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.CONCATENATED_DETAILS.value) {
             if (
               node.type !== EntityType.EVENT &&
-                            !(node.model instanceof EventModel)
+              !(node.model instanceof EventModel)
             ) {
               const lastName = node.model.lastName ? node.model.lastName : '';
               const firstName = node.model.firstName ? node.model.firstName : '';
@@ -829,7 +843,7 @@ export class TransmissionChainDataService {
               // concatenate results
               nodeData.label = lastName + ' ' + firstName + visualId + '\n' + age + ' - ' + gender + classification + '\n' + outcome + locationName + onset;
             } else {
-              nodeData.label = '';
+              nodeData.label = node.model.name;
             }
           }
 
@@ -870,7 +884,7 @@ export class TransmissionChainDataService {
       // add relation only if the nodes are in the selectedNodes array
       if (
         !selectedNodeIds[relationship.persons[0].id] ||
-                !selectedNodeIds[relationship.persons[1].id]
+        !selectedNodeIds[relationship.persons[1].id]
       ) {
         return;
       }
@@ -916,7 +930,7 @@ export class TransmissionChainDataService {
         let targetDate: any = '';
         if (
           sourceNode.type === EntityType.CASE &&
-                    sourceNode.model instanceof CaseModel
+          sourceNode.model instanceof CaseModel
         ) {
           if (sourceNode.model.dateOfOnset) {
             sourceDate = sourceNode.model.dateOfOnset as string;
@@ -936,7 +950,7 @@ export class TransmissionChainDataService {
 
         if (
           targetNode.type === EntityType.CASE &&
-                    targetNode.model instanceof CaseModel
+          targetNode.model instanceof CaseModel
         ) {
           if (targetNode.model.dateOfOnset) {
             targetDate = targetNode.model.dateOfOnset as string;
@@ -947,7 +961,7 @@ export class TransmissionChainDataService {
           }
         } else if (
           targetNode.type === EntityType.EVENT &&
-                    targetNode.model instanceof EventModel
+          targetNode.model instanceof EventModel
         ) {
           if (targetNode.model.date) {
             targetDate = targetNode.model.date as string;
@@ -956,7 +970,7 @@ export class TransmissionChainDataService {
 
         if (
           sourceDate &&
-                    targetDate
+          targetDate
         ) {
           const momentTargetDate = moment(targetDate, Constants.DEFAULT_DATE_DISPLAY_FORMAT);
           const momentSourceDate = moment(sourceDate, Constants.DEFAULT_DATE_DISPLAY_FORMAT);
@@ -975,9 +989,9 @@ export class TransmissionChainDataService {
         graphEdge.fontFamily = 'xtIcon';
       } else if (
         colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.CLUSTER.value &&
-                relationship.clusterId &&
-                clusterIconMap &&
-                clusterIconMap[relationship.clusterId]
+        relationship.clusterId &&
+        clusterIconMap &&
+        clusterIconMap[relationship.clusterId]
       ) {
         graphEdge.label = clusterIconMap[relationship.clusterId];
         graphEdge.fontFamily = 'Material Icons';
