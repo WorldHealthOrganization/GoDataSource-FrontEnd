@@ -687,7 +687,7 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
             loading.close();
 
             // refresh list
-            this.needsRefreshList();
+            this.needsRefreshList(true);
 
             // finished
             return;
