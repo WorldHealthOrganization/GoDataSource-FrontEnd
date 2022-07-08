@@ -749,7 +749,8 @@
                       <app-form-toggle-v2
                         [(ngModel)]="input.ageChecked"
                         [name]="FormHelperService.IGNORE_FIELD_PREFIX + (parentName ? parentName + '[ageDob]' : 'ageDob')"
-                        [options]="ageDOBOptions"></app-form-toggle-v2>
+                        [options]="ageDOBOptions"
+                        (ngModelChange)="markArrayItemsAsDirty(tab.form, parentName ? parentName + '[' + input.name.age + ']' : input.name.age); markArrayItemsAsDirty(tab.form, parentName ? parentName + '[' + input.name.dob + ']' : input.name.dob)"></app-form-toggle-v2>
                     </div>
 
                     <!-- Age -->
@@ -771,7 +772,7 @@
                         [min]="0"
                         [maxNumber]="Constants.DEFAULT_AGE_MAX_YEARS"
                         [max]="Constants.DEFAULT_AGE_MAX_YEARS"
-                        (ngModelChange)="input.value.age.years.set($event)"></app-form-number-v2>
+                        (ngModelChange)="input.value.age.years.set($event); ageNgModelDob.control.markAsDirty();"></app-form-number-v2>
 
                       <!-- Months -->
                       <ng-template
@@ -788,7 +789,7 @@
                           [min]="0"
                           [maxNumber]="11"
                           [max]="11"
-                          (ngModelChange)="input.value.age.months.set($event)"></app-form-number-v2>
+                          (ngModelChange)="input.value.age.months.set($event); ageNgModelDob.control.markAsDirty();"></app-form-number-v2>
                       </ng-template>
 
                       <!-- Type -->
@@ -801,11 +802,20 @@
                         [options]="ageTypeOptions"
                         (ngModelChange)="input.ageTypeYears ? input.value.age.months.set(0) : input.value.age.years.set(0)"></app-form-select-single-v2>
 
+                      <!-- Keep dob information -->
+                      <input
+                        #ageNgModelDob="ngModel"
+                        type="hidden"
+                        [ngModel]="input.value.dob.get()"
+                        [name]="parentName ? parentName + '[' + input.name.dob + ']' : input.name.dob" />
+
                     </div>
 
                     <!-- Dob -->
                     <ng-template
                       #dob>
+
+                      <!-- Date -->
                       <app-form-date-v2
                         fxFlex="calc(50% - 0.8rem)" fxFlex.xs="calc(100% - 0.8rem)"
                         [ngModel]="input.value.dob.get()"
@@ -813,7 +823,19 @@
                         placeholder="LNG_ENTITY_FIELD_LABEL_DOB"
                         [tooltip]="input.description?.dob"
                         [viewOnly]="isView || !input.value.dob.set"
-                        (ngModelChange)="input.value.dob.set($event)"></app-form-date-v2>
+                        (ngModelChange)="input.value.dob.set($event); ageNgModelYears.control.markAsDirty(); ageNgModelMonths.control.markAsDirty();"></app-form-date-v2>
+
+                      <!-- Keep age information -->
+                      <input
+                        #ageNgModelYears="ngModel"
+                        type="hidden"
+                        [ngModel]="input.value.age.years.get()"
+                        [name]="parentName ? parentName + '[' + input.name.age + '][years]' : (input.name.age + '[years]')" />
+                      <input
+                        #ageNgModelMonths="ngModel"
+                        type="hidden"
+                        [ngModel]="input.value.age.months.get()"
+                        [name]="parentName ? parentName + '[' + input.name.age + '][months]' : (input.name.age + '[months]')" />
                     </ng-template>
                   </div>
 
