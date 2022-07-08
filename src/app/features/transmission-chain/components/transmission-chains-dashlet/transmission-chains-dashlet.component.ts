@@ -499,15 +499,13 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   // show snapshot filters
   showSnapshotFilters: boolean = false;
   snapshotFilters: {
-    firstName?: string,
-    lastName?: string,
+    name?: string,
     labSeqResult?: string[],
     classification?: string[],
     occupation?: string[]
   } = {};
   snapshotFiltersClone: {
-    firstName?: string,
-    lastName?: string,
+    name?: string,
     labSeqResult?: string[],
     classification?: string[],
     occupation?: string[]
@@ -2561,11 +2559,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       });
 
       // cleanup
-      if (!usedMap['firstNameLNG_PAGE_GRAPH_SNAPSHOT_FILTER_FIRST_NAME_LABEL']) {
-        this.snapshotFilters.firstName = undefined;
-      }
-      if (!usedMap['lastNameLNG_PAGE_GRAPH_SNAPSHOT_FILTER_LAST_NAME_LABEL']) {
-        this.snapshotFilters.lastName = undefined;
+      if (!usedMap['nameLNG_ENTITY_FIELD_LABEL_NAME']) {
+        this.snapshotFilters.name = undefined;
       }
       if (!usedMap['labSeqResultLNG_PAGE_GRAPH_SNAPSHOT_FILTER_LAB_SEQ_RESULT_LABEL']) {
         this.snapshotFilters.labSeqResult = undefined;
@@ -3205,8 +3200,8 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         Constants.APP_PAGE.COT_GRAPH.value,
         [{
           type: V2AdvancedFilterType.TEXT,
-          field: 'firstName',
-          label: 'LNG_PAGE_GRAPH_SNAPSHOT_FILTER_FIRST_NAME_LABEL',
+          field: 'name',
+          label: 'LNG_ENTITY_FIELD_LABEL_NAME',
           allowedComparators: [
             _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.TEXT], { value: V2AdvancedFilterComparatorType.CONTAINS_TEXT })
           ],
@@ -3214,22 +3209,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             _qb,
             filter
           ) => {
-            this.snapshotFilters.firstName = filter.value ?
-              filter.value :
-              undefined;
-          }
-        }, {
-          type: V2AdvancedFilterType.TEXT,
-          field: 'lastName',
-          label: 'LNG_PAGE_GRAPH_SNAPSHOT_FILTER_LAST_NAME_LABEL',
-          allowedComparators: [
-            _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.TEXT], { value: V2AdvancedFilterComparatorType.CONTAINS_TEXT })
-          ],
-          filterBy: (
-            _qb,
-            filter
-          ) => {
-            this.snapshotFilters.lastName = filter.value ?
+            this.snapshotFilters.name = filter.value ?
               filter.value :
               undefined;
           }
