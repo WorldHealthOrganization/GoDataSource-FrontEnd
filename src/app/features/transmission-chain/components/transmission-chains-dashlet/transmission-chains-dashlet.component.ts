@@ -2797,14 +2797,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Page size changed
-     */
-  pageSizeChanged(pageSize: number) {
-    this.pageSize = pageSize;
-    this.mustLoadChain = true;
-  }
-
-  /**
      * Changed page
      */
   changedPage(): void {
