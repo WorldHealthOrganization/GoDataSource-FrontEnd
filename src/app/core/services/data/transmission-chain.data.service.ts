@@ -148,8 +148,7 @@ export class TransmissionChainDataService {
     chainGroup: TransmissionChainGroupModel,
     pageSize: number,
     snapshotFilters: {
-      firstName?: string,
-      lastName?: string,
+      name?: string,
       labSeqResult?: string[],
       classification?: string[],
       occupation?: string[]
@@ -157,8 +156,7 @@ export class TransmissionChainDataService {
   ): ITransmissionChainGroupPageModel[] {
     // must filter
     const mustFilterSnapshot: boolean = snapshotFilters && (
-      !!snapshotFilters.firstName ||
-      !!snapshotFilters.lastName || (
+      !!snapshotFilters.name || (
         snapshotFilters.labSeqResult &&
         snapshotFilters.labSeqResult.length > 0
       ) || (
@@ -182,8 +180,7 @@ export class TransmissionChainDataService {
     });
 
     // do we need to filter ?
-    let snapshotFiltersFirstName: string;
-    let snapshotFiltersLastName: string;
+    let snapshotFiltersName: string;
     let snapshotFiltersLabSeqResult: {
       [labSeqResult: string]: true
     };
@@ -195,8 +192,7 @@ export class TransmissionChainDataService {
     };
     if (mustFilterSnapshot) {
       // filter value
-      snapshotFiltersFirstName = snapshotFilters.firstName ? snapshotFilters.firstName.toLowerCase() : null;
-      snapshotFiltersLastName = snapshotFilters.lastName ? snapshotFilters.lastName.toLowerCase() : null;
+      snapshotFiltersName = snapshotFilters.name ? snapshotFilters.name.toLowerCase() : null;
 
       // seq results
       snapshotFiltersLabSeqResult = null;
@@ -247,11 +243,8 @@ export class TransmissionChainDataService {
       // filter
       if (
         mustFilterSnapshot && (
-          !snapshotFiltersFirstName ||
-          nodeData.model.name.toLowerCase().indexOf(snapshotFiltersFirstName) > -1
-        ) && (
-          !snapshotFiltersLastName ||
-          nodeData.model.name.toLowerCase().indexOf(snapshotFiltersLastName) > -1
+          !snapshotFiltersName ||
+          nodeData.model.name.toLowerCase().indexOf(snapshotFiltersName) > -1
         ) && (
           !snapshotFiltersLabSeqResult || (
             nodeData.labResults &&

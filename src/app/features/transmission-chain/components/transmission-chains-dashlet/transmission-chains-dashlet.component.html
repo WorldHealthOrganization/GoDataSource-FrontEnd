@@ -27,7 +27,7 @@
 
       <!-- Snapshots -->
       <app-form-select-single-v2
-        [disabled]="!showSnapshots"
+        *ngIf="showSnapshots"
         name="snapshotsList"
         [(ngModel)]="selectedSnapshot"
         [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_SNAPSHOTS' | translate"
@@ -39,6 +39,7 @@
 
       <!-- Create / Load snapshot -->
       <button
+        *ngIf="showSnapshots"
         type="button"
         mat-flat-button
         color="primary"
@@ -49,6 +50,7 @@
 
       <!-- Refresh chain -->
       <button
+        *ngIf="showSnapshots"
         type="button"
         mat-flat-button
         color="primary"
@@ -147,13 +149,26 @@
       </app-form-select-single-v2>
 
       <!-- Page size -->
-      <app-form-number-v2
-        [disabled]="!showSnapshots"
-        name="pageSize"
-        [(ngModel)]="pageSize"
-        [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE_SIZE' | translate"
-        (ngModelChange)="pageSizeChanged($event)">
-      </app-form-number-v2>
+      <div
+        fxLayout="row" fxLayoutGap="0.8rem" fxFlexAlign="center">
+        <!-- Change page size -->
+        <app-form-number-v2
+          fxFlex
+          [disabled]="!showSnapshots"
+          name="pageSize"
+          [(ngModel)]="pageSize"
+          [placeholder]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE_SIZE' | translate">
+        </app-form-number-v2>
+
+        <!-- Refresh -->
+        <button
+          fxGrow="0"
+          type="button"
+          mat-icon-button
+          (click)="mustLoadChain = true; loadChainsOfTransmission(undefined, 0)">
+          <mat-icon>refresh</mat-icon>
+        </button>
+      </div>
 
       <!-- Fast / Slow render -->
       <app-form-toggle-v2
