@@ -431,7 +431,7 @@
 
                 <!-- Item -->
                 <div
-                  *cdkVirtualFor="let item of input.items; templateCacheSize: 0; let sortItemIndex = index"
+                  *cdkVirtualFor="let item of input.items; templateCacheSize: 0"
                   cdkDrag cdkDragLockAxis="y" [cdkDragData]="item" (cdkDragStarted)="dragStarted($event)"
                   class="gd-app-side-dialog-v2-content-middle-item-input-sort-list-item"
                   fxLayout="row" fxLayoutAlign="start center"
@@ -449,7 +449,7 @@
                   <!-- Label -->
                   <div
                     class="gd-app-side-dialog-v2-content-middle-item-input-sort-list-item-label">
-                    {{sortItemIndex + 1}}. {{item.label | translate}}
+                    {{item.label | translate}}
                   </div>
 
                 </div>
