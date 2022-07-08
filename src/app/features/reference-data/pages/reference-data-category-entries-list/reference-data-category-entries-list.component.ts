@@ -1,6 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -19,6 +19,7 @@ import { IconModel } from '../../../../core/models/icon.model';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSortList, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 
 @Component({
   selector: 'app-reference-data-category-entries-list',
@@ -515,6 +516,9 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
    */
   private orderEntries(): void {
     // show dialog
+    let idToItemMap: {
+      [id: string]: ReferenceDataEntryModel
+    };
     this.dialogV2Service
       .showSideDialog({
         title: {
@@ -607,11 +611,16 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
 
               // create list of items that we need to sort
               const items: ILabelValuePairModel[] = [];
+              idToItemMap = {};
               entries.forEach((item) => {
+                // add option
                 items.push({
                   label: item.value,
                   value: item.id
                 });
+
+                // map
+                idToItemMap[item.id] = item;
               });
 
               // update sort items
@@ -619,12 +628,6 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
 
               // hide loading
               handler.loading.hide();
-
-              // update order
-              // #TODO
-
-              // refresh list
-              // #TODO
             });
         }
       })
@@ -637,6 +640,80 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
 
         // close dialog
         response.handler.hide();
+
+        // determine what we need to save
+        const itemsToUpdate: ReferenceDataEntryModel[] = [];
+        (response.data.map.sortItems as IV2SideDialogConfigInputSortList).items.forEach((item, index) => {
+          // nothing to update ?
+          const order: number = index + 1;
+          if (idToItemMap[item.value].order === order) {
+            return;
+          }
+
+          // must update
+          idToItemMap[item.value].order = order;
+          itemsToUpdate.push(idToItemMap[item.value]);
+        });
+
+        // nothing to update ?
+        if (itemsToUpdate.length < 1) {
+          // nothing to update
+          this.toastV2Service.success('LNG_FORM_WARNING_NO_CHANGES');
+
+          // finished
+          return;
+        }
+
+        // show loading
+        const loading = this.dialogV2Service.showLoadingDialog();
+
+        // create requests to update order
+        const requests: Observable<ReferenceDataEntryModel>[] = [];
+        itemsToUpdate.forEach((item) => {
+          requests.push(this.referenceDataDataService
+            .modifyEntry(
+              item.id, {
+                order: item.order
+              }
+            )
+          );
+        });
+
+        // update order
+        const nextRequest = () => {
+          // finished ?
+          if (requests.length < 1) {
+            // hide loading
+            loading.close();
+
+            // refresh list
+            this.needsRefreshList();
+
+            // finished
+            return;
+          }
+
+          // execute 5 requests at a time
+          forkJoin(requests.splice(0, 5))
+            .pipe(
+              catchError((err) => {
+                // error
+                this.toastV2Service.error(err);
+
+                // hide loading
+                loading.close();
+
+                // send it further
+                return throwError(err);
+              })
+            )
+            .subscribe(() => {
+              nextRequest();
+            });
+        };
+
+        // start updating data
+        nextRequest();
       });
   }
 }
