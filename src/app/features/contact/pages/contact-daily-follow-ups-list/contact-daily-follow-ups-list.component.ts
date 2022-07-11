@@ -1018,10 +1018,27 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                 },
                 visible: (item: FollowUpModel): boolean => {
                   return !item.deleted &&
-                    // definitions.entityData.type === EntityType.CONTACT &&
                     !this.caseData?.id &&
                     this.selectedOutbreakIsActive &&
                     FollowUpModel.canModify(this.authUser);
+                }
+              },
+
+              // View follow-ups
+              {
+                label: {
+                  get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_VIEW_FOLLOW_UPS_FORM_BUTTON'
+                },
+                action: {
+                  link: (item: FollowUpModel): string[] => {
+                    return ['/contacts', 'contact-related-follow-ups', item.personId];
+                  }
+                },
+                visible: (item: FollowUpModel): boolean => {
+                  return !item.deleted &&
+                    !this.caseData?.id &&
+                    this.selectedOutbreakIsActive &&
+                    FollowUpModel.canList(this.authUser);
                 }
               }
             ]
