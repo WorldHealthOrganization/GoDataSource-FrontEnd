@@ -202,6 +202,9 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
           .subscribe(() => {
             // emit
             this.onReverseRelationshipPersons();
+
+            // hide loading
+            loading.close();
           });
       });
   }
