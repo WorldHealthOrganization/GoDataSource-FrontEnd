@@ -1027,7 +1027,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               // View follow-ups
               {
                 label: {
-                  get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_VIEW_FOLLOW_UPS_FORM_BUTTON'
+                  get: (item: FollowUpModel) => this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_VIEW_PERSON_FOLLOW_UPS_FORM_BUTTON', { name: item.person.name })
                 },
                 action: {
                   link: (item: FollowUpModel): string[] => {
@@ -1037,7 +1037,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                 visible: (item: FollowUpModel): boolean => {
                   return !item.deleted &&
                     !this.caseData?.id &&
-                    this.selectedOutbreakIsActive &&
                     FollowUpModel.canList(this.authUser);
                 }
               }
