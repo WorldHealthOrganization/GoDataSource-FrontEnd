@@ -1034,6 +1034,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                     return ['/contacts', 'contact-related-follow-ups', item.personId];
                   }
                 },
+                // #TODO - does it work for both contacts and cases?
+                // #TODO columns must be links
                 visible: (item: FollowUpModel): boolean => {
                   return !item.deleted &&
                     FollowUpModel.canList(this.authUser);
