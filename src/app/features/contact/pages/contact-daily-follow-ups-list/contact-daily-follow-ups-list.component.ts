@@ -1036,7 +1036,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                 },
                 visible: (item: FollowUpModel): boolean => {
                   return !item.deleted &&
-                    !this.caseData?.id &&
                     FollowUpModel.canList(this.authUser);
                 }
               }
