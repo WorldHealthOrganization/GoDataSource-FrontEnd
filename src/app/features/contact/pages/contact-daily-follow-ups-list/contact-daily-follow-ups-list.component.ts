@@ -32,16 +32,22 @@ import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/c
 import { IV2FilterDate, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import {
-  IV2SideDialogConfigButtonType, IV2SideDialogConfigInputDate,
-  IV2SideDialogConfigInputDateRange, IV2SideDialogConfigInputNumber,
-  IV2SideDialogConfigInputSingleDropdown, IV2SideDialogConfigInputText,
-  IV2SideDialogConfigInputToggle, IV2SideDialogConfigInputToggleCheckbox,
-  IV2SideDialogData, V2SideDialogConfigInputType
+  IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigInputDate,
+  IV2SideDialogConfigInputDateRange,
+  IV2SideDialogConfigInputNumber,
+  IV2SideDialogConfigInputSingleDropdown,
+  IV2SideDialogConfigInputText,
+  IV2SideDialogConfigInputToggle,
+  IV2SideDialogConfigInputToggleCheckbox,
+  IV2SideDialogData,
+  V2SideDialogConfigInputType
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { FollowUpPage } from '../../typings/follow-up-page';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { IV2DateRange } from '../../../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
+import { EntityType } from '../../../../core/models/entity-type';
 
 @Component({
   selector: 'app-daily-follow-ups-list',
@@ -151,6 +157,19 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH,
           relationshipKey: 'contact'
+        },
+        link: (item: FollowUpModel) => {
+          return item.person && (
+            (
+              item.person.type === EntityType.CASE &&
+              CaseModel.canView(this.authUser)
+            ) || (
+              item.person.type === EntityType.CONTACT &&
+              ContactModel.canView(this.authUser)
+            )
+          ) ?
+            `/${item.person.type === EntityType.CASE ? 'cases' : 'contacts'}/${item.person.id}/view` :
+            undefined;
         }
       },
       {
@@ -165,6 +184,19 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH,
           relationshipKey: 'contact'
+        },
+        link: (item: FollowUpModel) => {
+          return item.person && (
+            (
+              item.person.type === EntityType.CASE &&
+              CaseModel.canView(this.authUser)
+            ) || (
+              item.person.type === EntityType.CONTACT &&
+              ContactModel.canView(this.authUser)
+            )
+          ) ?
+            `/${item.person.type === EntityType.CASE ? 'cases' : 'contacts'}/${item.person.id}/view` :
+            undefined;
         }
       },
       {
@@ -826,7 +858,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                 visible: (item: FollowUpModel): boolean => {
                   // visible only if at least one of the previous...
                   return !item.deleted &&
-                    !this.caseData?.id &&
+                    item.person?.type !== EntityType.CASE &&
                     this.selectedOutbreakIsActive &&
                     FollowUpModel.canModify(this.authUser) &&
                     !Constants.isDateInTheFuture(item.date);
@@ -929,7 +961,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                 },
                 visible: (item: FollowUpModel): boolean => {
                   return !item.deleted &&
-                    !this.caseData?.id &&
+                    item.person?.type !== EntityType.CASE &&
                     this.selectedOutbreakIsActive &&
                     FollowUpModel.canModify(this.authUser);
                 }
@@ -1018,10 +1050,35 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                 },
                 visible: (item: FollowUpModel): boolean => {
                   return !item.deleted &&
-                    // definitions.entityData.type === EntityType.CONTACT &&
-                    !this.caseData?.id &&
+                    item.person?.type !== EntityType.CASE &&
                     this.selectedOutbreakIsActive &&
                     FollowUpModel.canModify(this.authUser);
+                }
+              },
+
+              // Divider
+              {
+                visible: (item: FollowUpModel) => {
+                  return !item.deleted &&
+                    this.selectedOutbreakIsActive &&
+                    FollowUpModel.canModify(this.authUser) &&
+                    FollowUpModel.canList(this.authUser);
+                }
+              },
+
+              // View follow-ups
+              {
+                label: {
+                  get: (item: FollowUpModel) => this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_VIEW_PERSON_FOLLOW_UPS_FORM_BUTTON', { name: item.person.name })
+                },
+                action: {
+                  link: (item: FollowUpModel): string[] => {
+                    return ['/contacts', 'contact-related-follow-ups', item.personId];
+                  }
+                },
+                visible: (item: FollowUpModel): boolean => {
+                  return !item.deleted &&
+                    FollowUpModel.canList(this.authUser);
                 }
               }
             ]
