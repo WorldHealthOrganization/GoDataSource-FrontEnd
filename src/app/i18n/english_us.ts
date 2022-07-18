@@ -11,7 +11,8 @@ export const EnglishUsLang = {
      */
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
-    'LNG_PAGE_LIST_FOLLOW_UPS_VIEW_PERSON_FOLLOW_UPS_FORM_BUTTON': 'View "{{name}}" follow-ups'
+    'LNG_PAGE_LIST_FOLLOW_UPS_VIEW_PERSON_FOLLOW_UPS_FORM_BUTTON': 'View "{{name}}" follow-ups',
+    'LNG_PAGE_TEAMS_WORKLOAD_DATE_LABEL': 'Date'
 
 
     /**

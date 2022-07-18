@@ -1,3 +1,4 @@
+import { TeamDataResolver } from './../../core/services/resolvers/data/team.resolver';
 import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule, Route } from '@angular/router';
 import * as fromPages from './pages';
@@ -82,6 +83,10 @@ const routes: Routes = [
       permissions: [
         PERMISSION.TEAM_LIST_WORKLOAD
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      team: TeamDataResolver
     }
   }
 ];
