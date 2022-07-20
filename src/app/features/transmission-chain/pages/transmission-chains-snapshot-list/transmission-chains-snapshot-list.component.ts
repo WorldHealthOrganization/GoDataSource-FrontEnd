@@ -73,21 +73,10 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent<CotSn
       },
       {
         field: 'startDate',
-        label: 'LNG_ASYNC_COT_FIELD_LABEL_START_DATE',
+        label: 'LNG_ASYNC_COT_FIELD_LABEL_SNAPSHOT_DATETIME',
         sortable: true,
         format: {
-          type: V2ColumnFormat.DATE
-        },
-        filter: {
-          type: V2FilterType.DATE_RANGE
-        }
-      },
-      {
-        field: 'endDate',
-        label: 'LNG_ASYNC_COT_FIELD_LABEL_END_DATE',
-        sortable: true,
-        format: {
-          type: V2ColumnFormat.DATE
+          type: V2ColumnFormat.DATETIME
         },
         filter: {
           type: V2FilterType.DATE_RANGE
@@ -279,7 +268,6 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent<CotSn
       'id',
       'name',
       'startDate',
-      'endDate',
       'status',
       'sizeBytes',
       'createdBy'

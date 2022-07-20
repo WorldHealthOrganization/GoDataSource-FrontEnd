@@ -2,24 +2,23 @@ import * as _ from 'lodash';
 import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, FormControl } from '@angular/forms';
 import { GroupBase, GroupDirtyFields } from '../../xt-forms/core';
-import { Observable } from 'rxjs';
 import { ClusterDataService } from '../../../core/services/data/cluster.data.service';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
-import { ReferenceDataCategory } from '../../../core/models/reference-data.model';
-import { ReferenceDataDataService } from '../../../core/services/data/reference-data.data.service';
-import { LabelValuePair } from '../../../core/models/label-value-pair';
+import { ReferenceDataEntryModel } from '../../../core/models/reference-data.model';
 import { Constants } from '../../../core/models/constants';
-import { share } from 'rxjs/operators';
 import { moment } from '../../../core/helperClasses/x-moment';
 import { RelationshipModel } from '../../../core/models/entity-and-relationship.model';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { ActivatedRoute } from '@angular/router';
+import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model';
+import { IResolverV2ResponseModel } from '../../../core/services/resolvers/data/models/resolver-response.model';
 
 @Component({
   selector: 'app-form-relationship-quick',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './form-relationship-quick.component.html',
-  styleUrls: ['./form-relationship-quick.component.less'],
+  styleUrls: ['./form-relationship-quick.component.scss'],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
     useExisting: FormRelationshipQuickComponent,
@@ -30,12 +29,12 @@ export class FormRelationshipQuickComponent extends GroupBase<RelationshipModel>
   @Input() disabled: boolean = false;
   @Input() required: boolean = false;
 
-  certaintyLevelOptions$: Observable<any[]>;
-  exposureTypeOptions$: Observable<any[]>;
-  exposureFrequencyOptions$: Observable<any[]>;
-  exposureDurationOptions$: Observable<any[]>;
-  socialRelationshipOptions$: Observable<any[]>;
-  clusterOptions$: Observable<any[]>;
+  certaintyLevelOptions: ILabelValuePairModel[];
+  exposureTypeOptions: ILabelValuePairModel[];
+  exposureFrequencyOptions: ILabelValuePairModel[];
+  exposureDurationOptions: ILabelValuePairModel[];
+  socialRelationshipOptions: ILabelValuePairModel[];
+  clusterOptions: ILabelValuePairModel[];
 
   currentDate = Constants.getCurrentDate();
 
@@ -52,9 +51,16 @@ export class FormRelationshipQuickComponent extends GroupBase<RelationshipModel>
     @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
     private clusterDataService: ClusterDataService,
     private outbreakDataService: OutbreakDataService,
-    private referenceDataDataService: ReferenceDataDataService
+    private activatedRoute: ActivatedRoute
   ) {
     super(controlContainer, validators, asyncValidators);
+
+    // data
+    this.certaintyLevelOptions = (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options;
+    this.exposureTypeOptions = (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options;
+    this.exposureFrequencyOptions = (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options;
+    this.exposureDurationOptions = (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options;
+    this.socialRelationshipOptions = (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options;
   }
 
   /**
@@ -64,13 +70,6 @@ export class FormRelationshipQuickComponent extends GroupBase<RelationshipModel>
     // init value
     this.value = new RelationshipModel(this.value);
 
-    // reference data
-    this.certaintyLevelOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL).pipe(share());
-    this.exposureTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_TYPE);
-    this.exposureFrequencyOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_FREQUENCY);
-    this.exposureDurationOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION);
-    this.socialRelationshipOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION);
-
     // subscribe to the Selected Outbreak
     this.outbreakSubscriber = this.outbreakDataService
       .getSelectedOutbreakSubject()
@@ -78,7 +77,14 @@ export class FormRelationshipQuickComponent extends GroupBase<RelationshipModel>
         this.selectedOutbreak = selectedOutbreak;
         if (this.selectedOutbreak) {
           this.getMinimumDate();
-          this.clusterOptions$ = this.clusterDataService.getClusterList(this.selectedOutbreak.id);
+          this.clusterDataService
+            .getClusterList(this.selectedOutbreak.id)
+            .subscribe((data) => {
+              this.clusterOptions = data.map((item) => ({
+                label: item.name,
+                value: item.id
+              }));
+            });
         }
       });
   }
@@ -94,17 +100,6 @@ export class FormRelationshipQuickComponent extends GroupBase<RelationshipModel>
   ngAfterViewInit() {
     // call parent
     super.ngAfterViewInit();
-
-    setTimeout(() => {
-      // set default values on relationship
-      this.certaintyLevelOptions$
-        .subscribe((options: LabelValuePair[]) => {
-          if (!_.isEmpty(options) && _.isEmpty(this.value.certaintyLevelId)) {
-            // get the last option selected by default (high)
-            this.value.certaintyLevelId = Constants.CERTAINITY_LEVEL.HIGH;
-          }
-        });
-    });
   }
 
   /**

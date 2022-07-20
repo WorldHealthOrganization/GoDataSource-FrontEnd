@@ -18,6 +18,7 @@ import { AppFormEditQuestionnaireV2Component } from './app-form-edit-questionnai
 import { AppFormFillQuestionnaireV2Component } from './app-form-fill-questionnaire-v2/app-form-fill-questionnaire-v2.component';
 import { AppFormTimepickerV2Component } from './app-form-timepicker-v2/app-form-timepicker-v2.component';
 import { AppFormColorV2Component } from './app-form-color-v2/app-form-color-v2.component';
+import { AppFormNgxWigV2Component } from './app-form-ngx-wig-v2/app-form-ngx-wig-v2.component';
 
 export const components: any[] = [
   AppFormCheckboxV2Component,
@@ -27,6 +28,7 @@ export const components: any[] = [
   AppFormEditQuestionnaireV2Component,
   AppFormFillQuestionnaireV2Component,
   AppFormInputV2Component,
+  AppFormNgxWigV2Component,
   AppFormNumberRangeV2Component,
   AppFormNumberV2Component,
   AppFormPasswordV2Component,

@@ -1,30 +1,35 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { NgForm } from '@angular/forms';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import * as _ from 'lodash';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
-import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
-import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import * as moment from 'moment';
+import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 
 @Component({
   selector: 'app-create-entity-relationship-bulk',
   templateUrl: './create-entity-relationship-bulk.component.html'
 })
-export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges implements OnInit {
-
-  // breadcrumbs: BreadcrumbItemModel[] = [];
+export class CreateEntityRelationshipBulkComponent extends CreateViewModifyComponent<RelationshipModel> implements OnDestroy {
+  // entity related data
+  private _entity: CaseModel | ContactModel | EventModel;
+  entityType: EntityType;
+  entityId: string;
+  relationshipType: RelationshipType;
+  private _relationship: RelationshipModel = new RelationshipModel();
 
   // Entities Map for specific data
   entityMap = {
@@ -46,80 +51,74 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
     }
   };
 
-  // selected outbreak
-  selectedOutbreak: OutbreakModel;
-  // route params
-  entityType: EntityType;
-  entityId: string;
-  entity: CaseModel | ContactModel | EventModel;
   // route data
-  relationshipType: RelationshipType;
-
   selectedSourceIds: string[] = [];
   selectedTargetIds: string[] = [];
 
-  relationship: RelationshipModel = new RelationshipModel();
+  // current date
+  currentDate = this.Constants.getCurrentDate();
+
+  // get route path
+  get relationshipTypeRoutePath(): string {
+    return this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures';
+  }
 
   constructor(
     private router: Router,
-    private route: ActivatedRoute,
+    private activatedRoute: ActivatedRoute,
     private entityDataService: EntityDataService,
-    private outbreakDataService: OutbreakDataService,
-    private toastV2Service: ToastV2Service,
-    private formHelper: FormHelperService,
-    private relationshipDataService: RelationshipDataService
+    private relationshipDataService: RelationshipDataService,
+    protected toastV2Service: ToastV2Service,
+    authDataService: AuthDataService,
+    renderer2: Renderer2,
+    redirectService: RedirectService
   ) {
-    super();
-  }
+    super(
+      toastV2Service,
+      renderer2,
+      redirectService,
+      activatedRoute,
+      authDataService
+    );
 
-  ngOnInit() {
+    // disable select outbreak
+    TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = true;
+
     // get source and target persons from query params
-    this.route.queryParams
-      .subscribe((queryParams: { selectedSourceIds, selectedTargetIds }) => {
-        if (_.isEmpty(queryParams.selectedSourceIds) || _.isEmpty(queryParams.selectedTargetIds)) {
-          this.toastV2Service.error('LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES');
-
-          // No source or target entities selected; navigate back to exposures list
-          this.disableDirtyConfirm();
-          this.router.navigate(['../..']);
-        } else {
-          this.selectedSourceIds = JSON.parse(queryParams.selectedSourceIds);
-          this.selectedTargetIds = JSON.parse(queryParams.selectedTargetIds);
-        }
-      });
+    this.selectedSourceIds = JSON.parse(this.activatedRoute.snapshot.queryParams.selectedSourceIds);
+    this.selectedTargetIds = JSON.parse(this.activatedRoute.snapshot.queryParams.selectedTargetIds);
 
     // get relationship type
-    this.route.data.subscribe((routeData) => {
-      this.relationshipType = routeData.relationshipType;
-
-      this.initializeBreadcrumbs();
-    });
+    this.relationshipType = this.activatedRoute.snapshot.data.relationshipType;
 
     // get person type and ID from route params
-    this.route.params
-      .subscribe((params: { entityType, entityId }) => {
-        this.entityType = params.entityType;
-        this.entityId = params.entityId;
-
-        this.loadPerson();
-      });
-
-    // get selected outbreak
-    this.outbreakDataService
-      .getSelectedOutbreak()
-      .subscribe((selectedOutbreak: OutbreakModel) => {
-        this.selectedOutbreak = selectedOutbreak;
-
-        this.loadPerson();
-      });
+    this.entityType = this.activatedRoute.snapshot.params.entityType;
+    this.entityId = this.activatedRoute.snapshot.params.entityId;
   }
 
-  private loadPerson() {
-    if (
-      this.entityType &&
-            this.entityId &&
-            this.selectedOutbreak
-    ) {
+  /**
+   * Release resources
+   */
+  ngOnDestroy(): void {
+    // parent
+    super.onDestroy();
+
+    // enable select outbreak
+    TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = false;
+  }
+
+  /**
+   * Create new item model if needed
+   */
+  protected createNewItem(): RelationshipModel {
+    return null;
+  }
+
+  /**
+   * Retrieve item
+   */
+  protected retrieveItem(): Observable<RelationshipModel> {
+    return new Observable<RelationshipModel>((subscriber) => {
       // get person data
       this.entityDataService
         .getEntity(this.entityType, this.selectedOutbreak.id, this.entityId)
@@ -134,94 +133,356 @@ export class CreateEntityRelationshipBulkComponent extends ConfirmOnFormChanges 
           })
         )
         .subscribe((entityData: CaseModel | ContactModel | EventModel) => {
-          this.entity = entityData;
+          this._entity = entityData;
 
-          this.initializeBreadcrumbs();
+          // finished - no item to edit
+          subscriber.next(null);
+          subscriber.complete();
         });
-    }
-  }
-
-  private initializeBreadcrumbs() {
-    // if (
-    //   this.relationshipType &&
-    //         this.entity
-    // ) {
-    //   // add new breadcrumb: page title
-    //   const relationshipsListPageTitle = this.relationshipType === RelationshipType.EXPOSURE ?
-    //     'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE' :
-    //     'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE';
-    //
-    //   const assignRelationshipsPageTitle = this.relationshipType === RelationshipType.EXPOSURE ?
-    //     'LNG_PAGE_LIST_ENTITY_ASSIGN_EXPOSURES_TITLE' :
-    //     'LNG_PAGE_LIST_ENTITY_ASSIGN_CONTACTS_TITLE';
-    //
-    //   this.breadcrumbs = [
-    //     new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
-    //     new BreadcrumbItemModel(
-    //       this.entity.name,
-    //       `${this.entityMap[this.entityType].link}/${this.entityId}/view`
-    //     ),
-    //     new BreadcrumbItemModel(
-    //       relationshipsListPageTitle,
-    //       `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`
-    //     ),
-    //     new BreadcrumbItemModel(
-    //       assignRelationshipsPageTitle,
-    //       `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/share`,
-    //       false,
-    //       {
-    //         selectedTargetIds: JSON.stringify(this.selectedTargetIds)
-    //       }
-    //     ),
-    //     new BreadcrumbItemModel('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_TITLE', null, true)
-    //   ];
-    // }
-  }
-
-  get relationshipTypeRoutePath(): string {
-    return this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures';
+    });
   }
 
   /**
-     * craete relationships between all the entities from sources and all entities from targets
-     * the relationships will have the same data
-     * @param {NgForm} form
-     */
-  createNewRelationships(form: NgForm) {
-    if (!this.formHelper.validateForm(form)) {
-      return;
+   * Data initialized
+   */
+  protected initializedData(): void { }
+
+  /**
+   * Initialize page title
+   */
+  protected initializePageTitle(): void {
+    // add info accordingly to page type
+    if (this.isModify) {
+      this.pageTitle = 'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_TITLE';
+      this.pageTitleData = undefined;
     }
-
-    // which are sources and which are targets (based on relationship type) ?
-    let relationshipSources = this.selectedSourceIds;
-    let relationshipTargets = this.selectedTargetIds;
-    if (this.relationshipType === RelationshipType.EXPOSURE) {
-      relationshipTargets = this.selectedSourceIds;
-      relationshipSources = this.selectedTargetIds;
-    }
-
-    // bulk insert relationships
-    const relationshipsBulkData = {
-      sources: relationshipSources,
-      targets: relationshipTargets,
-      relationship: this.relationship
-    };
-    this.relationshipDataService
-      .createBulkRelationships(this.selectedOutbreak.id, relationshipsBulkData)
-      .pipe(
-        catchError((err) => {
-          this.toastV2Service.error(err);
-          return throwError(err);
-        })
-      )
-      .subscribe(() => {
-        this.toastV2Service.success('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_SUCCESS_MESSAGE');
-
-        // navigate back to root person's relationships list
-        this.disableDirtyConfirm();
-        this.router.navigate([`/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`]);
-      });
-
   }
 
+  /**
+   * Initialize tabs
+   */
+  protected initializeTabs(): void {
+    this.tabData = {
+      // tabs
+      tabs: [
+        // Detail
+        this.initializeDetailTab()
+      ],
+
+      // create details
+      create: null,
+
+      // buttons
+      buttons: this.initializeButtons(),
+
+      // create or update
+      createOrUpdate: this.initializeProcessData(),
+      redirectAfterCreateUpdate: () => {
+        // update - redirect to view
+        this.router.navigate([`/relationships/${ this.entityType }/${ this.entityId }/${ this.relationshipTypeRoutePath }`]);
+      }
+    };
+  }
+
+  /**
+   * Initialize expand list column renderer fields
+   */
+  protected initializeExpandListColumnRenderer(): void { }
+
+  /**
+   * Initialize expand list query fields
+   */
+  protected initializeExpandListQueryFields(): void { }
+
+  /**
+   * Initialize expand list advanced filters
+   */
+  protected initializeExpandListAdvancedFilters(): void { }
+
+  /**
+   * Refresh expand list
+   */
+  refreshExpandList(): void {}
+
+  /**
+   * Initialize process data
+   */
+  private initializeProcessData(): ICreateViewModifyV2CreateOrUpdate {
+    return (
+      _type,
+      _data,
+      finished
+    ) => {
+      // something went wrong ?
+      if (this.selectedSourceIds.length < 1 || this.selectedTargetIds.length < 1) {
+        // show error
+        this.toastV2Service.error('LNG_PAGE_CREATE_ENTITY_ERROR_NO_SELECTED_ENTITIES');
+
+        // don't do anything
+        return;
+      }
+
+      // which are sources and which are targets (based on relationship type) ?
+      let relationshipSources = this.selectedSourceIds;
+      let relationshipTargets = this.selectedTargetIds;
+      if (this.relationshipType === RelationshipType.EXPOSURE) {
+        relationshipTargets = this.selectedSourceIds;
+        relationshipSources = this.selectedTargetIds;
+      }
+
+      // bulk insert relationships
+      const relationshipsBulkData = {
+        sources: relationshipSources,
+        targets: relationshipTargets,
+        relationship: this._relationship
+      };
+      this.relationshipDataService
+        .createBulkRelationships(this.selectedOutbreak.id, relationshipsBulkData)
+        .pipe(
+          // handle error
+          catchError((err) => {
+            // show error
+            finished(err, undefined);
+
+            // finished
+            return throwError(err);
+          }),
+
+          // should be the last pipe
+          takeUntil(this.destroyed$)
+        )
+        .subscribe(() => {
+          this.toastV2Service.success('LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_SUCCESS_MESSAGE');
+
+          // finished with success
+          finished(undefined, null);
+        });
+    };
+  }
+
+  /**
+   * Initialize buttons
+   */
+  private initializeButtons(): ICreateViewModifyV2Buttons {
+    return {
+      view: null,
+      modify: {
+        link: {
+          link: () => [`/relationships/${ this.entityType }/${ this.entityId }/${ this.relationshipTypeRoutePath }`]
+        },
+        visible: () => RelationshipModel.canModify(this.authUser)
+      },
+      createCancel: null,
+      viewCancel: null,
+      modifyCancel: {
+        link: {
+          link: () => [`/relationships/${ this.entityType }/${ this.entityId }/${ this.relationshipTypeRoutePath }`]
+        }
+      },
+      quickActions: null
+    };
+  }
+
+  /**
+   * Details tabs
+   */
+  private initializeDetailTab(): ICreateViewModifyV2Tab {
+    // modify ?
+    return {
+      // Details
+      type: CreateViewModifyV2TabInputType.TAB,
+      label: 'LNG_COMMON_LABEL_DETAILS',
+      sections: [
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_TAB_RELATIONSHIPS',
+          inputs: [
+            // inputs
+            {
+              type: CreateViewModifyV2TabInputType.DATE,
+              name: 'dateOfFirstContact',
+              placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT',
+              description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT_DESCRIPTION',
+              maxDate: this.currentDate,
+              minDate: this.selectedOutbreak && this.selectedOutbreak.startDate ?
+                moment(this.selectedOutbreak.startDate).subtract(6, 'months').format() :
+                undefined,
+              value: {
+                get: () => this._relationship.dateOfFirstContact,
+                set: (value) => this._relationship.dateOfFirstContact = value
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.DATE,
+              name: 'contactDate',
+              placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE',
+              description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_DESCRIPTION',
+              maxDate: this.currentDate,
+              minDate: this.selectedOutbreak && this.selectedOutbreak.startDate ?
+                moment(this.selectedOutbreak.startDate).subtract(6, 'months').format() :
+                undefined,
+              value: {
+                get: () => this._relationship.contactDate,
+                set: (value) => this._relationship.contactDate = value
+              },
+              validators: {
+                required: () => true
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'contactDateEstimated',
+              placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED',
+              description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED_DESCRIPTION',
+              value: {
+                get: () => this._relationship.contactDateEstimated,
+                set: (value) => this._relationship.contactDateEstimated = value
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'certaintyLevelId',
+              placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
+              description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL_DESCRIPTION',
+              options: this.activatedRoute.snapshot.data.certainty.options,
+              value: {
+                get: () => {
+                  this._relationship.certaintyLevelId = this.activatedRoute.snapshot.data.certainty.options[0].value;
+                  return this._relationship.certaintyLevelId;
+                },
+                set: (value) => this._relationship.certaintyLevelId = value
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'exposureTypeId',
+              placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE',
+              description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE_DESCRIPTION',
+              options: this.activatedRoute.snapshot.data.exposureType.options,
+              value: {
+                get: () => this._relationship.exposureTypeId,
+                set: (value) => this._relationship.exposureTypeId = value
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'exposureFrequencyId',
+              placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY',
+              description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY_DESCRIPTION',
+              options: this.activatedRoute.snapshot.data.exposureFrequency.options,
+              value: {
+                get: () => this._relationship.exposureFrequencyId,
+                set: (value) => this._relationship.exposureFrequencyId = value
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'exposureDurationId',
+              placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION',
+              description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION_DESCRIPTION',
+              options: this.activatedRoute.snapshot.data.exposureFrequency.options,
+              value: {
+                get: () => this._relationship.exposureDurationId,
+                set: (value) => this._relationship.exposureDurationId = value
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'socialRelationshipTypeId',
+              placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION',
+              description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DESCRIPTION',
+              options: this.activatedRoute.snapshot.data.context.options,
+              value: {
+                get: () => this._relationship.socialRelationshipTypeId,
+                set: (value) => this._relationship.socialRelationshipTypeId = value
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'clusterId',
+              placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER',
+              description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER_DESCRIPTION',
+              options: this.activatedRoute.snapshot.data.cluster.options,
+              value: {
+                get: () => this._relationship.clusterId,
+                set: (value) => this._relationship.clusterId = value
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.TEXT,
+              name: 'socialRelationshipDetail',
+              placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP',
+              description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP_DESCRIPTION',
+              value: {
+                get: () => this._relationship.socialRelationshipDetail,
+                set: (value) => this._relationship.socialRelationshipDetail = value
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.TEXTAREA,
+              name: 'comment',
+              placeholder: () => 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
+              description: () => 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT_DESCRIPTION',
+              value: {
+                get: () => this._relationship.comment,
+                set: (value) => this._relationship.comment = value
+              }
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  protected initializeBreadcrumbs() {
+    // reset breadcrumbs
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
+        }
+      },
+      {
+        label: this.entityMap[this.entityType].label,
+        action: {
+          link: [this.entityMap[this.entityType].link]
+        }
+      },
+      {
+        label: this._entity.name,
+        action: {
+          link: [`${ this.entityMap[this.entityType].link }/${ this.entityId }/view`]
+        }
+      },
+      {
+        label: this.relationshipType === RelationshipType.EXPOSURE ?
+          'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE' :
+          'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE',
+        action: {
+          link: [`/relationships/${ this.entityType }/${ this.entityId }/${ this.relationshipTypeRoutePath }`]
+        }
+      },
+      {
+        label: this.relationshipType === RelationshipType.EXPOSURE ?
+          'LNG_PAGE_LIST_ENTITY_ASSIGN_EXPOSURES_TITLE' :
+          'LNG_PAGE_LIST_ENTITY_ASSIGN_CONTACTS_TITLE',
+        action: {
+          link: [`/relationships/${ this.entityType }/${ this.entityId }/${ this.relationshipTypeRoutePath }/share`],
+          linkQueryParams: {
+            selectedTargetIds: JSON.stringify(this.selectedTargetIds)
+          }
+        }
+      },
+      {
+        label: 'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_BULK_TITLE',
+        action: null
+      }
+    ];
+  }
 }

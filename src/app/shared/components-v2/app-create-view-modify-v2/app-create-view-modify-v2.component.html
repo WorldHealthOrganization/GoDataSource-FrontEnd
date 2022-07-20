@@ -385,6 +385,10 @@
                   [class.gd-create-view-modify-bottom-section-content-input-has-edit-questionnaire]="input.type === CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE"
                   [class.gd-create-view-modify-bottom-section-content-input-has-fill-questionnaire]="input.type === CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE"
                   [class.gd-create-view-modify-bottom-section-content-input-has-select-groups]="input.type === CreateViewModifyV2TabInputType.SELECT_GROUPS"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-wysiwyg]="input.type === CreateViewModifyV2TabInputType.WYSIWYG"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-label]="input.type === CreateViewModifyV2TabInputType.LABEL"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-link-list]="input.type === CreateViewModifyV2TabInputType.LINK_LIST"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-label-list]="input.type === CreateViewModifyV2TabInputType.LABEL_LIST"
                   [ngSwitch]="input.type">
 
                   <!-- Edit questionnaire -->
@@ -431,6 +435,17 @@
                     [checkObject]="!isView && input.validators?.notInObject ? input.validators?.notInObject()?.values : undefined"
                     [checkErrorMsg]="!isView && input.validators?.notInObject ? input.validators?.notInObject()?.err : undefined"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-input-v2>
+
+                  <!-- WYSIWYG -->
+                  <app-form-ngx-wig-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.WYSIWYG"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
+                    [viewOnly]="isView || !input.value.set"
+                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-ngx-wig-v2>
 
                   <!-- Color -->
                   <app-form-color-v2
@@ -734,7 +749,8 @@
                       <app-form-toggle-v2
                         [(ngModel)]="input.ageChecked"
                         [name]="FormHelperService.IGNORE_FIELD_PREFIX + (parentName ? parentName + '[ageDob]' : 'ageDob')"
-                        [options]="ageDOBOptions"></app-form-toggle-v2>
+                        [options]="ageDOBOptions"
+                        (ngModelChange)="markArrayItemsAsDirty(tab.form, parentName ? parentName + '[' + input.name.age + ']' : input.name.age); markArrayItemsAsDirty(tab.form, parentName ? parentName + '[' + input.name.dob + ']' : input.name.dob)"></app-form-toggle-v2>
                     </div>
 
                     <!-- Age -->
@@ -756,7 +772,7 @@
                         [min]="0"
                         [maxNumber]="Constants.DEFAULT_AGE_MAX_YEARS"
                         [max]="Constants.DEFAULT_AGE_MAX_YEARS"
-                        (ngModelChange)="input.value.age.years.set($event)"></app-form-number-v2>
+                        (ngModelChange)="input.value.age.years.set($event); ageNgModelDob.control.markAsDirty();"></app-form-number-v2>
 
                       <!-- Months -->
                       <ng-template
@@ -773,7 +789,7 @@
                           [min]="0"
                           [maxNumber]="11"
                           [max]="11"
-                          (ngModelChange)="input.value.age.months.set($event)"></app-form-number-v2>
+                          (ngModelChange)="input.value.age.months.set($event); ageNgModelDob.control.markAsDirty();"></app-form-number-v2>
                       </ng-template>
 
                       <!-- Type -->
@@ -786,11 +802,20 @@
                         [options]="ageTypeOptions"
                         (ngModelChange)="input.ageTypeYears ? input.value.age.months.set(0) : input.value.age.years.set(0)"></app-form-select-single-v2>
 
+                      <!-- Keep dob information -->
+                      <input
+                        #ageNgModelDob="ngModel"
+                        type="hidden"
+                        [ngModel]="input.value.dob.get()"
+                        [name]="parentName ? parentName + '[' + input.name.dob + ']' : input.name.dob" />
+
                     </div>
 
                     <!-- Dob -->
                     <ng-template
                       #dob>
+
+                      <!-- Date -->
                       <app-form-date-v2
                         fxFlex="calc(50% - 0.8rem)" fxFlex.xs="calc(100% - 0.8rem)"
                         [ngModel]="input.value.dob.get()"
@@ -798,7 +823,19 @@
                         placeholder="LNG_ENTITY_FIELD_LABEL_DOB"
                         [tooltip]="input.description?.dob"
                         [viewOnly]="isView || !input.value.dob.set"
-                        (ngModelChange)="input.value.dob.set($event)"></app-form-date-v2>
+                        (ngModelChange)="input.value.dob.set($event); ageNgModelYears.control.markAsDirty(); ageNgModelMonths.control.markAsDirty();"></app-form-date-v2>
+
+                      <!-- Keep age information -->
+                      <input
+                        #ageNgModelYears="ngModel"
+                        type="hidden"
+                        [ngModel]="input.value.age.years.get()"
+                        [name]="parentName ? parentName + '[' + input.name.age + '][years]' : (input.name.age + '[years]')" />
+                      <input
+                        #ageNgModelMonths="ngModel"
+                        type="hidden"
+                        [ngModel]="input.value.age.months.get()"
+                        [name]="parentName ? parentName + '[' + input.name.age + '][months]' : (input.name.age + '[months]')" />
                     </ng-template>
                   </div>
 
@@ -1162,6 +1199,74 @@
                     {{input.value.get() | translate}}
                   </div>
 
+                  <!-- Link List -->
+                  <div
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.LINK_LIST"
+                    fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem"
+                    class="gd-create-view-modify-bottom-section-content-input-link-list">
+
+                    <!-- Label -->
+                    <div
+                      class="gd-create-view-modify-bottom-section-content-input-link-list-label">
+                      <strong>
+                        {{input.label.get() | translate}}
+                      </strong>
+                    </div>
+
+                    <!-- Links -->
+                    <div
+                      class="gd-create-view-modify-bottom-section-content-input-link-list-links">
+                      <ng-container
+                        *ngFor="let link of input.links; let linkIndex = index;">
+
+                        <!-- Separator -->
+                        <span
+                          *ngIf="linkIndex > 0"
+                          class="gd-create-view-modify-bottom-section-content-input-link-list-links-separator">, </span>
+
+                        <!-- Link -->
+                        <a
+                          class="gd-create-view-modify-bottom-section-content-input-link-list-links-link"
+                          [routerLink]="link.action.link()"
+                          [queryParams]="link.action.queryParams ? link.action.queryParams() : undefined">{{link.label | translate}}</a>
+
+                      </ng-container>
+                    </div>
+                  </div>
+
+                  <!-- Label List -->
+                  <div
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.LABEL_LIST"
+                    fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem"
+                    class="gd-create-view-modify-bottom-section-content-input-label-list">
+
+                    <!-- Label -->
+                    <div
+                      class="gd-create-view-modify-bottom-section-content-input-label-list-label">
+                      <strong>
+                        {{input.label.get() | translate}}
+                      </strong>
+                    </div>
+
+                    <!-- Labels -->
+                    <div
+                      class="gd-create-view-modify-bottom-section-content-input-label-list-labels">
+                      <ng-container
+                        *ngFor="let label of input.labels; let labelIndex = index;">
+
+                        <!-- Separator -->
+                        <span
+                          *ngIf="labelIndex > 0"
+                          class="gd-create-view-modify-bottom-section-content-input-label-list-labels-separator">, </span>
+
+                        <!-- Label -->
+                        <span
+                          class="gd-create-view-modify-bottom-section-content-input-label-list-labels-label">{{label | translate}}</span>
+
+                      </ng-container>
+                    </div>
+                  </div>
+
                   <!-- List -->
                   <div
                     *ngSwitchCase="CreateViewModifyV2TabInputType.LIST">
@@ -1295,7 +1400,10 @@
                       <ng-container
                         *ngFor="let input of section.inputs">
                         <ng-container
-                          *ngTemplateOutlet="inputRender; context: { input, parentName: '', parentItemIndex: undefined, parentInput: undefined }"></ng-container>
+                          *ngIf="!input.visible || input.visible()">
+                          <ng-container
+                            *ngTemplateOutlet="inputRender; context: { input, parentName: '', parentItemIndex: undefined, parentInput: undefined }"></ng-container>
+                        </ng-container>
                       </ng-container>
 
                     </div>

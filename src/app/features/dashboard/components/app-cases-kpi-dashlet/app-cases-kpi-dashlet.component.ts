@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, ViewChild } from '@angular/core';
 import { AppDashletV2 } from '../../helperClasses/app-dashlet-v2';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
@@ -19,6 +19,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { MetricNewCasesWithContactsModel } from '../../../../core/models/metric-new-cases-contacts.model';
 import { MetricCasesTransmissionChainsModel } from '../../../../core/models/metrics/metric-cases-transmission-chains.model';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
+import { AppKpiDashletComponent } from '../app-kpi-dashlet/app-kpi-dashlet.component';
 
 @Component({
   selector: 'app-cases-kpi-dashlet',
@@ -27,6 +28,9 @@ import { ListFilterDataService } from '../../../../core/services/data/list-filte
 })
 export class AppCasesKpiDashletComponent
   extends AppDashletV2 implements OnDestroy {
+  // kpi dashlet
+  @ViewChild(AppKpiDashletComponent, { static: false }) dashlet: AppKpiDashletComponent;
+
   /**
    * Constructor
    */

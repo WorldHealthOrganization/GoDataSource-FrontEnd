@@ -395,6 +395,7 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
                 },
                 visible: (item: UserModel): boolean => {
                   return item.id !== this.authUser.id &&
+                    item.id !== 'sys_admin' &&
                     UserModel.canDelete(this.authUser);
                 }
               }

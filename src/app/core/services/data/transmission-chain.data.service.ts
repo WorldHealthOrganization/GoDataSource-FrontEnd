@@ -148,17 +148,23 @@ export class TransmissionChainDataService {
     chainGroup: TransmissionChainGroupModel,
     pageSize: number,
     snapshotFilters: {
-      firstName?: string,
-      lastName?: string,
-      labSeqResult?: string[]
+      name?: string,
+      labSeqResult?: string[],
+      classification?: string[],
+      occupation?: string[]
     }
   ): ITransmissionChainGroupPageModel[] {
     // must filter
     const mustFilterSnapshot: boolean = snapshotFilters && (
-      !!snapshotFilters.firstName ||
-            !!snapshotFilters.lastName || (
+      !!snapshotFilters.name || (
         snapshotFilters.labSeqResult &&
-                snapshotFilters.labSeqResult.length > 0
+        snapshotFilters.labSeqResult.length > 0
+      ) || (
+        snapshotFilters.classification &&
+        snapshotFilters.classification.length > 0
+      ) || (
+        snapshotFilters.occupation &&
+        snapshotFilters.occupation.length > 0
       )
     );
 
@@ -174,25 +180,53 @@ export class TransmissionChainDataService {
     });
 
     // do we need to filter ?
-    let snapshotFiltersFirstName: string;
-    let snapshotFiltersLastName: string;
+    let snapshotFiltersName: string;
     let snapshotFiltersLabSeqResult: {
       [labSeqResult: string]: true
     };
+    let snapshotFiltersClassification: {
+      [classification: string]: true
+    };
+    let snapshotFiltersOccupation: {
+      [occupation: string]: true
+    };
     if (mustFilterSnapshot) {
       // filter value
-      snapshotFiltersFirstName = snapshotFilters.firstName ? snapshotFilters.firstName.toLowerCase() : null;
-      snapshotFiltersLastName = snapshotFilters.lastName ? snapshotFilters.lastName.toLowerCase() : null;
+      snapshotFiltersName = snapshotFilters.name ? snapshotFilters.name.toLowerCase() : null;
 
       // seq results
       snapshotFiltersLabSeqResult = null;
       if (
         snapshotFilters.labSeqResult &&
-                snapshotFilters.labSeqResult.length > 0
+        snapshotFilters.labSeqResult.length > 0
       ) {
         snapshotFiltersLabSeqResult = {};
         snapshotFilters.labSeqResult.forEach((resultId) => {
           snapshotFiltersLabSeqResult[resultId] = true;
+        });
+      }
+
+      // classification
+      snapshotFiltersClassification = null;
+      if (
+        snapshotFilters.classification &&
+        snapshotFilters.classification.length > 0
+      ) {
+        snapshotFiltersClassification = {};
+        snapshotFilters.classification.forEach((classification) => {
+          snapshotFiltersClassification[classification] = true;
+        });
+      }
+
+      // occupation
+      snapshotFiltersOccupation = null;
+      if (
+        snapshotFilters.occupation &&
+        snapshotFilters.occupation.length > 0
+      ) {
+        snapshotFiltersOccupation = {};
+        snapshotFilters.occupation.forEach((occupation) => {
+          snapshotFiltersOccupation[occupation] = true;
         });
       }
     }
@@ -209,16 +243,25 @@ export class TransmissionChainDataService {
       // filter
       if (
         mustFilterSnapshot && (
-          !snapshotFiltersFirstName ||
-                    nodeData.model.name.toLowerCase().indexOf(snapshotFiltersFirstName) > -1
-        ) && (
-          !snapshotFiltersLastName ||
-                    nodeData.model.name.toLowerCase().indexOf(snapshotFiltersLastName) > -1
+          !snapshotFiltersName ||
+          nodeData.model.name.toLowerCase().indexOf(snapshotFiltersName) > -1
         ) && (
           !snapshotFiltersLabSeqResult || (
             nodeData.labResults &&
-                        nodeData.labResults.length > 0 &&
-                        nodeData.labResults.findIndex((item) => item.sequence && snapshotFiltersLabSeqResult[item.sequence.resultId]) > -1
+            nodeData.labResults.length > 0 &&
+            nodeData.labResults.findIndex((item) => item.sequence && snapshotFiltersLabSeqResult[item.sequence.resultId]) > -1
+          )
+        ) && (
+          !snapshotFiltersClassification || (
+            nodeData.model instanceof CaseModel &&
+            nodeData.model.classification &&
+            snapshotFiltersClassification[nodeData.model.classification]
+          )
+        ) && (
+          !snapshotFiltersOccupation || (
+            !(nodeData.model instanceof EventModel) &&
+            nodeData.model.occupation &&
+            snapshotFiltersOccupation[nodeData.model.occupation]
           )
         )
       ) {
@@ -244,9 +287,9 @@ export class TransmissionChainDataService {
           // not a proper relationship ?
           if (
             !chainRel.entityIds ||
-                        chainRel.entityIds.length !== 2 ||
-                        !chainGroup.nodesMap[chainRel.entityIds[0]] ||
-                        !chainGroup.nodesMap[chainRel.entityIds[1]]
+            chainRel.entityIds.length !== 2 ||
+            !chainGroup.nodesMap[chainRel.entityIds[0]] ||
+            !chainGroup.nodesMap[chainRel.entityIds[1]]
           ) {
             // jump over
             continue;
@@ -255,7 +298,7 @@ export class TransmissionChainDataService {
           // must add chain to list of display ?
           if (
             chainGroup.nodesMap[chainRel.entityIds[0]].matchesFilter ||
-                        chainGroup.nodesMap[chainRel.entityIds[1]].matchesFilter
+            chainGroup.nodesMap[chainRel.entityIds[1]].matchesFilter
           ) {
             // add chain to the list
             chainGroupChains.push(chainInfo);
@@ -337,7 +380,7 @@ export class TransmissionChainDataService {
     currentPageIndex = pages.length - 1;
     if (
       currentPageIndex > -1 &&
-            pages[currentPageIndex].totalSize < pageSize
+      pages[currentPageIndex].totalSize < pageSize
     ) {
       const size: number = pageSize - pages[currentPageIndex].totalSize;
       pages[currentPageIndex].totalSize += size;
@@ -356,6 +399,16 @@ export class TransmissionChainDataService {
         pageLabel: (pages.length + 1).toString()
       });
     }
+
+    // re-label pages
+    pages.forEach((page) => {
+      page.pageLabel = this.i18nService.instant(
+        'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_PAGE_LABEL_FORMAT', {
+          no: page.pageLabel,
+          total: pages.length
+        }
+      );
+    });
 
     // finished
     return pages;
@@ -626,30 +679,33 @@ export class TransmissionChainDataService {
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.AGE.value) {
             if (
               node.type !== EntityType.EVENT &&
-                            !(node.model instanceof EventModel) &&
-                            !_.isEmpty(node.model.age)
+              !(node.model instanceof EventModel)
             ) {
-              if (node.model.age.months > 0) {
-                nodeData.label = node.model.age.months + ' ' + monthsLabel;
+              if (!_.isEmpty(node.model.age)) {
+                if (node.model.age.months > 0) {
+                  nodeData.label = node.model.age.months + ' ' + monthsLabel;
+                } else {
+                  nodeData.label = node.model.age.years + ' ' + yearsLabel;
+                }
               } else {
-                nodeData.label = node.model.age.years + ' ' + yearsLabel;
+                nodeData.label = '';
               }
             } else {
-              nodeData.label = '';
+              nodeData.label = node.model.name;
             }
             // date of onset and event date
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.DATE_OF_ONSET_AND_EVENT_DATE.value) {
             if (
               node.type === EntityType.EVENT &&
-                            node.model instanceof EventModel &&
-                            node.model.date
+              node.model instanceof EventModel &&
+              node.model.date
             ) {
               nodeData.label = moment(node.model.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
             }
             if (
               node.type === EntityType.CASE &&
-                            node.model instanceof CaseModel &&
-                            node.model.dateOfOnset
+              node.model instanceof CaseModel &&
+              node.model.dateOfOnset
             ) {
               nodeData.label = moment(node.model.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
             }
@@ -657,21 +713,21 @@ export class TransmissionChainDataService {
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.GENDER.value) {
             if (
               node.type !== EntityType.EVENT &&
-                            !(node.model instanceof EventModel)
+              !(node.model instanceof EventModel)
             ) {
               nodeData.label = colorCriteria.nodeLabelValues[node.model.gender];
             } else {
-              nodeData.label = '';
+              nodeData.label = node.model.name;
             }
             // occupation
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.OCCUPATION.value) {
             if (
               node.type !== EntityType.EVENT &&
-                            !(node.model instanceof EventModel)
+              !(node.model instanceof EventModel)
             ) {
               nodeData.label = colorCriteria.nodeLabelValues[node.model.occupation];
             } else {
-              nodeData.label = '';
+              nodeData.label = node.model.name;
             }
             // location
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.LOCATION.value) {
@@ -680,12 +736,14 @@ export class TransmissionChainDataService {
               const mainAddr = node.model.mainAddress;
               if (
                 mainAddr &&
-                                mainAddr.locationId &&
-                                locationsListMap[mainAddr.locationId] &&
-                                locationsListMap[mainAddr.locationId].name
+                mainAddr.locationId &&
+                locationsListMap[mainAddr.locationId] &&
+                locationsListMap[mainAddr.locationId].name
               ) {
                 nodeData.label = locationsListMap[mainAddr.locationId].name;
               }
+            } else {
+              nodeData.label = node.model.name;
             }
             // initials
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.INITIALS.value) {
@@ -694,23 +752,23 @@ export class TransmissionChainDataService {
               const lastNameInitial = node.model.lastName && node.model.lastName.trim() ? node.model.lastName.trim().slice(0, 1) : '';
               nodeData.label = lastNameInitial + ' ' + firstNameInitial;
             } else {
-              nodeData.label = '';
+              nodeData.label = node.model.name;
             }
             // visual id
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.VISUAL_ID.value) {
             if (
               node.type !== EntityType.EVENT &&
-                            !(node.model instanceof EventModel)
+              !(node.model instanceof EventModel)
             ) {
               nodeData.label = node.model.visualId ? node.model.visualId : '';
             } else {
-              nodeData.label = '';
+              nodeData.label = node.model.name;
             }
             // visual id and location
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.ID_AND_LOCATION.value) {
             if (
               node.type !== EntityType.EVENT &&
-                            !(node.model instanceof EventModel)
+              !(node.model instanceof EventModel)
             ) {
               if (node.model.visualId) {
                 nodeData.label = node.model.visualId;
@@ -718,20 +776,29 @@ export class TransmissionChainDataService {
               const mainAddr = node.model.mainAddress;
               if (
                 mainAddr &&
-                                mainAddr.locationId &&
-                                locationsListMap[mainAddr.locationId] &&
-                                locationsListMap[mainAddr.locationId].name
+                mainAddr.locationId &&
+                locationsListMap[mainAddr.locationId] &&
+                locationsListMap[mainAddr.locationId].name
               ) {
                 nodeData.label = (node.model.visualId ? nodeData.label + ' - ' : '') + locationsListMap[mainAddr.locationId].name;
               }
             } else {
-              nodeData.label = '';
+              nodeData.label = node.model.name;
+              const mainAddr = node.model.mainAddress;
+              if (
+                mainAddr &&
+                mainAddr.locationId &&
+                locationsListMap[mainAddr.locationId] &&
+                locationsListMap[mainAddr.locationId].name
+              ) {
+                nodeData.label = (node.model.name ? nodeData.label + ' - ' : '') + locationsListMap[mainAddr.locationId].name;
+              }
             }
             // concatenated details
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.CONCATENATED_DETAILS.value) {
             if (
               node.type !== EntityType.EVENT &&
-                            !(node.model instanceof EventModel)
+              !(node.model instanceof EventModel)
             ) {
               const lastName = node.model.lastName ? node.model.lastName : '';
               const firstName = node.model.firstName ? node.model.firstName : '';
@@ -769,7 +836,7 @@ export class TransmissionChainDataService {
               // concatenate results
               nodeData.label = lastName + ' ' + firstName + visualId + '\n' + age + ' - ' + gender + classification + '\n' + outcome + locationName + onset;
             } else {
-              nodeData.label = '';
+              nodeData.label = node.model.name;
             }
           }
 
@@ -810,7 +877,7 @@ export class TransmissionChainDataService {
       // add relation only if the nodes are in the selectedNodes array
       if (
         !selectedNodeIds[relationship.persons[0].id] ||
-                !selectedNodeIds[relationship.persons[1].id]
+        !selectedNodeIds[relationship.persons[1].id]
       ) {
         return;
       }
@@ -856,7 +923,7 @@ export class TransmissionChainDataService {
         let targetDate: any = '';
         if (
           sourceNode.type === EntityType.CASE &&
-                    sourceNode.model instanceof CaseModel
+          sourceNode.model instanceof CaseModel
         ) {
           if (sourceNode.model.dateOfOnset) {
             sourceDate = sourceNode.model.dateOfOnset as string;
@@ -876,7 +943,7 @@ export class TransmissionChainDataService {
 
         if (
           targetNode.type === EntityType.CASE &&
-                    targetNode.model instanceof CaseModel
+          targetNode.model instanceof CaseModel
         ) {
           if (targetNode.model.dateOfOnset) {
             targetDate = targetNode.model.dateOfOnset as string;
@@ -887,7 +954,7 @@ export class TransmissionChainDataService {
           }
         } else if (
           targetNode.type === EntityType.EVENT &&
-                    targetNode.model instanceof EventModel
+          targetNode.model instanceof EventModel
         ) {
           if (targetNode.model.date) {
             targetDate = targetNode.model.date as string;
@@ -896,7 +963,7 @@ export class TransmissionChainDataService {
 
         if (
           sourceDate &&
-                    targetDate
+          targetDate
         ) {
           const momentTargetDate = moment(targetDate, Constants.DEFAULT_DATE_DISPLAY_FORMAT);
           const momentSourceDate = moment(sourceDate, Constants.DEFAULT_DATE_DISPLAY_FORMAT);
@@ -915,9 +982,9 @@ export class TransmissionChainDataService {
         graphEdge.fontFamily = 'xtIcon';
       } else if (
         colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.CLUSTER.value &&
-                relationship.clusterId &&
-                clusterIconMap &&
-                clusterIconMap[relationship.clusterId]
+        relationship.clusterId &&
+        clusterIconMap &&
+        clusterIconMap[relationship.clusterId]
       ) {
         graphEdge.label = clusterIconMap[relationship.clusterId];
         graphEdge.fontFamily = 'Material Icons';

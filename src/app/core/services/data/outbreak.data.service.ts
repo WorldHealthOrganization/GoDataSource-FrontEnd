@@ -246,7 +246,7 @@ export class OutbreakDataService {
    * Get the Outbreak that is Active for the authenticated user
    * Otherwise, use the first outbreak in the list
    */
-  determineSelectedOutbreak(): Observable<OutbreakModel> {
+  determineSelectedOutbreak(dontUpdateCacheOnChange?: boolean): Observable<OutbreakModel> {
     // check if user has selected any Outbreak (get it from local storage)
     const selectedOutbreakId = this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID);
     if (selectedOutbreakId) {
@@ -262,7 +262,9 @@ export class OutbreakDataService {
           }),
           tap((selectedOutbreak) => {
             // cache the selected Outbreak
-            this.setSelectedOutbreak(selectedOutbreak);
+            if (!dontUpdateCacheOnChange) {
+              this.setSelectedOutbreak(selectedOutbreak);
+            }
           })
         );
     }

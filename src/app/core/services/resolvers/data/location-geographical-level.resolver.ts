@@ -40,7 +40,9 @@ export class LocationGeographicalLevelDataResolver implements IMapResolverV2<Ref
               label: item.value,
               value: item.id,
               iconUrl: item.iconUrl,
-              data: item
+              data: item,
+              disabled: !item.active,
+              order: item.order
             });
           });
 

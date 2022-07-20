@@ -19,6 +19,13 @@ import { CotEdgeLabelDataResolver } from '../../core/services/resolvers/data/cot
 import { CotEdgeIconDataResolver } from '../../core/services/resolvers/data/cot-edge-icon.resolver';
 import { CotEdgeColorDataResolver } from '../../core/services/resolvers/data/cot-edge-color.resolver';
 import { CotSnapshotStatusDataResolver } from '../../core/services/resolvers/data/cot-snapshot-status.resolver';
+import { CertaintyLevelDataResolver } from '../../core/services/resolvers/data/certainty-level.resolver';
+import { ExposureTypeDataResolver } from '../../core/services/resolvers/data/exposure-type.resolver';
+import { ExposureFrequencyDataResolver } from '../../core/services/resolvers/data/exposure-frequency.resolver';
+import { ExposureDurationDataResolver } from '../../core/services/resolvers/data/exposure-duration.resolver';
+import { ContextOfTransmissionDataResolver } from '../../core/services/resolvers/data/context-of-transmission.resolver';
+import { RiskDataResolver } from '../../core/services/resolvers/data/risk.resolver';
+import { FinalFollowUpStatusDataResolver } from '../../core/services/resolvers/data/final-follow-up-status.resolver';
 
 const routes: Routes = [
   // Transmission Chains Graph
@@ -51,7 +58,14 @@ const routes: Routes = [
       cotNodeShape: CotNodeShapeDataResolver,
       cotEdgeLabel: CotEdgeLabelDataResolver,
       cotEdgeIcon: CotEdgeIconDataResolver,
-      cotEdgeColor: CotEdgeColorDataResolver
+      cotEdgeColor: CotEdgeColorDataResolver,
+      certaintyLevel: CertaintyLevelDataResolver,
+      exposureType: ExposureTypeDataResolver,
+      exposureFrequency: ExposureFrequencyDataResolver,
+      exposureDuration: ExposureDurationDataResolver,
+      contextOfTransmission: ContextOfTransmissionDataResolver,
+      risk: RiskDataResolver,
+      followUpStatus: FinalFollowUpStatusDataResolver
     }
   },
   // Transmission Chains List

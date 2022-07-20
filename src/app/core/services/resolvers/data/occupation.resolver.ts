@@ -40,7 +40,9 @@ export class OccupationDataResolver implements IMapResolverV2<ReferenceDataEntry
               label: item.value,
               value: item.id,
               iconUrl: item.iconUrl,
-              data: item
+              data: item,
+              disabled: !item.active,
+              order: item.order
             });
           });
 

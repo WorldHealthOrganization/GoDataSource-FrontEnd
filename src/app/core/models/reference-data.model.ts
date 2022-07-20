@@ -12,6 +12,7 @@ export enum ReferenceDataCategory {
   CASE_CLASSIFICATION_CONFIRMED_BY_LAB_RESULT = 'LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION_CONFIRMED_BY_LAB_RESULT',
   GENDER = 'LNG_REFERENCE_DATA_CATEGORY_GENDER',
   INVESTIGATION_STATUS = 'LNG_REFERENCE_DATA_CATEGORY_INVESTIGATION_STATUS',
+  EVENT_CATEGORY = 'LNG_REFERENCE_DATA_CATEGORY_EVENT_CATEGORY',
   OCCUPATION = 'LNG_REFERENCE_DATA_CATEGORY_OCCUPATION',
   LAB_NAME = 'LNG_REFERENCE_DATA_CATEGORY_LAB_NAME',
   LAB_SEQUENCE_LABORATORY = 'LNG_REFERENCE_DATA_CATEGORY_LAB_SEQUENCE_LABORATORY',
@@ -121,6 +122,7 @@ export class ReferenceDataEntryModel
   category: ReferenceDataCategoryModel;
   colorCode: string;
   order: number;
+  geoLocation: { lat: number, lng: number };
 
   private _iconId: string;
   iconUrl: string;
@@ -159,6 +161,7 @@ export class ReferenceDataEntryModel
     this.colorCode = _.get(data, 'colorCode');
     this.iconId = _.get(data, 'iconId');
     this.order = _.get(data, 'order');
+    this.geoLocation = _.get(data, 'geoLocation', {});
 
     // add category
     const categoryData = _.get(data, 'category');

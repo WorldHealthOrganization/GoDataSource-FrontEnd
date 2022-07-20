@@ -3,16 +3,37 @@
 
   <!-- Top -->
   <div
-    *ngIf="!viewOnly"
     class="gd-form-edit-questionnaire-v2-top"
-    fxLayoutAlign="end">
+    fxLayout="row" fxLayoutAlign="end" fxLayoutGap="0.8rem">
+
+    <!-- Expand All -->
     <button
+      type="button"
+      mat-flat-button
+      color="text"
+      (click)="collapseExpandAllQuestions(value, false); nonFlatToFlat()">
+      {{'LNG_QUESTIONNAIRE_TEMPLATE_EXPAND_ALL' | translate}}
+    </button>
+
+    <!-- Collapse All -->
+    <button
+      type="button"
+      mat-flat-button
+      color="text"
+      (click)="collapseExpandAllQuestions(value, true); nonFlatToFlat()">
+      {{'LNG_QUESTIONNAIRE_TEMPLATE_COLLAPSE_ALL' | translate}}
+    </button>
+
+    <!-- Add question -->
+    <button
+      *ngIf="!viewOnly"
       type="button"
       mat-flat-button
       color="primary"
       (click)="addQuestion(undefined)">
       {{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW' | translate}}
     </button>
+
   </div>
 
   <!-- Records -->
@@ -38,7 +59,7 @@
           [class.gd-form-edit-questionnaire-v2-item-markup]="item.data.answerType === Constants.ANSWER_TYPES.MARKUP.value"
           cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".gd-form-edit-questionnaire-v2-list-{{name}}" [cdkDragData]="item" [cdkDragDisabled]="viewOnly" (cdkDragStarted)="dragStarted($event)"
           [ngSwitch]="item.type"
-          [style.paddingLeft.px]="item.level * 20"
+          [style.paddingLeft.px]="item.level * 28"
           style="height: 4.5rem">
 
           <!-- Custom drag&drop placeholder -->
@@ -54,6 +75,22 @@
             <mat-icon
               [style.visibility]="item.canCollapseOrExpand ? 'visible' : 'hidden'"
               (click)="expandCollapse(item)">{{item.data.collapsed ? 'expand_more' : 'expand_less'}}</mat-icon>
+
+            <!-- Expand All -->
+            <mat-icon
+              *ngIf="item.canCollapseOrExpand && !item.data.collapsed"
+              [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_EXPAND_ALL' | translate"
+              (click)="collapseExpandAllQuestions(item.data.answers, false); nonFlatToFlat()">
+              expand
+            </mat-icon>
+
+            <!-- Collapse All -->
+            <mat-icon
+              *ngIf="item.canCollapseOrExpand && !item.data.collapsed"
+              [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_COLLAPSE_ALL' | translate"
+              (click)="collapseExpandAllQuestions(item.data.answers, true); nonFlatToFlat()">
+              compress
+            </mat-icon>
 
             <!-- Sort -->
             <mat-icon
@@ -72,6 +109,7 @@
 
               <!-- Number -->
               <span
+                *ngIf="!!item.no"
                 class="gd-form-edit-questionnaire-v2-item-question-content-number">{{item.no}}.</span>
 
               <!-- Label -->
@@ -80,7 +118,7 @@
 
               <!-- Icons -->
               <span
-                *ngIf="renderMode !== RenderMode.SMALL"
+                *ngIf="renderMode === RenderMode.MEDIUM"
                 class="gd-form-edit-questionnaire-v2-item-question-content-icons">
 
                 <!-- Answer type -->
@@ -105,6 +143,43 @@
                   color="warn">do_not_disturb</mat-icon>
               </span>
 
+              <!-- Labels instead of icons -->
+              <span
+                *ngIf="renderMode === RenderMode.FULL"
+                class="gd-form-edit-questionnaire-v2-item-question-content-icons-labels">
+
+                <!-- Answer type -->
+                <span
+                  *ngIf="item.data.answerType">
+                  {{item.data.answerType | translate}}
+                </span>
+
+                <!-- Category -->
+                <span
+                  *ngIf="item.data.category">
+                  {{item.data.category | translate}}
+                </span>
+
+                <!-- Multiple answers -->
+                <span
+                  *ngIf="item.data.multiAnswer">
+                  {{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER' | translate}}
+                </span>
+
+                <!-- Required -->
+                <span
+                  *ngIf="item.data.required"
+                  class="required">
+                  {{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED' | translate}}
+                </span>
+
+                <!-- Inactive -->
+                <span
+                  *ngIf="item.data.inactive">
+                  {{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_INACTIVE' | translate}}
+                </span>
+              </span>
+
             </div>
 
             <!-- Buttons -->
@@ -126,9 +201,19 @@
               <button
                 type="button"
                 mat-icon-button
-                [matTooltip]="'LNG_COMMON_BUTTON_UPDATE' | translate"
+                [matTooltip]="(viewOnly ? 'LNG_COMMON_BUTTON_VIEW' : 'LNG_COMMON_BUTTON_UPDATE') | translate"
                 (click)="viewEditQuestion(item.data, item.parent?.data)">
                 <mat-icon>{{viewOnly ? 'visibility' : 'edit'}}</mat-icon>
+              </button>
+
+              <!-- Clone question -->
+              <button
+                *ngIf="!viewOnly && item.data.answerType !== Constants.ANSWER_TYPES.MARKUP.value"
+                type="button"
+                mat-icon-button
+                [matTooltip]="'LNG_COMMON_BUTTON_CLONE' | translate"
+                (click)="cloneItem(item)">
+                <mat-icon>content_copy</mat-icon>
               </button>
 
               <!-- Delete question -->
@@ -156,6 +241,22 @@
             <mat-icon
               [style.visibility]="item.canCollapseOrExpand ? 'visible' : 'hidden'"
               (click)="expandCollapse(item)">{{item.data.collapsed ? 'expand_more' : 'expand_less'}}</mat-icon>
+
+            <!-- Expand All -->
+            <mat-icon
+              *ngIf="item.canCollapseOrExpand && !item.data.collapsed"
+              [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_EXPAND_ALL' | translate"
+              (click)="collapseExpandAllQuestions(item.data.additionalQuestions, false); nonFlatToFlat()">
+              expand
+            </mat-icon>
+
+            <!-- Collapse All -->
+            <mat-icon
+              *ngIf="item.canCollapseOrExpand && !item.data.collapsed"
+              [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_COLLAPSE_ALL' | translate"
+              (click)="collapseExpandAllQuestions(item.data.additionalQuestions, true); nonFlatToFlat()">
+              compress
+            </mat-icon>
 
             <!-- Sort -->
             <mat-icon
@@ -206,9 +307,19 @@
               <button
                 type="button"
                 mat-icon-button
-                [matTooltip]="'LNG_COMMON_BUTTON_UPDATE' | translate"
+                [matTooltip]="(viewOnly ? 'LNG_COMMON_BUTTON_VIEW' : 'LNG_COMMON_BUTTON_UPDATE') | translate"
                 (click)="viewEditAnswer(item.data, item.parent.data)">
                 <mat-icon>{{viewOnly ? 'visibility' : 'edit'}}</mat-icon>
+              </button>
+
+              <!-- Clone answer -->
+              <button
+                *ngIf="!viewOnly"
+                type="button"
+                mat-icon-button
+                [matTooltip]="'LNG_COMMON_BUTTON_CLONE' | translate"
+                (click)="cloneItem(item)">
+                <mat-icon>content_copy</mat-icon>
               </button>
 
               <!-- Delete answer -->
@@ -276,6 +387,7 @@
 
       <!-- Answer type -->
       <div
+        *ngIf="renderMode === RenderMode.MEDIUM"
         class="gd-form-edit-questionnaire-v2-legend-items-item">
         <mat-icon>spellcheck</mat-icon>
         <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE' | translate}}</span>
@@ -283,6 +395,7 @@
 
       <!-- Category -->
       <div
+        *ngIf="renderMode === RenderMode.MEDIUM"
         class="gd-form-edit-questionnaire-v2-legend-items-item">
         <mat-icon>folder_special</mat-icon>
         <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY' | translate}}</span>
@@ -290,6 +403,7 @@
 
       <!-- Multiple answers -->
       <div
+        *ngIf="renderMode === RenderMode.MEDIUM"
         class="gd-form-edit-questionnaire-v2-legend-items-item">
         <mat-icon>format_list_numbered_rtl</mat-icon>
         <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER' | translate}}</span>
@@ -297,6 +411,7 @@
 
       <!-- Required -->
       <div
+        *ngIf="renderMode === RenderMode.MEDIUM"
         class="gd-form-edit-questionnaire-v2-legend-items-item">
         <mat-icon>stars</mat-icon>
         <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED' | translate}}</span>
@@ -304,6 +419,7 @@
 
       <!-- Inactive -->
       <div
+        *ngIf="renderMode === RenderMode.MEDIUM"
         class="gd-form-edit-questionnaire-v2-legend-items-item">
         <mat-icon
           color="warn">do_not_disturb</mat-icon>
@@ -340,6 +456,14 @@
         class="gd-form-edit-questionnaire-v2-legend-items-item">
         <mat-icon>edit</mat-icon>
         <span>{{'LNG_COMMON_BUTTON_UPDATE' | translate}}</span>
+      </div>
+
+      <!-- Clone question / answer -->
+      <div
+        *ngIf="!viewOnly"
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        <mat-icon>content_copy</mat-icon>
+        <span>{{'LNG_COMMON_BUTTON_CLONE' | translate}}</span>
       </div>
 
       <!-- Delete -->

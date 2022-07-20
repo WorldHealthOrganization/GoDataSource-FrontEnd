@@ -76,11 +76,20 @@ export class ReferenceDataCategoriesListComponent
             return {
               label: this.i18nService.instant(entry.value),
               href: ReferenceDataEntryModel.canView(this.authUser) ?
-                `/reference-data/${ item.id }/${ item.id }/view` :
+                `/reference-data/${item.id}/${entry.id}/view` :
                 null
             };
           }) :
           []
+      },
+      {
+        field: 'entriesCount',
+        label: 'LNG_REFERENCE_DATA_CATEGORY_FIELD_LABEL_ENTRIES_COUNT',
+        format: {
+          type: (item: ReferenceDataCategoryModel) => item.entries?.length ?
+            item.entries.length.toString() :
+            '0'
+        }
       },
 
       // actions

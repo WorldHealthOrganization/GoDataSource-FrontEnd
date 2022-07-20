@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { Constants } from '../../../../core/models/constants';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { ActivatedRoute } from '@angular/router';
@@ -26,6 +26,11 @@ import { ContactOfContactModel } from '../../../../core/models/contact-of-contac
 import { ContactsOfContactsDataService } from '../../../../core/services/data/contacts-of-contacts.data.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { TransmissionChainsDashletComponent } from '../../components/transmission-chains-dashlet/transmission-chains-dashlet.component';
+import { DomService } from '../../../../core/services/helper/dom.service';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 
 enum NodeAction {
   MODIFY_PERSON = 'modify-person',
@@ -38,9 +43,11 @@ enum NodeAction {
   selector: 'app-transmission-chains-graph',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './transmission-chains-graph.component.html',
-  styleUrls: ['./transmission-chains-graph.component.less']
+  styleUrls: ['./transmission-chains-graph.component.scss']
 })
 export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
+  @ViewChild('cotDashletChild', { static: false }) cotDashletChild: TransmissionChainsDashletComponent;
+
   outbreakSubscriber: Subscription;
 
   // authenticated user
@@ -82,8 +89,8 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   NodeAction = NodeAction;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private authDataService: AuthDataService,
     protected toastV2Service: ToastV2Service,
@@ -94,7 +101,10 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     private relationshipDataService: RelationshipDataService,
     private contactDataService: ContactDataService,
     private contactsOfContactsDataService: ContactsOfContactsDataService,
-    private dialogV2Service: DialogV2Service
+    private dialogV2Service: DialogV2Service,
+    private entityHelperService: EntityHelperService,
+    private i18nService: I18nService,
+    private domService: DomService
   ) {}
 
   /**
@@ -173,8 +183,8 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Node tap / click
-     */
+   * Node tap / click
+   */
   onNodeTap(entity: GraphNodeModel) {
     // not really of expected format ?
     if (
@@ -185,156 +195,151 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     }
 
     // retrieve entity info
-    this.dialogV2Service.showLoadingDialog();
-    // #TODO
-    // const loadingDialog = this.dialogV2Service.showLoadingDialog();
-    // this.entityDataService
-    //   .getEntity(entity.type, this.selectedOutbreak.id, entity.id)
-    //   .pipe(
-    //     catchError((err) => {
-    //       this.toastV2Service.error(err);
-    //       loadingDialog.close();
-    //       return throwError(err);
-    //     })
-    //   )
-    //   .subscribe((entityData: CaseModel | EventModel | ContactModel | ContactOfContactModel) => {
-    //     if (entityData.type !== EntityType.CONTACT_OF_CONTACT) {
-    //       this.entityDataService
-    //         .checkEntityRelationshipsCount(
-    //           this.selectedOutbreak.id,
-    //           entityData.type,
-    //           entityData.id
-    //         )
-    //         .pipe(
-    //           catchError((err) => {
-    //             this.toastV2Service.error(err);
-    //             loadingDialog.close();
-    //             return throwError(err);
-    //           })
-    //         )
-    //         .subscribe((relationshipCount: { count: number }) => {
-    //           // set the flag for displaying personal chain of transmission link
-    //           this.displayPersonChainOfTransmissionLink = relationshipCount.count > 0;
-    //
-    //           // hide loading dialog
-    //           loadingDialog.close();
-    //
-    //           if (this.editMode) {
-    //             this.selectedRelationship = undefined;
-    //             // add node to selected persons list
-    //             this.selectedNodes.addNode(entityData);
-    //
-    //             // check if we can swap nodes
-    //             this.canSwapRelationshipPersons = this.canSwapSelectedNodes();
-    //
-    //             // focus boxes
-    //             setTimeout(() => {
-    //               this.domService.scrollItemIntoView(
-    //                 '.selected-node-details'
-    //               );
-    //             });
-    //           } else {
-    //             // show node information
-    //             this.dialogService.showCustomDialog(
-    //               ViewCotNodeDialogComponent,
-    //               {
-    //                 ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
-    //                 ...{
-    //                   data: {
-    //                     entity: entityData,
-    //                     displayPersonalCotLink: this.displayPersonChainOfTransmissionLink,
-    //                     snapshotId: this.cotDashletChild.selectedSnapshot,
-    //                     showPersonContacts: this.cotDashletChild.showContacts,
-    //                     showPersonContactsOfContacts: this.cotDashletChild.showContactsOfContacts
-    //                   }
-    //                 }
-    //               }
-    //             );
-    //           }
-    //         });
-    //     } else {
-    //       // hide loading dialog
-    //       loadingDialog.close();
-    //
-    //       // reset relationship swap persons
-    //       this.canSwapRelationshipPersons = false;
-    //
-    //       if (this.editMode) {
-    //         this.selectedRelationship = undefined;
-    //         // add node to selected persons list
-    //         this.selectedNodes.addNode(entityData);
-    //
-    //         // focus boxes
-    //         setTimeout(() => {
-    //           this.domService.scrollItemIntoView(
-    //             '.selected-node-details'
-    //           );
-    //         });
-    //       } else {
-    //         // show node information
-    //         this.dialogService.showCustomDialog(
-    //           ViewCotNodeDialogComponent,
-    //           {
-    //             ...ViewCotNodeDialogComponent.DEFAULT_CONFIG,
-    //             ...{
-    //               data: {
-    //                 entity: entityData
-    //               }
-    //             }
-    //           }
-    //         );
-    //       }
-    //     }
-    //   });
+    const loadingDialog = this.dialogV2Service.showLoadingDialog();
+    this.entityDataService
+      .getEntity(entity.type, this.selectedOutbreak.id, entity.id)
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          loadingDialog.close();
+          return throwError(err);
+        })
+      )
+      .subscribe((entityData: CaseModel | EventModel | ContactModel | ContactOfContactModel) => {
+        if (entityData.type !== EntityType.CONTACT_OF_CONTACT) {
+          this.entityDataService
+            .checkEntityRelationshipsCount(
+              this.selectedOutbreak.id,
+              entityData.type,
+              entityData.id
+            )
+            .pipe(
+              catchError((err) => {
+                this.toastV2Service.error(err);
+                loadingDialog.close();
+                return throwError(err);
+              })
+            )
+            .subscribe((relationshipCount: { count: number }) => {
+              // set the flag for displaying personal chain of transmission link
+              this.displayPersonChainOfTransmissionLink = relationshipCount.count > 0;
+
+              // hide loading dialog
+              loadingDialog.close();
+
+              if (this.editMode) {
+                this.selectedRelationship = undefined;
+                // add node to selected persons list
+                this.selectedNodes.addNode(entityData);
+
+                // check if we can swap nodes
+                this.canSwapRelationshipPersons = this.canSwapSelectedNodes();
+
+                // focus boxes
+                setTimeout(() => {
+                  this.domService.scrollItemIntoView(
+                    '.transmission-chain-edit-mode'
+                  );
+                });
+              } else {
+                // show node information
+                this.entityHelperService.showEntityDetailsDialog(
+                  this.i18nService.instant(
+                    'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_TITLE',
+                    {
+                      type: this.i18nService.instant(entityData.type)
+                    }
+                  ),
+                  entityData,
+                  this.selectedOutbreak, {
+                    displayPersonalCotLink: this.displayPersonChainOfTransmissionLink,
+                    snapshotId: this.cotDashletChild.selectedSnapshot,
+                    showPersonContacts: this.cotDashletChild.showContacts,
+                    showPersonContactsOfContacts: this.cotDashletChild.showContactsOfContacts
+                  }
+                );
+              }
+            });
+        } else {
+          // hide loading dialog
+          loadingDialog.close();
+
+          // reset relationship swap persons
+          this.canSwapRelationshipPersons = false;
+
+          if (this.editMode) {
+            this.selectedRelationship = undefined;
+            // add node to selected persons list
+            this.selectedNodes.addNode(entityData);
+
+            // focus boxes
+            setTimeout(() => {
+              this.domService.scrollItemIntoView(
+                '.transmission-chain-edit-mode'
+              );
+            });
+          } else {
+            // show node information
+            this.entityHelperService.showEntityDetailsDialog(
+              this.i18nService.instant(
+                'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_TITLE',
+                {
+                  type: this.i18nService.instant(entityData.type)
+                }
+              ),
+              entityData,
+              this.selectedOutbreak
+            );
+          }
+        }
+      });
   }
 
   /**
-     * Edge tap / click
-     */
-  onEdgeTap(_relationship: GraphEdgeModel) {
+   * Edge tap / click
+   */
+  onEdgeTap(relationship: GraphEdgeModel) {
     // retrieve relationship info
-    this.dialogV2Service.showLoadingDialog();
-    // #TODO
-    // const loadingDialog = this.dialogV2Service.showLoadingDialog();
-    // this.relationshipDataService
-    //   .getEntityRelationship(this.selectedOutbreak.id, relationship.sourceType, relationship.source, relationship.id)
-    //   .pipe(
-    //     catchError((err) => {
-    //       this.toastV2Service.error(err);
-    //       loadingDialog.close();
-    //       return throwError(err);
-    //     })
-    //   )
-    //   .subscribe((relationshipData) => {
-    //     // hide loading dialog
-    //     loadingDialog.close();
-    //
-    //     if (this.editMode) {
-    //       this.resetNodes();
-    //
-    //       this.selectedRelationship = relationshipData;
-    //
-    //       // focus box
-    //       setTimeout(() => {
-    //         this.domService.scrollItemIntoView(
-    //           '.selected-relationship-details'
-    //         );
-    //       });
-    //     } else {
-    //       // show edge information
-    //       this.dialogService.showCustomDialog(
-    //         ViewCotEdgeDialogComponent,
-    //         {
-    //           ...ViewCotEdgeDialogComponent.DEFAULT_CONFIG,
-    //           ...{
-    //             data: {
-    //               relationship: relationshipData
-    //             }
-    //           }
-    //         }
-    //       );
-    //     }
-    //   });
+    const loadingDialog = this.dialogV2Service.showLoadingDialog();
+    this.relationshipDataService
+      .getEntityRelationship(
+        this.selectedOutbreak.id,
+        relationship.sourceType,
+        relationship.source,
+        relationship.id)
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          loadingDialog.close();
+          return throwError(err);
+        })
+      )
+      .subscribe((relationshipData) => {
+        // hide loading dialog
+        loadingDialog.close();
+
+        if (this.editMode) {
+          this.resetNodes();
+
+          this.selectedRelationship = relationshipData;
+
+          // focus box
+          setTimeout(() => {
+            this.domService.scrollItemIntoView(
+              '.selected-relationship-details'
+            );
+          });
+        } else {
+          // show edge information
+          this.entityHelperService.showEntityDetailsDialog(
+            this.i18nService.instant('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_EDGE_TITLE'),
+            relationshipData,
+            this.selectedOutbreak, {
+              showResourceViewPageLink: true
+            }
+          );
+        }
+      });
   }
 
   removeSelectedNode(index) {
@@ -394,32 +399,57 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     );
   }
 
-  deleteSelectedPerson(_person: (CaseModel | ContactModel | EventModel)) {
-    // #TODO
-    // this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_CASE', { name: person.name })
-    //   .subscribe((answer: DialogAnswer) => {
-    //     if (answer.button === DialogAnswerButton.Yes) {
-    //       // delete person
-    //       this.entityDataService
-    //         .deleteEntity(person.type, this.selectedOutbreak.id, person.id)
-    //         .pipe(
-    //           catchError((err) => {
-    //             this.toastV2Service.error(err);
-    //
-    //             return throwError(err);
-    //           })
-    //         )
-    //         .subscribe(() => {
-    //           this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_DELETE_PERSON_SUCCESS_MESSAGE');
-    //
-    //           // reset form
-    //           this.resetFormModels();
-    //
-    //           // reset selected nodes
-    //           this.resetNodes();
-    //         });
-    //     }
-    //   });
+  /**
+   * Delete selected person
+   */
+  deleteSelectedPerson(person: (CaseModel | ContactModel | EventModel)) {
+    this.dialogV2Service
+      .showConfirmDialog({
+        config: {
+          title: {
+            get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
+          },
+          message: {
+            get: () => 'LNG_DIALOG_CONFIRM_DELETE_CASE',
+            data: () => ({
+              name: person.name
+            })
+          }
+        }
+      })
+      .subscribe((response) => {
+        // canceled ?
+        if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+          // finished
+          return;
+        }
+
+        // delete person
+        const loadingDialog = this.dialogV2Service.showLoadingDialog();
+        this.entityDataService
+          .deleteEntity(
+            person.type,
+            this.selectedOutbreak.id,
+            person.id
+          )
+          .pipe(
+            catchError((err) => {
+              this.toastV2Service.error(err);
+              loadingDialog.close();
+              return throwError(err);
+            })
+          )
+          .subscribe(() => {
+            this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_DELETE_PERSON_SUCCESS_MESSAGE');
+            loadingDialog.close();
+
+            // reset form
+            this.resetFormModels();
+
+            // reset selected nodes
+            this.resetNodes();
+          });
+      });
   }
 
   resetFormModels() {
@@ -431,27 +461,36 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Create a new Relationship between 2 selected nodes
-     * @param form
-     */
+   * Create a new Relationship between 2 selected nodes
+   */
   createRelationship(form: NgForm) {
-    // get forms fields
-    const fields = this.formHelper.getFields(form);
+    // submit to validate form
+    form.ngSubmit.emit();
 
-    if (!this.formHelper.validateForm(form)) {
+    // validate
+    if (!form.valid) {
+      // show message
+      this.toastV2Service.notice('LNG_FORM_ERROR_FORM_INVALID');
+
+      // finished
       return;
     }
+
+    // get forms fields
+    const fields = this.formHelper.getFields(form);
 
     // get source and target persons
     const sourcePerson = this.selectedNodes.sourceNode;
     const targetPerson = this.selectedNodes.targetNode;
+
+    // show loading
+    const loading = this.dialogV2Service.showLoadingDialog();
 
     // prepare relationship data
     const relationshipData = fields.relationship;
     relationshipData.persons = [{
       id: targetPerson.id
     }];
-
     this.relationshipDataService
       .createRelationship(
         this.selectedOutbreak.id,
@@ -462,10 +501,12 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
       .pipe(
         catchError((err) => {
           this.toastV2Service.error(err);
+          loading.close();
           return throwError(err);
         })
       )
       .subscribe(() => {
+        loading.close();
         this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_RELATIONSHIP_SUCCESS_MESSAGE');
 
         // reset form
@@ -480,17 +521,23 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Create a new Contact for a selected node (Case or Event)
-     * @param form
-     * @param entityType
-     */
+   * Create a new Contact for a selected node (Case or Event)
+   */
   createContact(form: NgForm) {
-    // get forms fields
-    const fields = this.formHelper.getFields(form);
+    // submit to validate form
+    form.ngSubmit.emit();
 
-    if (!this.formHelper.validateForm(form)) {
+    // validate
+    if (!form.valid) {
+      // show message
+      this.toastV2Service.notice('LNG_FORM_ERROR_FORM_INVALID');
+
+      // finished
       return;
     }
+
+    // get forms fields
+    const fields = this.formHelper.getFields(form);
 
     // contact fields
     const contactFields = fields.contact;
@@ -498,6 +545,9 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     const relationshipFields = fields.relationship;
     // get source person
     const sourcePerson = this.selectedNodes.sourceNode;
+
+    // show loading
+    const loading = this.dialogV2Service.showLoadingDialog();
 
     // add the new Contact
     this.contactDataService
@@ -519,6 +569,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             .pipe(
               catchError((err) => {
                 // display error message
+                loading.close();
                 this.toastV2Service.error(err);
 
                 // rollback - remove contact
@@ -532,11 +583,13 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             );
         }),
         catchError((err) => {
+          loading.close();
           this.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
+        loading.close();
         this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_SUCCESS_MESSAGE');
 
         // reset form
@@ -550,13 +603,24 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
       });
   }
 
+  /**
+   * Create contact of contacts
+   */
   createContactOfContact(form: NgForm) {
-    // get forms fields
-    const fields = this.formHelper.getFields(form);
+    // submit to validate form
+    form.ngSubmit.emit();
 
-    if (!this.formHelper.validateForm(form)) {
+    // validate
+    if (!form.valid) {
+      // show message
+      this.toastV2Service.notice('LNG_FORM_ERROR_FORM_INVALID');
+
+      // finished
       return;
     }
+
+    // get forms fields
+    const fields = this.formHelper.getFields(form);
 
     // contact of contact fields
     const contactOfContactFields = fields.contact;
@@ -564,6 +628,9 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     const relationshipFields = fields.relationship;
     // get source person
     const sourcePerson = this.selectedNodes.sourceNode;
+
+    // show loading
+    const loading = this.dialogV2Service.showLoadingDialog();
 
     // add the new Contact of Contact
     this.contactsOfContactsDataService
@@ -585,6 +652,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             .pipe(
               catchError((err) => {
                 // display error message
+                loading.close();
                 this.toastV2Service.error(err);
 
                 // rollback - remove contact
@@ -598,11 +666,13 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
             );
         }),
         catchError((err) => {
+          loading.close();
           this.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
+        loading.close();
         this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_CREATE_CONTACT_OF_CONTACT_SUCCESS_MESSAGE');
 
         // reset form
@@ -617,30 +687,49 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Create a new Contact for a selected node (Case or Event)
-     * @param form
-     */
+   * Create a new Contact for a selected node (Case or Event)
+   */
   modifyPerson(form: NgForm) {
-    if (!this.formHelper.validateForm(form)) {
+    // submit to validate form
+    form.ngSubmit.emit();
+
+    // validate
+    if (!form.valid) {
+      // show message
+      this.toastV2Service.notice('LNG_FORM_ERROR_FORM_INVALID');
+
+      // finished
       return;
     }
 
     // get forms fields
     const dirtyFields: any = this.formHelper.getDirtyFields(form);
+    if (_.isEmpty(dirtyFields)) {
+      // show message
+      this.toastV2Service.success('LNG_FORM_WARNING_NO_CHANGES');
+
+      // finished
+      return;
+    }
 
     // get person being modified
     const person: (CaseModel | ContactModel | EventModel | ContactOfContactModel) = this.selectedNodes.nodes[0];
+
+    // show loading
+    const loading = this.dialogV2Service.showLoadingDialog();
 
     // modify person
     this.entityDataService
       .modifyEntity(person.type, this.selectedOutbreak.id, person.id, dirtyFields)
       .pipe(
         catchError((err) => {
+          loading.close();
           this.toastV2Service.error(err);
           return throwError(err);
         })
       )
       .subscribe(() => {
+        loading.close();
         this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_PERSON_SUCCESS_MESSAGE');
 
         // reset form
@@ -655,16 +744,34 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Modify a selected relationship relationship
-     * @param {NgForm} form
-     */
+   * Modify a selected relationship
+   */
   modifyRelationship(form: NgForm) {
-    if (!this.formHelper.validateForm(form)) {
+    // submit to validate form
+    form.ngSubmit.emit();
+
+    // validate
+    if (!form.valid) {
+      // show message
+      this.toastV2Service.notice('LNG_FORM_ERROR_FORM_INVALID');
+
+      // finished
       return;
     }
 
     // get forms fields
     const dirtyFields: any = this.formHelper.getDirtyFields(form);
+    if (_.isEmpty(dirtyFields)) {
+      // show message
+      this.toastV2Service.success('LNG_FORM_WARNING_NO_CHANGES');
+
+      // finished
+      return;
+    }
+
+    // show loading
+    const loading = this.dialogV2Service.showLoadingDialog();
+
     // create source person
     const sourcePerson = _.find(this.selectedRelationship.persons, person => person.source === true);
     this.relationshipDataService
@@ -677,12 +784,13 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
       )
       .pipe(
         catchError((err) => {
+          loading.close();
           this.toastV2Service.error(err);
-
           return throwError(err);
         })
       )
       .subscribe(() => {
+        loading.close();
         this.toastV2Service.success('LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_RELATIONSHIP_SUCCESS_MESSAGE');
 
         // reset selected relationship
@@ -703,37 +811,58 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
      * Delete selected relationship
      */
   deleteSelectedRelationship() {
-    // #TODO
-    // this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP_CHAIN_OF_TRANSMISSION')
-    //   .subscribe((answer: DialogAnswer) => {
-    //     if (answer.button === DialogAnswerButton.Yes) {
-    //       const sourcePerson = _.find(this.selectedRelationship.persons, person => person.source === true);
-    //       // delete relationship
-    //       this.relationshipDataService
-    //         .deleteRelationship(this.selectedOutbreak.id, sourcePerson.type, sourcePerson.id, this.selectedRelationship.id)
-    //         .pipe(
-    //           catchError((err) => {
-    //             this.toastV2Service.error(err);
-    //             return throwError(err);
-    //           })
-    //         )
-    //         .subscribe(() => {
-    //           this.toastV2Service.success('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
-    //
-    //           // reset selected relationship
-    //           this.selectedRelationship = undefined;
-    //
-    //           // reset form
-    //           this.resetFormModels();
-    //
-    //           // reset selected nodes
-    //           this.resetNodes();
-    //
-    //           // reset node action
-    //           this.currentNodeAction = null;
-    //         });
-    //     }
-    //   });
+    this.dialogV2Service
+      .showConfirmDialog({
+        config: {
+          title: {
+            get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
+          },
+          message: {
+            get: () => 'LNG_DIALOG_CONFIRM_DELETE_RELATIONSHIP_CHAIN_OF_TRANSMISSION'
+          }
+        }
+      })
+      .subscribe((response) => {
+        // canceled ?
+        if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+          // finished
+          return;
+        }
+
+        // delete relationship
+        const loadingDialog = this.dialogV2Service.showLoadingDialog();
+        const sourcePerson = _.find(this.selectedRelationship.persons, person => person.source === true);
+        this.relationshipDataService
+          .deleteRelationship(
+            this.selectedOutbreak.id,
+            sourcePerson.type,
+            sourcePerson.id,
+            this.selectedRelationship.id
+          )
+          .pipe(
+            catchError((err) => {
+              this.toastV2Service.error(err);
+              loadingDialog.close();
+              return throwError(err);
+            })
+          )
+          .subscribe(() => {
+            this.toastV2Service.success('LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_ACTION_DELETE_RELATIONSHIP_SUCCESS_MESSAGE');
+            loadingDialog.close();
+
+            // reset selected relationship
+            this.selectedRelationship = undefined;
+
+            // reset form
+            this.resetFormModels();
+
+            // reset selected nodes
+            this.resetNodes();
+
+            // reset node action
+            this.currentNodeAction = null;
+          });
+      });
   }
 
   /**

@@ -40,7 +40,9 @@ export class QuestionnaireQuestionCategoryDataResolver implements IMapResolverV2
               label: item.value,
               value: item.id,
               iconUrl: item.iconUrl,
-              data: item
+              data: item,
+              disabled: !item.active,
+              order: item.order
             });
           });
 

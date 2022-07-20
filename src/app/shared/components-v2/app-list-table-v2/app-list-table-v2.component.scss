@@ -48,7 +48,24 @@
     min-height: 2.4rem;
 
     .gd-list-top-grouped-data {
+      overflow-x: overlay;
       padding-bottom: 2.4rem;
+
+      /* Hide menu scrollbar and show it on hover */
+      &::-webkit-scrollbar,
+      &::-webkit-scrollbar-thumb {
+        @include transition(all 0.24s ease-in-out 0s);
+        opacity: 0;
+        visibility: hidden;
+      }
+
+      &:hover {
+        &::-webkit-scrollbar,
+        &::-webkit-scrollbar-thumb {
+          opacity: 1;
+          visibility: visible;
+        }
+      }
 
       .gd-list-top-grouped-data-value {
         @include border-radius(0.8rem);
@@ -79,6 +96,14 @@
           z-index: 7;
         }
 
+        &:first-child {
+          margin-left: 0.4rem;
+        }
+
+        &:last-child {
+          margin-right: 0.4rem;
+        }
+
         &.gd-list-top-grouped-data-value-active {
           @include opacity(1);
 
@@ -95,6 +120,7 @@
           font-size: 1.8rem;
           font-weight: 500;
           position: relative;
+          white-space: nowrap;
           z-index: 10;
         }
 

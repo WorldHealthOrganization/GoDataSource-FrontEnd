@@ -101,6 +101,10 @@
           padding: 0.8rem 0;
           width: 10rem;
 
+          @include breakpoint('xxs') {
+            width: 8rem;
+          }
+
           .gd-dashlet-kpi-bottom-value-left-text & {
             padding: 0.4rem 0;
             width: 5rem;
@@ -216,8 +220,18 @@
   }
 
   .gd-form-number-v2-viewonly {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
     .gd-form-number-v2-viewonly-label {
       color: var(--gd-secondary);
+      white-space: nowrap;
+    }
+
+    .gd-form-number-v2-viewonly-value {
+      overflow: hidden;
+      text-overflow: ellipsis;
       white-space: nowrap;
     }
   }

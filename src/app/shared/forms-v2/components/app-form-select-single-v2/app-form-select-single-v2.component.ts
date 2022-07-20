@@ -53,6 +53,9 @@ export class AppFormSelectSingleV2Component
   // sort disabled
   @Input() sortDisabled: boolean;
 
+  // scroll to top when showing options popup ?
+  @Input() optionsPopupScrollToTop: boolean;
+
   // loading
   @Input() loading: boolean;
 
@@ -103,7 +106,34 @@ export class AppFormSelectSingleV2Component
       if (!this.sortDisabled) {
         this.allOptions
           .sort((item1, item2) => {
-            return item1.label.toLowerCase().localeCompare(item2.label.toLowerCase());
+            // compare
+            if (
+              typeof item1.order === 'number' &&
+              typeof item2.order === 'number'
+            ) {
+              // equal ?
+              if (item1.order === item2.order) {
+                return (item1.label ? this.translateService.instant(item1.label) : '')
+                  .localeCompare((item2.label ? this.translateService.instant(item2.label) : ''));
+              }
+
+              // finished
+              return item1.order - item2.order;
+            } else if (
+              typeof item1.order === 'number' &&
+              !item2.order
+            ) {
+              return -1;
+            } else if (
+              !item1.order &&
+              typeof item2.order === 'number'
+            ) {
+              return 1;
+            }
+
+            // finished
+            return (item1.label ? this.translateService.instant(item1.label) : '')
+              .localeCompare((item2.label ? this.translateService.instant(item2.label) : ''));
           });
       }
     }
@@ -120,6 +150,9 @@ export class AppFormSelectSingleV2Component
   get options(): ILabelValuePairModel[] {
     return this.allOptions;
   }
+
+  // allow disabled options to be selected ?
+  @Input() allowDisabledToBeSelected: boolean = false;
 
   // vscroll handler
   @ViewChild('cdkVirtualScrollViewport') cdkVirtualScrollViewport: CdkVirtualScrollViewport;
@@ -178,15 +211,28 @@ export class AppFormSelectSingleV2Component
    * vScroll to see the first selected item
    */
   vScrollToFirstSelectedOption(): void {
+    // nothing to do ?
+    if (!this.cdkVirtualScrollViewport) {
+      return;
+    }
+
+    // scroll to top ?
+    if (this.optionsPopupScrollToTop) {
+      // scroll
+      this.cdkVirtualScrollViewport.scrollToOffset(0);
+      this.changeDetectorRef.detectChanges();
+
+      // finished
+      return;
+    }
+
     // scroll to item ?
-    if (
-      this.value &&
-      this.cdkVirtualScrollViewport
-    ) {
+    if (this.value) {
       // determine value to search
       const index: number = this.filteredOptions.findIndex((option) => option.value === this.value);
       if (index > -1) {
         this.cdkVirtualScrollViewport.scrollToIndex(index);
+        this.changeDetectorRef.detectChanges();
       }
     }
   }

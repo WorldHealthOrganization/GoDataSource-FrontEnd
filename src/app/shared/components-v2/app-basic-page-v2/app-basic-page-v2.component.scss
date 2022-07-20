@@ -22,6 +22,10 @@ app-basic-page-v2 {
     
       /* Page top buttons */
       .gd-basic-top-title-buttons-buttons {
+        &:empty {
+          display: none !important;
+        }
+
         @include breakpoint('xs') {
           margin-top: 1.6rem;
         }
@@ -52,8 +56,7 @@ app-basic-page-v2 {
     }
 
     app-import-case-data & {
-      min-height: 52rem;
-      overflow: hidden;
+      min-height: 45rem;
     }
 
     app-view-movement-case &,

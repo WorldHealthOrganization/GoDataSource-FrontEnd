@@ -49,7 +49,8 @@ export enum V2SideDialogConfigInputType {
   HTML,
   FILTER_LIST,
   FILTER_LIST_FILTER,
-  FILTER_LIST_SORT
+  FILTER_LIST_SORT,
+  SORT_LIST
 }
 
 /**
@@ -471,6 +472,8 @@ export interface IV2SideDialogConfigInputFilterList extends IV2SideDialogConfigI
 
   // not used
   placeholder?: never;
+
+  // optional
   optionsAsLabelValue?: ILabelValuePairModel[];
   sortableOptionsAsLabelValue?: ILabelValuePairModel[];
   optionsAsLabelValueMap?: {
@@ -483,6 +486,19 @@ export interface IV2SideDialogConfigInputFilterList extends IV2SideDialogConfigI
 }
 
 /**
+ * Side dialog input - filter list
+ */
+export interface IV2SideDialogConfigInputSortList extends IV2SideDialogConfigInputBase {
+  // required
+  type: V2SideDialogConfigInputType.SORT_LIST;
+  name: string;
+  items: ILabelValuePairModel[];
+
+  // not used
+  placeholder?: never;
+}
+
+/**
  * Side dialog inputs
  */
 export type V2SideDialogConfigInputFromInput = IV2SideDialogConfigInputCheckbox | IV2SideDialogConfigInputText | IV2SideDialogConfigInputTextarea
@@ -492,7 +508,7 @@ export type V2SideDialogConfigInputFromInput = IV2SideDialogConfigInputCheckbox 
 export type V2SideDialogConfigInput = IV2SideDialogConfigInputDivider | IV2SideDialogConfigInputDateRange | IV2SideDialogConfigInputNumberRange
 | IV2SideDialogConfigInputKeyValue | IV2SideDialogConfigInputHTML | V2SideDialogConfigInputFromInput | IV2SideDialogConfigInputLink
 | IV2SideDialogConfigInputLinkWithAction | IV2SideDialogConfigInputGroup | IV2SideDialogConfigInputButton | IV2SideDialogConfigInputRow
-| IV2SideDialogConfigInputAccordion | IV2SideDialogConfigInputFilterList;
+| IV2SideDialogConfigInputAccordion | IV2SideDialogConfigInputFilterList | IV2SideDialogConfigInputSortList;
 
 /**
  * Side dialog inputs map

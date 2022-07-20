@@ -279,7 +279,8 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
   protected initializeExpandListAdvancedFilters(): void {
     this.expandListAdvancedFilters = EventModel.generateAdvancedFilters({
       options: {
-        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        eventCategory: (this.activatedRoute.snapshot.data.eventCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
       }
     });
   }
@@ -368,6 +369,29 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
             replace: {
               condition: () => !UserModel.canListForFilters(this.authUser),
               html: this.translateService.instant('LNG_PAGE_CREATE_EVENT_CANT_SET_RESPONSIBLE_ID_TITLE')
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'eventCategory',
+            placeholder: () => 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY',
+            description: () => 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY_DESCRIPTION',
+            options: (this.activatedRoute.snapshot.data.eventCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            value: {
+              get: () => this.itemData.eventCategory,
+              set: (value) => {
+                this.itemData.eventCategory = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.DATE,
+            name: 'endDate',
+            placeholder: () => 'LNG_EVENT_FIELD_LABEL_END_DATE',
+            description: () => 'LNG_EVENT_FIELD_LABEL_END_DATE_DESCRIPTION',
+            value: {
+              get: () => this.itemData.endDate,
+              set: (value) => {
+                this.itemData.endDate = value;
+              }
             }
           }, {
             type: CreateViewModifyV2TabInputType.TEXTAREA,

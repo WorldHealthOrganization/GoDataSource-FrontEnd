@@ -1,0 +1,40 @@
+.gd-relationship-summary {
+  .gd-relationship-summary-header {
+    border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+    padding: 0.8rem;
+
+    .gd-relationship-summary-header-title {
+      color: var(--gd-primary-alt);
+      font-size: 1.8rem;
+      font-weight: 500;
+    }
+
+    .gd-relationship-summary-header-close {
+      font-size: 1.8rem;
+      height: 2.6rem;
+      min-width: 2.6rem;
+      padding: 0.4rem;
+      width: 2.6rem;
+
+      .mat-icon {
+        font-size: 1.8rem;
+      }
+    }
+  }
+
+  .gd-relationship-summary-content {
+    max-height: 30rem;
+    min-height: 20rem;
+    overflow-y: overlay;
+    padding: 0.8rem;
+
+    .gd-relationship-summary-content-label {
+      color: var(--gd-secondary);
+    }
+  }
+
+  .gd-relationship-summary-footer {
+    border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+    padding: 0.8rem;
+  }
+}

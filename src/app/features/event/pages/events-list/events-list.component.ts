@@ -34,6 +34,7 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 
 @Component({
   selector: 'app-events-list',
@@ -104,6 +105,27 @@ export class EventsListComponent
       {
         field: 'date',
         label: 'LNG_EVENT_FIELD_LABEL_DATE',
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        sortable: true,
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
+        field: 'eventCategory',
+        label: 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY',
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.eventCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          includeNoValue: true
+        }
+      },
+      {
+        field: 'endDate',
+        label: 'LNG_EVENT_FIELD_LABEL_END_DATE',
         format: {
           type: V2ColumnFormat.DATE
         },
@@ -762,7 +784,8 @@ export class EventsListComponent
   protected initializeTableAdvancedFilters(): void {
     this.advancedFilters = EventModel.generateAdvancedFilters({
       options: {
-        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+        user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        eventCategory: (this.activatedRoute.snapshot.data.eventCategory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
       }
     });
   }
@@ -1080,7 +1103,9 @@ export class EventsListComponent
                         { label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS', value: 'numberOfContacts' },
                         { label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING', value: 'dateOfReporting' },
                         { label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', value: 'isDateOfReportingApproximate' },
-                        { label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUserId' }
+                        { label: 'LNG_EVENT_FIELD_LABEL_END_DATE', value: 'endDate' },
+                        { label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUserId' },
+                        { label: 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY', value: 'eventCategory' }
                       ]
                     },
                     groups: {
@@ -1249,6 +1274,8 @@ export class EventsListComponent
       'id',
       'name',
       'date',
+      'eventCategory',
+      'endDate',
       'description',
       'address',
       'responsibleUserId',

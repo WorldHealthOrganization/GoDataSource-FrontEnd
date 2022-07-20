@@ -39,6 +39,7 @@
               fxFlex>
               <!-- Number -->
               <span
+                *ngIf="!!item.no"
                 class="gd-form-fill-questionnaire-v2-list-item-question-content-number">{{item.no}}.</span>
 
               <!-- Label -->
@@ -84,6 +85,7 @@
 
             <!-- No -->
             <span
+              *ngIf="!!item.no"
               class="gd-form-fill-questionnaire-v2-list-item-answer-number">{{item.no}}.</span>
 
             <!-- Date -->
@@ -142,6 +144,7 @@
 
             <!-- No -->
             <span
+              *ngIf="!!item.parent.no"
               class="gd-form-fill-questionnaire-v2-list-item-answer-number"
               style="visibility: hidden">{{item.parent.no}}.</span>
 

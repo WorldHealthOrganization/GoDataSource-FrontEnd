@@ -96,7 +96,7 @@ export class FollowUpsDataService {
           (followUps || []).forEach((followUp) => {
             if (
               followUp.address &&
-                            followUp.address.locationId
+              followUp.address.locationId
             ) {
               locationIdsToRetrieve[followUp.address.locationId] = true;
             }

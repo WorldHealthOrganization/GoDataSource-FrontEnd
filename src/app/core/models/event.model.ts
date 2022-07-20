@@ -26,12 +26,14 @@ export class EventModel
   name: string;
   date: string | Moment;
   dateApproximate: boolean;
+  eventCategory: string;
   description: string;
   address: AddressModel;
   type: EntityType = EntityType.EVENT;
   dateOfReporting: string | Moment;
   isDateOfReportingApproximate: boolean;
   outbreakId: string;
+  endDate: string | Moment;
 
   numberOfContacts: number;
   numberOfExposures: number;
@@ -49,7 +51,8 @@ export class EventModel
    */
   static generateAdvancedFilters(data: {
     options: {
-      user: ILabelValuePairModel[]
+      user: ILabelValuePairModel[],
+      eventCategory: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -65,6 +68,12 @@ export class EventModel
         field: 'date',
         label: 'LNG_EVENT_FIELD_LABEL_DATE',
         sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'eventCategory',
+        label: 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY',
+        options: data.options.eventCategory
       },
       {
         type: V2AdvancedFilterType.TEXT,
@@ -88,6 +97,11 @@ export class EventModel
         field: 'isDateOfReportingApproximate',
         label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
         sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'endDate',
+        label: 'LNG_EVENT_FIELD_LABEL_END_DATE'
       },
       {
         type: V2AdvancedFilterType.RANGE_NUMBER,
@@ -178,10 +192,12 @@ export class EventModel
     this.name = _.get(data, 'name');
     this.date = _.get(data, 'date');
     this.dateApproximate = _.get(data, 'dateApproximate');
+    this.eventCategory = _.get(data, 'eventCategory');
     this.description = _.get(data, 'description');
     this.dateOfReporting = _.get(data, 'dateOfReporting');
     this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
     this.outbreakId = _.get(data, 'outbreakId');
+    this.endDate = _.get(data, 'endDate');
 
     this.numberOfContacts = _.get(data, 'numberOfContacts');
     this.numberOfExposures = _.get(data, 'numberOfExposures');

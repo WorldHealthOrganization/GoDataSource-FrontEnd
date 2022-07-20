@@ -1,244 +1,151 @@
-import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { FollowUpModel } from '../../../../core/models/follow-up.model';
-import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import * as _ from 'lodash';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { Constants } from '../../../../core/models/constants';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { DialogField } from '../../../../shared/components';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { FormDateRangeSliderData } from '../../../../shared/xt-forms/components/form-date-range-slider/form-date-range-slider.component';
 import { FollowUpPage } from '../../typings/follow-up-page';
-import { RangeFollowUpsModel } from '../../../../core/models/range-follow-ups.model';
-import { RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
-import { Observable } from 'rxjs';
-import { catchError, share } from 'rxjs/operators';
-import { moment, Moment } from '../../../../core/helperClasses/x-moment';
-import { Subscription } from 'rxjs/internal/Subscription';
-import { AddressType } from '../../../../core/models/address.model';
-import { TeamModel } from '../../../../core/models/team.model';
-import { TeamDataService } from '../../../../core/services/data/team.data.service';
-import { throwError } from 'rxjs/internal/observable/throwError';
-import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { catchError, map, takeUntil } from 'rxjs/operators';
+import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { CaseModel } from '../../../../core/models/case.model';
+import { FollowUpModel } from '../../../../core/models/follow-up.model';
+import * as _ from 'lodash';
+import { Moment, moment } from '../../../../core/helperClasses/x-moment';
+import { Constants } from '../../../../core/models/constants';
+import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { ActivatedRoute } from '@angular/router';
+import { RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { EntityType } from '../../../../core/models/entity-type';
+import { Location } from '@angular/common';
+import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { LocationModel } from '../../../../core/models/location.model';
+import { throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { AppBasicPageV2Component } from '../../../../shared/components-v2/app-basic-page-v2/app-basic-page-v2.component';
+import { TeamModel } from '../../../../core/models/team.model';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { ExportDataExtension, ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
+import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { TranslateService } from '@ngx-translate/core';
+import * as momentOriginal from 'moment';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
   selector: 'app-contact-range-follow-ups-list',
-  encapsulation: ViewEncapsulation.None,
   templateUrl: './contact-range-follow-ups-list.component.html',
-  styleUrls: ['./contact-range-follow-ups-list.component.scss']
+  styleUrls: ['./contact-range-follow-ups-list.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class ContactRangeFollowUpsListComponent
-  // #TODO - remove list component paginator ?
   extends ListComponent<any>
-  implements OnInit, OnDestroy {
+  implements OnDestroy {
 
-  // basic page component
-  @ViewChild('basicPage', { static: true }) basicPage: AppBasicPageV2Component;
-
-  // breadcrumbs
-  // breadcrumbs: BreadcrumbItemModel[] = [];
-
-  outbreakSubscriber: Subscription;
-
-  // which follow-ups list page are we visiting?
-  rootPage: FollowUpPage = FollowUpPage.RANGE;
-
-  // follow ups list
-  followUpsGroupedByContact: {
-    person: ContactModel | CaseModel,
-    followUps: {
-      [date: string]: FollowUpModel[]
+  // default table columns
+  defaultTableColumns: IV2Column[] = [
+    {
+      field: 'name',
+      label: 'LNG_ENTITY_FIELD_LABEL_NAME',
+      pinned: IV2ColumnPinned.LEFT,
+      notMovable: true,
+      format: {
+        type: 'person.name'
+      },
+      link: (data) => {
+        return data.person.type === EntityType.CASE ?
+          (CaseModel.canView(this.authUser) ? `/cases/${data.person.id}/view` : undefined) :
+          (ContactModel.canView(this.authUser) ? `/contacts/${data.person.id}/view` : undefined);
+      }
+    }, {
+      field: 'visualId',
+      label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID',
+      format: {
+        type: 'person.visualId'
+      },
+      pinned: IV2ColumnPinned.LEFT,
+      notMovable: true
+    }, {
+      field: 'locationId',
+      label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
+      format: {
+        type: 'person.mainAddress.location.name'
+      },
+      pinned: IV2ColumnPinned.LEFT,
+      notMovable: true,
+      link: (data) => {
+        return data.person?.mainAddress?.location?.id && LocationModel.canView(this.authUser) ?
+          `/locations/${data.person.mainAddress.location.id}/view` :
+          undefined;
+      }
+    },
+    {
+      field: 'dateOfLastContact',
+      label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
+      format: {
+        type: V2ColumnFormat.DATE,
+        field: 'person.dateOfLastContact'
+      },
+      notMovable: true
+    },
+    {
+      field: 'endDate',
+      label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_DATE_END_FOLLOW_UP',
+      format: {
+        type: V2ColumnFormat.DATE,
+        field: 'person.followUp.endDate'
+      },
+      notMovable: true
     }
-  }[] = [];
-  daysToDisplay: string[] = [];
-  dailyStatuses: {
-    // status ID => Status
-    [statusId: string]: ReferenceDataEntryModel
-  } = {};
-
-  // used for pagination
-  followUpsGroupedByContactCount$: Observable<IBasicCount>;
-  teamsList$: Observable<TeamModel[]>;
-
-  // loading flag - display spinner instead of table
-  displayLoading: boolean = false;
-
-  // export
-  exportRangeFollowUpsUrl: string;
-  exportRangeFollowUpsFileName: string;
-  exportRangeExtraAPIData: {
-    [key: string]: any
-  };
-  exportRangeExtraDialogFields: DialogField[];
-
-  // constants
-  ExportDataExtension = ExportDataExtension;
-  ReferenceDataCategory = ReferenceDataCategory;
-  FollowUpModel = FollowUpModel;
-  EntityType = EntityType;
-
-  filtersVisible: boolean = false;
-
-  filters: {
-    contactName: any,
-    visualId: any,
-    dateOfLastContact: any,
-    dateOfTheEndOfTheFollowUp: any,
-    locationIds: string[],
-    teamIds: string[],
-    displayMissedFollowUps: boolean
-    displayMissedFollowUpsNoDays: number
-  } = {
-      contactName: null,
-      visualId: null,
-      dateOfLastContact: null,
-      dateOfTheEndOfTheFollowUp: null,
-      locationIds: [],
-      teamIds: [],
-      displayMissedFollowUps: false,
-      displayMissedFollowUpsNoDays: 1
-    };
+  ];
 
   /**
-     * Filter slider data
-     */
-  slideFilterData: {
-    minDate: Moment,
-    maxDate: Moment,
-    maxRange: number
-  } = {
-      minDate: moment().startOf('day'),
-      maxDate: moment().endOf('day'),
-      maxRange: 0
-    };
-
-  /**
-     * Slider Date Filter Value
-     */
-  sliderDateFilterValue: FormDateRangeSliderData;
-
-  /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
-    private outbreakDataService: OutbreakDataService,
     private followUpsDataService: FollowUpsDataService,
+    private activatedRoute: ActivatedRoute,
+    private location: Location,
     private toastV2Service: ToastV2Service,
-    private referenceDataDataService: ReferenceDataDataService,
-    private i18nService: I18nService,
-    private genericDataService: GenericDataService,
-    private teamDataService: TeamDataService
+    private dialogV2Service: DialogV2Service,
+    private translateService: TranslateService
   ) {
     super(
       listHelperService,
       true
     );
-  }
 
-  /**
-     * Component initialized
-     */
-  ngOnInit() {
-    // get the authenticated user
-    this.teamsList$ = this.teamDataService.getTeamsList().pipe(share());
-
-    // add page title
-    this.exportRangeFollowUpsFileName = this.i18nService.instant('LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL') +
-            ' - ' +
-            moment().format('YYYY-MM-DD');
-
-    // retrieve group by options
-    this.genericDataService
-      .getRangeFollowUpGroupByOptions()
-      .subscribe((options) => {
-        this.exportRangeExtraDialogFields = [
-          new DialogField({
-            name: 'groupBy',
-            placeholder: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON',
-            inputOptions: options,
-            value: Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE.value,
-            required: true
-          })
-        ];
-      });
-
-    // subscribe to the Selected Outbreak
-    this.outbreakSubscriber = this.outbreakDataService
-      .getSelectedOutbreakSubject()
-      .subscribe((selectedOutbreak: OutbreakModel) => {
-        // selected outbreak
-        this.selectedOutbreak = selectedOutbreak;
-
-        // export url
-        this.exportRangeFollowUpsUrl = null;
-        this.slideFilterData = {
-          minDate: moment().startOf('day'),
-          maxDate: moment().endOf('day'),
-          maxRange: 0
-        };
-        if (
-          this.selectedOutbreak &&
-                    this.selectedOutbreak.id
-        ) {
-          this.exportRangeFollowUpsUrl = `outbreaks/${this.selectedOutbreak.id}/contacts/range-list/export`;
-
-          // set filter slider info
-          this.slideFilterData.minDate = moment(this.selectedOutbreak.startDate).startOf('day');
-          this.slideFilterData.maxDate = moment().add(1, 'days').endOf('day');
-          this.slideFilterData.maxRange = this.selectedOutbreak.periodOfFollowup;
-
-          // initialize pagination
-          this.initPaginator();
-
-          // filter
-          this.filterByDateRange(new FormDateRangeSliderData({
-            low: moment().add(-this.selectedOutbreak.periodOfFollowup + 1, 'days').startOf('day'),
-            high: moment().add(1, 'days').endOf('day')
-          }), true);
+    // additional information
+    this.suffixLegends = [{
+      label: 'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE',
+      value: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options.map((option) => Object.assign(
+        {},
+        option, {
+          color: option.data?.getColorCode ?
+            option.data.getColorCode() :
+            Constants.DEFAULT_COLOR_REF_DATA
         }
-
-        // daily status colors
-        this.referenceDataDataService
-          .getReferenceDataByCategory(ReferenceDataCategory.CONTACT_DAILY_FOLLOW_UP_STATUS)
-          .subscribe((data: ReferenceDataCategoryModel) => {
-            this.dailyStatuses = {};
-            _.each(data.entries, (entry: ReferenceDataEntryModel) => {
-              this.dailyStatuses[entry.id] = entry;
-            });
-          });
-      });
-
-    // initialize breadcrumbs
-    this.initializeBreadcrumbs();
-
-    // update ui size
-    this.basicPage.detectChanges();
+      ))
+    }];
   }
 
   /**
-     * Component destroyed
-     */
-  ngOnDestroy() {
+   * Component destroyed
+   */
+  ngOnDestroy(): void {
     // release parent resources
     super.onDestroy();
+  }
 
-    // outbreak subscriber
-    if (this.outbreakSubscriber) {
-      this.outbreakSubscriber.unsubscribe();
-      this.outbreakSubscriber = null;
-    }
+  /**
+   * Selected outbreak was changed
+   */
+  selectedOutbreakChanged(): void {
+    // initialize pagination
+    this.initPaginator();
+
+    // ...and re-load the list when the Selected Outbreak is changed
+    this.needsRefreshList(true);
   }
 
   /**
@@ -254,17 +161,149 @@ export class ContactRangeFollowUpsListComponent
   /**
    * Initialize table infos
    */
-  protected initializeTableInfos(): void {}
+  protected initializeTableInfos(): void {
+    this.infos = [
+      'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_NO_DATA_LABEL',
+      'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_CLICK_TO_VIEW_FOLLOW_UP_LABEL',
+      'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_QUESTIONNAIRE_ALERT_LABEL'
+    ];
+  }
 
   /**
    * Initialize Table Advanced Filters
    */
-  protected initializeTableAdvancedFilters(): void {}
+  protected initializeTableAdvancedFilters(): void {
+    this.advancedFilters = [
+      // case / contact
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'firstName',
+        label: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
+        childQueryBuilderKey: 'contact'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'lastName',
+        label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
+        childQueryBuilderKey: 'contact'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'visualId',
+        label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID',
+        childQueryBuilderKey: 'contact'
+      },
+      {
+        type: V2AdvancedFilterType.LOCATION_MULTIPLE,
+        field: 'addresses',
+        label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_LOCATION',
+        childQueryBuilderKey: 'contact'
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'dateOfLastContact',
+        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
+        childQueryBuilderKey: 'contact'
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'followUp.endDate',
+        label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_DATE_END_FOLLOW_UP',
+        childQueryBuilderKey: 'contact'
+      },
+
+      // follow-up
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'date',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE'
+      }, {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'teamId',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
+        options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options
+      }, {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'statusId',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
+        options: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+      }
+    ];
+  }
 
   /**
    * Initialize table quick actions
    */
-  protected initializeQuickActions(): void {}
+  protected initializeQuickActions(): void {
+    this.quickActions = {
+      type: V2ActionType.MENU,
+      label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
+      visible: (): boolean => {
+        return FollowUpModel.canExportRange(this.authUser);
+      },
+      menuOptions: [
+        // Export follow-up dashboard
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_BUTTON'
+          },
+          action: {
+            click: () => {
+              this.dialogV2Service.showExportData({
+                title: {
+                  get: () => 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_TITLE'
+                },
+                export: {
+                  url: `outbreaks/${this.selectedOutbreak.id}/contacts/range-list/export`,
+                  async: false,
+                  method: ExportDataMethod.POST,
+                  fileName: `${this.translateService.instant('LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL')} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`,
+                  allow: {
+                    types: [
+                      ExportDataExtension.PDF
+                    ]
+                  },
+                  inputs: {
+                    append: [
+                      {
+                        type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+                        placeholder: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_EXPORT_GROUP_BY_BUTTON',
+                        name: 'groupBy',
+                        options: (this.activatedRoute.snapshot.data.followUpGroupBy as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+                        value: Constants.RANGE_FOLLOW_UP_EXPORT_GROUP_BY.PLACE.value,
+                        validators: {
+                          required: () => true
+                        }
+                      }, {
+                        type: V2SideDialogConfigInputType.DATE,
+                        placeholder: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_START_DATE',
+                        name: 'startDate',
+                        value: undefined,
+                        validators: {
+                          required: () => true
+                        }
+                      }, {
+                        type: V2SideDialogConfigInputType.DATE,
+                        placeholder: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_END_DATE',
+                        name: 'endDate',
+                        value: undefined,
+                        validators: {
+                          required: () => true
+                        }
+                      }
+                    ]
+                  }
+                }
+              });
+            }
+          },
+          visible: (): boolean => {
+            return FollowUpModel.canExportRange(this.authUser);
+          }
+        }
+      ]
+    };
+  }
 
   /**
    * Initialize table group actions
@@ -285,27 +324,31 @@ export class ContactRangeFollowUpsListComponent
    * Initialize breadcrumbs
    */
   protected initializeBreadcrumbs(): void {
-    //   // init breadcrumbs
-    //   this.breadcrumbs = [];
-    //
-    //   // contacts breadcrumb
-    //   if (ContactModel.canList(this.authUser)) {
-    //     this.breadcrumbs.push(
-    //       new BreadcrumbItemModel(
-    //         'LNG_PAGE_LIST_CONTACTS_TITLE',
-    //         '/contacts'
-    //       )
-    //     );
-    //   }
-    //
-    //   // current page breadcrumb
-    //   this.breadcrumbs.push(
-    //     new BreadcrumbItemModel(
-    //       'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL',
-    //       '.',
-    //       true
-    //     )
-    //   );
+    // reset
+    this.breadcrumbs = [{
+      label: 'LNG_COMMON_LABEL_HOME',
+      action: {
+        link: DashboardModel.canViewDashboard(this.authUser) ?
+          ['/dashboard'] :
+          ['/account/my-profile']
+      }
+    }];
+
+    // contacts breadcrumb
+    if (ContactModel.canList(this.authUser)) {
+      this.breadcrumbs.push({
+        label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
+        action: {
+          link: ['/contacts']
+        }
+      });
+    }
+
+    // current page
+    this.breadcrumbs.push({
+      label: 'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL',
+      action: null
+    });
   }
 
   /**
@@ -318,7 +361,7 @@ export class ContactRangeFollowUpsListComponent
   /**
    * Refresh list
    */
-  refreshList() {
+  refreshList(): void {
     // order by name
     this.queryBuilder.sort.clear();
     this.queryBuilder.sort
@@ -335,282 +378,178 @@ export class ContactRangeFollowUpsListComponent
         RequestSortDirection.ASC
       );
 
-    // #TODO - must remove, added only for test purposes
-    this.queryBuilder.filter.byDateRange(
-      'date', {
-        startDate: '2019-01-01',
-        endDate: '2019-02-28'
-      }
-    );
-
-    // retrieve the list of Follow Ups
-    this.displayLoading = true;
-    this.followUpsGroupedByContact = [];
-    let minDate: Moment;
-    let maxDate: Moment;
-    this.followUpsDataService
+    // retrieve list
+    this.records$ = this.followUpsDataService
       .getRangeFollowUpsList(
         this.selectedOutbreak.id,
         this.queryBuilder
       )
       .pipe(
+        // process data
+        map((rangeData) => {
+          // determine date ranges
+          let minDate: Moment;
+          let maxDate: Moment;
+
+          // transform to list
+          const usedDates: {
+            [date: string]: true
+          } = {};
+          const followUpsGroupedByContact: {
+            person: ContactModel | CaseModel,
+            followUps: {
+              [date: string]: FollowUpModel[]
+            }
+          }[] = (rangeData || []).map((data) => {
+            // determine follow-up questionnaire alertness
+            data.followUps = FollowUpModel.determineAlertness(
+              this.selectedOutbreak.contactFollowUpTemplate,
+              data.followUps
+            );
+
+            // get grouped followups by contact & date
+            return {
+              person: data.person,
+              followUps: _.chain(data.followUps)
+                .groupBy((followUp: FollowUpModel) => {
+                  // determine min & max dates
+                  const date = moment(followUp.date).startOf('day');
+                  if (followUp.statusId) {
+                    minDate = minDate ?
+                      (date.isBefore(minDate) ? date : minDate) :
+                      date;
+                    maxDate = maxDate ?
+                      (date.isAfter(maxDate) ? moment(date) : maxDate) :
+                      moment(date);
+                  }
+
+                  // sort by date ascending
+                  return date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+                })
+                .mapValues((followUpData: FollowUpModel[], date) => {
+                  // used ?
+                  if (followUpData?.length > 0) {
+                    usedDates[date] = true;
+                  }
+
+                  // sort
+                  return _.sortBy(
+                    followUpData,
+                    (followUp: FollowUpModel) => {
+                      return moment(followUp.date);
+                    }
+                  );
+                })
+                .value()
+            };
+          });
+
+          // create dates array
+          const daysColumns: IV2Column[] = [];
+          if (
+            minDate &&
+            maxDate
+          ) {
+            // push dates
+            while (minDate.isSameOrBefore(maxDate)) {
+              // add day to list
+              // - exclude dates with no data
+              const formattedDate = minDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+              if (usedDates[formattedDate]) {
+                daysColumns.push({
+                  field: formattedDate,
+                  label: formattedDate,
+                  notMovable: true,
+                  format: {
+                    type: V2ColumnFormat.HTML
+                  },
+                  html: (
+                    data,
+                    column
+                  ) => {
+                    // nothing to do here ?
+                    const followUps: FollowUpModel[] = data.followUps[column.field];
+                    if (!followUps?.length) {
+                      return '';
+                    }
+
+                    // construct html
+                    let html: string = '<div class="gd-follow-up-dashboard-date-column-cell">';
+                    followUps.forEach((followUp) => {
+                      // determine bg color
+                      const bgColor: string = followUp.statusId && (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[followUp.statusId] ?
+                        (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[followUp.statusId].getColorCode() :
+                        Constants.DEFAULT_COLOR_REF_DATA;
+
+                      // construct url
+                      const url: string = data.person.type === EntityType.CASE ?
+                        `/cases/${data.person.id}/follow-ups/${followUp.id}/view?rootPage=${FollowUpPage.RANGE}` :
+                        `/contacts/${data.person.id}/follow-ups/${followUp.id}/view?rootPage=${FollowUpPage.RANGE}`;
+
+                      // render html
+                      html += `<a class="gd-list-table-link" href="${this.location.prepareExternalUrl(url)}">
+                        <div is-link="${url}" class="gd-follow-up-dashboard-date-column-cell-follow-up" style="background-color: ${bgColor};">
+                          ${!followUp.alerted ? '' : '<img class="gd-follow-up-dashboard-date-column-cell-follow-up-alerted" src="/assets/images/bell.png" />'}
+                        </div>
+                      </a>`;
+                    });
+
+                    // finalize html
+                    html += '</div>';
+
+                    // finished
+                    return html;
+                  }
+                });
+              }
+
+              // next day
+              minDate.add('1', 'days');
+            }
+          }
+
+          // update table columns
+          this.tableColumns = [
+            ...this.defaultTableColumns,
+            ...daysColumns
+          ];
+
+          // finished
+          return followUpsGroupedByContact;
+        }),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
+  }
+
+  /**
+   * Get total number of items, based on the applied filters
+   */
+  refreshListCount(): void {
+    // remove paginator from query builder
+    const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+    countQueryBuilder.paginator.clear();
+    countQueryBuilder.sort.clear();
+
+    // count
+    this.followUpsDataService
+      .getRangeFollowUpsListCount(
+        this.selectedOutbreak.id,
+        countQueryBuilder
+      )
+      .pipe(
+        // error
         catchError((err) => {
           this.toastV2Service.error(err);
           return throwError(err);
-        })
+        }),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
       )
-      .subscribe((rangeData: RangeFollowUpsModel[]) => {
-        this.followUpsGroupedByContact = _.map(rangeData, (data: RangeFollowUpsModel) => {
-          // determine follow-up questionnaire alertness
-          data.followUps = FollowUpModel.determineAlertness(
-            this.selectedOutbreak.contactFollowUpTemplate,
-            data.followUps
-          );
-
-          // get grouped followups by contact & date
-          return {
-            person: data.person,
-            followUps: _.chain(data.followUps)
-              .groupBy((followUp: FollowUpModel) => {
-                // determine min & max dates
-                const date = moment(followUp.date).startOf('day');
-                if (followUp.statusId) {
-                  minDate = minDate ?
-                    (date.isBefore(minDate) ? date : minDate) :
-                    date;
-                  maxDate = maxDate ?
-                    (date.isAfter(maxDate) ? moment(date) : maxDate) :
-                    moment(date);
-                }
-
-                // sort by date ascending
-                return date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-              })
-              .mapValues((followUpData: FollowUpModel[]) => {
-                return _.sortBy(
-                  followUpData,
-                  (followUp: FollowUpModel) => {
-                    return moment(followUp.date);
-                  }
-                );
-              })
-              .value()
-          };
-        });
-
-        // create dates array
-        this.daysToDisplay = [];
-        if (
-          minDate &&
-                      maxDate
-        ) {
-          // push dates
-          while (minDate.isSameOrBefore(maxDate)) {
-            // add day to list
-            this.daysToDisplay.push(minDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
-
-            // next day
-            minDate.add('1', 'days');
-          }
-        }
-
-        // display data
-        this.displayLoading = false;
+      .subscribe((response) => {
+        this.pageCount = response;
       });
-  }
-
-  /**
-     * Get total number of items, based on the applied filters
-     */
-  refreshListCount() {
-    if (this.selectedOutbreak) {
-      // remove paginator from query builder
-      const countQueryBuilder = _.cloneDeep(this.queryBuilder);
-      countQueryBuilder.paginator.clear();
-      countQueryBuilder.sort.clear();
-      this.followUpsGroupedByContactCount$ = this.followUpsDataService
-        .getRangeFollowUpsListCount(this.selectedOutbreak.id, countQueryBuilder)
-        .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            return throwError(err);
-          }),
-          share()
-        );
-    }
-  }
-
-  /**
-     * Filter by slider value
-     */
-  filterByDateRange(
-    value: FormDateRangeSliderData,
-    instant: boolean = false
-  ) {
-    // set the new value
-    this.sliderDateFilterValue = value;
-
-    // cleanup
-    this.queryBuilder.filter.removePathCondition('date');
-    this.queryBuilder.filter.removePathCondition('or.date');
-    this.queryBuilder.filter.removePathCondition('or.statusId');
-
-    // determine limits
-    const startDate: Moment = moment(this.sliderDateFilterValue.low).startOf('day');
-    const endDate: Moment = moment(this.sliderDateFilterValue.high).endOf('day');
-
-    // do we need to account for missed follow-ups ?
-    if (
-      this.filters.displayMissedFollowUps &&
-            this.filters.displayMissedFollowUpsNoDays > 0
-    ) {
-      this.queryBuilder.filter.where({
-        or: [{
-          date: {
-            between: [
-              startDate,
-              endDate
-            ]
-          }
-        }, {
-          statusId: {
-            inq: [
-              'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_PERFORMED',
-              'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_MISSED',
-              'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_NOT_ATTEMPTED'
-            ]
-          },
-          date: {
-            between: [
-              moment(startDate).add(-this.filters.displayMissedFollowUpsNoDays, 'days').startOf('day'),
-              endDate
-            ]
-          }
-        }]
-      });
-    } else {
-      // filter
-      this.queryBuilder.filter.byDateRange(
-        'date', {
-          startDate,
-          endDate
-        }
-      );
-
-      // set export data
-      this.exportRangeExtraAPIData = {
-        startDate,
-        endDate
-      };
-    }
-
-    // refresh list
-    this.needsRefreshList(instant);
-  }
-
-  /**
-     * Reset filters
-     */
-  resetFilters() {
-    // reset filters in UI
-    this.filters = {
-      contactName: null,
-      visualId: null,
-      dateOfLastContact: null,
-      dateOfTheEndOfTheFollowUp: null,
-      locationIds: [],
-      teamIds: [],
-      displayMissedFollowUps: false,
-      displayMissedFollowUpsNoDays: 1
-    };
-
-    // reset applied filters
-    this.resetFiltersToSideFilters();
-
-    // apply default filter
-    if (this.sliderDateFilterValue) {
-      this.filterByDateRange(this.sliderDateFilterValue);
-    }
-
-    // hide filters
-    this.filtersVisible = false;
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Apply filters
-     */
-  applyFilters() {
-    // clear query builder and apply each filter separately
-    this.queryBuilder.clear();
-
-    // apply default filter
-    if (this.sliderDateFilterValue) {
-      this.filterByDateRange(this.sliderDateFilterValue);
-    }
-
-    if (this.filters.contactName !== null) {
-      this.queryBuilder.addChildQueryBuilder('contact')
-        .filter.byTextMultipleProperties([ 'firstName', 'lastName'], this.filters.contactName);
-    }
-
-    if (this.filters.visualId !== null) {
-      this.queryBuilder.addChildQueryBuilder('contact')
-        .filter.byText('visualId', this.filters.visualId);
-    }
-
-    if (this.filters.dateOfLastContact !== null) {
-      this.queryBuilder.addChildQueryBuilder('contact')
-        .filter.byDateRange('dateOfLastContact', this.filters.dateOfLastContact);
-    }
-
-    if (this.filters.dateOfTheEndOfTheFollowUp !== null) {
-      this.queryBuilder.addChildQueryBuilder('contact')
-        .filter.byDateRange('followUp.endDate', this.filters.dateOfTheEndOfTheFollowUp);
-    }
-
-    if (this.filters.teamIds !== null) {
-      this.queryBuilder.filter
-        .bySelect('teamId', this.filters.teamIds, true, null);
-    }
-
-    // filter by contact locations
-    // only current addresses
-    if (!_.isEmpty(this.filters.locationIds)) {
-      this.queryBuilder
-        .addChildQueryBuilder('contact').filter
-        .where({
-          addresses: {
-            $elemMatch: {
-              typeId: AddressType.CURRENT_ADDRESS,
-              parentLocationIdFilter: {
-                $in: this.filters.locationIds
-              }
-            }
-          }
-        });
-    }
-
-    // hide filters
-    this.filtersVisible = false;
-
-    // refresh list
-    this.needsRefreshList();
-  }
-
-  /**
-     * Show/Hide filters
-     */
-  toggleFilters() {
-    this.filtersVisible = !this.filtersVisible;
-  }
-
-  /**
-     * Show/Hide filters button label
-     */
-  get toggleFiltersButtonLabel(): string {
-    return this.filtersVisible ? 'LNG_COMMON_BUTTON_HIDE_FILTERS' : 'LNG_COMMON_BUTTON_SHOW_FILTERS';
   }
 }

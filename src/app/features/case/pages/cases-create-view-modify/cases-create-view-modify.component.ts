@@ -365,7 +365,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Initialize tabs - Personal
    */
   private initializeTabsPersonal(): ICreateViewModifyV2Tab {
-    return {
+    // create tab
+    const tab: ICreateViewModifyV2Tab = {
       type: CreateViewModifyV2TabInputType.TAB,
       label: this.isCreate ?
         'LNG_PAGE_CREATE_CASE_TAB_PERSONAL_TITLE' :
@@ -438,7 +439,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
                   // reset pregnancy ?
                   if (this.itemData.gender === Constants.GENDER_MALE) {
-                    this.itemData.pregnancyStatus = undefined;
+                    // reset
+                    this.itemData.pregnancyStatus = null;
+
+                    // make sure we update pregnancy too
+                    tab.form.controls['pregnancyStatus'].markAsDirty();
                   }
                 }
               }
@@ -489,6 +494,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                       // set value
                       this.itemData.age = this.itemData.age || new AgeModel();
                       this.itemData.age.years = value;
+
+                      // reset
+                      this.itemData.dob = null;
                     }
                   },
                   months: {
@@ -497,13 +505,34 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                       // set value
                       this.itemData.age = this.itemData.age || new AgeModel();
                       this.itemData.age.months = value;
+
+                      // reset
+                      this.itemData.dob = null;
                     }
                   }
                 },
                 dob: {
                   get: () => this.itemData.dob,
                   set: (value) => {
+                    // set value
                     this.itemData.dob = value;
+
+                    // update age
+                    if (
+                      this.itemData.dob &&
+                      (this.itemData.dob as Moment).isValid()
+                    ) {
+                      // add age object if we don't have one
+                      this.itemData.age = this.itemData.age || new AgeModel();
+
+                      // add data
+                      const now = moment();
+                      this.itemData.age.years = now.diff(this.itemData.dob, 'years');
+                      this.itemData.age.months = this.itemData.age.years < 1 ? now.diff(this.itemData.dob, 'months') : 0;
+                    } else {
+                      this.itemData.age.months = 0;
+                      this.itemData.age.years = 0;
+                    }
                   }
                 }
               }
@@ -660,6 +689,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         }
       ]
     };
+
+    // finished
+    return tab;
   }
 
   /**

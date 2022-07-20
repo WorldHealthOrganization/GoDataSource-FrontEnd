@@ -6,7 +6,7 @@ import {
   IV2SideDialogConfigButtonType,
   IV2SideDialogConfigInputAccordionPanel,
   IV2SideDialogConfigInputFilterList,
-  IV2SideDialogConfigInputFilterListFilter, IV2SideDialogConfigInputFilterListSort,
+  IV2SideDialogConfigInputFilterListFilter, IV2SideDialogConfigInputFilterListSort, IV2SideDialogConfigInputSortList,
   IV2SideDialogData,
   IV2SideDialogHandler,
   IV2SideDialogResponse,
@@ -26,6 +26,8 @@ import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model
 import { RequestFilterOperator, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDragStart } from '@angular/cdk/drag-drop/drag-events';
 
 /**
  * Component
@@ -50,6 +52,9 @@ export class AppSideDialogV2Component implements OnDestroy {
     // update handler
     this.dialogHandler.form = this._form;
   }
+
+  // invalid drag zone
+  private _isInvalidDragEvent: boolean = true;
 
   // dialog config
   config: IV2SideDialogConfig;
@@ -857,4 +862,47 @@ export class AppSideDialogV2Component implements OnDestroy {
       });
   }
 
+  /**
+   * Drop item
+   */
+  dropItem(
+    event: CdkDragDrop<any[]>,
+    input: IV2SideDialogConfigInputSortList
+  ): void {
+    // stop ?
+    if (this._isInvalidDragEvent) {
+      return;
+    }
+
+    // disable drag
+    this._isInvalidDragEvent = true;
+    moveItemInArray(
+      input.items,
+      event.previousIndex,
+      event.currentIndex
+    );
+
+    // force rerender
+    input.items = [...input.items];
+
+    // update ui
+    this.changeDetectorRef.detectChanges();
+  }
+
+  /**
+   * Drag started
+   */
+  dragStarted(_event: CdkDragStart): void {
+    // stop ?
+    if (this._isInvalidDragEvent) {
+      document.dispatchEvent(new Event('mouseup'));
+    }
+  }
+
+  /**
+   * Started the drag from a zone that isn't allowed
+   */
+  notInvalidDragZone(): void {
+    this._isInvalidDragEvent = false;
+  }
 }

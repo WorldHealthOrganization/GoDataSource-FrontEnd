@@ -1,10 +1,10 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
@@ -16,6 +16,10 @@ import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v
 import * as _ from 'lodash';
 import { TranslateService } from '@ngx-translate/core';
 import { IconModel } from '../../../../core/models/icon.model';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSortList, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 
 @Component({
   selector: 'app-reference-data-category-entries-list',
@@ -289,6 +293,22 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
         ]
       }
     ];
+
+    // add lat & lng for specific categories
+    if (
+      this.category.id === ReferenceDataCategory.INSTITUTION_NAME ||
+      this.category.id === ReferenceDataCategory.LAB_NAME ||
+      this.category.id === ReferenceDataCategory.LAB_SEQUENCE_LABORATORY
+    ) {
+      this.tableColumns.push({
+        field: 'geoLocation.lat',
+        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_GEO_LOCATION_LAT'
+      },
+      {
+        field: 'geoLocation.lng',
+        label: 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_GEO_LOCATION_LNG'
+      });
+    }
   }
 
   /**
@@ -314,9 +334,25 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
       type: V2ActionType.MENU,
       label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
       visible: (): boolean => {
-        return IconModel.canList(this.authUser);
+        return ReferenceDataEntryModel.canModify(this.authUser) ||
+          IconModel.canList(this.authUser);
       },
       menuOptions: [
+        // Sort options
+        {
+          label: {
+            get: () => 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ORDER_ENTRIES'
+          },
+          action: {
+            click: () => {
+              this.orderEntries();
+            }
+          },
+          visible: (): boolean => {
+            return ReferenceDataEntryModel.canModify(this.authUser);
+          }
+        },
+
         // Manage Icons
         {
           label: {
@@ -472,6 +508,212 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
       )
       .subscribe((response) => {
         this.pageCount = response;
+      });
+  }
+
+  /**
+   * Order entries
+   */
+  private orderEntries(): void {
+    // show dialog
+    let idToItemMap: {
+      [id: string]: ReferenceDataEntryModel
+    };
+    this.dialogV2Service
+      .showSideDialog({
+        title: {
+          get: () => 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ORDER_ENTRIES'
+        },
+        hideInputFilter: true,
+        width: '60rem',
+        inputs: [{
+          type: V2SideDialogConfigInputType.DIVIDER,
+          placeholder: this.category.name
+        }, {
+          type: V2SideDialogConfigInputType.SORT_LIST,
+          name: 'sortItems',
+          items: []
+        }],
+        bottomButtons: [{
+          type: IV2SideDialogConfigButtonType.OTHER,
+          label: 'LNG_COMMON_BUTTON_APPLY',
+          color: 'primary'
+        }, {
+          type: IV2SideDialogConfigButtonType.CANCEL,
+          label: 'LNG_COMMON_BUTTON_CANCEL',
+          color: 'text'
+        }],
+        initialized: (handler) => {
+          // display loading
+          handler.loading.show();
+
+          // create qb
+          const qb = new RequestQueryBuilder();
+          qb.filter.byEquality(
+            'categoryId',
+            this.category.id
+          );
+
+          // retrieve only id, name & order
+          qb.fields(
+            'id',
+            'value',
+            'order'
+          );
+
+          // get the outbreak template to clone
+          this.referenceDataDataService
+            .getEntries(qb)
+            .pipe(
+              catchError((err) => {
+                // error
+                this.toastV2Service.error(err);
+
+                // hide loading
+                handler.hide();
+
+                // send it further
+                return throwError(err);
+              })
+            )
+            .subscribe((entries) => {
+              // sort items by order, followed by name
+              entries.sort((item1, item2) => {
+                // compare
+                if (
+                  typeof item1.order === 'number' &&
+                  typeof item2.order === 'number'
+                ) {
+                  // equal ?
+                  if (item1.order === item2.order) {
+                    return (item1.value ? this.translateService.instant(item1.value) : '')
+                      .localeCompare((item2.value ? this.translateService.instant(item2.value) : ''));
+                  }
+
+                  // finished
+                  return item1.order - item2.order;
+                } else if (
+                  typeof item1.order === 'number' &&
+                  !item2.order
+                ) {
+                  return -1;
+                } else if (
+                  !item1.order &&
+                  typeof item2.order === 'number'
+                ) {
+                  return 1;
+                }
+
+                // finished
+                return (item1.value ? this.translateService.instant(item1.value) : '')
+                  .localeCompare((item2.value ? this.translateService.instant(item2.value) : ''));
+              });
+
+              // create list of items that we need to sort
+              const items: ILabelValuePairModel[] = [];
+              idToItemMap = {};
+              entries.forEach((item) => {
+                // add option
+                items.push({
+                  label: item.value,
+                  value: item.id
+                });
+
+                // map
+                idToItemMap[item.id] = item;
+              });
+
+              // update sort items
+              (handler.data.map.sortItems as IV2SideDialogConfigInputSortList).items = items;
+
+              // hide loading
+              handler.loading.hide();
+            });
+        }
+      })
+      .subscribe((response) => {
+        // cancelled ?
+        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+          // finished
+          return;
+        }
+
+        // close dialog
+        response.handler.hide();
+
+        // determine what we need to save
+        const itemsToUpdate: ReferenceDataEntryModel[] = [];
+        (response.data.map.sortItems as IV2SideDialogConfigInputSortList).items.forEach((item, index) => {
+          // nothing to update ?
+          const order: number = index + 1;
+          if (idToItemMap[item.value].order === order) {
+            return;
+          }
+
+          // must update
+          idToItemMap[item.value].order = order;
+          itemsToUpdate.push(idToItemMap[item.value]);
+        });
+
+        // nothing to update ?
+        if (itemsToUpdate.length < 1) {
+          // nothing to update
+          this.toastV2Service.success('LNG_FORM_WARNING_NO_CHANGES');
+
+          // finished
+          return;
+        }
+
+        // show loading
+        const loading = this.dialogV2Service.showLoadingDialog();
+
+        // create requests to update order
+        const requests: Observable<ReferenceDataEntryModel>[] = [];
+        itemsToUpdate.forEach((item) => {
+          requests.push(this.referenceDataDataService
+            .modifyEntry(
+              item.id, {
+                order: item.order
+              }
+            )
+          );
+        });
+
+        // update order
+        const nextRequest = () => {
+          // finished ?
+          if (requests.length < 1) {
+            // hide loading
+            loading.close();
+
+            // refresh list
+            this.needsRefreshList(true);
+
+            // finished
+            return;
+          }
+
+          // execute 5 requests at a time
+          forkJoin(requests.splice(0, 5))
+            .pipe(
+              catchError((err) => {
+                // error
+                this.toastV2Service.error(err);
+
+                // hide loading
+                loading.close();
+
+                // send it further
+                return throwError(err);
+              })
+            )
+            .subscribe(() => {
+              nextRequest();
+            });
+        };
+
+        // start updating data
+        nextRequest();
       });
   }
 }

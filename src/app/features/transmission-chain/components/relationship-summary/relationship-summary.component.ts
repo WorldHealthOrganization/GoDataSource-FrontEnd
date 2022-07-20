@@ -1,25 +1,29 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { UserModel } from '../../../../core/models/user.model';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import * as _ from 'lodash';
 import { EntityType } from '../../../../core/models/entity-type';
-import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
 import { RelationshipPersonModel } from '../../../../core/models/relationship-person.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 
 @Component({
   selector: 'app-relationship-summary',
   templateUrl: './relationship-summary.component.html',
   encapsulation: ViewEncapsulation.None,
-  styleUrls: ['./relationship-summary.component.less']
+  styleUrls: ['./relationship-summary.component.scss']
 })
 export class RelationshipSummaryComponent implements OnInit, OnChanges {
   @Input() relationship: RelationshipModel;
@@ -78,20 +82,22 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
   RelationshipModel = RelationshipModel;
 
   selectedOutbreak: OutbreakModel;
-  relationshipData: LabelValuePair[] = [];
+  relationshipData: ILabelValuePairModel[] = [];
 
   relationshipLink: string;
 
   canReverseRelation: boolean = true;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private authDataService: AuthDataService,
     private relationshipDataService: RelationshipDataService,
     private outbreakDataService: OutbreakDataService,
-    private dialogService: DialogService
+    private dialogV2Service: DialogV2Service,
+    private entityHelperService: EntityHelperService,
+    private toastV2Service: ToastV2Service
   ) {}
 
   ngOnChanges(changes: SimpleChanges) {
@@ -148,32 +154,63 @@ export class RelationshipSummaryComponent implements OnInit, OnChanges {
   }
 
   /**
-     * Reverse persons of an existing relationship
-     */
+   * Reverse persons of an existing relationship
+   */
   reverseExistingRelationship() {
-    this.dialogService
-      .showConfirm('LNG_DIALOG_CONFIRM_REVERSE_PERSONS')
-      .subscribe((answer: DialogAnswer) => {
-        if (answer.button === DialogAnswerButton.Yes) {
-          const relationshipPersons = {
-            sourceId: _.find(this.relationship.persons, { target: true }).id,
-            targetId: this.relationship.sourcePerson.id
-          };
-          this.relationshipDataService
-            .reverseExistingRelationship(
-              this.selectedOutbreak.id,
-              this.relationship.id,
-              relationshipPersons.sourceId,
-              relationshipPersons.targetId
-            )
-            .subscribe(() => this.onReverseRelationshipPersons());
+    this.dialogV2Service
+      .showConfirmDialog({
+        config: {
+          title: {
+            get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
+          },
+          message: {
+            get: () => 'LNG_DIALOG_CONFIRM_REVERSE_PERSONS'
+          }
         }
+      })
+      .subscribe((response) => {
+        // canceled ?
+        if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+          // finished
+          return;
+        }
+
+        // show loading
+        const loading = this.dialogV2Service.showLoadingDialog();
+
+        const relationshipPersons = {
+          sourceId: _.find(this.relationship.persons, { target: true }).id,
+          targetId: this.relationship.sourcePerson.id
+        };
+        this.relationshipDataService
+          .reverseExistingRelationship(
+            this.selectedOutbreak.id,
+            this.relationship.id,
+            relationshipPersons.sourceId,
+            relationshipPersons.targetId
+          )
+          .pipe(
+            catchError((err) => {
+              // show error
+              this.toastV2Service.error(err);
+
+              // hide loading
+              loading.close();
+              return throwError(err);
+            })
+          )
+          .subscribe(() => {
+            // emit
+            this.onReverseRelationshipPersons();
+
+            // hide loading
+            loading.close();
+          });
       });
   }
 
-  updateRelationshipData(_relationship: RelationshipModel) {
-    // #TODO - new design
-    // this.relationshipData = this.relationshipDataService.getLightObjectDisplay(relationship);
+  updateRelationshipData(relationship: RelationshipModel) {
+    this.relationshipData = this.entityHelperService.lightRelationship(relationship);
   }
 
   onRemove() {

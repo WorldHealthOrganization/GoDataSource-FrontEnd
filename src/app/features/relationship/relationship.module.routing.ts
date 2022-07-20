@@ -97,6 +97,14 @@ const relationshipTypeChildrenRoutes = [
         PERMISSION.OUTBREAK_VIEW,
         PERMISSION.RELATIONSHIP_SHARE
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      entity: RelationshipPersonDataResolver,
+      gender: GenderDataResolver,
+      risk: RiskDataResolver,
+      classification: ClassificationDataResolver,
+      personType: PersonTypeDataResolver
     }
   },
   // Share selected relationships (2): Create relationships form
@@ -108,7 +116,17 @@ const relationshipTypeChildrenRoutes = [
       permissions: [
         PERMISSION.OUTBREAK_VIEW,
         PERMISSION.RELATIONSHIP_SHARE
-      ]
+      ],
+      action: CreateViewModifyV2Action.MODIFY
+    },
+    resolve: {
+      outbreak: SelectedOutbreakDataResolver,
+      certainty: CertaintyLevelDataResolver,
+      exposureType: ExposureTypeDataResolver,
+      exposureFrequency: ExposureFrequencyDataResolver,
+      exposureDuration: ExposureDurationDataResolver,
+      context: ContextOfTransmissionDataResolver,
+      cluster: ClusterDataResolver
     },
     canDeactivate: [
       PageChangeConfirmationGuard
@@ -133,6 +151,12 @@ const relationshipTypeChildrenRoutes = [
           })
         ]
       })
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      gender: GenderDataResolver,
+      personType: PersonTypeDataResolver,
+      entity: RelationshipPersonDataResolver
     }
   },
   // Create relationships

@@ -27,6 +27,7 @@ import { LocationIdentifierModel } from '../../../../core/models/location-identi
 export enum CreateViewModifyV2TabInputType {
   // inputs
   TEXT,
+  WYSIWYG,
   EMAIL,
   PASSWORD,
   SELECT_SINGLE,
@@ -62,7 +63,9 @@ export enum CreateViewModifyV2TabInputType {
   SECTION,
 
   // other
-  LABEL
+  LABEL,
+  LINK_LIST,
+  LABEL_LIST
 }
 
 /**
@@ -118,6 +121,15 @@ interface ICreateViewModifyV2TabInputText extends Omit<ICreateViewModifyV2TabInp
       err: string
     }
   };
+}
+
+/**
+ * Input - what you see is what you get
+ */
+interface ICreateViewModifyV2TabInputWYSIWYG extends Omit<ICreateViewModifyV2TabInputBase, 'value' | 'placeholder' | 'description'> {
+  // required
+  type: CreateViewModifyV2TabInputType.WYSIWYG;
+  value: ICreateViewModifyV2TabInputValue<string>;
 }
 
 /**
@@ -512,19 +524,50 @@ interface ICreateViewModifyV2TabLabel {
   value: {
     get: () => string
   };
+
+  // optional
+  visible?: () => boolean;
+}
+
+/**
+ * Input - link list
+ */
+interface ICreateViewModifyV2TabLinkList {
+  // required
+  type: CreateViewModifyV2TabInputType.LINK_LIST;
+  label: {
+    get: () => string
+  };
+  links: {
+    label: string;
+    action: ICreateViewModifyV2Link;
+  }[];
+}
+
+/**
+ * Input - label list
+ */
+interface ICreateViewModifyV2TabLabelList {
+  // required
+  type: CreateViewModifyV2TabInputType.LABEL_LIST;
+  label: {
+    get: () => string
+  };
+  labels: string[];
 }
 
 /**
  * Input
  */
-export type CreateViewModifyV2TabInput = ICreateViewModifyV2TabInputText | ICreateViewModifyV2TabInputEmail | ICreateViewModifyV2TabInputPassword
-| ICreateViewModifyV2TabInputSingleSelect | ICreateViewModifyV2TabInputMultipleSelect | ICreateViewModifyV2TabInputToggleCheckbox
+export type CreateViewModifyV2TabInput = ICreateViewModifyV2TabInputText | ICreateViewModifyV2TabInputWYSIWYG | ICreateViewModifyV2TabInputEmail
+| ICreateViewModifyV2TabInputPassword | ICreateViewModifyV2TabInputSingleSelect | ICreateViewModifyV2TabInputMultipleSelect | ICreateViewModifyV2TabInputToggleCheckbox
 | ICreateViewModifyV2TabInputLocationSingle | ICreateViewModifyV2TabInputLocationMultiple | ICreateViewModifyV2TabInputTextArea
 | ICreateViewModifyV2TabInputNumber | ICreateViewModifyV2TabInputSelectGroups | ICreateViewModifyV2TabInputAgeOrDOB
 | ICreateViewModifyV2TabInputAsyncValidatorText | ICreateViewModifyV2TabInputColor | ICreateViewModifyV2TabInputDate
 | ICreateViewModifyV2TabInputList | ICreateViewModifyV2TabInputLatLng | ICreateViewModifyV2TabInputListText | ICreateViewModifyV2TabInputLocationIdentifier
 | ICreateViewModifyV2TabInputDocument | ICreateViewModifyV2TabInputAddress | ICreateViewModifyV2TabInputVaccine
-| ICreateViewModifyV2TabInputCenterDateRange | ICreateViewModifyV2TabInputMapServer | ICreateViewModifyV2TabLabel;
+| ICreateViewModifyV2TabInputCenterDateRange | ICreateViewModifyV2TabInputMapServer | ICreateViewModifyV2TabLabel | ICreateViewModifyV2TabLinkList
+| ICreateViewModifyV2TabLabelList;
 
 /**
  * Tab section

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { ActivatedRoute } from '@angular/router';
@@ -25,6 +25,10 @@ import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import * as FileSaver from 'file-saver';
+import { AppCasesKpiDashletComponent } from '../../components/app-cases-kpi-dashlet/app-cases-kpi-dashlet.component';
+import { AppContactsKpiDashletComponent } from '../../components/app-contacts-kpi-dashlet/app-contacts-kpi-dashlet.component';
+import { AppCotKpiDashletComponent } from '../../components/app-cot-kpi-dashlet/app-cot-kpi-dashlet.component';
+import * as domtoimage from 'dom-to-image';
 
 @Component({
   selector: 'app-dashboard',
@@ -33,6 +37,12 @@ import * as FileSaver from 'file-saver';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent implements OnDestroy {
+  // children dashlets
+  @ViewChild('kpiSection', { static: false }) private _kpiSection: ElementRef;
+  @ViewChild('kpiCases', { static: false }) private _kpiCases: AppCasesKpiDashletComponent;
+  @ViewChild('kpiContacts', { static: false }) private _kpiContacts: AppContactsKpiDashletComponent;
+  @ViewChild('kpiCOT', { static: false }) private _kpiCOT: AppCotKpiDashletComponent;
+
   // quick actions
   quickActions: IV2ActionMenuLabel;
 
@@ -210,7 +220,13 @@ export class DashboardComponent implements OnDestroy {
         DashboardModel.canExportContactFollowUpSuccessRateReport(this._authUser) ||
         DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(this._authUser) ||
         DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(this._authUser) ||
-        DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(this._authUser)
+        DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(this._authUser) || (
+          DashboardModel.canExportKpi(this._authUser) && (
+            this.visibleDashlets.KPICases ||
+            this.visibleDashlets.KPIContacts ||
+            this.visibleDashlets.KPICOT
+          )
+        )
       ),
       menuOptions: [
         // Export case classification per location report
@@ -380,6 +396,63 @@ export class DashboardComponent implements OnDestroy {
             }
           },
           visible: () => DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(this._authUser)
+        },
+
+        // Export KPI
+        {
+          label: {
+            get: () => 'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL'
+          },
+          action: {
+            click: () => {
+              // display error message if we try to render empty item
+              if (
+                !this._kpiCases.dashlet.expanded &&
+                !this._kpiContacts.dashlet.expanded &&
+                !this._kpiCOT.dashlet.expanded
+              ) {
+                // err
+                this.toastV2Service.error('LNG_PAGE_DASHBOARD_KPIS_ELEMENTS_NOT_VISIBLE_ERROR_MSG');
+
+                // finished
+                return;
+              }
+
+              // convert dom container to image
+              const loading = this.dialogV2Service.showLoadingDialog();
+              setTimeout(() => {
+                (domtoimage as any)
+                  .toPng(
+                    this._kpiSection.nativeElement, {
+                      filter: (node) => {
+                        return node.tagName !== 'A';
+                      }
+                    }
+                  )
+                  .then((dataUrl) => {
+                    const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
+                    this.importExportDataService
+                      .exportImageToPdf({ image: dataBase64, responseType: 'blob', splitFactor: 1 })
+                      .pipe(
+                        catchError((err) => {
+                          this.toastV2Service.error(err);
+                          loading.close();
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe((blob) => {
+                        this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL');
+                        loading.close();
+                      });
+                  });
+              });
+            }
+          },
+          visible: () => DashboardModel.canExportKpi(this._authUser) && (
+            this.visibleDashlets.KPICases ||
+            this.visibleDashlets.KPIContacts ||
+            this.visibleDashlets.KPICOT
+          )
         }
       ]
     };
@@ -501,349 +574,4 @@ export class DashboardComponent implements OnDestroy {
       `${fileName}.${extension}`
     );
   }
-
-  // // provide constants to template
-  // DashboardDashlet = DashboardDashlet;
-  // DashboardModel = DashboardModel;
-  //
-  // selectedOutbreak: OutbreakModel;
-  //
-  // // flag if there aren't any outbreaks in the system
-  // noOutbreaksInSystem: boolean = false;
-  //
-  // // constants
-  // ExportDataExtension = ExportDataExtension;
-  //
-  // casesByClassificationAndLocationReportUrl: string = '';
-  // contactsFollowupSuccessRateReportUrl: string = '';
-  //
-  // loadingDialog: LoadingDialogModel;
-  //
-  // // available side filters
-  // availableSideFilters: FilterModel[] = [];
-  //
-  // globalFilterDate: Moment = moment();
-  // globalFilterLocationId: string;
-  // globalFilterClassificationId: string[] = [];
-  //
-  // @ViewChild('kpiSection') private kpiSection: ElementRef;
-  // @ViewChildren('kpiSectionGroup') private kpiSectionGroup: QueryList<MatExpansionPanel>;
-  //
-  // // subscribers
-  // outbreakSubscriber: Subscription;
-  //
-  // Constants = Constants;
-  //
-  // epiCurveViewType;
-  // epiCurveViewTypes$: Observable<any[]>;
-  //
-  // caseClassificationsList$: Observable<LabelValuePair[]>;
-  //
-  // /**
-  //    * Constructor
-  //    */
-  // constructor(
-  //   private authDataService: AuthDataService,
-  //   private outbreakDataService: OutbreakDataService,
-  //   private domService: DomService,
-  //   private importExportDataService: ImportExportDataService,
-  //   private i18nService: I18nService,
-  //   private genericDataService: GenericDataService,
-  //   private dialogService: DialogService,
-  //   protected toastV2Service: ToastV2Service,
-  //   private systemSettingsDataService: SystemSettingsDataService,
-  //   private referenceDataDataService: ReferenceDataDataService
-  // ) {
-  //   // get the authenticated user
-  //   this.authUser = this.authDataService.getAuthenticatedUser();
-  // }
-  //
-  // /**
-  //    * Component initialized
-  //    */
-  // ngOnInit() {
-  //   // map kpi groups
-  //   this.kpiGroupsMap = {};
-  //   this.kpiGroups.forEach((group) => {
-  //     this.kpiGroupsMap[group.id] = group;
-  //   });
-  //
-  //   this.caseClassificationsList$ = this.referenceDataDataService
-  //     .getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION)
-  //     .pipe(
-  //       map((records: LabelValuePair[]) => {
-  //         return _.filter(
-  //           records,
-  //           (record: LabelValuePair) => {
-  //             return record.value !== Constants.CASE_CLASSIFICATION.NOT_A_CASE;
-  //           }
-  //         );
-  //       }),
-  //       share()
-  //     );
-  //
-  //   this.initializeDashlets();
-  //
-  //   // get Outbreaks list to check if there are any in the system
-  //   this.outbreakDataService
-  //     .getOutbreaksCount()
-  //     .subscribe((outbreaksCount) => {
-  //       this.noOutbreaksInSystem = !outbreaksCount.count;
-  //     });
-  //
-  //   this.outbreakSubscriber = this.outbreakDataService
-  //     .getSelectedOutbreakSubject()
-  //     .subscribe((selectedOutbreak: OutbreakModel) => {
-  //       if (selectedOutbreak && selectedOutbreak.id) {
-  //         this.selectedOutbreak = selectedOutbreak;
-  //         this.casesByClassificationAndLocationReportUrl = `/outbreaks/${this.selectedOutbreak.id}/cases/per-classification-per-location-level-report/download/`;
-  //         this.contactsFollowupSuccessRateReportUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/per-location-level-tracing-report/download/`;
-  //       }
-  //     });
-  //
-  //   // set default epi curve
-  //   if (DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(this.authUser)) {
-  //     this.epiCurveViewType = Constants.EPI_CURVE_TYPES.CLASSIFICATION.value;
-  //   } else if (DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(this.authUser)) {
-  //     this.epiCurveViewType = Constants.EPI_CURVE_TYPES.OUTCOME.value;
-  //   } else if (DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(this.authUser)) {
-  //     this.epiCurveViewType = Constants.EPI_CURVE_TYPES.REPORTING.value;
-  //   } else {
-  //     // NOT SUPPORTED
-  //   }
-  //
-  //   // initialize Side Filters
-  //   this.initializeSideFilters();
-  // }
-  //
-  // /**
-  //    * Component destroyed
-  //    */
-  // ngOnDestroy() {
-  //   // outbreak subscriber
-  //   if (this.outbreakSubscriber) {
-  //     this.outbreakSubscriber.unsubscribe();
-  //     this.outbreakSubscriber = null;
-  //   }
-  // }
-  //
-  // /**
-  //    * Initialize Side Filters
-  //    */
-  // private initializeSideFilters() {
-  //   // set available side filters
-  //   this.availableSideFilters = [
-  //     new FilterModel({
-  //       fieldName: 'locationId',
-  //       fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION',
-  //       type: FilterType.LOCATION,
-  //       required: true,
-  //       multipleOptions: false,
-  //       value: this.globalFilterLocationId
-  //     }),
-  //     new FilterModel({
-  //       fieldName: 'date',
-  //       fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE',
-  //       type: FilterType.DATE,
-  //       required: true,
-  //       maxDate: moment(),
-  //       value: this.globalFilterDate
-  //     }),
-  //     new FilterModel({
-  //       fieldName: 'classificationId',
-  //       fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_CLASSIFICATION',
-  //       type: FilterType.MULTISELECT,
-  //       required: true,
-  //       options$: this.caseClassificationsList$,
-  //       value: this.globalFilterClassificationId
-  //     })
-  //   ];
-  // }
-  //
-  // private initializeDashlets() {
-  //   const userDashboardSettings: UserSettingsDashboardModel = this.authUser.getSettings(UserSettings.DASHBOARD);
-  //   _.each(this.kpiGroups, (group) => {
-  //     _.each(group.dashlets, (dashlet) => {
-  //       // add the dashlet to the list (if it's not already existing)
-  //       userDashboardSettings.addDashletIfNotExists(new DashletSettingsModel({
-  //         name: dashlet,
-  //         kpiGroup: group.id
-  //       }));
-  //     });
-  //   });
-  //
-  //   // Update dashlets order based on authenticated user's settings
-  //   this.refreshDashletsOrder();
-  // }
-  //
-  // /**
-  //    * Update dashlets order based on authenticated user's settings
-  //    */
-  // private refreshDashletsOrder() {
-  //   const dashboardSettings = this.authUser.getSettings(UserSettings.DASHBOARD);
-  //   _.each(this.kpiGroups, (group) => {
-  //     group.dashlets.sort((a, b) => {
-  //       const dashletA = dashboardSettings.getDashlet(a);
-  //       const dashletB = dashboardSettings.getDashlet(b);
-  //
-  //       if (dashletA && dashletB) {
-  //         return dashletA.order - dashletB.order;
-  //       } else {
-  //         return 1;
-  //       }
-  //     });
-  //   });
-  // }
-  //
-  // /**
-  //    * Persist user's settings for the dashboard
-  //    */
-  // private persistUserDashboardSettings(): Observable<any> {
-  //   return this.authDataService.updateSettingsForCurrentUser({
-  //     [UserSettings.DASHBOARD]: this.authUser.getSettings(UserSettings.DASHBOARD)
-  //   });
-  // }
-  //
-  // /**
-  //    * Check if a dashlet is visible for current user
-  //    * @param name
-  //    */
-  // isDashletVisible(name: string): boolean {
-  //   return _.get(
-  //     this.authUser.getSettings(UserSettings.DASHBOARD).getDashlet(name),
-  //     'visible',
-  //     true
-  //   );
-  // }
-  //
-  // /**
-  //    * Hide a dashlet for current user
-  //    * @param name
-  //    */
-  // hideDashlet(name: string) {
-  //   this.authUser.getSettings(UserSettings.DASHBOARD).hideDashlet(name);
-  //
-  //   this.refreshDashletsOrder();
-  //
-  //   // persist changes
-  //   this.persistUserDashboardSettings().subscribe();
-  // }
-  //
-  // moveDashletBefore(name: string) {
-  //   this.authUser.getSettings(UserSettings.DASHBOARD).moveDashletBefore(name);
-  //
-  //   this.refreshDashletsOrder();
-  //
-  //   // persist changes
-  //   this.persistUserDashboardSettings().subscribe();
-  // }
-  //
-  // moveDashletAfter(name: string) {
-  //   this.authUser.getSettings(UserSettings.DASHBOARD).moveDashletAfter(name);
-  //
-  //   this.refreshDashletsOrder();
-  //
-  //   // persist changes
-  //   this.persistUserDashboardSettings().subscribe();
-  // }
-  //
-  // showAllDashlets(kpiGroup: string) {
-  //   this.authUser.getSettings(UserSettings.DASHBOARD).showAllDashlets(kpiGroup);
-  //   // persist changes
-  //   this.persistUserDashboardSettings().subscribe();
-  // }
-  //
-  //
-  // /**
-  //    * Generate KPIs report
-  //    */
-  // generateKpisReport() {
-  //   // display error message if we try to render empty item
-  //   let atLeastOneIsExpanded: boolean = false;
-  //   this.kpiSectionGroup.forEach((item) => {
-  //     if (item.expanded) {
-  //       atLeastOneIsExpanded = true;
-  //     }
-  //   });
-  //   if (!atLeastOneIsExpanded) {
-  //     this.toastV2Service.error('LNG_PAGE_DASHBOARD_KPIS_ELEMENTS_NOT_VISIBLE_ERROR_MSG');
-  //     return;
-  //   }
-  //
-  //   // display loading
-  //   this.showLoadingDialog();
-  //
-  //   // convert dom container to image
-  //   setTimeout(() => {
-  //     (domtoimage as any).toPng(this.kpiSection.nativeElement)
-  //       .then((dataUrl) => {
-  //         const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
-  //
-  //         this.importExportDataService
-  //           .exportImageToPdf({ image: dataBase64, responseType: 'blob', splitFactor: 1 })
-  //           .pipe(
-  //             catchError((err) => {
-  //               this.toastV2Service.error(err);
-  //               this.closeLoadingDialog();
-  //               return throwError(err);
-  //             })
-  //           )
-  //           .subscribe((blob) => {
-  //             this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL');
-  //           });
-  //       });
-  //   });
-  // }
-  //
-  //
-  // /**
-  //    * Apply side filters
-  //    * @param data
-  //    */
-  // applySideFilters(filters: AppliedFilterModel[]) {
-  //   // retrieve date & location filters
-  //   // retrieve location filter
-  //   const dateFilter: AppliedFilterModel = _.find(filters, { filter: { fieldName: 'date' } });
-  //   const locationFilter: AppliedFilterModel = _.find(filters, { filter: { fieldName: 'locationId' } });
-  //   const classificationFilter: AppliedFilterModel = _.find(filters, { filter: { fieldName: 'classificationId' } });
-  //
-  //   // set filters
-  //   this.globalFilterDate = _.isEmpty(dateFilter.value) ? undefined : moment(dateFilter.value);
-  //   this.globalFilterLocationId = _.isEmpty(locationFilter.value) ? undefined : locationFilter.value;
-  //   this.globalFilterClassificationId = _.isEmpty(classificationFilter.value) ? undefined : classificationFilter.value;
-  // }
-  //
-  // /**
-  //    * Display loading dialog
-  //    */
-  // showLoadingDialog() {
-  //   this.loadingDialog = this.dialogService.showLoadingDialog();
-  // }
-  //
-  // /**
-  //    * Hide loading dialog
-  //    */
-  // closeLoadingDialog() {
-  //   if (this.loadingDialog) {
-  //     this.loadingDialog.close();
-  //     this.loadingDialog = null;
-  //   }
-  // }
-  //
-  //
-  //
-  // /**
-  //    * Check if we have kpi group access
-  //    */
-  // hasKpiAccess(): boolean {
-  //   // check if there is at least one group that has access
-  //   for (const group of this.kpiGroups) {
-  //     if (group.hasAccess(this.authUser)) {
-  //       return true;
-  //     }
-  //   }
-  //
-  //   // we don't have access
-  //   return false;
-  // }
 }

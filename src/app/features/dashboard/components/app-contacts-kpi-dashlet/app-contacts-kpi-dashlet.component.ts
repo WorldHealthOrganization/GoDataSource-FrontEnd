@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, ViewChild } from '@angular/core';
 import { AppDashletV2 } from '../../helperClasses/app-dashlet-v2';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
@@ -25,6 +25,7 @@ import { CaseModel } from '../../../../core/models/case.model';
 import { ListFilterDataService } from '../../../../core/services/data/list-filter.data.service';
 import { MetricContactsSeenEachDays } from '../../../../core/models/metrics/metric-contacts-seen-each-days.model';
 import { MetricContactsWithSuccessfulFollowUp } from '../../../../core/models/metrics/metric.contacts-with-success-follow-up.model';
+import { AppKpiDashletComponent } from '../app-kpi-dashlet/app-kpi-dashlet.component';
 
 @Component({
   selector: 'app-contacts-kpi-dashlet',
@@ -33,6 +34,9 @@ import { MetricContactsWithSuccessfulFollowUp } from '../../../../core/models/me
 })
 export class AppContactsKpiDashletComponent
   extends AppDashletV2 implements OnDestroy {
+  // kpi dashlet
+  @ViewChild(AppKpiDashletComponent, { static: false }) dashlet: AppKpiDashletComponent;
+
   /**
    * Constructor
    */

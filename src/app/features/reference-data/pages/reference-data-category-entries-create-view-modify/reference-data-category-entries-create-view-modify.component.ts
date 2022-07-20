@@ -17,7 +17,7 @@ import {
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
@@ -202,7 +202,8 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
    * Initialize tabs - Details
    */
   private initializeTabsDetails(): ICreateViewModifyV2Tab {
-    return {
+    // create tab
+    const tab: ICreateViewModifyV2Tab = {
       type: CreateViewModifyV2TabInputType.TAB,
       label: 'LNG_COMMON_LABEL_DETAILS',
       sections: [
@@ -330,6 +331,50 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
         }
       ]
     };
+
+    // add lat & lng for specific categories
+    if (
+      this.category.id === ReferenceDataCategory.INSTITUTION_NAME ||
+      this.category.id === ReferenceDataCategory.LAB_NAME ||
+      this.category.id === ReferenceDataCategory.LAB_SEQUENCE_LABORATORY
+    ) {
+      tab.sections[0].inputs.push({
+        type: CreateViewModifyV2TabInputType.NUMBER,
+        name: 'geoLocation[lat]',
+        placeholder: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_GEO_LOCATION_LAT',
+        value: {
+          get: () => this.itemData.geoLocation?.lat,
+          set: (value) => {
+            // set data
+            this.itemData.geoLocation = this.itemData.geoLocation || { lat: undefined, lng: undefined };
+            this.itemData.geoLocation.lat = value;
+          }
+        },
+        validators: {
+          required: () => !!this.itemData.geoLocation?.lng ||
+            this.itemData.geoLocation?.lng === 0
+        }
+      }, {
+        type: CreateViewModifyV2TabInputType.NUMBER,
+        name: 'geoLocation[lng]',
+        placeholder: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_GEO_LOCATION_LNG',
+        value: {
+          get: () => this.itemData.geoLocation?.lng,
+          set: (value) => {
+            // set data
+            this.itemData.geoLocation = this.itemData.geoLocation || { lat: undefined, lng: undefined };
+            this.itemData.geoLocation.lng = value;
+          }
+        },
+        validators: {
+          required: () => !!this.itemData.geoLocation?.lat ||
+            this.itemData.geoLocation?.lat === 0
+        }
+      });
+    }
+
+    // finished
+    return tab;
   }
 
   /**

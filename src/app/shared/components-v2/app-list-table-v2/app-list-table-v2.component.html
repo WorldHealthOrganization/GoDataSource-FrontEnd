@@ -156,7 +156,7 @@
       #displayGroupedData>
       <div
         class="gd-list-top-grouped-data"
-        fxLayout="row" fxLayoutAlign="space-between stretch" fxLayoutGap="2.4rem">
+        fxLayout="row" fxLayoutAlign="space-between stretch" fxLayoutGap="1.6rem">
 
         <!-- Group value -->
         <div
@@ -327,6 +327,7 @@
 
       <!-- Visible columns -->
       <button
+        *ngIf="hasUserSettings"
         type="button"
         mat-icon-button
         [matTooltip]="'LNG_SIDE_COLUMNS_SECTION_COLUMNS_TO_DISPLAY_TITLE' | translate"
@@ -351,7 +352,7 @@
     [class.gd-list-table-data-88]="showHeaderFilters"
     [modules]="modules"
     rowHeight="40"
-    rowSelection="multiple"
+    [rowSelection]="groupActionsSingleRecord ? 'single' : 'multiple'"
     suppressRowClickSelection="true"
     suppressPropertyNamesCheck="true"
     enableCellTextSelection="true"
