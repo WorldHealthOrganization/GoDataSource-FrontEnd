@@ -6,7 +6,7 @@
 </app-topnav>
 -->
 
-<div class="page-content">
+<!-- <div class="page-content">
     <div
         *ngIf="displayLoading"
         class="merge-loading">
@@ -17,12 +17,12 @@
         *ngIf="!displayLoading">
         <mat-horizontal-stepper linear #stepper>
 
-            <!-- Personal step -->
+            <!~~ Personal step ~~>
             <mat-step [stepControl]="personalForm">
                 <form #personalForm="ngForm">
                     <ng-template matStepLabel>{{'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_TAB_PERSONAL_TITLE' | translate}}</ng-template>
 
-                    <!-- Personal Details section -->
+                    <!~~ Personal Details section ~~>
                     <mat-card class="page-section">
                         <div fxLayout="column">
 
@@ -103,7 +103,7 @@
                         </div>
                     </mat-card>
 
-                    <!-- Flagged section -->
+                    <!~~ Flagged section ~~>
                     <mat-card class="page-section">
                         <div fxLayout="column">
 
@@ -154,7 +154,7 @@
                         </div>
                     </mat-card>
 
-                    <!--Vaccines received section-->
+                    <!~~Vaccines received section~~>
                     <div class="section-title">{{'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED_DETAILS' | translate}}</div>
                     <app-form-vaccines-list
                         name="vaccinesReceived"
@@ -162,7 +162,7 @@
                         [disabled]="true">
                     </app-form-vaccines-list>
 
-                    <!-- Documents section -->
+                    <!~~ Documents section ~~>
                     <div class="section-title">{{ 'LNG_CASE_FIELD_LABEL_DOCUMENTS' | translate }}</div>
                     <app-form-document-list
                         name="documents"
@@ -176,7 +176,7 @@
                 </form>
             </mat-step>
 
-            <!-- Address step -->
+            <!~~ Address step ~~>
             <mat-step [stepControl]="addressForm">
                 <form #addressForm="ngForm">
                     <ng-template matStepLabel>{{ 'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_TAB_ADDRESS_TITLE' | translate }}</ng-template>
@@ -216,12 +216,12 @@
                 </form>
             </mat-step>
 
-            <!-- Infection step -->
+            <!~~ Infection step ~~>
             <mat-step [stepControl]="infectionForm">
                 <form #infectionForm="ngForm">
                     <ng-template matStepLabel>{{ 'LNG_PAGE_CREATE_CASE_TAB_INFECTION_TITLE' | translate }}</ng-template>
 
-                    <!-- Case Infection Details section -->
+                    <!~~ Case Infection Details section ~~>
                     <mat-card class="page-section">
                         <div fxLayout="column">
 
@@ -235,9 +235,9 @@
                                     required="true">
                                 </app-form-select>
 
-                                <div fxFlex><!-- placeholder --></div>
-                                <div fxFlex><!-- placeholder --></div>
-                                <div fxFlex><!-- placeholder --></div>
+                                <div fxFlex><!~~ placeholder ~~></div>
+                                <div fxFlex><!~~ placeholder ~~></div>
+                                <div fxFlex><!~~ placeholder ~~></div>
                             </div>
 
                             <div fxLayout="row" fxLayoutGap="20px">
@@ -277,7 +277,7 @@
                         </div>
                     </mat-card>
 
-                    <!-- Outcome section -->
+                    <!~~ Outcome section ~~>
                     <mat-card class="page-section">
                         <div fxLayout="column">
                             <div fxLayout="row" fxLayoutGap="20px">
@@ -317,7 +317,7 @@
                     </mat-card>
 
                     <div class="section-title">{{'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS' | translate}}</div>
-                    <!-- Dates section -->
+                    <!~~ Dates section ~~>
                     <app-form-case-center-daterange-list
                         name="dateRanges"
                         [(ngModel)]="caseData.dateRanges"
@@ -337,7 +337,7 @@
                 </form>
             </mat-step>
 
-            <!-- Questionnaire step -->
+            <!~~ Questionnaire step ~~>
             <mat-step [stepControl]="questionnaireForm">
                 <form #questionnaireForm="ngForm">
                     <ng-template matStepLabel>{{ 'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_TAB_QUESTIONNAIRE_TITLE' | translate }}</ng-template>
@@ -351,13 +351,13 @@
                         [clearable]="false">
                     </app-form-select>
 
-                    <!-- Questionnaire section -->
-<!--                    <app-form-fill-questionnaire-->
-<!--                        name="questionnaireAnswers"-->
-<!--                        [ngModel]="questionnaireAnswers"-->
-<!--                        [questions]="selectedOutbreak?.caseInvestigationTemplate"-->
-<!--                        [disabled]="true">-->
-<!--                    </app-form-fill-questionnaire>-->
+                    <!~~ Questionnaire section ~~>
+<!~~                    <app-form-fill-questionnaire~~>
+<!~~                        name="questionnaireAnswers"~~>
+<!~~                        [ngModel]="questionnaireAnswers"~~>
+<!~~                        [questions]="selectedOutbreak?.caseInvestigationTemplate"~~>
+<!~~                        [disabled]="true">~~>
+<!~~                    </app-form-fill-questionnaire>~~>
 
                     <div class="stepper-navigation-buttons">
                         <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>
@@ -365,7 +365,7 @@
                 </form>
             </mat-step>
 
-            <!-- Final step -->
+            <!~~ Final step ~~>
             <mat-step>
                 <ng-template matStepLabel>{{'LNG_STEPPER_FINAL_STEP_LABEL'| translate}}</ng-template>
                 {{'LNG_STEPPER_FINAL_STEP_TEXT' | translate}}
@@ -378,4 +378,4 @@
             </mat-step>
         </mat-horizontal-stepper>
     </div>
-</div>
+</div> -->

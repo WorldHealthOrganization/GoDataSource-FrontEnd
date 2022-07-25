@@ -23,12 +23,19 @@ import { Constants } from '../../../../core/models/constants';
 import { UserModel } from '../../../../core/models/user.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
-import { EntityType } from '../../../../core/models/entity-type';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { catchError, takeUntil } from 'rxjs/operators';
 import { AgeModel } from '../../../../core/models/age.model';
+import { DocumentModel } from '../../../../core/models/document.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { moment } from '../../../../core/helperClasses/x-moment';
+import * as _ from 'lodash';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { VaccineModel } from '../../../../core/models/vaccine.model';
+import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { EntityType } from '../../../../core/models/entity-type';
 
 /**
  * Component
@@ -40,6 +47,13 @@ import { AgeModel } from '../../../../core/models/age.model';
 export class CaseMergeDuplicateRecordsCreateViewModifyComponent extends CreateViewModifyComponent<CaseModel> implements OnDestroy {
   mergeRecordIds: string[];
   mergeRecords: EntityModel[];
+  currentAddresses: {
+    options: LabelValuePair[]
+  } = { options: [] };
+
+  questionnaireAnswers: {
+    options: LabelValuePair[]
+  } = { options: [] };
 
   /**
    * Constructor
@@ -65,30 +79,8 @@ export class CaseMergeDuplicateRecordsCreateViewModifyComponent extends CreateVi
       activatedRoute,
       authDataService
     );
-    this.activatedRoute.queryParams
-      .subscribe((params: { ids }) => {
-        // record ids
-        this.mergeRecordIds = JSON.parse(params.ids);
-
-        // retrieve records
-        const qb = new RequestQueryBuilder();
-        qb.filter.bySelect(
-          'id',
-          this.mergeRecordIds,
-          true,
-          null
-        );
-        this.outbreakDataService
-          .getPeopleList(this.selectedOutbreak.id, qb)
-          .pipe(
-
-            takeUntil(this.destroyed$)
-          )
-          .subscribe((recordMerge) => {
-            // merge records
-            this.mergeRecords = recordMerge;
-          });
-      });
+    // retrieve cases ids
+    this.mergeRecordIds = JSON.parse(this.activatedRoute.snapshot.queryParams.ids);
   }
 
   /**
@@ -106,31 +98,37 @@ export class CaseMergeDuplicateRecordsCreateViewModifyComponent extends CreateVi
    * Create new item model if needed
    */
   protected createNewItem(): CaseModel {
-    return new CaseModel({
-      addresses: [new AddressModel({
-        typeId: AddressType.CURRENT_ADDRESS
-      })]
-    });
+    return null;
   }
 
   /**
    * Retrieve item
    */
   protected retrieveItem(): Observable<CaseModel> {
-    return this.caseDataService
-      .getCase(
-        this.selectedOutbreak.id,
-        this.mergeRecordIds[0]
+    return new Observable<CaseModel>((subscriber) => {
+    // retrieve records
+      const qb = new RequestQueryBuilder();
+      qb.filter.bySelect(
+        'id',
+        this.mergeRecordIds,
+        true,
+        null
       );
+      this.outbreakDataService
+        .getPeopleList(this.selectedOutbreak.id, qb)
+        .subscribe((recordMerge) => {
+          // merge records
+          this.mergeRecords = recordMerge;
+          subscriber.next(new CaseModel());
+          subscriber.complete();
+        });
+    });
   }
 
   /**
    * Data initialized
    */
-  protected initializedData(): void {
-    this.itemData = new CaseModel();
-    this.itemData.id = this.mergeRecordIds[0];
-  }
+  protected initializedData(): void {}
 
   /**
    * Initialize page title
@@ -177,42 +175,40 @@ export class CaseMergeDuplicateRecordsCreateViewModifyComponent extends CreateVi
       // tabs
       tabs: [
         // Personal
-        this.initializeTabsPersonal(),
+        this.initializeTabPersonal(),
 
         // Epidemiology
-        this.initializeTabsEpidemiology()
+        this.initializeTabEpidemiology(),
 
         // Questionnaires
-        // this.initializeTabsQuestionnaire()
+        this.initializeTabQuestionnaire()
       ],
 
       // create details
-      create: {
-        finalStep: {
-          buttonLabel: this.translateService.instant('LNG_STEPPER_FINAL_STEP_LABEL'),
-          message: () => this.translateService.instant(
-            'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
-            this.itemData
-          )
-        }
-      },
+      create: null,
 
       // buttons
       buttons: this.initializeButtons(),
 
       // create or update
       createOrUpdate: this.initializeProcessData(),
-      redirectAfterCreateUpdate: (data: CaseModel) => {
+      redirectAfterCreateUpdate: () => {
         // redirect to view
-        this.redirectService.to([`/cases/${data.id}/view`]);
+        this.redirectService.to(['/duplicated-records']);
       }
     };
   }
 
   /**
-   * Initialize tabs - Personal
+   * Initialize tab - Personal
    */
-  private initializeTabsPersonal(): ICreateViewModifyV2Tab {
+  private initializeTabPersonal(): ICreateViewModifyV2Tab {
+    // merge all records documents
+    this.determineDocuments();
+
+    // merge all records addresses
+    this.determineAddresses();
+
     return {
       type: CreateViewModifyV2TabInputType.TAB,
       label: 'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_TAB_PERSONAL_TITLE',
@@ -309,7 +305,8 @@ export class CaseMergeDuplicateRecordsCreateViewModifyComponent extends CreateVi
                   this.itemData.occupation = value;
                 }
               }
-            }, {
+            }, { // #TODO: I think "CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH" should be extended to show drop-downs for "age" and "dob".
+              // If user can set both could also input misleading data like "dob" few months ago and "age" 80 years..
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'age',
               placeholder: () => 'LNG_CASE_FIELD_LABEL_AGE',
@@ -324,12 +321,8 @@ export class CaseMergeDuplicateRecordsCreateViewModifyComponent extends CreateVi
                 ),
                 set: (value: any) => {
                   // TODO: for some reason, value is of type AgeModel instead of string. please investigate
-                  console.log(value);
                   // set value
-
-                  // @ts-ignore
                   this.itemData.age = value || new AgeModel();
-                  console.log(this.itemData);
 
                   // if (value !== undefined){
                   //
@@ -393,131 +386,95 @@ export class CaseMergeDuplicateRecordsCreateViewModifyComponent extends CreateVi
               }
             }
           ]
-        }
+        },
 
-        // TODO: merge documents; code from create-view-modify cases below
         // Documents
-        // {
-        //   type: CreateViewModifyV2TabInputType.SECTION,
-        //   label: 'LNG_CASE_FIELD_LABEL_DOCUMENTS',
-        //   inputs: [{
-        //     type: CreateViewModifyV2TabInputType.LIST,
-        //     name: 'documents',
-        //     items: this.itemData.documents,
-        //     itemsChanged: (list) => {
-        //       // update documents
-        //       this.itemData.documents = list.items;
-        //     },
-        //     definition: {
-        //       add: {
-        //         label: 'LNG_DOCUMENT_LABEL_ADD_NEW_DOCUMENT',
-        //         newItem: () => new DocumentModel()
-        //       },
-        //       remove: {
-        //         label: 'LNG_COMMON_BUTTON_DELETE',
-        //         confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_DOCUMENT'
-        //       },
-        //       input: {
-        //         type: CreateViewModifyV2TabInputType.DOCUMENT,
-        //         typeOptions: (this.activatedRoute.snapshot.data.documentType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        //         value: {
-        //           get: (index: number) => {
-        //             return this.itemData.documents[index];
-        //           }
-        //         }
-        //       }
-        //     }
-        //   }]
-        // },
-        // TODO: merge documents; html from old design below
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_CASE_FIELD_LABEL_DOCUMENTS',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.LIST,
+            name: 'documents',
+            items: this.itemData.documents,
+            itemsChanged: (list) => {
+              // update documents
+              this.itemData.documents = list.items;
+            },
+            definition: {
+              add: {
+                label: 'LNG_DOCUMENT_LABEL_ADD_NEW_DOCUMENT',
+                newItem: () => new DocumentModel()
+              },
+              remove: {
+                label: 'LNG_COMMON_BUTTON_DELETE',
+                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_DOCUMENT'
+              },
+              input: {
+                type: CreateViewModifyV2TabInputType.DOCUMENT,
+                typeOptions: (this.activatedRoute.snapshot.data.documentType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                value: {
+                  get: (index: number) => {
+                    return this.itemData.documents[index];
+                  }
+                }
+              }
+            }
+          }]
+        },
 
-        // <!-- Documents section -->
-        // <div class="section-title">{{ 'LNG_CASE_FIELD_LABEL_DOCUMENTS' | translate }}</div>
-        // <app-form-document-list
-        // name="documents"
-        //   [ngModel]="caseData.documents"
-        //   [disabled]="true">
-        //   </app-form-document-list>
-
-        // TODO: merge addresses; code from create-view-modify cases below
         // Addresses
-        // {
-        //   type: CreateViewModifyV2TabInputType.SECTION,
-        //   label: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
-        //   inputs: [{
-        //     type: CreateViewModifyV2TabInputType.LIST,
-        //     name: 'addresses',
-        //     items: this.itemData.addresses,
-        //     itemsChanged: (list) => {
-        //       // update addresses
-        //       this.itemData.addresses = list.items;
-        //     },
-        //     definition: {
-        //       add: {
-        //         label: 'LNG_ADDRESS_LABEL_ADD_NEW_ADDRESS',
-        //         newItem: () => new AddressModel()
-        //       },
-        //       remove: {
-        //         label: 'LNG_COMMON_BUTTON_DELETE',
-        //         confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_ADDRESS'
-        //       },
-        //       input: {
-        //         type: CreateViewModifyV2TabInputType.ADDRESS,
-        //         typeOptions: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        //         value: {
-        //           get: (index: number) => {
-        //             return this.itemData.addresses[index];
-        //           }
-        //         },
-        //         validators: {
-        //           required: () => true
-        //         }
-        //       }
-        //     }
-        //   }]
-        // }
-        // TODO: merge addresses; html from old design below
-
-        // <!-- Address step -->
-        // <mat-step [stepControl]="addressForm">
-        //     <form #addressForm="ngForm">
-        //       <ng-template matStepLabel>{{ 'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_TAB_ADDRESS_TITLE' | translate }}</ng-template>
-        //
-        // <mat-card
-        // *ngIf="uniqueOptions?.currentAddresses.options.length > 0"
-        // class="page-section">
-        //   <app-form-select
-        // name="selectedAddress"
-        //   [(ngModel)]="uniqueOptions?.currentAddresses.value"
-        //   [placeholder]="'LNG_CASE_FIELD_LABEL_ADDRESS' | translate"
-        //   [options]="uniqueOptions?.currentAddresses.options"
-        // (optionChanged)="changedAddress($event)"
-        //   [clearable]="false">
-        //   </app-form-select>
-        //
-        //   <app-form-address
-        // name="address"
-        //   [ngModel]="address"
-        //   [disabled]="true">
-        // </app-form-address>
-        // </mat-card>
-        //
-        // <app-form-address-list
-        // *ngIf="caseData.addresses?.length > 0"
-        // name="addresses"
-        //   [ngModel]="caseData.addresses"
-        //   [disabled]="true"
-        //   [required]="false"
-        //   [minItems]="0">
-        //   </app-form-address-list>
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_CASE_FIELD_LABEL_ADDRESSES',
+          inputs: [
+            // show previous addresses
+            {
+              type: CreateViewModifyV2TabInputType.LIST,
+              name: 'addresses',
+              items: this.itemData.addresses,
+              itemsChanged: (list) => {
+              // update addresses
+                this.itemData.addresses = list.items;
+              },
+              definition: {
+                add: {
+                  label: 'LNG_ADDRESS_LABEL_ADD_NEW_ADDRESS',
+                  newItem: () => new AddressModel()
+                },
+                remove: {
+                  label: 'LNG_COMMON_BUTTON_DELETE',
+                  confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_ADDRESS'
+                },
+                input: {
+                  type: CreateViewModifyV2TabInputType.ADDRESS,
+                  typeOptions: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                  value: {
+                    get: (index: number) => {
+                      return this.itemData.addresses[index];
+                    }
+                  },
+                  validators: {
+                    required: () => true
+                  }
+                }
+              }
+            }
+          ]
+        }
       ]
     };
   }
 
   /**
-   * Initialize tabs - Epidemiology
-   */
-  private initializeTabsEpidemiology(): ICreateViewModifyV2Tab {
+    * Initialize tab - Epidemiology
+    */
+  private initializeTabEpidemiology(): ICreateViewModifyV2Tab {
+    // merge all records vaccines
+    this.determineVaccines();
+
+    // merge all records date ranges
+    this.determineDateRanges();
+
     return {
       type: CreateViewModifyV2TabInputType.TAB,
       label: 'LNG_PAGE_CREATE_CASE_TAB_INFECTION_TITLE',
@@ -563,10 +520,21 @@ export class CaseMergeDuplicateRecordsCreateViewModifyComponent extends CreateVi
             description: () => 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE_DESCRIPTION',
             options: this.getFieldOptions('isDateOfOnsetApproximate').options,
             value: {
-              get: () => this.itemData.isDateOfOnsetApproximate === undefined ? 'LNG_COMMON_LABEL_NONE'
-                : this.itemData.isDateOfOnsetApproximate === true ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO',
+              get: () => this.itemData.isDateOfOnsetApproximate === undefined ?
+                'LNG_COMMON_LABEL_NONE' :
+                (
+                  this.itemData.isDateOfOnsetApproximate === true ?
+                    'LNG_COMMON_LABEL_YES' :
+                    'LNG_COMMON_LABEL_NO'
+                ),
               set: (value) => {
-                this.itemData.isDateOfOnsetApproximate = (value === 'LNG_COMMON_LABEL_YES' ? true : value === 'LNG_COMMON_LABEL_NO' ? false : undefined);
+                this.itemData.isDateOfOnsetApproximate = value === 'LNG_COMMON_LABEL_YES' ?
+                  true :
+                  (
+                    value === 'LNG_COMMON_LABEL_NO' ?
+                      false :
+                      undefined
+                  );
               }
             }
           }, {
@@ -657,10 +625,21 @@ export class CaseMergeDuplicateRecordsCreateViewModifyComponent extends CreateVi
             description: () => 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED_DESCRIPTION',
             options: this.getFieldOptions('transferRefused').options,
             value: {
-              get: () => this.itemData.transferRefused === undefined ? 'LNG_COMMON_LABEL_NONE'
-                : this.itemData.isDateOfOnsetApproximate === true ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO',
+              get: () => this.itemData.transferRefused === undefined ?
+                'LNG_COMMON_LABEL_NONE' :
+                (
+                  this.itemData.isDateOfOnsetApproximate === true ?
+                    'LNG_COMMON_LABEL_YES' :
+                    'LNG_COMMON_LABEL_NO'
+                ),
               set: (value) => {
-                this.itemData.transferRefused = (value === 'LNG_COMMON_LABEL_YES' ? true : value === 'LNG_COMMON_LABEL_NO' ? false : undefined);
+                this.itemData.transferRefused = value === 'LNG_COMMON_LABEL_YES' ?
+                  true :
+                  (
+                    value === 'LNG_COMMON_LABEL_NO' ?
+                      false :
+                      undefined
+                  );
               }
             }
           }, {
@@ -672,10 +651,23 @@ export class CaseMergeDuplicateRecordsCreateViewModifyComponent extends CreateVi
             value: {
               get: () => this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
                 'LNG_COMMON_LABEL_NO' :
-                this.itemData.safeBurial === undefined ? 'LNG_COMMON_LABEL_NONE'
-                  : this.itemData.isDateOfOnsetApproximate === true ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO',
+                (
+                  this.itemData.safeBurial === undefined ?
+                    'LNG_COMMON_LABEL_NONE' :
+                    (
+                      this.itemData.isDateOfOnsetApproximate === true ?
+                        'LNG_COMMON_LABEL_YES' :
+                        'LNG_COMMON_LABEL_NO'
+                    )
+                ),
               set: (value) => {
-                this.itemData.safeBurial = (value === 'LNG_COMMON_LABEL_YES' ? true : value === 'LNG_COMMON_LABEL_NO' ? false : undefined);
+                this.itemData.safeBurial = value === 'LNG_COMMON_LABEL_YES' ?
+                  true :
+                  (
+                    value === 'LNG_COMMON_LABEL_NO' ?
+                      false :
+                      undefined
+                  );
               }
             },
             disabled: () => {
@@ -754,10 +746,21 @@ export class CaseMergeDuplicateRecordsCreateViewModifyComponent extends CreateVi
             description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION',
             options: this.getFieldOptions('isDateOfReportingApproximate').options,
             value: {
-              get: () => this.itemData.isDateOfReportingApproximate === undefined ? 'LNG_COMMON_LABEL_NONE'
-                : this.itemData.isDateOfOnsetApproximate === true ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO',
+              get: () => this.itemData.isDateOfReportingApproximate === undefined ?
+                'LNG_COMMON_LABEL_NONE' :
+                (
+                  this.itemData.isDateOfOnsetApproximate === true ?
+                    'LNG_COMMON_LABEL_YES' :
+                    'LNG_COMMON_LABEL_NO'
+                ),
               set: (value) => {
-                this.itemData.isDateOfReportingApproximate = (value === 'LNG_COMMON_LABEL_YES' ? true : value === 'LNG_COMMON_LABEL_NO' ? false : undefined);
+                this.itemData.isDateOfReportingApproximate = value === 'LNG_COMMON_LABEL_YES' ?
+                  true :
+                  (
+                    value === 'LNG_COMMON_LABEL_NO' ?
+                      false :
+                      undefined
+                  );
               }
             }
           }, {
@@ -785,169 +788,139 @@ export class CaseMergeDuplicateRecordsCreateViewModifyComponent extends CreateVi
               }
             }
           }]
-        }
+        },
 
-        // TODO: merge vaccines; code from create-view-modify cases below
+        // #TODO: Vaccine form-inputs shold be disabled like in the old design? Option currently not supported
         // Vaccines
-        // {
-        //   type: CreateViewModifyV2TabInputType.SECTION,
-        //   label: 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED_DETAILS',
-        //   inputs: [{
-        //     type: CreateViewModifyV2TabInputType.LIST,
-        //     name: 'vaccinesReceived',
-        //     items: this.itemData.vaccinesReceived,
-        //     itemsChanged: (list) => {
-        //       // update documents
-        //       this.itemData.vaccinesReceived = list.items;
-        //     },
-        //     definition: {
-        //       add: {
-        //         label: 'LNG_COMMON_BUTTON_ADD_VACCINE',
-        //         newItem: () => new VaccineModel()
-        //       },
-        //       remove: {
-        //         label: 'LNG_COMMON_BUTTON_DELETE',
-        //         confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_VACCINE'
-        //       },
-        //       input: {
-        //         type: CreateViewModifyV2TabInputType.VACCINE,
-        //         vaccineOptions: (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        //         vaccineStatusOptions: (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        //         value: {
-        //           get: (index: number) => {
-        //             return this.itemData.vaccinesReceived[index];
-        //           }
-        //         }
-        //       }
-        //     }
-        //   }]
-        // },
-        // TODO: merge vaccines; html from old design below
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED_DETAILS',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.LIST,
+            name: 'vaccinesReceived',
+            items: this.itemData.vaccinesReceived,
+            itemsChanged: (list) => {
+              // update documents
+              this.itemData.vaccinesReceived = list.items;
+            },
+            definition: {
+              add: {
+                label: 'LNG_COMMON_BUTTON_ADD_VACCINE',
+                newItem: () => new VaccineModel()
+              },
+              remove: {
+                label: 'LNG_COMMON_BUTTON_DELETE',
+                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_VACCINE'
+              },
+              input: {
+                type: CreateViewModifyV2TabInputType.VACCINE,
+                vaccineOptions: (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                vaccineStatusOptions: (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                value: {
+                  get: (index: number) => {
+                    return this.itemData.vaccinesReceived[index];
+                  }
+                }
+              }
+            }
+          }]
+        },
 
-        //     <!--Vaccines received section-->
-        //     <div class="section-title">{{'LNG_CASE_FIELD_LABEL_VACCINES_RECEIVED_DETAILS' | translate}}</div>
-        // <app-form-vaccines-list
-        // name="vaccinesReceived"
-        //   [(ngModel)]="caseData.vaccinesReceived"
-        //   [disabled]="true">
-        //   </app-form-vaccines-list>
-
-        // TODO: merge hospitalizations; code from create-view-modify cases below
+        // #TODO: Date range form-inputs shold be disabled like in the old design? Option currently not supported
         // Date ranges
-        // {
-        //   type: CreateViewModifyV2TabInputType.SECTION,
-        //   label: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS',
-        //   inputs: [{
-        //     type: CreateViewModifyV2TabInputType.LIST,
-        //     name: 'dateRanges',
-        //     items: this.itemData.dateRanges,
-        //     itemsChanged: (list) => {
-        //       // update documents
-        //       this.itemData.dateRanges = list.items;
-        //     },
-        //     definition: {
-        //       add: {
-        //         label: 'LNG_COMMON_BUTTON_ADD_DATE_RANGE',
-        //         newItem: () => new CaseCenterDateRangeModel()
-        //       },
-        //       remove: {
-        //         label: 'LNG_COMMON_BUTTON_DELETE',
-        //         confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_DATE_RANGE'
-        //       },
-        //       input: {
-        //         type: CreateViewModifyV2TabInputType.CENTER_DATE_RANGE,
-        //         typeOptions: (this.activatedRoute.snapshot.data.dateRangeType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        //         centerOptions: (this.activatedRoute.snapshot.data.dateRangeCenter as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        //         value: {
-        //           get: (index: number) => {
-        //             return this.itemData.dateRanges[index];
-        //           }
-        //         },
-        //         startDateValidators: {
-        //           dateSameOrAfter: () => [
-        //             'dateOfOnset'
-        //           ]
-        //         }
-        //       }
-        //     }
-        //   }]
-        // }
-        // TODO: merge hospitalizations; html from old design below
-
-        //   <!-- Dates section -->
-        //   <app-form-case-center-daterange-list
-        // name="dateRanges"
-        //   [(ngModel)]="caseData.dateRanges"
-        // fromTooltip="LNG_CASE_FIELD_LABEL_DATE_RANGE_FROM_DESCRIPTION"
-        // toTooltip="LNG_CASE_FIELD_LABEL_DATE_RANGE_TO_DESCRIPTION"
-        //   [componentTitle]="'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS' | translate"
-        // centerNameLabel="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME"
-        // centerNameTooltip="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME_DESCRIPTION"
-        //   [required]="true"
-        //   [dateOfOnset]="caseData.dateOfOnset"
-        //   ></app-form-case-center-daterange-list>
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.LIST,
+            name: 'dateRanges',
+            items: this.itemData.dateRanges,
+            itemsChanged: (list) => {
+              // update documents
+              this.itemData.dateRanges = list.items;
+            },
+            definition: {
+              add: {
+                label: 'LNG_COMMON_BUTTON_ADD_DATE_RANGE',
+                newItem: () => new CaseCenterDateRangeModel()
+              },
+              remove: {
+                label: 'LNG_COMMON_BUTTON_DELETE',
+                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_DATE_RANGE'
+              },
+              input: {
+                type: CreateViewModifyV2TabInputType.CENTER_DATE_RANGE,
+                typeOptions: (this.activatedRoute.snapshot.data.dateRangeType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                centerOptions: (this.activatedRoute.snapshot.data.dateRangeCenter as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                value: {
+                  get: (index: number) => {
+                    return this.itemData.dateRanges[index];
+                  }
+                },
+                startDateValidators: {
+                  dateSameOrAfter: () => [
+                    'dateOfOnset'
+                  ]
+                }
+              }
+            }
+          }]
+        }
       ]
     };
   }
 
   /**
-   * Initialize tabs - Questionnaire
+   * Initialize tab - Questionnaire
    */
-  // TODO: merge questionnaires; code from create-view-modify cases below
-  // private initializeTabsQuestionnaire(): ICreateViewModifyV2TabTable {
-  //   let errors: string = '';
-  //   return {
-  //     type: CreateViewModifyV2TabInputType.TAB_TABLE,
-  //     label: 'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE',
-  //     definition: {
-  //       type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
-  //       name: 'questionnaireAnswers',
-  //       questionnaire: this.selectedOutbreak.caseInvestigationTemplate,
-  //       value: {
-  //         get: () => this.itemData.questionnaireAnswers,
-  //         set: (value) => {
-  //           this.itemData.questionnaireAnswers = value;
-  //         }
-  //       },
-  //       updateErrors: (errorsHTML) => {
-  //         errors = errorsHTML;
-  //       }
-  //     },
-  //     invalidHTMLSuffix: () => {
-  //       return errors;
-  //     },
-  //     visible: () => this.selectedOutbreak.caseInvestigationTemplate?.length > 0
-  //   };
-  // }
-  // TODO: merge questionnaires; html from old design below
+  private initializeTabQuestionnaire(): ICreateViewModifyV2Tab {
+    // merge all records questionnaires
+    this.determineQuestionnaireAnswers();
 
-  //   <!-- Questionnaire step -->
-  // <mat-step [stepControl]="questionnaireForm">
-  //   <form #questionnaireForm="ngForm">
-  //     <ng-template matStepLabel>{{ 'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_TAB_QUESTIONNAIRE_TITLE' | translate }}</ng-template>
-  //
-  // <app-form-select
-  // name="selectedQuestionnaireAnswers"
-  //   [(ngModel)]="uniqueOptions?.questionnaireAnswers.value"
-  //   [placeholder]="'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS' | translate"
-  //   [options]="uniqueOptions?.questionnaireAnswers.options"
-  // (optionChanged)="changedQuestionnaireAnswers($event)"
-  //   [clearable]="false">
-  //   </app-form-select>
-  //
-  // <!-- Questionnaire section -->
-  // <!--                    <app-form-fill-questionnaire-->
-  // <!--                        name="questionnaireAnswers"-->
-  // <!--                        [ngModel]="questionnaireAnswers"-->
-  // <!--                        [questions]="selectedOutbreak?.caseInvestigationTemplate"-->
-  // <!--                        [disabled]="true">-->
-  // <!--                    </app-form-fill-questionnaire>-->
-  //
-  // <div class="stepper-navigation-buttons">
-  //   <button mat-raised-button color="accent" matStepperNext>{{'LNG_STEPPER_BUTTON_NEXT'| translate}}</button>
-  // </div>
-  // </form>
-  // </mat-step>
+    return {
+      type: CreateViewModifyV2TabInputType.TAB,
+      label: 'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_TAB_QUESTIONNAIRE_TITLE',
+      sections: [
+        // Questionnaire
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_CASE_FIELD_LABEL_DETAILS',
+          inputs: [
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'questionnaireAnswers',
+              placeholder: () => 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS',
+              options: this.questionnaireAnswers.options,
+              value: {
+                get: (): string => this.questionnaireAnswers.options[0]?.label,
+                set: (value: any) => {
+                  this.itemData.questionnaireAnswers = value;
+                }
+              },
+              validators: {
+                required: () => true
+              }
+            }
+            // #TODO: Needed to display answer selected but not accepted by .SECTION, should be also disabled.
+            // Would be better to extend .TAB_TABLE_FILL_QUESTIONNAIRE and use it here?
+            //  Show selected Questionnaire
+            // {
+            //   type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
+            //   name: 'questionnaireAnswers',
+            //   questionnaire: this.selectedOutbreak.caseInvestigationTemplate,
+            //   value: {
+            //     get: () => this.itemData.questionnaireAnswers,
+            //     set: (value) => {
+            //       this.itemData.questionnaireAnswers = value;
+            //     }
+            //   }
+            // }
+          ]
+        }
+      ]
+    };
+  }
+
 
   /**
    * Initialize buttons
@@ -997,6 +970,20 @@ export class CaseMergeDuplicateRecordsCreateViewModifyComponent extends CreateVi
       data,
       finished
     ) => {
+      // Attach data if itemsChanged() not triggered
+      if (data.documents === undefined) {
+        data.documents = this.itemData.documents;
+      }
+      if (data.addresses === undefined) {
+        data.addresses = this.itemData.addresses;
+      }
+      if (data.questionnaireAnswers === undefined) {
+        data.questionnaireAnswers = this.itemData.questionnaireAnswers;
+      }
+      if (data.dateRanges === undefined) {
+        data.dateRanges = this.itemData.dateRanges;
+      }
+
       // finished
       this.outbreakDataService
         .mergePeople(
@@ -1033,31 +1020,24 @@ export class CaseMergeDuplicateRecordsCreateViewModifyComponent extends CreateVi
   /**
    * Initialize expand list column renderer fields
    */
-  protected initializeExpandListColumnRenderer(): void {
-
-  }
+  protected initializeExpandListColumnRenderer(): void {}
 
   /**
    * Initialize expand list query fields
    */
-  protected initializeExpandListQueryFields(): void {
-
-  }
+  protected initializeExpandListQueryFields(): void {}
 
   /**
    * Initialize expand list advanced filters
    */
-  protected initializeExpandListAdvancedFilters(): void {
-
-  }
+  protected initializeExpandListAdvancedFilters(): void {}
 
   /**
    * Refresh expand list
    */
-  refreshExpandList(_data): void {
+  refreshExpandList(_data): void {}
 
-  }
-
+  // get field unique options
   private getFieldOptions(key: string): { options: LabelValuePair[], value: any } {
     switch (key) {
       case 'ageDob': return EntityModel.uniqueAgeDobOptions(
@@ -1113,6 +1093,141 @@ export class CaseMergeDuplicateRecordsCreateViewModifyComponent extends CreateVi
       }
 
       default: return EntityModel.uniqueStringOptions(this.mergeRecords, key);
+    }
+  }
+
+  /**
+     * Determine documents
+     */
+  private determineDocuments() {
+    this.itemData.documents = [];
+    _.each(this.mergeRecords, (ent: EntityModel) => {
+      _.each((ent.model as CaseModel).documents, (doc: DocumentModel) => {
+        if (doc.number || doc.type) {
+          this.itemData.documents.push(doc);
+        }
+      });
+    });
+  }
+
+  // #TODO: Couldn't implment the old logic
+  // Why?
+  // - can't hide form-inputs, tried with "replace()" but is not present on all type of form-inputs (.ADDRESS)
+  // - can't change data and show changes to user when selecting currentAddress
+  // Needs:
+  // - .SELECT_SINGLE drop-down for currentAddresses to be hidden if found only one currentAddress
+  // - .ADDRESS form-input to show currentAddress after select in drop-down, disabled if found just one currentAddress and display it
+  // Implemneted:
+  // - this.determineAddresses() keeps the most recent currentAddress by date
+  // - if address has no date becomes previousAddress now
+  // - if no currentAddress found the last address becomes currentAddress
+  // Pros:
+  // - user gets more flexibility to edit/remove which addresses he likes
+  // - now addressess WITHOUT date are keeped as previousAddresses
+  // - before if address had just locationId and typeId currentAddress drop-down showed empty options, no more the case now
+  // Cons:
+  // - user can't figure out if addresses WITHOUT date where currentAddress before and other may become (addresses WITH date are sorted and the most recent is keeped)
+  // - idk if meets client requirements..
+  /**
+     * Determine addresses
+     */
+  private determineAddresses() {
+    // merge all addresses, keep just one current address
+    let currentAddress;
+    this.itemData.addresses = [];
+    _.each(this.mergeRecords, (ent: EntityModel) => {
+      _.each((ent.model as CaseModel).addresses, (address: AddressModel) => {
+        if (
+          address.locationId ||
+          address.fullAddress
+        ) {
+          // current address ?
+          // if we have multiple current addresses then we change them to previously addresses and keep the freshest one by address.date
+          if (address.typeId === AddressType.CURRENT_ADDRESS) {
+            if (address.date) {
+              // we have multiple current addresses ?
+              if (currentAddress) {
+                // address is newer?
+                if (moment(currentAddress.date).isBefore(moment(address.date))) {
+                  currentAddress.typeId = AddressType.PREVIOUS_ADDRESS;
+                  this.itemData.addresses.push(currentAddress);
+                  currentAddress = address;
+                } else {
+                  address.typeId = AddressType.PREVIOUS_ADDRESS;
+                  this.itemData.addresses.push(address);
+                }
+              } else {
+                currentAddress = address;
+              }
+            } else {
+              // make it previous address
+              address.typeId = AddressType.PREVIOUS_ADDRESS;
+              this.itemData.addresses.push(address);
+            }
+          } else {
+            this.itemData.addresses.push(address);
+          }
+        }
+      });
+    });
+
+    // do we have a recent current address ?
+    if (currentAddress) {
+      this.itemData.addresses.push(currentAddress);
+    } else if (this.itemData.addresses.length > 0) { // make a current address
+      this.itemData.addresses[this.itemData.addresses.length - 1].typeId = AddressType.CURRENT_ADDRESS;
+    }
+  }
+
+  /**
+    * Determine vaccines
+    */
+  private determineVaccines() {
+    // merge all documents
+    this.itemData.vaccinesReceived = [];
+    _.each(this.mergeRecords, (ent: EntityModel) => {
+      _.each((ent.model as CaseModel).vaccinesReceived, (vac: VaccineModel) => {
+        if (vac.vaccine) {
+          this.itemData.vaccinesReceived.push(vac);
+        }
+      });
+    });
+  }
+
+  /**
+     * Determine date ranges
+     */
+  private determineDateRanges() {
+    // merge all hospitalization dates
+    this.itemData.dateRanges = [];
+    _.each(this.mergeRecords, (ent: EntityModel) => {
+      _.each((ent.model as CaseModel).dateRanges, (date: CaseCenterDateRangeModel) => {
+        if (date.startDate || date.endDate) {
+          this.itemData.dateRanges.push(date);
+        }
+      });
+    });
+  }
+
+
+  /**
+     * Determine questionnaire answers
+     */
+  private determineQuestionnaireAnswers() {
+    // add questionnaire answers
+    _.each(this.mergeRecords, (ent: EntityModel) => {
+      const model: CaseModel = ent.model as CaseModel;
+      if (!_.isEmpty(model.questionnaireAnswers)) {
+        this.questionnaireAnswers.options.push(new LabelValuePair(
+          model.name,
+          model.questionnaireAnswers
+        ));
+      }
+    });
+
+    // preselect questionnaire answer if we have only one
+    if (this.questionnaireAnswers.options.length === 1) {
+      this.itemData.questionnaireAnswers = this.questionnaireAnswers.options[0].value;
     }
   }
 }
