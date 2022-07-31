@@ -42,7 +42,7 @@ const routes: Routes = [
   // Case - Merge
   {
     path: 'cases/merge',
-    component: fromPages.CaseMergeDuplicateRecordsCreateViewModifyComponent,
+    component: fromPages.CaseMergeDuplicateRecordsComponent,
     canActivate: [AuthGuard],
     data: {
       permissions: [
