@@ -97,7 +97,17 @@ const routes: Routes = [
     data: {
       permissions: [
         PERMISSION.DUPLICATE_MERGE_CONTACTS_OF_CONTACTS
-      ]
+      ],
+      action: CreateViewModifyV2Action.MODIFY
+    },
+    resolve: {
+      outbreak: SelectedOutbreakDataResolver,
+      documentType: DocumentTypeDataResolver,
+      addressType: AddressTypeDataResolver,
+      vaccine: VaccineDataResolver,
+      vaccineStatus: VaccineStatusDataResolver,
+      users: UserDataResolver,
+      teams: TeamDataResolver
     },
     canDeactivate: [
       PageChangeConfirmationGuard

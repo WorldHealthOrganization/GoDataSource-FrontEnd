@@ -112,7 +112,7 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
   /**
    * Data initialized
    */
-  protected initializedData(): void { }
+  protected initializedData(): void {}
 
   /**
      * Initialize page title

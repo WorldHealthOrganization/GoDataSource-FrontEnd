@@ -1,3 +1,27 @@
+<app-create-view-modify-v2
+  [action]="action"
+  [allowEdit]="selectedOutbreakIsActive"
+  [loadingPage]="loadingPage"
+  [loadingItemData]="loadingItemData"
+  [breadcrumbs]="breadcrumbs"
+  [pageTitle]="pageTitle"
+  [pageTitleData]="pageTitleData"
+  [itemID]="itemData?.id"
+  [tabData]="tabData"
+  listTitle="LNG_PAGE_LIST_CASES_TITLE"
+  [expandListRecords$]="expandListRecords$"
+  [expandListColumnRenderer]="expandListColumnRenderer"
+  [expandListAdvancedFilterType]="Constants.APP_PAGE.CASES.value"
+  [expandListAdvancedFilters]="expandListAdvancedFilters"
+  [expandListQueryFields]="expandListQueryFields"
+  expandListAdvancedFiltersCacheKey="/cases"
+  (expandListRefreshData)="refreshExpandList($event)"
+  (expandListChangeRecord)="expandListChangeRecord($event)">
+</app-create-view-modify-v2>
+
+
+
+<!-- #FIXME: Template cleanup -->
 <!--
 <app-topnav [activeOutbreakEditable]="false">
     <ng-container dynamic-section>
@@ -6,7 +30,7 @@
 </app-topnav>
 -->
 
-<div class="page-content">
+<!-- <div class="page-content">
     <div
         *ngIf="displayLoading"
         class="merge-loading">
@@ -17,12 +41,12 @@
         *ngIf="!displayLoading">
         <mat-horizontal-stepper linear #stepper>
 
-            <!-- Personal step -->
+            <!~~ Personal step ~~>
             <mat-step [stepControl]="personalForm">
                 <form #personalForm="ngForm">
                     <ng-template matStepLabel>{{'LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_TAB_PERSONAL_TITLE'| translate}}</ng-template>
 
-                    <!-- Personal Details section -->
+                    <!~~ Personal Details section ~~>
                     <mat-card class="page-section">
                         <div fxLayout="column">
                             <div fxLayout="row" fxLayoutGap="20px">
@@ -89,7 +113,7 @@
                                     [options]="uniqueOptions?.ageDob.options">
                                 </app-form-select>
 
-                                <div fxFlex><!-- placeholder --></div>
+                                <div fxFlex><!~~ placeholder ~~></div>
                             </div>
 
                             <div fxLayout="row" fxLayoutGap="20px">
@@ -118,13 +142,13 @@
                                     [options]="uniqueOptions?.isDateOfReportingApproximate.options">
                                 </app-form-select>
 
-                                <div fxFlex><!-- placeholder --></div>
+                                <div fxFlex><!~~ placeholder ~~></div>
                             </div>
 
                         </div>
                     </mat-card>
 
-                    <!-- Flagged section -->
+                    <!~~ Flagged section ~~>
                     <mat-card class="page-section">
                         <div fxLayout="column">
 
@@ -137,9 +161,9 @@
                                     [options]="uniqueOptions?.riskLevel.options">
                                 </app-form-select>
 
-                                <div fxFlex><!-- placeholder --></div>
-                                <div fxFlex><!-- placeholder --></div>
-                                <div fxFlex><!-- placeholder --></div>
+                                <div fxFlex><!~~ placeholder ~~></div>
+                                <div fxFlex><!~~ placeholder ~~></div>
+                                <div fxFlex><!~~ placeholder ~~></div>
                             </div>
 
                             <div fxLayout="row">
@@ -154,7 +178,7 @@
                         </div>
                     </mat-card>
 
-                    <!--Vaccines received section-->
+                    <!~~Vaccines received section~~>
                     <div class="section-title">{{'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VACCINES_RECEIVED_DETAILS' | translate}}</div>
                     <app-form-vaccines-list
                         name="vaccinesReceived"
@@ -162,7 +186,7 @@
                         [disabled]="true">
                     </app-form-vaccines-list>
 
-                    <!-- Documents section -->
+                    <!~~ Documents section ~~>
                     <div class="section-title">
                         {{'LNG_CONTACT_FIELD_LABEL_DOCUMENTS' | translate}}
                     </div>
@@ -178,7 +202,7 @@
                 </form>
             </mat-step>
 
-            <!-- Address step -->
+            <!~~ Address step ~~>
             <mat-step [stepControl]="addressForm">
                 <form #addressForm="ngForm">
                     <ng-template matStepLabel>
@@ -220,7 +244,7 @@
                 </form>
             </mat-step>
 
-            <!-- Final step -->
+            <!~~ Final step ~~>
             <mat-step>
                 <ng-template matStepLabel>
                     {{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}
@@ -238,4 +262,4 @@
             </mat-step>
         </mat-horizontal-stepper>
     </div>
-</div>
+</div> -->
