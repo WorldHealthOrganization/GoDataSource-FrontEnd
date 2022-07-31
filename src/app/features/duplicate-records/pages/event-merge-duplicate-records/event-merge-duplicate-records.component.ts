@@ -1,19 +1,27 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { NgForm } from '@angular/forms';
+import { Component, OnDestroy, Renderer2, ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { AddressModel } from '../../../../core/models/address.model';
 import * as _ from 'lodash';
 import { EntityType } from '../../../../core/models/entity-type';
-import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { EventModel } from '../../../../core/models/event.model';
+import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
+import { AppMessages } from '../../../../core/enums/app-messages.enum';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { ICreateViewModifyV2Refresh } from '../../../../shared/components-v2/app-create-view-modify-v2/models/refresh.model';
+import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import { I18nService } from '../../../../core/services/helper/i18n.service';
+import { UserModel } from '../../../../core/models/user.model';
+import { TranslateService } from '@ngx-translate/core';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 
 @Component({
   selector: 'app-event-merge-duplicate-records',
@@ -21,200 +29,439 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
   templateUrl: './event-merge-duplicate-records.component.html',
   styleUrls: ['./event-merge-duplicate-records.component.less']
 })
-export class EventMergeDuplicateRecordsComponent extends ConfirmOnFormChanges implements OnInit {
-  // breadcrumbs
-  // breadcrumbs: BreadcrumbItemModel[] = [
-  //   new BreadcrumbItemModel('LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE', '/duplicated-records'),
-  //   new BreadcrumbItemModel('LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_TITLE', '.', true)
-  // ];
-
-  // selected outbreak ID
-  outbreakId: string;
-
-  // loading flag - display spinner instead of table
-  displayLoading: boolean = false;
-
+export class EventMergeDuplicateRecordsComponent extends CreateViewModifyComponent<EventModel> implements OnDestroy {
   mergeRecordIds: string[];
   mergeRecords: EntityModel[];
-
-  address: AddressModel = new AddressModel();
-
-  uniqueOptions: {
-    name: {
-      options: LabelValuePair[],
-      value: any
-    },
-    date: {
-      options: LabelValuePair[],
-      value: any
-    },
-    dateOfReporting: {
-      options: LabelValuePair[],
-      value: any
-    },
-    isDateOfReportingApproximate: {
-      options: LabelValuePair[],
-      value: any
-    },
-    description: {
-      options: LabelValuePair[],
-      value: any
-    },
-    address: {
-      options: LabelValuePair[],
-      value: any
-    }
-  };
 
   /**
      * Constructor
      */
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
+    private activatedRoute: ActivatedRoute,
     private outbreakDataService: OutbreakDataService,
-    private toastV2Service: ToastV2Service,
-    private formHelper: FormHelperService
+    private i18nService: I18nService,
+    private translateService: TranslateService,
+    protected toastV2Service: ToastV2Service,
+    authDataService: AuthDataService,
+    renderer2: Renderer2,
+    redirectService: RedirectService
   ) {
-    super();
+    super(
+      toastV2Service,
+      renderer2,
+      redirectService,
+      activatedRoute,
+      authDataService
+    );
+    // retrieve contacts ids
+    this.mergeRecordIds = JSON.parse(this.activatedRoute.snapshot.queryParams.ids);
   }
 
   /**
-     * Component initialized
-     */
-  ngOnInit() {
-    // get merge ids
-    // retrieve query params
-    this.displayLoading = true;
-    this.route.queryParams
-      .subscribe((params: { ids }) => {
-        // record ids
-        this.mergeRecordIds = JSON.parse(params.ids);
+ * Release resources
+ */
+  ngOnDestroy(): void {
+    // parent
+    super.onDestroy();
 
-        // get selected outbreak
-        this.outbreakDataService
-          .getSelectedOutbreak()
-          .subscribe((selectedOutbreak: OutbreakModel) => {
-            this.outbreakId = selectedOutbreak.id;
-
-            // retrieve records
-            const qb = new RequestQueryBuilder();
-            qb.filter.bySelect(
-              'id',
-              this.mergeRecordIds,
-              true,
-              null
-            );
-            this.outbreakDataService
-              .getPeopleList(this.outbreakId, qb)
-              .subscribe((recordMerge) => {
-                // merge records
-                this.mergeRecords = recordMerge;
-
-                // determine unique values
-                this.determineUniqueValues();
-
-                // finished
-                this.displayLoading = false;
-              });
-          });
-      });
+    // remove global notifications
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
   }
 
   /**
-     * Determine dropdown values
+     * Create new item model if needed
      */
-  determineUniqueValues() {
-    // initialize
-    this.uniqueOptions = {
-      name: {
-        options: [],
-        value: undefined
-      },
-      date: {
-        options: [],
-        value: undefined
-      },
-      dateOfReporting: {
-        options: [],
-        value: undefined
-      },
-      isDateOfReportingApproximate: {
-        options: [],
-        value: undefined
-      },
-      description: {
-        options: [],
-        value: undefined
-      },
-      address: {
-        options: [],
-        value: undefined
+  protected createNewItem(): EventModel {
+    return null;
+  }
+
+  /**
+  * Retrieve item
+  */
+  protected retrieveItem(_record?: EventModel): Observable<EventModel> {
+    return new Observable<EventModel>((subscriber) => {
+      // retrieve records
+      const qb = new RequestQueryBuilder();
+      qb.filter.bySelect(
+        'id',
+        this.mergeRecordIds,
+        true,
+        null
+      );
+      this.outbreakDataService
+        .getPeopleList(this.selectedOutbreak.id, qb)
+        .subscribe((recordMerge) => {
+          // merge records
+          this.mergeRecords = recordMerge;
+
+          // Complete Observable
+          subscriber.next(new EventModel());
+          subscriber.complete();
+        });
+    });
+  }
+
+  /**
+   * Data initialized
+   */
+  protected initializedData(): void {}
+  /**
+   * Initialize page title
+   */
+  protected initializePageTitle(): void {
+    this.pageTitle = 'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_TITLE';
+    this.pageTitleData = undefined;
+  }
+
+  /**
+     * Initialize breadcrumbs
+     */
+  protected initializeBreadcrumbs(): void {
+    // reset breadcrumbs
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
+        }
+      }
+    ];
+
+    this.breadcrumbs.push({
+      label: 'LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE',
+      action: {
+        link: ['/duplicated-records']
+      }
+    },
+    {
+      label: 'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_TITLE',
+      action: null
+    });
+  }
+
+  /**
+      * Initialize tabs
+      */
+  protected initializeTabs(): void {
+    this.tabData = {
+      // tabs
+      tabs: [
+        // Personal
+        this.initializeTabDetails()
+      ],
+
+      // create details
+      create: null,
+
+      // buttons
+      buttons: this.initializeButtons(),
+
+      // create or update
+      createOrUpdate: this.initializeProcessData(),
+      redirectAfterCreateUpdate: () => {
+        // redirect to view
+        this.redirectService.to(['/duplicated-records']);
       }
     };
-
-    // determine unique values
-    if (this.mergeRecords) {
-      this.uniqueOptions.name = EntityModel.uniqueStringOptions(this.mergeRecords, 'name');
-      this.uniqueOptions.date = EntityModel.uniqueDateOptions(this.mergeRecords, 'date');
-      this.uniqueOptions.dateOfReporting = EntityModel.uniqueDateOptions(this.mergeRecords, 'dateOfReporting');
-      this.uniqueOptions.isDateOfReportingApproximate = EntityModel.uniqueBooleanOptions(this.mergeRecords, 'isDateOfReportingApproximate');
-      this.uniqueOptions.description = EntityModel.uniqueStringOptions(this.mergeRecords, 'description');
-      this.uniqueOptions.address = EntityModel.uniqueAddressOptions(this.mergeRecords, 'address');
-
-      // address
-      this.address = this.uniqueOptions.address.value ? this.uniqueOptions.address.value : new AddressModel();
-    }
   }
 
   /**
-     * Address changed
-     * @param data
-     */
-  changedAddress(data: LabelValuePair) {
-    this.address = data ? data.value : new AddressModel();
-  }
+   * Initialize expand list column renderer fields
+   */
+  protected initializeExpandListColumnRenderer(): void {}
 
   /**
-     * Create Event
-     * @param {NgForm[]} stepForms
-     */
-  createNewEvent(stepForms: NgForm[]) {
-    // get forms fields
-    const dirtyFields: any = this.formHelper.mergeFields(stepForms);
+  * Initialize expand list query fields
+  */
+  protected initializeExpandListQueryFields(): void {}
 
-    // sanitize
-    delete dirtyFields.selectedAddress;
+  /**
+   * Initialize expand list advanced filters
+   */
+  protected initializeExpandListAdvancedFilters(): void {}
 
-    // merge records
-    if (!_.isEmpty(dirtyFields)) {
-      if (this.formHelper.isFormsSetValid(stepForms)) {
-        // add the new Event
-        this.displayLoading = true;
-        this.outbreakDataService
-          .mergePeople(
-            this.outbreakId,
-            EntityType.EVENT,
-            this.mergeRecordIds,
-            dirtyFields
-          )
-          .pipe(
-            catchError((err) => {
-              this.displayLoading = false;
-              this.toastV2Service.error(err);
-              return throwError(err);
-            })
-          )
-          .subscribe(() => {
-            this.toastV2Service.success('LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_MERGE_EVENTS_SUCCESS_MESSAGE');
+  /**
+   * Refresh expand list
+   */
+  refreshExpandList(_data: ICreateViewModifyV2Refresh): void {}
 
-            // navigate to listing page
-            this.disableDirtyConfirm();
-            this.router.navigate(['/duplicated-records']);
-          });
-      } else {
-        this.toastV2Service.error('LNG_FORM_ERROR_FORM_INVALID');
+  /**
+ * Initialize buttons
+ */
+  private initializeButtons(): ICreateViewModifyV2Buttons {
+    return {
+      view: {
+        link: {
+          link: () => null
+        },
+        visible: () => false
+      },
+      modify: {
+        link: {
+          link: () => null
+        },
+        visible: () => false
+      },
+      createCancel: {
+        link: {
+          link: () => ['/duplicated-records']
+        }
+      },
+      viewCancel: {
+        link: {
+          link: () => null
+        },
+        visible: () => false
+      },
+      modifyCancel: {
+        link: {
+          link: () => ['/duplicated-records']
+        }
+      },
+      quickActions: {
+        options: []
       }
+    };
+  }
+
+  /**
+ * Initialize process data
+ */
+  private initializeProcessData(): ICreateViewModifyV2CreateOrUpdate {
+    return (
+      _type,
+      data,
+      finished
+    ) => {
+      // finished
+      this.outbreakDataService
+        .mergePeople(
+          this.selectedOutbreak.id,
+          EntityType.EVENT,
+          this.mergeRecordIds,
+          data
+        )
+        .pipe(
+          // handle error
+          catchError((err) => {
+            // show error
+            finished(err, undefined);
+
+            // finished
+            return throwError(err);
+          }),
+
+          // should be the last pipe
+          takeUntil(this.destroyed$)
+        )
+        .subscribe((item) => {
+          // success creating / updating event
+          this.toastV2Service.success(
+            'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_MERGE_EVENTS_SUCCESS_MESSAGE'
+          );
+
+          // finished with success
+          finished(undefined, item);
+        });
+    };
+  }
+
+  // get field unique options
+  private getFieldOptions(key: string): { options: LabelValuePair[], value: any } {
+    switch (key) {
+      case 'age': return EntityModel.uniqueAgeOptions(
+        this.mergeRecords,
+        this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+        this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+      );
+      case 'dob': return EntityModel.uniqueDobOptions(this.mergeRecords);
+      case 'date': return EntityModel.uniqueDateOptions(this.mergeRecords, key);
+      case 'endDate': return EntityModel.uniqueDateOptions(this.mergeRecords, key);
+      case 'dateOfReporting': return EntityModel.uniqueDateOptions(this.mergeRecords, key);
+      case 'isDateOfReportingApproximate': return EntityModel.uniqueBooleanOptions(this.mergeRecords, key);
+      case 'responsibleUserId': {
+        const uniqueUserOptions = EntityModel.uniqueStringOptions(this.mergeRecords, key);
+        uniqueUserOptions.options = uniqueUserOptions.options.map(
+          (labelValuePair) => {
+            labelValuePair.label = this.activatedRoute.snapshot.data.users.options.find(
+              (user) => user.value === labelValuePair.value).label;
+
+            return new LabelValuePair(labelValuePair.label, labelValuePair.value);
+          });
+        return uniqueUserOptions;
+      }
+      case 'address': return EntityModel.uniqueAddressOptions(this.mergeRecords, key);
+
+      default: return EntityModel.uniqueStringOptions(this.mergeRecords, key);
     }
+  }
+
+  /**
+  * Initialize tab details
+  */
+  private initializeTabDetails(): ICreateViewModifyV2Tab {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB,
+      label: 'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE',
+      sections: [
+        // Details
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'name',
+            placeholder: () => 'LNG_EVENT_FIELD_LABEL_NAME',
+            description: () => 'LNG_EVENT_FIELD_LABEL_NAME_DESCRIPTION',
+            options: this.getFieldOptions('name').options,
+            value: {
+              get: () => this.itemData.name,
+              set: (value) => {
+                this.itemData.name = value;
+              }
+            },
+            validators: {
+              required: () => true
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'date',
+            placeholder: () => 'LNG_EVENT_FIELD_LABEL_DATE',
+            description: () => 'LNG_EVENT_FIELD_LABEL_DATE_DESCRIPTION',
+            options: this.getFieldOptions('date').options,
+            value: {
+              get: () => this.itemData.date?.toString(),
+              set: (value) => {
+                this.itemData.date = value;
+              }
+            },
+            validators: {
+              required: () => true
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'dateOfReporting',
+            placeholder: () => 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
+            description: () => 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
+            options: this.getFieldOptions('dateOfReporting').options,
+            value: {
+              get: () => this.itemData.dateOfReporting?.toString(),
+              set: (value) => {
+                this.itemData.dateOfReporting = value;
+              }
+            },
+            validators: {
+              required: () => true
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'isDateOfReportingApproximate',
+            placeholder: () => 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+            description: () => 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION',
+            options: this.getFieldOptions('isDateOfReportingApproximate').options,
+            value: {
+              get: () => this.itemData.isDateOfReportingApproximate === undefined ?
+                'LNG_COMMON_LABEL_NONE' :
+                (
+                  this.itemData.isDateOfReportingApproximate === true ?
+                    'LNG_COMMON_LABEL_YES' :
+                    'LNG_COMMON_LABEL_NO'
+                ),
+              set: (value) => {
+                this.itemData.isDateOfReportingApproximate = value === 'LNG_COMMON_LABEL_YES' ?
+                  true :
+                  (
+                    value === 'LNG_COMMON_LABEL_NO' ?
+                      false :
+                      undefined
+                  );
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'responsibleUserId',
+            placeholder: () => 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+            description: () => 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
+            options: this.getFieldOptions('isDateOfReportingApproximate').options,
+            value: {
+              get: () => this.itemData.responsibleUserId,
+              set: (value) => {
+                this.itemData.responsibleUserId = value;
+              }
+            },
+            replace: {
+              condition: () => !UserModel.canListForFilters(this.authUser),
+              html: this.translateService.instant('LNG_PAGE_CREATE_EVENT_CANT_SET_RESPONSIBLE_ID_TITLE')
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'eventCategory',
+            placeholder: () => 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY',
+            description: () => 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY_DESCRIPTION',
+            options: this.getFieldOptions('eventCategory').options,
+            value: {
+              get: () => this.itemData.eventCategory,
+              set: (value) => {
+                this.itemData.eventCategory = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'endDate',
+            placeholder: () => 'LNG_EVENT_FIELD_LABEL_END_DATE',
+            description: () => 'LNG_EVENT_FIELD_LABEL_END_DATE_DESCRIPTION',
+            options: this.getFieldOptions('endDate').options,
+            value: {
+              get: () => this.itemData.endDate?.toString(),
+              set: (value) => {
+                this.itemData.endDate = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'description',
+            placeholder: () => 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
+            description: () => 'LNG_EVENT_FIELD_LABEL_DESCRIPTION_DESCRIPTION',
+            options: this.getFieldOptions('description').options,
+            value: {
+              get: () => this.itemData.description,
+              set: (value) => {
+                this.itemData.description = value;
+              }
+            }
+          }]
+        },
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_EVENT_FIELD_LABEL_ADDRESS',
+          inputs: [
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'addresses',
+              placeholder: () => 'LNG_EVENT_FIELD_LABEL_CHOOSE_ADDRESS',
+              options: this.getFieldOptions('address').options,
+              value: {
+                // #TODO: Value is displayed in dropdown only after it's selected twice in a row, please investigate
+                // May be because value is of type "ICreateViewModifyV2TabInputValue<string>" instead of "ICreateViewModifyV2TabInputValue<any>"
+                get: () => this.itemData.address?.fullAddress,
+                set: (value: any) => {
+                  this.itemData.address = this.getFieldOptions('address').options.find((pair: LabelValuePair) => pair.label === value.fullAddress)?.value;
+                }
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.ADDRESS,
+              typeOptions: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              name: 'address',
+              value: {
+                get: () => this.itemData.address
+              }
+            }
+          ]
+        }
+      ]
+    };
   }
 }

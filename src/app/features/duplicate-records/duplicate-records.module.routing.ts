@@ -122,7 +122,12 @@ const routes: Routes = [
     data: {
       permissions: [
         PERMISSION.DUPLICATE_MERGE_EVENTS
-      ]
+      ],
+      action: CreateViewModifyV2Action.MODIFY
+    },
+    resolve: {
+      outbreak: SelectedOutbreakDataResolver,
+      addressType: AddressTypeDataResolver
     },
     canDeactivate: [
       PageChangeConfirmationGuard
