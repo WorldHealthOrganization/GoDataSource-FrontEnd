@@ -21,7 +21,6 @@ export * from './marked-not-duplicates-list/marked-not-duplicates-list.component
 // export the list of all page components
 export const pageComponents: any[] = [
   DuplicateRecordsListComponent,
-  // CaseMergeDuplicateRecordsComponent,
   CaseMergeDuplicateRecordsCreateViewModifyComponent,
   ContactMergeDuplicateRecordsComponent,
   ContactOfContactMergeDuplicateComponent,

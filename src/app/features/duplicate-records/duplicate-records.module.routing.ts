@@ -14,6 +14,8 @@ import { VaccineDataResolver } from '../../core/services/resolvers/data/vaccine.
 import { VaccineStatusDataResolver } from '../../core/services/resolvers/data/vaccine-status.resolver';
 import { PersonDateTypeDataResolver } from '../../core/services/resolvers/data/person-date-type.resolver';
 import { DateRangeCenterDataResolver } from '../../core/services/resolvers/data/date-range-center.resolver';
+import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+import { TeamDataResolver } from '../../core/services/resolvers/data/team.resolver';
 
 
 // Not Duplicates List - Cases / Contacts / Contacts of Contacts
@@ -70,7 +72,17 @@ const routes: Routes = [
     data: {
       permissions: [
         PERMISSION.DUPLICATE_MERGE_CONTACTS
-      ]
+      ],
+      action: CreateViewModifyV2Action.MODIFY
+    },
+    resolve: {
+      outbreak: SelectedOutbreakDataResolver,
+      documentType: DocumentTypeDataResolver,
+      addressType: AddressTypeDataResolver,
+      vaccine: VaccineDataResolver,
+      vaccineStatus: VaccineStatusDataResolver,
+      users: UserDataResolver,
+      teams: TeamDataResolver
     },
     canDeactivate: [
       PageChangeConfirmationGuard

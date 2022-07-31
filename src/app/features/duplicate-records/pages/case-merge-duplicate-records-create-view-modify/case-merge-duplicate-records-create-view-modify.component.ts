@@ -47,9 +47,6 @@ import { EntityType } from '../../../../core/models/entity-type';
 export class CaseMergeDuplicateRecordsCreateViewModifyComponent extends CreateViewModifyComponent<CaseModel> implements OnDestroy {
   mergeRecordIds: string[];
   mergeRecords: EntityModel[];
-  currentAddresses: {
-    options: LabelValuePair[]
-  } = { options: [] };
 
   questionnaireAnswers: {
     options: LabelValuePair[]
@@ -119,6 +116,8 @@ export class CaseMergeDuplicateRecordsCreateViewModifyComponent extends CreateVi
         .subscribe((recordMerge) => {
           // merge records
           this.mergeRecords = recordMerge;
+
+          // Complete Observable
           subscriber.next(new CaseModel());
           subscriber.complete();
         });
@@ -170,7 +169,6 @@ export class CaseMergeDuplicateRecordsCreateViewModifyComponent extends CreateVi
    * Initialize tabs
    */
   protected initializeTabs(): void {
-
     this.tabData = {
       // tabs
       tabs: [
@@ -305,37 +303,23 @@ export class CaseMergeDuplicateRecordsCreateViewModifyComponent extends CreateVi
                   this.itemData.occupation = value;
                 }
               }
-            }, { // #TODO: I think "CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH" should be extended to show drop-downs for "age" and "dob".
-              // If user can set both could also input misleading data like "dob" few months ago and "age" 80 years..
+            }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'age',
               placeholder: () => 'LNG_CASE_FIELD_LABEL_AGE',
               description: () => 'LNG_CASE_FIELD_LABEL_AGE_DESCRIPTION',
               options: this.getFieldOptions('age').options,
               value: {
-                // TODO: value is displayed in dropdown only after it's selected twice in a row
+                // TODO: value is displayed in dropdown only after it's selected twice in a row, please investigate
+                // May be because value is of type "ICreateViewModifyV2TabInputValue<string>" instead of "ICreateViewModifyV2TabInputValue<any>"
                 get: () => EntityModel.getAgeString(
                   this.itemData.age,
                   this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
                   this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
                 ),
                 set: (value: any) => {
-                  // TODO: for some reason, value is of type AgeModel instead of string. please investigate
                   // set value
                   this.itemData.age = value || new AgeModel();
-
-                  // if (value !== undefined){
-                  //
-                  //   const ageStringNoWords = value.replace(this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'), '');
-                  //   ageStringNoWords.replace(this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS'), '');
-                  //
-                  //   const yearsString = ageStringNoWords.split(' ')?.[0];
-                  //   const monthsString = ageStringNoWords.split(' ')?.[1];
-                  //
-                  //   this.itemData.age = this.itemData.age || new AgeModel();
-                  //   this.itemData.age.years = toInteger(yearsString);
-                  //   this.itemData.age.months = toInteger(monthsString);
-                  // } else {this.itemData.age = { years: 0, months: 0 }; }
                 }
               },
               disabled: () => !!this.itemData.dob
@@ -917,7 +901,8 @@ export class CaseMergeDuplicateRecordsCreateViewModifyComponent extends CreateVi
             // }
           ]
         }
-      ]
+      ],
+      visible: () => this.selectedOutbreak.caseInvestigationTemplate?.length > 0
     };
   }
 
@@ -1040,35 +1025,12 @@ export class CaseMergeDuplicateRecordsCreateViewModifyComponent extends CreateVi
   // get field unique options
   private getFieldOptions(key: string): { options: LabelValuePair[], value: any } {
     switch (key) {
-      case 'ageDob': return EntityModel.uniqueAgeDobOptions(
+      case 'age': return EntityModel.uniqueAgeOptions(
         this.mergeRecords,
         this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
         this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
       );
-      case 'age': {
-        const uniqueAgeOptions = EntityModel.uniqueAgeDobOptions(
-          this.mergeRecords,
-          this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-          this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
-        );
-        uniqueAgeOptions.options = uniqueAgeOptions.options.map(
-          (labelValuePair) => {
-            const caseModel = labelValuePair.value;
-            if (caseModel.age.years === 0 && caseModel.age.months === 0) {
-              labelValuePair.label = undefined;
-            }
-            labelValuePair.value = new AgeModel();
-            labelValuePair.value.years = caseModel?.age?.years;
-            labelValuePair.value.months = caseModel?.age?.months;
-
-            return new LabelValuePair(labelValuePair.label, labelValuePair.value);
-          }
-        );
-        uniqueAgeOptions.options = uniqueAgeOptions.options.filter(element => {return element.label !== undefined; });
-        // console.log(filteredOptions);
-        return uniqueAgeOptions;
-      }
-      case 'dob': return EntityModel.uniqueDateOptions(this.mergeRecords, key);
+      case 'dob': return EntityModel.uniqueDobOptions(this.mergeRecords);
       case 'dateOfReporting': return EntityModel.uniqueDateOptions(this.mergeRecords, key);
       case 'isDateOfReportingApproximate': return EntityModel.uniqueBooleanOptions(this.mergeRecords, key);
       case 'transferRefused': return EntityModel.uniqueBooleanOptions(this.mergeRecords, key);
@@ -1110,23 +1072,19 @@ export class CaseMergeDuplicateRecordsCreateViewModifyComponent extends CreateVi
     });
   }
 
-  // #TODO: Couldn't implment the old logic
+  // #TODO: Couldn't implement the old logic
   // Why?
   // - can't hide form-inputs, tried with "replace()" but is not present on all type of form-inputs (.ADDRESS)
   // - can't change data and show changes to user when selecting currentAddress
-  // Needs:
-  // - .SELECT_SINGLE drop-down for currentAddresses to be hidden if found only one currentAddress
-  // - .ADDRESS form-input to show currentAddress after select in drop-down, disabled if found just one currentAddress and display it
   // Implemneted:
-  // - this.determineAddresses() keeps the most recent currentAddress by date
-  // - if address has no date becomes previousAddress now
-  // - if no currentAddress found the last address becomes currentAddress
+  // - this.determineAddresses() keeps the most recent currentAddress by date as before
+  // - if currentAddress has no date becomes first one is keept others become previousAddress now
   // Pros:
   // - user gets more flexibility to edit/remove which addresses he likes
   // - now addressess WITHOUT date are keeped as previousAddresses
   // - before if address had just locationId and typeId currentAddress drop-down showed empty options, no more the case now
   // Cons:
-  // - user can't figure out if addresses WITHOUT date where currentAddress before and other may become (addresses WITH date are sorted and the most recent is keeped)
+  // - user can't figure out if addresses WITHOUT date where currentAddress before except the first one found which is keept
   // - idk if meets client requirements..
   /**
      * Determine addresses
@@ -1160,9 +1118,13 @@ export class CaseMergeDuplicateRecordsCreateViewModifyComponent extends CreateVi
                 currentAddress = address;
               }
             } else {
-              // make it previous address
-              address.typeId = AddressType.PREVIOUS_ADDRESS;
-              this.itemData.addresses.push(address);
+              if (currentAddress) {
+                // make it previous address
+                address.typeId = AddressType.PREVIOUS_ADDRESS;
+                this.itemData.addresses.push(address);
+              } else {
+                currentAddress = address;
+              }
             }
           } else {
             this.itemData.addresses.push(address);
@@ -1173,9 +1135,8 @@ export class CaseMergeDuplicateRecordsCreateViewModifyComponent extends CreateVi
 
     // do we have a recent current address ?
     if (currentAddress) {
-      this.itemData.addresses.push(currentAddress);
-    } else if (this.itemData.addresses.length > 0) { // make a current address
-      this.itemData.addresses[this.itemData.addresses.length - 1].typeId = AddressType.CURRENT_ADDRESS;
+      // put it first
+      this.itemData.addresses.unshift(currentAddress);
     }
   }
 

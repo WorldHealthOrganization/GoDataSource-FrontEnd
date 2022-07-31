@@ -227,7 +227,7 @@ export class ContactOfContactMergeDuplicateComponent extends ConfirmOnFormChange
       this.uniqueOptions.gender = EntityModel.uniqueStringOptions(this.mergeRecords, 'gender');
       this.uniqueOptions.pregnancyStatus = EntityModel.uniqueStringOptions(this.mergeRecords, 'pregnancyStatus');
       this.uniqueOptions.occupation = EntityModel.uniqueStringOptions(this.mergeRecords, 'occupation');
-      this.uniqueOptions.ageDob = EntityModel.uniqueAgeDobOptions(
+      this.uniqueOptions.ageDob = EntityModel.uniqueAgeOptions(
         this.mergeRecords,
         this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
         this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')

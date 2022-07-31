@@ -365,32 +365,35 @@ export class EntityModel {
      * Unique values
      * @param records
      */
-  static uniqueAgeDobOptions(
+  static uniqueAgeOptions(
     records: EntityModel[],
     yearsLabel: string,
     monthsLabel: string
   ): { options: LabelValuePair[], value: any } {
-    // convert dob to string
-    const dobString = (dob): string => {
-      return dob ?
-        dob :
-        '';
-    };
-
-    // convert age dob to string
-    const ageDobString = (dob, age): string => {
-      dob = dobString(dob);
-      age = EntityModel.getAgeString(age, yearsLabel, monthsLabel);
-      return `${dob} ${age}`.trim();
-    };
-
-    // return age / dob unique options
+    // return age unique options
     return EntityModel.uniqueValueOptions(
       records,
       '',
       // no need to do something custom
-      (value: CaseModel | ContactModel) => ageDobString(value.dob, value.age),
-      (value) => new LabelValuePair(ageDobString(value.dob, value.age), value)
+      (value: CaseModel | ContactModel) => EntityModel.getAgeString(value.age, yearsLabel, monthsLabel),
+      (value: CaseModel | ContactModel) => new LabelValuePair(EntityModel.getAgeString(value.age, yearsLabel, monthsLabel), value.age)
+    );
+  }
+
+  /**
+    * Unique values
+    * @param records
+    */
+  static uniqueDobOptions(
+    records: EntityModel[]
+  ): { options: LabelValuePair[], value: any } {
+    // return dob unique options
+    return EntityModel.uniqueValueOptions(
+      records,
+      '',
+      // no need to do something custom
+      (value: CaseModel | ContactModel) => moment(value.dob).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+      (value: CaseModel | ContactModel) => new LabelValuePair(moment(value.dob).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT), value.dob)
     );
   }
 
