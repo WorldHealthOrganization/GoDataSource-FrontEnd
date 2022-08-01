@@ -360,9 +360,11 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
       new TextSheetColumn()
         .setTitle('LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER')
         .setProperty('contact.addresses[0].phoneNumber'),
+      // #TODO: Cell should be required if "geoLocation.lng" has value
       new TextSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT')
         .setProperty('contact.addresses[0].geoLocation.lat'),
+      // #TODO: Cell should be required if "geoLocation.lat" has value
       new TextSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG')
         .setProperty('contact.addresses[0].geoLocation.lng'),

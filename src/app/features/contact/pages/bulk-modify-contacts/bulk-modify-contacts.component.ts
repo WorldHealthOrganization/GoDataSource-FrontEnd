@@ -440,9 +440,11 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
       new TextSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER')
         .setProperty('addresses.phoneNumber'),
+      // #TODO: Cell should be required if "geoLocation.lng" has value
       new TextSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT')
         .setProperty('addresses.geoLocation.lat'),
+      // #TODO: Cell should be required if "geoLocation.lat" has value
       new TextSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG')
         .setProperty('addresses.geoLocation.lng'),
