@@ -27,6 +27,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IV2ActionIconLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { CellProperties } from 'handsontable/settings';
 
 @Component({
   selector: 'app-bulk-create-contacts-of-contacts',
@@ -247,7 +248,7 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
       new TextSheetColumn()
         .setTitle('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID')
         .setProperty('contactOfContact.visualId')
-        .setAsyncValidator((value: string, callback: (result: boolean) => void): void => {
+        .setAsyncValidator((value: string, _cellProperties: CellProperties, callback: (result: boolean) => void): void => {
           if (_.isEmpty(value)) {
             callback(true);
           } else {

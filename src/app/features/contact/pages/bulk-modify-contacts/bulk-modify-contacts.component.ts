@@ -9,7 +9,7 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { AbstractSheetColumn, LocationSheetColumn, DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
+import { AbstractSheetColumn, LocationSheetColumn, DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, TextSheetColumn, NumericSheetColumn } from '../../../../core/models/sheet/sheet.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { ContactModel } from '../../../../core/models/contact.model';
@@ -30,6 +30,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IV2ActionIconLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { CellProperties } from 'handsontable/settings';
 
 @Component({
   selector: 'app-bulk-modify-contacts',
@@ -440,14 +441,36 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
       new TextSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER')
         .setProperty('addresses.phoneNumber'),
-      // #TODO: Cell should be required if "geoLocation.lng" has value
-      new TextSheetColumn()
+      new NumericSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT')
-        .setProperty('addresses.geoLocation.lat'),
-      // #TODO: Cell should be required if "geoLocation.lat" has value
-      new TextSheetColumn()
+        .setProperty('addresses.geoLocation.lat')
+        .setAsyncValidator((value, cellProperties: CellProperties, callback: (result: boolean) => void): void => {
+          if (
+            value ||
+            value === 0
+          ) {
+            callback(true);
+          } else {
+            // for now lng should always be the next one
+            const lng: number = this.hotTableWrapper.data[cellProperties.row][cellProperties.col + 1];
+            callback(!lng && lng !== 0);
+          }
+        }),
+      new NumericSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG')
-        .setProperty('addresses.geoLocation.lng'),
+        .setProperty('addresses.geoLocation.lng')
+        .setAsyncValidator((value, cellProperties: CellProperties, callback: (result: boolean) => void): void => {
+          if (
+            value ||
+            value === 0
+          ) {
+            callback(true);
+          } else {
+            // for now lat should always be the previous one
+            const lat: number = this.hotTableWrapper.data[cellProperties.row][cellProperties.col - 1];
+            callback(!lat && lat !== 0);
+          }
+        }),
 
       // Contact Document(s)
       // Can't edit since they are multiple
