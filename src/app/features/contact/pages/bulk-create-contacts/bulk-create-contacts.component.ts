@@ -360,6 +360,12 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
       new TextSheetColumn()
         .setTitle('LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER')
         .setProperty('contact.addresses[0].phoneNumber'),
+      new TextSheetColumn()
+        .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT')
+        .setProperty('contact.addresses[0].geoLocation.lat'),
+      new TextSheetColumn()
+        .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG')
+        .setProperty('contact.addresses[0].geoLocation.lng'),
 
       // Contact Document(s)
       new DropdownSheetColumn()

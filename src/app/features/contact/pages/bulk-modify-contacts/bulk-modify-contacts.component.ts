@@ -318,6 +318,14 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                 addressModel = AddressModel.getCurrentAddress(contact.addresses);
                 value = addressModel ? addressModel.addressLine1 : null;
                 break;
+              case 'addresses.geoLocation.lat':
+                addressModel = AddressModel.getCurrentAddress(contact.addresses);
+                value = addressModel ? addressModel.geoLocation?.lat : null;
+                break;
+              case 'addresses.geoLocation.lng':
+                addressModel = AddressModel.getCurrentAddress(contact.addresses);
+                value = addressModel ? addressModel.geoLocation?.lng : null;
+                break;
               default:
                 value = _.get(contact, property);
             }
@@ -432,6 +440,12 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
       new TextSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER')
         .setProperty('addresses.phoneNumber'),
+      new TextSheetColumn()
+        .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT')
+        .setProperty('addresses.geoLocation.lat'),
+      new TextSheetColumn()
+        .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG')
+        .setProperty('addresses.geoLocation.lng'),
 
       // Contact Document(s)
       // Can't edit since they are multiple
@@ -594,6 +608,20 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                     address.addressLine1 = contactData.addresses.addressLine1;
                   } else {
                     address.addressLine1 = null;
+                  }
+
+                  // replace geoLocation.lat
+                  if (contactData.addresses.geoLocation?.lat !== undefined) {
+                    address.geoLocation.lat = contactData.addresses.geoLocation?.lat;
+                  } else {
+                    address.geoLocation.lat = null;
+                  }
+
+                  // replace geolocation.lng
+                  if (contactData.addresses.geoLocation?.lng !== undefined) {
+                    address.geoLocation.lng = contactData.addresses.geoLocation?.lng;
+                  } else {
+                    address.geoLocation.lng = null;
                   }
 
                   // replace with correct data
