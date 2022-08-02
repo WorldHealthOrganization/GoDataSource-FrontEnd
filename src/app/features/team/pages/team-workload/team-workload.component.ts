@@ -302,13 +302,11 @@ export class TeamWorkloadComponent extends ListComponent<any> implements OnDestr
                       `/contacts/follow-ups?fromWorkload=true&date=${ moment(followUpsPerDay.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) }&team=${ data.team && data.team.id ? data.team.id : '' }`;
 
                     // status for successful followups
-                    // TODO: Bug, status array with the two tokens not send as querry params
-                    // const status: string = '&status=LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_SEEN_OK&status=LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_SEEN_NOT_OK';
-                    const status: string = '';
+                    const status: string = '&status=LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_SEEN_OK&status=LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_SEEN_NOT_OK';
 
                     // render html
                     const   html: string =
-                      `<a class="gd-list-table-link" href="${ this.location.prepareExternalUrl(url) }">
+                      `<a class="gd-list-table-link" href="${ this.location.prepareExternalUrl(url + status) }">
                         <span is-link="${ url + status }">
                           ${ followUpsPerDay.successfulFollowupsCount }
                         </span>
