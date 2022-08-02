@@ -184,6 +184,9 @@ export class AppFormFillQuestionnaireV2Component
     }
   }
 
+  // disable validation ?
+  @Input() disableValidation: boolean;
+
   // view only
   @Input() viewOnly: boolean;
 
@@ -1078,6 +1081,18 @@ export class AppFormFillQuestionnaireV2Component
     flatQuestion: IFlattenNodeQuestion,
     updateErrorsData: boolean
   ): void {
+    // validation disabled ?
+    if (this.disableValidation) {
+      // reset errors
+      if (this._errorsCount > 0) {
+        this._errors = {};
+        this.updateErrorsData();
+      }
+
+      // finished
+      return;
+    }
+
     // check all answers
     let isValid: boolean = true;
     const answers: IAnswerData[] = (this.value[flatQuestion.data.variable] || []);

@@ -57,7 +57,8 @@ const routes: Routes = [
       vaccine: VaccineDataResolver,
       vaccineStatus: VaccineStatusDataResolver,
       dateRangeType: PersonDateTypeDataResolver,
-      dateRangeCenter: DateRangeCenterDataResolver
+      dateRangeCenter: DateRangeCenterDataResolver,
+      users: UserDataResolver
     },
     canDeactivate: [
       PageChangeConfirmationGuard
@@ -127,7 +128,8 @@ const routes: Routes = [
     },
     resolve: {
       outbreak: SelectedOutbreakDataResolver,
-      addressType: AddressTypeDataResolver
+      addressType: AddressTypeDataResolver,
+      users: UserDataResolver
     },
     canDeactivate: [
       PageChangeConfirmationGuard

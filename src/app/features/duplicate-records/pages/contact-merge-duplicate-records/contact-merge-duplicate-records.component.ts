@@ -4,7 +4,6 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { ActivatedRoute } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { DocumentModel } from '../../../../core/models/document.model';
@@ -28,6 +27,7 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 import { TeamModel } from '../../../../core/models/team.model';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { EntityType } from '../../../../core/models/entity-type';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
   selector: 'app-contact-merge-duplicate-records',
@@ -38,7 +38,7 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
   mergeRecordIds: string[];
   mergeRecords: EntityModel[];
   questionnaireAnswers: {
-    options: LabelValuePair[]
+    options: ILabelValuePairModel[]
   } = { options: [] };
 
   /**
@@ -777,10 +777,10 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
     _.each(this.mergeRecords, (ent: EntityModel) => {
       const model: ContactModel = ent.model as ContactModel;
       if (!_.isEmpty(model.questionnaireAnswers)) {
-        this.questionnaireAnswers.options.push(new LabelValuePair(
-          model.name,
-          model.questionnaireAnswers
-        ));
+        this.questionnaireAnswers.options.push({
+          label: model.name,
+          value: model.questionnaireAnswers
+        });
       }
     });
 
@@ -791,7 +791,7 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
   }
 
   // get field unique options
-  private getFieldOptions(key: string): { options: LabelValuePair[], value: any } {
+  private getFieldOptions(key: string): { options: ILabelValuePairModel[], value: any } {
     switch (key) {
       case 'age': return EntityModel.uniqueAgeOptions(
         this.mergeRecords,
@@ -808,13 +808,16 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
             labelValuePair.label = this.activatedRoute.snapshot.data.users.options.find(
               (user) => user.value === labelValuePair.value).label;
 
-            return new LabelValuePair(labelValuePair.label, labelValuePair.value);
+            return {
+              label: labelValuePair.label,
+              value: labelValuePair.value
+            };
           });
         return uniqueUserOptions;
       }
       case 'followUpTeamId': {
         const uniqueTeamIds = EntityModel.uniqueStringOptions(this.mergeRecords, key);
-        uniqueTeamIds.options = uniqueTeamIds.options.map((pair: LabelValuePair) => {
+        uniqueTeamIds.options = uniqueTeamIds.options.map((pair: ILabelValuePairModel) => {
           pair.label = this.activatedRoute.snapshot.data.teams.map[pair.label].name;
           return pair;
         });

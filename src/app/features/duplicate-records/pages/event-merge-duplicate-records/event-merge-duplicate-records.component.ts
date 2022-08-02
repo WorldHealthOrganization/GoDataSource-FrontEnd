@@ -3,7 +3,6 @@ import { ActivatedRoute } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { EntityType } from '../../../../core/models/entity-type';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { Observable, throwError } from 'rxjs';
@@ -20,6 +19,7 @@ import { UserModel } from '../../../../core/models/user.model';
 import { TranslateService } from '@ngx-translate/core';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
   selector: 'app-event-merge-duplicate-records',
@@ -270,7 +270,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
   }
 
   // get field unique options
-  private getFieldOptions(key: string): { options: LabelValuePair[], value: any } {
+  private getFieldOptions(key: string): { options: ILabelValuePairModel[], value: any } {
     switch (key) {
       case 'age': return EntityModel.uniqueAgeOptions(
         this.mergeRecords,
@@ -289,7 +289,10 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
             labelValuePair.label = this.activatedRoute.snapshot.data.users.options.find(
               (user) => user.value === labelValuePair.value).label;
 
-            return new LabelValuePair(labelValuePair.label, labelValuePair.value);
+            return {
+              label: labelValuePair.label,
+              value: labelValuePair.value
+            };
           });
         return uniqueUserOptions;
       }
@@ -448,7 +451,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
                 // May be because value is of type "ICreateViewModifyV2TabInputValue<string>" instead of "ICreateViewModifyV2TabInputValue<any>"
                 get: () => this.itemData.address?.fullAddress,
                 set: (value: any) => {
-                  this.itemData.address = this.getFieldOptions('address').options.find((pair: LabelValuePair) => pair.label === value.fullAddress)?.value;
+                  this.itemData.address = this.getFieldOptions('address').options.find((pair: ILabelValuePairModel) => pair.label === value.fullAddress)?.value;
                 }
               }
             },

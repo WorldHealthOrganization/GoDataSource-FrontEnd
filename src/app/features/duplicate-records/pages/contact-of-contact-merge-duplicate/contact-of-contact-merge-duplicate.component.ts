@@ -2,7 +2,6 @@ import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { ActivatedRoute } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -27,6 +26,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { UserModel } from '../../../../core/models/user.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
   selector: 'app-contact-of-contact-merge-duplicate',
@@ -659,7 +659,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
   }
 
   // get field unique options
-  private getFieldOptions(key: string): { options: LabelValuePair[], value: any } {
+  private getFieldOptions(key: string): { options: ILabelValuePairModel[], value: any } {
     switch (key) {
       case 'age': return EntityModel.uniqueAgeOptions(
         this.mergeRecords,
@@ -676,7 +676,10 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
             labelValuePair.label = this.activatedRoute.snapshot.data.users.options.find(
               (user) => user.value === labelValuePair.value).label;
 
-            return new LabelValuePair(labelValuePair.label, labelValuePair.value);
+            return {
+              label: labelValuePair.label,
+              value: labelValuePair.value
+            };
           });
         return uniqueUserOptions;
       }
