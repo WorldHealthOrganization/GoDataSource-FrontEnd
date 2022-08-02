@@ -371,6 +371,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
           ) {
             callback(true);
           } else {
+            // # TODO: "this.hotTableWrapper.data" comes "undefined", please investigate
             // for now lng should always be the next one
             const lng: number = this.hotTableWrapper.data[cellProperties.row][cellProperties.col + 1];
             callback(!lng && lng !== 0);
@@ -387,6 +388,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
             callback(true);
           } else {
             // for now lat should always be the previous one
+            // # TODO: "this.hotTableWrapper.data" comes "undefined", please investigate
             const lat: number = this.hotTableWrapper.data[cellProperties.row][cellProperties.col - 1];
             callback(!lat && lat !== 0);
           }

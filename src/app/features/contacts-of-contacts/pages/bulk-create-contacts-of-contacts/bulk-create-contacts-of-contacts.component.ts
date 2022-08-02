@@ -366,6 +366,8 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
         .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_RELATION')
         .setProperty('relationship.socialRelationshipTypeId')
         .setOptions(this.socialRelationshipOptions$, this.i18nService)
+        // #TODO: geoLocation.lat/lng columns need to be added.
+        // "this.hotTableWrapper.data" comes "undefined", please investigate
     ];
 
     // configure the context menu
