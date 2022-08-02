@@ -12,7 +12,9 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { Location } from '@angular/common';
-import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { SavedFilterData, SavedFilterDataAppliedFilter } from '../../../../core/models/saved-filters.model';
+import { RequestFilterOperator } from '../../../../core/helperClasses/request-query-builder';
 
 @Component({
   selector: 'app-team-workload',
@@ -30,12 +32,25 @@ export class TeamWorkloadComponent extends ListComponent<any> implements OnDestr
         type: 'team.name'
       },
       link: (data) => {
-        return TeamModel.canView(this.authUser) ?
+        return TeamModel.canView(this.authUser) && this.activatedRoute.snapshot.data.team.map[data.team.id] ?
           `/teams/${ data.team.id }/view` :
           undefined;
       }
     }
   ];
+
+  // advanced filters config
+  advancedFiltersConfig: {
+    operatorHide?: boolean,
+    disableAdd?: boolean,
+    disableReset?: boolean,
+    disableDelete?: boolean
+  } = {
+      operatorHide: true,
+      disableAdd: true,
+      disableReset: true,
+      disableDelete: true
+    };
 
   /**
    * Constructor
@@ -65,8 +80,26 @@ export class TeamWorkloadComponent extends ListComponent<any> implements OnDestr
    * Selected outbreak was changed
    */
   selectedOutbreakChanged(): void {
+    // set default advanced filters
+    this.tableV2Component.generateFiltersFromFilterData(new SavedFilterData({
+      appliedFilterOperator: RequestFilterOperator.AND,
+      appliedFilters: [
+        // date
+        new SavedFilterDataAppliedFilter({
+          filter: {
+            uniqueKey: 'dateLNG_PAGE_TEAMS_WORKLOAD_DATE_LABEL'
+          },
+          comparator: V2AdvancedFilterComparatorType.BETWEEN,
+          value: {
+            startDate: moment(Constants.getCurrentDate().subtract(28, 'days')).startOf('day'),
+            endDate: moment(Constants.getCurrentDate()).endOf('day')
+          }
+        })
+      ]
+    }));
+
     // initialize pagination
-    this.initPaginator();
+    // this page doesn't have pagination
 
     // ...and re-load the list when the Selected Outbreak is changed
     this.needsRefreshList(true);
@@ -166,15 +199,6 @@ export class TeamWorkloadComponent extends ListComponent<any> implements OnDestr
    * Refresh list
    */
   refreshList() {
-    // TODO: Advanced filter "date" should be initialised before landing page to replase old date slider
-    // add filter period
-    this.queryBuilder.filter.byDateRange(
-      'date', {
-        startDate: moment(Constants.getCurrentDate().subtract(14, 'days')).startOf('day'),
-        endDate: moment(Constants.getCurrentDate()).endOf('day')
-      }
-    );
-
     // retrieve the list of Follow Ups
     this.records$ = this.followUpsDataService
       .getFollowUpsPerDayTeam(this.selectedOutbreak.id, this.queryBuilder)
@@ -208,8 +232,9 @@ export class TeamWorkloadComponent extends ListComponent<any> implements OnDestr
             // get grouped followups by team
             return {
               team: this.activatedRoute.snapshot.data.team.map[team.id] ??
-              // TODO: Link should be disabled in table for "-No team assigned-"
-                { name: this.i18nService.instant('LNG_PAGE_TEAMS_WORKLOAD_NO_TEAM_LABEL') },
+                {
+                  name: this.i18nService.instant('LNG_PAGE_TEAMS_WORKLOAD_NO_TEAM_LABEL')
+                },
               followUpsPerDay: _.keyBy(team.dates, (entry) => {
                 // determine min & max dates
                 const date = moment(entry.date).startOf('day');

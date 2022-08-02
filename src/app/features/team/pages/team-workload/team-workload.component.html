@@ -18,6 +18,8 @@
   [filtersApplied]="filtersApplied"
   [advancedFilterType]="Constants.APP_PAGE.TEAM_WORKLOAD.value"
   [advancedFilters]="advancedFilters"
+  [advancedFiltersConfig]="advancedFiltersConfig"
+  paginatorDisabled="true"
   (refreshData)="needsRefreshList(true)"
   (refreshDataCount)="refreshListCount()"
   (pageChange)="changePage($event)"
