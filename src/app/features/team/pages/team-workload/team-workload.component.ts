@@ -15,6 +15,7 @@ import { Location } from '@angular/common';
 import { V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { SavedFilterData, SavedFilterDataAppliedFilter } from '../../../../core/models/saved-filters.model';
 import { RequestFilterOperator } from '../../../../core/helperClasses/request-query-builder';
+import { IV2DateRange } from '../../../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
 
 @Component({
   selector: 'app-team-workload',
@@ -81,6 +82,10 @@ export class TeamWorkloadComponent extends ListComponent<any> implements OnDestr
    */
   selectedOutbreakChanged(): void {
     // set default advanced filters
+    const defaultFilter: IV2DateRange = {
+      startDate: moment(Constants.getCurrentDate().subtract(28, 'days')).startOf('day'),
+      endDate: moment(Constants.getCurrentDate()).endOf('day')
+    };
     this.tableV2Component.generateFiltersFromFilterData(new SavedFilterData({
       appliedFilterOperator: RequestFilterOperator.AND,
       appliedFilters: [
@@ -90,13 +95,16 @@ export class TeamWorkloadComponent extends ListComponent<any> implements OnDestr
             uniqueKey: 'dateLNG_PAGE_TEAMS_WORKLOAD_DATE_LABEL'
           },
           comparator: V2AdvancedFilterComparatorType.BETWEEN,
-          value: {
-            startDate: moment(Constants.getCurrentDate().subtract(28, 'days')).startOf('day'),
-            endDate: moment(Constants.getCurrentDate()).endOf('day')
-          }
+          value: defaultFilter
         })
       ]
     }));
+
+    // filter by default range
+    this.queryBuilder.filter.byDateRange(
+      'date',
+      defaultFilter
+    );
 
     // initialize pagination
     // this page doesn't have pagination
