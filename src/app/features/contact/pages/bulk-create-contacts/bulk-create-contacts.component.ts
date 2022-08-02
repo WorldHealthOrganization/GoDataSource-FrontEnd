@@ -364,34 +364,38 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
       new NumericSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT')
         .setProperty('contact.addresses[0].geoLocation.lat')
-        .setAsyncValidator((value, cellProperties: CellProperties, callback: (result: boolean) => void): void => {
-          if (
-            value ||
-            value === 0
-          ) {
-            callback(true);
-          } else {
-            // # TODO: "this.hotTableWrapper.data" comes "undefined", please investigate
-            // for now lng should always be the next one
-            const lng: number = this.hotTableWrapper.data[cellProperties.row][cellProperties.col + 1];
-            callback(!lng && lng !== 0);
-          }
+        .setAsyncValidator((_value, _cellProperties: CellProperties, callback: (result: boolean) => void): void => {
+          // if (
+          //   value ||
+          //   value === 0
+          // ) {
+          //   callback(true);
+          // } else {
+          //   // #TODO: "this.hotTableWrapper.data" comes "undefined", please investigate.
+          //   // Found that if [data] property is added to template component selector <app-hot-table-wrapper>, problem gets fixed.
+          //   // for now lng should always be the next one
+          //   const lng: number = this.hotTableWrapper.data[cellProperties.row][cellProperties.col + 1];
+          //   callback(!lng && lng !== 0);
+          // }
+          callback(true);
         }),
       new NumericSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG')
         .setProperty('contact.addresses[0].geoLocation.lng')
-        .setAsyncValidator((value, cellProperties: CellProperties, callback: (result: boolean) => void): void => {
-          if (
-            value ||
-            value === 0
-          ) {
-            callback(true);
-          } else {
-            // for now lat should always be the previous one
-            // # TODO: "this.hotTableWrapper.data" comes "undefined", please investigate
-            const lat: number = this.hotTableWrapper.data[cellProperties.row][cellProperties.col - 1];
-            callback(!lat && lat !== 0);
-          }
+        .setAsyncValidator((_value, _cellProperties: CellProperties, callback: (result: boolean) => void): void => {
+          // if (
+          //   value ||
+          //   value === 0
+          // ) {
+          //   callback(true);
+          // } else {
+          //   // #TODO: "this.hotTableWrapper.data" comes "undefined", please investigate.
+          //   // Found that if [data] property is added to template component selector <app-hot-table-wrapper>, problem gets fixed.
+          //   // for now lat should always be the previous one
+          //   const lat: number = this.hotTableWrapper.data[cellProperties.row][cellProperties.col - 1];
+          //   callback(!lat && lat !== 0);
+          // }
+          callback(true);
         }),
 
       // Contact Document(s)

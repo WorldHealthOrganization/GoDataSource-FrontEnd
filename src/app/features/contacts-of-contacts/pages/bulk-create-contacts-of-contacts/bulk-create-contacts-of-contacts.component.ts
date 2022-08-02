@@ -15,7 +15,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { UserModel } from '../../../../core/models/user.model';
-import { DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, LocationSheetColumn, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
+import { DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, LocationSheetColumn, NumericSheetColumn, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { Constants } from '../../../../core/models/constants';
@@ -337,6 +337,42 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
       new TextSheetColumn()
         .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER')
         .setProperty('contactOfContact.documents[0].number'),
+      new NumericSheetColumn()
+        .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT')
+        .setProperty('contact.addresses[0].geoLocation.lat')
+        .setAsyncValidator((_value, _cellProperties: CellProperties, callback: (result: boolean) => void): void => {
+          //   // #TODO: "this.hotTableWrapper.data" comes "undefined", please investigate.
+          //   // Found that if [data] property is added to template component selector <app-hot-table-wrapper>, problem gets fixed.
+          // if (
+          //   value ||
+          //   value === 0
+          // ) {
+          //   callback(true);
+          // } else {
+          //   // for now lng should always be the next one
+          //   const lng: number = this.hotTableWrapper.data[cellProperties.row][cellProperties.col + 1];
+          //   callback(!lng && lng !== 0);
+          // }
+          callback(true);
+        }),
+      new NumericSheetColumn()
+        .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG')
+        .setProperty('contact.addresses[0].geoLocation.lng')
+        .setAsyncValidator((_value, _cellProperties: CellProperties, callback: (result: boolean) => void): void => {
+          //   // #TODO: "this.hotTableWrapper.data" comes "undefined", please investigate.
+          //   // Found that if [data] property is added to template component selector <app-hot-table-wrapper>, problem gets fixed.
+          // if (
+          //   value ||
+          //   value === 0
+          // ) {
+          //   callback(true);
+          // }  else {
+          //   // for now lat should always be the previous one
+          //   const lat: number = this.hotTableWrapper.data[cellProperties.row][cellProperties.col - 1];
+          //   callback(!lat && lat !== 0);
+          // }
+          callback(true);
+        }),
 
       // Relationship properties
       new DateSheetColumn(

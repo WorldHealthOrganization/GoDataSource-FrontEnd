@@ -4,7 +4,7 @@ import { HotTableWrapperComponent } from '../../../../shared/components/hot-tabl
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Observable, Subscription, throwError } from 'rxjs';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { AbstractSheetColumn, DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, LocationSheetColumn, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
+import { AbstractSheetColumn, DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, LocationSheetColumn, NumericSheetColumn, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -27,6 +27,7 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IV2ActionIconLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { CellProperties } from 'handsontable/settings';
 
 @Component({
   selector: 'app-bulk-modify-contacts-of-contacts',
@@ -284,6 +285,14 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
                 addressModel = AddressModel.getCurrentAddress(contactOfContact.addresses);
                 value = addressModel ? addressModel.addressLine1 : null;
                 break;
+              case 'addresses.geoLocation.lat':
+                addressModel = AddressModel.getCurrentAddress(contactOfContact.addresses);
+                value = addressModel ? addressModel.geoLocation?.lat : null;
+                break;
+              case 'addresses.geoLocation.lng':
+                addressModel = AddressModel.getCurrentAddress(contactOfContact.addresses);
+                value = addressModel ? addressModel.geoLocation?.lng : null;
+                break;
               default:
                 value = _.get(contactOfContact, property);
             }
@@ -390,7 +399,37 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
         .setProperty('addresses.postalCode'),
       new TextSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER')
-        .setProperty('addresses.phoneNumber')
+        .setProperty('addresses.phoneNumber'),
+      new NumericSheetColumn()
+        .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT')
+        .setProperty('addresses.geoLocation.lat')
+        .setAsyncValidator((value, cellProperties: CellProperties, callback: (result: boolean) => void): void => {
+          if (
+            value ||
+            value === 0
+          ) {
+            callback(true);
+          } else {
+            // for now lng should always be the next one
+            const lng: number = this.hotTableWrapper.data[cellProperties.row][cellProperties.col + 1];
+            callback(!lng && lng !== 0);
+          }
+        }),
+      new NumericSheetColumn()
+        .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG')
+        .setProperty('addresses.geoLocation.lng')
+        .setAsyncValidator((value, cellProperties: CellProperties, callback: (result: boolean) => void): void => {
+          if (
+            value ||
+            value === 0
+          ) {
+            callback(true);
+          } else {
+            // for now lat should always be the previous one
+            const lat: number = this.hotTableWrapper.data[cellProperties.row][cellProperties.col - 1];
+            callback(!lat && lat !== 0);
+          }
+        })
 
       // Contact Document(s)
       // Can't edit since they are multiple
@@ -514,6 +553,20 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
                     address.addressLine1 = contactOfContactData.addresses.addressLine1;
                   } else {
                     address.addressLine1 = null;
+                  }
+
+                  // replace geoLocation.lat
+                  if (contactOfContactData.addresses.geoLocation?.lat !== undefined) {
+                    address.geoLocation.lat = contactOfContactData.addresses.geoLocation?.lat;
+                  } else {
+                    address.geoLocation.lat = null;
+                  }
+
+                  // replace geolocation.lng
+                  if (contactOfContactData.addresses.geoLocation?.lng !== undefined) {
+                    address.geoLocation.lng = contactOfContactData.addresses.geoLocation?.lng;
+                  } else {
+                    address.geoLocation.lng = null;
                   }
 
                   // replace with correct data
