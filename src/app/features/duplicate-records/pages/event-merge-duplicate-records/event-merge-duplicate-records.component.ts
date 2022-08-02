@@ -1,17 +1,15 @@
-import { Component, OnDestroy, Renderer2, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import * as _ from 'lodash';
 import { EntityType } from '../../../../core/models/entity-type';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { Observable, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { EventModel } from '../../../../core/models/event.model';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
-import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -25,17 +23,16 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 
 @Component({
   selector: 'app-event-merge-duplicate-records',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './event-merge-duplicate-records.component.html',
-  styleUrls: ['./event-merge-duplicate-records.component.less']
+  templateUrl: './event-merge-duplicate-records.component.html'
 })
 export class EventMergeDuplicateRecordsComponent extends CreateViewModifyComponent<EventModel> implements OnDestroy {
+  // data
   mergeRecordIds: string[];
   mergeRecords: EntityModel[];
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private activatedRoute: ActivatedRoute,
     private outbreakDataService: OutbreakDataService,
@@ -53,24 +50,22 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
       activatedRoute,
       authDataService
     );
+
     // retrieve contacts ids
     this.mergeRecordIds = JSON.parse(this.activatedRoute.snapshot.queryParams.ids);
   }
 
   /**
- * Release resources
- */
+   * Release resources
+   */
   ngOnDestroy(): void {
     // parent
     super.onDestroy();
-
-    // remove global notifications
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
   }
 
   /**
-     * Create new item model if needed
-     */
+   * Create new item model if needed
+   */
   protected createNewItem(): EventModel {
     return null;
   }
@@ -90,6 +85,12 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
       );
       this.outbreakDataService
         .getPeopleList(this.selectedOutbreak.id, qb)
+        .pipe(
+          catchError((err) => {
+            subscriber.error(err);
+            return throwError(err);
+          })
+        )
         .subscribe((recordMerge) => {
           // merge records
           this.mergeRecords = recordMerge;
@@ -105,6 +106,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
    * Data initialized
    */
   protected initializedData(): void {}
+
   /**
    * Initialize page title
    */
@@ -114,8 +116,8 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
   }
 
   /**
-     * Initialize breadcrumbs
-     */
+   * Initialize breadcrumbs
+   */
   protected initializeBreadcrumbs(): void {
     // reset breadcrumbs
     this.breadcrumbs = [
@@ -126,24 +128,23 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
             ['/dashboard'] :
             ['/account/my-profile']
         }
+      },
+      {
+        label: 'LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE',
+        action: {
+          link: ['/duplicated-records']
+        }
+      },
+      {
+        label: 'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_TITLE',
+        action: null
       }
     ];
-
-    this.breadcrumbs.push({
-      label: 'LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE',
-      action: {
-        link: ['/duplicated-records']
-      }
-    },
-    {
-      label: 'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_TITLE',
-      action: null
-    });
   }
 
   /**
-      * Initialize tabs
-      */
+    * Initialize tabs
+    */
   protected initializeTabs(): void {
     this.tabData = {
       // tabs

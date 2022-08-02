@@ -1,4 +1,4 @@
-import { Component, OnDestroy, Renderer2, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
@@ -17,7 +17,6 @@ import { Observable, throwError } from 'rxjs';
 import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
-import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
@@ -31,17 +30,16 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 
 @Component({
   selector: 'app-contact-of-contact-merge-duplicate',
-  encapsulation: ViewEncapsulation.None,
-  templateUrl: './contact-of-contact-merge-duplicate.component.html',
-  styleUrls: ['./contact-of-contact-merge-duplicate.component.less']
+  templateUrl: './contact-of-contact-merge-duplicate.component.html'
 })
 export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyComponent<ContactOfContactModel> implements OnDestroy {
+  // data
   mergeRecordIds: string[];
   mergeRecords: EntityModel[];
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private activatedRoute: ActivatedRoute,
     private outbreakDataService: OutbreakDataService,
@@ -59,6 +57,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
       activatedRoute,
       authDataService
     );
+
     // retrieve contacts ids
     this.mergeRecordIds = JSON.parse(this.activatedRoute.snapshot.queryParams.ids);
   }
@@ -69,9 +68,6 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
   ngOnDestroy(): void {
     // parent
     super.onDestroy();
-
-    // remove global notifications
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
   }
 
   /**
@@ -94,8 +90,16 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
         true,
         null
       );
+
+      // retrieve
       this.outbreakDataService
         .getPeopleList(this.selectedOutbreak.id, qb)
+        .pipe(
+          catchError((err) => {
+            subscriber.error(err);
+            return throwError(err);
+          })
+        )
         .subscribe((recordMerge) => {
           // merge records
           this.mergeRecords = recordMerge;
@@ -113,16 +117,16 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
   protected initializedData(): void {}
 
   /**
-       * Initialize page title
-       */
+   * Initialize page title
+   */
   protected initializePageTitle(): void {
     this.pageTitle = 'LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_TITLE';
     this.pageTitleData = undefined;
   }
 
   /**
-     * Initialize breadcrumbs
-     */
+   * Initialize breadcrumbs
+   */
   protected initializeBreadcrumbs(): void {
     // reset breadcrumbs
     this.breadcrumbs = [
@@ -133,19 +137,18 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
             ['/dashboard'] :
             ['/account/my-profile']
         }
+      },
+      {
+        label: 'LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE',
+        action: {
+          link: ['/duplicated-records']
+        }
+      },
+      {
+        label: 'LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_TITLE',
+        action: null
       }
     ];
-
-    this.breadcrumbs.push({
-      label: 'LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE',
-      action: {
-        link: ['/duplicated-records']
-      }
-    },
-    {
-      label: 'LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_TITLE',
-      action: null
-    });
   }
 
   /**

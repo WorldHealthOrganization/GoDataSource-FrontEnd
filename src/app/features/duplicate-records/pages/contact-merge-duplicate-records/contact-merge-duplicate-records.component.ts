@@ -16,7 +16,6 @@ import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { ICreateViewModifyV2Refresh } from '../../../../shared/components-v2/app-create-view-modify-v2/models/refresh.model';
-import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -35,6 +34,7 @@ import { EntityType } from '../../../../core/models/entity-type';
   templateUrl: './contact-merge-duplicate-records.component.html'
 })
 export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyComponent<ContactModel> implements OnDestroy {
+  // data
   mergeRecordIds: string[];
   mergeRecords: EntityModel[];
   questionnaireAnswers: {
@@ -42,8 +42,8 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
   } = { options: [] };
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private activatedRoute: ActivatedRoute,
     private outbreakDataService: OutbreakDataService,
@@ -61,6 +61,7 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
       activatedRoute,
       authDataService
     );
+
     // retrieve contacts ids
     this.mergeRecordIds = JSON.parse(this.activatedRoute.snapshot.queryParams.ids);
   }
@@ -71,9 +72,6 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
   ngOnDestroy(): void {
     // parent
     super.onDestroy();
-
-    // remove global notifications
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
   }
 
   /**
@@ -98,6 +96,12 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
       );
       this.outbreakDataService
         .getPeopleList(this.selectedOutbreak.id, qb)
+        .pipe(
+          catchError((err) => {
+            subscriber.error(err);
+            return throwError(err);
+          })
+        )
         .subscribe((recordMerge) => {
           // merge records
           this.mergeRecords = recordMerge;
@@ -115,8 +119,8 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
   protected initializedData(): void {}
 
   /**
-     * Initialize page title
-     */
+   * Initialize page title
+   */
   protected initializePageTitle(): void {
     this.pageTitle = 'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TITLE';
     this.pageTitleData = undefined;
@@ -135,19 +139,18 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
             ['/dashboard'] :
             ['/account/my-profile']
         }
+      },
+      {
+        label: 'LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE',
+        action: {
+          link: ['/duplicated-records']
+        }
+      },
+      {
+        label: 'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TITLE',
+        action: null
       }
     ];
-
-    this.breadcrumbs.push({
-      label: 'LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE',
-      action: {
-        link: ['/duplicated-records']
-      }
-    },
-    {
-      label: 'LNG_PAGE_CONTACT_MERGE_DUPLICATE_RECORDS_TITLE',
-      action: null
-    });
   }
 
   /**

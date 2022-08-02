@@ -9,7 +9,6 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
-import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { Observable, throwError } from 'rxjs';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -45,9 +44,9 @@ import { EntityType } from '../../../../core/models/entity-type';
   templateUrl: 'case-merge-duplicate-records.component.html'
 })
 export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponent<CaseModel> implements OnDestroy {
+  // data
   mergeRecordIds: string[];
   mergeRecords: EntityModel[];
-
   questionnaireAnswers: {
     options: LabelValuePair[]
   } = { options: [] };
@@ -76,6 +75,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
       activatedRoute,
       authDataService
     );
+
     // retrieve cases ids
     this.mergeRecordIds = JSON.parse(this.activatedRoute.snapshot.queryParams.ids);
   }
@@ -86,9 +86,6 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
   ngOnDestroy(): void {
     // parent
     super.onDestroy();
-
-    // remove global notifications
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
   }
 
   /**
@@ -103,7 +100,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
    */
   protected retrieveItem(): Observable<CaseModel> {
     return new Observable<CaseModel>((subscriber) => {
-    // retrieve records
+      // retrieve records
       const qb = new RequestQueryBuilder();
       qb.filter.bySelect(
         'id',
@@ -111,8 +108,16 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
         true,
         null
       );
+
+      // records
       this.outbreakDataService
         .getPeopleList(this.selectedOutbreak.id, qb)
+        .pipe(
+          catchError((err) => {
+            subscriber.error(err);
+            return throwError(err);
+          })
+        )
         .subscribe((recordMerge) => {
           // merge records
           this.mergeRecords = recordMerge;
@@ -150,19 +155,18 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
             ['/dashboard'] :
             ['/account/my-profile']
         }
+      },
+      {
+        label: 'LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE',
+        action: {
+          link: ['/duplicated-records']
+        }
+      },
+      {
+        label: 'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_TITLE',
+        action: null
       }
     ];
-
-    this.breadcrumbs.push({
-      label: 'LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE',
-      action: {
-        link: ['/duplicated-records']
-      }
-    },
-    {
-      label: 'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_TITLE',
-      action: null
-    });
   }
 
   /**
@@ -1087,8 +1091,8 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
   // - user can't figure out if addresses WITHOUT date where currentAddress before except the first one found which is keept
   // - idk if meets client requirements..
   /**
-     * Determine addresses
-     */
+   * Determine addresses
+   */
   private determineAddresses() {
     // merge all addresses, keep just one current address
     let currentAddress;
@@ -1156,8 +1160,8 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
   }
 
   /**
-     * Determine date ranges
-     */
+   * Determine date ranges
+   */
   private determineDateRanges() {
     // merge all hospitalization dates
     this.itemData.dateRanges = [];
@@ -1172,8 +1176,8 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
 
 
   /**
-     * Determine questionnaire answers
-     */
+   * Determine questionnaire answers
+   */
   private determineQuestionnaireAnswers() {
     // add questionnaire answers
     _.each(this.mergeRecords, (ent: EntityModel) => {
