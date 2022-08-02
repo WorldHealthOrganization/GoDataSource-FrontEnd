@@ -314,8 +314,8 @@ export class TeamWorkloadComponent extends ListComponent<any> implements OnDestr
                         </span>
                       </a>
                       ${ this.i18nService.instant('LNG_PAGE_TEAMS_WORKLOAD_TABLE_OF_LABEL') }
-                      <a class="gd-list-table-link" href = "${ this.location.prepareExternalUrl(url) }" >
-                        <span is - link="${ url }">
+                      <a class="gd-list-table-link" href="${ this.location.prepareExternalUrl(url) }" >
+                        <span is-link="${ url }">
                           ${ followUpsPerDay.totalFollowupsCount }
                         </span>
                       </a>`;
