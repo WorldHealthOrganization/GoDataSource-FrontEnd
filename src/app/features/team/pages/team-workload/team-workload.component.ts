@@ -38,8 +38,8 @@ export class TeamWorkloadComponent extends ListComponent<any> implements OnDestr
   ];
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     private followUpsDataService: FollowUpsDataService,
@@ -54,8 +54,8 @@ export class TeamWorkloadComponent extends ListComponent<any> implements OnDestr
   }
 
   /**
-     * Remove component resources
-     */
+   * Remove component resources
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
@@ -87,7 +87,7 @@ export class TeamWorkloadComponent extends ListComponent<any> implements OnDestr
    */
   protected initializeTableInfos(): void {
     this.infos = [
-      'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_NO_DATA_LABEL'
+      'LNG_PAGE_TEAMS_WORKLOAD_NO_DATA_LABEL'
     ];
   }
 
