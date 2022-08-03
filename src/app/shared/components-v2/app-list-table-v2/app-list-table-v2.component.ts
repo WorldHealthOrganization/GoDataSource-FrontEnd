@@ -180,6 +180,14 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       null;
   }
 
+  // advanced filters config
+  @Input() advancedFiltersConfig: {
+    operatorHide?: boolean,
+    disableAdd?: boolean,
+    disableReset?: boolean,
+    disableDelete?: boolean
+  };
+
   // show header filters ?
   savingHeaderFilterVisibility: boolean = false;
   private _showHeaderFilters: boolean = true;
@@ -1888,7 +1896,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       .showAdvancedFiltersDialog(
         this.advancedFilterType,
         this.advancedFilters,
-        this._advancedFiltersApplied
+        this._advancedFiltersApplied,
+        this.advancedFiltersConfig
       )
       .subscribe((response) => {
         // cancelled ?
