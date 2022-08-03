@@ -28,6 +28,7 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IV2ActionIconLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { CellProperties } from 'handsontable/settings';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 
 @Component({
   selector: 'app-bulk-create-contacts-of-contacts',
@@ -315,7 +316,55 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
       new LocationSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_LOCATION')
         .setProperty('contactOfContact.addresses[0].locationId')
-        .setUseOutbreakLocations(true),
+        .setUseOutbreakLocations(true)
+        .setLocationChangedCallback((rowNo, locationInfo) => {
+          // nothing to do ?
+          if (
+            !locationInfo ||
+            !locationInfo.geoLocation ||
+            typeof locationInfo.geoLocation.lat !== 'number' ||
+            typeof locationInfo.geoLocation.lng !== 'number'
+          ) {
+            return;
+          }
+
+          // ask for confirmation if we should copy location lat & lng
+          this.dialogV2Service
+            .showConfirmDialog({
+              config: {
+                title: {
+                  get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
+                },
+                message: {
+                  get: () => 'LNG_DIALOG_CONFIRM_REPLACE_GEOLOCATION'
+                }
+              }
+            })
+            .subscribe((response) => {
+              // canceled ?
+              if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                // finished
+                return;
+              }
+
+              // find lat column
+              const latColumnIndex: number = this.hotTableWrapper.sheetColumns.findIndex((column) => column.property === 'contactOfContact.addresses[0].geoLocation.lat');
+              const lngColumnIndex: number = this.hotTableWrapper.sheetColumns.findIndex((column) => column.property === 'contactOfContact.addresses[0].geoLocation.lng');
+
+              // change location lat & lng
+              const sheetCore: Handsontable.default = (this.hotTableWrapper.sheetTable as any).hotInstance;
+              sheetCore.setDataAtCell(
+                rowNo,
+                latColumnIndex,
+                locationInfo.geoLocation.lat
+              );
+              sheetCore.setDataAtCell(
+                rowNo,
+                lngColumnIndex,
+                locationInfo.geoLocation.lng
+              );
+            });
+        }),
       new TextSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_CITY')
         .setProperty('contactOfContact.addresses[0].city'),
@@ -328,18 +377,9 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
       new TextSheetColumn()
         .setTitle('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PHONE_NUMBER')
         .setProperty('contactOfContact.addresses[0].phoneNumber'),
-
-      // Contact Document(s)
-      new DropdownSheetColumn()
-        .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE')
-        .setProperty('contactOfContact.documents[0].type')
-        .setOptions(this.documentTypesList$, this.i18nService),
-      new TextSheetColumn()
-        .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER')
-        .setProperty('contactOfContact.documents[0].number'),
       new NumericSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT')
-        .setProperty('contact.addresses[0].geoLocation.lat')
+        .setProperty('contactOfContact.addresses[0].geoLocation.lat')
         .setAsyncValidator((value, cellProperties: CellProperties, callback: (result: boolean) => void): void => {
           if (
             value ||
@@ -355,7 +395,7 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
         }),
       new NumericSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG')
-        .setProperty('contact.addresses[0].geoLocation.lng')
+        .setProperty('contactOfContact.addresses[0].geoLocation.lng')
         .setAsyncValidator((value, cellProperties: CellProperties, callback: (result: boolean) => void): void => {
           if (
             value ||
@@ -369,6 +409,15 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
             callback(!lat && lat !== 0);
           }
         }),
+
+      // Contact Document(s)
+      new DropdownSheetColumn()
+        .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE')
+        .setProperty('contactOfContact.documents[0].type')
+        .setOptions(this.documentTypesList$, this.i18nService),
+      new TextSheetColumn()
+        .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER')
+        .setProperty('contactOfContact.documents[0].number'),
 
       // Relationship properties
       new DateSheetColumn(
