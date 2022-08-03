@@ -452,8 +452,9 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
             callback(true);
           } else {
             // for now lng should always be the next one
-            const lng: number = this.hotTableWrapper.data[cellProperties.row][cellProperties.col + 1];
-            callback(!lng && lng !== 0);
+            const sheetCore: Handsontable.default = (this.hotTableWrapper.sheetTable as any).hotInstance;
+            const lat: number | string = sheetCore.getDataAtCell(cellProperties.row, cellProperties.col + 1);
+            callback(!lat && lat !== 0);
           }
         }),
       new NumericSheetColumn()
@@ -467,7 +468,8 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
             callback(true);
           } else {
             // for now lat should always be the previous one
-            const lat: number = this.hotTableWrapper.data[cellProperties.row][cellProperties.col - 1];
+            const sheetCore: Handsontable.default = (this.hotTableWrapper.sheetTable as any).hotInstance;
+            const lat: number | string = sheetCore.getDataAtCell(cellProperties.row, cellProperties.col - 1);
             callback(!lat && lat !== 0);
           }
         }),
