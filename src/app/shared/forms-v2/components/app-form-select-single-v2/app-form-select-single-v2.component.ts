@@ -35,6 +35,9 @@ import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 export class AppFormSelectSingleV2Component
   extends AppFormBaseV2<string> implements OnDestroy {
 
+  // right - icon buttons
+  @Input() suffixIconButtons: IAppFormIconButtonV2[];
+
   // float label
   @Input() neverFloatLabel: boolean = false;
 
@@ -234,6 +237,22 @@ export class AppFormSelectSingleV2Component
         this.cdkVirtualScrollViewport.scrollToIndex(index);
         this.changeDetectorRef.detectChanges();
       }
+    }
+  }
+
+  /**
+   * Click button
+   */
+  iconButtonClick(
+    event,
+    iconB: IAppFormIconButtonV2
+  ): void {
+    // prevent propagation
+    event.stopPropagation();
+
+    // execute click action
+    if (iconB.clickAction) {
+      iconB.clickAction(this);
     }
   }
 }

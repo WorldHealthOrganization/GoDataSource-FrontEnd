@@ -32,6 +32,8 @@ import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/component
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import * as _ from 'lodash';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { IAppFormIconButtonV2 } from '../../../../shared/forms-v2/core/app-form-icon-button-v2';
 
 @Component({
   selector: 'app-relationships-create-view-modify',
@@ -356,7 +358,8 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
               dateSameOrBefore: () => [
                 this._today
               ]
-            }
+            },
+            suffixIconButtons: this.createCopySuffixButtons('dateOfFirstContact')
           }, {
             type: CreateViewModifyV2TabInputType.DATE,
             name: name('contactDate'),
@@ -374,7 +377,8 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
               dateSameOrBefore: () => [
                 this._today
               ]
-            }
+            },
+            suffixIconButtons: this.createCopySuffixButtons('contactDate')
           }, {
             type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
             name: name('contactDateEstimated'),
@@ -386,7 +390,8 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
                 // set data
                 relationshipData.contactDateEstimated = value;
               }
-            }
+            },
+            suffixIconButtons: this.createCopySuffixButtons('contactDateEstimated')
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
             name: name('certaintyLevelId'),
@@ -401,7 +406,8 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
             },
             validators: {
               required: () => true
-            }
+            },
+            suffixIconButtons: this.createCopySuffixButtons('certaintyLevelId')
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
             name: name('exposureTypeId'),
@@ -413,7 +419,8 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
               set: (value) => {
                 relationshipData.exposureTypeId = value;
               }
-            }
+            },
+            suffixIconButtons: this.createCopySuffixButtons('exposureTypeId')
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
             name: name('exposureFrequencyId'),
@@ -425,7 +432,8 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
               set: (value) => {
                 relationshipData.exposureFrequencyId = value;
               }
-            }
+            },
+            suffixIconButtons: this.createCopySuffixButtons('exposureFrequencyId')
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
             name: name('exposureDurationId'),
@@ -437,7 +445,8 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
               set: (value) => {
                 relationshipData.exposureDurationId = value;
               }
-            }
+            },
+            suffixIconButtons: this.createCopySuffixButtons('exposureDurationId')
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
             name: name('socialRelationshipTypeId'),
@@ -449,7 +458,8 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
               set: (value) => {
                 relationshipData.socialRelationshipTypeId = value;
               }
-            }
+            },
+            suffixIconButtons: this.createCopySuffixButtons('socialRelationshipTypeId')
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
             name: name('clusterId'),
@@ -461,7 +471,8 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
               set: (value) => {
                 relationshipData.clusterId = value;
               }
-            }
+            },
+            suffixIconButtons: this.createCopySuffixButtons('clusterId')
           }, {
             type: CreateViewModifyV2TabInputType.TEXT,
             name: name('socialRelationshipDetail'),
@@ -472,7 +483,8 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
               set: (value) => {
                 relationshipData.socialRelationshipDetail = value;
               }
-            }
+            },
+            suffixIconButtons: this.createCopySuffixButtons('socialRelationshipDetail')
           }, {
             type: CreateViewModifyV2TabInputType.TEXTAREA,
             name: name('comment'),
@@ -483,7 +495,8 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
               set: (value) => {
                 relationshipData.comment = value;
               }
-            }
+            },
+            suffixIconButtons: this.createCopySuffixButtons('comment')
           }]
         }
       ]
@@ -771,5 +784,46 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
    */
   expandListChangeRecord(data: any): void {
     super.expandListChangeRecord(data.relationship);
+  }
+
+  /**
+   * Create copy suffix buttons
+   */
+  createCopySuffixButtons(prop: string): IAppFormIconButtonV2[] {
+    return this._createRelationships?.length > 1 ?
+      [{
+        icon: 'content_copy',
+        tooltip: 'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_COPY_BUTTON_TITLE',
+        clickAction: (item) => {
+          this.dialogV2Service.showConfirmDialog({
+            config: {
+              title: {
+                get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
+              },
+              message: {
+                get: () => 'LNG_DIALOG_CONFIRM_COPY_VALUE'
+              }
+            }
+          }).subscribe((response) => {
+            // canceled ?
+            if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+              // finished
+              return;
+            }
+
+            // copy values
+            this._createRelationships.forEach((rel) => {
+              // we already have data, no need to replace
+              if (rel[prop]) {
+                return;
+              }
+
+              // replace with new data
+              rel[prop] = _.cloneDeep(item.value);
+            });
+          });
+        }
+      }] :
+      undefined;
   }
 }

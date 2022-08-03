@@ -60,6 +60,9 @@ import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 export class AppFormDateV2Component
   extends AppFormBaseV2<string | Moment> implements OnDestroy {
 
+  // right - icon buttons
+  @Input() suffixIconButtons: IAppFormIconButtonV2[];
+
   // float label
   @Input() neverFloatLabel: boolean = false;
 
@@ -120,5 +123,21 @@ export class AppFormDateV2Component
    */
   ngOnDestroy(): void {
     super.onDestroy();
+  }
+
+  /**
+   * Click button
+   */
+  iconButtonClick(
+    event,
+    iconB: IAppFormIconButtonV2
+  ): void {
+    // prevent propagation
+    event.stopPropagation();
+
+    // execute click action
+    if (iconB.clickAction) {
+      iconB.clickAction(this);
+    }
   }
 }
