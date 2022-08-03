@@ -333,7 +333,7 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
             .showConfirmDialog({
               config: {
                 title: {
-                  get: () => 'LNG_DIALOG_CONFIRM_REPLACE_GEOLOCATION'
+                  get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
                 },
                 message: {
                   get: () => 'LNG_DIALOG_CONFIRM_REPLACE_GEOLOCATION'
