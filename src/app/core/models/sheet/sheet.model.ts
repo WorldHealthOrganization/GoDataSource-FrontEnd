@@ -5,8 +5,9 @@ import { SheetCellValidationType } from './sheet-cell-validation-type';
 import { map } from 'rxjs/operators';
 import { Moment } from '../../helperClasses/x-moment';
 import { LabelValuePair } from '../label-value-pair';
+import { CellProperties } from 'handsontable/settings';
 
-export type SheetColumnAsyncValidator = (value: string, callback: (result: boolean) => void) => void;
+export type SheetColumnAsyncValidator = (value: string | number, cellProperties: CellProperties, callback: (result: boolean) => void) => void;
 
 export abstract class AbstractSheetColumn {
   // translation key for column name

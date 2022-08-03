@@ -15,7 +15,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { UserModel } from '../../../../core/models/user.model';
-import { DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, LocationSheetColumn, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
+import { DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, LocationSheetColumn, NumericSheetColumn, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { Constants } from '../../../../core/models/constants';
@@ -27,6 +27,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IV2ActionIconLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { CellProperties } from 'handsontable/settings';
 
 @Component({
   selector: 'app-bulk-create-contacts-of-contacts',
@@ -247,7 +248,7 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
       new TextSheetColumn()
         .setTitle('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID')
         .setProperty('contactOfContact.visualId')
-        .setAsyncValidator((value: string, callback: (result: boolean) => void): void => {
+        .setAsyncValidator((value: string, _cellProperties: CellProperties, callback: (result: boolean) => void): void => {
           if (_.isEmpty(value)) {
             callback(true);
           } else {
@@ -336,6 +337,38 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
       new TextSheetColumn()
         .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER')
         .setProperty('contactOfContact.documents[0].number'),
+      new NumericSheetColumn()
+        .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT')
+        .setProperty('contact.addresses[0].geoLocation.lat')
+        .setAsyncValidator((value, cellProperties: CellProperties, callback: (result: boolean) => void): void => {
+          if (
+            value ||
+            value === 0
+          ) {
+            callback(true);
+          } else {
+            // for now lng should always be the next one
+            const sheetCore: Handsontable.default = (this.hotTableWrapper.sheetTable as any).hotInstance;
+            const lat: number | string = sheetCore.getDataAtCell(cellProperties.row, cellProperties.col + 1);
+            callback(!lat && lat !== 0);
+          }
+        }),
+      new NumericSheetColumn()
+        .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG')
+        .setProperty('contact.addresses[0].geoLocation.lng')
+        .setAsyncValidator((value, cellProperties: CellProperties, callback: (result: boolean) => void): void => {
+          if (
+            value ||
+            value === 0
+          ) {
+            callback(true);
+          } else {
+            // for now lat should always be the previous one
+            const sheetCore: Handsontable.default = (this.hotTableWrapper.sheetTable as any).hotInstance;
+            const lat: number | string = sheetCore.getDataAtCell(cellProperties.row, cellProperties.col - 1);
+            callback(!lat && lat !== 0);
+          }
+        }),
 
       // Relationship properties
       new DateSheetColumn(
