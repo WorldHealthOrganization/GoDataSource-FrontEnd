@@ -6,6 +6,7 @@ import { map } from 'rxjs/operators';
 import { Moment } from '../../helperClasses/x-moment';
 import { LabelValuePair } from '../label-value-pair';
 import { CellProperties } from 'handsontable/settings';
+import { LocationModel } from '../location.model';
 
 export type SheetColumnAsyncValidator = (value: string | number, cellProperties: CellProperties, callback: (result: boolean) => void) => void;
 
@@ -196,6 +197,12 @@ export class LocationSheetColumn extends AbstractSheetColumn {
   // outbreak locations ?
   useOutbreakLocations: boolean = false;
 
+  // location changed callback
+  locationChanged: (
+    row: number,
+    location: LocationModel
+  ) => void;
+
   /**
    * Constructor
    */
@@ -208,6 +215,19 @@ export class LocationSheetColumn extends AbstractSheetColumn {
    */
   setUseOutbreakLocations(useOutbreakLocations: boolean) {
     this.useOutbreakLocations = useOutbreakLocations;
+    return this;
+  }
+
+  /**
+   * Set location changed callback
+   */
+  setLocationChangedCallback(
+    locationChanged: (
+      row: number,
+      location: LocationModel
+    ) => void
+  ) {
+    this.locationChanged = locationChanged;
     return this;
   }
 }

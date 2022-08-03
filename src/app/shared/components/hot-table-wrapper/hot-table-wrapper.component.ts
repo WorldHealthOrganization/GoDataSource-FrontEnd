@@ -91,8 +91,10 @@ class CustomLocationEditor extends Handsontable.default.editors.BaseEditor {
     }
 
     // show dialog
-    let temporaryLocation: LocationModel;
     const wrapper: HotTableWrapperComponent = HotTableWrapperComponent.WRAPPERS[this.hot.rootElement.id];
+    let temporaryLocation: LocationModel = this.originalValue && wrapper.cachedLocations[this.originalValue] ?
+      wrapper.cachedLocations[this.originalValue] :
+      undefined;
     this.locationDialogVisible = HotTableWrapperDialogVisibility.Visible;
     wrapper.dialogV2Service.showSideDialog({
       title: {
@@ -115,7 +117,8 @@ class CustomLocationEditor extends Handsontable.default.editors.BaseEditor {
           temporaryLocation = locationInfo ?
             new LocationModel({
               id: locationInfo.id,
-              name: locationInfo.label
+              name: locationInfo.label,
+              geoLocation: locationInfo.geoLocation
             }) :
             undefined;
         }
@@ -155,6 +158,15 @@ class CustomLocationEditor extends Handsontable.default.editors.BaseEditor {
           temporaryLocation.id :
           ''
       );
+
+      // trigger col change callback
+      const sheetCol = wrapper.sheetColumns && wrapper.sheetColumns[this.col] && (wrapper.sheetColumns[this.col] as LocationSheetColumn);
+      if (sheetCol.locationChanged) {
+        sheetCol.locationChanged(
+          this.row,
+          temporaryLocation
+        );
+      }
 
       // close
       response.handler.hide();
