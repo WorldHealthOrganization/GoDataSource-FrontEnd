@@ -328,18 +328,9 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
       new TextSheetColumn()
         .setTitle('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PHONE_NUMBER')
         .setProperty('contactOfContact.addresses[0].phoneNumber'),
-
-      // Contact Document(s)
-      new DropdownSheetColumn()
-        .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE')
-        .setProperty('contactOfContact.documents[0].type')
-        .setOptions(this.documentTypesList$, this.i18nService),
-      new TextSheetColumn()
-        .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER')
-        .setProperty('contactOfContact.documents[0].number'),
       new NumericSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT')
-        .setProperty('contact.addresses[0].geoLocation.lat')
+        .setProperty('contactOfContact.addresses[0].geoLocation.lat')
         .setAsyncValidator((value, cellProperties: CellProperties, callback: (result: boolean) => void): void => {
           if (
             value ||
@@ -355,7 +346,7 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
         }),
       new NumericSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG')
-        .setProperty('contact.addresses[0].geoLocation.lng')
+        .setProperty('contactOfContact.addresses[0].geoLocation.lng')
         .setAsyncValidator((value, cellProperties: CellProperties, callback: (result: boolean) => void): void => {
           if (
             value ||
@@ -369,6 +360,15 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
             callback(!lat && lat !== 0);
           }
         }),
+
+      // Contact Document(s)
+      new DropdownSheetColumn()
+        .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE')
+        .setProperty('contactOfContact.documents[0].type')
+        .setOptions(this.documentTypesList$, this.i18nService),
+      new TextSheetColumn()
+        .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER')
+        .setProperty('contactOfContact.documents[0].number'),
 
       // Relationship properties
       new DateSheetColumn(
