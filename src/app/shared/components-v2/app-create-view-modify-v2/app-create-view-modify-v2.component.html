@@ -426,6 +426,7 @@
                     [viewOnly]="isView || !input.value.set"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                     autocomplete="off"
+                    [suffixIconButtons]="input.suffixIconButtons"
                     [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
                     app-regex-validator
                     [regexExpr]="!isView && input.validators?.regex ? input.validators?.regex().expression : undefined"
@@ -526,6 +527,7 @@
                     [options]="input.options"
                     [clearable]="true"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    [suffixIconButtons]="input.suffixIconButtons"
                     [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
                     app-trigger-validation-for
                     [triggerValidationFor]="!isView && input.validators?.validateOther ? input.validators?.validateOther() : undefined"
@@ -559,6 +561,7 @@
                     [tooltip]="input.description ? input.description() : undefined"
                     [viewOnly]="isView || !input.value.set"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    [suffixIconButtons]="input.suffixIconButtons"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-toggle-checkbox-v2>
 
                   <!-- Location single -->
@@ -600,6 +603,7 @@
                     [viewOnly]="isView || !input.value.set"
                     [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    [suffixIconButtons]="input.suffixIconButtons"
                     (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-textarea-v2>
 
                   <!-- Select groups -->
@@ -850,6 +854,7 @@
                     [viewOnly]="isView || !input.value.set"
                     [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
                     autocomplete="off"
+                    [suffixIconButtons]="input.suffixIconButtons"
                     [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
                     [minDate]="input.minDate"
                     [maxDate]="input.maxDate"

@@ -20,6 +20,16 @@
       [disabled]="disabled"
       [required]="required"></textarea>
 
+    <!-- Right - Icon buttons -->
+    <button
+      *ngFor="let iconB of suffixIconButtons"
+      tabindex="-1"
+      type="button"
+      mat-icon-button
+      matSuffix
+      [matTooltip]="iconB.tooltip | translate"
+      (click)="iconButtonClick($event, iconB)"><mat-icon>{{iconB.icon}}</mat-icon></button>
+
     <!-- Errors -->
     <mat-error
       *ngIf="control?.invalid && control?.touched">
