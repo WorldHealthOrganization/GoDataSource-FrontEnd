@@ -187,14 +187,14 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
             questionnaireAnswers: mergeRecords
               .filter((item) => (item.model as ContactModel).questionnaireAnswers && Object.keys((item.model as ContactModel).questionnaireAnswers).length > 0)
               .map((item, index) => ({
-                label: `${ this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE') } ${ index + 1 }`,
+                label: `${ this.translateService.instant('LNG_PAGE_MODIFY_CONTACT_TAB_QUESTIONNAIRE_TITLE') } ${ index + 1 }`,
                 value: index,
                 data: (item.model as ContactModel).questionnaireAnswers
               })),
             questionnaireHistoryAnswers: mergeRecords
               .filter((item) => (item.model as ContactModel).questionnaireAnswersCase && Object.keys((item.model as ContactModel).questionnaireAnswersCase).length > 0)
               .map((item, index) => ({
-                label: `${ this.translateService.instant(EntityType.CONTACT) } ${ this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE') } ${ index + 1 }`,
+                label: `${ this.translateService.instant(EntityType.CASE) } ${ this.translateService.instant('LNG_PAGE_MODIFY_CONTACT_TAB_CASE_QUESTIONNAIRE_TITLE') } ${ index + 1 }`,
                 value: index,
                 data: (item.model as ContactModel).questionnaireAnswersCase
               }))
