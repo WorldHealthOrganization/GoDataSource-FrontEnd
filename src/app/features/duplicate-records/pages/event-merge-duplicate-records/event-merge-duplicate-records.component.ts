@@ -12,14 +12,14 @@ import { CreateViewModifyComponent } from '../../../../core/helperClasses/create
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { ICreateViewModifyV2Refresh } from '../../../../shared/components-v2/app-create-view-modify-v2/models/refresh.model';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { TranslateService } from '@ngx-translate/core';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { AddressModel, AddressType } from '../../../../core/models/address.model';
+import { moment } from '../../../../core/helperClasses/x-moment';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 
 @Component({
   selector: 'app-event-merge-duplicate-records',
@@ -27,8 +27,18 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 })
 export class EventMergeDuplicateRecordsComponent extends CreateViewModifyComponent<EventModel> implements OnDestroy {
   // data
-  mergeRecordIds: string[];
-  mergeRecords: EntityModel[];
+  private _mergeRecordIds: string[];
+  private _uniqueOptions: {
+    name: ILabelValuePairModel[],
+    date: ILabelValuePairModel[],
+    dateOfReporting: ILabelValuePairModel[],
+    isDateOfReportingApproximate: ILabelValuePairModel[],
+    responsibleUserId: ILabelValuePairModel[],
+    eventCategory: ILabelValuePairModel[],
+    endDate: ILabelValuePairModel[],
+    description: ILabelValuePairModel[]
+    addresses: ILabelValuePairModel[]
+  };
 
   /**
    * Constructor
@@ -36,7 +46,6 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
   constructor(
     private activatedRoute: ActivatedRoute,
     private outbreakDataService: OutbreakDataService,
-    private i18nService: I18nService,
     private translateService: TranslateService,
     protected toastV2Service: ToastV2Service,
     authDataService: AuthDataService,
@@ -51,8 +60,8 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
       authDataService
     );
 
-    // retrieve contacts ids
-    this.mergeRecordIds = JSON.parse(this.activatedRoute.snapshot.queryParams.ids);
+    // retrieve events ids
+    this._mergeRecordIds = JSON.parse(this.activatedRoute.snapshot.queryParams.ids);
   }
 
   /**
@@ -79,10 +88,12 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
       const qb = new RequestQueryBuilder();
       qb.filter.bySelect(
         'id',
-        this.mergeRecordIds,
+        this._mergeRecordIds,
         true,
         null
       );
+
+      // records
       this.outbreakDataService
         .getPeopleList(this.selectedOutbreak.id, qb)
         .pipe(
@@ -91,12 +102,126 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
             return throwError(err);
           })
         )
-        .subscribe((recordMerge) => {
-          // merge records
-          this.mergeRecords = recordMerge;
+        .subscribe((mergeRecords) => {
+          // determine data
+          this._uniqueOptions = {
+            name: this.getFieldOptions(
+              mergeRecords,
+              'name'
+            ).options,
+            date: this.getFieldOptions(
+              mergeRecords,
+              'date'
+            ).options,
+            dateOfReporting: this.getFieldOptions(
+              mergeRecords,
+              'dateOfReporting'
+            ).options,
+            isDateOfReportingApproximate: this.getFieldOptions(
+              mergeRecords,
+              'isDateOfReportingApproximate'
+            ).options,
+            responsibleUserId: this.getFieldOptions(
+              mergeRecords,
+              'responsibleUserId'
+            ).options,
+            eventCategory: this.getFieldOptions(
+              mergeRecords,
+              'eventCategory'
+            ).options,
+            endDate: this.getFieldOptions(
+              mergeRecords,
+              'endDate'
+            ).options,
+            description: this.getFieldOptions(
+              mergeRecords,
+              'description'
+            ).options,
+            addresses: []
+          };
 
-          // Complete Observable
-          subscriber.next(new EventModel());
+          // auto-select if only one value
+          const data: EventModel = new EventModel();
+          data.name = this._uniqueOptions.name.length === 1 ?
+            this._uniqueOptions.name[0].value :
+            data.name;
+          data.date = this._uniqueOptions.date.length === 1 ?
+            this._uniqueOptions.date[0].value :
+            data.date;
+          data.dateOfReporting = this._uniqueOptions.dateOfReporting.length === 1 ?
+            this._uniqueOptions.dateOfReporting[0].value :
+            data.dateOfReporting;
+          data.isDateOfReportingApproximate = this._uniqueOptions.isDateOfReportingApproximate.length === 1 ?
+            this._uniqueOptions.isDateOfReportingApproximate[0].value :
+            data.isDateOfReportingApproximate;
+          data.responsibleUserId = this._uniqueOptions.responsibleUserId.length === 1 ?
+            this._uniqueOptions.responsibleUserId[0].value :
+            data.responsibleUserId;
+          data.eventCategory = this._uniqueOptions.eventCategory.length === 1 ?
+            this._uniqueOptions.eventCategory[0].value :
+            data.eventCategory;
+          data.endDate = this._uniqueOptions.endDate.length === 1 ?
+            this._uniqueOptions.endDate[0].value :
+            data.endDate;
+          data.description = this._uniqueOptions.description.length === 1 ?
+            this._uniqueOptions.description[0].value :
+            data.description;
+
+          // initialize addresses
+          let currentAddress: AddressModel;
+
+          // go through records and determine data
+          mergeRecords.forEach((item) => {
+            // determine addresses
+            const event = item.model as EventModel;
+            // add to list ?
+            if (
+              event.address.locationId ||
+              event.address.fullAddress
+            ) {
+              // current address ?
+              // if we have multiple current addresses then we change them to previously addresses and keep the freshest one by address.date
+              if (event.address.typeId === AddressType.CURRENT_ADDRESS) {
+                if (event.address.date) {
+                  // we have multiple current addresses ?
+                  if (currentAddress) {
+                    // address is newer?
+                    if (
+                      !currentAddress.date ||
+                      moment(currentAddress.date).isBefore(moment(event.address.date))
+                    ) {
+                      currentAddress.typeId = AddressType.PREVIOUS_ADDRESS;
+                      this._uniqueOptions.addresses.push({ label: currentAddress.fullAddress, value: currentAddress });
+                      currentAddress = event.address;
+                    } else {
+                      event.address.typeId = AddressType.PREVIOUS_ADDRESS;
+                      this._uniqueOptions.addresses.push({ label: event.address.fullAddress, value: event.address });
+                    }
+                  } else {
+                    currentAddress = event.address;
+                  }
+                } else {
+                  if (currentAddress) {
+                    // make it previous address
+                    event.address.typeId = AddressType.PREVIOUS_ADDRESS;
+                    this._uniqueOptions.addresses.push({ label: event.address.fullAddress, value: event.address });
+                  } else {
+                    currentAddress = event.address;
+                  }
+                }
+              } else {
+                this._uniqueOptions.addresses.push({ label: event.address.fullAddress, value: event.address });
+              }
+            }
+
+            // do we have a recent current address ?
+            if (currentAddress) {
+              // put it first
+              this._uniqueOptions.addresses.unshift({ label: currentAddress.fullAddress, value: currentAddress });
+            }
+          });
+          // finish
+          subscriber.next(data);
           subscriber.complete();
         });
     });
@@ -186,7 +311,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
   /**
    * Refresh expand list
    */
-  refreshExpandList(_data: ICreateViewModifyV2Refresh): void {}
+  refreshExpandList(_data): void {}
 
   /**
  * Initialize buttons
@@ -236,12 +361,15 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
       data,
       finished
     ) => {
+      // cleanup
+      delete data.addresses;
+
       // finished
       this.outbreakDataService
         .mergePeople(
           this.selectedOutbreak.id,
           EntityType.EVENT,
-          this.mergeRecordIds,
+          this._mergeRecordIds,
           data
         )
         .pipe(
@@ -270,35 +398,34 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
   }
 
   // get field unique options
-  private getFieldOptions(key: string): { options: ILabelValuePairModel[], value: any } {
+  private getFieldOptions(
+    mergeRecords: EntityModel[],
+    key: string
+  ): { options: ILabelValuePairModel[], value: any } {
     switch (key) {
       case 'age': return EntityModel.uniqueAgeOptions(
-        this.mergeRecords,
-        this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-        this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+        mergeRecords,
+        this.translateService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+        this.translateService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
       );
-      case 'dob': return EntityModel.uniqueDobOptions(this.mergeRecords);
-      case 'date': return EntityModel.uniqueDateOptions(this.mergeRecords, key);
-      case 'endDate': return EntityModel.uniqueDateOptions(this.mergeRecords, key);
-      case 'dateOfReporting': return EntityModel.uniqueDateOptions(this.mergeRecords, key);
-      case 'isDateOfReportingApproximate': return EntityModel.uniqueBooleanOptions(this.mergeRecords, key);
+      case 'dob': return EntityModel.uniqueDobOptions(mergeRecords);
+      case 'date': return EntityModel.uniqueDateOptions(mergeRecords, key);
+      case 'endDate': return EntityModel.uniqueDateOptions(mergeRecords, key);
+      case 'dateOfReporting': return EntityModel.uniqueDateOptions(mergeRecords, key);
+      case 'isDateOfReportingApproximate': return EntityModel.uniqueBooleanOptions(mergeRecords, key);
       case 'responsibleUserId': {
-        const uniqueUserOptions = EntityModel.uniqueStringOptions(this.mergeRecords, key);
-        uniqueUserOptions.options = uniqueUserOptions.options.map(
+        const uniqueUserOptions = EntityModel.uniqueStringOptions(mergeRecords, key);
+        uniqueUserOptions.options.forEach(
           (labelValuePair) => {
-            labelValuePair.label = this.activatedRoute.snapshot.data.users.options.find(
-              (user) => user.value === labelValuePair.value).label;
-
-            return {
-              label: labelValuePair.label,
-              value: labelValuePair.value
-            };
+            labelValuePair.label = (this.activatedRoute.snapshot.data.users as IResolverV2ResponseModel<UserModel>).map[labelValuePair.value] ?
+              (this.activatedRoute.snapshot.data.users as IResolverV2ResponseModel<UserModel>).map[labelValuePair.value].name :
+              labelValuePair.label;
           });
         return uniqueUserOptions;
       }
-      case 'address': return EntityModel.uniqueAddressOptions(this.mergeRecords, key);
+      case 'address': return EntityModel.uniqueAddressOptions(mergeRecords, key);
 
-      default: return EntityModel.uniqueStringOptions(this.mergeRecords, key);
+      default: return EntityModel.uniqueStringOptions(mergeRecords, key);
     }
   }
 
@@ -319,7 +446,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
             name: 'name',
             placeholder: () => 'LNG_EVENT_FIELD_LABEL_NAME',
             description: () => 'LNG_EVENT_FIELD_LABEL_NAME_DESCRIPTION',
-            options: this.getFieldOptions('name').options,
+            options: this._uniqueOptions.name,
             value: {
               get: () => this.itemData.name,
               set: (value) => {
@@ -334,9 +461,9 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
             name: 'date',
             placeholder: () => 'LNG_EVENT_FIELD_LABEL_DATE',
             description: () => 'LNG_EVENT_FIELD_LABEL_DATE_DESCRIPTION',
-            options: this.getFieldOptions('date').options,
+            options: this._uniqueOptions.date,
             value: {
-              get: () => this.itemData.date?.toString(),
+              get: () => this.itemData.date as any,
               set: (value) => {
                 this.itemData.date = value;
               }
@@ -349,9 +476,9 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
             name: 'dateOfReporting',
             placeholder: () => 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING',
             description: () => 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
-            options: this.getFieldOptions('dateOfReporting').options,
+            options: this._uniqueOptions.dateOfReporting,
             value: {
-              get: () => this.itemData.dateOfReporting?.toString(),
+              get: () => this.itemData.dateOfReporting,
               set: (value) => {
                 this.itemData.dateOfReporting = value;
               }
@@ -364,23 +491,11 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
             name: 'isDateOfReportingApproximate',
             placeholder: () => 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
             description: () => 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION',
-            options: this.getFieldOptions('isDateOfReportingApproximate').options,
+            options: this._uniqueOptions.isDateOfReportingApproximate,
             value: {
-              get: () => this.itemData.isDateOfReportingApproximate === undefined ?
-                'LNG_COMMON_LABEL_NONE' :
-                (
-                  this.itemData.isDateOfReportingApproximate === true ?
-                    'LNG_COMMON_LABEL_YES' :
-                    'LNG_COMMON_LABEL_NO'
-                ),
+              get: () => this.itemData.isDateOfReportingApproximate as any,
               set: (value) => {
-                this.itemData.isDateOfReportingApproximate = value === 'LNG_COMMON_LABEL_YES' ?
-                  true :
-                  (
-                    value === 'LNG_COMMON_LABEL_NO' ?
-                      false :
-                      undefined
-                  );
+                this.itemData.isDateOfReportingApproximate = value as any;
               }
             }
           }, {
@@ -388,7 +503,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
             name: 'responsibleUserId',
             placeholder: () => 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID',
             description: () => 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
-            options: this.getFieldOptions('isDateOfReportingApproximate').options,
+            options: this._uniqueOptions.responsibleUserId,
             value: {
               get: () => this.itemData.responsibleUserId,
               set: (value) => {
@@ -404,7 +519,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
             name: 'eventCategory',
             placeholder: () => 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY',
             description: () => 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY_DESCRIPTION',
-            options: this.getFieldOptions('eventCategory').options,
+            options: this._uniqueOptions.eventCategory,
             value: {
               get: () => this.itemData.eventCategory,
               set: (value) => {
@@ -416,7 +531,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
             name: 'endDate',
             placeholder: () => 'LNG_EVENT_FIELD_LABEL_END_DATE',
             description: () => 'LNG_EVENT_FIELD_LABEL_END_DATE_DESCRIPTION',
-            options: this.getFieldOptions('endDate').options,
+            options: this._uniqueOptions.endDate,
             value: {
               get: () => this.itemData.endDate?.toString(),
               set: (value) => {
@@ -428,7 +543,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
             name: 'description',
             placeholder: () => 'LNG_EVENT_FIELD_LABEL_DESCRIPTION',
             description: () => 'LNG_EVENT_FIELD_LABEL_DESCRIPTION_DESCRIPTION',
-            options: this.getFieldOptions('description').options,
+            options: this._uniqueOptions.description,
             value: {
               get: () => this.itemData.description,
               set: (value) => {
@@ -442,16 +557,19 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
           label: 'LNG_EVENT_FIELD_LABEL_ADDRESS',
           inputs: [
             {
+              // #TODO: Drop-down doesn't display selection correct.
+              // Steps:
+              // - select a value
+              // - select another value
+              // - previous selected value remains displayed
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'addresses',
               placeholder: () => 'LNG_EVENT_FIELD_LABEL_CHOOSE_ADDRESS',
-              options: this.getFieldOptions('address').options,
+              options: this._uniqueOptions.addresses,
               value: {
-                // #TODO: Value is displayed in dropdown only after it's selected twice in a row, please investigate
-                // May be because value is of type "ICreateViewModifyV2TabInputValue<string>" instead of "ICreateViewModifyV2TabInputValue<any>"
                 get: () => this.itemData.address?.fullAddress,
                 set: (value: any) => {
-                  this.itemData.address = this.getFieldOptions('address').options.find((pair: ILabelValuePairModel) => pair.label === value.fullAddress)?.value;
+                  this.itemData.address = value;
                 }
               }
             },

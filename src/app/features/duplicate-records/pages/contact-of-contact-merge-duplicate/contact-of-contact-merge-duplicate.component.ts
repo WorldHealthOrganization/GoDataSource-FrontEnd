@@ -4,16 +4,13 @@ import { AddressModel, AddressType } from '../../../../core/models/address.model
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { ActivatedRoute } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { DocumentModel } from '../../../../core/models/document.model';
 import * as _ from 'lodash';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { Observable, throwError } from 'rxjs';
-import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -21,7 +18,6 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { ICreateViewModifyV2Refresh } from '../../../../shared/components-v2/app-create-view-modify-v2/models/refresh.model';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
-import { AgeModel } from '../../../../core/models/age.model';
 import { TranslateService } from '@ngx-translate/core';
 import { UserModel } from '../../../../core/models/user.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
@@ -34,8 +30,23 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 })
 export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyComponent<ContactOfContactModel> implements OnDestroy {
   // data
-  mergeRecordIds: string[];
-  mergeRecords: EntityModel[];
+  private _mergeRecordIds: string[];
+  private _uniqueOptions: {
+    firstName: ILabelValuePairModel[],
+    middleName: ILabelValuePairModel[],
+    lastName: ILabelValuePairModel[],
+    gender: ILabelValuePairModel[],
+    pregnancyStatus: ILabelValuePairModel[],
+    occupation: ILabelValuePairModel[],
+    age: ILabelValuePairModel[],
+    dob: ILabelValuePairModel[],
+    visualId: ILabelValuePairModel[],
+    responsibleUserId: ILabelValuePairModel[],
+    dateOfReporting: ILabelValuePairModel[],
+    isDateOfReportingApproximate: ILabelValuePairModel[],
+    riskLevel: ILabelValuePairModel[],
+    riskReason: ILabelValuePairModel[]
+  };
 
   /**
    * Constructor
@@ -43,7 +54,6 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
   constructor(
     private activatedRoute: ActivatedRoute,
     private outbreakDataService: OutbreakDataService,
-    private i18nService: I18nService,
     private translateService: TranslateService,
     protected toastV2Service: ToastV2Service,
     authDataService: AuthDataService,
@@ -59,7 +69,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
     );
 
     // retrieve contacts ids
-    this.mergeRecordIds = JSON.parse(this.activatedRoute.snapshot.queryParams.ids);
+    this._mergeRecordIds = JSON.parse(this.activatedRoute.snapshot.queryParams.ids);
   }
 
   /**
@@ -86,7 +96,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
       const qb = new RequestQueryBuilder();
       qb.filter.bySelect(
         'id',
-        this.mergeRecordIds,
+        this._mergeRecordIds,
         true,
         null
       );
@@ -100,12 +110,201 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
             return throwError(err);
           })
         )
-        .subscribe((recordMerge) => {
-          // merge records
-          this.mergeRecords = recordMerge;
+        .subscribe((mergeRecords) => {
+          // determine data
+          this._uniqueOptions = {
+            firstName: this.getFieldOptions(
+              mergeRecords,
+              'firstName'
+            ).options,
+            middleName: this.getFieldOptions(
+              mergeRecords,
+              'middleName'
+            ).options,
+            lastName: this.getFieldOptions(
+              mergeRecords,
+              'lastName'
+            ).options,
+            gender: this.getFieldOptions(
+              mergeRecords,
+              'gender'
+            ).options,
+            pregnancyStatus: this.getFieldOptions(
+              mergeRecords,
+              'pregnancyStatus'
+            ).options,
+            occupation: this.getFieldOptions(
+              mergeRecords,
+              'occupation'
+            ).options,
+            age: this.getFieldOptions(
+              mergeRecords,
+              'age'
+            ).options,
+            dob: this.getFieldOptions(
+              mergeRecords,
+              'dob'
+            ).options,
+            visualId: this.getFieldOptions(
+              mergeRecords,
+              'visualId'
+            ).options,
+            responsibleUserId: this.getFieldOptions(
+              mergeRecords,
+              'responsibleUserId'
+            ).options,
+            dateOfReporting: this.getFieldOptions(
+              mergeRecords,
+              'dateOfReporting'
+            ).options,
+            isDateOfReportingApproximate: this.getFieldOptions(
+              mergeRecords,
+              'isDateOfReportingApproximate'
+            ).options,
+            riskLevel: this.getFieldOptions(
+              mergeRecords,
+              'riskLevel'
+            ).options,
+            riskReason: this.getFieldOptions(
+              mergeRecords,
+              'riskReason'
+            ).options
+          };
 
-          // Complete Observable
-          subscriber.next(new ContactOfContactModel());
+          // auto-select if only one value
+          const data: ContactOfContactModel = new ContactOfContactModel();
+          data.firstName = this._uniqueOptions.firstName.length === 1 ?
+            this._uniqueOptions.firstName[0].value :
+            data.firstName;
+          data.middleName = this._uniqueOptions.middleName.length === 1 ?
+            this._uniqueOptions.middleName[0].value :
+            data.middleName;
+          data.lastName = this._uniqueOptions.lastName.length === 1 ?
+            this._uniqueOptions.lastName[0].value :
+            data.lastName;
+          data.gender = this._uniqueOptions.gender.length === 1 ?
+            this._uniqueOptions.gender[0].value :
+            data.gender;
+          data.pregnancyStatus = this._uniqueOptions.pregnancyStatus.length === 1 ?
+            this._uniqueOptions.pregnancyStatus[0].value :
+            data.pregnancyStatus;
+          data.occupation = this._uniqueOptions.occupation.length === 1 ?
+            this._uniqueOptions.occupation[0].value :
+            data.occupation;
+          data.age = this._uniqueOptions.age.length === 1 ?
+            this._uniqueOptions.age[0].value :
+            data.age;
+          data.dob = this._uniqueOptions.dob.length === 1 ?
+            this._uniqueOptions.dob[0].value :
+            data.dob;
+          data.visualId = this._uniqueOptions.visualId.length === 1 ?
+            this._uniqueOptions.visualId[0].value :
+            data.visualId;
+          data.responsibleUserId = this._uniqueOptions.responsibleUserId.length === 1 ?
+            this._uniqueOptions.responsibleUserId[0].value :
+            data.responsibleUserId;
+          data.dateOfReporting = this._uniqueOptions.dateOfReporting.length === 1 ?
+            this._uniqueOptions.dateOfReporting[0].value :
+            data.dateOfReporting;
+          data.isDateOfReportingApproximate = this._uniqueOptions.isDateOfReportingApproximate.length === 1 ?
+            this._uniqueOptions.isDateOfReportingApproximate[0].value :
+            data.isDateOfReportingApproximate;
+          data.riskLevel = this._uniqueOptions.riskLevel.length === 1 ?
+            this._uniqueOptions.riskLevel[0].value :
+            data.riskLevel;
+          data.riskReason = this._uniqueOptions.riskReason.length === 1 ?
+            this._uniqueOptions.riskReason[0].value :
+            data.riskReason;
+
+          // initialize documents, addresses ...
+          const addedDocs: {
+            [key: string]: true
+          } = {};
+          data.documents = [];
+          let currentAddress: AddressModel;
+          data.addresses = [];
+          data.vaccinesReceived = [];
+
+          // go through records and determine data
+          mergeRecords.forEach((item) => {
+            // determine documents
+            ((item.model as ContactOfContactModel).documents || []).forEach((doc) => {
+              // determine doc key
+              const key: string = `${ doc.type ? doc.type.trim() : '' }${ doc.number ? doc.number.trim() : '' }`;
+
+              // add to list ?
+              if (
+                key &&
+                !addedDocs[key]
+              ) {
+                // add to list
+                data.documents.push(doc);
+
+                // make sure we don't add it again
+                addedDocs[key] = true;
+              }
+            });
+
+            // determine addresses
+            ((item.model as ContactOfContactModel).addresses || []).forEach((address) => {
+              // add to list ?
+              if (
+                address.locationId ||
+                address.fullAddress
+              ) {
+                // current address ?
+                // if we have multiple current addresses then we change them to previously addresses and keep the freshest one by address.date
+                if (address.typeId === AddressType.CURRENT_ADDRESS) {
+                  if (address.date) {
+                    // we have multiple current addresses ?
+                    if (currentAddress) {
+                      // address is newer?
+                      if (
+                        !currentAddress.date ||
+                        moment(currentAddress.date).isBefore(moment(address.date))
+                      ) {
+                        currentAddress.typeId = AddressType.PREVIOUS_ADDRESS;
+                        data.addresses.push(currentAddress);
+                        currentAddress = address;
+                      } else {
+                        address.typeId = AddressType.PREVIOUS_ADDRESS;
+                        data.addresses.push(address);
+                      }
+                    } else {
+                      currentAddress = address;
+                    }
+                  } else {
+                    if (currentAddress) {
+                      // make it previous address
+                      address.typeId = AddressType.PREVIOUS_ADDRESS;
+                      data.addresses.push(address);
+                    } else {
+                      currentAddress = address;
+                    }
+                  }
+                } else {
+                  data.addresses.push(address);
+                }
+              }
+            });
+
+            // determine vaccines
+            ((item.model as ContactOfContactModel).vaccinesReceived || []).forEach((vaccine) => {
+              if (vaccine.vaccine) {
+                // add to list
+                data.vaccinesReceived.push(vaccine);
+              }
+            });
+          });
+
+          // do we have a recent current address ?
+          if (currentAddress) {
+            // put it first
+            data.addresses.unshift(currentAddress);
+          }
+
+          // finish
+          subscriber.next(data);
           subscriber.complete();
         });
     });
@@ -248,20 +447,12 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
       data,
       finished
     ) => {
-      // Attach data if itemsChanged() not triggered
-      if (data.documents === undefined) {
-        data.documents = this.itemData.documents;
-      }
-      if (data.addresses === undefined) {
-        data.addresses = this.itemData.addresses;
-      }
-
       // finished
       this.outbreakDataService
         .mergePeople(
           this.selectedOutbreak.id,
           EntityType.CONTACT_OF_CONTACT,
-          this.mergeRecordIds,
+          this._mergeRecordIds,
           data
         )
         .pipe(
@@ -293,13 +484,6 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
   * Initialize tabs - Personal
   */
   private initializeTabPersonal(): ICreateViewModifyV2Tab {
-    // merge all records documents
-    this.determineDocuments();
-
-    // merge all records documents
-    this.determineAddresses();
-
-    // create tab
     return {
       type: CreateViewModifyV2TabInputType.TAB,
       label: 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_PERSONAL_TITLE',
@@ -314,7 +498,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
               name: 'firstName',
               placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME',
               description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME_DESCRIPTION',
-              options: this.getFieldOptions('firstName').options,
+              options: this._uniqueOptions.firstName,
               value: {
                 get: () => this.itemData.firstName,
                 set: (value) => {
@@ -329,7 +513,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
               name: 'middleName',
               placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME',
               description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION',
-              options: this.getFieldOptions('middleName').options,
+              options: this._uniqueOptions.middleName,
               value: {
                 get: () => this.itemData.middleName,
                 set: (value) => {
@@ -341,7 +525,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
               name: 'lastName',
               placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME',
               description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME_DESCRIPTION',
-              options: this.getFieldOptions('lastName').options,
+              options: this._uniqueOptions.lastName,
               value: {
                 get: () => this.itemData.lastName,
                 set: (value) => {
@@ -353,7 +537,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
               name: 'gender',
               placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER',
               description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER_DESCRIPTION',
-              options: this.getFieldOptions('gender').options,
+              options: this._uniqueOptions.gender,
               value: {
                 get: () => this.itemData.gender,
                 set: (value) => {
@@ -372,7 +556,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
               name: 'pregnancyStatus',
               placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
               description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION',
-              options: this.getFieldOptions('pregnancyStatus').options,
+              options: this._uniqueOptions.pregnancyStatus,
               value: {
                 get: () => this.itemData.pregnancyStatus,
                 set: (value) => {
@@ -387,7 +571,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
               name: 'occupation',
               placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION',
               description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION_DESCRIPTION',
-              options: this.getFieldOptions('occupation').options,
+              options: this._uniqueOptions.occupation,
               value: {
                 get: () => this.itemData.occupation,
                 set: (value) => {
@@ -399,35 +583,25 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
               name: 'age',
               placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE',
               description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE_DESCRIPTION',
-              options: this.getFieldOptions('age').options,
+              options: this._uniqueOptions.age,
               value: {
-                // #TODO: Value is displayed in dropdown only after it's selected twice in a row, please investigate
-                // May be because value is of type "ICreateViewModifyV2TabInputValue<string>" instead of "ICreateViewModifyV2TabInputValue<any>"
-                get: () => EntityModel.getAgeString(
-                  this.itemData.age,
-                  this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-                  this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
-                ),
-                set: (value: any) => {
-                  // set value
-                  this.itemData.age = value || new AgeModel();
+                get: () => this.itemData.age as any,
+                set: (value) => {
+                  this.itemData.age = value as any;
                 }
-              },
-              disabled: () => !!this.itemData.dob
+              }
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'dob',
               placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOB',
               description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOB_DESCRIPTION',
-              options: this.getFieldOptions('dob').options,
+              options: this._uniqueOptions.dob,
               value: {
-                get: () => this.itemData.dob?.toString(),
+                get: () => this.itemData.dob,
                 set: (value) => {
-                  // set value
                   this.itemData.dob = value;
                 }
-              },
-              disabled: () => this.itemData.age.years !== 0 || this.itemData.age.months !== 0
+              }
             }, {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'visualId',
@@ -436,7 +610,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
                 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
                 this.selectedOutbreak.contactOfContactIdMask
               ),
-              options: this.getFieldOptions('visualId').options,
+              options: this._uniqueOptions.visualId,
               value: {
                 get: () => this.itemData.visualId,
                 set: (value) => {
@@ -448,7 +622,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
               name: 'responsibleUserId',
               placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
               description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
-              options: this.getFieldOptions('responsibleUserId').options,
+              options: this._uniqueOptions.responsibleUserId,
               value: {
                 get: () => this.itemData.responsibleUserId,
                 set: (value) => {
@@ -470,16 +644,14 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
           inputs: [{
             type: CreateViewModifyV2TabInputType.LIST,
             name: 'documents',
+            readonly: true,
             items: this.itemData.documents,
             itemsChanged: (list) => {
               // update documents
               this.itemData.documents = list.items;
             },
             definition: {
-              add: {
-                label: 'LNG_DOCUMENT_LABEL_ADD_NEW_DOCUMENT',
-                newItem: () => new DocumentModel()
-              },
+              add: undefined,
               remove: {
                 label: 'LNG_COMMON_BUTTON_DELETE',
                 confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_DOCUMENT'
@@ -504,16 +676,14 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
           inputs: [{
             type: CreateViewModifyV2TabInputType.LIST,
             name: 'addresses',
+            readonly: true,
             items: this.itemData.addresses,
             itemsChanged: (list) => {
               // update addresses
               this.itemData.addresses = list.items;
             },
             definition: {
-              add: {
-                label: 'LNG_ADDRESS_LABEL_ADD_NEW_ADDRESS',
-                newItem: () => new AddressModel()
-              },
+              add: undefined,
               remove: {
                 label: 'LNG_COMMON_BUTTON_DELETE',
                 confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_ADDRESS'
@@ -541,10 +711,6 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
   * Initialize tabs - Epidemiology
   */
   private initializeTabEpidemiology(): ICreateViewModifyV2Tab {
-    // merge all records vaccines
-    this.determineVaccines();
-
-    // create tab
     return {
       type: CreateViewModifyV2TabInputType.TAB,
       label: 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_INFECTION_TITLE',
@@ -558,9 +724,9 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
             name: 'dateOfReporting',
             placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
             description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
-            options: this.getFieldOptions('dateOfReporting').options,
+            options: this._uniqueOptions.dateOfReporting,
             value: {
-              get: () => this.itemData.dateOfReporting?.toString(),
+              get: () => this.itemData.dateOfReporting as any,
               set: (value) => {
                 this.itemData.dateOfReporting = value;
               }
@@ -573,23 +739,11 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
             name: 'isDateOfReportingApproximate',
             placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
             description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION',
-            options: this.getFieldOptions('isDateOfReportingApproximate').options,
+            options: this._uniqueOptions.isDateOfReportingApproximate,
             value: {
-              get: () => this.itemData.isDateOfReportingApproximate === undefined ?
-                'LNG_COMMON_LABEL_NONE' :
-                (
-                  this.itemData.isDateOfReportingApproximate === true ?
-                    'LNG_COMMON_LABEL_YES' :
-                    'LNG_COMMON_LABEL_NO'
-                ),
+              get: () => this.itemData.isDateOfReportingApproximate as any,
               set: (value) => {
-                this.itemData.isDateOfReportingApproximate = value === 'LNG_COMMON_LABEL_YES' ?
-                  true :
-                  (
-                    value === 'LNG_COMMON_LABEL_NO' ?
-                      false :
-                      undefined
-                  );
+                this.itemData.isDateOfReportingApproximate = value as any;
               }
             }
           }, {
@@ -597,7 +751,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
             name: 'riskLevel',
             placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL',
             description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL_DESCRIPTION',
-            options: this.getFieldOptions('isDateOfReportingApproximate').options,
+            options: this._uniqueOptions.riskLevel,
             value: {
               get: () => this.itemData.riskLevel,
               set: (value) => {
@@ -609,7 +763,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
             name: 'riskReason',
             placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON',
             description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON_DESCRIPTION',
-            options: this.getFieldOptions('riskReason').options,
+            options: this._uniqueOptions.riskReason,
             value: {
               get: () => this.itemData.riskReason,
               set: (value) => {
@@ -619,7 +773,6 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
           }]
         },
 
-        // #TODO: Vaccine form-inputs shold be disabled like in the old design? Option currently not supported
         // Vaccines
         {
           type: CreateViewModifyV2TabInputType.SECTION,
@@ -627,16 +780,14 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
           inputs: [{
             type: CreateViewModifyV2TabInputType.LIST,
             name: 'vaccinesReceived',
+            readonly: true,
             items: this.itemData.vaccinesReceived,
             itemsChanged: (list) => {
               // update documents
               this.itemData.vaccinesReceived = list.items;
             },
             definition: {
-              add: {
-                label: 'LNG_COMMON_BUTTON_ADD_VACCINE',
-                newItem: () => new VaccineModel()
-              },
+              add: undefined,
               remove: {
                 label: 'LNG_COMMON_BUTTON_DELETE',
                 confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_VACCINE'
@@ -659,130 +810,30 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
   }
 
   // get field unique options
-  private getFieldOptions(key: string): { options: ILabelValuePairModel[], value: any } {
+  private getFieldOptions(
+    mergeRecords: EntityModel[],
+    key: string
+  ): { options: ILabelValuePairModel[], value: any } {
     switch (key) {
       case 'age': return EntityModel.uniqueAgeOptions(
-        this.mergeRecords,
-        this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-        this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+        mergeRecords,
+        this.translateService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+        this.translateService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
       );
-      case 'dob': return EntityModel.uniqueDobOptions(this.mergeRecords);
-      case 'dateOfReporting': return EntityModel.uniqueDateOptions(this.mergeRecords, key);
-      case 'isDateOfReportingApproximate': return EntityModel.uniqueBooleanOptions(this.mergeRecords, key);
+      case 'dob': return EntityModel.uniqueDobOptions(mergeRecords);
+      case 'dateOfReporting': return EntityModel.uniqueDateOptions(mergeRecords, key);
+      case 'isDateOfReportingApproximate': return EntityModel.uniqueBooleanOptions(mergeRecords, key);
       case 'responsibleUserId': {
-        const uniqueUserOptions = EntityModel.uniqueStringOptions(this.mergeRecords, key);
-        uniqueUserOptions.options = uniqueUserOptions.options.map(
+        const uniqueUserOptions = EntityModel.uniqueStringOptions(mergeRecords, key);
+        uniqueUserOptions.options.forEach(
           (labelValuePair) => {
-            labelValuePair.label = this.activatedRoute.snapshot.data.users.options.find(
-              (user) => user.value === labelValuePair.value).label;
-
-            return {
-              label: labelValuePair.label,
-              value: labelValuePair.value
-            };
+            labelValuePair.label = (this.activatedRoute.snapshot.data.users as IResolverV2ResponseModel<UserModel>).map[labelValuePair.value] ?
+              (this.activatedRoute.snapshot.data.users as IResolverV2ResponseModel<UserModel>).map[labelValuePair.value].name :
+              labelValuePair.label;
           });
         return uniqueUserOptions;
       }
-
-      default: return EntityModel.uniqueStringOptions(this.mergeRecords, key);
-    }
-  }
-
-  /**
-   * Determine vaccines
-   */
-  private determineVaccines() {
-    // merge all vaccines
-    this.itemData.vaccinesReceived = [];
-    _.each(this.mergeRecords, (ent: EntityModel) => {
-      _.each((ent.model as ContactOfContactModel).vaccinesReceived, (vac: VaccineModel) => {
-        if (vac.vaccine) {
-          this.itemData.vaccinesReceived.push(vac);
-        }
-      });
-    });
-  }
-
-  /**
-     * Determine documents
-     */
-  private determineDocuments() {
-    // merge all documents
-    this.itemData.documents = [];
-    _.each(this.mergeRecords, (ent: EntityModel) => {
-      _.each((ent.model as ContactOfContactModel).documents, (doc: DocumentModel) => {
-        if (doc.number || doc.type) {
-          this.itemData.documents.push(doc);
-        }
-      });
-    });
-  }
-
-  // #TODO: Couldn't implement the old logic
-  // Why?
-  // - can't hide form-inputs, tried with "replace()" but is not present on all type of form-inputs (.ADDRESS)
-  // - can't change data and show changes to user when selecting currentAddress
-  // Implemneted:
-  // - this.determineAddresses() keeps the most recent currentAddress by date as before
-  // - if currentAddress has no date becomes first one is keept others become previousAddress now
-  // Pros:
-  // - user gets more flexibility to edit/remove which addresses he likes
-  // - now addressess WITHOUT date are keeped as previousAddresses
-  // - before if address had just locationId and typeId currentAddress drop-down showed empty options, no more the case now
-  // Cons:
-  // - user can't figure out if addresses WITHOUT date where currentAddress before except the first one found which is keept
-  // - idk if meets client requirements..
-  /**
-     * Determine addresses
-     */
-  private determineAddresses() {
-    // merge all addresses, keep just one current address
-    let currentAddress: AddressModel;
-    this.itemData.addresses = [];
-    _.each(this.mergeRecords, (ent: EntityModel) => {
-      _.each((ent.model as ContactOfContactModel).addresses, (address: AddressModel) => {
-        if (
-          address.locationId ||
-          address.fullAddress
-        ) {
-          // current address ?
-          // if we have multiple current addresses then we need to change them to previously addresses
-          if (address.typeId === AddressType.CURRENT_ADDRESS) {
-            if (address.date) {
-              // we have multiple current addresses ?
-              if (currentAddress) {
-                // address is newer?
-                if (moment(currentAddress.date).isBefore(moment(address.date))) {
-                  currentAddress.typeId = AddressType.PREVIOUS_ADDRESS;
-                  this.itemData.addresses.push(currentAddress);
-                  currentAddress = address;
-                } else {
-                  address.typeId = AddressType.PREVIOUS_ADDRESS;
-                  this.itemData.addresses.push(address);
-                }
-              } else {
-                currentAddress = address;
-              }
-            } else {
-              if (currentAddress) {
-                // make it previous address
-                address.typeId = AddressType.PREVIOUS_ADDRESS;
-                this.itemData.addresses.push(address);
-              } else {
-                currentAddress = address;
-              }
-            }
-          } else {
-            this.itemData.addresses.push(address);
-          }
-        }
-      });
-    });
-
-    // do we have a recent current address ?
-    if (currentAddress) {
-      // put it first
-      this.itemData.addresses.unshift(currentAddress);
+      default: return EntityModel.uniqueStringOptions(mergeRecords, key);
     }
   }
 }

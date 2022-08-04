@@ -727,6 +727,11 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
                 }
               }
             }, {
+              // #TODO: Drop-down doesn't display selection correct.
+              // Steps:
+              // - select a value
+              // - select another value
+              // - previous selected value remains displayed
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'age',
               placeholder: () => 'LNG_CASE_FIELD_LABEL_AGE',
@@ -1327,6 +1332,13 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
    * Initialize process data
    */
   private initializeProcessData(): ICreateViewModifyV2CreateOrUpdate {
+    // #TODO: Request returns 500 Internal error, message is empty object
+    // Steps:
+    // - on Outbreak Ionut
+    // - navigate to "Duplicate records" page
+    // - check first 3 duplciated "Ionut Test Case 2" cases
+    // - fill required fields
+    // - hit "Save"
     return (
       _type,
       data,
