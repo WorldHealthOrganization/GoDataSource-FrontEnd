@@ -203,6 +203,11 @@
           }
   
           .mat-form-field-suffix {
+            .mat-icon-button {
+              background-color: rgba(var(--gd-secondary-rgb), 0.15);
+              color: var(--gd-secondary);
+            }
+
             .mat-icon {
               color: var(--gd-secondary);
             }
