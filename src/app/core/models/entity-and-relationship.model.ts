@@ -381,10 +381,11 @@ export class EntityModel {
       records,
       '',
       // no need to do something custom
-      (value: CaseModel | ContactModel) => EntityModel.getAgeString(value.age, yearsLabel, monthsLabel),
-      (value: CaseModel | ContactModel) => ({
+      (value: CaseModel | ContactModel | ContactOfContactModel) => EntityModel.getAgeString(value.age, yearsLabel, monthsLabel),
+      (value: CaseModel | ContactModel | ContactOfContactModel) => ({
         label: EntityModel.getAgeString(value.age, yearsLabel, monthsLabel),
-        value: value.age
+        value: value.id,
+        data: value.age
       })
     );
   }
@@ -401,8 +402,8 @@ export class EntityModel {
       records,
       '',
       // no need to do something custom
-      (value: CaseModel | ContactModel) => moment(value.dob).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
-      (value: CaseModel | ContactModel) => ({
+      (value: CaseModel | ContactModel | ContactOfContactModel) => moment(value.dob).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+      (value: CaseModel | ContactModel | ContactOfContactModel) => ({
         label: moment(value.dob).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
         value: value.dob
       })

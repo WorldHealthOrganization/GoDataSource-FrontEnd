@@ -1094,6 +1094,15 @@ export class AppFormFillQuestionnaireV2Component
       return;
     }
 
+    // no need to validate ?
+    if (
+      flatQuestion.data?.inactive ||
+      flatQuestion.oneParentIsInactive
+    ) {
+      // finished
+      return;
+    }
+
     // check all answers
     let isValid: boolean = true;
     const answers: IAnswerData[] = (this.value[flatQuestion.data.variable] || []);
