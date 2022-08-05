@@ -480,9 +480,10 @@ export class AppFormFillQuestionnaireV2Component
             }
 
             // map options
-            const options: ILabelValuePairModel[] = question.answers.map((answer) => ({
+            const options: ILabelValuePairModel[] = question.answers.map((answer, localAnswerIndex) => ({
               label: answer.label,
-              value: answer.value
+              value: answer.value,
+              order: localAnswerIndex
             }));
 
             // render

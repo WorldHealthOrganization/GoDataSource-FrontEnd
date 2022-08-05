@@ -9,7 +9,7 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { AbstractSheetColumn, LocationSheetColumn, DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
+import { AbstractSheetColumn, LocationSheetColumn, DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, TextSheetColumn, NumericSheetColumn } from '../../../../core/models/sheet/sheet.model';
 import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { ContactModel } from '../../../../core/models/contact.model';
@@ -30,6 +30,8 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IV2ActionIconLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { CellProperties } from 'handsontable/settings';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 
 @Component({
   selector: 'app-bulk-modify-contacts',
@@ -318,6 +320,14 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                 addressModel = AddressModel.getCurrentAddress(contact.addresses);
                 value = addressModel ? addressModel.addressLine1 : null;
                 break;
+              case 'addresses.geoLocation.lat':
+                addressModel = AddressModel.getCurrentAddress(contact.addresses);
+                value = addressModel ? addressModel.geoLocation?.lat : null;
+                break;
+              case 'addresses.geoLocation.lng':
+                addressModel = AddressModel.getCurrentAddress(contact.addresses);
+                value = addressModel ? addressModel.geoLocation?.lng : null;
+                break;
               default:
                 value = _.get(contact, property);
             }
@@ -419,7 +429,55 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
       new LocationSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_LOCATION')
         .setProperty('addresses.locationId')
-        .setUseOutbreakLocations(true),
+        .setUseOutbreakLocations(true)
+        .setLocationChangedCallback((rowNo, locationInfo) => {
+          // nothing to do ?
+          if (
+            !locationInfo ||
+            !locationInfo.geoLocation ||
+            typeof locationInfo.geoLocation.lat !== 'number' ||
+            typeof locationInfo.geoLocation.lng !== 'number'
+          ) {
+            return;
+          }
+
+          // ask for confirmation if we should copy location lat & lng
+          this.dialogV2Service
+            .showConfirmDialog({
+              config: {
+                title: {
+                  get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
+                },
+                message: {
+                  get: () => 'LNG_DIALOG_CONFIRM_REPLACE_GEOLOCATION'
+                }
+              }
+            })
+            .subscribe((response) => {
+              // canceled ?
+              if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                // finished
+                return;
+              }
+
+              // find lat column
+              const latColumnIndex: number = this.hotTableWrapper.sheetColumns.findIndex((column) => column.property === 'addresses.geoLocation.lat');
+              const lngColumnIndex: number = this.hotTableWrapper.sheetColumns.findIndex((column) => column.property === 'addresses.geoLocation.lng');
+
+              // change location lat & lng
+              const sheetCore: Handsontable.default = (this.hotTableWrapper.sheetTable as any).hotInstance;
+              sheetCore.setDataAtCell(
+                rowNo,
+                latColumnIndex,
+                locationInfo.geoLocation.lat
+              );
+              sheetCore.setDataAtCell(
+                rowNo,
+                lngColumnIndex,
+                locationInfo.geoLocation.lng
+              );
+            });
+        }),
       new TextSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_CITY')
         .setProperty('addresses.city'),
@@ -432,6 +490,38 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
       new TextSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER')
         .setProperty('addresses.phoneNumber'),
+      new NumericSheetColumn()
+        .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT')
+        .setProperty('addresses.geoLocation.lat')
+        .setAsyncValidator((value, cellProperties: CellProperties, callback: (result: boolean) => void): void => {
+          if (
+            value ||
+            value === 0
+          ) {
+            callback(true);
+          } else {
+            // for now lng should always be the next one
+            const sheetCore: Handsontable.default = (this.hotTableWrapper.sheetTable as any).hotInstance;
+            const lat: number | string = sheetCore.getDataAtCell(cellProperties.row, cellProperties.col + 1);
+            callback(!lat && lat !== 0);
+          }
+        }),
+      new NumericSheetColumn()
+        .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG')
+        .setProperty('addresses.geoLocation.lng')
+        .setAsyncValidator((value, cellProperties: CellProperties, callback: (result: boolean) => void): void => {
+          if (
+            value ||
+            value === 0
+          ) {
+            callback(true);
+          } else {
+            // for now lat should always be the previous one
+            const sheetCore: Handsontable.default = (this.hotTableWrapper.sheetTable as any).hotInstance;
+            const lat: number | string = sheetCore.getDataAtCell(cellProperties.row, cellProperties.col - 1);
+            callback(!lat && lat !== 0);
+          }
+        }),
 
       // Contact Document(s)
       // Can't edit since they are multiple
@@ -594,6 +684,20 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                     address.addressLine1 = contactData.addresses.addressLine1;
                   } else {
                     address.addressLine1 = null;
+                  }
+
+                  // replace geoLocation.lat
+                  if (contactData.addresses.geoLocation?.lat !== undefined) {
+                    address.geoLocation.lat = contactData.addresses.geoLocation?.lat;
+                  } else {
+                    address.geoLocation.lat = null;
+                  }
+
+                  // replace geolocation.lng
+                  if (contactData.addresses.geoLocation?.lng !== undefined) {
+                    address.geoLocation.lng = contactData.addresses.geoLocation?.lng;
+                  } else {
+                    address.geoLocation.lng = null;
                   }
 
                   // replace with correct data

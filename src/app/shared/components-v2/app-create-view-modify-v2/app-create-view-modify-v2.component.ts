@@ -495,7 +495,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
         .showConfirmDialog({
           config: {
             title: {
-              get: () => 'LNG_DIALOG_CONFIRM_REPLACE_GEOLOCATION'
+              get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
             },
             message: {
               get: () => 'LNG_DIALOG_CONFIRM_REPLACE_GEOLOCATION'

@@ -189,7 +189,7 @@
 
           .mat-icon {
             color: rgba(var(--gd-text-rgb), 0.75);
-            font-size: 2rem;
+            font-size: 1.6rem;
             line-height: 1;
             text-align: center;
           }
@@ -197,10 +197,20 @@
           .mat-icon-button {
             font-size: 1.6rem;
             height: 2.4rem;
+            min-width: 0;
+            padding: 0;
             width: 2.4rem;
 
             + .mat-icon-button {
               margin-left: 0.4rem;
+            }
+
+            .mat-icon {
+              color: rgba(var(--gd-text-rgb), 0.75);
+              font-size: 1.6rem;
+              height: 1.6rem;
+              line-height: 1;
+              text-align: center;
             }
           }
         }
@@ -286,6 +296,11 @@
           }
 
           .mat-form-field-suffix {
+            .mat-icon-button {
+              background-color: rgba(var(--gd-secondary-rgb), 0.15);
+              color: var(--gd-secondary);
+            }
+
             .mat-icon {
               color: var(--gd-secondary);
             }

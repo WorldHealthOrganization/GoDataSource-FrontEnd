@@ -28,6 +28,10 @@ import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 })
 export class AppFormToggleCheckboxV2Component
   extends AppFormBaseV2<boolean> implements OnDestroy {
+
+  // right - icon buttons
+  @Input() suffixIconButtons: IAppFormIconButtonV2[];
+
   // view only
   @Input() viewOnly: boolean;
 
@@ -75,5 +79,21 @@ export class AppFormToggleCheckboxV2Component
    */
   ngOnDestroy(): void {
     super.onDestroy();
+  }
+
+  /**
+   * Click button
+   */
+  iconButtonClick(
+    event,
+    iconB: IAppFormIconButtonV2
+  ): void {
+    // prevent propagation
+    event.stopPropagation();
+
+    // execute click action
+    if (iconB.clickAction) {
+      iconB.clickAction(this);
+    }
   }
 }

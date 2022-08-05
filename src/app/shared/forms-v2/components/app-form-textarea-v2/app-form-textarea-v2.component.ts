@@ -10,6 +10,7 @@ import {
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
+import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 
 @Component({
   selector: 'app-form-textarea-v2',
@@ -25,6 +26,10 @@ import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 })
 export class AppFormTextareaV2Component
   extends AppFormBaseV2<string> implements OnDestroy {
+
+  // right - icon buttons
+  @Input() suffixIconButtons: IAppFormIconButtonV2[];
+
   // view only
   @Input() viewOnly: boolean;
 
@@ -51,5 +56,21 @@ export class AppFormTextareaV2Component
    */
   ngOnDestroy(): void {
     super.onDestroy();
+  }
+
+  /**
+   * Click button
+   */
+  iconButtonClick(
+    event,
+    iconB: IAppFormIconButtonV2
+  ): void {
+    // prevent propagation
+    event.stopPropagation();
+
+    // execute click action
+    if (iconB.clickAction) {
+      iconB.clickAction(this);
+    }
   }
 }
