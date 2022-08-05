@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { ActivatedRoute } from '@angular/router';

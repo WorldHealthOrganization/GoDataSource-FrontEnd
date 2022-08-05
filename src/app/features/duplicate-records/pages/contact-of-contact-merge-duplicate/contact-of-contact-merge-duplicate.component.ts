@@ -5,7 +5,6 @@ import { EntityModel } from '../../../../core/models/entity-and-relationship.mod
 import { ActivatedRoute } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import * as _ from 'lodash';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';

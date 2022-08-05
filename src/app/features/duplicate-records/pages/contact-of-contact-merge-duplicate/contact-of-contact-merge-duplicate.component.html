@@ -8,14 +8,5 @@
   [pageTitleData]="pageTitleData"
   [itemID]="itemData?.id"
   [tabData]="tabData"
-  [retrieveAllFormDataOnModify]="true"
-  listTitle="LNG_PAGE_LIST_CASES_TITLE"
-  [expandListRecords$]="expandListRecords$"
-  [expandListColumnRenderer]="expandListColumnRenderer"
-  [expandListAdvancedFilterType]="Constants.APP_PAGE.CASES.value"
-  [expandListAdvancedFilters]="expandListAdvancedFilters"
-  [expandListQueryFields]="expandListQueryFields"
-  expandListAdvancedFiltersCacheKey="/cases"
-  (expandListRefreshData)="refreshExpandList($event)"
-  (expandListChangeRecord)="expandListChangeRecord($event)">
+  [retrieveAllFormDataOnModify]="true">
 </app-create-view-modify-v2>
