@@ -403,12 +403,6 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
     key: string
   ): { options: ILabelValuePairModel[], value: any } {
     switch (key) {
-      case 'age': return EntityModel.uniqueAgeOptions(
-        mergeRecords,
-        this.translateService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-        this.translateService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
-      );
-      case 'dob': return EntityModel.uniqueDobOptions(mergeRecords);
       case 'date': return EntityModel.uniqueDateOptions(mergeRecords, key);
       case 'endDate': return EntityModel.uniqueDateOptions(mergeRecords, key);
       case 'dateOfReporting': return EntityModel.uniqueDateOptions(mergeRecords, key);

@@ -750,7 +750,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
               description: () => 'LNG_CASE_FIELD_LABEL_DOB_DESCRIPTION',
               options: this._uniqueOptions.dob,
               value: {
-                get: () => this.itemData.dob,
+                get: () => this.itemData.dob as any,
                 set: (value) => {
                   this.itemData.dob = value;
                 }
