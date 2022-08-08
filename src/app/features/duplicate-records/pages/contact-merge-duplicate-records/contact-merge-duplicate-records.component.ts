@@ -590,7 +590,7 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
                     undefined;
                   this.itemData.age = this._ageContactID !== undefined ?
                     this._uniqueOptions.age.find((ageItem) => ageItem.value === this._ageContactID).data :
-                    this.itemData.age;
+                    undefined;
                 }
               }
             }, {

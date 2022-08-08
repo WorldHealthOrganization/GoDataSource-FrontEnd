@@ -744,7 +744,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
                     undefined;
                   this.itemData.age = this._ageCaseID !== undefined ?
                     this._uniqueOptions.age.find((ageItem) => ageItem.value === this._ageCaseID).data :
-                    this.itemData.age;
+                    undefined;
                 }
               }
             }, {

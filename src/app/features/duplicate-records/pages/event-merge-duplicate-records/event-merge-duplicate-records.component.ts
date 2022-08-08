@@ -17,8 +17,6 @@ import { UserModel } from '../../../../core/models/user.model';
 import { TranslateService } from '@ngx-translate/core';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import { AddressModel, AddressType } from '../../../../core/models/address.model';
-import { moment } from '../../../../core/helperClasses/x-moment';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 
 @Component({
@@ -39,6 +37,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
     description: ILabelValuePairModel[]
     addresses: ILabelValuePairModel[]
   };
+  private _addressID: string;
 
   /**
    * Constructor
@@ -140,6 +139,24 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
             addresses: []
           };
 
+          // go through records and determine data
+          mergeRecords.forEach((item) => {
+            // determine addresses
+            const event = item.model as EventModel;
+
+            // add to list ?
+            if (
+              event.address.locationId ||
+              event.address.fullAddress
+            ) {
+              this._uniqueOptions.addresses.push({
+                label: event.address.fullAddress,
+                value: event.id,
+                data: event.address
+              });
+            }
+          });
+
           // auto-select if only one value
           const data: EventModel = new EventModel();
           data.name = this._uniqueOptions.name.length === 1 ?
@@ -166,60 +183,13 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
           data.description = this._uniqueOptions.description.length === 1 ?
             this._uniqueOptions.description[0].value :
             data.description;
+          this._addressID = this._uniqueOptions.addresses.length === 1 ?
+            this._uniqueOptions.addresses[0].value :
+            undefined;
+          data.address = this._addressID !== undefined ?
+            this._uniqueOptions.addresses.find((addressItem) => addressItem.value === this._addressID).data :
+            undefined;
 
-          // initialize addresses
-          let currentAddress: AddressModel;
-
-          // go through records and determine data
-          mergeRecords.forEach((item) => {
-            // determine addresses
-            const event = item.model as EventModel;
-            // add to list ?
-            if (
-              event.address.locationId ||
-              event.address.fullAddress
-            ) {
-              // current address ?
-              // if we have multiple current addresses then we change them to previously addresses and keep the freshest one by address.date
-              if (event.address.typeId === AddressType.CURRENT_ADDRESS) {
-                if (event.address.date) {
-                  // we have multiple current addresses ?
-                  if (currentAddress) {
-                    // address is newer?
-                    if (
-                      !currentAddress.date ||
-                      moment(currentAddress.date).isBefore(moment(event.address.date))
-                    ) {
-                      currentAddress.typeId = AddressType.PREVIOUS_ADDRESS;
-                      this._uniqueOptions.addresses.push({ label: currentAddress.fullAddress, value: currentAddress });
-                      currentAddress = event.address;
-                    } else {
-                      event.address.typeId = AddressType.PREVIOUS_ADDRESS;
-                      this._uniqueOptions.addresses.push({ label: event.address.fullAddress, value: event.address });
-                    }
-                  } else {
-                    currentAddress = event.address;
-                  }
-                } else {
-                  if (currentAddress) {
-                    // make it previous address
-                    event.address.typeId = AddressType.PREVIOUS_ADDRESS;
-                    this._uniqueOptions.addresses.push({ label: event.address.fullAddress, value: event.address });
-                  } else {
-                    currentAddress = event.address;
-                  }
-                }
-              } else {
-                this._uniqueOptions.addresses.push({ label: event.address.fullAddress, value: event.address });
-              }
-            }
-
-            // do we have a recent current address ?
-            if (currentAddress) {
-              // put it first
-              this._uniqueOptions.addresses.unshift({ label: currentAddress.fullAddress, value: currentAddress });
-            }
-          });
           // finish
           subscriber.next(data);
           subscriber.complete();
@@ -417,7 +387,6 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
           });
         return uniqueUserOptions;
       }
-      case 'address': return EntityModel.uniqueAddressOptions(mergeRecords, key);
 
       default: return EntityModel.uniqueStringOptions(mergeRecords, key);
     }
@@ -551,19 +520,19 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
           label: 'LNG_EVENT_FIELD_LABEL_ADDRESS',
           inputs: [
             {
-              // #TODO: Drop-down doesn't display selection correct.
-              // Steps:
-              // - select a value
-              // - select another value
-              // - previous selected value remains displayed
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'addresses',
               placeholder: () => 'LNG_EVENT_FIELD_LABEL_CHOOSE_ADDRESS',
               options: this._uniqueOptions.addresses,
               value: {
-                get: () => this.itemData.address?.fullAddress,
+                get: () => this._addressID,
                 set: (value: any) => {
-                  this.itemData.address = value;
+                  this._addressID = value ?
+                    value :
+                    undefined;
+                  this.itemData.address = this._addressID !== undefined ?
+                    this._uniqueOptions.addresses.find((addressItem) => addressItem.value === this._addressID).data :
+                    undefined;
                 }
               }
             },
@@ -573,7 +542,9 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
               name: 'address',
               value: {
                 get: () => this.itemData.address
-              }
+              },
+              visible: () => !!this.itemData.address,
+              readonly: true
             }
           ]
         }

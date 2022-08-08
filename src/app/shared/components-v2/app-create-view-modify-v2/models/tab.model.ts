@@ -473,6 +473,8 @@ interface ICreateViewModifyV2TabInputAddress {
   validators?: {
     required?: () => boolean
   };
+  visible?: () => boolean;
+  readonly?: boolean;
 }
 
 /**

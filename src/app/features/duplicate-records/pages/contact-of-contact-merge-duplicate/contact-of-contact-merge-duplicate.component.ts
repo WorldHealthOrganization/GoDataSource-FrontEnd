@@ -600,7 +600,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
                     undefined;
                   this.itemData.age = this._ageContactOfContactID !== undefined ?
                     this._uniqueOptions.age.find((ageItem) => ageItem.value === this._ageContactOfContactID).data :
-                    this.itemData.age;
+                    undefined;
                 }
               }
             }, {

@@ -3,7 +3,6 @@ import { ContactModel } from './contact.model';
 import { CaseModel } from './case.model';
 import { EventModel } from './event.model';
 import { EntityType } from './entity-type';
-import { AddressModel } from './address.model';
 import { IAnswerData, QuestionModel } from './question.model';
 import { Constants } from './constants';
 import { Moment, moment } from '../helperClasses/x-moment';
@@ -291,27 +290,6 @@ export class EntityModel {
       (value) => value ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO',
       (value) => ({
         label: value ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO',
-        value
-      })
-    );
-  }
-
-  /**
-     * Unique values
-     * @param records
-     * @param path
-     */
-  static uniqueAddressOptions(
-    records: EntityModel[],
-    path: string
-  ): { options: ILabelValuePairModel[], value: any } {
-    return EntityModel.uniqueValueOptions(
-      records,
-      path,
-      // no need to do something custom
-      (value) => value,
-      (value) => ({
-        label: (value as AddressModel).fullAddress,
         value
       })
     );
