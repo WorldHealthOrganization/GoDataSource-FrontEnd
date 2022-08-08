@@ -46,6 +46,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
     riskLevel: ILabelValuePairModel[],
     riskReason: ILabelValuePairModel[]
   };
+  private _ageContactOfContactID: string;
 
   /**
    * Constructor
@@ -190,8 +191,11 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
           data.occupation = this._uniqueOptions.occupation.length === 1 ?
             this._uniqueOptions.occupation[0].value :
             data.occupation;
-          data.age = this._uniqueOptions.age.length === 1 ?
+          this._ageContactOfContactID = this._uniqueOptions.age.length === 1 ?
             this._uniqueOptions.age[0].value :
+            undefined;
+          data.age = this._ageContactOfContactID !== undefined ?
+            this._uniqueOptions.age.find((ageItem) => ageItem.value === this._ageContactOfContactID).data :
             data.age;
           data.dob = this._uniqueOptions.dob.length === 1 ?
             this._uniqueOptions.dob[0].value :
@@ -446,6 +450,11 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
       data,
       finished
     ) => {
+      // age
+      if (data.age) {
+        data.age = this.itemData.age;
+      }
+
       // finished
       this.outbreakDataService
         .mergePeople(
@@ -584,9 +593,14 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
               description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE_DESCRIPTION',
               options: this._uniqueOptions.age,
               value: {
-                get: () => this.itemData.age as any,
-                set: (value) => {
-                  this.itemData.age = value as any;
+                get: () => this._ageContactOfContactID,
+                set: (value: any) => {
+                  this._ageContactOfContactID = value ?
+                    value :
+                    undefined;
+                  this.itemData.age = this._ageContactOfContactID !== undefined ?
+                    this._uniqueOptions.age.find((ageItem) => ageItem.value === this._ageContactOfContactID).data :
+                    this.itemData.age;
                 }
               }
             }, {
@@ -596,7 +610,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
               description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOB_DESCRIPTION',
               options: this._uniqueOptions.dob,
               value: {
-                get: () => this.itemData.dob,
+                get: () => this.itemData.dob as any,
                 set: (value) => {
                   this.itemData.dob = value;
                 }

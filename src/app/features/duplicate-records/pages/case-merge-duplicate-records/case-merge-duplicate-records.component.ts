@@ -76,6 +76,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
   };
   private _selectedQuestionnaireAnswers: number;
   private _selectedQuestionnaireHistoryAnswers: number;
+  private _ageCaseID: string;
 
   /**
    * Constructor
@@ -295,8 +296,11 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
           data.occupation = this._uniqueOptions.occupation.length === 1 ?
             this._uniqueOptions.occupation[0].value :
             data.occupation;
-          data.age = this._uniqueOptions.age.length === 1 ?
+          this._ageCaseID = this._uniqueOptions.age.length === 1 ?
             this._uniqueOptions.age[0].value :
+            undefined;
+          data.age = this._ageCaseID !== undefined ?
+            this._uniqueOptions.age.find((ageItem) => ageItem.value === this._ageCaseID).data :
             data.age;
           data.dob = this._uniqueOptions.dob.length === 1 ?
             this._uniqueOptions.dob[0].value :
@@ -727,20 +731,20 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
                 }
               }
             }, {
-              // #TODO: Drop-down doesn't display selection correct.
-              // Steps:
-              // - select a value
-              // - select another value
-              // - previous selected value remains displayed
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'age',
               placeholder: () => 'LNG_CASE_FIELD_LABEL_AGE',
               description: () => 'LNG_CASE_FIELD_LABEL_AGE_DESCRIPTION',
               options: this._uniqueOptions.age,
               value: {
-                get: () => this.itemData.age as any,
+                get: () => this._ageCaseID,
                 set: (value: any) => {
-                  this.itemData.age = value;
+                  this._ageCaseID = value ?
+                    value :
+                    undefined;
+                  this.itemData.age = this._ageCaseID !== undefined ?
+                    this._uniqueOptions.age.find((ageItem) => ageItem.value === this._ageCaseID).data :
+                    this.itemData.age;
                 }
               }
             }, {
@@ -1332,13 +1336,6 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
    * Initialize process data
    */
   private initializeProcessData(): ICreateViewModifyV2CreateOrUpdate {
-    // #TODO: Request returns 500 Internal error, message is empty object
-    // Steps:
-    // - on Outbreak Ionut
-    // - navigate to "Duplicate records" page
-    // - check first 3 duplciated "Ionut Test Case 2" cases
-    // - fill required fields
-    // - hit "Save"
     return (
       _type,
       data,
@@ -1347,6 +1344,11 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
       // cleanup
       delete data._selectedQuestionnaireAnswers;
       delete data._selectedQuestionnaireHistoryAnswers;
+
+      // age
+      if (data.age) {
+        data.age = this.itemData.age;
+      }
 
       // finished
       this.outbreakDataService

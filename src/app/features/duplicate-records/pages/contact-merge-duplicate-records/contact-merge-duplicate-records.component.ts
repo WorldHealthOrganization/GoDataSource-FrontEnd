@@ -53,6 +53,7 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
   };
   private _selectedQuestionnaireAnswers: number;
   private _selectedQuestionnaireHistoryAnswers: number;
+  private _ageContactID: string;
 
   /**
    * Constructor
@@ -219,8 +220,11 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
           data.occupation = this._uniqueOptions.occupation.length === 1 ?
             this._uniqueOptions.occupation[0].value :
             data.occupation;
-          data.age = this._uniqueOptions.age.length === 1 ?
+          this._ageContactID = this._uniqueOptions.age.length === 1 ?
             this._uniqueOptions.age[0].value :
+            undefined;
+          data.age = this._ageContactID !== undefined ?
+            this._uniqueOptions.age.find((ageItem) => ageItem.value === this._ageContactID).data :
             data.age;
           data.dob = this._uniqueOptions.dob.length === 1 ?
             this._uniqueOptions.dob[0].value :
@@ -573,20 +577,20 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
               }
             },
             {
-              // #TODO: Drop-down doesn't display selection correct.
-              // Steps:
-              // - select a value
-              // - select another value
-              // - previous selected value remains displayed
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'age',
               placeholder: () => 'LNG_CONTACT_FIELD_LABEL_AGE',
               description: () => 'LNG_CONTACT_FIELD_LABEL_AGE_DESCRIPTION',
               options: this._uniqueOptions.age,
               value: {
-                get: () => this.itemData.age as any,
+                get: () => this._ageContactID,
                 set: (value: any) => {
-                  this.itemData.age = value;
+                  this._ageContactID = value ?
+                    value :
+                    undefined;
+                  this.itemData.age = this._ageContactID !== undefined ?
+                    this._uniqueOptions.age.find((ageItem) => ageItem.value === this._ageContactID).data :
+                    this.itemData.age;
                 }
               }
             }, {
@@ -596,7 +600,7 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
               description: () => 'LNG_CONTACT_FIELD_LABEL_DOB_DESCRIPTION',
               options: this._uniqueOptions.dob,
               value: {
-                get: () => this.itemData.dob,
+                get: () => this.itemData.dob as any,
                 set: (value) => {
                   this.itemData.dob = value;
                 }
@@ -1032,6 +1036,15 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
       data,
       finished
     ) => {
+      // cleanup
+      delete data._selectedQuestionnaireAnswers;
+      delete data._selectedQuestionnaireHistoryAnswers;
+
+      // age
+      if (data.age) {
+        data.age = this.itemData.age;
+      }
+
       // finished
       this.outbreakDataService
         .mergePeople(
