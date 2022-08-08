@@ -6,5 +6,6 @@ export enum AppMessages {
   APP_MESSAGE_DUPLICATE_CASE_CONTACT = 'app-message-duplicate-case-contact',
   APP_MESSAGE_MUST_CHANGE_PASSWORD = 'app-message-must-change-password',
   APP_MESSAGE_USER_IN_MULTIPLE_TEAMS = 'app-message-user-in-multiple-teams',
-  APP_MESSAGE_HISTORY_FOLLOW_UPS = 'app-message-history-follow-ups'
+  APP_MESSAGE_HISTORY_FOLLOW_UPS = 'app-message-history-follow-ups',
+  APP_MESSAGE_DUPLICATE_MERGE_ACTIVE_OUTBREAK = 'app-message-duplicate-merge-active-outbreak'
 }

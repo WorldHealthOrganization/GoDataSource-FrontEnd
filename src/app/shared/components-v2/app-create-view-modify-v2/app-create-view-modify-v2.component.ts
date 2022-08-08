@@ -77,6 +77,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     [key: string]: string
   };
 
+  // retrieve all form data ?
+  @Input() retrieveAllFormDataOnModify: boolean;
+
   // tabs to render
   private _tabData: ICreateViewModifyV2;
   @Input() set tabData(tabData: ICreateViewModifyV2) {
@@ -584,7 +587,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     }
 
     // determine form data
-    const fieldData = this.formHelper.mergeDirtyFields(forms);
+    const fieldData = this.retrieveAllFormDataOnModify ?
+      this.formHelper.mergeFields(forms) :
+      this.formHelper.mergeDirtyFields(forms);
     if (_.isEmpty(fieldData)) {
       // show message
       this.toastV2Service.success('LNG_FORM_WARNING_NO_CHANGES');

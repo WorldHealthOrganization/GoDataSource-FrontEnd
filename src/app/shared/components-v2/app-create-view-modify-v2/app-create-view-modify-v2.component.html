@@ -410,6 +410,7 @@
                     [viewOnly]="isView || !input.value.set"
                     [questionnaire]="input.questionnaire"
                     [selectedTab]="selectedTab === tab"
+                    [disableValidation]="input.disableValidation"
                     app-questionnaire-answers-validator
                     (ngModelChange)="input.value.set($event, parentItemIndex)"
                     (errorsChanged)="input.updateErrors($event)"></app-form-fill-questionnaire-v2>
@@ -877,6 +878,7 @@
                       placeholder="LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE"
                       tooltip="LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE_DESCRIPTION"
                       [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly"
                       [options]="input.typeOptions"
                       required="true"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-select-single-v2>
@@ -889,6 +891,7 @@
                       placeholder="LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER"
                       tooltip="LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER_DESCRIPTION"
                       [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly"
                       required="true"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
@@ -908,6 +911,7 @@
                       placeholder="LNG_ADDRESS_FIELD_LABEL_TYPE"
                       tooltip="LNG_ADDRESS_FIELD_LABEL_TYPE_DESCRIPTION"
                       [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly || input.readonly"
                       [options]="input.typeOptions"
                       [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-select-single-v2>
@@ -919,6 +923,7 @@
                       placeholder="LNG_ADDRESS_FIELD_LABEL_DATE"
                       tooltip="LNG_ADDRESS_FIELD_LABEL_DATE_DESCRIPTION"
                       [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly || input.readonly"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-date-v2>
 
                     <!-- Email address -->
@@ -928,6 +933,7 @@
                       placeholder="LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS"
                       tooltip="LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS_DESCRIPTION"
                       [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly || input.readonly"
                       app-email-validator
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
@@ -938,6 +944,7 @@
                       placeholder="LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER"
                       tooltip="LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION"
                       [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly || input.readonly"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
                     <!-- Location -->
@@ -946,6 +953,7 @@
                       name="locationId"
                       placeholder="LNG_ADDRESS_FIELD_LABEL_LOCATION"
                       [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly || input.readonly"
                       useOutbreakLocations="true"
                       [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"
@@ -958,6 +966,7 @@
                       placeholder="LNG_ADDRESS_FIELD_LABEL_CITY"
                       tooltip="LNG_ADDRESS_FIELD_LABEL_CITY_DESCRIPTION"
                       [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly || input.readonly"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
                     <!-- Postal code -->
@@ -967,6 +976,7 @@
                       placeholder="LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE"
                       tooltip="LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE_DESCRIPTION"
                       [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly || input.readonly"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
                     <!-- Address line 1 -->
@@ -976,6 +986,7 @@
                       placeholder="LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1"
                       tooltip="LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1_DESCRIPTION"
                       [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly || input.readonly"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
 
                     <!-- Lat & Lng -->
@@ -992,6 +1003,7 @@
                         placeholder="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT"
                         tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT_DESCRIPTION"
                         [viewOnly]="isView"
+                        [disabled]="parentInput?.readonly || input.readonly"
                         [required]="!isView && input.value.get(parentItemIndex).geoLocation.lng"
                         app-min-max-validator
                         [min]="-90"
@@ -1008,6 +1020,7 @@
                         placeholder="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG"
                         tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG_DESCRIPTION"
                         [viewOnly]="isView"
+                        [disabled]="parentInput?.readonly || input.readonly"
                         [required]="!isView && input.value.get(parentItemIndex).geoLocation.lat"
                         app-min-max-validator
                         [min]="-180"
@@ -1024,6 +1037,7 @@
                       name="geoLocationAccurate"
                       placeholder="LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES"
                       [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly || input.readonly"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-toggle-checkbox-v2>
 
                   </div>
@@ -1041,6 +1055,7 @@
                       name="vaccine"
                       placeholder="LNG_ENTITY_FIELD_LABEL_VACCINE"
                       [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly"
                       [options]="input.vaccineOptions"
                       required="true"></app-form-select-single-v2>
 
@@ -1050,7 +1065,8 @@
                       [(ngModel)]="input.value.get(parentItemIndex).date"
                       name="date"
                       placeholder="LNG_ENTITY_FIELD_LABEL_VACCINE_DATE"
-                      [viewOnly]="isView"></app-form-date-v2>
+                      [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly"></app-form-date-v2>
 
                     <!-- Vaccine status -->
                     <app-form-select-single-v2
@@ -1059,6 +1075,7 @@
                       name="status"
                       placeholder="LNG_ENTITY_FIELD_LABEL_VACCINE_STATUS"
                       [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly"
                       [options]="input.vaccineStatusOptions"
                       required="true"></app-form-select-single-v2>
 
@@ -1077,6 +1094,7 @@
                       name="typeId"
                       placeholder="LNG_CASE_FIELD_LABEL_DATE_RANGE_TYPE_ID"
                       [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly"
                       [options]="input.typeOptions"
                       required="true"></app-form-select-single-v2>
 
@@ -1091,6 +1109,7 @@
                         name="startDate"
                         placeholder="LNG_FORM_RANGE_FIELD_LABEL_FROM"
                         [viewOnly]="isView"
+                        [disabled]="parentInput?.readonly"
                         app-date-validator
                         dateSameOrBefore="endDate"
                         [dateSameOrAfter]="input.startDateValidators?.dateSameOrAfter ? input.startDateValidators?.dateSameOrAfter() : undefined"></app-form-date-v2>
@@ -1102,6 +1121,7 @@
                         name="endDate"
                         placeholder="LNG_FORM_RANGE_FIELD_LABEL_TO"
                         [viewOnly]="isView"
+                        [disabled]="parentInput?.readonly"
                         app-date-validator
                         dateSameOrAfter="startDate"></app-form-date-v2>
 
@@ -1113,6 +1133,7 @@
                       name="centerName"
                       placeholder="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME"
                       [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly"
                       [options]="input.centerOptions"></app-form-select-single-v2>
 
                     <!-- Location -->
@@ -1121,6 +1142,7 @@
                       name="locationId"
                       placeholder="LNG_CASE_FIELD_LABEL_CENTER_DATES_LOCATION"
                       [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly"
                       useOutbreakLocations="true"></app-form-select-location-single-v2>
 
                     <!-- Comments -->
@@ -1128,7 +1150,8 @@
                       [(ngModel)]="input.value.get(parentItemIndex).comments"
                       name="comments"
                       placeholder="LNG_CASE_FIELD_LABEL_CENTER_DATES_COMMENTS"
-                      [viewOnly]="isView"></app-form-textarea-v2>
+                      [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly"></app-form-textarea-v2>
 
                   </div>
 
@@ -1289,7 +1312,7 @@
 
                       <!-- Display items -->
                       <ng-container
-                        *ngIf="!isView || input.items?.length > 0; else emptyList">
+                        *ngIf="(!isView && input.definition.add) || input.items?.length > 0; else emptyList">
                         <div
                           *ngFor="let item of input.items; let itemIndex = index; trackBy: trackByIndex"
                           class="gd-create-view-modify-bottom-section-content-input-list-item"
@@ -1350,7 +1373,7 @@
 
                     <!-- Add -->
                     <div
-                      *ngIf="!isView">
+                      *ngIf="!isView && input.definition.add">
                       <button
                         type="button"
                         mat-flat-button

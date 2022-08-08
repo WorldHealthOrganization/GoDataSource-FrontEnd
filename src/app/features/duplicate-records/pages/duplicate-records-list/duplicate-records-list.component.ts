@@ -22,7 +22,8 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IV2ActionIconLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { Router } from '@angular/router';
+import { AppMessages } from '../../../../core/enums/app-messages.enum';
 
 @Component({
   selector: 'app-duplicate-records-list',
@@ -69,7 +70,7 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
     protected listHelperService: ListHelperService,
     private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
-    private dialogV2Service: DialogV2Service
+    private router: Router
   ) {
     // parent
     super(listHelperService);
@@ -88,8 +89,8 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
   }
 
   /**
-     * Component initialized
-     */
+   * Component initialized
+   */
   ngOnInit() {
     // subscribe to the Selected Outbreak
     this.outbreakSubscriber = this.outbreakDataService
@@ -105,8 +106,8 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
   }
 
   /**
-     * Component destroyed
-     */
+   * Component destroyed
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
@@ -115,6 +116,22 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
     if (this.outbreakSubscriber) {
       this.outbreakSubscriber.unsubscribe();
       this.outbreakSubscriber = null;
+    }
+
+    // remove global notifications
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_MERGE_ACTIVE_OUTBREAK);
+  }
+
+  /**
+   * Selected outbreak was changed
+   */
+  selectedOutbreakChanged(): void {
+    if (!this.selectedOutbreakIsActive) {
+      this.toastV2Service.notice(
+        'LNG_PAGE_LIST_DUPLICATE_RECORDS_WARNING_NO_ACTIVE_OUTBREAK',
+        undefined,
+        AppMessages.APP_MESSAGE_DUPLICATE_MERGE_ACTIVE_OUTBREAK
+      );
     }
   }
 
@@ -330,15 +347,13 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
     }
 
     // redirect to merge page
-    // #TODO - remove show loading
-    this.dialogV2Service.showLoadingDialog();
-    // this.router.navigate(
-    //   ['/duplicated-records', EntityModel.getLinkForEntityType(types[0]), 'merge'], {
-    //     queryParams: {
-    //       ids: JSON.stringify(mergeIds)
-    //     }
-    //   }
-    // );
+    this.router.navigate(
+      ['/duplicated-records', EntityModel.getLinkForEntityType(types[0]), 'merge'], {
+        queryParams: {
+          ids: JSON.stringify(mergeIds)
+        }
+      }
+    );
   }
 
   /**
@@ -347,13 +362,13 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
   hasMergePermission(group: PeoplePossibleDuplicateGroupModel): boolean {
     switch (group.groupType) {
       case EntityType.CASE:
-        return PeoplePossibleDuplicateModel.canMergeCases(this.authUser);
+        return PeoplePossibleDuplicateModel.canMergeCases(this.authUser) && this.selectedOutbreakIsActive;
       case EntityType.CONTACT:
-        return PeoplePossibleDuplicateModel.canMergeContacts(this.authUser);
+        return PeoplePossibleDuplicateModel.canMergeContacts(this.authUser) && this.selectedOutbreakIsActive;
       case EntityType.EVENT:
-        return PeoplePossibleDuplicateModel.canMergeEvents(this.authUser);
+        return PeoplePossibleDuplicateModel.canMergeEvents(this.authUser) && this.selectedOutbreakIsActive;
       case EntityType.CONTACT_OF_CONTACT:
-        return PeoplePossibleDuplicateModel.canMergeContacts(this.authUser);
+        return PeoplePossibleDuplicateModel.canMergeContacts(this.authUser) && this.selectedOutbreakIsActive;
       default:
         // not supported
         return false;

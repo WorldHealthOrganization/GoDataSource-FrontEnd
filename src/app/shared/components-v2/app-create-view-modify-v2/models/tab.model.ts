@@ -406,6 +406,7 @@ export interface ICreateViewModifyV2TabInputList {
 
   // optional
   sortable?: boolean;
+  readonly?: boolean;
 }
 
 /**
@@ -472,6 +473,8 @@ interface ICreateViewModifyV2TabInputAddress {
   validators?: {
     required?: () => boolean
   };
+  visible?: () => boolean;
+  readonly?: boolean;
 }
 
 /**
@@ -654,6 +657,9 @@ interface ICreateViewModifyV2TabTableFillQuestionnaire {
   }>;
   questionnaire: QuestionModel[];
   updateErrors: (errorsHTML: string) => void;
+
+  // optional
+  disableValidation?: boolean;
 }
 
 /**

@@ -3,8 +3,6 @@ import { ContactModel } from './contact.model';
 import { CaseModel } from './case.model';
 import { EventModel } from './event.model';
 import { EntityType } from './entity-type';
-import { LabelValuePair } from './label-value-pair';
-import { AddressModel } from './address.model';
 import { IAnswerData, QuestionModel } from './question.model';
 import { Constants } from './constants';
 import { Moment, moment } from '../helperClasses/x-moment';
@@ -16,6 +14,7 @@ import { OutbreakModel } from './outbreak.model';
 import { IPermissionBasic, IPermissionBasicBulk, IPermissionExportable, IPermissionRelationship } from './permission.interface';
 import { ContactOfContactModel } from './contact-of-contact.model';
 import { DocumentModel } from './document.model';
+import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 
 export class RelationshipModel
   extends BaseModel
@@ -212,15 +211,15 @@ export class EntityModel {
     records: EntityModel[],
     path: string,
     valueParser: (value: any) => any,
-    labelValueMap: (value: any) => LabelValuePair
-  ): { options: LabelValuePair[], value: any } {
+    labelValueMap: (value: any) => ILabelValuePairModel
+  ): { options: ILabelValuePairModel[], value: any } {
     // construct options
-    const options: LabelValuePair[] = _.chain(records)
+    const options: ILabelValuePairModel[] = _.chain(records)
       .map((record: EntityModel) => path ? _.get(record.model, path) : record.model)
       .filter((value) => value !== '' && value !== undefined && value !== null)
       .uniqBy((value: any) => valueParser(value))
       .map((value) => labelValueMap(value))
-      .filter((value: LabelValuePair) => value.label !== '' && value.value !== '' && value.value !== undefined && value.value !== null)
+      .filter((value: ILabelValuePairModel) => value.label !== '' && value.value !== '' && value.value !== undefined && value.value !== null)
       .value();
 
     // finished
@@ -242,15 +241,15 @@ export class EntityModel {
     map?: {
       [value: string]: string
     }
-  ): { options: LabelValuePair[], value: any } {
+  ): { options: ILabelValuePairModel[], value: any } {
     return EntityModel.uniqueValueOptions(
       records,
       path,
       (value) => _.isString(value) ? value.toLowerCase() : value,
-      (value) => new LabelValuePair(
-        map && map[value] ? map[value] : value,
+      (value) => ({
+        label: map && map[value] ? map[value] : value,
         value
-      )
+      })
     );
   }
 
@@ -262,16 +261,16 @@ export class EntityModel {
   static uniqueDateOptions(
     records: EntityModel[],
     path: string
-  ): { options: LabelValuePair[], value: any } {
+  ): { options: ILabelValuePairModel[], value: any } {
     return EntityModel.uniqueValueOptions(
       records,
       path,
       // no need to do something custom
       (value) => value,
-      (value) => new LabelValuePair(
-        moment(value).isValid() ? moment(value).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : value,
+      (value) => ({
+        label: moment(value).isValid() ? moment(value).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : value,
         value
-      )
+      })
     );
   }
 
@@ -283,31 +282,16 @@ export class EntityModel {
   static uniqueBooleanOptions(
     records: EntityModel[],
     path: string
-  ): { options: LabelValuePair[], value: any } {
+  ): { options: ILabelValuePairModel[], value: any } {
     return EntityModel.uniqueValueOptions(
       records,
       path,
       // no need to do something custom
       (value) => value ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO',
-      (value) => new LabelValuePair(value ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO', value)
-    );
-  }
-
-  /**
-     * Unique values
-     * @param records
-     * @param path
-     */
-  static uniqueAddressOptions(
-    records: EntityModel[],
-    path: string
-  ): { options: LabelValuePair[], value: any } {
-    return EntityModel.uniqueValueOptions(
-      records,
-      path,
-      // no need to do something custom
-      (value) => value,
-      (value) => new LabelValuePair((value as AddressModel).fullAddress, value)
+      (value) => ({
+        label: value ? 'LNG_COMMON_LABEL_YES' : 'LNG_COMMON_LABEL_NO',
+        value
+      })
     );
   }
 
@@ -365,32 +349,42 @@ export class EntityModel {
      * Unique values
      * @param records
      */
-  static uniqueAgeDobOptions(
+  static uniqueAgeOptions(
     records: EntityModel[],
     yearsLabel: string,
     monthsLabel: string
-  ): { options: LabelValuePair[], value: any } {
-    // convert dob to string
-    const dobString = (dob): string => {
-      return dob ?
-        dob :
-        '';
-    };
-
-    // convert age dob to string
-    const ageDobString = (dob, age): string => {
-      dob = dobString(dob);
-      age = EntityModel.getAgeString(age, yearsLabel, monthsLabel);
-      return `${dob} ${age}`.trim();
-    };
-
-    // return age / dob unique options
+  ): { options: ILabelValuePairModel[], value: any } {
+    // return age unique options
     return EntityModel.uniqueValueOptions(
       records,
       '',
       // no need to do something custom
-      (value: CaseModel | ContactModel) => ageDobString(value.dob, value.age),
-      (value) => new LabelValuePair(ageDobString(value.dob, value.age), value)
+      (value: CaseModel | ContactModel | ContactOfContactModel) => EntityModel.getAgeString(value.age, yearsLabel, monthsLabel),
+      (value: CaseModel | ContactModel | ContactOfContactModel) => ({
+        label: EntityModel.getAgeString(value.age, yearsLabel, monthsLabel),
+        value: value.id,
+        data: value.age
+      })
+    );
+  }
+
+  /**
+    * Unique values
+    * @param records
+    */
+  static uniqueDobOptions(
+    records: EntityModel[]
+  ): { options: ILabelValuePairModel[], value: any } {
+    // return dob unique options
+    return EntityModel.uniqueValueOptions(
+      records,
+      '',
+      // no need to do something custom
+      (value: CaseModel | ContactModel | ContactOfContactModel) => moment(value.dob).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+      (value: CaseModel | ContactModel | ContactOfContactModel) => ({
+        label: moment(value.dob).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+        value: value.dob
+      })
     );
   }
 
