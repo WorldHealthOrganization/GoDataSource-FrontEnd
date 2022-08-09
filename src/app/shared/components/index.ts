@@ -1,18 +1,13 @@
 // import each component
-import { FormAddressComponent } from './form-address/form-address.component';
-import { FormDocumentComponent } from './form-document/form-document.component';
 import { FormRangeComponent } from './form-range/form-range.component';
 import { FormRelationshipComponent } from './form-relationship/form-relationship.component';
 import { YesNoLabelComponent } from './yes-no-label/yes-no-label.component';
 import { ReferenceDataLabelComponent } from './reference-data-label/reference-data-label.component';
 import { ChronologyComponent } from './chronology/chronology.component';
 import { LocationBreadcrumbsComponent } from './location-breadcrumbs/location-breadcrumbs.component';
-import { FormAgeComponent } from './form-age/form-age.component';
-import { FormAgeDobComponent } from './form-age-dob/form-age-dob.component';
 import { FormRelationshipQuickComponent } from './form-relationship-quick/form-relationship-quick.component';
 import { FormContactQuickComponent } from './form-contact-quick/form-contact-quick.component';
 import { NumberOfItemsLabelComponent } from './number-of-items-label/number-of-items-label.component';
-import { FormCaseCenterDaterangeComponent } from './form-case-center-daterange/form-case-center-daterange.component';
 import { HoverRowActionsComponent } from './hover-row-actions/hover-row-actions.component';
 import { FormLocationIdentifierListComponent } from './form-location-identifier-list/form-location-identifier-list.component';
 import { FormLocationIdentifierComponent } from './form-location-identifier/form-location-identifier.component';
@@ -31,12 +26,8 @@ export * from './hover-row-actions/hover-row-actions.component';
 // export the list of all components
 export const components: any[] = [
   // inputs
-  FormAddressComponent,
-  FormDocumentComponent,
   FormRangeComponent,
   FormRelationshipComponent,
-  FormAgeComponent,
-  FormAgeDobComponent,
   FormRelationshipQuickComponent,
   FormContactQuickComponent,
   FormContactOfContactQuickComponent,
@@ -55,7 +46,6 @@ export const components: any[] = [
 
   // general
   NumberOfItemsLabelComponent,
-  FormCaseCenterDaterangeComponent,
   FancyTooltipComponent,
 
   // layout extensions
