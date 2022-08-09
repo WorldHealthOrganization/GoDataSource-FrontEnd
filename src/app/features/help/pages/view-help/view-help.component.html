@@ -1,12 +1,11 @@
 <app-basic-page-v2
   [breadcrumbs]="breadcrumbs"
   pageTitle="LNG_PAGE_VIEW_HELP_ITEM_TITLE">
-    <div
-         class="view-item-title">
-        {{ helpItemData.title | translate }}
+    <div>
+      {{ helpItemData.title | translate }}
     </div>
     <div
-         [innerHtml]="helpItemData.content | translate">
+       [innerHtml]="helpItemData.content | translate">
     </div>
 </app-basic-page-v2>
 
