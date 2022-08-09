@@ -12,7 +12,6 @@ import { ReferenceDataLabelComponent } from './reference-data-label/reference-da
 import { ChronologyComponent } from './chronology/chronology.component';
 import { LocationBreadcrumbsComponent } from './location-breadcrumbs/location-breadcrumbs.component';
 import { FormAgeComponent } from './form-age/form-age.component';
-import { AgeLabelComponent } from './age-label/age-label.component';
 import { FormAgeDobComponent } from './form-age-dob/form-age-dob.component';
 import { FormRelationshipQuickComponent } from './form-relationship-quick/form-relationship-quick.component';
 import { ColorListLegendComponent } from './color-list-legend/color-list-legend.component';
@@ -68,7 +67,6 @@ export const components: any[] = [
   ReferenceDataLabelComponent,
   LocationBreadcrumbsComponent,
   ChronologyComponent,
-  AgeLabelComponent,
   ColorListLegendComponent,
 
   // dialogs
