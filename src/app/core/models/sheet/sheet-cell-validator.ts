@@ -4,6 +4,7 @@ import * as _ from 'lodash';
 import { SheetCellType } from './sheet-cell-type';
 import { Constants } from '../constants';
 import { moment } from '../../helperClasses/x-moment';
+import { CellProperties } from 'handsontable/settings';
 
 export class SheetCellValidator {
   // cells being part of empty rows will get this value at validation time, so we know to skip validation for them (e.g. skip Required validation)
@@ -38,7 +39,7 @@ export class SheetCellValidator {
       let validationPassed = true;
 
       // get individual validation functions
-      const validationFunctions = _.map(validationTypes, (type) => SheetCellValidator.getValidation(type));
+      const validationFunctions = _.map(validationTypes, (type) => SheetCellValidator.getValidation(type, this));
       // keep the number of validations that passed, so we know when the whole validation process is done
       let validationsPassed = 0;
 
@@ -71,7 +72,8 @@ export class SheetCellValidator {
    * @param validationType
    */
   static getValidation(
-    validationType: SheetCellValidationType
+    validationType: SheetCellValidationType,
+    cellProperties: CellProperties
   ): (value: any, callback: (boolean) => void, sheetColumn: any) => void {
     switch (validationType) {
       case SheetCellValidationType.DROPDOWN:
@@ -121,6 +123,7 @@ export class SheetCellValidator {
             // call next validator
             sheetColumn.asyncValidators[index++](
               value,
+              cellProperties,
               next
             );
           };

@@ -121,6 +121,7 @@ interface ICreateViewModifyV2TabInputText extends Omit<ICreateViewModifyV2TabInp
       err: string
     }
   };
+  suffixIconButtons?: IAppFormIconButtonV2[];
 }
 
 /**
@@ -212,6 +213,7 @@ interface ICreateViewModifyV2TabInputSingleSelect extends Omit<ICreateViewModify
       err: string
     }
   };
+  suffixIconButtons?: IAppFormIconButtonV2[];
 }
 
 /**
@@ -236,6 +238,9 @@ interface ICreateViewModifyV2TabInputToggleCheckbox extends Omit<ICreateViewModi
   // required
   type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX;
   value: ICreateViewModifyV2TabInputValue<boolean>;
+
+  // optional
+  suffixIconButtons?: IAppFormIconButtonV2[];
 }
 
 /**
@@ -273,6 +278,9 @@ interface ICreateViewModifyV2TabInputTextArea extends Omit<ICreateViewModifyV2Ta
   // required
   type: CreateViewModifyV2TabInputType.TEXTAREA;
   value: ICreateViewModifyV2TabInputValue<string>;
+
+  // optional
+  suffixIconButtons?: IAppFormIconButtonV2[];
 }
 
 /**
@@ -372,6 +380,7 @@ interface ICreateViewModifyV2TabInputDate extends Omit<ICreateViewModifyV2TabInp
   }
   minDate?: Moment | string;
   maxDate?: Moment | string;
+  suffixIconButtons?: IAppFormIconButtonV2[];
 }
 
 /**
@@ -397,6 +406,7 @@ export interface ICreateViewModifyV2TabInputList {
 
   // optional
   sortable?: boolean;
+  readonly?: boolean;
 }
 
 /**
@@ -463,6 +473,8 @@ interface ICreateViewModifyV2TabInputAddress {
   validators?: {
     required?: () => boolean
   };
+  visible?: () => boolean;
+  readonly?: boolean;
 }
 
 /**
@@ -645,6 +657,9 @@ interface ICreateViewModifyV2TabTableFillQuestionnaire {
   }>;
   questionnaire: QuestionModel[];
   updateErrors: (errorsHTML: string) => void;
+
+  // optional
+  disableValidation?: boolean;
 }
 
 /**

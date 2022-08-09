@@ -302,6 +302,10 @@ export class Constants {
     FOLLOW_UP_DASHBOARD: {
       label: 'LNG_APP_PAGE_FOLLOW_UP_DASHBOARD',
       value: 'LNG_APP_PAGE_FOLLOW_UP_DASHBOARD'
+    },
+    TEAM_WORKLOAD: {
+      label: 'LNG_APP_PAGE_TEAM_WORKLOAD',
+      value: 'LNG_APP_PAGE_TEAM_WORKLOAD'
     }
   };
 

@@ -6,6 +6,17 @@ import { PageChangeConfirmationGuard } from '../../core/services/guards/page-cha
 import { GenderDataResolver } from '../../core/services/resolvers/data/gender.resolver';
 import { YesNoAllDataResolver } from '../../core/services/resolvers/data/yes-no-all.resolver';
 import * as fromPages from './pages';
+import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
+import { DocumentTypeDataResolver } from '../../core/services/resolvers/data/document-type.resolver';
+import { SelectedOutbreakDataResolver } from '../../core/services/resolvers/data/selected-outbreak.resolver';
+import { AddressTypeDataResolver } from '../../core/services/resolvers/data/address-type.resolver';
+import { VaccineDataResolver } from '../../core/services/resolvers/data/vaccine.resolver';
+import { VaccineStatusDataResolver } from '../../core/services/resolvers/data/vaccine-status.resolver';
+import { PersonDateTypeDataResolver } from '../../core/services/resolvers/data/person-date-type.resolver';
+import { DateRangeCenterDataResolver } from '../../core/services/resolvers/data/date-range-center.resolver';
+import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+import { TeamDataResolver } from '../../core/services/resolvers/data/team.resolver';
+
 
 // Not Duplicates List - Cases / Contacts / Contacts of Contacts
 const noDuplicatesListFoundation: Route = {
@@ -36,7 +47,18 @@ const routes: Routes = [
     data: {
       permissions: [
         PERMISSION.DUPLICATE_MERGE_CASES
-      ]
+      ],
+      action: CreateViewModifyV2Action.MODIFY
+    },
+    resolve: {
+      outbreak: SelectedOutbreakDataResolver,
+      documentType: DocumentTypeDataResolver,
+      addressType: AddressTypeDataResolver,
+      vaccine: VaccineDataResolver,
+      vaccineStatus: VaccineStatusDataResolver,
+      dateRangeType: PersonDateTypeDataResolver,
+      dateRangeCenter: DateRangeCenterDataResolver,
+      users: UserDataResolver
     },
     canDeactivate: [
       PageChangeConfirmationGuard
@@ -51,7 +73,17 @@ const routes: Routes = [
     data: {
       permissions: [
         PERMISSION.DUPLICATE_MERGE_CONTACTS
-      ]
+      ],
+      action: CreateViewModifyV2Action.MODIFY
+    },
+    resolve: {
+      outbreak: SelectedOutbreakDataResolver,
+      documentType: DocumentTypeDataResolver,
+      addressType: AddressTypeDataResolver,
+      vaccine: VaccineDataResolver,
+      vaccineStatus: VaccineStatusDataResolver,
+      users: UserDataResolver,
+      teams: TeamDataResolver
     },
     canDeactivate: [
       PageChangeConfirmationGuard
@@ -66,7 +98,17 @@ const routes: Routes = [
     data: {
       permissions: [
         PERMISSION.DUPLICATE_MERGE_CONTACTS_OF_CONTACTS
-      ]
+      ],
+      action: CreateViewModifyV2Action.MODIFY
+    },
+    resolve: {
+      outbreak: SelectedOutbreakDataResolver,
+      documentType: DocumentTypeDataResolver,
+      addressType: AddressTypeDataResolver,
+      vaccine: VaccineDataResolver,
+      vaccineStatus: VaccineStatusDataResolver,
+      users: UserDataResolver,
+      teams: TeamDataResolver
     },
     canDeactivate: [
       PageChangeConfirmationGuard
@@ -81,7 +123,13 @@ const routes: Routes = [
     data: {
       permissions: [
         PERMISSION.DUPLICATE_MERGE_EVENTS
-      ]
+      ],
+      action: CreateViewModifyV2Action.MODIFY
+    },
+    resolve: {
+      outbreak: SelectedOutbreakDataResolver,
+      addressType: AddressTypeDataResolver,
+      users: UserDataResolver
     },
     canDeactivate: [
       PageChangeConfirmationGuard

@@ -21,6 +21,5 @@ export const pageComponents: any[] = [
   ContactMergeDuplicateRecordsComponent,
   ContactOfContactMergeDuplicateComponent,
   EventMergeDuplicateRecordsComponent,
-
   MarkedNotDuplicatesListComponent
 ];

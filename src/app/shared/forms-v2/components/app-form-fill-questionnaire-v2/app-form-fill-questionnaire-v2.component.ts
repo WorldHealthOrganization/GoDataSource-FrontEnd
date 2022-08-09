@@ -184,6 +184,9 @@ export class AppFormFillQuestionnaireV2Component
     }
   }
 
+  // disable validation ?
+  @Input() disableValidation: boolean;
+
   // view only
   @Input() viewOnly: boolean;
 
@@ -477,9 +480,10 @@ export class AppFormFillQuestionnaireV2Component
             }
 
             // map options
-            const options: ILabelValuePairModel[] = question.answers.map((answer) => ({
+            const options: ILabelValuePairModel[] = question.answers.map((answer, localAnswerIndex) => ({
               label: answer.label,
-              value: answer.value
+              value: answer.value,
+              order: localAnswerIndex
             }));
 
             // render
@@ -532,8 +536,19 @@ export class AppFormFillQuestionnaireV2Component
               // determine if we need to show other things depending on what was selected
               // multiple answer question ?
               if (question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value) {
-                // go through each multiple response
+                // if converted from single to multi we need to make sure we have array
+                if (
+                  item.value !== undefined &&
+                  item.value !== null &&
+                  !Array.isArray(item.value)
+                ) {
+                  // update value
+                  item.value = [item.value];
+                }
+
+                // do we have data ?
                 if (item.value?.length > 0) {
+                  // go through each multiple response
                   item.value.forEach((answerValue: string) => {
                     if (answersWithQuestionsMap[answerValue]) {
                       // flatten children questions
@@ -551,6 +566,19 @@ export class AppFormFillQuestionnaireV2Component
                   });
                 }
               } else {
+                // if converted from multi to single we need to revert array
+                if (
+                  item.value !== undefined &&
+                  item.value !== null &&
+                  Array.isArray(item.value)
+                ) {
+                  // update value
+                  item.value = item.value.length === 1 ?
+                    item.value[0] :
+                    undefined;
+                }
+
+                // flatten
                 if (answersWithQuestionsMap[item.value]) {
                   // flatten children questions
                   this.flatten(
@@ -1078,6 +1106,27 @@ export class AppFormFillQuestionnaireV2Component
     flatQuestion: IFlattenNodeQuestion,
     updateErrorsData: boolean
   ): void {
+    // validation disabled ?
+    if (this.disableValidation) {
+      // reset errors
+      if (this._errorsCount > 0) {
+        this._errors = {};
+        this.updateErrorsData();
+      }
+
+      // finished
+      return;
+    }
+
+    // no need to validate ?
+    if (
+      flatQuestion.data?.inactive ||
+      flatQuestion.oneParentIsInactive
+    ) {
+      // finished
+      return;
+    }
+
     // check all answers
     let isValid: boolean = true;
     const answers: IAnswerData[] = (this.value[flatQuestion.data.variable] || []);

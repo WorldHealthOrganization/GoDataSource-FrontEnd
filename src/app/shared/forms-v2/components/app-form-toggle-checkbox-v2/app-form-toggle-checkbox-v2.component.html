@@ -38,6 +38,16 @@
       {{placeholder | translate}}
     </span>
 
+    <!-- Right - Icon buttons -->
+    <button
+      *ngFor="let iconB of suffixIconButtons"
+      tabindex="-1"
+      type="button"
+      mat-icon-button
+      matSuffix
+      [matTooltip]="iconB.tooltip | translate"
+      (click)="iconButtonClick($event, iconB)"><mat-icon>{{iconB.icon}}</mat-icon></button>
+
   </mat-button-toggle>
 
   <!-- View only -->

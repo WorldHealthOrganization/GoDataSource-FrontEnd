@@ -12,6 +12,10 @@ export const EnglishUsLang = {
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
     'LNG_PAGE_LIST_FOLLOW_UPS_VIEW_PERSON_FOLLOW_UPS_FORM_BUTTON': 'View "{{name}}" follow-ups',
+    'LNG_EVENT_FIELD_LABEL_CHOOSE_ADDRESS': 'Choose address',
+    'LNG_PAGE_TEAMS_WORKLOAD_DATE_LABEL': 'Date',
+    'LNG_PAGE_TEAMS_WORKLOAD_NO_DATA_LABEL': '* If a date is missing from header columns, it means that there is no data for that date',
+    'LNG_PAGE_LIST_DUPLICATE_RECORDS_WARNING_NO_ACTIVE_OUTBREAK': 'To merge duplicates selected outbreak must be active',
     'LNG_PAGE_DASHBOARD_EPI_CURVE_EXPORT_FORMAT': 'Export format',
     'LNG_COMMON_LABEL_EXPORT_FORMAT_SINGLE_PAGE': 'Single-page format',
     'LNG_COMMON_LABEL_EXPORT_FORMAT_MULTI_PAGE': 'Multi-page format'

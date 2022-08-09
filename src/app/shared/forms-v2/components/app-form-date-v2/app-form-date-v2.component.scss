@@ -119,18 +119,33 @@
 
         /* Form input suffix */
         .mat-form-field-suffix {
+          @include flex(flex);
+          @include flex_align_items(center);
           top: 0.6rem;
+
+          .mat-icon-button {
+            font-size: 1.6rem;
+            height: 2.4rem;
+            min-width: 0;
+            padding: 0;
+            width: 2.4rem;
+
+            .mat-icon {
+              color: rgba(var(--gd-text-rgb), 0.75);
+              font-size: 1.6rem;
+              height: 1.6rem;
+              line-height: 1;
+              text-align: center;
+            }
+          }
 
           .mat-datepicker-toggle {
             color: var(--gd-secondary);
+            margin-right: 0.4rem;
 
             .mat-icon-button {
               background: transparent;
               font-size: 2rem;
-              height: 2.4rem;
-              min-width: 0;
-              padding: 0;
-              width: 2.4rem;
 
               svg {
                 @include svg(var(--gd-secondary));
@@ -212,6 +227,11 @@
           }
   
           .mat-form-field-suffix {
+            .mat-icon-button {
+              background-color: rgba(var(--gd-secondary-rgb), 0.15);
+              color: var(--gd-secondary);
+            }
+
             .mat-icon {
               color: var(--gd-secondary);
             }

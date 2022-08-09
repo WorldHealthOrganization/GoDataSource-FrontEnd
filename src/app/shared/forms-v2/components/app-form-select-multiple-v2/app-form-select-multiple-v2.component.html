@@ -134,24 +134,27 @@
         *ngIf="value">
 
         <!-- Options -->
-        <mat-option
-          *ngFor="let selectedValue of value"
-          style="height: 0; display: none;"
-          [value]="selectedValue">
+        <ng-container
+          *ngFor="let selectedValue of value">
+          <mat-option
+            *ngIf="allOptionsMap[selectedValue]"
+            style="height: 0; display: none;"
+            [value]="selectedValue">
 
-          <!-- Icon -->
-          <mat-icon
-            *ngIf="allOptionsMap[selectedValue]?.icon">{{allOptionsMap[selectedValue].icon}}</mat-icon>
+            <!-- Icon -->
+            <mat-icon
+              *ngIf="allOptionsMap[selectedValue].icon">{{allOptionsMap[selectedValue].icon}}</mat-icon>
 
-          <!-- Image -->
-          <img
-            *ngIf="allOptionsMap[selectedValue]?.iconUrl"
-            [src]="allOptionsMap[selectedValue]?.iconUrl"/>
+            <!-- Image -->
+            <img
+              *ngIf="allOptionsMap[selectedValue].iconUrl"
+              [src]="allOptionsMap[selectedValue].iconUrl"/>
 
-          <!-- Label -->
-          {{allOptionsMap[selectedValue]?.label}}
+            <!-- Label -->
+            {{allOptionsMap[selectedValue].label}}
 
-        </mat-option>
+          </mat-option>
+        </ng-container>
 
       </ng-container>
 
