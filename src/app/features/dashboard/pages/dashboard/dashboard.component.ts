@@ -529,6 +529,7 @@ export class DashboardComponent implements OnDestroy {
       });
   }
 
+  // #TODO: Exported PDF it's not stretching/shrinking correspondly
   /**
    * Get Epi curve dashlet
    */
