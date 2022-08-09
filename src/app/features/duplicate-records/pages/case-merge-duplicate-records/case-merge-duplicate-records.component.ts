@@ -1373,9 +1373,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
         )
         .subscribe((item) => {
           // success creating / updating event
-          this.toastV2Service.success(
-            'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_MERGE_CASES_SUCCESS_MESSAGE'
-          );
+          this.toastV2Service.success('LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_MERGE_CASES_SUCCESS_MESSAGE');
 
           // finished with success
           finished(undefined, item);

@@ -2358,8 +2358,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         )
         .subscribe(() => {
           // success message
-          this.toastV2Service.success(
-            'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
+          this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
 
           // close popup
           response.handler.hide();

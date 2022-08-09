@@ -357,9 +357,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
         )
         .subscribe((item) => {
           // success creating / updating event
-          this.toastV2Service.success(
-            'LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_MERGE_EVENTS_SUCCESS_MESSAGE'
-          );
+          this.toastV2Service.success('LNG_PAGE_EVENT_MERGE_DUPLICATE_RECORDS_MERGE_EVENTS_SUCCESS_MESSAGE');
 
           // finished with success
           finished(undefined, item);
