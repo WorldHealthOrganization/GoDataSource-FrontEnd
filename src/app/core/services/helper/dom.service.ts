@@ -101,7 +101,6 @@ export class DomService {
       const svg = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
       const url = DOMURL.createObjectURL(svg);
       img.onload = function() {
-        // context.drawImage(img, 0, 0, render.width, render.height);
         context.drawImage(img, 0, 0, render.width, render.height);
         const png = canvas.toDataURL('image/png');
         DOMURL.revokeObjectURL(png);
