@@ -2,10 +2,8 @@
 import { YesNoLabelComponent } from './yes-no-label/yes-no-label.component';
 import { ReferenceDataLabelComponent } from './reference-data-label/reference-data-label.component';
 import { ChronologyComponent } from './chronology/chronology.component';
-import { LocationBreadcrumbsComponent } from './location-breadcrumbs/location-breadcrumbs.component';
 import { FormRelationshipQuickComponent } from './form-relationship-quick/form-relationship-quick.component';
 import { FormContactQuickComponent } from './form-contact-quick/form-contact-quick.component';
-import { NumberOfItemsLabelComponent } from './number-of-items-label/number-of-items-label.component';
 import { HoverRowActionsComponent } from './hover-row-actions/hover-row-actions.component';
 import { FormCaseQuickComponent } from './form-case-quick/form-case-quick.component';
 import { FormEventQuickComponent } from './form-event-quick/form-event-quick.component';
@@ -31,11 +29,9 @@ export const components: any[] = [
   // display information
   YesNoLabelComponent,
   ReferenceDataLabelComponent,
-  LocationBreadcrumbsComponent,
   ChronologyComponent,
 
   // general
-  NumberOfItemsLabelComponent,
   FancyTooltipComponent,
 
   // layout extensions
