@@ -29,12 +29,13 @@ export class DomService {
 
   /**
      * Convert SVG to PNG image
-     * @param selector
-     * @param splitFactor
-     * @param tempCanvasSelector
-     * @returns {Observable<string>}
      */
-  getPNGBase64(selector: string, tempCanvasSelector: string, splitFactor: number = 1, exportFormat?: boolean): Observable<string> {
+  getPNGBase64(
+    selector: string,
+    tempCanvasSelector: string,
+    splitFactor: number = 1,
+    exportAsSinglePage?: boolean
+  ): Observable<string> {
     return new Observable((observer) => {
       // server page size
       const pageSize = {
@@ -63,7 +64,7 @@ export class DomService {
       const render: any = {};
 
       // single page format?
-      if (exportFormat) {
+      if (exportAsSinglePage) {
         // change resizing logic
         if (imageAspectRatio > 1) {
           render.height = graphContainerSVGHeight * (pageSize.width / graphContainerSVGWidth) * splitFactor;
@@ -75,7 +76,7 @@ export class DomService {
           }
         }
       } else {
-      // check image format (landscape or portrait)
+        // check image format (landscape or portrait)
         if (imageAspectRatio > 1) {
         // landscape mode; enlarge the image vertically, to match the height of the page
           render.width = pageSize.height * splitFactor * imageAspectRatio;

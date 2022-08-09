@@ -541,19 +541,20 @@ export class DashboardComponent implements OnDestroy {
       },
 
       // inputs
+      hideInputFilter: true,
       inputs: [
         {
           type: V2SideDialogConfigInputType.TOGGLE,
-          value: Constants.EXPORT_FORMAT_OPTIONS.MULTI_PAGE.value,
+          value: false,
           name: 'exportFormat',
           options: [
             {
-              label: Constants.EXPORT_FORMAT_OPTIONS.MULTI_PAGE.label,
-              value: Constants.EXPORT_FORMAT_OPTIONS.MULTI_PAGE.value
+              label: 'LNG_COMMON_LABEL_EXPORT_FORMAT_MULTI_PAGE',
+              value: false
             },
             {
-              label: Constants.EXPORT_FORMAT_OPTIONS.SINGLE_PAGE.label,
-              value: Constants.EXPORT_FORMAT_OPTIONS.SINGLE_PAGE.value
+              label: 'LNG_COMMON_LABEL_EXPORT_FORMAT_SINGLE_PAGE',
+              value: true
             }
           ]
         }
@@ -581,11 +582,18 @@ export class DashboardComponent implements OnDestroy {
         return;
       }
 
-      const exportFormat: boolean = (response.data.map.exportFormat as IV2SideDialogConfigInputToggle).value as boolean;
+      // determine export format
+      const exportAsSinglePage: boolean = (response.data.map.exportFormat as IV2SideDialogConfigInputToggle).value as boolean;
 
+      // export
       const loading = this.dialogV2Service.showLoadingDialog();
       this.domService
-        .getPNGBase64(selector, '#tempCanvas', 1, exportFormat)
+        .getPNGBase64(
+          selector,
+          '#tempCanvas',
+          1,
+          exportAsSinglePage
+        )
         .subscribe((pngBase64) => {
           // object not found ?
           if (!pngBase64) {

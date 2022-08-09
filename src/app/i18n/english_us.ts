@@ -17,8 +17,8 @@ export const EnglishUsLang = {
     'LNG_PAGE_TEAMS_WORKLOAD_NO_DATA_LABEL': '* If a date is missing from header columns, it means that there is no data for that date',
     'LNG_PAGE_LIST_DUPLICATE_RECORDS_WARNING_NO_ACTIVE_OUTBREAK': 'To merge duplicates selected outbreak must be active',
     'LNG_PAGE_DASHBOARD_EPI_CURVE_EXPORT_FORMAT': 'Export format',
-    'LNG_COMMON_LABEL_EXPORT_FORMAT_SINGLE_PAGE': 'Single-page format',
-    'LNG_COMMON_LABEL_EXPORT_FORMAT_MULTI_PAGE': 'Multi-page format'
+    'LNG_COMMON_LABEL_EXPORT_FORMAT_SINGLE_PAGE': 'Single-page',
+    'LNG_COMMON_LABEL_EXPORT_FORMAT_MULTI_PAGE': 'Multi-page'
 
 
     /**
