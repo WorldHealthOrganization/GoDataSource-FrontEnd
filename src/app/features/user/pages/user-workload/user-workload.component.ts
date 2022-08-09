@@ -8,7 +8,6 @@ import { Constants } from '../../../../core/models/constants';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import * as _ from 'lodash';
-import { FormDateRangeSliderData } from '../../../../shared/xt-forms/components/form-date-range-slider/form-date-range-slider.component';
 import { Subscription } from 'rxjs';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { UserModel } from '../../../../core/models/user.model';
@@ -52,7 +51,7 @@ export class UserWorkloadComponent extends ListComponent<any> implements OnInit,
     };
 
   // Slider Date Filter Value
-  sliderDateFilterValue: FormDateRangeSliderData;
+  sliderDateFilterValue: any; // FormDateRangeSliderData;
 
   getSelectedOutbreakSubject: Subscription;
 
@@ -110,10 +109,14 @@ export class UserWorkloadComponent extends ListComponent<any> implements OnInit,
               this.slideFilterData.minDate = moment(this.selectedOutbreak.startDate).startOf('day');
               this.slideFilterData.maxDate = moment().add(1, 'days').endOf('day');
               this.slideFilterData.maxRange = this.selectedOutbreak.periodOfFollowup;
-              this.sliderDateFilterValue = new FormDateRangeSliderData({
+              // this.sliderDateFilterValue = new FormDateRangeSliderData({
+              //   low: moment().add(-this.selectedOutbreak.periodOfFollowup + 1, 'days').startOf('day'),
+              //   high: moment().add(1, 'days').endOf('day')
+              // });
+              this.sliderDateFilterValue = {
                 low: moment().add(-this.selectedOutbreak.periodOfFollowup + 1, 'days').startOf('day'),
                 high: moment().add(1, 'days').endOf('day')
-              });
+              };
             } else {
               // hide loading
               this.displayLoading = false;
@@ -318,7 +321,8 @@ export class UserWorkloadComponent extends ListComponent<any> implements OnInit,
   /**
      * Filter by slider value
      */
-  filterByDateRange(value: FormDateRangeSliderData) {
+  // filterByDateRange(value: FormDateRangeSliderData) {
+  filterByDateRange(value: any) {
     // set the new value
     this.sliderDateFilterValue = value;
 

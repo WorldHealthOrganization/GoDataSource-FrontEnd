@@ -32,7 +32,6 @@ import { ModelHelperService } from './helper/model-helper.service';
 import { FormHelperService } from './helper/form-helper.service';
 import { I18nService } from './helper/i18n.service';
 import { CacheService } from './helper/cache.service';
-import { DialogService } from './helper/dialog.service';
 import { DomService } from './helper/dom.service';
 import { AuthGuard } from './guards/auth-guard.service';
 import { PasswordChangeGuard } from './guards/password-change-guard.service';
@@ -285,7 +284,6 @@ export const services: any[] = [
   FormHelperService,
   I18nService,
   CacheService,
-  DialogService,
   DialogV2Service,
   DomService,
   EntityFollowUpHelperService,

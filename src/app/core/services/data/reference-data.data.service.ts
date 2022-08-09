@@ -2,11 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { ModelHelperService } from '../helper/model-helper.service';
-import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../models/reference-data.model';
+import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../models/reference-data.model';
 import { CacheKey, CacheService } from '../helper/cache.service';
 import * as _ from 'lodash';
 import { RequestQueryBuilder, RequestSortDirection } from '../../helperClasses/request-query-builder';
-import { LabelValuePair } from '../../models/label-value-pair';
 import { map, mergeMap, share, tap } from 'rxjs/operators';
 import { I18nService } from '../helper/i18n.service';
 import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
@@ -103,29 +102,6 @@ export class ReferenceDataDataService {
         map((entries) => {
           // find the category
           return _.find(entries, { id: categoryId });
-        })
-      );
-  }
-
-  /**
-     * Retrieve the list of Reference Data Entries for a specific Category mapped as LabelValuePair
-     * @param {ReferenceDataCategory} categoryId
-     * @returns {Observable<ReferenceDataCategoryModel>}
-     */
-  getReferenceDataByCategoryAsLabelValue(categoryId: ReferenceDataCategory): Observable<LabelValuePair[]> {
-    return this.getReferenceDataByCategory(categoryId)
-      .pipe(
-        map((data: ReferenceDataCategoryModel) => {
-          return _.map(_.get(data, 'entries'), (entry: ReferenceDataEntryModel) =>
-            new LabelValuePair(
-              entry.value,
-              entry.id,
-              !entry.active,
-              entry.active,
-              entry.iconUrl,
-              entry.description
-            )
-          );
         })
       );
   }

@@ -23,7 +23,6 @@ import { catchError, tap } from 'rxjs/operators';
 import { Moment, moment } from '../../../../core/helperClasses/x-moment';
 import { WorldMapComponent, WorldMapMarker, WorldMapMarkerLayer, WorldMapMarkerType, WorldMapPath, WorldMapPathType, WorldMapPoint } from '../../../../common-modules/world-map/components/world-map/world-map.component';
 import { UserModel } from '../../../../core/models/user.model';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import * as cytoscape from 'cytoscape';
 import * as cola from 'cytoscape-cola';
@@ -264,11 +263,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   mustLoadChain: boolean = true;
 
   // snapshots
-  snapshotOptions: LabelValuePair[];
+  snapshotOptions: ILabelValuePairModel[];
   snapshotOptionsMap: {
     [snapshotID: string]: {
       snapshot: CotSnapshotModel,
-      option: LabelValuePair
+      option: ILabelValuePairModel
     }
   } = {};
   selectedSnapshotCreateKey: string = 'create';
@@ -280,7 +279,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   markers: WorldMapMarker[] = [];
   lines: WorldMapPath[] = [];
   cy: any;
-  transmissionChainViewTypes: LabelValuePair[];
+  transmissionChainViewTypes: ILabelValuePairModel[];
   timelineViewType: string = 'horizontal';
   datesArrayMap: {
     [key: string]: number
@@ -305,15 +304,14 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
   // render method
   renderMethod: string = 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_RENDER_METHOD_FAST';
-  renderMethodOptions = [
-    new LabelValuePair(
-      'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_RENDER_METHOD_FAST',
-      'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_RENDER_METHOD_FAST'
-    ),
-    new LabelValuePair(
-      'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_RENDER_METHOD_PRECISE',
-      'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_RENDER_METHOD_PRECISE'
-    )
+  renderMethodOptions: ILabelValuePairModel[] = [
+    {
+      label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_RENDER_METHOD_FAST',
+      value: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_RENDER_METHOD_FAST'
+    }, {
+      label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_RENDER_METHOD_PRECISE',
+      value: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_RENDER_METHOD_PRECISE'
+    }
   ];
 
   // layout cola - bubble view
@@ -560,10 +558,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     // load view types
     this.genericDataService
       .getTransmissionChainViewTypes()
-      .subscribe((types: LabelValuePair[]): void => {
+      .subscribe((types: ILabelValuePairModel[]): void => {
         // determine items to which we have access
-        const filteredTypes: LabelValuePair[] = [];
-        types.forEach((type: LabelValuePair) => {
+        const filteredTypes: ILabelValuePairModel[] = [];
+        types.forEach((type: ILabelValuePairModel) => {
           if (
             (
               type.value === Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value &&
@@ -717,10 +715,10 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
                   .getSnapshot(this.selectedOutbreak.id, this.snapshotId)
                   .subscribe((entity) => {
                     // create option
-                    const option: LabelValuePair = new LabelValuePair(
-                      this.getSnapshotOptionLabel(entity),
-                      entity.id
-                    );
+                    const option: ILabelValuePairModel = {
+                      label: this.getSnapshotOptionLabel(entity),
+                      value: entity.id
+                    };
 
                     // map snapshot for easy access
                     this.snapshotOptionsMap[entity.id] = {
@@ -2279,18 +2277,18 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       )
       .subscribe((snapshots) => {
         // format snapshots
-        this.snapshotOptions = [new LabelValuePair(
-          'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_OPTION_CREATE_NEW',
-          this.selectedSnapshotCreateKey
-        )];
+        this.snapshotOptions = [{
+          label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_OPTION_CREATE_NEW',
+          value: this.selectedSnapshotCreateKey
+        }];
         this.snapshotOptionsMap = {};
         (snapshots || []).forEach((snapshot) => {
           // create option
-          const option: LabelValuePair = new LabelValuePair(
-            this.getSnapshotOptionLabel(snapshot),
-            snapshot.id,
-            snapshot.status !== Constants.COT_SNAPSHOT_STATUSES.LNG_COT_STATUS_SUCCESS.value
-          );
+          const option: ILabelValuePairModel = {
+            label: this.getSnapshotOptionLabel(snapshot),
+            value: snapshot.id,
+            disabled: snapshot.status !== Constants.COT_SNAPSHOT_STATUSES.LNG_COT_STATUS_SUCCESS.value
+          };
 
           // map snapshot for easy access
           this.snapshotOptionsMap[snapshot.id] = {
