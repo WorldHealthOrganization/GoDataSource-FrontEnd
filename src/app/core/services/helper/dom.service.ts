@@ -34,7 +34,7 @@ export class DomService {
      * @param tempCanvasSelector
      * @returns {Observable<string>}
      */
-  getPNGBase64(selector: string, tempCanvasSelector: string, splitFactor: number = 1): Observable<string> {
+  getPNGBase64(selector: string, tempCanvasSelector: string, splitFactor: number = 1, exportFormat?: boolean): Observable<string> {
     return new Observable((observer) => {
       // server page size
       const pageSize = {
@@ -62,15 +62,29 @@ export class DomService {
       // initialize canvas dimensions
       const render: any = {};
 
-      // check image format (landscape or portrait)
-      if (imageAspectRatio > 1) {
-        // landscape mode; enlarge the image vertically, to match the height of the page
-        render.width = pageSize.height * splitFactor * imageAspectRatio;
-        render.height = pageSize.height * splitFactor;
+      // single page format?
+      if (exportFormat) {
+        // change resizing logic
+        if (imageAspectRatio > 1) {
+          render.height = graphContainerSVGHeight * (pageSize.width / graphContainerSVGWidth) * splitFactor;
+          render.width = pageSize.width;
+        } else {
+          if (graphContainerSVGHeight > pageSize.height) {
+            render.width = graphContainerSVGWidth * (pageSize.height / graphContainerSVGHeight) * splitFactor;
+            render.height = pageSize.height;
+          }
+        }
       } else {
+      // check image format (landscape or portrait)
+        if (imageAspectRatio > 1) {
+        // landscape mode; enlarge the image vertically, to match the height of the page
+          render.width = pageSize.height * splitFactor * imageAspectRatio;
+          render.height = pageSize.height * splitFactor;
+        } else {
         // portrait mode; enlarge the image horizontally, to match the width of the page
-        render.width = pageSize.width * splitFactor;
-        render.height = pageSize.width * splitFactor / imageAspectRatio;
+          render.width = pageSize.width * splitFactor;
+          render.height = pageSize.width * splitFactor / imageAspectRatio;
+        }
       }
 
       // get SVG as string
@@ -87,6 +101,7 @@ export class DomService {
       const svg = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
       const url = DOMURL.createObjectURL(svg);
       img.onload = function() {
+        // context.drawImage(img, 0, 0, render.width, render.height);
         context.drawImage(img, 0, 0, render.width, render.height);
         const png = canvas.toDataURL('image/png');
         DOMURL.revokeObjectURL(png);

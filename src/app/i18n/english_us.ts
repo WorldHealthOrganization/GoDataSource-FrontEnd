@@ -11,7 +11,10 @@ export const EnglishUsLang = {
      */
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
-    'LNG_PAGE_LIST_FOLLOW_UPS_VIEW_PERSON_FOLLOW_UPS_FORM_BUTTON': 'View "{{name}}" follow-ups'
+    'LNG_PAGE_LIST_FOLLOW_UPS_VIEW_PERSON_FOLLOW_UPS_FORM_BUTTON': 'View "{{name}}" follow-ups',
+    'LNG_PAGE_DASHBOARD_EPI_CURVE_EXPORT_FORMAT': 'Export format',
+    'LNG_COMMON_LABEL_EXPORT_FORMAT_SINGLE_PAGE': 'Single-page format',
+    'LNG_COMMON_LABEL_EXPORT_FORMAT_MULTI_PAGE': 'Multi-page format'
 
 
     /**

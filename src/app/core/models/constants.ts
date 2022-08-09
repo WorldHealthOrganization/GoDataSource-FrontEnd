@@ -469,6 +469,18 @@ export class Constants {
     }
   };
 
+  // Export format
+  static EXPORT_FORMAT_OPTIONS = {
+    SINGLE_PAGE: {
+      label: 'LNG_COMMON_LABEL_EXPORT_FORMAT_SINGLE_PAGE',
+      value: true
+    },
+    MULTI_PAGE: {
+      label: 'LNG_COMMON_LABEL_EXPORT_FORMAT_MULTI_PAGE',
+      value: false
+    }
+  };
+
   static PROGRESS_OPTIONS = {
     IN_PROGRESS: {
       label: 'LNG_PROGRESS_OPTION_LABEL_IN_PROGRESS',
