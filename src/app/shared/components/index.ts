@@ -9,8 +9,6 @@ import { FormRelationshipQuickComponent } from './form-relationship-quick/form-r
 import { FormContactQuickComponent } from './form-contact-quick/form-contact-quick.component';
 import { NumberOfItemsLabelComponent } from './number-of-items-label/number-of-items-label.component';
 import { HoverRowActionsComponent } from './hover-row-actions/hover-row-actions.component';
-import { FormLocationIdentifierListComponent } from './form-location-identifier-list/form-location-identifier-list.component';
-import { FormLocationIdentifierComponent } from './form-location-identifier/form-location-identifier.component';
 import { FormCaseQuickComponent } from './form-case-quick/form-case-quick.component';
 import { FormEventQuickComponent } from './form-event-quick/form-event-quick.component';
 import { ListItemLabelComponent } from './list-item-label/list-item-label.component';
@@ -33,8 +31,6 @@ export const components: any[] = [
   FormContactOfContactQuickComponent,
   FormCaseQuickComponent,
   FormEventQuickComponent,
-  FormLocationIdentifierListComponent,
-  FormLocationIdentifierComponent,
   HotTableWrapperComponent,
 
   // display information
