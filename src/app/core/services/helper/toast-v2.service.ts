@@ -215,7 +215,15 @@ export class ToastV2Service {
 
         // add toast to list of maps to easily hide it later
         if (messageId) {
+          // map
           ToastV2Service.TOASTS[messageId] = toast.toastId;
+
+          // handle tap - hide toast
+          toast.onTap.subscribe((function(service: ToastV2Service, localMessageId: string) {
+            return () => {
+              service.hide(localMessageId);
+            };
+          })(this, messageId));
         }
       });
   }
