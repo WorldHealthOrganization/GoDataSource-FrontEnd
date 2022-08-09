@@ -13,10 +13,9 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 import { UserModel } from '../../../../core/models/user.model';
 import { LocationDataService } from '../../../../core/services/data/location.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { ExportDataExtension } from '../../../../core/services/helper/dialog.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
-import { ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
+import { ExportDataExtension, ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';

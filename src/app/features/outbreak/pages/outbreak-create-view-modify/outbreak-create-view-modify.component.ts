@@ -25,7 +25,6 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { MapServerModel } from '../../../../core/models/map-server.model';
 import * as _ from 'lodash';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
@@ -781,10 +780,10 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
                     // set style options
                     input.styleSourceOptions[url] = [];
                     Object.keys(glStyle.sources).forEach((source: string) => {
-                      input.styleSourceOptions[url].push(new LabelValuePair(
-                        source,
-                        source
-                      ));
+                      input.styleSourceOptions[url].push({
+                        label: source,
+                        value: source
+                      });
                     });
 
                     // select the first source
