@@ -9,7 +9,6 @@ import { NumberOfItemsLabelComponent } from './number-of-items-label/number-of-i
 import { HoverRowActionsComponent } from './hover-row-actions/hover-row-actions.component';
 import { FormCaseQuickComponent } from './form-case-quick/form-case-quick.component';
 import { FormEventQuickComponent } from './form-event-quick/form-event-quick.component';
-import { ListItemLabelComponent } from './list-item-label/list-item-label.component';
 import { HotTableWrapperComponent } from './hot-table-wrapper/hot-table-wrapper.component';
 import { FormContactOfContactQuickComponent } from './form-contact-of-contact-quick/form-contact-of-contact-quick.component';
 import { FancyTooltipComponent } from './fancy-tooltip/fancy-tooltip.component';
@@ -31,7 +30,6 @@ export const components: any[] = [
 
   // display information
   YesNoLabelComponent,
-  ListItemLabelComponent,
   ReferenceDataLabelComponent,
   LocationBreadcrumbsComponent,
   ChronologyComponent,
