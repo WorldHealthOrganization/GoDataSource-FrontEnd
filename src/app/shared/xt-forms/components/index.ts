@@ -2,10 +2,8 @@ import { FormValidationComponent } from './form-validation/form-validation.compo
 import { FormInputComponent } from './form-input/form-input.component';
 import { FormTextareaComponent } from './form-textarea/form-textarea.component';
 import { FormSelectComponent } from './form-select/form-select.component';
-import { FormDatepickerComponent } from './form-datepicker/form-datepicker.component';
 import { FormSlideToggleComponent } from './form-slide-toggle/form-slide-toggle.component';
 import { FormCheckboxComponent } from './form-checkbox/form-checkbox.component';
-import { FormDaterangeComponent } from './form-daterange/form-daterange.component';
 import { FormRadioComponent } from './form-radio/form-radio.component';
 import { FormHiddenInputComponent } from './form-hidden-input/form-hidden-input.component';
 import { FormSelectGroupsComponent } from './form-select-groups/form-select-groups.component';
@@ -18,10 +16,8 @@ export const components: any[] = [
   FormTextareaComponent,
   FormSelectComponent,
   FormSelectVscrollComponent,
-  FormDatepickerComponent,
   FormSlideToggleComponent,
   FormCheckboxComponent,
-  FormDaterangeComponent,
   FormRadioComponent,
   FormHiddenInputComponent,
   FormSelectGroupsComponent,

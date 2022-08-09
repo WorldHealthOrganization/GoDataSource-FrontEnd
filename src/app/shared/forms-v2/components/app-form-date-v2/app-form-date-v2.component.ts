@@ -15,8 +15,21 @@ import { MAT_MOMENT_DATE_ADAPTER_OPTIONS } from '@angular/material-moment-adapte
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
 import { CustomDateAdapter } from '../../../angular-material/adapter/custom-date-adapter';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { DEFAULT_FORMAT } from '../../../xt-forms/components/form-datepicker/form-datepicker.component';
 import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
+import { Constants } from '../../../../core/models/constants';
+
+// Define format to be used into datepicker
+const DEFAULT_FORMAT = {
+  parse: {
+    dateInput: Constants.DEFAULT_DATE_DISPLAY_FORMAT
+  },
+  display: {
+    dateInput: Constants.DEFAULT_DATE_DISPLAY_FORMAT,
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY'
+  }
+};
 
 @Component({
   selector: 'app-form-date-v2',
