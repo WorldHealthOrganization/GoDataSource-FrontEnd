@@ -1,8 +1,8 @@
 <app-basic-page-v2
   [breadcrumbs]="breadcrumbs">
-    <ul class="device-history">
-        <li *ngFor="let historyItem of deviceHistoryList">
-            {{ historyItem.status | translate }} - {{ historyItem.createdAt | dateTimeDefault }}
-        </li>
-    </ul>
+  <ul class="device-history">
+    <li *ngFor="let historyItem of deviceHistoryList">
+      {{ historyItem.status | translate }} - {{ historyItem.createdAt | dateTimeDefault }}
+    </li>
+  </ul>
 </app-basic-page-v2>
