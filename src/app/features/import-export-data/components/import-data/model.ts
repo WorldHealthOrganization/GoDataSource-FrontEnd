@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 export enum ImportDataExtension {
   CSV = '.csv',
@@ -378,7 +378,7 @@ export class ImportableMapField {
 
   // read-only values
   private _readOnlyValues: {
-    [id: string]: LabelValuePair[]
+    [id: string]: ILabelValuePairModel[]
   } = {};
 
   // item is readonly (required fields) ?
@@ -509,7 +509,7 @@ export class ImportableMapField {
   /**
      * Get options
      */
-  getOptionsForReadOnlySource(option: IMappedOption): LabelValuePair[] {
+  getOptionsForReadOnlySource(option: IMappedOption): ILabelValuePairModel[] {
     // if not readonly, then there is no point in constructing a list of label / values since it should exist in the main dropdown options
     if (!option.readOnly) {
       return [];
@@ -518,14 +518,12 @@ export class ImportableMapField {
     // do we need to init / re-init the options ?
     if (
       !this._readOnlyValues[option.id] ||
-            this._readOnlyValues[option.id][0].value !== option.sourceOption
+      this._readOnlyValues[option.id][0].value !== option.sourceOption
     ) {
-      this._readOnlyValues[option.id] = [
-        new LabelValuePair(
-          option.sourceOption,
-          option.sourceOption
-        )
-      ];
+      this._readOnlyValues[option.id] = [{
+        label: option.sourceOption,
+        value: option.sourceOption
+      }];
     }
 
     // finished

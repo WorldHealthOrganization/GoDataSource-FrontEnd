@@ -7,7 +7,6 @@ import * as _ from 'lodash';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { v4 as uuid } from 'uuid';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { SavedImportMappingService } from '../../../../core/services/data/saved-import-mapping.data.service';
 import { ISavedImportMappingModel, SavedImportField, SavedImportMappingModel, SavedImportOption } from '../../../../core/models/saved-import-mapping.model';
 import { Observable, Subscriber, throwError } from 'rxjs';
@@ -36,6 +35,7 @@ import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputText, IV2SideDia
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { IV2LoadingDialogHandler } from '../../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
 import { ILocation } from '../../../../shared/forms-v2/core/app-form-location-base-v2';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 export enum ImportServerModelNames {
   CASE_LAB_RESULTS = 'labResult',
@@ -294,7 +294,7 @@ export class ImportDataComponent
   importableObject: ImportableFileModel;
 
   // Source / Destination level value
-  possibleSourceDestinationLevels: LabelValuePair[];
+  possibleSourceDestinationLevels: ILabelValuePairModel[];
 
   // search filters
   @ViewChild('filterBySourceInput') filterBySourceInput: NgModel;
@@ -682,10 +682,10 @@ export class ImportDataComponent
     // init array levels
     this.possibleSourceDestinationLevels = [];
     for (let level = 0; level < 100; level++) {
-      this.possibleSourceDestinationLevels.push(new LabelValuePair(
-        (level + 1).toString(),
-        level
-      ));
+      this.possibleSourceDestinationLevels.push({
+        label: (level + 1).toString(),
+        value: level
+      });
     }
 
     // init uploader
@@ -1261,7 +1261,7 @@ export class ImportDataComponent
             // map all determined levels
             _.each(
               this.possibleSourceDestinationLevels,
-              (supportedLevel: LabelValuePair) => {
+              (supportedLevel: ILabelValuePairModel) => {
                 if (
                   (mappedHeaderObj = mappedHeaders[_.camelCase(`${parentPath}.${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`).toLowerCase()]) ||
                                     (mappedHeaderObj = mappedHeaders[_.camelCase(`${this.i18nService.instant(value)}[${this.i18nService.instant(supportedLevel.label)}]`).toLowerCase()]) || (
@@ -2633,7 +2633,7 @@ export class ImportDataComponent
   setMapOptionValue(
     mappedOpt: IMappedOption,
     source: boolean,
-    data: ImportableLabelValuePair | LabelValuePair
+    data: ImportableLabelValuePair | ILabelValuePairModel
   ): void {
     // set source option
     if (source) {

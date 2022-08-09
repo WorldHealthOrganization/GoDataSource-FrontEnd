@@ -4,16 +4,14 @@ import { HotTableWrapperComponent } from '../../../../shared/components/hot-tabl
 import { ActivatedRoute, Router } from '@angular/router';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { catchError, share } from 'rxjs/operators';
 import * as _ from 'lodash';
-import { Observable, Subscription, throwError } from 'rxjs';
+import { Observable, of, Subscription, throwError } from 'rxjs';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
 import { UserModel } from '../../../../core/models/user.model';
 import { DateSheetColumn, DropdownSheetColumn, IntegerSheetColumn, LocationSheetColumn, NumericSheetColumn, TextSheetColumn } from '../../../../core/models/sheet/sheet.model';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
@@ -29,6 +27,8 @@ import { IV2ActionIconLabel, V2ActionType } from '../../../../shared/components-
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { CellProperties } from 'handsontable/settings';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 
 @Component({
   selector: 'app-bulk-create-contacts-of-contacts',
@@ -48,17 +48,17 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
   relatedEntityId: string;
 
   // contact options
-  genderList$: Observable<LabelValuePair[]>;
-  occupationsList$: Observable<LabelValuePair[]>;
-  riskLevelsList$: Observable<LabelValuePair[]>;
-  documentTypesList$: Observable<LabelValuePair[]>;
+  genderList$: Observable<ILabelValuePairModel[]>;
+  occupationsList$: Observable<ILabelValuePairModel[]>;
+  riskLevelsList$: Observable<ILabelValuePairModel[]>;
+  documentTypesList$: Observable<ILabelValuePairModel[]>;
 
   // relationship options
-  certaintyLevelOptions$: Observable<LabelValuePair[]>;
-  exposureTypeOptions$: Observable<LabelValuePair[]>;
-  exposureFrequencyOptions$: Observable<LabelValuePair[]>;
-  exposureDurationOptions$: Observable<LabelValuePair[]>;
-  socialRelationshipOptions$: Observable<LabelValuePair[]>;
+  certaintyLevelOptions$: Observable<ILabelValuePairModel[]>;
+  exposureTypeOptions$: Observable<ILabelValuePairModel[]>;
+  exposureFrequencyOptions$: Observable<ILabelValuePairModel[]>;
+  exposureDurationOptions$: Observable<ILabelValuePairModel[]>;
+  socialRelationshipOptions$: Observable<ILabelValuePairModel[]>;
 
   relatedEntityData: ContactModel;
 
@@ -94,12 +94,11 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
    */
   constructor(
     private router: Router,
-    private route: ActivatedRoute,
+    private activatedRoute: ActivatedRoute,
     private contactDataService: ContactDataService,
     private contactsOfContactsDataService: ContactsOfContactsDataService,
     private outbreakDataService: OutbreakDataService,
     private toastV2Service: ToastV2Service,
-    private referenceDataDataService: ReferenceDataDataService,
     private i18nService: I18nService,
     private dialogV2Service: DialogV2Service,
     private authDataService: AuthDataService
@@ -115,21 +114,21 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
     this.authUser = this.authDataService.getAuthenticatedUser();
 
     // reference data
-    this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
-    this.occupationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.OCCUPATION).pipe(share());
-    this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).pipe(share());
-    this.documentTypesList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.DOCUMENT_TYPE).pipe(share());
-    this.certaintyLevelOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CERTAINTY_LEVEL).pipe(share());
-    this.exposureTypeOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_TYPE).pipe(share());
-    this.exposureFrequencyOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_FREQUENCY).pipe(share());
-    this.exposureDurationOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.EXPOSURE_DURATION).pipe(share());
-    this.socialRelationshipOptions$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CONTEXT_OF_TRANSMISSION).pipe(share());
+    this.genderList$ = of((this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
+    this.occupationsList$ = of((this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
+    this.riskLevelsList$ = of((this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
+    this.documentTypesList$ = of((this.activatedRoute.snapshot.data.documentType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
+    this.certaintyLevelOptions$ = of((this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
+    this.exposureTypeOptions$ = of((this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
+    this.exposureFrequencyOptions$ = of((this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
+    this.exposureDurationOptions$ = of((this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
+    this.socialRelationshipOptions$ = of((this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
 
     // configure Sheet widget
     this.configureSheetWidget();
 
     // retrieve query params
-    this.route.queryParams
+    this.activatedRoute.queryParams
       .subscribe((params: { entityId }) => {
         this.relatedEntityId = _.get(params, 'entityId');
 

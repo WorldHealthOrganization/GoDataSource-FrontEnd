@@ -4,9 +4,9 @@ import { SheetCellType } from './sheet-cell-type';
 import { SheetCellValidationType } from './sheet-cell-validation-type';
 import { map } from 'rxjs/operators';
 import { Moment } from '../../helperClasses/x-moment';
-import { LabelValuePair } from '../label-value-pair';
 import { CellProperties } from 'handsontable/settings';
 import { LocationModel } from '../location.model';
+import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
 
 export type SheetColumnAsyncValidator = (value: string | number, cellProperties: CellProperties, callback: (result: boolean) => void) => void;
 
@@ -151,7 +151,7 @@ export class IntegerSheetColumn extends NumericSheetColumn {
  */
 export class DropdownSheetColumn extends AbstractSheetColumn {
   // list of options for dropdown
-  public options$: Observable<LabelValuePair[]>;
+  public options$: Observable<ILabelValuePairModel[]>;
   // list of translated labels to be used as dropdown options ('handsontable' expects a list of strings)
   public optionLabels$: Observable<string[]>;
 
@@ -169,7 +169,7 @@ export class DropdownSheetColumn extends AbstractSheetColumn {
    * Set Options
    */
   setOptions(
-    options$: Observable<LabelValuePair[]>,
+    options$: Observable<ILabelValuePairModel[]>,
     i18nService,
     idTranslatesToLabel: boolean = true
   ) {

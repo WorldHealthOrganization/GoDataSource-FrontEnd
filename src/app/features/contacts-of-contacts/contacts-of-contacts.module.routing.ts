@@ -113,7 +113,18 @@ const routes: Routes = [
     },
     canDeactivate: [
       PageChangeConfirmationGuard
-    ]
+    ],
+    resolve: {
+      gender: GenderDataResolver,
+      occupation: OccupationDataResolver,
+      risk: RiskDataResolver,
+      documentType: DocumentTypeDataResolver,
+      certaintyLevel: CertaintyLevelDataResolver,
+      exposureType: ExposureTypeDataResolver,
+      exposureFrequency: ExposureFrequencyDataResolver,
+      exposureDuration: ExposureDurationDataResolver,
+      contextOfTransmission: ContextOfTransmissionDataResolver
+    }
   },
   // Bulk Modify Contacts of Contacts
   {
@@ -127,7 +138,12 @@ const routes: Routes = [
     },
     canDeactivate: [
       PageChangeConfirmationGuard
-    ]
+    ],
+    resolve: {
+      gender: GenderDataResolver,
+      occupation: OccupationDataResolver,
+      risk: RiskDataResolver
+    }
   },
   // View Contact of contact movement
   {
