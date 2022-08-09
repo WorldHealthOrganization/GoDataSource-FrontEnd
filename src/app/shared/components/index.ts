@@ -1,5 +1,4 @@
 // import each component
-import { FormRangeComponent } from './form-range/form-range.component';
 import { FormRelationshipComponent } from './form-relationship/form-relationship.component';
 import { YesNoLabelComponent } from './yes-no-label/yes-no-label.component';
 import { ReferenceDataLabelComponent } from './reference-data-label/reference-data-label.component';
@@ -24,7 +23,6 @@ export * from './hover-row-actions/hover-row-actions.component';
 // export the list of all components
 export const components: any[] = [
   // inputs
-  FormRangeComponent,
   FormRelationshipComponent,
   FormRelationshipQuickComponent,
   FormContactQuickComponent,
