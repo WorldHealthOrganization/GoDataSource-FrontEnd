@@ -785,6 +785,15 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       data,
       finished
     ) => {
+      // append variant / strain data
+      if (data.sequence) {
+        data.sequence = Object.assign(
+          {},
+          this.itemData.sequence,
+          data.sequence
+        );
+      }
+
       // finished
       (type === CreateViewModifyV2ActionType.CREATE ?
         this.labResultDataService.createLabResult(
