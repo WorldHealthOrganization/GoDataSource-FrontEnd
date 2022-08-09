@@ -538,9 +538,7 @@ export class EventsListComponent
                             })
                           )
                           .subscribe(() => {
-                            this.toastV2Service.success(
-                              'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_SUCCESS_MESSAGE'
-                            );
+                            this.toastV2Service.success('LNG_PAGE_LIST_EVENTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // hide loading
                             loading.close();
@@ -740,9 +738,7 @@ export class EventsListComponent
                           )
                           .subscribe(() => {
                             // success
-                            this.toastV2Service.success(
-                              'LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_SUCCESS_MESSAGE'
-                            );
+                            this.toastV2Service.success('LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_SUCCESS_MESSAGE');
 
                             // hide loading
                             loading.close();
