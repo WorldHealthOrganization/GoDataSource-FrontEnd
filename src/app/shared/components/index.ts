@@ -6,7 +6,6 @@ import { FormDocumentListComponent } from './form-document-list/form-document-li
 import { FormRangeComponent } from './form-range/form-range.component';
 import { DialogComponent } from './dialog/dialog.component';
 import { FormRelationshipComponent } from './form-relationship/form-relationship.component';
-import { CountedItemsListComponent } from './counted-items-list/counted-items-list.component';
 import { YesNoLabelComponent } from './yes-no-label/yes-no-label.component';
 import { ReferenceDataLabelComponent } from './reference-data-label/reference-data-label.component';
 import { ChronologyComponent } from './chronology/chronology.component';
@@ -35,7 +34,6 @@ import { MatPaginatorExtendedComponent } from './mat-paginator-extended/mat-pagi
 // export necessary components individually
 export * from './dialog/dialog.component';
 export * from './loading-dialog/loading-dialog.component';
-export * from './counted-items-list/counted-items-list.component';
 export * from './hover-row-actions/hover-row-actions.component';
 
 // export the list of all components
@@ -60,7 +58,6 @@ export const components: any[] = [
   HotTableWrapperComponent,
 
   // display information
-  CountedItemsListComponent,
   YesNoLabelComponent,
   ListItemLabelComponent,
   ReferenceDataLabelComponent,
