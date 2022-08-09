@@ -1,6 +1,4 @@
 // import each component
-import { YesNoLabelComponent } from './yes-no-label/yes-no-label.component';
-import { ReferenceDataLabelComponent } from './reference-data-label/reference-data-label.component';
 import { ChronologyComponent } from './chronology/chronology.component';
 import { FormRelationshipQuickComponent } from './form-relationship-quick/form-relationship-quick.component';
 import { FormContactQuickComponent } from './form-contact-quick/form-contact-quick.component';
@@ -27,8 +25,6 @@ export const components: any[] = [
   HotTableWrapperComponent,
 
   // display information
-  YesNoLabelComponent,
-  ReferenceDataLabelComponent,
   ChronologyComponent,
 
   // general
