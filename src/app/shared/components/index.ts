@@ -14,7 +14,6 @@ import { LocationBreadcrumbsComponent } from './location-breadcrumbs/location-br
 import { FormAgeComponent } from './form-age/form-age.component';
 import { FormAgeDobComponent } from './form-age-dob/form-age-dob.component';
 import { FormRelationshipQuickComponent } from './form-relationship-quick/form-relationship-quick.component';
-import { ColorListLegendComponent } from './color-list-legend/color-list-legend.component';
 import { FormContactQuickComponent } from './form-contact-quick/form-contact-quick.component';
 import { LoadingDialogComponent } from './loading-dialog/loading-dialog.component';
 import { NumberOfItemsLabelComponent } from './number-of-items-label/number-of-items-label.component';
@@ -67,7 +66,6 @@ export const components: any[] = [
   ReferenceDataLabelComponent,
   LocationBreadcrumbsComponent,
   ChronologyComponent,
-  ColorListLegendComponent,
 
   // dialogs
   DialogComponent,
