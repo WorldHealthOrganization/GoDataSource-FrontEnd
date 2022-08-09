@@ -2,7 +2,6 @@
 import { FormAddressComponent } from './form-address/form-address.component';
 import { FormDocumentComponent } from './form-document/form-document.component';
 import { FormRangeComponent } from './form-range/form-range.component';
-import { DialogComponent } from './dialog/dialog.component';
 import { FormRelationshipComponent } from './form-relationship/form-relationship.component';
 import { YesNoLabelComponent } from './yes-no-label/yes-no-label.component';
 import { ReferenceDataLabelComponent } from './reference-data-label/reference-data-label.component';
@@ -12,7 +11,6 @@ import { FormAgeComponent } from './form-age/form-age.component';
 import { FormAgeDobComponent } from './form-age-dob/form-age-dob.component';
 import { FormRelationshipQuickComponent } from './form-relationship-quick/form-relationship-quick.component';
 import { FormContactQuickComponent } from './form-contact-quick/form-contact-quick.component';
-import { LoadingDialogComponent } from './loading-dialog/loading-dialog.component';
 import { NumberOfItemsLabelComponent } from './number-of-items-label/number-of-items-label.component';
 import { FormCaseCenterDaterangeComponent } from './form-case-center-daterange/form-case-center-daterange.component';
 import { HoverRowActionsComponent } from './hover-row-actions/hover-row-actions.component';
@@ -28,8 +26,6 @@ import { PieDonutChartComponent } from './pie-donut-graph/pie-donut-chart.compon
 import { MatPaginatorExtendedComponent } from './mat-paginator-extended/mat-paginator-extended.component';
 
 // export necessary components individually
-export * from './dialog/dialog.component';
-export * from './loading-dialog/loading-dialog.component';
 export * from './hover-row-actions/hover-row-actions.component';
 
 // export the list of all components
@@ -56,10 +52,6 @@ export const components: any[] = [
   ReferenceDataLabelComponent,
   LocationBreadcrumbsComponent,
   ChronologyComponent,
-
-  // dialogs
-  DialogComponent,
-  LoadingDialogComponent,
 
   // general
   NumberOfItemsLabelComponent,
