@@ -8,7 +8,6 @@ import { FormCheckboxComponent } from './form-checkbox/form-checkbox.component';
 import { FormDaterangeComponent } from './form-daterange/form-daterange.component';
 import { FormRadioComponent } from './form-radio/form-radio.component';
 import { FormDateSliderComponent } from './form-date-slider/form-date-slider.component';
-import { FormDateRangeSliderComponent } from './form-date-range-slider/form-date-range-slider.component';
 import { FormHiddenInputComponent } from './form-hidden-input/form-hidden-input.component';
 import { FormSelectGroupsComponent } from './form-select-groups/form-select-groups.component';
 import { FormSelectVscrollComponent } from './form-select-vscroll/form-select-vscroll.component';
@@ -26,7 +25,6 @@ export const components: any[] = [
   FormDaterangeComponent,
   FormRadioComponent,
   FormDateSliderComponent,
-  FormDateRangeSliderComponent,
   FormHiddenInputComponent,
   FormSelectGroupsComponent,
   FormTimepickerComponent
