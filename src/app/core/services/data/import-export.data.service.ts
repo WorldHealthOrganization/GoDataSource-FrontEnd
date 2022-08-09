@@ -4,7 +4,13 @@ import { Observable } from 'rxjs';
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
 import { IAsyncImportResponse, IImportableFileDistinctValues } from '../../../features/import-export-data/components/import-data/model';
-import { IAsyncExportResponse } from '../helper/dialog.service';
+
+/**
+ * Async response
+ */
+interface IAsyncExportResponse {
+  exportLogId: string;
+}
 
 @Injectable()
 export class ImportExportDataService {

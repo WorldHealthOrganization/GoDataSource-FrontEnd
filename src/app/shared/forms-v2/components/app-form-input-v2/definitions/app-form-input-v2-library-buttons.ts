@@ -725,12 +725,12 @@ export class AppFormInputV2LibraryButtons {
    * Construct buttons library
    */
   constructor(@Inject(I18nService) i18nService: I18nService,
-    @Inject(DialogV2Service) dialogService: DialogV2Service,
+    @Inject(DialogV2Service) dialogV2Service: DialogV2Service,
     @Inject(Renderer2) renderer2: Renderer2
   ) {
     // remember services
     AppFormInputV2LibraryButtons.i18nService = i18nService;
-    AppFormInputV2LibraryButtons._dialogV2Service = dialogService;
+    AppFormInputV2LibraryButtons._dialogV2Service = dialogV2Service;
     AppFormInputV2LibraryButtons._renderer2 = renderer2;
 
     // initialize buttons
