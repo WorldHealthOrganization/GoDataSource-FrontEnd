@@ -1326,9 +1326,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
           link: () => ['/duplicated-records']
         }
       },
-      quickActions: {
-        options: []
-      }
+      quickActions: undefined
     };
   }
 
