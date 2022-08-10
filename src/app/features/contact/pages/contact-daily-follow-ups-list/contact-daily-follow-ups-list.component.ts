@@ -48,6 +48,7 @@ import { FollowUpPage } from '../../typings/follow-up-page';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { IV2DateRange } from '../../../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
 import { EntityType } from '../../../../core/models/entity-type';
+import { AppFormSelectMultipleV2Component } from '../../../../shared/forms-v2/components/app-form-select-multiple-v2/app-form-select-multiple-v2.component';
 
 @Component({
   selector: 'app-daily-follow-ups-list',
@@ -310,12 +311,21 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
           options: this.activatedRoute.snapshot.data.team.options,
+          includeNoValue: true,
           value: this._workloadData?.team ?
             [this._workloadData.team] :
-            undefined,
+            (
+              this._workloadData?.team !== undefined ?
+                [AppFormSelectMultipleV2Component.HAS_NO_VALUE] :
+                undefined
+            ),
           defaultValue: this._workloadData?.team ?
             [this._workloadData.team] :
-            undefined
+            (
+              this._workloadData?.team !== undefined ?
+                [AppFormSelectMultipleV2Component.HAS_NO_VALUE] :
+                undefined
+            )
         }
       },
       {
