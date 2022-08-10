@@ -56,7 +56,6 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
     classification: ILabelValuePairModel[],
     dateOfOnset: ILabelValuePairModel[],
     isDateOfOnsetApproximate: ILabelValuePairModel[],
-    dateBecomeCase: ILabelValuePairModel[],
     dateOfInfection: ILabelValuePairModel[],
     investigationStatus: ILabelValuePairModel[],
     dateInvestigationCompleted: ILabelValuePairModel[],
@@ -74,7 +73,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
     questionnaireAnswers: ILabelValuePairModel[],
     questionnaireHistoryAnswers: ILabelValuePairModel[],
     wasContact: ILabelValuePairModel[],
-    dateBecomeContact: ILabelValuePairModel[]
+    dateBecomeCase: ILabelValuePairModel[]
   };
   private _selectedQuestionnaireAnswers: number;
   private _selectedQuestionnaireHistoryAnswers: number;
@@ -202,10 +201,6 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
               mergeRecords,
               'isDateOfOnsetApproximate'
             ).options,
-            dateBecomeCase: this.getFieldOptions(
-              mergeRecords,
-              'dateBecomeCase'
-            ).options,
             dateOfInfection: this.getFieldOptions(
               mergeRecords,
               'dateOfInfection'
@@ -280,9 +275,9 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
               mergeRecords,
               'wasContact'
             ).options,
-            dateBecomeContact: this.getFieldOptions(
+            dateBecomeCase: this.getFieldOptions(
               mergeRecords,
-              'dateBecomeContact'
+              'dateBecomeCase'
             ).options
           };
 
@@ -330,9 +325,6 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
           data.isDateOfOnsetApproximate = this._uniqueOptions.isDateOfOnsetApproximate.length === 1 ?
             this._uniqueOptions.isDateOfOnsetApproximate[0].value :
             data.isDateOfOnsetApproximate;
-          data.dateBecomeCase = this._uniqueOptions.dateBecomeCase.length === 1 ?
-            this._uniqueOptions.dateBecomeCase[0].value :
-            data.dateBecomeCase;
           data.dateOfInfection = this._uniqueOptions.dateOfInfection.length === 1 ?
             this._uniqueOptions.dateOfInfection[0].value :
             data.dateOfInfection;
@@ -378,9 +370,9 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
           data.wasContact = this._uniqueOptions.wasContact.length === 1 ?
             this._uniqueOptions.wasContact[0].value :
             data.wasContact;
-          data.dateBecomeContact = this._uniqueOptions.dateBecomeContact.length === 1 ?
-            this._uniqueOptions.dateBecomeContact[0].value :
-            data.dateBecomeContact;
+          data.dateBecomeCase = this._uniqueOptions.dateBecomeCase.length === 1 ?
+            this._uniqueOptions.dateBecomeCase[0].value :
+            data.dateBecomeCase;
 
           // reset data if not decease
           if (data.outcomeId !== Constants.OUTCOME_STATUS.DECEASED) {
@@ -934,18 +926,6 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
             }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'dateBecomeCase',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
-            description: () => 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE_DESCRIPTION',
-            options: this._uniqueOptions.dateBecomeCase,
-            value: {
-              get: () => this.itemData.dateBecomeCase,
-              set: (value) => {
-                this.itemData.dateBecomeCase = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
             name: 'dateOfInfection',
             placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
             description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION_DESCRIPTION',
@@ -1203,13 +1183,13 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
             },
             {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'dateBecomeContact',
-              placeholder: () => 'LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT',
-              options: this._uniqueOptions.dateBecomeContact,
+              name: 'dateBecomeCase',
+              placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
+              options: this._uniqueOptions.dateBecomeCase,
               value: {
-                get: () => this.itemData.dateBecomeContact as any,
+                get: () => this.itemData.dateBecomeCase as any,
                 set: (value) => {
-                  this.itemData.dateBecomeContact = value;
+                  this.itemData.dateBecomeCase = value;
                 }
               }
             }
@@ -1391,7 +1371,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
       // was contact
       if (!data.wasContact) {
         delete data.wasContact;
-        delete data.dateBecomeContact;
+        delete data.dateBecomeCase;
       }
 
       // finished
@@ -1465,7 +1445,6 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
       case 'dateOfOnset': return EntityModel.uniqueDateOptions(mergeRecords, key);
       case 'isDateOfOnsetApproximate': return EntityModel.uniqueBooleanOptions(mergeRecords, key);
       case 'wasContact': return EntityModel.uniqueBooleanOptions(mergeRecords, key);
-      case 'dateBecomeContact': return EntityModel.uniqueDateOptions(mergeRecords, key);
       case 'dateBecomeCase': return EntityModel.uniqueDateOptions(mergeRecords, key);
       case 'dateOfInfection': return EntityModel.uniqueDateOptions(mergeRecords, key);
       case 'dateInvestigationCompleted': return EntityModel.uniqueDateOptions(mergeRecords, key);
