@@ -213,7 +213,7 @@ export class UserWorkloadComponent extends ListComponent<any> implements OnDestr
       .pipe(
         // process data
         map((metricUsersFollowups) => {
-          // Move "No team" to top
+          // Move "No user" to top
           metricUsersFollowups.users.sort((a) => a.id ? 0 : -1);
 
           // determine date ranges
@@ -237,7 +237,7 @@ export class UserWorkloadComponent extends ListComponent<any> implements OnDestr
               }
             }
           }[] = (metricUsersFollowups.users || []).map((user) => {
-            // get grouped followups by team
+            // get grouped followups by user
             return {
               user: this.activatedRoute.snapshot.data.user.map[user.id] ??
               {
@@ -343,9 +343,9 @@ export class UserWorkloadComponent extends ListComponent<any> implements OnDestr
         }),
 
         // set count
-        tap((followUpsGroupedByTeam: []) => {
+        tap((followUpsGroupedByUser: []) => {
           this.pageCount = {
-            count: followUpsGroupedByTeam.length,
+            count: followUpsGroupedByUser.length,
             hasMore: false
           };
         }),
