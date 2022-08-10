@@ -298,11 +298,13 @@ export class TeamWorkloadComponent extends ListComponent<any> implements OnDestr
                     }
 
                     // construct url
-                    const url: string =
-                      `/contacts/follow-ups?fromWorkload=true&date=${ moment(followUpsPerDay.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) }&team=${ data.team && data.team.id ? data.team.id : '' }`;
+                    const url: string = `/contacts/follow-ups?fromWorkload=true&date=${ moment(followUpsPerDay.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) }&team=${ data.team && data.team.id ? data.team.id : '' }`;
 
                     // status for successful followups
-                    const status: string = '&status=LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_SEEN_OK&status=LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_SEEN_NOT_OK';
+                    const status: string = '&status=' + encodeURIComponent(JSON.stringify([
+                      'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_SEEN_OK',
+                      'LNG_REFERENCE_DATA_CONTACT_DAILY_FOLLOW_UP_STATUS_TYPE_SEEN_NOT_OK'
+                    ]));
 
                     // render html
                     const   html: string =
