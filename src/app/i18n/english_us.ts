@@ -11,7 +11,8 @@ export const EnglishUsLang = {
      */
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
-
+    'LNG_PAGE_USERS_WORKLOAD_NO_DATA_LABEL': '* If a date is missing from header columns, it means that there is no data for that date',
+    'LNG_PAGE_USERS_WORKLOAD_DATE_LABEL': 'Date'
 
 
     /**

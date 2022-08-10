@@ -306,6 +306,10 @@ export class Constants {
     TEAM_WORKLOAD: {
       label: 'LNG_APP_PAGE_TEAM_WORKLOAD',
       value: 'LNG_APP_PAGE_TEAM_WORKLOAD'
+    },
+    USER_WORKLOAD: {
+      label: 'LNG_APP_PAGE_USER_WORKLOAD',
+      value: 'LNG_APP_PAGE_USER_WORKLOAD'
     }
   };
 
