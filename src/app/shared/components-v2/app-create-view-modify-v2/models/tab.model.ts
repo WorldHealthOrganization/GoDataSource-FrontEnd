@@ -214,6 +214,7 @@ interface ICreateViewModifyV2TabInputSingleSelect extends Omit<ICreateViewModify
     }
   };
   suffixIconButtons?: IAppFormIconButtonV2[];
+  visible?: () => boolean;
 }
 
 /**
@@ -281,6 +282,7 @@ interface ICreateViewModifyV2TabInputTextArea extends Omit<ICreateViewModifyV2Ta
 
   // optional
   suffixIconButtons?: IAppFormIconButtonV2[];
+  visible?: () => boolean;
 }
 
 /**
@@ -381,6 +383,7 @@ interface ICreateViewModifyV2TabInputDate extends Omit<ICreateViewModifyV2TabInp
   minDate?: Moment | string;
   maxDate?: Moment | string;
   suffixIconButtons?: IAppFormIconButtonV2[];
+  visible?: () => boolean;
 }
 
 /**
