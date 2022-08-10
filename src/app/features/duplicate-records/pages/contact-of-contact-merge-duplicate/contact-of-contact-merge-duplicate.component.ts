@@ -435,9 +435,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
           link: () => ['/duplicated-records']
         }
       },
-      quickActions: {
-        options: []
-      }
+      quickActions: undefined
     };
   }
 
