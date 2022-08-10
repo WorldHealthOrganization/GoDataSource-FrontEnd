@@ -207,7 +207,7 @@ export class UserWorkloadComponent extends ListComponent<any> implements OnDestr
   * Refresh list
   */
   refreshList() {
-    // retrieve the list of Follow Ups
+    // retrieve the list of Follow-Ups
     this.records$ = this.followUpsDataService
       .getFollowUpsPerDayUser(this.selectedOutbreak.id, this.queryBuilder)
       .pipe(
