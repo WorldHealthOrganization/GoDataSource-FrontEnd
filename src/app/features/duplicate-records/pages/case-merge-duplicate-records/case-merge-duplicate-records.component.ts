@@ -72,7 +72,9 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
     riskLevel: ILabelValuePairModel[],
     riskReason: ILabelValuePairModel[],
     questionnaireAnswers: ILabelValuePairModel[],
-    questionnaireHistoryAnswers: ILabelValuePairModel[]
+    questionnaireHistoryAnswers: ILabelValuePairModel[],
+    wasContact: ILabelValuePairModel[],
+    dateBecomeContact: ILabelValuePairModel[]
   };
   private _selectedQuestionnaireAnswers: number;
   private _selectedQuestionnaireHistoryAnswers: number;
@@ -270,10 +272,18 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
             questionnaireHistoryAnswers: mergeRecords
               .filter((item) => (item.model as CaseModel).questionnaireAnswersContact && Object.keys((item.model as CaseModel).questionnaireAnswersContact).length > 0)
               .map((item, index) => ({
-                label: `${this.translateService.instant(EntityType.CONTACT)} ${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE')} ${index + 1}`,
+                label: `${this.translateService.instant(EntityType.CONTACT)} ${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE').toLowerCase()} ${index + 1}`,
                 value: index,
                 data: (item.model as CaseModel).questionnaireAnswersContact
-              }))
+              })),
+            wasContact: this.getFieldOptions(
+              mergeRecords,
+              'wasContact'
+            ).options,
+            dateBecomeContact: this.getFieldOptions(
+              mergeRecords,
+              'dateBecomeContact'
+            ).options
           };
 
           // auto-select if only one value
@@ -365,6 +375,12 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
           data.riskReason = this._uniqueOptions.riskReason.length === 1 ?
             this._uniqueOptions.riskReason[0].value :
             data.riskReason;
+          data.wasContact = this._uniqueOptions.wasContact.length === 1 ?
+            this._uniqueOptions.wasContact[0].value :
+            data.wasContact;
+          data.dateBecomeContact = this._uniqueOptions.dateBecomeContact.length === 1 ?
+            this._uniqueOptions.dateBecomeContact[0].value :
+            data.dateBecomeContact;
 
           // reset data if not decease
           if (data.outcomeId !== Constants.OUTCOME_STATUS.DECEASED) {
@@ -1076,7 +1092,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
             description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
             options: this._uniqueOptions.dateOfReporting,
             value: {
-              get: () => this.itemData.dateOfReporting?.toString(),
+              get: () => this.itemData.dateOfReporting as any,
               set: (value) => {
                 this.itemData.dateOfReporting = value;
               }
@@ -1155,7 +1171,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
             {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: '_selectedQuestionnaireHistoryAnswers',
-              placeholder: () => `${this.translateService.instant(EntityType.CONTACT)} ${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE')}`,
+              placeholder: () => `${this.translateService.instant(EntityType.CONTACT)} ${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE').toLowerCase()}`,
               options: this._uniqueOptions.questionnaireHistoryAnswers,
               value: {
                 get: () => this._selectedQuestionnaireHistoryAnswers as any,
@@ -1170,6 +1186,30 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
                       this._uniqueOptions.questionnaireHistoryAnswers[this._selectedQuestionnaireHistoryAnswers].data :
                       null;
                   });
+                }
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'wasContact',
+              placeholder: () => 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
+              options: this._uniqueOptions.wasContact,
+              value: {
+                get: () => this.itemData.wasContact as any,
+                set: (value) => {
+                  this.itemData.wasContact = value as any;
+                }
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'dateBecomeContact',
+              placeholder: () => 'LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT',
+              options: this._uniqueOptions.dateBecomeContact,
+              value: {
+                get: () => this.itemData.dateBecomeContact as any,
+                set: (value) => {
+                  this.itemData.dateBecomeContact = value;
                 }
               }
             }
@@ -1348,6 +1388,12 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
         data.age = this.itemData.age;
       }
 
+      // was contact
+      if (!data.wasContact) {
+        delete data.wasContact;
+        delete data.dateBecomeContact;
+      }
+
       // finished
       this.outbreakDataService
         .mergePeople(
@@ -1418,6 +1464,8 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
       case 'transferRefused': return EntityModel.uniqueBooleanOptions(mergeRecords, key);
       case 'dateOfOnset': return EntityModel.uniqueDateOptions(mergeRecords, key);
       case 'isDateOfOnsetApproximate': return EntityModel.uniqueBooleanOptions(mergeRecords, key);
+      case 'wasContact': return EntityModel.uniqueBooleanOptions(mergeRecords, key);
+      case 'dateBecomeContact': return EntityModel.uniqueDateOptions(mergeRecords, key);
       case 'dateBecomeCase': return EntityModel.uniqueDateOptions(mergeRecords, key);
       case 'dateOfInfection': return EntityModel.uniqueDateOptions(mergeRecords, key);
       case 'dateInvestigationCompleted': return EntityModel.uniqueDateOptions(mergeRecords, key);
