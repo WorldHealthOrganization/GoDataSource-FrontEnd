@@ -1021,9 +1021,7 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
           link: () => ['/duplicated-records']
         }
       },
-      quickActions: {
-        options: []
-      }
+      quickActions: undefined
     };
   }
 

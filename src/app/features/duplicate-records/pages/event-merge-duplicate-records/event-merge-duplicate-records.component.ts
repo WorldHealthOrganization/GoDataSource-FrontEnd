@@ -316,9 +316,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
           link: () => ['/duplicated-records']
         }
       },
-      quickActions: {
-        options: []
-      }
+      quickActions: undefined
     };
   }
 
