@@ -562,12 +562,12 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
 
                   // reset data
                   if (this.itemData.sequence.hasSequence) {
-                    this.itemData.sequence.noSequenceReason = '';
+                    this.itemData.sequence.noSequenceReason = undefined;
                   } else {
-                    this.itemData.sequence.dateSampleSent = '';
-                    this.itemData.sequence.labId = '';
-                    this.itemData.sequence.dateResult = '';
-                    this.itemData.sequence.resultId = '';
+                    this.itemData.sequence.dateSampleSent = undefined;
+                    this.itemData.sequence.labId = undefined;
+                    this.itemData.sequence.dateResult = undefined;
+                    this.itemData.sequence.resultId = undefined;
                   }
                 }
               }
@@ -583,7 +583,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
                   this.itemData.sequence.dateSampleSent = value;
                 }
               },
-              disabled: () => !this.itemData.sequence.hasSequence
+              visible: () => this.itemData.sequence.hasSequence
             },
             {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
@@ -597,7 +597,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
                   this.itemData.sequence.labId = value;
                 }
               },
-              disabled: () => !this.itemData.sequence.hasSequence
+              visible: () => this.itemData.sequence.hasSequence
             },
             {
               type: CreateViewModifyV2TabInputType.DATE,
@@ -610,7 +610,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
                   this.itemData.sequence.dateResult = value;
                 }
               },
-              disabled: () => !this.itemData.sequence.hasSequence
+              visible: () => this.itemData.sequence.hasSequence
             },
             {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
@@ -624,7 +624,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
                   this.itemData.sequence.resultId = value;
                 }
               },
-              disabled: () => !this.itemData.sequence.hasSequence
+              visible: () => this.itemData.sequence.hasSequence
             },
             {
               type: CreateViewModifyV2TabInputType.TEXTAREA,
@@ -637,7 +637,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
                   this.itemData.sequence.noSequenceReason = value;
                 }
               },
-              disabled: () => this.itemData.sequence.hasSequence
+              visible: () => !this.itemData.sequence.hasSequence
             }
           ]
         }
