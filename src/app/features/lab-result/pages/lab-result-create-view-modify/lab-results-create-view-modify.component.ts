@@ -583,7 +583,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
                   this.itemData.sequence.dateSampleSent = value;
                 }
               },
-              visible: () => this.itemData.sequence.hasSequence
+              disabled: () => !this.itemData.sequence.hasSequence
             },
             {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
@@ -597,7 +597,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
                   this.itemData.sequence.labId = value;
                 }
               },
-              visible: () => this.itemData.sequence.hasSequence
+              disabled: () => !this.itemData.sequence.hasSequence
             },
             {
               type: CreateViewModifyV2TabInputType.DATE,
@@ -610,7 +610,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
                   this.itemData.sequence.dateResult = value;
                 }
               },
-              visible: () => this.itemData.sequence.hasSequence
+              disabled: () => !this.itemData.sequence.hasSequence
             },
             {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
@@ -624,7 +624,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
                   this.itemData.sequence.resultId = value;
                 }
               },
-              visible: () => this.itemData.sequence.hasSequence
+              disabled: () => !this.itemData.sequence.hasSequence
             },
             {
               type: CreateViewModifyV2TabInputType.TEXTAREA,
@@ -637,7 +637,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
                   this.itemData.sequence.noSequenceReason = value;
                 }
               },
-              visible: () => !this.itemData.sequence.hasSequence
+              disabled: () => this.itemData.sequence.hasSequence
             }
           ]
         }
