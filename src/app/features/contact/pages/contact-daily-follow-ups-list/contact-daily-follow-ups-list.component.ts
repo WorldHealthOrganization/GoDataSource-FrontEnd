@@ -95,7 +95,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         team: this.activatedRoute.snapshot.queryParams.team,
         user: this.activatedRoute.snapshot.queryParams.user,
         status: this.activatedRoute.snapshot.queryParams.status ?
-          this.activatedRoute.snapshot.queryParams.status :
+          (
+            typeof this.activatedRoute.snapshot.queryParams.status === 'string' ?
+              JSON.parse(this.activatedRoute.snapshot.queryParams.status) :
+              this.activatedRoute.snapshot.queryParams.status
+          ) :
           null
       };
     }
