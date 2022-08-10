@@ -194,7 +194,7 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
             questionnaireHistoryAnswers: mergeRecords
               .filter((item) => (item.model as ContactModel).questionnaireAnswersCase && Object.keys((item.model as ContactModel).questionnaireAnswersCase).length > 0)
               .map((item, index) => ({
-                label: `${ this.translateService.instant(EntityType.CASE) } ${ this.translateService.instant('LNG_PAGE_MODIFY_CONTACT_TAB_CASE_QUESTIONNAIRE_TITLE') } ${ index + 1 }`,
+                label: `${ this.translateService.instant(EntityType.CASE) } ${ this.translateService.instant('LNG_PAGE_MODIFY_CONTACT_TAB_CASE_QUESTIONNAIRE_TITLE').toLowerCase() } ${ index + 1 }`,
                 value: index,
                 data: (item.model as ContactModel).questionnaireAnswersCase
               }))
@@ -841,7 +841,7 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
             {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: '_selectedQuestionnaireHistoryAnswers',
-              placeholder: () => `${ this.translateService.instant(EntityType.CONTACT) } ${ this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE') }`,
+              placeholder: () => `${ this.translateService.instant(EntityType.CASE) } ${ this.translateService.instant('LNG_PAGE_MODIFY_CONTACT_TAB_CASE_QUESTIONNAIRE_TITLE').toLowerCase() }`,
               options: this._uniqueOptions.questionnaireHistoryAnswers,
               value: {
                 get: () => this._selectedQuestionnaireHistoryAnswers as any,
@@ -930,7 +930,7 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
   private initializeTabQuestionnaireAsCase(): ICreateViewModifyV2TabTable {
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
-      label: `${ this.translateService.instant(EntityType.CASE) } ${ this.translateService.instant('LNG_PAGE_MODIFY_CONTACT_TAB_CASE_QUESTIONNAIRE_TITLE') }`,
+      label: `${ this.translateService.instant(EntityType.CASE) } ${ this.translateService.instant('LNG_PAGE_MODIFY_CONTACT_TAB_CASE_QUESTIONNAIRE_TITLE').toLowerCase() }`,
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
         name: 'questionnaireAnswersCase',

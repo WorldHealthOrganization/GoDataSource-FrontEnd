@@ -270,7 +270,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
             questionnaireHistoryAnswers: mergeRecords
               .filter((item) => (item.model as CaseModel).questionnaireAnswersContact && Object.keys((item.model as CaseModel).questionnaireAnswersContact).length > 0)
               .map((item, index) => ({
-                label: `${this.translateService.instant(EntityType.CONTACT)} ${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE')} ${index + 1}`,
+                label: `${this.translateService.instant(EntityType.CONTACT)} ${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE').toLowerCase()} ${index + 1}`,
                 value: index,
                 data: (item.model as CaseModel).questionnaireAnswersContact
               }))
@@ -1155,7 +1155,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
             {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: '_selectedQuestionnaireHistoryAnswers',
-              placeholder: () => `${this.translateService.instant(EntityType.CONTACT)} ${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE')}`,
+              placeholder: () => `${this.translateService.instant(EntityType.CONTACT)} ${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE').toLowerCase()}`,
               options: this._uniqueOptions.questionnaireHistoryAnswers,
               value: {
                 get: () => this._selectedQuestionnaireHistoryAnswers as any,
