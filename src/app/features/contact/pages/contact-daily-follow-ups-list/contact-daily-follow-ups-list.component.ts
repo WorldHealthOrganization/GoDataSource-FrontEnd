@@ -1796,7 +1796,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           }
         },
         visible: (): boolean => {
-          return FollowUpModel.canBulkModify(this.authUser);
+          return FollowUpModel.canBulkModify(this.authUser) &&
+            this.selectedOutbreakIsActive;
         },
         disable: (selected: string[]): boolean => {
           return selected.length < 1;
@@ -1893,7 +1894,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           }
         },
         visible: (): boolean => {
-          return FollowUpModel.canBulkDelete(this.authUser);
+          return FollowUpModel.canBulkDelete(this.authUser) &&
+            this.selectedOutbreakIsActive;
         },
         disable: (selected: string[]): boolean => {
           return selected.length < 1 ||
@@ -1963,7 +1965,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           }
         },
         visible: (): boolean => {
-          return FollowUpModel.canBulkDelete(this.authUser);
+          return FollowUpModel.canBulkDelete(this.authUser) &&
+            this.selectedOutbreakIsActive;
         },
         disable: (selected: string[]): boolean => {
           return selected.length < 1 ||
