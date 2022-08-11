@@ -186,7 +186,11 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
         return LabResultModel.canExport(this.authUser) && (
           (this.personType === EntityType.CASE && CaseModel.canExportLabResult(this.authUser)) ||
           (this.personType === EntityType.CONTACT && ContactModel.canExportLabResult(this.authUser)) ||
-          (this.personType === EntityType.CASE && CaseModel.canModify(this.authUser))
+          (
+            this.personType === EntityType.CASE &&
+            CaseModel.canModify(this.authUser) &&
+            this.selectedOutbreakIsActive
+          )
         );
       },
       menuOptions: [
@@ -200,7 +204,9 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
             }
           },
           visible: (): boolean => {
-            return this.personType === EntityType.CASE && CaseModel.canModify(this.authUser);
+            return this.personType === EntityType.CASE &&
+              CaseModel.canModify(this.authUser) &&
+              this.selectedOutbreakIsActive;
           }
         },
 

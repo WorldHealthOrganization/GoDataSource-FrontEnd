@@ -1633,7 +1633,8 @@ export class ContactsListComponent
           }
         },
         visible: (): boolean => {
-          return ContactModel.canBulkModify(this.authUser);
+          return ContactModel.canBulkModify(this.authUser) &&
+            this.selectedOutbreakIsActive;
         },
         disable: (selected: string[]): boolean => {
           return selected.length < 1;
