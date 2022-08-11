@@ -1535,7 +1535,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       type: V2ActionType.MENU,
       label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
       visible: (): boolean => {
-        return (this.selectedOutbreakIsActive && FollowUpModel.canGenerate(this.authUser)) ||
+        return (
+          this.selectedOutbreakIsActive && FollowUpModel.canGenerate(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ) ||
           (!this.appliedListFilter && FollowUpModel.canExportDailyForm(this.authUser)) ||
           (!this.appliedListFilter && FollowUpModel.canExport(this.authUser));
       },
@@ -1550,7 +1553,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               this.generateFollowUps();
             }
           },
-          visible: () => FollowUpModel.canGenerate(this.authUser)
+          visible: () => FollowUpModel.canGenerate(this.authUser) &&
+            this.selectedOutbreakIsActive
         },
 
         // Divider
@@ -1792,7 +1796,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           }
         },
         visible: (): boolean => {
-          return FollowUpModel.canBulkModify(this.authUser);
+          return FollowUpModel.canBulkModify(this.authUser) &&
+            this.selectedOutbreakIsActive;
         },
         disable: (selected: string[]): boolean => {
           return selected.length < 1;
@@ -1889,7 +1894,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           }
         },
         visible: (): boolean => {
-          return FollowUpModel.canBulkDelete(this.authUser);
+          return FollowUpModel.canBulkDelete(this.authUser) &&
+            this.selectedOutbreakIsActive;
         },
         disable: (selected: string[]): boolean => {
           return selected.length < 1 ||
@@ -1959,7 +1965,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           }
         },
         visible: (): boolean => {
-          return FollowUpModel.canBulkDelete(this.authUser);
+          return FollowUpModel.canBulkDelete(this.authUser) &&
+            this.selectedOutbreakIsActive;
         },
         disable: (selected: string[]): boolean => {
           return selected.length < 1 ||
