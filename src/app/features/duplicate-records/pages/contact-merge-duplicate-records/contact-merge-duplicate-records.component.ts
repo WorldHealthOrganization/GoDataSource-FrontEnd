@@ -1088,7 +1088,6 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
       // was case
       if (!data.wasCase) {
         delete data.wasCase;
-        delete data.dateBecomeContact;
       }
 
       // finished
