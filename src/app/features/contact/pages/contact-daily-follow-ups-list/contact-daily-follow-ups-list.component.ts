@@ -556,10 +556,18 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           includeNoValue: true,
           value: this._workloadData?.user ?
             [this._workloadData.user] :
-            undefined,
+            (
+              this._workloadData?.user !== undefined ?
+                [AppFormSelectMultipleV2Component.HAS_NO_VALUE] :
+                undefined
+            ),
           defaultValue: this._workloadData?.user ?
             [this._workloadData.user] :
-            undefined
+            (
+              this._workloadData?.user !== undefined ?
+                [AppFormSelectMultipleV2Component.HAS_NO_VALUE] :
+                undefined
+            )
         },
         link: (data) => {
           return data.responsibleUserId ?
