@@ -509,7 +509,8 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
       },
       visible: (): boolean => {
         return this.entityData.type === EntityType.CONTACT &&
-          FollowUpModel.canCreate(this.authUser);
+          FollowUpModel.canCreate(this.authUser) &&
+          this.selectedOutbreakIsActive;
       }
     };
   }

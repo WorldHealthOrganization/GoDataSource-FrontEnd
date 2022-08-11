@@ -186,7 +186,8 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
         },
         visible: (): boolean => {
           return RelationshipModel.canShare(this.authUser) &&
-            this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].share(this.authUser);
+            this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].share(this.authUser) &&
+            this.selectedOutbreakIsActive;
         },
         disable: (selected: string[]): boolean => {
           return selected.length < 1;
@@ -221,7 +222,8 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
         },
         visible: (): boolean => {
           return this.relationshipType === RelationshipType.CONTACT &&
-            this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].changeSource(this.authUser);
+            this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].changeSource(this.authUser) &&
+            this.selectedOutbreakIsActive;
         },
         disable: (selected: string[]): boolean => {
           return selected.length < 1;
@@ -294,7 +296,8 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
         },
         visible: (): boolean => {
           return RelationshipModel.canBulkDelete(this.authUser) &&
-            this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].bulkDelete(this.authUser);
+            this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].bulkDelete(this.authUser) &&
+            this.selectedOutbreakIsActive;
         },
         disable: (selected: string[]): boolean => {
           return selected.length < 1;
@@ -322,7 +325,8 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
       },
       visible: (): boolean => {
         return RelationshipModel.canCreate(this.authUser) &&
-          this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].create(this.authUser);
+          this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].create(this.authUser) &&
+          this.selectedOutbreakIsActive;
       }
     };
   }

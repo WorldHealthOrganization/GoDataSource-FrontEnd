@@ -1013,7 +1013,8 @@ export class EventsListComponent
         link: (): string[] => ['/events', 'create']
       },
       visible: (): boolean => {
-        return EventModel.canCreate(this.authUser);
+        return EventModel.canCreate(this.authUser) &&
+          this.selectedOutbreakIsActive;
       }
     };
   }

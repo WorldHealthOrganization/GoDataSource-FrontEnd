@@ -1786,7 +1786,8 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         link: (): string[] => ['/cases', 'create']
       },
       visible: (): boolean => {
-        return CaseModel.canCreate(this.authUser);
+        return CaseModel.canCreate(this.authUser) &&
+          this.selectedOutbreakIsActive;
       }
     };
   }

@@ -251,12 +251,14 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
       },
       visible: (): boolean => {
         return (
-          this.entityData.type === EntityType.CASE &&
-          CaseModel.canCreateLabResult(this.authUser)
-        ) || (
-          this.entityData.type === EntityType.CONTACT &&
-          ContactModel.canCreateLabResult(this.authUser)
-        );
+          (
+            this.entityData.type === EntityType.CASE &&
+            CaseModel.canCreateLabResult(this.authUser)
+          ) || (
+            this.entityData.type === EntityType.CONTACT &&
+            ContactModel.canCreateLabResult(this.authUser)
+          )
+        ) && this.selectedOutbreakIsActive;
       }
     };
   }
