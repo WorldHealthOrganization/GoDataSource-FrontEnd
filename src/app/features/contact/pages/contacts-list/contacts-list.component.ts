@@ -1289,8 +1289,15 @@ export class ContactsListComponent
           !this.appliedListFilter &&
           (ContactModel.canModify(this.authUser) ||
             ContactModel.canExport(this.authUser) ||
-            ContactModel.canImport(this.authUser) ||
+            (
+              ContactModel.canImport(this.authUser) &&
+              this.selectedOutbreakIsActive
+            ) ||
             ContactModel.canExportRelationships(this.authUser) ||
+            (
+              OutbreakModel.canImportRelationship(this.authUser) &&
+              this.selectedOutbreakIsActive
+            ) ||
             ContactModel.canExportDailyFollowUpList(this.authUser) ||
             ContactModel.canExportDailyFollowUpsForm(this.authUser))
         );
@@ -1341,7 +1348,8 @@ export class ContactsListComponent
             link: () => ['/import-export-data', 'contact-data', 'import']
           },
           visible: (): boolean => {
-            return ContactModel.canImport(this.authUser);
+            return ContactModel.canImport(this.authUser) &&
+              this.selectedOutbreakIsActive;
           }
         },
 
@@ -1404,7 +1412,8 @@ export class ContactsListComponent
             }
           },
           visible: (): boolean => {
-            return OutbreakModel.canImportRelationship(this.authUser);
+            return OutbreakModel.canImportRelationship(this.authUser) &&
+              this.selectedOutbreakIsActive;
           }
         },
 
@@ -1633,7 +1642,8 @@ export class ContactsListComponent
           }
         },
         visible: (): boolean => {
-          return ContactModel.canBulkModify(this.authUser);
+          return ContactModel.canBulkModify(this.authUser) &&
+            this.selectedOutbreakIsActive;
         },
         disable: (selected: string[]): boolean => {
           return selected.length < 1;

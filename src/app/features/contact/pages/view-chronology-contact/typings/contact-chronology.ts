@@ -97,7 +97,9 @@ export class ContactChronology {
           followUpHistory: IFollowUpHistory
         ) => {
           const translateData = {
-            status: i18nService.instant(followUpHistory.status)
+            status: followUpHistory.status ?
+              i18nService.instant(followUpHistory.status) :
+              '—'
           };
           if (!_.isEmpty(followUpHistory.startDate)) {
             chronologyEntries.push(new ChronologyItem({

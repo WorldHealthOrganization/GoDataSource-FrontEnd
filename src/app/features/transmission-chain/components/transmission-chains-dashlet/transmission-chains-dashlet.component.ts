@@ -2215,15 +2215,25 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   isEditModeAvailable(): boolean {
     switch (this.transmissionChainViewType) {
       case Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value:
-        return TransmissionChainModel.canModifyBubbleNetwork(this.authUser);
+        return TransmissionChainModel.canModifyBubbleNetwork(this.authUser) &&
+          this.selectedOutbreak?.id &&
+          this.selectedOutbreak?.id === this.authUser?.activeOutbreakId;
       case Constants.TRANSMISSION_CHAIN_VIEW_TYPES.HIERARCHICAL_NETWORK.value:
-        return TransmissionChainModel.canModifyHierarchicalNetwork(this.authUser);
+        return TransmissionChainModel.canModifyHierarchicalNetwork(this.authUser) &&
+          this.selectedOutbreak?.id &&
+          this.selectedOutbreak?.id === this.authUser?.activeOutbreakId;
       case Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value:
-        return TransmissionChainModel.canModifyTimelineNetworkDateOfOnset(this.authUser);
+        return TransmissionChainModel.canModifyTimelineNetworkDateOfOnset(this.authUser) &&
+          this.selectedOutbreak?.id &&
+          this.selectedOutbreak?.id === this.authUser?.activeOutbreakId;
       case Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value:
-        return TransmissionChainModel.canModifyTimelineNetworkDateOfLastContact(this.authUser);
+        return TransmissionChainModel.canModifyTimelineNetworkDateOfLastContact(this.authUser) &&
+          this.selectedOutbreak?.id &&
+          this.selectedOutbreak?.id === this.authUser?.activeOutbreakId;
       case Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value:
-        return TransmissionChainModel.canModifyTimelineNetworkDateOfReporting(this.authUser);
+        return TransmissionChainModel.canModifyTimelineNetworkDateOfReporting(this.authUser) &&
+          this.selectedOutbreak?.id &&
+          this.selectedOutbreak?.id === this.authUser?.activeOutbreakId;
     }
 
     // finished
