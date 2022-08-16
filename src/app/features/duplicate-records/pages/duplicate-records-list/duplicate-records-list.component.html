@@ -229,7 +229,7 @@
     [pageIndex]="pageIndex"
     [countData]="duplicatesListCount$ | async"
     [pageSize]="pageSize"
-    [pageSizeOptions]="[]"
+    [pageSizeOptions]="Constants.PAGE_SIZE_OPTIONS"
     (page)="changePage($event)"
     class="gd-duplicate-records-pagination">
   </app-mat-paginator-extended>
