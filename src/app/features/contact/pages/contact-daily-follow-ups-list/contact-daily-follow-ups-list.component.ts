@@ -2442,7 +2442,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                 export: {
                   url: `outbreaks/${ this.selectedOutbreak.id }/follow-ups/export`,
                   async: true,
-                  method: ExportDataMethod.GET,
+                  // TODO: Export not working even with ignoreActiveOutbreak on true in BE
+                  method: ExportDataMethod.POST,
                   fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_TITLE') } - ${ moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) }`,
                   queryBuilder: qb,
                   allow: {
