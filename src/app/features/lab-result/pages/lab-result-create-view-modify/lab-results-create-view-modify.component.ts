@@ -705,6 +705,9 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
           }
         },
         visible: () => {
+          if (!this.selectedOutbreakIsActive) {
+            return false;
+          }
           if (this._personType === EntityType.CASE) {
             return CaseModel.canModifyLabResult(this.authUser);
           } else if (this._personType === EntityType.CONTACT) {
