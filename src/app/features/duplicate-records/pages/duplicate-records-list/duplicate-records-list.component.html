@@ -7,7 +7,8 @@
 <app-basic-page-v2
   [breadcrumbs]="breadcrumbs"
   pageTitle="LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE"
-  [actionButton]="actionButton">
+  [actionButton]="actionButton"
+  selectedOutbreakDisabled="false">
 
   <!-- Loading data data -->
   <div
@@ -48,7 +49,6 @@
                 <mat-cell *matCellDef="let item;" fxFlex="6rem">
                   <app-form-checkbox
                     *ngIf="hasMergePermission(group)"
-                    #listCheckedIndividual
                     [name]="'recordCheck[' + item + ']'"
                     class="table-checkbox"
                     ngModel
@@ -231,7 +231,7 @@
     [pageIndex]="pageIndex"
     [countData]="duplicatesListCount$ | async"
     [pageSize]="pageSize"
-    [pageSizeOptions]="Constants.PAGE_SIZE_OPTIONS"
+    [pageSizeOptions]="[]"
     (page)="changePage($event)"
     class="gd-duplicate-records-pagination">
   </app-mat-paginator-extended>
