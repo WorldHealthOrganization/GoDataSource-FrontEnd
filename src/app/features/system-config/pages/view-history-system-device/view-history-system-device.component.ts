@@ -1,63 +1,246 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { DeviceDataService } from '../../../../core/services/data/device.data.service';
 import { DeviceHistoryModel } from '../../../../core/models/device-history.model';
-import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { DeviceModel } from '../../../../core/models/device.model';
-import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { Observable } from 'rxjs';
+import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
+import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder/request-filter-generator';
+import { map, takeUntil } from 'rxjs/operators';
+import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import { TranslateService } from '@ngx-translate/core';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
   selector: 'app-view-history-system-device',
   templateUrl: './view-history-system-device.component.html'
 })
-export class ViewHistorySystemDeviceComponent implements OnInit {
-  // breadcrumbs
-  breadcrumbs: IV2Breadcrumb[] = [];
-
-  deviceHistoryList: DeviceHistoryModel[];
-
-  authUser: UserModel;
-
-  deviceId: string;
+export class ViewHistorySystemDeviceComponent extends CreateViewModifyComponent<DeviceHistoryModel> implements OnDestroy {
+  private _devicesHistoryValues: string[] = [];
+  private _devicesHistoryPlaceholders: string[] = [];
+  private _deviceId: string;
 
   /**
      * Constructor
      */
   constructor(
-    protected route: ActivatedRoute,
+    protected toastV2Service: ToastV2Service,
+    protected activatedRoute: ActivatedRoute,
+    private translateService: TranslateService,
     private deviceDataService: DeviceDataService,
-    private authDataService: AuthDataService,
-    private dialogV2Service: DialogV2Service
-  ) {}
+    authDataService: AuthDataService,
+    renderer2: Renderer2,
+    redirectService: RedirectService
+  ) {
+    super(
+      toastV2Service,
+      renderer2,
+      redirectService,
+      activatedRoute,
+      authDataService
+    );
+
+    // get deviceId
+    this._deviceId = this.activatedRoute.snapshot.params.deviceId;
+  }
 
   /**
-     * Component initialized
-     */
-  ngOnInit() {
-    // get the authenticated user
-    this.authUser = this.authDataService.getAuthenticatedUser();
+   * Release resources
+   */
+  ngOnDestroy(): void {
+    // parent
+    super.onDestroy();
+  }
 
-    // show loading
-    const loading = this.dialogV2Service.showLoadingDialog();
+  /**
+  * Create new item model if needed
+  */
+  protected createNewItem(): DeviceHistoryModel {
+    return null;
+  }
 
-    // retrieve query params
-    this.route.params
-      .subscribe((params: { deviceId }) => {
-        this.deviceId = params.deviceId;
-        this.deviceDataService.getHistoryDevice(this.deviceId)
-          .subscribe( (results) => {
-            this.deviceHistoryList = results;
+  /**
+   * Retrieve item
+   */
+  protected retrieveItem(record?: DeviceHistoryModel): Observable<DeviceHistoryModel> {
+    // view other device history?
+    this._deviceId = record?.id ?? this._deviceId;
 
-            // hide loading
-            loading.close();
+    return new Observable(subscriber => {
+      this.deviceDataService.getHistoryDevice(this._deviceId)
+        .subscribe((results) => {
+          this._devicesHistoryPlaceholders = [];
+          this._devicesHistoryValues = results.map(item => {
+            // format createdAt
+            const createdAt: string = item.createdAt
+              ? moment(item.createdAt).format(this.Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
+              '';
+
+            // format status
+            const status: string = item.status ?
+              this.translateService.instant(item.status) :
+              '';
+            this._devicesHistoryPlaceholders.push(status);
+
+            // finish
+            return createdAt;
           });
 
-        // update breadcrumbs
-        this.initializeBreadcrumbs();
+          // finish
+          subscriber.next(null);
+          subscriber.complete();
+        });
+    });
+  }
+
+  /**
+  * Data initialized
+  */
+  protected initializedData(): void {}
+
+  /**
+   * Initialize page title
+   */
+  protected initializePageTitle(): void {
+    // view history
+    this.pageTitle = 'LNG_PAGE_VIEW_SYSTEM_DEVICE_HISTORY_TITLE';
+    this.pageTitleData = null;
+  }
+
+  /**
+   * Initialize tabs
+   */
+  protected initializeTabs(): void {
+    this.tabData = {
+      // tabs
+      tabs: [
+        // Personal
+        this.initializeTabsDetails()
+      ],
+
+      // create details
+      create: undefined,
+
+      // buttons
+      buttons: this.initializeButtons(),
+
+      // create or update
+      createOrUpdate: undefined,
+      redirectAfterCreateUpdate: undefined
+    };
+  }
+
+  /**
+  * Initialize tabs - Details
+  */
+  private initializeTabsDetails(): ICreateViewModifyV2Tab {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB,
+      label: 'LNG_COMMON_LABEL_DETAILS',
+      sections: [
+        // Details
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_COMMON_LABEL_DETAILS',
+          inputs: [
+            {
+              type: CreateViewModifyV2TabInputType.LIST,
+              name: 'history',
+              items: this._devicesHistoryValues,
+              readonly: true,
+              itemsChanged: undefined,
+              definition: {
+                add: undefined,
+                remove: undefined,
+                input: {
+                  type: CreateViewModifyV2TabInputType.LIST_TEXT,
+                  placeholder: (_value, index) => {
+                    return this._devicesHistoryPlaceholders[index];
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  /**
+  * Initialize buttons
+  */
+  private initializeButtons(): ICreateViewModifyV2Buttons {
+    return {
+      view: undefined,
+      modify: undefined,
+      createCancel: undefined,
+      viewCancel: {
+        link: {
+          link: () => ['/system-config/devices']
+        }
+      },
+      modifyCancel: undefined,
+      quickActions: undefined
+    };
+  }
+
+  /**
+  * Initialize expand list column renderer fields
+  */
+  protected initializeExpandListColumnRenderer(): void {
+    this.expandListColumnRenderer = {
+      type: CreateViewModifyV2ExpandColumnType.TEXT,
+      get: (item: DeviceModel) => item.name,
+      link: (item: DeviceModel) => ['/system-config/devices', item.id, 'view']
+    };
+  }
+
+  /**
+  * Initialize expand list query fields
+  */
+  protected initializeExpandListQueryFields(): void {
+    this.expandListQueryFields = [
+      'id',
+      'name'
+    ];
+  }
+
+  /**
+  * Initialize expand list advanced filters
+  */
+  protected initializeExpandListAdvancedFilters(): void {}
+
+  /**
+  * Refresh expand list
+  */
+  refreshExpandList(data): void {
+    // append / remove search
+    if (data.searchBy) {
+      data.queryBuilder.filter.where({
+        name: RequestFilterGenerator.textContains(
+          data.searchBy
+        )
       });
+    }
+
+    // retrieve data
+    this.expandListRecords$ = this.deviceDataService
+      .getDevices(data.queryBuilder)
+      .pipe(
+        // map to device model
+        map((items) => {
+          // trick eslint
+          return (items || []).map((item) => item as any);
+        }),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
   }
 
   /**

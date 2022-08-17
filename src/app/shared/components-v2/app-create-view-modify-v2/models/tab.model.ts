@@ -429,7 +429,7 @@ interface ICreateViewModifyV2TabInputListText {
   type: CreateViewModifyV2TabInputType.LIST_TEXT;
 
   // optional
-  placeholder: () => string;
+  placeholder: (item: string, index: number) => string;
   description?: () => string;
   disabled?: (item: CreateViewModifyV2TabInput) => boolean;
 }

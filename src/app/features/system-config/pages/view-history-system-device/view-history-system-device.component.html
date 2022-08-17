@@ -1,8 +1,20 @@
-<app-basic-page-v2
-  [breadcrumbs]="breadcrumbs">
-  <ul class="device-history">
-    <li *ngFor="let historyItem of deviceHistoryList">
-      {{ historyItem.status | translate }} - {{ historyItem.createdAt | dateTimeDefault }}
-    </li>
-  </ul>
-</app-basic-page-v2>
+<app-create-view-modify-v2
+  [action]="action"
+  allowEdit="true"
+  [loadingPage]="loadingPage"
+  [loadingItemData]="loadingItemData"
+  [breadcrumbs]="breadcrumbs"
+  [pageTitle]="pageTitle"
+  [pageTitleData]="pageTitleData"
+  [itemID]="itemData?.id"
+  [tabData]="tabData"
+  listTitle="LNG_PAGE_LIST_SYSTEM_DEVICES_TITLE"
+  [expandListRecords$]="expandListRecords$"
+  [expandListColumnRenderer]="expandListColumnRenderer"
+  [expandListAdvancedFilterType]="undefined"
+  [expandListAdvancedFilters]="expandListAdvancedFilters"
+  [expandListQueryFields]="expandListQueryFields"
+  expandListAdvancedFiltersCacheKey="/system-config/devices"
+  (expandListRefreshData)="refreshExpandList($event)"
+  (expandListChangeRecord)="expandListChangeRecord($event)">
+</app-create-view-modify-v2>
