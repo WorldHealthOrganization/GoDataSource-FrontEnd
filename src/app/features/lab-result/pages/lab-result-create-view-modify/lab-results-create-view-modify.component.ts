@@ -66,8 +66,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       renderer2,
       redirectService,
       activatedRoute,
-      authDataService,
-      true
+      authDataService
     );
 
     // get data
