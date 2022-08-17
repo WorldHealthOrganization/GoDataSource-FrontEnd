@@ -66,8 +66,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       renderer2,
       redirectService,
       activatedRoute,
-      authDataService,
-      true
+      authDataService
     );
 
     // get data
@@ -706,11 +705,9 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
         },
         visible: () => {
           if (this._personType === EntityType.CASE) {
-            return CaseModel.canModifyLabResult(this.authUser) &&
-              this.selectedOutbreakIsActive;
+            return CaseModel.canModifyLabResult(this.authUser);
           } else if (this._personType === EntityType.CONTACT) {
-            return ContactModel.canModifyLabResult(this.authUser) &&
-              this.selectedOutbreakIsActive;
+            return ContactModel.canModifyLabResult(this.authUser);
           } else {
             return false;
           }
