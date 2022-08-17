@@ -1,6 +1,5 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import * as _ from 'lodash';
 import { Observable } from 'rxjs';
@@ -10,7 +9,6 @@ import { AddressModel } from '../../../../core/models/address.model';
 import { FormControl, NgForm } from '@angular/forms';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { catchError, share } from 'rxjs/operators';
-import { Subscription } from 'rxjs/internal/Subscription';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
@@ -31,11 +29,9 @@ import { AppMessages } from '../../../../core/enums/app-messages.enum';
   templateUrl: './duplicate-records-list.component.html',
   styleUrls: ['./duplicate-records-list.component.scss']
 })
-export class DuplicateRecordsListComponent extends ListComponent<any> implements OnInit, OnDestroy {
+export class DuplicateRecordsListComponent extends ListComponent<any> implements OnDestroy {
   // breadcrumbs
   breadcrumbs: IV2Breadcrumb[] = [];
-
-  outbreakSubscriber: Subscription;
 
   // constants
   EntityType = EntityType;
@@ -46,9 +42,7 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
   duplicatesList: PeoplePossibleDuplicateModel;
   duplicatesListCount$: Observable<IBasicCount>;
 
-  /**
-     * Visible table columns
-     */
+  // visible table columns
   tableVisibleHeaderColumns: string[] = [
     'checkbox',
     'type',
@@ -64,8 +58,8 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
   actionButton: IV2ActionIconLabel;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected listHelperService: ListHelperService,
     private toastV2Service: ToastV2Service,
@@ -89,34 +83,11 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
   }
 
   /**
-   * Component initialized
-   */
-  ngOnInit() {
-    // subscribe to the Selected Outbreak
-    this.outbreakSubscriber = this.outbreakDataService
-      .getSelectedOutbreakSubject()
-      .subscribe((selectedOutbreak: OutbreakModel) => {
-        this.selectedOutbreak = selectedOutbreak;
-
-        // initialize pagination
-        this.initPaginator();
-        // ...and re-load the list when the Selected Outbreak is changed
-        this.needsRefreshList(true);
-      });
-  }
-
-  /**
    * Component destroyed
    */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
-
-    // outbreak subscriber
-    if (this.outbreakSubscriber) {
-      this.outbreakSubscriber.unsubscribe();
-      this.outbreakSubscriber = null;
-    }
 
     // remove global notifications
     this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_MERGE_ACTIVE_OUTBREAK);
@@ -133,6 +104,11 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
         AppMessages.APP_MESSAGE_DUPLICATE_MERGE_ACTIVE_OUTBREAK
       );
     }
+
+    // initialize pagination
+    this.initPaginator();
+    // ...and re-load the list when the Selected Outbreak is changed
+    this.needsRefreshList(true);
   }
 
   /**
@@ -227,8 +203,8 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
   }
 
   /**
-     * Get total number of items, based on the applied filters
-     */
+   * Get total number of items, based on the applied filters
+   */
   refreshListCount() {
     // check
     if (!this.selectedOutbreak?.id) {
@@ -251,9 +227,8 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
   }
 
   /**
-     * Check all checkboxes
-     * @param form
-     */
+   * Check all checkboxes
+   */
   checkAllToggle(form: NgForm) {
     // toggle value
     const newValue: boolean = form.controls.checkAll.value;
@@ -265,9 +240,8 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
   }
 
   /**
-     * Check all checkboxes
-     * @param form
-     */
+   * Check all checkboxes
+   */
   checkOneToggle(form: NgForm) {
     // set children checkboxes values
     let newValue: boolean = true;
@@ -282,16 +256,15 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
   }
 
   /**
-     * Determine if we have at least one checkbox checked
-     * @param form
-     */
+   * Determine if we have at least one checkbox checked
+   */
   hasAtLeastTwoCheckboxChecked(form: NgForm): boolean {
     // set children checkboxes values
     let checkedItems: number = 0;
     _.each(form.controls, (checkbox: FormControl, name: string) => {
       if (
         name !== 'checkAll' &&
-                checkbox.value
+        checkbox.value
       ) {
         checkedItems++;
         if (checkedItems > 1) {
@@ -305,9 +278,8 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
   }
 
   /**
-     * Merge records
-     * @param form
-     */
+   * Merge records
+   */
   mergeCheckedRecords(form: NgForm) {
     // determine merge ids
     const mergeIds: string[] = [];
@@ -357,8 +329,8 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
   }
 
   /**
-     * Check if group has merge permission
-     */
+   * Check if group has merge permission
+   */
   hasMergePermission(group: PeoplePossibleDuplicateGroupModel): boolean {
     switch (group.groupType) {
       case EntityType.CASE:
@@ -376,15 +348,15 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
   }
 
   /**
-     * Cast to event
-     */
+   * Cast to event
+   */
   getEvent(item): EventModel {
     return item as EventModel;
   }
 
   /**
-     * Cast to anything but not event
-     */
+   * Cast to anything but not event
+   */
   getNotEvent(item): CaseModel | ContactModel | ContactOfContactModel {
     return item as CaseModel | ContactModel | ContactOfContactModel;
   }
