@@ -28,13 +28,13 @@
                 [routerLink]="buttonData.routerLink"
                 [queryParams]="buttonData.queryParams">
                 <button
-                    mat-icon-button
-                    color="accent"
-                    type="button"
-                    [ngClass]="buttonData.class"
-                    (click)="clickedButton(buttonData, $event)"
-                    [matTooltip]="buttonData.iconTooltip | translate:buttonData.iconTooltipTranslateData ? buttonData.iconTooltipTranslateData(actionData) : null">
-                    <span class="xt-icon">{{ buttonData.icon }}</span>
+                  mat-icon-button
+                  color="accent"
+                  type="button"
+                  [ngClass]="buttonData.class"
+                  (click)="clickedButton(buttonData, $event)"
+                  [matTooltip]="buttonData.iconTooltip | translate:buttonData.iconTooltipTranslateData ? buttonData.iconTooltipTranslateData(actionData) : null">
+                  <mat-icon>{{ buttonData.icon }}</mat-icon>
                 </button>
             </a>
 
@@ -44,14 +44,14 @@
                 <span
                     [matTooltip]="buttonData.disabledTooltip | translate">
                     <button
-                        mat-icon-button
-                        color="primary"
-                        type="button"
-                        [ngClass]="buttonData.class"
-                        (click)="clickedButton(buttonData)"
-                        [matTooltip]="buttonData.iconTooltip | translate:buttonData.iconTooltipTranslateData ? buttonData.iconTooltipTranslateData(actionData) : null"
-                        [disabled]="buttonData.isDisabled">
-                        <span class="xt-icon">{{ buttonData.icon }}</span>
+                      mat-icon-button
+                      color="primary"
+                      type="button"
+                      [ngClass]="buttonData.class"
+                      (click)="clickedButton(buttonData)"
+                      [matTooltip]="buttonData.iconTooltip | translate:buttonData.iconTooltipTranslateData ? buttonData.iconTooltipTranslateData(actionData) : null"
+                      [disabled]="buttonData.isDisabled">
+                      <mat-icon>{{ buttonData.icon }}</mat-icon>
                     </button>
                 </span>
             </ng-template>
@@ -62,12 +62,12 @@
         <ng-container
             *ngIf="buttonData.type === HoverRowActionType.MENU && buttonData.menuOptions">
             <button
-                mat-icon-button
-                color="accent"
-                type="button"
-                [ngClass]="buttonData.class"
-                [matMenuTriggerFor]="actionsMenu">
-                <span class="xt-icon">{{ buttonData.icon }}</span>
+              mat-icon-button
+              color="accent"
+              type="button"
+              [ngClass]="buttonData.class"
+              [matMenuTriggerFor]="actionsMenu">
+              <mat-icon>{{ buttonData.icon }}</mat-icon>
             </button>
 
             <mat-menu

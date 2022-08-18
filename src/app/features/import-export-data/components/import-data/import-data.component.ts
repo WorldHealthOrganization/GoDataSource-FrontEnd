@@ -369,7 +369,7 @@ export class ImportDataComponent
   recordActions: HoverRowAction[] = [
     // Add
     new HoverRowAction({
-      icon: 'addCircle',
+      icon: 'add_circle_outline',
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD_OPTION',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
         return (item instanceof ImportableMapField) &&
@@ -412,7 +412,7 @@ export class ImportDataComponent
 
     // Expand
     new HoverRowAction({
-      icon: 'thinArrowRight',
+      icon: 'expand_more',
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_EXPAND_OPTIONS',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
         return (item instanceof ImportableMapField) &&
@@ -444,7 +444,7 @@ export class ImportDataComponent
 
     // Collapse
     new HoverRowAction({
-      icon: 'thinArrowDown',
+      icon: 'expand_less',
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_COLLAPSE_OPTIONS',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
         return (item instanceof ImportableMapField) &&
@@ -508,7 +508,7 @@ export class ImportDataComponent
 
     // Clone
     new HoverRowAction({
-      icon: 'fileCopy',
+      icon: 'content_copy',
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_CLONE',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
         return item instanceof ImportableMapField;
