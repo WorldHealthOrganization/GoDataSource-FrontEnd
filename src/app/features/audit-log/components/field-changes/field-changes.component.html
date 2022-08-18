@@ -56,7 +56,7 @@
         <div
             fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="3px"
             [matTooltip]="'LNG_PAGE_LIST_AUDIT_LOGS_RICH_TEXT_DESCRIPTION' | translate">
-            <span class="xt-icon">info</span>
+            <mat-icon>info</mat-icon>
             <span class="rich-content">{{'LNG_PAGE_LIST_AUDIT_LOGS_RICH_TEXT_LABEL' | translate}}</span>
         </div>
     </div>
@@ -72,8 +72,7 @@
         fxLayout="row" fxLayoutGap="3px"
         (click)="collapsed = !collapsed">
         <span class="field-name">{{valueAsObjectOrArray.rootProperty}}</span>
-        <span *ngIf="collapsed" class="xt-icon">thinArrowRight</span>
-        <span *ngIf="!collapsed" class="xt-icon">thinArrowDown</span>
+        <mat-icon>{{collapsed ? 'expand_more' : 'expand_less' }}</mat-icon>
     </div>
     <div
         [fxShow]="!collapsed"
