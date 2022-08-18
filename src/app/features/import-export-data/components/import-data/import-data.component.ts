@@ -36,6 +36,7 @@ import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v
 import { IV2LoadingDialogHandler } from '../../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
 import { ILocation } from '../../../../shared/forms-v2/core/app-form-location-base-v2';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { AppMessages } from '../../../../core/enums/app-messages.enum';
 
 export enum ImportServerModelNames {
   CASE_LAB_RESULTS = 'labResult',
@@ -369,7 +370,7 @@ export class ImportDataComponent
   recordActions: HoverRowAction[] = [
     // Add
     new HoverRowAction({
-      icon: 'addCircle',
+      icon: 'add_circle_outline',
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_ADD_NEW_FIELD_OPTION',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
         return (item instanceof ImportableMapField) &&
@@ -412,7 +413,7 @@ export class ImportDataComponent
 
     // Expand
     new HoverRowAction({
-      icon: 'thinArrowRight',
+      icon: 'expand_more',
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_EXPAND_OPTIONS',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
         return (item instanceof ImportableMapField) &&
@@ -444,7 +445,7 @@ export class ImportDataComponent
 
     // Collapse
     new HoverRowAction({
-      icon: 'thinArrowDown',
+      icon: 'expand_less',
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_COLLAPSE_OPTIONS',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
         return (item instanceof ImportableMapField) &&
@@ -508,7 +509,7 @@ export class ImportDataComponent
 
     // Clone
     new HoverRowAction({
-      icon: 'fileCopy',
+      icon: 'content_copy',
       iconTooltip: 'LNG_PAGE_IMPORT_DATA_BUTTON_CLONE',
       visible: (item: ImportableMapField | IMappedOption): boolean => {
         return item instanceof ImportableMapField;
@@ -829,6 +830,9 @@ export class ImportDataComponent
       this.onWindowResizeScope,
       true
     );
+
+    // hide toast
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_IMPORT_DATA_MAPPING_FINISHED);
 
     // release search logic
     if (this.triggerImportListRefresh) {
@@ -2795,6 +2799,9 @@ export class ImportDataComponent
       message: 'LNG_PAGE_IMPORT_DATA_RETRIEVING_UNIQUE_VALUES'
     });
 
+    // hide toast
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_IMPORT_DATA_MAPPING_FINISHED);
+
     // retrieve items
     this.importExportDataService
       .determineDistinctValues(
@@ -3198,7 +3205,7 @@ export class ImportDataComponent
                     this.toastV2Service.success(
                       'LNG_PAGE_IMPORT_DATA_MAPPING_FINISHED',
                       {},
-                      true
+                      AppMessages.APP_MESSAGE_IMPORT_DATA_MAPPING_FINISHED
                     );
                   });
                 });

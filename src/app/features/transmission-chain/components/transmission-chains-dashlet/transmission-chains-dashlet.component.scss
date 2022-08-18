@@ -5,11 +5,11 @@ app-transmission-chains-dashlet {
   /* Page top section */
   .gd-basic-top {
     padding-bottom: 2.4rem;
-  
+
     @include breakpoint('xs') {
       padding-bottom: 0.8rem;
     }
-  
+
     .gd-basic-top-title-buttons {
       /* Page title */
       .gd-basic-top-title-buttons-title {
@@ -19,7 +19,7 @@ app-transmission-chains-dashlet {
         font-weight: 500;
         line-height: $gd-line-height;
       }
-    
+
       /* Page top buttons */
       .gd-basic-top-title-buttons-buttons {
         &:empty {
@@ -247,32 +247,29 @@ app-transmission-chains-dashlet {
           font-weight: 700;
           margin-top: 0.8rem;
           margin-bottom: 0.8rem;
-  
+
           .legend-field-name {
             font-weight: 400;
           }
         }
-  
+
         .legend-item {
           @include flex(flex);
           @include flex_align_items(center);
-  
+
           > :first-child {
             margin-right: 0.4rem;
           }
-  
-          .xt-icon {
-            font-size: 1.6rem;
-          }
-  
+
           .mat-icon {
             font-family: 'Material Icons';
             font-size: 1.6rem;
             font-style: normal;
             font-weight: 400;
+            line-height: inherit;
           }
         }
-  
+
         .legend-item:after {
           clear: both;
           content: ".";
@@ -280,12 +277,12 @@ app-transmission-chains-dashlet {
           height: 0;
           visibility: hidden;
         }
-  
+
         .legend-color {
           height: 1.6rem;
           width: 1.6rem;
         }
-  
+
         .matches-filter {
           background-color: transparent;
           border: double 0.4rem;
@@ -295,7 +292,7 @@ app-transmission-chains-dashlet {
           margin-right: 0.8rem;
           width: 1.6rem;
         }
-  
+
         .legend-icon {
           background-repeat: no-repeat;
           background-size: contain;
@@ -327,18 +324,18 @@ app-transmission-chains-dashlet {
         margin: 0.4rem 0.8rem;
         position: fixed;
       }
-  
+
       .cy-zoom-buttons {
         bottom: 0;
         left: 0;
         padding: 0.8rem;
         position: absolute;
         z-index: 9999;
-  
+
         &.cy-zoom-buttons-full-screen {
           position: fixed;
         }
-  
+
         .cy-zoom-button {
           display: block;
           font-weight: 700;
@@ -358,15 +355,15 @@ app-transmission-chains-dashlet {
           }
         }
       }
-  
+
       .cytoscape-graph-container {
         height: 100%;
-  
+
         .graph-inner-container {
           height: 100%;
         }
       }
-  
+
       .cy {
         display: block;
         height: 100%;
@@ -374,7 +371,7 @@ app-transmission-chains-dashlet {
         overflow: hidden;
         padding: 1.6rem;
         width: 100%;
-  
+
         &.cy-full-screen {
           background-color: var(--gd-background);
           height: 100vh; /* Fallback for browsers which cannot support Custom Properties */
@@ -386,35 +383,35 @@ app-transmission-chains-dashlet {
           z-index: 1010;
         }
       }
-  
+
       .entities-no-dates {
         cursor: pointer;
       }
-  
+
       .graph-actions {
         position: absolute;
         right: 0.8rem;
         top: 0.8rem;
         z-index: 9999;
-  
+
         &.graph-actions-geo-map {
           margin-right: 13.2rem;
         }
-  
+
         &.graph-actions-full-screen {
           position: fixed;
-  
+
           &.graph-actions-geo-map {
             margin-right: 14.8rem;
           }
         }
       }
     }
-  
+
     /* Graph map */
     .geospatial-map-container {
       height: 100%;
-  
+
       app-world-map {
         .world-map-full-screen {
           right: 32.4rem;
@@ -427,7 +424,7 @@ app-transmission-chains-dashlet {
         top: 1.6rem;
       }
     }
-  
+
     /* Graph timeline */
     .timeline-info-buttons {
       bottom: 0.8rem;

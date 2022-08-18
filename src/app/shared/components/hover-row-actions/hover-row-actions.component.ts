@@ -104,7 +104,7 @@ export enum HoverRowActionsPosition {
   selector: 'app-hover-row-actions',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './hover-row-actions.component.html',
-  styleUrls: ['./hover-row-actions.component.less']
+  styleUrls: ['./hover-row-actions.component.scss']
 })
 export class HoverRowActionsComponent implements OnInit, OnDestroy {
   /**

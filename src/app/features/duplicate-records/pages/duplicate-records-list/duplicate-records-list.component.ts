@@ -105,8 +105,12 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
       );
     }
 
+    // remove global notifications
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_MERGE_ACTIVE_OUTBREAK);
+
     // initialize pagination
     this.initPaginator();
+
     // ...and re-load the list when the Selected Outbreak is changed
     this.needsRefreshList(true);
   }

@@ -1141,7 +1141,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         // must refactor this entire function :)
         (this.clusterOptions || []).forEach((item) => {
           this.legend.edgeIcon[item.id] = {
-            class: 'mat-icon',
             icon: item.icon
           };
         });
@@ -1157,7 +1156,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         }
         _.forEach(edgeIconReferenceDataEntries, (value) => {
           this.legend.edgeIcon[value.value] = {
-            class: 'xt-icon',
             icon: getEdgeIconFunc(value.value)
           };
         });
@@ -1181,7 +1179,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         getNodeShapeFunc = GraphNodeModel.getNodeShapeClassification;
       }
       _.forEach(nodeShapeReferenceDataEntries, (value) => {
-        this.legend.nodeShape[value.value] = `${getNodeShapeFunc(value.value)}_shape`;
+        this.legend.nodeShape[value.value] = getNodeShapeFunc(value.value);
       });
       this.legend.nodeShapeKeys = Object.keys(this.legend.nodeShape);
     }
