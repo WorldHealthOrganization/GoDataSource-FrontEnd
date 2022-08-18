@@ -20,6 +20,7 @@ import { DeviceDataService } from '../../../../core/services/data/device.data.se
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import * as _ from 'lodash';
 
 /**
  * Component
@@ -349,7 +350,13 @@ export class SystemDevicesCreateViewModifyComponent extends CreateViewModifyComp
   /**
    * Initialize expand list advanced filters
    */
-  protected initializeExpandListAdvancedFilters(): void {}
+  protected initializeExpandListAdvancedFilters(): void {
+    this.expandListAdvancedFilters = DeviceModel.generateAdvancedFilters({
+      options: {
+        deviceStatus: _.values(this.Constants.DEVICE_WIPE_STATUS)
+      }
+    });
+  }
 
   /**
    * Refresh expand list

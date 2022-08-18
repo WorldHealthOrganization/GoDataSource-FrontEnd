@@ -15,6 +15,7 @@ import { map, takeUntil } from 'rxjs/operators';
 import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { TranslateService } from '@ngx-translate/core';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import * as _ from 'lodash';
 
 @Component({
   selector: 'app-view-history-system-device',
@@ -213,7 +214,13 @@ export class ViewHistorySystemDeviceComponent extends CreateViewModifyComponent<
   /**
   * Initialize expand list advanced filters
   */
-  protected initializeExpandListAdvancedFilters(): void {}
+  protected initializeExpandListAdvancedFilters(): void {
+    this.expandListAdvancedFilters = DeviceModel.generateAdvancedFilters({
+      options: {
+        deviceStatus: _.values(this.Constants.DEVICE_WIPE_STATUS)
+      }
+    });
+  }
 
   /**
   * Refresh expand list
