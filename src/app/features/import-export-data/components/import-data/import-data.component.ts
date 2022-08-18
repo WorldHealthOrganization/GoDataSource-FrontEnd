@@ -36,6 +36,7 @@ import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v
 import { IV2LoadingDialogHandler } from '../../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
 import { ILocation } from '../../../../shared/forms-v2/core/app-form-location-base-v2';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { AppMessages } from '../../../../core/enums/app-messages.enum';
 
 export enum ImportServerModelNames {
   CASE_LAB_RESULTS = 'labResult',
@@ -829,6 +830,9 @@ export class ImportDataComponent
       this.onWindowResizeScope,
       true
     );
+
+    // hide toast
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_IMPORT_DATA_MAPPING_FINISHED);
 
     // release search logic
     if (this.triggerImportListRefresh) {
@@ -2795,6 +2799,9 @@ export class ImportDataComponent
       message: 'LNG_PAGE_IMPORT_DATA_RETRIEVING_UNIQUE_VALUES'
     });
 
+    // hide toast
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_IMPORT_DATA_MAPPING_FINISHED);
+
     // retrieve items
     this.importExportDataService
       .determineDistinctValues(
@@ -3198,7 +3205,7 @@ export class ImportDataComponent
                     this.toastV2Service.success(
                       'LNG_PAGE_IMPORT_DATA_MAPPING_FINISHED',
                       {},
-                      true
+                      AppMessages.APP_MESSAGE_IMPORT_DATA_MAPPING_FINISHED
                     );
                   });
                 });
