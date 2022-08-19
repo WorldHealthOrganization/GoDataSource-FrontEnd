@@ -310,6 +310,14 @@ export class Constants {
     USER_WORKLOAD: {
       label: 'LNG_APP_PAGE_USER_WORKLOAD',
       value: 'LNG_APP_PAGE_USER_WORKLOAD'
+    },
+    HELP_SEARCH: {
+      label: 'LNG_APP_PAGE_HELP_SEARCH',
+      value: 'LNG_APP_PAGE_HELP_SEARCH'
+    },
+    SYSTEM_DEVICES: {
+      label: 'LNG_APP_PAGE_SYSTEM_DEVICES',
+      value: 'LNG_APP_PAGE_SYSTEM_DEVICES'
     }
   };
 

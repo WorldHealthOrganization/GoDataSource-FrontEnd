@@ -349,7 +349,13 @@ export class SystemDevicesCreateViewModifyComponent extends CreateViewModifyComp
   /**
    * Initialize expand list advanced filters
    */
-  protected initializeExpandListAdvancedFilters(): void {}
+  protected initializeExpandListAdvancedFilters(): void {
+    this.expandListAdvancedFilters = DeviceModel.generateAdvancedFilters({
+      options: {
+        deviceStatus: Object.values(this.Constants.DEVICE_WIPE_STATUS)
+      }
+    });
+  }
 
   /**
    * Refresh expand list
