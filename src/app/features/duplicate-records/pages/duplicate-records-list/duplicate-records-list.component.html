@@ -217,13 +217,20 @@
     </div>
   </ng-container>
 
-<!--    &lt;!&ndash; No data &ndash;&gt;-->
-<!--    #TODO -->
-<!--    <div-->
-<!--        *ngIf="!refreshingList && isEmptyList"-->
-<!--        class="empty-table-text">-->
-<!--        {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}-->
-<!--    </div>-->
+  <!-- No data -->
+  <div
+    *ngIf="true"
+    fxLayout="column" fxLayoutAlign="center center"
+    class="gd-create-view-modify-list-data-no-records">
+
+    <!-- Image -->
+    <div
+      class="gd-create-view-modify-list-data-no-records-image"></div>
+
+    <!-- Message -->
+    <div
+      class="gd-create-view-modify-list-data-no-records-text">{{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}</div>
+  </div>
 
   <!-- Pages (need to be hidden and not ngIf, otherwise it makes a new duplicate request) -->
   <app-mat-paginator-extended

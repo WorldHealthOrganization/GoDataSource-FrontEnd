@@ -19,7 +19,7 @@ import { ContactOfContactModel } from '../../../../core/models/contact-of-contac
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { IV2ActionIconLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2ActionIcon, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { Router } from '@angular/router';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 
@@ -55,7 +55,7 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
   ];
 
   // action
-  actionButton: IV2ActionIconLabel;
+  actionButton: IV2ActionIcon;
 
   /**
    * Constructor
@@ -71,9 +71,9 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
 
     // action button
     this.actionButton = {
-      type: V2ActionType.ICON_LABEL,
-      icon: '',
-      label: 'LNG_COMMON_BUTTON_REFRESH_LIST',
+      type: V2ActionType.ICON,
+      icon: 'refresh',
+      primary: false,
       action: {
         click: () => {
           this.needsRefreshList(true);

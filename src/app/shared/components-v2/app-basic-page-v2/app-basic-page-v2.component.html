@@ -27,9 +27,26 @@
       class="gd-basic-top-title-buttons-buttons">
 
       <!-- Action button -->
+      <!-- primary button? -->
       <a
-        *ngIf="actionButton && (!actionButton.visible || actionButton.visible(null))"
+        *ngIf="actionButton && (!actionButton.visible || actionButton.visible(null)) && actionButton.primary"
         mat-flat-button
+        [routerLink]="actionButton.action.link && (!actionButton.disable || !actionButton.disable(null)) ? actionButton.action.link(null) : undefined"
+        [queryParams]="actionButton.action.linkQueryParams ? actionButton.action.linkQueryParams(null) : undefined"
+        [disabled]="actionButton.disable && actionButton.disable(null)"
+        (click)="actionButton.action.click ? actionButton.action.click(null) : undefined">
+
+        <!-- Icon -->
+        <mat-icon
+          *ngIf="actionButton.icon">{{actionButton.icon}}</mat-icon>
+
+        <!-- Label -->
+        <span>{{ actionButton.label | translate }}</span>
+      </a>
+      <!-- secondary button -->
+      <a
+        *ngIf="actionButton && (!actionButton.visible || actionButton.visible(null)) && !actionButton.primary"
+        mat-icon-button
         [routerLink]="actionButton.action.link && (!actionButton.disable || !actionButton.disable(null)) ? actionButton.action.link(null) : undefined"
         [queryParams]="actionButton.action.linkQueryParams ? actionButton.action.linkQueryParams(null) : undefined"
         [disabled]="actionButton.disable && actionButton.disable(null)"
