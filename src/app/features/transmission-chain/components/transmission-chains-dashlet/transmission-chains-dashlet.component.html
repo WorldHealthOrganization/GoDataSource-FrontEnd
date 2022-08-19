@@ -375,7 +375,7 @@
         </div>
         <div
           *ngFor="let nodeShapeItem of legend.nodeShapeKeys" class="legend-item">
-          <span class="xt-icon">{{legend.nodeShape[nodeShapeItem]}}</span>
+          <span><mat-icon>{{legend.nodeShape[nodeShapeItem]}}</mat-icon></span>
           <div>
             {{nodeShapeItem | translate}}
           </div>
@@ -389,10 +389,7 @@
         </div>
         <div
           *ngFor="let edgeIconItem of legend.edgeIconKeys" class="legend-item">
-                  <span
-                    [class]="legend.edgeIcon[edgeIconItem].class">
-                      {{ legend.edgeIcon[edgeIconItem].icon }}
-                  </span>
+          <span><mat-icon>{{legend.edgeIcon[edgeIconItem].icon}}</mat-icon></span>
           <div>
             {{legend.clustersList && legend.clustersList[edgeIconItem] ? legend.clustersList[edgeIconItem] : (edgeIconItem | translate)}}
           </div>
@@ -488,7 +485,7 @@
         <!-- cytoscape element -->
         <div
           #cyItem
-          class="cy xt-icon {{ fullScreen ? 'cy-full-screen' : ''}}">
+          class="cy {{ fullScreen ? 'cy-full-screen' : ''}}">
         </div>
       </div>
 
