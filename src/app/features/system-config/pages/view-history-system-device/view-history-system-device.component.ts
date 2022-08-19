@@ -22,13 +22,14 @@ import * as _ from 'lodash';
   templateUrl: './view-history-system-device.component.html'
 })
 export class ViewHistorySystemDeviceComponent extends CreateViewModifyComponent<DeviceHistoryModel> implements OnDestroy {
+  // data
   private _devicesHistoryValues: string[] = [];
   private _devicesHistoryPlaceholders: string[] = [];
   private _deviceId: string;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected toastV2Service: ToastV2Service,
     protected activatedRoute: ActivatedRoute,
@@ -59,8 +60,8 @@ export class ViewHistorySystemDeviceComponent extends CreateViewModifyComponent<
   }
 
   /**
-  * Create new item model if needed
-  */
+   * Create new item model if needed
+   */
   protected createNewItem(): DeviceHistoryModel {
     return null;
   }
@@ -72,24 +73,23 @@ export class ViewHistorySystemDeviceComponent extends CreateViewModifyComponent<
     // view other device history?
     this._deviceId = record?.id ?? this._deviceId;
 
+    // retrieve data
     return new Observable(subscriber => {
       this.deviceDataService.getHistoryDevice(this._deviceId)
         .subscribe((results) => {
           this._devicesHistoryPlaceholders = [];
           this._devicesHistoryValues = results.map(item => {
-            // format createdAt
-            const createdAt: string = item.createdAt
-              ? moment(item.createdAt).format(this.Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
-              '';
-
             // format status
-            const status: string = item.status ?
-              this.translateService.instant(item.status) :
-              '';
-            this._devicesHistoryPlaceholders.push(status);
+            this._devicesHistoryPlaceholders.push(
+              item.status ?
+                this.translateService.instant(item.status) :
+                ''
+            );
 
-            // finish
-            return createdAt;
+            // format createdAt
+            return item.createdAt ?
+              moment(item.createdAt).format(this.Constants.DEFAULT_DATE_TIME_DISPLAY_FORMAT) :
+              '';
           });
 
           // finish
@@ -160,7 +160,7 @@ export class ViewHistorySystemDeviceComponent extends CreateViewModifyComponent<
                 remove: undefined,
                 input: {
                   type: CreateViewModifyV2TabInputType.LIST_TEXT,
-                  placeholder: (_value, index) => {
+                  placeholder: (_input, _parentInput, index) => {
                     return this._devicesHistoryPlaceholders[index];
                   }
                 }
@@ -251,8 +251,8 @@ export class ViewHistorySystemDeviceComponent extends CreateViewModifyComponent<
   }
 
   /**
-     * Initialize breadcrumbs
-     */
+   * Initialize breadcrumbs
+   */
   initializeBreadcrumbs() {
     // reset
     this.breadcrumbs = [{

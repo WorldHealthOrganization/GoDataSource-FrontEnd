@@ -16,7 +16,7 @@
   [infos]="infos"
   [suffixLegends]="suffixLegends"
   [filtersApplied]="filtersApplied"
-  [advancedFilterType]="undefined"
+  [advancedFilterType]="Constants.APP_PAGE.HELP_SEARCH.value"
   [advancedFilters]="advancedFilters"
   paginatorDisabled="true"
   (refreshData)="needsRefreshList(true)"
@@ -27,4 +27,3 @@
   (resetHeaderFilters)="resetFiltersToSideFilters()"
   (advancedFilterBy)="applySideFilters($event)">
 </app-list-table-v2>
-<!-- #TODO: Needs [advancedFilterType] -->

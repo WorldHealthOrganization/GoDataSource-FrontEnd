@@ -11,12 +11,10 @@
   listTitle="LNG_PAGE_VIEW_HELP_ITEM_TITLE"
   [expandListRecords$]="expandListRecords$"
   [expandListColumnRenderer]="expandListColumnRenderer"
-  [expandListAdvancedFilterType]="undefined"
+  [expandListAdvancedFilterType]="Constants.APP_PAGE.HELP_SEARCH.value"
   [expandListAdvancedFilters]="expandListAdvancedFilters"
   [expandListQueryFields]="expandListQueryFields"
-  expandListAdvancedFiltersCacheKey="/help/categories/{categoryId}/items/{id}/view-global"
+  [expandListAdvancedFiltersCacheKey]="undefined"
   (expandListRefreshData)="refreshExpandList($event)"
   (expandListChangeRecord)="expandListChangeRecord($event)">
 </app-create-view-modify-v2>
-<!-- #TODO: Needs [expandListAdvancedFilterType] -->
-<!-- #TODO: Is expandListAdvancedFiltersCacheKey what it should be? -->

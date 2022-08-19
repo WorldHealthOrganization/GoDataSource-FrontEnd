@@ -54,7 +54,6 @@ const routes: Routes = [
     resolve:
     {
       helpCategory: HelpCategoryDataResolver
-
     }
   },
   // Help categories list

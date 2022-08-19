@@ -75,11 +75,15 @@ export class ViewHelpComponent extends CreateViewModifyComponent<HelpItemModel> 
    */
   protected retrieveItem(record?: HelpItemModel): Observable<HelpItemModel> {
     // view other help item?
-    if (record?.id && record?.categoryId) {
+    if (
+      record?.id &&
+      record?.categoryId
+    ) {
       this._itemId = record?.id;
       this._categoryId = record?.categoryId;
     }
 
+    // retrieve data
     return new Observable((subscriber) => {
       this.helpDataService
         .getHelpItem(this._categoryId, this._itemId)
@@ -234,7 +238,6 @@ export class ViewHelpComponent extends CreateViewModifyComponent<HelpItemModel> 
     // retrieve data
     this.expandListRecords$ = this.helpDataService.getHelpItemsList(data.queryBuilder)
       .pipe(
-
         // should be the last pipe
         takeUntil(this.destroyed$)
       );
