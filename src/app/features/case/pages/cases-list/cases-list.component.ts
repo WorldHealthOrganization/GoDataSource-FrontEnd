@@ -1675,6 +1675,9 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
               null
             );
 
+            // allow deleted records
+            qb.includeDeleted();
+
             // export
             this.exportCases(qb);
           }
