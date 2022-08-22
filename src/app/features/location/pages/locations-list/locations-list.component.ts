@@ -19,7 +19,7 @@ import { ExportDataExtension, ExportDataMethod } from '../../../../core/services
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
-import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2ActionIcon, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2FilterText, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-location.model';
@@ -36,6 +36,16 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
   // parent tree
   private _parentLocationTree: HierarchicalLocationModel;
   pageTitle: string;
+
+  // view action
+  viewAction: IV2ActionIcon = {
+    type: V2ActionType.ICON,
+    icon: '',
+    action: {
+      link: () => ['/locations', this._parentId, 'view']
+    },
+    visible: () => LocationModel.canView(this.authUser)
+  };
 
   /**
    * Constructor

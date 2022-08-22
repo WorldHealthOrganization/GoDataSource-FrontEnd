@@ -38,7 +38,7 @@ interface IV2ActionLink {
 /**
  * Action Icon
  */
-interface IV2ActionIcon {
+export interface IV2ActionIcon {
   // type
   type: V2ActionType.ICON;
   icon: string;

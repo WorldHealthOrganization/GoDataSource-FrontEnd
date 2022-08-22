@@ -16,10 +16,20 @@
 
     <!-- Title -->
     <div
-      fxFlex
       class="gd-list-top-tile-buttons-title">
       {{pageTitle | translate}}
     </div>
+
+    <!-- View button -->
+    <a
+      *ngIf="viewAction && viewAction?.visible(undefined)"
+      type="button"
+      class="gd-list-top-tile-buttons-view"
+      mat-icon-button
+      [routerLink]="viewAction.action.link(undefined)"
+      [queryParams]="viewAction.action.linkQueryParams ? viewAction.action.linkQueryParams(undefined) : undefined">
+      <mat-icon>visibility</mat-icon>
+    </a>
 
     <!-- Buttons -->
     <div
