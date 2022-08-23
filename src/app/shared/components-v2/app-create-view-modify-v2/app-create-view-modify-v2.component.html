@@ -706,7 +706,7 @@
                     fxFlex
                     [(ngModel)]="parentInput.items[parentItemIndex]"
                     [name]="parentName + '[' + parentItemIndex + ']'"
-                    [placeholder]="input.placeholder()"
+                    [placeholder]="input.placeholder(input, parentInput, parentItemIndex)"
                     [tooltip]="input.description ? input.description() : undefined"
                     [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
                     [viewOnly]="isView"
