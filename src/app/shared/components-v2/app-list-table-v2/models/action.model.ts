@@ -58,11 +58,13 @@ export interface IV2ActionIcon {
   action: IV2ActionClick | IV2ActionLink;
 
   // optional
-  primary?: boolean;
   iconTooltip?: string;
   visible?: (data: any) => boolean;
   disable?: (data: any) => boolean;
   cssClasses?: (data: any) => string;
+
+  // never
+  label?: never;
 }
 
 /**
@@ -76,10 +78,12 @@ export interface IV2ActionIconLabel {
   action: IV2ActionClick | IV2ActionLink;
 
   // optional
-  primary?: boolean;
   iconTooltip?: string;
   visible?: (data: any) => boolean;
   disable?: (data: any) => boolean;
+
+  // never
+  cssClasses?: never;
 }
 
 /**

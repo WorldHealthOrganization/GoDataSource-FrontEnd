@@ -73,7 +73,7 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
     this.actionButton = {
       type: V2ActionType.ICON,
       icon: 'refresh',
-      primary: false,
+      iconTooltip: 'LNG_COMMON_BUTTON_REFRESH_LIST',
       action: {
         click: () => {
           this.needsRefreshList(true);
