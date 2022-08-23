@@ -3,6 +3,8 @@ import { IPermissionBasic, IPermissionDevice } from './permission.interface';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
 import { BaseModel } from './base.model';
+import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 
 export class DeviceModel
   extends BaseModel
@@ -33,6 +35,68 @@ export class DeviceModel
      */
   static canListHistory(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DEVICE_LIST_HISTORY) : false; }
   static canWipe(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.DEVICE_WIPE) : false; }
+
+  /**
+   * Advanced filters
+   */
+  static generateAdvancedFilters(data: {
+    options: {
+      deviceStatus: ILabelValuePairModel[]
+    }
+  }): V2AdvancedFilter[] {
+    // finished
+    return [
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'name',
+        label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_NAME',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'description',
+        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_DESCRIPTION',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'physicalDeviceId',
+        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_PHYSICAL_DEVICE_ID',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'manufacturer',
+        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_MANUFACTURER',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'model',
+        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_MODEL',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'os',
+        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_OPERATING_SYSTEM',
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'status',
+        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_STATUS',
+        options: data.options.deviceStatus,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'lastSeen',
+        label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_LAST_SEEN',
+        sortable: true
+      }
+    ];
+  }
 
   /**
      * Constructor

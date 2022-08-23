@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
 import { TopnavComponent } from '../../../core/components/topnav/topnav.component';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
-import { IV2ActionIconLabel, IV2ActionMenuLabel } from '../app-list-table-v2/models/action.model';
+import { IV2ActionIcon, IV2ActionIconLabel, IV2ActionMenuLabel, V2ActionType } from '../app-list-table-v2/models/action.model';
 import { V2AdvancedFilter } from '../app-list-table-v2/models/advanced-filter.model';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
 import { SavedFilterData } from '../../../core/models/saved-filters.model';
@@ -28,7 +28,7 @@ export class AppBasicPageV2Component implements OnInit, OnDestroy {
   @Input() quickActions: IV2ActionMenuLabel;
 
   // button
-  @Input() actionButton: IV2ActionIconLabel;
+  @Input() actionButton: IV2ActionIconLabel | IV2ActionIcon;
 
   // advanced filters
   @Input() advancedFilterType: string;
@@ -38,6 +38,14 @@ export class AppBasicPageV2Component implements OnInit, OnDestroy {
 
   // applied filters
   private _advancedFiltersApplied: SavedFilterData;
+
+  // selected outbreak dropdown should be disabled ? by default is disabled
+  @Input() set selectedOutbreakDisabled(value: boolean) {
+    TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = value;
+  }
+
+  // constants
+  V2ActionType = V2ActionType;
 
   // filter by
   @Output() advancedFilterBy = new EventEmitter<IV2SideDialogAdvancedFiltersResponse>();

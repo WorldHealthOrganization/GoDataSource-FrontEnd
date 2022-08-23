@@ -277,11 +277,16 @@ export class ImportExportDataService {
   }
 
   /**
-     * export images as  pdf
-     * @param {{image: string; responseType: string; splitFactor: number}} imageData
-     * @returns {Observable<any>}
-     */
-  exportImageToPdf( imageData: { image: string, responseType: string, splitFactor: number }): Observable<any> {
+   * Export images as  pdf
+   */
+  exportImageToPdf(
+    imageData: {
+      image: string,
+      responseType: string,
+      splitFactor: number,
+      splitType?: 'auto' | 'grid' | 'horizontal' | 'vertical'
+    }
+  ): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/pdf' });
     return this.http.post('/system-settings/image-to-pdf/', imageData,  { headers, responseType: 'blob' });
   }

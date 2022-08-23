@@ -343,6 +343,9 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
               null
             );
 
+            // allow deleted records
+            qb.includeDeleted();
+
             // export
             this.exportFollowUps(qb);
           }

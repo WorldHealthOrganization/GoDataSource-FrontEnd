@@ -85,15 +85,15 @@ export class GraphNodeModel {
   static getNodeShapeType(type: EntityType): string | undefined {
     switch (type) {
       case EntityType.CASE:
-        return 'ellipse';
+        return 'circle';
       case EntityType.CONTACT:
         return 'pentagon';
       case EntityType.CONTACT_OF_CONTACT:
-        return 'diamond';
+        return 'square';
       case EntityType.EVENT:
         return 'star';
       default:
-        return 'ellipse';
+        return 'circle';
     }
   }
 
@@ -103,13 +103,13 @@ export class GraphNodeModel {
   static getNodeShapeClassification(classification: string): string | undefined {
     switch (classification) {
       case Constants.CASE_CLASSIFICATION.CONFIRMED:
-        return 'ellipse';
+        return 'circle';
       case Constants.CASE_CLASSIFICATION.PROBABLE:
-        return 'rectangle';
+        return 'square';
       case Constants.CASE_CLASSIFICATION.SUSPECT:
         return 'pentagon';
       default:
-        return 'ellipse';
+        return 'circle';
     }
   }
 

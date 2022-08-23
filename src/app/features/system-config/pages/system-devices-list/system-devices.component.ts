@@ -12,6 +12,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 
 @Component({
   selector: 'app-system-devices-list',
@@ -58,37 +59,65 @@ export class SystemDevicesComponent extends ListComponent<DeviceModel> implement
       {
         field: 'name',
         label: 'LNG_SYSTEM_CLIENT_APPLICATION_FIELD_LABEL_NAME',
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'description',
         label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_DESCRIPTION',
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'physicalDeviceId',
         label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_PHYSICAL_DEVICE_ID',
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'manufacturer',
         label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_MANUFACTURER',
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'model',
         label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_MODEL',
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'os',
         label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_OPERATING_SYSTEM',
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
       },
       {
         field: 'status',
         label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_STATUS',
-        sortable: true
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: _.values(this.Constants.DEVICE_WIPE_STATUS)
+        }
       },
       {
         field: 'lastSeen',
@@ -96,6 +125,9 @@ export class SystemDevicesComponent extends ListComponent<DeviceModel> implement
         sortable: true,
         format: {
           type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
         }
       },
 
@@ -321,7 +353,13 @@ export class SystemDevicesComponent extends ListComponent<DeviceModel> implement
   /**
    * Initialize Table Advanced Filters
    */
-  protected initializeTableAdvancedFilters(): void {}
+  protected initializeTableAdvancedFilters(): void {
+    this.advancedFilters = DeviceModel.generateAdvancedFilters({
+      options: {
+        deviceStatus: _.values(this.Constants.DEVICE_WIPE_STATUS)
+      }
+    });
+  }
 
   /**
    * Initialize table quick actions

@@ -1820,6 +1820,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               null
             );
 
+            // allow deleted records
+            qb.includeDeleted();
+
             // export
             this.exportFollowUps(qb);
           }
