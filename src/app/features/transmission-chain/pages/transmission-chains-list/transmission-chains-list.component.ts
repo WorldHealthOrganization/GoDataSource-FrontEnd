@@ -79,11 +79,23 @@ export class TransmissionChainsListComponent extends ListComponent<TransmissionC
       },
       {
         field: 'size',
+        label: 'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NO_ENTITIES'
+      },
+      {
+        field: 'noCases',
         label: 'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NO_CASES'
       },
       {
         field: 'noAliveCases',
         label: 'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NO_CASES_ALIVE'
+      },
+      {
+        field: 'noDeceasedCases',
+        label: 'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NO_CASES_DECEASED'
+      },
+      {
+        field: 'eventsCount',
+        label: 'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NUMBER_OF_EVENTS'
       },
       {
         field: 'contactsCount',
@@ -298,7 +310,8 @@ export class TransmissionChainsListComponent extends ListComponent<TransmissionC
       'nodes.name',
       'nodes.firstName',
       'nodes.middleName',
-      'nodes.lastName'
+      'nodes.lastName',
+      'nodes.outcomeId'
     ];
   }
 

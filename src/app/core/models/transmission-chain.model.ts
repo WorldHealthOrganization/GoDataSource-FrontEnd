@@ -35,6 +35,8 @@ implements
   size: number;
   // total number of contacts
   contactsCount: number;
+  // total number of events
+  eventsCount: number = 0;
   // earliest date of onset
   earliestDateOfOnset: string;
   // root case
@@ -95,23 +97,24 @@ implements
     let earliestDateOfOnset: Moment;
     const processRelationPersonId = (personId) => {
       if (
-      // if we didn't already collect this Case info
+        // if we didn't already collect this Case info
         !this.casesMap[personId] &&
-                !this.eventsMap[personId] &&
-                // and if we have Case info
-                entityMap[personId]
+        !this.eventsMap[personId] &&
+        // and if we have Case info
+        entityMap[personId]
       ) {
         // collect Case or Event info, mapped by personID
         if (entityMap[personId].type === EntityType.EVENT) {
           const eventModel: EventModel = entityMap[personId].model as EventModel;
           this.eventsMap[personId] = eventModel;
+          this.eventsCount++;
           const date = eventModel.date ?
             moment(eventModel.date) :
             undefined;
           if (
             date && (
               !earliestDateOfOnset ||
-                            date.isBefore(earliestDateOfOnset)
+              date.isBefore(earliestDateOfOnset)
             )
           ) {
             earliestDateOfOnset = date;
@@ -127,7 +130,7 @@ implements
           if (
             date && (
               !earliestDateOfOnset ||
-                            date.isBefore(earliestDateOfOnset)
+              date.isBefore(earliestDateOfOnset)
             )
           ) {
             earliestDateOfOnset = date;
@@ -192,27 +195,31 @@ implements
   canViewAnyGraph(user: UserModel): boolean { return TransmissionChainModel.canViewAnyGraph(user); }
 
   /**
-     * Length of the chain - number of relations
-     * @returns {number}
-     */
+   * Length of the chain - number of relations
+   */
   get length(): number {
     return this.chainRelations ? this.chainRelations.length : 0;
   }
 
   /**
-     * Number of Cases in Chain
-     * @returns {number}
-     */
+   * Number of Cases in Chain
+   */
   get noCases() {
     return this.casesMapLength;
   }
 
   /**
-     * Number of Alive Cases in Chain
-     * @returns {any}
-     */
+   * Number of Alive Cases in Chain
+   */
   get noAliveCases() {
     return this.aliveCasesCount;
+  }
+
+  /**
+   * Number of Deceased Cases in Chain
+   */
+  get noDeceasedCases() {
+    return this.noCases - this.aliveCasesCount;
   }
 }
 
