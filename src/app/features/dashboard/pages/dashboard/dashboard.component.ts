@@ -29,6 +29,7 @@ import { AppCasesKpiDashletComponent } from '../../components/app-cases-kpi-dash
 import { AppContactsKpiDashletComponent } from '../../components/app-contacts-kpi-dashlet/app-contacts-kpi-dashlet.component';
 import { AppCotKpiDashletComponent } from '../../components/app-cot-kpi-dashlet/app-cot-kpi-dashlet.component';
 import * as domtoimage from 'dom-to-image';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputToggle, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -532,32 +533,96 @@ export class DashboardComponent implements OnDestroy {
    * Get Epi curve dashlet
    */
   private getEpiCurveDashlet(selector: string) {
-    const loading = this.dialogV2Service.showLoadingDialog();
-    this.domService
-      .getPNGBase64(selector, '#tempCanvas')
-      .subscribe((pngBase64) => {
-        // object not found ?
-        if (!pngBase64) {
-          this.toastV2Service.notice('LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG');
-          loading.close();
-          return;
-        }
+    this.dialogV2Service.showSideDialog({
+      // title
+      title: {
+        get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_EXPORT_FORMAT'
+      },
 
-        // export
-        this.importExportDataService
-          .exportImageToPdf({ image: pngBase64, responseType: 'blob', splitFactor: 1 })
-          .pipe(
-            catchError((err) => {
-              this.toastV2Service.error(err);
-              loading.close();
-              return throwError(err);
-            })
-          )
-          .subscribe((blob) => {
-            this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL');
+      // inputs
+      hideInputFilter: true,
+      inputs: [
+        {
+          type: V2SideDialogConfigInputType.TOGGLE,
+          value: false,
+          name: 'exportFormat',
+          options: [
+            {
+              label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_EXPORT_FORMAT_MULTI_PAGE',
+              value: false
+            },
+            {
+              label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_EXPORT_FORMAT_SINGLE_PAGE',
+              value: true
+            }
+          ]
+        }
+      ],
+
+      // buttons
+      bottomButtons: [
+        {
+          label: 'LNG_COMMON_BUTTON_EXPORT',
+          type: IV2SideDialogConfigButtonType.OTHER,
+          color: 'primary',
+          key: 'save'
+        }, {
+          type: IV2SideDialogConfigButtonType.CANCEL,
+          label: 'LNG_COMMON_BUTTON_CANCEL',
+          color: 'text'
+        }
+      ]
+    }).subscribe((response) => {
+      // cancelled ?
+      if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+        return;
+      }
+
+      // determine export format
+      const exportAsSinglePage: boolean = (response.data.map.exportFormat as IV2SideDialogConfigInputToggle).value as boolean;
+
+      // export
+      const loading = this.dialogV2Service.showLoadingDialog();
+      this.domService
+        .getPNGBase64(
+          selector,
+          '#tempCanvas',
+          1
+        )
+        .subscribe((pngBase64) => {
+          // object not found ?
+          if (!pngBase64) {
+            this.toastV2Service.notice('LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG');
             loading.close();
-          });
-      });
+            return;
+          }
+
+          // export
+          this.importExportDataService
+            .exportImageToPdf({
+              image: pngBase64,
+              responseType: 'blob',
+              splitFactor: 1,
+              splitType: exportAsSinglePage ?
+                'grid' :
+                'auto'
+            })
+            .pipe(
+              catchError((err) => {
+                this.toastV2Service.error(err);
+                loading.close();
+                return throwError(err);
+              })
+            )
+            .subscribe((blob) => {
+              this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL');
+              loading.close();
+            });
+        });
+
+      // close popup
+      response.handler.hide();
+    });
   }
 
   /**
