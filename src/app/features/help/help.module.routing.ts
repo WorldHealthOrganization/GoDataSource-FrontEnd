@@ -46,8 +46,15 @@ const routes: Routes = [
   {
     path: 'categories/:categoryId/items/:itemId/view-global',
     component: fromPages.ViewHelpComponent,
-    canActivate: [AuthGuard]
-    // NO permissions required, only to be authenticated
+    canActivate: [AuthGuard],
+    data: {
+      // NO permissions required, only to be authenticated
+      action: CreateViewModifyV2Action.VIEW
+    },
+    resolve:
+    {
+      helpCategory: HelpCategoryDataResolver
+    }
   },
   // Help categories list
   {

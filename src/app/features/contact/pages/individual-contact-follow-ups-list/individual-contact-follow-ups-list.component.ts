@@ -319,7 +319,8 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
           }
         },
         visible: (): boolean => {
-          return FollowUpModel.canBulkModify(this.authUser);
+          return FollowUpModel.canBulkModify(this.authUser) &&
+            this.selectedOutbreakIsActive;
         },
         disable: (selected: string[]): boolean => {
           return selected.length < 1;
@@ -341,6 +342,9 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
               true,
               null
             );
+
+            // allow deleted records
+            qb.includeDeleted();
 
             // export
             this.exportFollowUps(qb);
@@ -416,7 +420,8 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
           }
         },
         visible: (): boolean => {
-          return FollowUpModel.canBulkDelete(this.authUser);
+          return FollowUpModel.canBulkDelete(this.authUser) &&
+            this.selectedOutbreakIsActive;
         },
         disable: (selected: string[]): boolean => {
           return selected.length < 1 ||
@@ -486,7 +491,8 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
           }
         },
         visible: (): boolean => {
-          return FollowUpModel.canBulkDelete(this.authUser);
+          return FollowUpModel.canBulkDelete(this.authUser) &&
+            this.selectedOutbreakIsActive;
         },
         disable: (selected: string[]): boolean => {
           return selected.length < 1 ||
@@ -509,7 +515,8 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
       },
       visible: (): boolean => {
         return this.entityData.type === EntityType.CONTACT &&
-          FollowUpModel.canCreate(this.authUser);
+          FollowUpModel.canCreate(this.authUser) &&
+          this.selectedOutbreakIsActive;
       }
     };
   }

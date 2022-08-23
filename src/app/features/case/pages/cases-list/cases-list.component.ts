@@ -1675,6 +1675,9 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
               null
             );
 
+            // allow deleted records
+            qb.includeDeleted();
+
             // export
             this.exportCases(qb);
           }
@@ -1786,7 +1789,8 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         link: (): string[] => ['/cases', 'create']
       },
       visible: (): boolean => {
-        return CaseModel.canCreate(this.authUser);
+        return CaseModel.canCreate(this.authUser) &&
+          this.selectedOutbreakIsActive;
       }
     };
   }

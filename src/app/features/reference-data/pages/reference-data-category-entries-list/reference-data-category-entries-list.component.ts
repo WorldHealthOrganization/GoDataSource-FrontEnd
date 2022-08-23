@@ -298,7 +298,8 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
     if (
       this.category.id === ReferenceDataCategory.INSTITUTION_NAME ||
       this.category.id === ReferenceDataCategory.LAB_NAME ||
-      this.category.id === ReferenceDataCategory.LAB_SEQUENCE_LABORATORY
+      this.category.id === ReferenceDataCategory.LAB_SEQUENCE_LABORATORY ||
+      this.category.id === ReferenceDataCategory.DATE_RANGE_CENTRE_NAME
     ) {
       this.tableColumns.push({
         field: 'geoLocation.lat',

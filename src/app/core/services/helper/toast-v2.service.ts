@@ -118,7 +118,15 @@ export class ToastV2Service {
 
           // add toast to list of maps to easily hide it later
           if (messageId) {
+            // map
             ToastV2Service.TOASTS[messageId] = toast.toastId;
+
+            // handle tap - hide toast
+            toast.onTap.subscribe((function(service: ToastV2Service, localMessageId: string) {
+              return () => {
+                service.hide(localMessageId);
+              };
+            })(this, messageId));
           }
         });
 
@@ -165,20 +173,41 @@ export class ToastV2Service {
     translateData?: {
       [key: string]: string
     },
-    sticky?: boolean
+    messageId?: string
   ): void {
     this.i18nService
       .get(message, translateData)
       .subscribe((messageTranslated) => {
+        // don't add again if toast with same id exists
+        if (
+          messageId &&
+          ToastV2Service.TOASTS[messageId]
+        ) {
+          return;
+        }
+
         // show toast
-        this.toastrService.success(
+        const toast = this.toastrService.success(
           messageTranslated,
           undefined, {
-            timeOut: sticky ? 0 : ToastV2Service.TIMEOUT,
-            disableTimeOut: sticky,
-            tapToDismiss: true
+            timeOut: messageId ? 0 : ToastV2Service.TIMEOUT,
+            disableTimeOut: !!messageId,
+            tapToDismiss: !messageId
           }
         );
+
+        // add toast to list of maps to easily hide it later
+        if (messageId) {
+          // map
+          ToastV2Service.TOASTS[messageId] = toast.toastId;
+
+          // handle tap - hide toast
+          toast.onTap.subscribe((function(service: ToastV2Service, localMessageId: string) {
+            return () => {
+              service.hide(localMessageId);
+            };
+          })(this, messageId));
+        }
       });
   }
 
@@ -215,7 +244,15 @@ export class ToastV2Service {
 
         // add toast to list of maps to easily hide it later
         if (messageId) {
+          // map
           ToastV2Service.TOASTS[messageId] = toast.toastId;
+
+          // handle tap - hide toast
+          toast.onTap.subscribe((function(service: ToastV2Service, localMessageId: string) {
+            return () => {
+              service.hide(localMessageId);
+            };
+          })(this, messageId));
         }
       });
   }

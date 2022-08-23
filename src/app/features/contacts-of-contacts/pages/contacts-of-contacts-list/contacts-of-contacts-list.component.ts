@@ -962,6 +962,9 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
             const qb = new RequestQueryBuilder();
             qb.filter.bySelect('id', selected, true, null);
 
+            // allow deleted records
+            qb.includeDeleted();
+
             // export
             this.exportContactsOfContacts(qb);
           }
@@ -1065,7 +1068,8 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
           }
         },
         visible: (): boolean => {
-          return ContactOfContactModel.canBulkModify(this.authUser);
+          return ContactOfContactModel.canBulkModify(this.authUser) &&
+            this.selectedOutbreakIsActive;
         },
         disable: (selected: string[]): boolean => {
           return selected.length < 1;

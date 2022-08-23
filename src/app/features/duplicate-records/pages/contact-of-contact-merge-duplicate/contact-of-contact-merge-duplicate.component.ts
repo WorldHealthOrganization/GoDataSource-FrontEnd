@@ -435,9 +435,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
           link: () => ['/duplicated-records']
         }
       },
-      quickActions: {
-        options: []
-      }
+      quickActions: undefined
     };
   }
 
@@ -478,9 +476,7 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
         )
         .subscribe((item) => {
           // success creating / updating event
-          this.toastV2Service.success(
-            'LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACTS_SUCCESS_MESSAGE'
-          );
+          this.toastV2Service.success('LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACTS_SUCCESS_MESSAGE');
 
           // finished with success
           finished(undefined, item);

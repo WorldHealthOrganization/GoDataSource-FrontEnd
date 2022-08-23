@@ -425,9 +425,7 @@ export class OutbreakTemplatesListComponent
                           )
                           .subscribe((clonedOutbreakTemplate) => {
                             // msg
-                            this.toastV2Service.success(
-                              'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CLONE_SUCCESS_MESSAGE'
-                            );
+                            this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_CLONE_SUCCESS_MESSAGE');
 
                             // hide loading
                             loading.close();

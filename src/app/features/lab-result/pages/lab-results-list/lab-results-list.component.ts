@@ -669,14 +669,20 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       type: V2ActionType.MENU,
       label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
       visible: (): boolean => {
-        return CaseModel.canImportLabResult(this.authUser) ||
-          (this.selectedOutbreak && this.selectedOutbreak.isContactLabResultsActive && ContactModel.canImportLabResult(this.authUser)) ||
-          (
-            LabResultModel.canExport(this.authUser) && (
-              CaseModel.canExportLabResult(this.authUser) ||
-              ContactModel.canExportLabResult(this.authUser)
-            )
-          );
+        return (
+          CaseModel.canImportLabResult(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ) || (
+          this.selectedOutbreak &&
+          this.selectedOutbreak.isContactLabResultsActive &&
+          ContactModel.canImportLabResult(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ) || (
+          LabResultModel.canExport(this.authUser) && (
+            CaseModel.canExportLabResult(this.authUser) ||
+            ContactModel.canExportLabResult(this.authUser)
+          )
+        );
       },
       menuOptions: [
         // Export lab result data
@@ -704,7 +710,8 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
             link: () => ['/import-export-data', 'case-lab-data', 'import']
           },
           visible: (): boolean => {
-            return CaseModel.canImportLabResult(this.authUser);
+            return CaseModel.canImportLabResult(this.authUser) &&
+              this.selectedOutbreakIsActive;
           }
         },
 
@@ -719,7 +726,8 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
           visible: (): boolean => {
             return this.selectedOutbreak &&
               this.selectedOutbreak.isContactLabResultsActive &&
-              ContactModel.canImportLabResult(this.authUser);
+              ContactModel.canImportLabResult(this.authUser) &&
+              this.selectedOutbreakIsActive;
           }
         }
       ]
@@ -741,6 +749,9 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
             // construct query builder
             const qb = new RequestQueryBuilder();
             qb.filter.bySelect('id', selected, true, null);
+
+            // allow deleted records
+            qb.includeDeleted();
 
             // export
             this.exportLabResults(qb);

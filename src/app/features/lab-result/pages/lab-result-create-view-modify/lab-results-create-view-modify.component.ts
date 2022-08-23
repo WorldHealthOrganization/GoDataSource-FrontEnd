@@ -66,8 +66,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       renderer2,
       redirectService,
       activatedRoute,
-      authDataService,
-      true
+      authDataService
     );
 
     // get data
@@ -562,12 +561,12 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
 
                   // reset data
                   if (this.itemData.sequence.hasSequence) {
-                    this.itemData.sequence.noSequenceReason = '';
+                    this.itemData.sequence.noSequenceReason = undefined;
                   } else {
-                    this.itemData.sequence.dateSampleSent = '';
-                    this.itemData.sequence.labId = '';
-                    this.itemData.sequence.dateResult = '';
-                    this.itemData.sequence.resultId = '';
+                    this.itemData.sequence.dateSampleSent = undefined;
+                    this.itemData.sequence.labId = undefined;
+                    this.itemData.sequence.dateResult = undefined;
+                    this.itemData.sequence.resultId = undefined;
                   }
                 }
               }
@@ -785,6 +784,15 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
       data,
       finished
     ) => {
+      // append variant / strain data
+      if (data.sequence) {
+        data.sequence = Object.assign(
+          {},
+          this.itemData.sequence,
+          data.sequence
+        );
+      }
+
       // finished
       (type === CreateViewModifyV2ActionType.CREATE ?
         this.labResultDataService.createLabResult(

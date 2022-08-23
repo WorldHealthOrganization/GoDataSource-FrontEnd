@@ -538,9 +538,7 @@ export class EventsListComponent
                             })
                           )
                           .subscribe(() => {
-                            this.toastV2Service.success(
-                              'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_SUCCESS_MESSAGE'
-                            );
+                            this.toastV2Service.success('LNG_PAGE_LIST_EVENTS_ACTION_DELETE_SUCCESS_MESSAGE');
 
                             // hide loading
                             loading.close();
@@ -740,9 +738,7 @@ export class EventsListComponent
                           )
                           .subscribe(() => {
                             // success
-                            this.toastV2Service.success(
-                              'LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_SUCCESS_MESSAGE'
-                            );
+                            this.toastV2Service.success('LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_SUCCESS_MESSAGE');
 
                             // hide loading
                             loading.close();
@@ -950,6 +946,9 @@ export class EventsListComponent
             const qb = new RequestQueryBuilder();
             qb.filter.bySelect('id', selected, true, null);
 
+            // allow deleted records
+            qb.includeDeleted();
+
             // export
             this.exportEvents(qb);
           }
@@ -1017,7 +1016,8 @@ export class EventsListComponent
         link: (): string[] => ['/events', 'create']
       },
       visible: (): boolean => {
-        return EventModel.canCreate(this.authUser);
+        return EventModel.canCreate(this.authUser) &&
+          this.selectedOutbreakIsActive;
       }
     };
   }

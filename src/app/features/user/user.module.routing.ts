@@ -94,6 +94,10 @@ const routes: Routes = [
       permissions: [
         PERMISSION.USER_LIST_WORKLOAD
       ]
+    },
+    resolve: {
+      yesNoAll: YesNoAllDataResolver,
+      user: UserDataResolver
     }
   }
 ];

@@ -1114,8 +1114,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
           )
           .subscribe(() => {
             // success message
-            this.toastV2Service.success(
-              'LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SUCCESS_MESSAGE');
+            this.toastV2Service.success('LNG_PAGE_SYSTEM_BACKUPS_AUTOMATIC_BACKUP_SETTINGS_DIALOG_SUCCESS_MESSAGE');
 
             // close popup
             response.handler.hide();

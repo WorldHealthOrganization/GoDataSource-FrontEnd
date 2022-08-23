@@ -336,7 +336,8 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
     if (
       this.category.id === ReferenceDataCategory.INSTITUTION_NAME ||
       this.category.id === ReferenceDataCategory.LAB_NAME ||
-      this.category.id === ReferenceDataCategory.LAB_SEQUENCE_LABORATORY
+      this.category.id === ReferenceDataCategory.LAB_SEQUENCE_LABORATORY ||
+      this.category.id === ReferenceDataCategory.DATE_RANGE_CENTRE_NAME
     ) {
       tab.sections[0].inputs.push({
         type: CreateViewModifyV2TabInputType.NUMBER,

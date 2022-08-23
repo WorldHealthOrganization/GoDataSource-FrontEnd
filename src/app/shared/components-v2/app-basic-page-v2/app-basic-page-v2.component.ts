@@ -39,6 +39,11 @@ export class AppBasicPageV2Component implements OnInit, OnDestroy {
   // applied filters
   private _advancedFiltersApplied: SavedFilterData;
 
+  // selected outbreak dropdown should be disabled ? by default is disabled
+  @Input() set selectedOutbreakDisabled(value: boolean) {
+    TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = value;
+  }
+
   // filter by
   @Output() advancedFilterBy = new EventEmitter<IV2SideDialogAdvancedFiltersResponse>();
 

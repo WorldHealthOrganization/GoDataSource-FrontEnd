@@ -747,9 +747,7 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
                           )
                           .subscribe((clonedOutbreak) => {
 
-                            this.toastV2Service.success(
-                              'LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_SUCCESS_MESSAGE'
-                            );
+                            this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_SUCCESS_MESSAGE');
 
                             // hide loading
                             loading.close();

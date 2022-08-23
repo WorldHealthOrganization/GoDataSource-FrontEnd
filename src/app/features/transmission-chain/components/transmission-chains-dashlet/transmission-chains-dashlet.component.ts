@@ -1141,7 +1141,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         // must refactor this entire function :)
         (this.clusterOptions || []).forEach((item) => {
           this.legend.edgeIcon[item.id] = {
-            class: 'mat-icon',
             icon: item.icon
           };
         });
@@ -1157,7 +1156,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         }
         _.forEach(edgeIconReferenceDataEntries, (value) => {
           this.legend.edgeIcon[value.value] = {
-            class: 'xt-icon',
             icon: getEdgeIconFunc(value.value)
           };
         });
@@ -1181,7 +1179,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         getNodeShapeFunc = GraphNodeModel.getNodeShapeClassification;
       }
       _.forEach(nodeShapeReferenceDataEntries, (value) => {
-        this.legend.nodeShape[value.value] = `${getNodeShapeFunc(value.value)}_shape`;
+        this.legend.nodeShape[value.value] = getNodeShapeFunc(value.value);
       });
       this.legend.nodeShapeKeys = Object.keys(this.legend.nodeShape);
     }
@@ -2215,15 +2213,25 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
   isEditModeAvailable(): boolean {
     switch (this.transmissionChainViewType) {
       case Constants.TRANSMISSION_CHAIN_VIEW_TYPES.BUBBLE_NETWORK.value:
-        return TransmissionChainModel.canModifyBubbleNetwork(this.authUser);
+        return TransmissionChainModel.canModifyBubbleNetwork(this.authUser) &&
+          this.selectedOutbreak?.id &&
+          this.selectedOutbreak?.id === this.authUser?.activeOutbreakId;
       case Constants.TRANSMISSION_CHAIN_VIEW_TYPES.HIERARCHICAL_NETWORK.value:
-        return TransmissionChainModel.canModifyHierarchicalNetwork(this.authUser);
+        return TransmissionChainModel.canModifyHierarchicalNetwork(this.authUser) &&
+          this.selectedOutbreak?.id &&
+          this.selectedOutbreak?.id === this.authUser?.activeOutbreakId;
       case Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK.value:
-        return TransmissionChainModel.canModifyTimelineNetworkDateOfOnset(this.authUser);
+        return TransmissionChainModel.canModifyTimelineNetworkDateOfOnset(this.authUser) &&
+          this.selectedOutbreak?.id &&
+          this.selectedOutbreak?.id === this.authUser?.activeOutbreakId;
       case Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_LAST_CONTACT.value:
-        return TransmissionChainModel.canModifyTimelineNetworkDateOfLastContact(this.authUser);
+        return TransmissionChainModel.canModifyTimelineNetworkDateOfLastContact(this.authUser) &&
+          this.selectedOutbreak?.id &&
+          this.selectedOutbreak?.id === this.authUser?.activeOutbreakId;
       case Constants.TRANSMISSION_CHAIN_VIEW_TYPES.TIMELINE_NETWORK_REPORTING.value:
-        return TransmissionChainModel.canModifyTimelineNetworkDateOfReporting(this.authUser);
+        return TransmissionChainModel.canModifyTimelineNetworkDateOfReporting(this.authUser) &&
+          this.selectedOutbreak?.id &&
+          this.selectedOutbreak?.id === this.authUser?.activeOutbreakId;
     }
 
     // finished

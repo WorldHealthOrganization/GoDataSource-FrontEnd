@@ -126,7 +126,13 @@ export class HelpSearchComponent extends ListComponent<HelpItemModel> implements
   /**
    * Initialize Table Advanced Filters
    */
-  protected initializeTableAdvancedFilters(): void {}
+  protected initializeTableAdvancedFilters(): void {
+    this.advancedFilters = HelpItemModel.generateAdvancedFilters({
+      options: {
+        helpCategory: (this.activatedRoute.snapshot.data.helpCategory as IResolverV2ResponseModel<HelpCategoryModel>).options
+      }
+    });
+  }
 
   /**
    * Initialize table quick actions

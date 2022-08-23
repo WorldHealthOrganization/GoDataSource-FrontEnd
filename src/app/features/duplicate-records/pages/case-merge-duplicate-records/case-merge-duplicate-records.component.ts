@@ -56,7 +56,6 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
     classification: ILabelValuePairModel[],
     dateOfOnset: ILabelValuePairModel[],
     isDateOfOnsetApproximate: ILabelValuePairModel[],
-    dateBecomeCase: ILabelValuePairModel[],
     dateOfInfection: ILabelValuePairModel[],
     investigationStatus: ILabelValuePairModel[],
     dateInvestigationCompleted: ILabelValuePairModel[],
@@ -72,7 +71,9 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
     riskLevel: ILabelValuePairModel[],
     riskReason: ILabelValuePairModel[],
     questionnaireAnswers: ILabelValuePairModel[],
-    questionnaireHistoryAnswers: ILabelValuePairModel[]
+    questionnaireHistoryAnswers: ILabelValuePairModel[],
+    wasContact: ILabelValuePairModel[],
+    dateBecomeCase: ILabelValuePairModel[]
   };
   private _selectedQuestionnaireAnswers: number;
   private _selectedQuestionnaireHistoryAnswers: number;
@@ -200,10 +201,6 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
               mergeRecords,
               'isDateOfOnsetApproximate'
             ).options,
-            dateBecomeCase: this.getFieldOptions(
-              mergeRecords,
-              'dateBecomeCase'
-            ).options,
             dateOfInfection: this.getFieldOptions(
               mergeRecords,
               'dateOfInfection'
@@ -270,10 +267,18 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
             questionnaireHistoryAnswers: mergeRecords
               .filter((item) => (item.model as CaseModel).questionnaireAnswersContact && Object.keys((item.model as CaseModel).questionnaireAnswersContact).length > 0)
               .map((item, index) => ({
-                label: `${this.translateService.instant(EntityType.CONTACT)} ${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE')} ${index + 1}`,
+                label: `${this.translateService.instant(EntityType.CONTACT)} ${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE').toLowerCase()} ${index + 1}`,
                 value: index,
                 data: (item.model as CaseModel).questionnaireAnswersContact
-              }))
+              })),
+            wasContact: this.getFieldOptions(
+              mergeRecords,
+              'wasContact'
+            ).options,
+            dateBecomeCase: this.getFieldOptions(
+              mergeRecords,
+              'dateBecomeCase'
+            ).options
           };
 
           // auto-select if only one value
@@ -320,9 +325,6 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
           data.isDateOfOnsetApproximate = this._uniqueOptions.isDateOfOnsetApproximate.length === 1 ?
             this._uniqueOptions.isDateOfOnsetApproximate[0].value :
             data.isDateOfOnsetApproximate;
-          data.dateBecomeCase = this._uniqueOptions.dateBecomeCase.length === 1 ?
-            this._uniqueOptions.dateBecomeCase[0].value :
-            data.dateBecomeCase;
           data.dateOfInfection = this._uniqueOptions.dateOfInfection.length === 1 ?
             this._uniqueOptions.dateOfInfection[0].value :
             data.dateOfInfection;
@@ -365,6 +367,12 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
           data.riskReason = this._uniqueOptions.riskReason.length === 1 ?
             this._uniqueOptions.riskReason[0].value :
             data.riskReason;
+          data.wasContact = this._uniqueOptions.wasContact.length === 1 ?
+            this._uniqueOptions.wasContact[0].value :
+            data.wasContact;
+          data.dateBecomeCase = this._uniqueOptions.dateBecomeCase.length === 1 ?
+            this._uniqueOptions.dateBecomeCase[0].value :
+            data.dateBecomeCase;
 
           // reset data if not decease
           if (data.outcomeId !== Constants.OUTCOME_STATUS.DECEASED) {
@@ -918,18 +926,6 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
             }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            name: 'dateBecomeCase',
-            placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
-            description: () => 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE_DESCRIPTION',
-            options: this._uniqueOptions.dateBecomeCase,
-            value: {
-              get: () => this.itemData.dateBecomeCase,
-              set: (value) => {
-                this.itemData.dateBecomeCase = value;
-              }
-            }
-          }, {
-            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
             name: 'dateOfInfection',
             placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION',
             description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_INFECTION_DESCRIPTION',
@@ -1076,7 +1072,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
             description: () => 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
             options: this._uniqueOptions.dateOfReporting,
             value: {
-              get: () => this.itemData.dateOfReporting?.toString(),
+              get: () => this.itemData.dateOfReporting as any,
               set: (value) => {
                 this.itemData.dateOfReporting = value;
               }
@@ -1155,7 +1151,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
             {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: '_selectedQuestionnaireHistoryAnswers',
-              placeholder: () => `${this.translateService.instant(EntityType.CONTACT)} ${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE')}`,
+              placeholder: () => `${this.translateService.instant(EntityType.CONTACT)} ${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE').toLowerCase()}`,
               options: this._uniqueOptions.questionnaireHistoryAnswers,
               value: {
                 get: () => this._selectedQuestionnaireHistoryAnswers as any,
@@ -1170,6 +1166,30 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
                       this._uniqueOptions.questionnaireHistoryAnswers[this._selectedQuestionnaireHistoryAnswers].data :
                       null;
                   });
+                }
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'wasContact',
+              placeholder: () => 'LNG_CASE_FIELD_LABEL_WAS_CONTACT',
+              options: this._uniqueOptions.wasContact,
+              value: {
+                get: () => this.itemData.wasContact as any,
+                set: (value) => {
+                  this.itemData.wasContact = value as any;
+                }
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'dateBecomeCase',
+              placeholder: () => 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE',
+              options: this._uniqueOptions.dateBecomeCase,
+              value: {
+                get: () => this.itemData.dateBecomeCase as any,
+                set: (value) => {
+                  this.itemData.dateBecomeCase = value;
                 }
               }
             }
@@ -1326,9 +1346,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
           link: () => ['/duplicated-records']
         }
       },
-      quickActions: {
-        options: []
-      }
+      quickActions: undefined
     };
   }
 
@@ -1348,6 +1366,11 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
       // age
       if (data.age) {
         data.age = this.itemData.age;
+      }
+
+      // was contact
+      if (!data.wasContact) {
+        delete data.wasContact;
       }
 
       // finished
@@ -1373,9 +1396,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
         )
         .subscribe((item) => {
           // success creating / updating event
-          this.toastV2Service.success(
-            'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_MERGE_CASES_SUCCESS_MESSAGE'
-          );
+          this.toastV2Service.success('LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_MERGE_CASES_SUCCESS_MESSAGE');
 
           // finished with success
           finished(undefined, item);
@@ -1422,6 +1443,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
       case 'transferRefused': return EntityModel.uniqueBooleanOptions(mergeRecords, key);
       case 'dateOfOnset': return EntityModel.uniqueDateOptions(mergeRecords, key);
       case 'isDateOfOnsetApproximate': return EntityModel.uniqueBooleanOptions(mergeRecords, key);
+      case 'wasContact': return EntityModel.uniqueBooleanOptions(mergeRecords, key);
       case 'dateBecomeCase': return EntityModel.uniqueDateOptions(mergeRecords, key);
       case 'dateOfInfection': return EntityModel.uniqueDateOptions(mergeRecords, key);
       case 'dateInvestigationCompleted': return EntityModel.uniqueDateOptions(mergeRecords, key);

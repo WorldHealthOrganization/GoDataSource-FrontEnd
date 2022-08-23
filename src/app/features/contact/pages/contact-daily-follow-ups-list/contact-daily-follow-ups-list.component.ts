@@ -48,6 +48,7 @@ import { FollowUpPage } from '../../typings/follow-up-page';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { IV2DateRange } from '../../../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
 import { EntityType } from '../../../../core/models/entity-type';
+import { AppFormSelectMultipleV2Component } from '../../../../shared/forms-v2/components/app-form-select-multiple-v2/app-form-select-multiple-v2.component';
 
 @Component({
   selector: 'app-daily-follow-ups-list',
@@ -95,7 +96,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         team: this.activatedRoute.snapshot.queryParams.team,
         user: this.activatedRoute.snapshot.queryParams.user,
         status: this.activatedRoute.snapshot.queryParams.status ?
-          this.activatedRoute.snapshot.queryParams.status :
+          (
+            typeof this.activatedRoute.snapshot.queryParams.status === 'string' ?
+              JSON.parse(this.activatedRoute.snapshot.queryParams.status) :
+              this.activatedRoute.snapshot.queryParams.status
+          ) :
           null
       };
     }
@@ -306,12 +311,21 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
           options: this.activatedRoute.snapshot.data.team.options,
+          includeNoValue: true,
           value: this._workloadData?.team ?
             [this._workloadData.team] :
-            undefined,
+            (
+              this._workloadData?.team !== undefined ?
+                [AppFormSelectMultipleV2Component.HAS_NO_VALUE] :
+                undefined
+            ),
           defaultValue: this._workloadData?.team ?
             [this._workloadData.team] :
-            undefined
+            (
+              this._workloadData?.team !== undefined ?
+                [AppFormSelectMultipleV2Component.HAS_NO_VALUE] :
+                undefined
+            )
         }
       },
       {
@@ -542,10 +556,18 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           includeNoValue: true,
           value: this._workloadData?.user ?
             [this._workloadData.user] :
-            undefined,
+            (
+              this._workloadData?.user !== undefined ?
+                [AppFormSelectMultipleV2Component.HAS_NO_VALUE] :
+                undefined
+            ),
           defaultValue: this._workloadData?.user ?
             [this._workloadData.user] :
-            undefined
+            (
+              this._workloadData?.user !== undefined ?
+                [AppFormSelectMultipleV2Component.HAS_NO_VALUE] :
+                undefined
+            )
         },
         link: (data) => {
           return data.responsibleUserId ?
@@ -1513,7 +1535,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       type: V2ActionType.MENU,
       label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
       visible: (): boolean => {
-        return (this.selectedOutbreakIsActive && FollowUpModel.canGenerate(this.authUser)) ||
+        return (
+          this.selectedOutbreakIsActive && FollowUpModel.canGenerate(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ) ||
           (!this.appliedListFilter && FollowUpModel.canExportDailyForm(this.authUser)) ||
           (!this.appliedListFilter && FollowUpModel.canExport(this.authUser));
       },
@@ -1528,7 +1553,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               this.generateFollowUps();
             }
           },
-          visible: () => FollowUpModel.canGenerate(this.authUser)
+          visible: () => FollowUpModel.canGenerate(this.authUser) &&
+            this.selectedOutbreakIsActive
         },
 
         // Divider
@@ -1770,7 +1796,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           }
         },
         visible: (): boolean => {
-          return FollowUpModel.canBulkModify(this.authUser);
+          return FollowUpModel.canBulkModify(this.authUser) &&
+            this.selectedOutbreakIsActive;
         },
         disable: (selected: string[]): boolean => {
           return selected.length < 1;
@@ -1792,6 +1819,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               true,
               null
             );
+
+            // allow deleted records
+            qb.includeDeleted();
 
             // export
             this.exportFollowUps(qb);
@@ -1867,7 +1897,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           }
         },
         visible: (): boolean => {
-          return FollowUpModel.canBulkDelete(this.authUser);
+          return FollowUpModel.canBulkDelete(this.authUser) &&
+            this.selectedOutbreakIsActive;
         },
         disable: (selected: string[]): boolean => {
           return selected.length < 1 ||
@@ -1937,7 +1968,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           }
         },
         visible: (): boolean => {
-          return FollowUpModel.canBulkDelete(this.authUser);
+          return FollowUpModel.canBulkDelete(this.authUser) &&
+            this.selectedOutbreakIsActive;
         },
         disable: (selected: string[]): boolean => {
           return selected.length < 1 ||
@@ -2358,8 +2390,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         )
         .subscribe(() => {
           // success message
-          this.toastV2Service.success(
-            'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
+          this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_GENERATE_FOLLOW_UPS_SUCCESS_MESSAGE');
 
           // close popup
           response.handler.hide();

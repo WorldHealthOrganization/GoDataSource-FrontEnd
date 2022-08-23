@@ -14,11 +14,26 @@
     fxLayout="row"
     class="gd-list-top-tile-buttons">
 
-    <!-- Title -->
+    <!-- Title & view button -->
     <div
-      fxFlex
+      fxFlex fxLayoutAlign="start center" fxLayoutGap="1.6rem"
       class="gd-list-top-tile-buttons-title">
-      {{pageTitle | translate}}
+
+      <!-- Title -->
+      <span>
+        {{pageTitle | translate}}
+      </span>
+
+      <!-- View button -->
+      <a
+        *ngIf="viewAction && (!viewAction.visible || viewAction.visible(undefined))"
+        type="button"
+        mat-icon-button
+        [routerLink]="viewAction.action.link(undefined)"
+        [queryParams]="viewAction.action.linkQueryParams ? viewAction.action.linkQueryParams(undefined) : undefined">
+        <mat-icon>visibility</mat-icon>
+      </a>
+
     </div>
 
     <!-- Buttons -->

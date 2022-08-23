@@ -975,11 +975,11 @@ export class TransmissionChainDataService {
       // set edge icon
       if (colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value) {
         graphEdge.setEdgeIconContextOfTransmission(relationship);
-        graphEdge.fontFamily = 'xtIcon';
+        graphEdge.fontFamily = 'Material Icons';
 
       } else if (colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.EXPOSURE_TYPE.value) {
         graphEdge.setEdgeIconExposureType(relationship);
-        graphEdge.fontFamily = 'xtIcon';
+        graphEdge.fontFamily = 'Material Icons';
       } else if (
         colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.CLUSTER.value &&
         relationship.clusterId &&
