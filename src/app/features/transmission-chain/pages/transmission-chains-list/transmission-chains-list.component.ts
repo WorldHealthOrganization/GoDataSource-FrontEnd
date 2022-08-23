@@ -82,16 +82,24 @@ export class TransmissionChainsListComponent extends ListComponent<TransmissionC
         label: 'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NO_ENTITIES'
       },
       {
+        field: 'noCases',
+        label: 'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NO_CASES'
+      },
+      {
         field: 'noAliveCases',
         label: 'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NO_CASES_ALIVE'
       },
       {
-        field: 'contactsCount',
-        label: 'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NUMBER_OF_CONTACTS'
+        field: 'noDeceasedCases',
+        label: 'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NO_CASES_DECEASED'
       },
       {
         field: 'eventsCount',
         label: 'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NUMBER_OF_EVENTS'
+      },
+      {
+        field: 'contactsCount',
+        label: 'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NUMBER_OF_CONTACTS'
       },
       {
         field: 'duration',

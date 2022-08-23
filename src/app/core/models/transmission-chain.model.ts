@@ -195,27 +195,31 @@ implements
   canViewAnyGraph(user: UserModel): boolean { return TransmissionChainModel.canViewAnyGraph(user); }
 
   /**
-     * Length of the chain - number of relations
-     * @returns {number}
-     */
+   * Length of the chain - number of relations
+   */
   get length(): number {
     return this.chainRelations ? this.chainRelations.length : 0;
   }
 
   /**
-     * Number of Cases in Chain
-     * @returns {number}
-     */
+   * Number of Cases in Chain
+   */
   get noCases() {
     return this.casesMapLength;
   }
 
   /**
-     * Number of Alive Cases in Chain
-     * @returns {any}
-     */
+   * Number of Alive Cases in Chain
+   */
   get noAliveCases() {
     return this.aliveCasesCount;
+  }
+
+  /**
+   * Number of Deceased Cases in Chain
+   */
+  get noDeceasedCases() {
+    return this.noCases - this.aliveCasesCount;
   }
 }
 
