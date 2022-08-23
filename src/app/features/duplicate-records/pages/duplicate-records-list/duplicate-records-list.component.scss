@@ -78,13 +78,13 @@ app-duplicate-records-list {
     }
   }
 
-  .gd-create-view-modify-list-data-no-records {
+  .gd-duplicate-records-list-no-records {
     left: 50%;
     position: absolute;
     top: 50%;
     @include translate(-50%, -50%);
 
-    .gd-create-view-modify-list-data-no-records-image {
+    .gd-duplicate-records-list-no-records-image {
       background-image: url(../../../../../assets/images/nothing-found.svg);
       background-size: contain;
       background-position: center;
@@ -93,7 +93,7 @@ app-duplicate-records-list {
       width: 15rem;
     }
 
-    .gd-create-view-modify-list-data-no-records-text {
+    .gd-duplicate-records-list-no-records-text {
       color: var(--gd-secondary);
       display: block;
       font-size: 1.4rem;

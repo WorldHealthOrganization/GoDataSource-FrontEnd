@@ -215,15 +215,15 @@
   <div
     *ngIf="duplicatesList && !duplicatesList.groups?.length"
     fxLayout="column" fxLayoutAlign="center center"
-    class="gd-create-view-modify-list-data-no-records">
+    class="gd-duplicate-records-list-no-records">
 
     <!-- Image -->
     <div
-      class="gd-create-view-modify-list-data-no-records-image"></div>
+      class="gd-duplicate-records-list-no-records-image"></div>
 
     <!-- Message -->
     <div
-      class="gd-create-view-modify-list-data-no-records-text">{{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}</div>
+      class="gd-duplicate-records-list-no-records-text">{{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}</div>
   </div>
 
   <!-- Pages (need to be hidden and not ngIf, otherwise it makes a new duplicate request) -->
