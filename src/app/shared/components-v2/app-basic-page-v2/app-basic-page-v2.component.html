@@ -27,21 +27,41 @@
       class="gd-basic-top-title-buttons-buttons">
 
       <!-- Action button -->
-      <a
+      <ng-container
         *ngIf="actionButton && (!actionButton.visible || actionButton.visible(null))"
-        mat-flat-button
-        [routerLink]="actionButton.action.link && (!actionButton.disable || !actionButton.disable(null)) ? actionButton.action.link(null) : undefined"
-        [queryParams]="actionButton.action.linkQueryParams ? actionButton.action.linkQueryParams(null) : undefined"
-        [disabled]="actionButton.disable && actionButton.disable(null)"
-        (click)="actionButton.action.click ? actionButton.action.click(null) : undefined">
+        [ngSwitch]="actionButton.type">
+
+        <!-- Icon / Label -->
+        <a
+          *ngSwitchCase="V2ActionType.ICON_LABEL"
+          mat-flat-button
+          [routerLink]="actionButton.action.link && (!actionButton.disable || !actionButton.disable(null)) ? actionButton.action.link(null) : undefined"
+          [queryParams]="actionButton.action.linkQueryParams ? actionButton.action.linkQueryParams(null) : undefined"
+          [disabled]="actionButton.disable && actionButton.disable(null)"
+          (click)="actionButton.action.click ? actionButton.action.click(null) : undefined">
+
+          <!-- Icon -->
+          <mat-icon
+            *ngIf="actionButton.icon">{{actionButton.icon}}</mat-icon>
+
+          <!-- Label -->
+          <span>{{ actionButton.label | translate }}</span>
+        </a>
 
         <!-- Icon -->
-        <mat-icon
-          *ngIf="actionButton.icon">{{actionButton.icon}}</mat-icon>
+        <a
+          *ngSwitchCase="V2ActionType.ICON"
+          class="{{actionButton.cssClasses ? actionButton.cssClasses(null) : ''}}"
+          mat-icon-button
+          [routerLink]="actionButton.action.link && (!actionButton.disable || !actionButton.disable(null)) ? actionButton.action.link(null) : undefined"
+          [queryParams]="actionButton.action.linkQueryParams ? actionButton.action.linkQueryParams(null) : undefined"
+          [matTooltip]="actionButton.iconTooltip | translate"
+          [disabled]="actionButton.disable && actionButton.disable(null)"
+          (click)="actionButton.action.click ? actionButton.action.click(null) : undefined">
+          <mat-icon>{{actionButton.icon}}</mat-icon>
+        </a>
 
-        <!-- Label -->
-        <span>{{ actionButton.label | translate }}</span>
-      </a>
+      </ng-container>
 
       <!-- Advanced filters -->
       <button

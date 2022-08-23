@@ -51,7 +51,7 @@ export interface IV2Link {
 /**
  * Action Icon
  */
-interface IV2ActionIcon {
+export interface IV2ActionIcon {
   // type
   type: V2ActionType.ICON;
   icon: string;
@@ -62,6 +62,9 @@ interface IV2ActionIcon {
   visible?: (data: any) => boolean;
   disable?: (data: any) => boolean;
   cssClasses?: (data: any) => string;
+
+  // never
+  label?: never;
 }
 
 /**
@@ -78,6 +81,9 @@ export interface IV2ActionIconLabel {
   iconTooltip?: string;
   visible?: (data: any) => boolean;
   disable?: (data: any) => boolean;
+
+  // never
+  cssClasses?: never;
 }
 
 /**

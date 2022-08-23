@@ -1,9 +1,3 @@
-<!--&lt;!&ndash; Total number of records from the list &ndash;&gt;-->
-<!-- #TODO -->
-<!--<app-total-number-of-records-->
-<!--    [value]="duplicatesListCount$ | async">-->
-<!--</app-total-number-of-records>-->
-
 <app-basic-page-v2
   [breadcrumbs]="breadcrumbs"
   pageTitle="LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE"
@@ -217,17 +211,24 @@
     </div>
   </ng-container>
 
-<!--    &lt;!&ndash; No data &ndash;&gt;-->
-<!--    #TODO -->
-<!--    <div-->
-<!--        *ngIf="!refreshingList && isEmptyList"-->
-<!--        class="empty-table-text">-->
-<!--        {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}-->
-<!--    </div>-->
+  <!-- No data -->
+  <div
+    *ngIf="duplicatesList && !duplicatesList.groups?.length"
+    fxLayout="column" fxLayoutAlign="center center"
+    class="gd-duplicate-records-list-no-records">
+
+    <!-- Image -->
+    <div
+      class="gd-duplicate-records-list-no-records-image"></div>
+
+    <!-- Message -->
+    <div
+      class="gd-duplicate-records-list-no-records-text">{{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}</div>
+  </div>
 
   <!-- Pages (need to be hidden and not ngIf, otherwise it makes a new duplicate request) -->
   <app-mat-paginator-extended
-    *ngIf="duplicatesList"
+    *ngIf="duplicatesList?.groups?.length > 0"
     [pageIndex]="pageIndex"
     [countData]="duplicatesListCount$ | async"
     [pageSize]="pageSize"
