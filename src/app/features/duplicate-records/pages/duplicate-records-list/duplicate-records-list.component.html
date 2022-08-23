@@ -1,9 +1,3 @@
-<!--&lt;!&ndash; Total number of records from the list &ndash;&gt;-->
-<!-- #TODO -->
-<!--<app-total-number-of-records-->
-<!--    [value]="duplicatesListCount$ | async">-->
-<!--</app-total-number-of-records>-->
-
 <app-basic-page-v2
   [breadcrumbs]="breadcrumbs"
   pageTitle="LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE"
@@ -219,7 +213,7 @@
 
   <!-- No data -->
   <div
-    *ngIf="true"
+    *ngIf="duplicatesList && !duplicatesList.groups?.length"
     fxLayout="column" fxLayoutAlign="center center"
     class="gd-create-view-modify-list-data-no-records">
 
@@ -234,7 +228,7 @@
 
   <!-- Pages (need to be hidden and not ngIf, otherwise it makes a new duplicate request) -->
   <app-mat-paginator-extended
-    *ngIf="duplicatesList"
+    *ngIf="duplicatesList?.groups?.length > 0"
     [pageIndex]="pageIndex"
     [countData]="duplicatesListCount$ | async"
     [pageSize]="pageSize"
