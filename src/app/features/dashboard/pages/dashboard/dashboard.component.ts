@@ -529,7 +529,6 @@ export class DashboardComponent implements OnDestroy {
       });
   }
 
-  // #TODO: Exported PDF it's not stretching/shrinking correspondly
   /**
    * Get Epi curve dashlet
    */
@@ -549,11 +548,11 @@ export class DashboardComponent implements OnDestroy {
           name: 'exportFormat',
           options: [
             {
-              label: 'LNG_COMMON_LABEL_EXPORT_FORMAT_MULTI_PAGE',
+              label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_EXPORT_FORMAT_MULTI_PAGE',
               value: false
             },
             {
-              label: 'LNG_COMMON_LABEL_EXPORT_FORMAT_SINGLE_PAGE',
+              label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_EXPORT_FORMAT_SINGLE_PAGE',
               value: true
             }
           ]
@@ -566,10 +565,7 @@ export class DashboardComponent implements OnDestroy {
           label: 'LNG_COMMON_BUTTON_EXPORT',
           type: IV2SideDialogConfigButtonType.OTHER,
           color: 'primary',
-          key: 'save',
-          disabled: (_data, handler): boolean => {
-            return !handler.form || handler.form.invalid;
-          }
+          key: 'save'
         }, {
           type: IV2SideDialogConfigButtonType.CANCEL,
           label: 'LNG_COMMON_BUTTON_CANCEL',
@@ -591,8 +587,7 @@ export class DashboardComponent implements OnDestroy {
         .getPNGBase64(
           selector,
           '#tempCanvas',
-          1,
-          exportAsSinglePage
+          1
         )
         .subscribe((pngBase64) => {
           // object not found ?
@@ -604,7 +599,14 @@ export class DashboardComponent implements OnDestroy {
 
           // export
           this.importExportDataService
-            .exportImageToPdf({ image: pngBase64, responseType: 'blob', splitFactor: 1 })
+            .exportImageToPdf({
+              image: pngBase64,
+              responseType: 'blob',
+              splitFactor: 1,
+              splitType: exportAsSinglePage ?
+                'grid' :
+                'auto'
+            })
             .pipe(
               catchError((err) => {
                 this.toastV2Service.error(err);

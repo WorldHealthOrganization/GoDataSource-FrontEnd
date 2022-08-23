@@ -28,13 +28,12 @@ export class DomService {
   }
 
   /**
-     * Convert SVG to PNG image
-     */
+   * Convert SVG to PNG image
+   */
   getPNGBase64(
     selector: string,
     tempCanvasSelector: string,
-    splitFactor: number = 1,
-    exportAsSinglePage?: boolean
+    splitFactor: number = 1
   ): Observable<string> {
     return new Observable((observer) => {
       // server page size
@@ -63,29 +62,15 @@ export class DomService {
       // initialize canvas dimensions
       const render: any = {};
 
-      // single page format?
-      if (exportAsSinglePage) {
-        // change resizing logic
-        if (imageAspectRatio > 1) {
-          render.height = graphContainerSVGHeight * (pageSize.width / graphContainerSVGWidth) * splitFactor;
-          render.width = pageSize.width;
-        } else {
-          if (graphContainerSVGHeight > pageSize.height) {
-            render.width = graphContainerSVGWidth * (pageSize.height / graphContainerSVGHeight) * splitFactor;
-            render.height = pageSize.height;
-          }
-        }
+      // check image format (landscape or portrait)
+      if (imageAspectRatio > 1) {
+      // landscape mode; enlarge the image vertically, to match the height of the page
+        render.width = pageSize.height * splitFactor * imageAspectRatio;
+        render.height = pageSize.height * splitFactor;
       } else {
-        // check image format (landscape or portrait)
-        if (imageAspectRatio > 1) {
-        // landscape mode; enlarge the image vertically, to match the height of the page
-          render.width = pageSize.height * splitFactor * imageAspectRatio;
-          render.height = pageSize.height * splitFactor;
-        } else {
-        // portrait mode; enlarge the image horizontally, to match the width of the page
-          render.width = pageSize.width * splitFactor;
-          render.height = pageSize.width * splitFactor / imageAspectRatio;
-        }
+      // portrait mode; enlarge the image horizontally, to match the width of the page
+        render.width = pageSize.width * splitFactor;
+        render.height = pageSize.width * splitFactor / imageAspectRatio;
       }
 
       // get SVG as string
