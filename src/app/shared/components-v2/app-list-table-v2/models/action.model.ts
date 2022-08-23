@@ -6,7 +6,8 @@ import { Params } from '@angular/router';
 export enum V2ActionType {
   ICON = 'icon',
   MENU = 'menu',
-  ICON_LABEL = 'icon_label'
+  ICON_LABEL = 'icon_label',
+  LINK = 'link'
 }
 
 /**
@@ -33,6 +34,18 @@ interface IV2ActionLink {
 
   // exclude
   click?: never;
+}
+
+/**
+ * Link
+ */
+export interface IV2Link {
+  // type
+  type: V2ActionType.LINK;
+  action: IV2ActionLink;
+
+  // optional
+  visible?: (data: any) => boolean;
 }
 
 /**

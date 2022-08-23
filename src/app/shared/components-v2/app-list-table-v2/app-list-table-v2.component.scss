@@ -6,13 +6,27 @@
   .gd-list-top-tile-buttons {
     padding-bottom: 2.4rem;
 
-    /* Page title */
+    /* Page title & view button */
     .gd-list-top-tile-buttons-title {
-      color: var(--gd-primary);
-      font-family: $gd-font-family;
-      font-size: 2.4rem;
-      font-weight: 500;
-      line-height: $gd-line-height;
+      span {
+        color: var(--gd-primary);
+        font-family: $gd-font-family;
+        font-size: 2.4rem;
+        font-weight: 500;
+        line-height: $gd-line-height;
+      }
+
+      .mat-icon-button {
+        font-size: 2.4rem;
+        height: auto;
+        min-width: 3rem;
+        padding: 0.4rem;
+        width: 3rem;
+
+        .mat-icon {
+          color: var(--gd-text);
+        }
+      }
     }
 
     /* Page top buttons */

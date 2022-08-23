@@ -164,7 +164,8 @@ const routes: Routes = [
         data: {
           permissions: [
             PERMISSION.DEVICE_LIST_HISTORY
-          ]
+          ],
+          action: CreateViewModifyV2Action.VIEW
         },
         canDeactivate: [
           PageChangeConfirmationGuard
