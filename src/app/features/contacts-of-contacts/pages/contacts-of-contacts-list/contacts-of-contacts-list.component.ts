@@ -962,6 +962,9 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
             const qb = new RequestQueryBuilder();
             qb.filter.bySelect('id', selected, true, null);
 
+            // allow deleted records
+            qb.includeDeleted();
+
             // export
             this.exportContactsOfContacts(qb);
           }
