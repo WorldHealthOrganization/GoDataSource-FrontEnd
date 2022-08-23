@@ -29,7 +29,7 @@ import {
 import { AppListTableV2ActionsComponent } from './components/actions/app-list-table-v2-actions.component';
 import { IExtendedColDef } from './models/extended-column.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
-import { IV2ActionIcon, IV2ActionIconLabel, IV2ActionMenuLabel, V2ActionMenuItem, V2ActionType } from './models/action.model';
+import { IV2ActionIconLabel, IV2ActionMenuLabel, IV2Link, V2ActionMenuItem, V2ActionType } from './models/action.model';
 import { IV2GroupedData, IV2GroupedDataValue } from './models/grouped-data.model';
 import { IBasicCount } from '../../../core/models/basic-count.interface';
 import { PageEvent } from '@angular/material/paginator';
@@ -157,7 +157,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   // title
   @Input() pageTitle: string;
 
-  @Input() viewAction: IV2ActionIcon;
+  // view action
+  @Input() viewAction: IV2Link;
 
   // quick actions
   @Input() quickActions: IV2ActionMenuLabel;
