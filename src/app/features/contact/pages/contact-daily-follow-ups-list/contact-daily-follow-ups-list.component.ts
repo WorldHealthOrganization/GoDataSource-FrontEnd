@@ -1823,6 +1823,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             // allow deleted records
             qb.includeDeleted();
 
+            // keep sort order
+            if (!this.queryBuilder.sort.isEmpty()) {
+              qb.sort.criterias = { ...this.queryBuilder.sort.criterias };
+            }
+
             // export
             this.exportFollowUps(qb);
           }

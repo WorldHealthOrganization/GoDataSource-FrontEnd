@@ -1678,6 +1678,11 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
             // allow deleted records
             qb.includeDeleted();
 
+            // keep sort order
+            if (!this.queryBuilder.sort.isEmpty()) {
+              qb.sort.criterias = { ...this.queryBuilder.sort.criterias };
+            }
+
             // export
             this.exportCases(qb);
           }
