@@ -222,7 +222,7 @@ export class OutbreakDataService {
   getSelectedOutbreak(): Observable<OutbreakModel> {
     return new Observable((observer) => {
 
-      const selectedOutbreakCompleted$ = new Subject();
+      const selectedOutbreakCompleted$ = new Subject<void>();
       // subscribe to the Subject stream
       this.getSelectedOutbreakSubject()
         .pipe(

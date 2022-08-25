@@ -32,7 +32,6 @@
     "@ngx-translate/core": "14.0.0",
     "@popperjs/core": "2.11.6",
     "@swimlane/ngx-charts": "20.1.0",
-    "angular-mgl-timeline": "0.4.0",
     "buffer": "6.0.3",
     "c3": "0.7.20",
     "cytoscape": "3.22.1",
@@ -54,7 +53,7 @@
     "ngx-toastr": "15.0.0",
     "ngx-wig": "14.0.6",
     "ol": "7.0.0",
-    "rxjs": "6.6.7",
+    "rxjs": "7.4.0",
     "tslib": "2.4.0",
     "uuid": "8.3.2",
     "zone.js": "0.11.8"

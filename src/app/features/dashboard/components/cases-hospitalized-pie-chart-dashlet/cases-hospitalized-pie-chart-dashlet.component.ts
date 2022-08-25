@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
-import { Subscription, Subscriber, throwError, Observable } from 'rxjs';
+import { Subscription, throwError, Observable } from 'rxjs';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { catchError, map } from 'rxjs/operators';
@@ -72,9 +72,9 @@ implements OnInit, OnDestroy {
   /**
      * Global Filters changed
      */
-  protected refreshDataCaller = new DebounceTimeCaller(new Subscriber<void>(() => {
+  protected refreshDataCaller = new DebounceTimeCaller(() => {
     this.refreshData();
-  }), 100);
+  }, 100);
 
   /**
      * Constructor

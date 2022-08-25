@@ -12,7 +12,6 @@ import * as moment from 'moment';
 import { Moment } from 'moment';
 import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { DebounceTimeCaller, DebounceTimeCallerType } from '../../helperClasses/debounce-time-caller';
-import { Subscriber } from 'rxjs/internal-compatibility';
 import { SystemSettingsDataService } from './system-settings.data.service';
 import { environment } from '../../../../environments/environment';
 
@@ -25,13 +24,13 @@ export class AuthDataService {
   private lastTokenInfoCalledSubscribers: Moment;
   private tokenInfoSubscriberSubject: BehaviorSubject<ITokenInfo> = new BehaviorSubject<ITokenInfo>(null);
   private tokenInfoSubscriberSubjectCaller: DebounceTimeCaller = new DebounceTimeCaller(
-    new Subscriber<void>(() => {
+    () => {
       // call token info subscribers
       this.determineTokenInfo();
 
       // call again
       this.tokenInfoSubscriberSubjectCaller.call();
-    }),
+    },
     AuthDataService.TOKEN_INFO_CALL_FREQUENCY_SECONDS * 100 / 2,
     DebounceTimeCallerType.DONT_RESET_AND_WAIT
   );

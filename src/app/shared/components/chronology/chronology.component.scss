@@ -1,108 +1,108 @@
-@import 'mixins';
-@import 'font';
-
-app-chronology {
-  mgl-timeline {
-    --timeline-header-width: 15rem;
-
-    padding: 3.6rem 0 1.6rem;
-
-    .mgl-timeline-line {
-      background-color: rgba(var(--gd-primary-rgb), 0.25);
-      left: calc(var(--timeline-header-width) + 0.3rem);
-      @include translate(0, 0);
-      width: 0.3rem;
-    }
-
-    &.mobile {
-      .mgl-timeline-line {
-        left: 50%;
-        @include translate(-50%, 0);
-      }
-    }
-
-    mgl-timeline-entry {
-      margin-bottom: 5rem;
-      width: 100%;
-
-      mgl-timeline-entry-side {
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        background-color: var(--gd-background);
-        @include border-radius(0.4rem);
-        @include box-shadow(0 0.4rem 0.8rem 0 rgba(0, 0, 0, 0.2), 0 0.6rem 2rem 0 rgba(0, 0, 0, 0.19));
-        display: -webkit-box;
-        display: -moz-box;
-        left: calc(var(--timeline-header-width) + 4rem);
-        max-height: 7.5rem;
-        max-width: 100%;
-        overflow: hidden;
-        padding: 0.8rem;
-        text-align: left;
-        top: 50%;
-        @include translate(0, -50%);
-        width: auto;
-
-        &.mobile {
-          display: -webkit-box;
-          display: -moz-box;
-          margin-top: 0.8rem;
-          position: static;
-          top: 0;
-          @include translate(0, 0);
-          word-break: break-all;
-        }
-      }
-
-      .mgl-timeline-entry-card {
-        background-color: transparent;
-        width: var(--timeline-header-width);
-
-        .mgl-timeline-entry-card-header {
-          background-color: transparent;
-
-          mgl-timeline-entry-dot {
-            background-color: var(--gd-primary);
-            border: 0.4rem solid var(--gd-background);
-            color: var(--gd-background);
-            text-align: center;
-            z-index: 1000;
-
-            @media screen and (max-width: 719px) {
-              left: 50% !important;
-              top: -4rem !important;
-              @include transform(translate(-50%, 0) !important);
-            }
-
-            span {
-              position: relative;
-              top: 0.6rem;
-            }
-          }
-
-          mgl-timeline-entry-header {
-            font-size: 1.6rem;
-            font-weight: bold;
-            padding: 0;
-          }
-        }
-      }
-
-      &.mobile {
-        @include flex(flex);
-        @include flex_align_items(center);
-        @include flex_direction(column-reverse);
-        margin: 0 0 8rem;
-        width: 100%;
-
-        .mgl-timeline-entry-card {
-          .mgl-timeline-entry-card-header {
-            mgl-timeline-entry-header {
-              background-color: var(--gd-background);
-            }
-          }
-        }
-      }
-    }
-  }
-}
+//@import 'mixins';
+//@import 'font';
+//
+//app-chronology {
+//  mgl-timeline {
+//    --timeline-header-width: 15rem;
+//
+//    padding: 3.6rem 0 1.6rem;
+//
+//    .mgl-timeline-line {
+//      background-color: rgba(var(--gd-primary-rgb), 0.25);
+//      left: calc(var(--timeline-header-width) + 0.3rem);
+//      @include translate(0, 0);
+//      width: 0.3rem;
+//    }
+//
+//    &.mobile {
+//      .mgl-timeline-line {
+//        left: 50%;
+//        @include translate(-50%, 0);
+//      }
+//    }
+//
+//    mgl-timeline-entry {
+//      margin-bottom: 5rem;
+//      width: 100%;
+//
+//      mgl-timeline-entry-side {
+//        -webkit-line-clamp: 3;
+//        -webkit-box-orient: vertical;
+//        background-color: var(--gd-background);
+//        @include border-radius(0.4rem);
+//        @include box-shadow(0 0.4rem 0.8rem 0 rgba(0, 0, 0, 0.2), 0 0.6rem 2rem 0 rgba(0, 0, 0, 0.19));
+//        display: -webkit-box;
+//        display: -moz-box;
+//        left: calc(var(--timeline-header-width) + 4rem);
+//        max-height: 7.5rem;
+//        max-width: 100%;
+//        overflow: hidden;
+//        padding: 0.8rem;
+//        text-align: left;
+//        top: 50%;
+//        @include translate(0, -50%);
+//        width: auto;
+//
+//        &.mobile {
+//          display: -webkit-box;
+//          display: -moz-box;
+//          margin-top: 0.8rem;
+//          position: static;
+//          top: 0;
+//          @include translate(0, 0);
+//          word-break: break-all;
+//        }
+//      }
+//
+//      .mgl-timeline-entry-card {
+//        background-color: transparent;
+//        width: var(--timeline-header-width);
+//
+//        .mgl-timeline-entry-card-header {
+//          background-color: transparent;
+//
+//          mgl-timeline-entry-dot {
+//            background-color: var(--gd-primary);
+//            border: 0.4rem solid var(--gd-background);
+//            color: var(--gd-background);
+//            text-align: center;
+//            z-index: 1000;
+//
+//            @media screen and (max-width: 719px) {
+//              left: 50% !important;
+//              top: -4rem !important;
+//              @include transform(translate(-50%, 0) !important);
+//            }
+//
+//            span {
+//              position: relative;
+//              top: 0.6rem;
+//            }
+//          }
+//
+//          mgl-timeline-entry-header {
+//            font-size: 1.6rem;
+//            font-weight: bold;
+//            padding: 0;
+//          }
+//        }
+//      }
+//
+//      &.mobile {
+//        @include flex(flex);
+//        @include flex_align_items(center);
+//        @include flex_direction(column-reverse);
+//        margin: 0 0 8rem;
+//        width: 100%;
+//
+//        .mgl-timeline-entry-card {
+//          .mgl-timeline-entry-card-header {
+//            mgl-timeline-entry-header {
+//              background-color: var(--gd-background);
+//            }
+//          }
+//        }
+//      }
+//    }
+//  }
+//}
