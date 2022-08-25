@@ -1,4 +1,4 @@
-import { AbstractControl, ControlContainer, ControlValueAccessor, FormGroup, NgForm, NgModelGroup } from '@angular/forms';
+import { AbstractControl, ControlContainer, ControlValueAccessor, UntypedFormGroup, NgForm, NgModelGroup } from '@angular/forms';
 import { noop } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseErrorStateMatcherV2 } from './app-form-base-error-state-matcher-v2';
@@ -38,7 +38,7 @@ export abstract class AppFormBaseV2<T> implements ControlValueAccessor {
 
     // retrieve control
     let control: AbstractControl;
-    if (this.controlContainer.control instanceof FormGroup) {
+    if (this.controlContainer.control instanceof UntypedFormGroup) {
       // FIX for dotted path, since get uses paths, but we don't always want to use paths
       control = this.controlContainer.control.controls[this.controlName];
     } else if (this.controlContainer.control) {

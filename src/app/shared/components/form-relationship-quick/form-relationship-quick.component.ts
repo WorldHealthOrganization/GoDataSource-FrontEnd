@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { Component, Input, ViewEncapsulation, Optional, Inject, Host, SkipSelf, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
-import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, FormControl } from '@angular/forms';
+import { NG_VALUE_ACCESSOR, NG_VALIDATORS, NG_ASYNC_VALIDATORS, ControlContainer, UntypedFormControl } from '@angular/forms';
 import { GroupBase, GroupDirtyFields } from '../../xt-forms/core';
 import { ClusterDataService } from '../../../core/services/data/cluster.data.service';
 import { OutbreakModel } from '../../../core/models/outbreak.model';
@@ -123,10 +123,10 @@ export class FormRelationshipQuickComponent extends GroupBase<RelationshipModel>
      * Retrieve fields
      */
   getDirtyFields(): {
-    [name: string]: FormControl
+    [name: string]: UntypedFormControl
   } {
     const dirtyControls = {};
-    _.forEach(this.groupForm.controls, (control: FormControl, controlName: string) => {
+    _.forEach(this.groupForm.controls, (control: UntypedFormControl, controlName: string) => {
       if (control.dirty) {
         dirtyControls[controlName] = control;
       }
