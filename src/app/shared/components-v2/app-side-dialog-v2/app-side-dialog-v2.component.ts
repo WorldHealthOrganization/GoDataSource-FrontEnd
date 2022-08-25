@@ -26,8 +26,7 @@ import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model
 import { RequestFilterOperator, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/bottom-dialog-config.model';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { CdkDragStart } from '@angular/cdk/drag-drop/drag-events';
+import { CdkDragDrop, CdkDragStart, moveItemInArray } from '@angular/cdk/drag-drop';
 
 /**
  * Component

@@ -20,8 +20,8 @@ import * as moment from 'moment';
 import { UserDataService } from '../../services/data/user.data.service';
 import { catchError } from 'rxjs/operators';
 import { IV2BottomDialogConfigButtonType } from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
-import { MatBottomSheetRef } from '@angular/material/bottom-sheet/bottom-sheet-ref';
 import { AppBottomDialogV2Component } from '../../../shared/components-v2/app-bottom-dialog-v2/app-bottom-dialog-v2.component';
+import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
 
 @Component({
   selector: 'app-authenticated',
