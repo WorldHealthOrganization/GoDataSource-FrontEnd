@@ -26,7 +26,7 @@ import { ColorPickerModule } from 'ngx-color-picker';
 
 @NgModule({
   imports: [
-    AgGridModule.withComponents([]),
+    AgGridModule,
     ColorPickerModule,
     CommonModule,
     DragDropModule,
@@ -64,7 +64,7 @@ import { ColorPickerModule } from 'ngx-color-picker';
   ],
   providers: [],
   exports: [
-    AgGridModule.withComponents([]),
+    AgGridModule,
     CommonModule,
     DragDropModule,
     RouterModule,
