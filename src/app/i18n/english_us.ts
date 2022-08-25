@@ -18,7 +18,8 @@ export const EnglishUsLang = {
     'LNG_PAGE_DASHBOARD_EPI_CURVE_EXPORT_FORMAT_SINGLE_PAGE': 'Single page',
     'LNG_PAGE_DASHBOARD_EPI_CURVE_EXPORT_FORMAT_MULTI_PAGE': 'Multiple pages',
     'LNG_PAGE_LIST_AUDIT_LOGS_EXPORT_TITLE': 'Export audit logs',
-    'LNG_PAGE_LIST_AUDIT_LOGS_EXPORT_BUTTON': 'Export audit logs data'
+    'LNG_PAGE_LIST_AUDIT_LOGS_EXPORT_BUTTON': 'Export audit logs data',
+    'LNG_PAGE_LIST_AUDIT_LOGS_GROUP_ACTION_EXPORT_SELECTED_AUDIT_LOGS': 'Export the selected audit logs'
 
 
     /**

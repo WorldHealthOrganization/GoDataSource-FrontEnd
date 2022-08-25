@@ -219,7 +219,39 @@ export class AuditLogsListComponent
   /**
    * Initialize table group actions
    */
-  protected initializeGroupActions(): void {}
+  protected initializeGroupActions(): void {
+    this.groupActions = [
+      {
+        label: {
+          get: () => 'LNG_PAGE_LIST_AUDIT_LOGS_GROUP_ACTION_EXPORT_SELECTED_AUDIT_LOGS'
+        },
+        action: {
+          click: (selected: string[]) => {
+            // construct query builder
+            const qb = new RequestQueryBuilder();
+            qb.filter.bySelect(
+              'id',
+              selected,
+              true,
+              null
+            );
+
+            // allow deleted records
+            qb.includeDeleted();
+
+            // export
+            this.exportAuditLogs(qb);
+          }
+        },
+        visible: (): boolean => {
+          return AuditLogModel.canExport(this.authUser);
+        },
+        disable: (selected: string[]): boolean => {
+          return selected.length < 1;
+        }
+      }
+    ];
+  }
 
   /**
    * Initialize table add action
