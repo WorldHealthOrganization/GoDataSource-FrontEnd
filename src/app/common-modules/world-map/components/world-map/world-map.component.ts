@@ -454,7 +454,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
               // load styles if necessary
               if (
                 !mapServer.styleUrl ||
-                                !mapServer.styleUrlSource
+                !mapServer.styleUrlSource
               ) {
                 // mark style as being loaded
                 layerData.styleLoaded = true;
