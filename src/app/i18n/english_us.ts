@@ -16,7 +16,9 @@ export const EnglishUsLang = {
     'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NO_CASES_DECEASED': 'Number of deceased cases',
     'LNG_PAGE_DASHBOARD_EPI_CURVE_EXPORT_FORMAT': 'Export format',
     'LNG_PAGE_DASHBOARD_EPI_CURVE_EXPORT_FORMAT_SINGLE_PAGE': 'Single page',
-    'LNG_PAGE_DASHBOARD_EPI_CURVE_EXPORT_FORMAT_MULTI_PAGE': 'Multiple pages'
+    'LNG_PAGE_DASHBOARD_EPI_CURVE_EXPORT_FORMAT_MULTI_PAGE': 'Multiple pages',
+    'LNG_PAGE_LIST_AUDIT_LOGS_EXPORT_TITLE': 'Export audit logs',
+    'LNG_PAGE_LIST_AUDIT_LOGS_EXPORT_BUTTON': 'Export audit logs data'
 
 
     /**

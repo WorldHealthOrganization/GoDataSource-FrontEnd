@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
+import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { AuditLogModel } from '../../../../core/models/audit-log.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { UserModel, UserRoleModel } from '../../../../core/models/user.model';
@@ -16,6 +16,10 @@ import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { TranslateService } from '@ngx-translate/core';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { ExportDataExtension, ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-audit-logs-list',
@@ -39,7 +43,8 @@ export class AuditLogsListComponent
     private auditLogDataService: AuditLogDataService,
     private toastV2Service: ToastV2Service,
     private activatedRoute: ActivatedRoute,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private dialogV2Service: DialogV2Service
   ) {
     super(listHelperService);
   }
@@ -187,7 +192,29 @@ export class AuditLogsListComponent
   /**
    * Initialize table quick actions
    */
-  protected initializeQuickActions(): void {}
+  protected initializeQuickActions(): void {
+    this.quickActions = {
+      type: V2ActionType.MENU,
+      label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
+      visible: (): boolean => AuditLogModel.canExport(this.authUser),
+      menuOptions: [
+        // Export audit logs
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_AUDIT_LOGS_EXPORT_BUTTON'
+          },
+          action: {
+            click: () => {
+              this.exportAuditLogs(this.queryBuilder);
+            }
+          },
+          visible: (): boolean => {
+            return AuditLogModel.canExport(this.authUser);
+          }
+        }
+      ]
+    };
+  }
 
   /**
    * Initialize table group actions
@@ -301,6 +328,36 @@ export class AuditLogsListComponent
         this.pageCount = response;
       });
   }
+
+
+  /**
+   * Export audit log data
+   */
+  private exportAuditLogs(qb: RequestQueryBuilder): void {
+    this.dialogV2Service
+      .showExportData({
+        title: {
+          get: () => 'LNG_PAGE_LIST_AUDIT_LOGS_EXPORT_TITLE'
+        },
+        export: {
+          url: '/audit-logs/export',
+          async: true,
+          method: ExportDataMethod.POST,
+          fileName: `${ this.translateService.instant('LNG_PAGE_LIST_AUDIT_LOGS_TITLE') } - ${ moment().format('YYYY-MM-DD HH:mm') }`,
+          queryBuilder: qb,
+          allow: {
+            types: [
+              ExportDataExtension.JSON
+            ],
+            encrypt: true,
+            dbColumns: true,
+            dbValues: true,
+            jsonReplaceUndefinedWithNull: true
+          }
+        }
+      });
+  }
+
 
   // TODO: Left for changes tree feature inspiration
   /**
