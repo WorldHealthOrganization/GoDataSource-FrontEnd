@@ -468,7 +468,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                   .then((glStyle) => {
                     // apply style
                     applyStyle(
-                      layerData.layer,
+                      layerData.layer as VectorTileLayer | VectorLayer<any>,
                       glStyle,
                       mapServer.styleUrlSource,
                       pathStyleUrl
