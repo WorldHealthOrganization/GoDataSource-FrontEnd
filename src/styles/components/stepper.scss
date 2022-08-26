@@ -4,6 +4,10 @@
   font-family: $gd-font-family;
   height: 100%;
 
+  .mat-horizontal-stepper-wrapper {
+    height: 100%;
+  }
+
   .mat-horizontal-stepper-header-container {
     background-color: var(--gd-background);
     border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);

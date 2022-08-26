@@ -113,6 +113,7 @@ a.mat-icon-button {
     @include flex_align_items(center);
     @include flex_direction(row);
     @include flex_justify(center);
+    height: 100%;
   }
 
   .mat-icon {
