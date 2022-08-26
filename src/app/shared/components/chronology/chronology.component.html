@@ -1,3 +1,30 @@
+<cdk-virtual-scroll-viewport
+  [itemSize]="40"
+  style="height: 100%;">
+  <div
+    *cdkVirtualFor="let entry of entries; templateCacheSize: 0;"
+    style="height: 4rem;">
+
+    <!-- Date -->
+    <div>
+      {{ entry.date | dateDefault }}
+    </div>
+
+    <!-- Days since previous event -->
+    <div>
+      {{ entry.daysSincePreviousEvent }}
+    </div>
+
+    <!-- Info -->
+    <div>
+      {{ entry.type === Constants.CHRONOLOGY_ITEM_TYPE.FOLLOW_UP ? ('LNG_PAGE_VIEW_CHRONOLOGY_CHRONOLOGY_ITEM_TYPE_FOLLOW_UP' | translate) : '' }}
+      {{ entry.label | translate:entry.translateData }}
+    </div>
+
+  </div>
+</cdk-virtual-scroll-viewport>
+
+<!-- #TODO - remove me -->
 <!--<mgl-timeline [alternate]="false">-->
 <!--    <mgl-timeline-entry *ngFor="let entry of entries">-->
 <!--        <mgl-timeline-entry-header-->

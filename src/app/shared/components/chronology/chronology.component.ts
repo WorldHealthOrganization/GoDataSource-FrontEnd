@@ -1,4 +1,4 @@
-import { Component, Input, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, ViewEncapsulation } from '@angular/core';
 import * as _ from 'lodash';
 import { ChronologyItem } from './typings/chronology-item';
 import { Constants } from '../../../core/models/constants';
@@ -8,13 +8,15 @@ import { moment } from '../../../core/helperClasses/x-moment';
   selector: 'app-chronology',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './chronology.component.html',
-  styleUrls: ['./chronology.component.scss']
+  styleUrls: ['./chronology.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChronologyComponent {
-  private _entries: ChronologyItem[] = [];
-
+  // constants
   Constants = Constants;
 
+  // entries
+  private _entries: ChronologyItem[] = [];
   @Input() set entries(entries: ChronologyItem[]) {
     // set collection
     this._entries = entries || [];
@@ -39,13 +41,5 @@ export class ChronologyComponent {
   }
   get entries(): ChronologyItem[] {
     return this._entries;
-  }
-
-  /**
-     * Prevent expanding time-line component
-     */
-  noClick(event: MouseEvent) {
-    event.preventDefault();
-    event.stopPropagation();
   }
 }
