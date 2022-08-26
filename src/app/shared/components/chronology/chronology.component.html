@@ -1,22 +1,25 @@
 <cdk-virtual-scroll-viewport
-  [itemSize]="40"
-  style="height: 100%;">
+  class="gd-chronology"
+  [itemSize]="80">
   <div
     *cdkVirtualFor="let entry of entries; templateCacheSize: 0;"
-    style="height: 4rem;">
+    class="gd-chronology-item"
+    style="height: 8rem;">
 
     <!-- Date -->
-    <div>
+    <div class="gd-chronology-item-date">
       {{ entry.date | dateDefault }}
     </div>
 
     <!-- Days since previous event -->
-    <div>
-      {{ entry.daysSincePreviousEvent }}
+    <div class="gd-chronology-item-number">
+      <div class="gd-chronology-item-number-text">
+        {{ entry.daysSincePreviousEvent }}
+      </div>
     </div>
 
     <!-- Info -->
-    <div>
+    <div class="gd-chronology-item-text">
       {{ entry.type === Constants.CHRONOLOGY_ITEM_TYPE.FOLLOW_UP ? ('LNG_PAGE_VIEW_CHRONOLOGY_CHRONOLOGY_ITEM_TYPE_FOLLOW_UP' | translate) : '' }}
       {{ entry.label | translate:entry.translateData }}
     </div>
