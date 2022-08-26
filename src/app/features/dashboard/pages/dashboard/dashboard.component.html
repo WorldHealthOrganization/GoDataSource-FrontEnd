@@ -121,6 +121,7 @@
 
   <!-- Bottom -->
   <div
+    *ngIf="isOutbreakSelected; else noData"
     class="gd-dashboard-bottom"
     fxLayout="column" fxLayoutGap="1.6rem">
 
@@ -243,6 +244,21 @@
       </app-cot-kpi-dashlet>
 
     </div>
-
   </div>
+
+  <ng-template #noData>
+    <!-- No data -->
+    <div
+      fxLayout="column" fxLayoutAlign="center center"
+      class="gd-duplicate-records-list-no-records">
+
+      <!-- Image -->
+      <div
+        class="gd-duplicate-records-list-no-records-image"></div>
+
+      <!-- Message -->
+      <div
+        class="gd-duplicate-records-list-no-records-text">{{'LNG_COMMON_LABEL_NO_OUTBREAK_SELECTED' | translate}}</div>
+    </div>
+  </ng-template>
 </div>

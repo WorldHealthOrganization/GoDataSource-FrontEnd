@@ -91,6 +91,9 @@ export class DashboardComponent implements OnDestroy {
   // selected outbreak
   private _outbreakSubscriber: Subscription;
   private _selectedOutbreak: OutbreakModel;
+  public get isOutbreakSelected(): boolean {
+    return this._selectedOutbreak !== undefined;
+  }
 
   // visible dashlets
   visibleDashlets: {

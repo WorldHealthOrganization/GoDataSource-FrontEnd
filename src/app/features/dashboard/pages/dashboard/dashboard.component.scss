@@ -95,4 +95,29 @@
       }
     }
   }
+
+  // #TODO: Needs vertical-align adjustments
+  .gd-duplicate-records-list-no-records {
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    @include translate(-50%, -50%);
+
+    .gd-duplicate-records-list-no-records-image {
+      background-image: url(../../../../../assets/images/nothing-found.svg);
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 15rem;
+      width: 15rem;
+    }
+
+    .gd-duplicate-records-list-no-records-text {
+      color: var(--gd-secondary);
+      display: block;
+      font-size: 1.4rem;
+      padding: 1.6rem 0.8rem;
+      text-align: center;
+    }
+  }
 }
