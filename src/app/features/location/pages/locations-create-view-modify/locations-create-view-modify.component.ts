@@ -472,6 +472,25 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
               }
             },
             visible: () => !this.isCreate
+          },
+
+          // Divider
+          {
+            type: CreateViewModifyV2MenuType.DIVIDER,
+            visible: () => !this.isCreate &&
+              LocationModel.canListUsage(this.authUser)
+          },
+
+          // See Location usage
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_PAGE_LIST_LOCATIONS_ACTION_USAGE',
+            action: {
+              link: () => ['/locations', this.itemData.id, 'usage']
+            },
+            visible: (): boolean => {
+              return LocationModel.canListUsage(this.authUser);
+            }
           }
         ]
       }

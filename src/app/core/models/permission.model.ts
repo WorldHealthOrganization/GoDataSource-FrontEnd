@@ -14,6 +14,7 @@ export enum PERMISSION {
 
   // audit logs
   AUDIT_LOG_LIST = 'audit_log_list',
+  AUDIT_LOG_EXPORT = 'audit_log_export',
 
   // languages
   LANGUAGE_LIST = 'language_list',

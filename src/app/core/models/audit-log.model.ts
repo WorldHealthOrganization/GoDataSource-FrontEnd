@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { UserModel } from './user.model';
-import { IPermissionBasic } from './permission.interface';
+import { IPermissionBasic, IPermissionExportable } from './permission.interface';
 import { PERMISSION } from './permission.model';
 
 export class AuditLogChangeDataModel {
@@ -17,7 +17,7 @@ export class AuditLogChangeDataModel {
 
 export class AuditLogModel
 implements
-        IPermissionBasic {
+  IPermissionBasic, IPermissionExportable {
   id: string;
   action: string;
   modelName: string;
@@ -37,6 +37,11 @@ implements
   static canCreate(): boolean { return false; }
   static canModify(): boolean { return false; }
   static canDelete(): boolean { return false; }
+
+  /**
+   * Static Permissions - IPermissionExportable
+   */
+  static canExport(user: UserModel): boolean { return (user ? user.hasPermissions(PERMISSION.AUDIT_LOG_EXPORT) : false); }
 
   /**
      * Constructor
@@ -66,4 +71,9 @@ implements
   canCreate(): boolean { return AuditLogModel.canCreate(); }
   canModify(): boolean { return AuditLogModel.canModify(); }
   canDelete(): boolean { return AuditLogModel.canDelete(); }
+
+  /**
+    * Permissions - IPermissionExportable
+    */
+  canExport(user: UserModel): boolean { return AuditLogModel.canExport(user); }
 }

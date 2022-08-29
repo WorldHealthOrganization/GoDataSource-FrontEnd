@@ -965,6 +965,11 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
             // allow deleted records
             qb.includeDeleted();
 
+            // keep sort order
+            if (!this.queryBuilder.sort.isEmpty()) {
+              qb.sort.criterias = { ...this.queryBuilder.sort.criterias };
+            }
+
             // export
             this.exportContactsOfContacts(qb);
           }
