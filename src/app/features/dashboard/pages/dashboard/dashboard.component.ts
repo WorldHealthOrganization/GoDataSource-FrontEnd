@@ -91,6 +91,9 @@ export class DashboardComponent implements OnDestroy {
   // selected outbreak
   private _outbreakSubscriber: Subscription;
   private _selectedOutbreak: OutbreakModel;
+  public get isOutbreakSelected(): boolean {
+    return !!this._selectedOutbreak?.id;
+  }
 
   // visible dashlets
   visibleDashlets: {
@@ -182,7 +185,11 @@ export class DashboardComponent implements OnDestroy {
       .getSelectedOutbreakSubject()
       .subscribe((selectedOutbreak: OutbreakModel) => {
         if (selectedOutbreak?.id) {
+          // update outbreak
           this._selectedOutbreak = selectedOutbreak;
+
+          // redraw data
+          this.detectChanges();
         }
       });
 

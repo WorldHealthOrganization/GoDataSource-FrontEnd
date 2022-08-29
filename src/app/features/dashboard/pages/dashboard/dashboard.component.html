@@ -19,6 +19,7 @@
 
       <!-- Buttons -->
       <div
+        *ngIf="isOutbreakSelected"
         fxFlex fxLayoutAlign="end" fxLayoutGap="0.8rem"
         class="gd-basic-top-title-buttons-buttons">
 
@@ -121,6 +122,7 @@
 
   <!-- Bottom -->
   <div
+    *ngIf="isOutbreakSelected; else noData"
     class="gd-dashboard-bottom"
     fxLayout="column" fxLayoutGap="1.6rem">
 
@@ -243,6 +245,23 @@
       </app-cot-kpi-dashlet>
 
     </div>
-
   </div>
+
+  <!-- No Data icons -->
+  <ng-template
+    #noData>
+    <!-- No data -->
+    <div
+      fxLayout="column" fxLayoutAlign="center center"
+      class="gd-dashboard-no-data">
+
+      <!-- Image -->
+      <div
+        class="gd-dashboard-no-data-image"></div>
+
+      <!-- Message -->
+      <div
+        class="gd-dashboard-no-data-text">{{'LNG_COMMON_LABEL_NO_OUTBREAK_SELECTED' | translate}}</div>
+    </div>
+  </ng-template>
 </div>
