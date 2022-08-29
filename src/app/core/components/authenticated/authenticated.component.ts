@@ -13,15 +13,15 @@ import { DashboardModel } from '../../models/dashboard.model';
 import { ConfirmOnFormChanges, PageChangeConfirmationGuard } from '../../services/guards/page-change-confirmation-guard.service';
 import { determineRenderMode, RenderMode } from '../../enums/render-mode.enum';
 import { DebounceTimeCaller, DebounceTimeCallerType } from '../../helperClasses/debounce-time-caller';
-import { Subscriber, throwError } from 'rxjs';
+import { throwError } from 'rxjs';
 import { ITokenInfo } from '../../models/auth.model';
 import { Moment } from 'moment';
 import * as moment from 'moment';
 import { UserDataService } from '../../services/data/user.data.service';
 import { catchError } from 'rxjs/operators';
 import { IV2BottomDialogConfigButtonType } from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
-import { MatBottomSheetRef } from '@angular/material/bottom-sheet/bottom-sheet-ref';
 import { AppBottomDialogV2Component } from '../../../shared/components-v2/app-bottom-dialog-v2/app-bottom-dialog-v2.component';
+import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
 
 @Component({
   selector: 'app-authenticated',
@@ -81,7 +81,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
   private documentKeyUp: () => void;
   private documentMouseMove: () => void;
   private tokenCheckIfLoggedOutCaller: DebounceTimeCaller = new DebounceTimeCaller(
-    new Subscriber<void>(() => {
+    () => {
       // check if we must check if we;re logged out
       // -7 seconds error marje
       if (
@@ -107,7 +107,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
         // retrieve the user instance or log out
         this.refreshUserTokenOrLogOut(false);
       }
-    }),
+    },
     3000,
     DebounceTimeCallerType.DONT_RESET_AND_WAIT
   );
@@ -178,8 +178,7 @@ export class AuthenticatedComponent implements OnInit, OnDestroy {
         this.sideDialog
           .show(data.config)
           .subscribe((response) => {
-            data.responseSubscriber.next(response);
-            data.responseSubscriber.complete();
+            data.responseSubscriber(response);
             data.responseSubscriber = undefined;
           });
       });

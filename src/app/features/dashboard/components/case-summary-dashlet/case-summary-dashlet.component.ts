@@ -4,7 +4,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import * as _ from 'lodash';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
-import { Observable, Subscriber, Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { Constants } from '../../../../core/models/constants';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -71,9 +71,9 @@ implements OnInit, OnDestroy {
   /**
    * Global Filters changed
    */
-  protected refreshDataCaller = new DebounceTimeCaller(new Subscriber<void>(() => {
+  protected refreshDataCaller = new DebounceTimeCaller(() => {
     this.refreshData();
-  }), 100);
+  }, 100);
 
   /**
    * Constructor

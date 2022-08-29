@@ -1,5 +1,4 @@
-import { Component, Input, ViewEncapsulation } from '@angular/core';
-import * as _ from 'lodash';
+import { ChangeDetectionStrategy, Component, Input, ViewEncapsulation } from '@angular/core';
 import { ChronologyItem } from './typings/chronology-item';
 import { Constants } from '../../../core/models/constants';
 import { moment } from '../../../core/helperClasses/x-moment';
@@ -8,44 +7,54 @@ import { moment } from '../../../core/helperClasses/x-moment';
   selector: 'app-chronology',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './chronology.component.html',
-  styleUrls: ['./chronology.component.scss']
+  styleUrls: ['./chronology.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChronologyComponent {
-  private _entries: ChronologyItem[] = [];
-
+  // constants
   Constants = Constants;
 
+  // entries
+  private _entries: ChronologyItem[];
   @Input() set entries(entries: ChronologyItem[]) {
     // set collection
-    this._entries = entries || [];
+    this._entries = entries;
 
-    // sort collection asc
-    this._entries = _.sortBy(
-      this._entries,
-      'date'
-    );
+    // process data only if we have entries
+    if (this._entries) {
+      // sort collection descending
+      this._entries.sort((e1, e2) => {
+        if (e1 === e2) {
+          return 0;
+        } else if (
+          !e1 &&
+          e2
+        ) {
+          return -1;
+        } else if (
+          e1 &&
+          !e2
+        ) {
+          return 1;
+        } else {
+          return e2.date.valueOf() - e1.date.valueOf();
+        }
+      });
 
-    // determine number of days between events
-    let previousItem: ChronologyItem;
-    this._entries.forEach((item: ChronologyItem, index: number) => {
-      // we don't need to determine number of days for the first item
-      if (index > 0) {
-        item.daysSincePreviousEvent = moment(item.date).startOf('day').diff(moment(previousItem.date).startOf('day'), 'days');
-      }
+      // determine number of days between events
+      let previousItem: ChronologyItem;
+      this._entries.forEach((item: ChronologyItem, index: number) => {
+        // we don't need to determine number of days for the first item
+        if (index > 0) {
+          item.daysSincePreviousEvent = moment(previousItem.date).startOf('day').diff(moment(item.date).startOf('day'), 'days');
+        }
 
-      // previous item
-      previousItem = item;
-    });
+        // previous item
+        previousItem = item;
+      });
+    }
   }
   get entries(): ChronologyItem[] {
     return this._entries;
-  }
-
-  /**
-     * Prevent expanding time-line component
-     */
-  noClick(event: MouseEvent) {
-    event.preventDefault();
-    event.stopPropagation();
   }
 }

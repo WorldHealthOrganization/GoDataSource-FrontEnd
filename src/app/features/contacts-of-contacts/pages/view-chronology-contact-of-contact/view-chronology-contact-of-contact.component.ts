@@ -22,7 +22,7 @@ export class ViewChronologyContactOfContactComponent implements OnInit {
   breadcrumbs: IV2Breadcrumb[] = [];
 
   contactOfContactData: ContactOfContactModel = new ContactOfContactModel();
-  chronologyEntries: ChronologyItem[] = [];
+  chronologyEntries: ChronologyItem[];
 
   // authenticated user details
   authUser: UserModel;

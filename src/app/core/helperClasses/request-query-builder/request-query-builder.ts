@@ -3,7 +3,6 @@ import { ISerializedQueryFilter, RequestFilter } from './request-filter';
 import { ISerializedQuerySort, RequestSort } from './request-sort';
 import { ISerializedQueryPaginator, RequestPaginator } from './request-paginator';
 import { DebounceTimeCaller } from '../debounce-time-caller';
-import { Subscriber } from 'rxjs/index';
 
 /**
  * Serialized
@@ -89,7 +88,7 @@ export class RequestQueryBuilder {
     this.changesListener = listener;
     if (this.changesListener) {
       this.triggerChangesListener = new DebounceTimeCaller(
-        new Subscriber<void>(() => {
+        () => {
           // do we have a change listener ?
           if (!this.changesListener) {
             return;
@@ -97,7 +96,7 @@ export class RequestQueryBuilder {
 
           // trigger change
           this.changesListener();
-        }),
+        },
         400
       );
     }

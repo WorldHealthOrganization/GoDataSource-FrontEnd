@@ -8,7 +8,6 @@ import { SheetCellType } from '../../../core/models/sheet/sheet-cell-type';
 import { Constants } from '../../../core/models/constants';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { Observable } from 'rxjs/internal/Observable';
-import { Subscriber } from 'rxjs/internal-compatibility';
 import { catchError, map, tap } from 'rxjs/operators';
 import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 import { LocationModel } from '../../../core/models/location.model';
@@ -19,6 +18,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
 import { IV2SideDialogConfigButtonType, V2SideDialogConfigInputType } from '../../components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { Subscriber } from 'rxjs';
 
 /**
  * Error message

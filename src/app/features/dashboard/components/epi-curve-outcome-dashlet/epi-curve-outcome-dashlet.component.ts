@@ -7,7 +7,7 @@ import { ReferenceDataCategory } from '../../../../core/models/reference-data.mo
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
-import { Subscription, Subscriber } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { MetricCasesCountStratifiedOutcome } from '../../../../core/models/metrics/metric-cases-count-stratified-outcome.model';
@@ -97,10 +97,10 @@ export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
   /**
      * Global Filters changed
      */
-  protected refreshDataCaller = new DebounceTimeCaller(new Subscriber<void>(() => {
+  protected refreshDataCaller = new DebounceTimeCaller(() => {
     this._retrievedData = false;
     this.refreshData();
-  }), 100);
+  }, 100);
 
   // options
   epiCurveWeekTypesOptions: ILabelValuePairModel[];

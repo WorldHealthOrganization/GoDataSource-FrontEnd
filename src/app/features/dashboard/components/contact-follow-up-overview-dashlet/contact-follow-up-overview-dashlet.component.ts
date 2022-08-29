@@ -4,7 +4,7 @@ import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { Constants } from '../../../../core/models/constants';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
-import { Subscription,  Subscriber } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
@@ -100,10 +100,10 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
   /**
      * Global Filters changed
      */
-  protected refreshDataCaller = new DebounceTimeCaller(new Subscriber<void>(() => {
+  protected refreshDataCaller = new DebounceTimeCaller(() => {
     this._retrievedData = false;
     this.refreshData();
-  }), 100);
+  }, 100);
 
   /**
      * Constructor
