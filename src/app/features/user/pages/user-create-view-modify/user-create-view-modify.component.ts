@@ -359,7 +359,6 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
                 }
               },
               options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              // TODO: In the old design input fields were hidden not deactivated. Should we implement "visible: (): boolean => {}"?
               disabled: (): boolean => {
                 return !OutbreakModel.canList(this.authUser);
               },
@@ -381,7 +380,6 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
                 }
               },
               options: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              // TODO: In the old design input fields were hidden not deactivated. Should we implement "visible: (): boolean => {}"?
               disabled: (): boolean => {
                 return !OutbreakModel.canList(this.authUser);
               },
