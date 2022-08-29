@@ -9,7 +9,6 @@ import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { ContactChronology } from './typings/contact-chronology';
-import { forkJoin, of } from 'rxjs/index';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -20,6 +19,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { forkJoin, of } from 'rxjs';
 
 @Component({
   selector: 'app-view-chronology-contact',
@@ -32,7 +32,7 @@ export class ViewChronologyContactComponent implements OnInit {
   breadcrumbs: IV2Breadcrumb[] = [];
 
   contactData: ContactModel = new ContactModel();
-  chronologyEntries: ChronologyItem[] = [];
+  chronologyEntries: ChronologyItem[];
 
   // authenticated user details
   authUser: UserModel;

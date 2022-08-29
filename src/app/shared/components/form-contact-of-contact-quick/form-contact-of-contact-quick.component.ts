@@ -1,5 +1,5 @@
 import { Component, Host, Inject, OnDestroy, OnInit, Optional, SkipSelf, ViewEncapsulation } from '@angular/core';
-import { ControlContainer, FormControl, NG_ASYNC_VALIDATORS, NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ControlContainer, UntypedFormControl, NG_ASYNC_VALIDATORS, NG_VALIDATORS, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { GroupBase, GroupDirtyFields } from '../../xt-forms/core';
 import { ContactOfContactModel } from '../../../core/models/contact-of-contact.model';
 import { OutbreakDataService } from '../../../core/services/data/outbreak.data.service';
@@ -146,10 +146,10 @@ export class FormContactOfContactQuickComponent extends GroupBase<ContactOfConta
      * Retrieve fields
      */
   getDirtyFields(): {
-    [name: string]: FormControl
+    [name: string]: UntypedFormControl
   } {
     const dirtyControls = {};
-    _.forEach(this.groupForm.controls, (control: FormControl, controlName: string) => {
+    _.forEach(this.groupForm.controls, (control: UntypedFormControl, controlName: string) => {
       if (control.dirty) {
         dirtyControls[controlName] = control;
       }

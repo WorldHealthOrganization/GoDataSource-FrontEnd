@@ -37,9 +37,9 @@ export class LocationUsageListComponent extends ListComponent<any> implements On
    */
   constructor(
     protected listHelperService: ListHelperService,
-    private locationDataService: LocationDataService,
+    protected locationDataService: LocationDataService,
     protected activatedRoute: ActivatedRoute,
-    public i18nService: I18nService
+    protected i18nService: I18nService
   ) {
     super(listHelperService);
 
@@ -54,6 +54,23 @@ export class LocationUsageListComponent extends ListComponent<any> implements On
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
+  }
+
+  /**
+   * Selected outbreak was changed
+   */
+  selectedOutbreakChanged(): void {
+    // already in process of refresh ?
+    if (!this.tableColumns?.length) {
+      return;
+    }
+
+    // hack to redo buttons visibility
+    const oldTableColumns = this.tableColumns;
+    this.tableColumns = [];
+    setTimeout(() => {
+      this.tableColumns = oldTableColumns;
+    });
   }
 
   /**
@@ -97,13 +114,11 @@ export class LocationUsageListComponent extends ListComponent<any> implements On
           type: V2ColumnFormat.ACTIONS
         },
         actions: [
-          // View Case
+          // View
           {
             type: V2ActionType.ICON,
             icon: 'visibility',
             iconTooltip: 'LNG_PAGE_ACTION_VIEW',
-            // TODO: Needs disabledTooltip
-            // disabledTooltip: 'LNG_PAGE_LIST_USAGE_LOCATIONS_NOT_SELECTED_OUTBREAK',
             action: {
               link: (item: UsageDetailsItem): string[] => {
                 return [item.viewUrl];
@@ -113,21 +128,17 @@ export class LocationUsageListComponent extends ListComponent<any> implements On
               return item.typePermissions &&
                 item.typePermissions.canView(this.authUser) &&
                 !!item.outbreakId &&
-                !!item.outbreakName;
-            },
-            disable: (item: UsageDetailsItem): boolean => {
-              return !this.selectedOutbreak ||
-              item.outbreakId !== this.selectedOutbreak.id;
+                !!item.outbreakName &&
+                this.selectedOutbreak?.id &&
+                item.outbreakId === this.selectedOutbreak.id;
             }
           },
 
-          // Modify Case
+          // Modify
           {
             type: V2ActionType.ICON,
             icon: 'edit',
             iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
-            // TODO: Needs disabledTooltip
-            // disabledTooltip: 'LNG_PAGE_LIST_USAGE_LOCATIONS_NOT_SELECTED_OUTBREAK',
             action: {
               link: (item: UsageDetailsItem): string[] => {
                 return [item.modifyUrl];
@@ -137,11 +148,10 @@ export class LocationUsageListComponent extends ListComponent<any> implements On
               return item.typePermissions &&
                 item.typePermissions.canModify(this.authUser) &&
                 !!item.outbreakId &&
+                !!item.outbreakName &&
+                this.selectedOutbreak?.id &&
+                item.outbreakId === this.selectedOutbreak.id &&
                 item.outbreakId === this.authUser.activeOutbreakId;
-            },
-            disable: (item: UsageDetailsItem): boolean => {
-              return !this.selectedOutbreak ||
-                item.outbreakId !== this.selectedOutbreak.id;
             }
           }
         ]

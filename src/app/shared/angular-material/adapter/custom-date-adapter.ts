@@ -1,5 +1,4 @@
-import { MomentDateAdapter } from '@angular/material-moment-adapter';
-import { MatMomentDateAdapterOptions } from '@angular/material-moment-adapter/adapter/moment-date-adapter';
+import { MatMomentDateAdapterOptions, MomentDateAdapter } from '@angular/material-moment-adapter';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { Moment } from 'moment';
 import * as moment from 'moment';

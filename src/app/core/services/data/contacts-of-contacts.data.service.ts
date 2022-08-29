@@ -7,11 +7,11 @@ import { ContactOfContactModel } from '../../models/contact-of-contact.model';
 import { AddressModel } from '../../models/address.model';
 import { EntityDuplicatesModel } from '../../models/entity-duplicates.model';
 import { RiskLevelGroupModel } from '../../models/risk-level-group.model';
-import { catchError, map } from 'rxjs/internal/operators';
 import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';
 import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
 import * as _ from 'lodash';
 import { IBasicCount } from '../../models/basic-count.interface';
+import { catchError, map } from 'rxjs/operators';
 
 @Injectable()
 export class ContactsOfContactsDataService {
@@ -222,7 +222,7 @@ export class ContactsOfContactsDataService {
         catchError((response: Error | VisualIdErrorModel) => {
           return (
             (response as VisualIdErrorModel).code === VisualIdErrorModelCode.INVALID_VISUAL_ID_MASK ||
-                        (response as VisualIdErrorModel).code === VisualIdErrorModelCode.DUPLICATE_VISUAL_ID
+            (response as VisualIdErrorModel).code === VisualIdErrorModelCode.DUPLICATE_VISUAL_ID
           ) ?
             of(
               this.modelHelper.getModelInstance(

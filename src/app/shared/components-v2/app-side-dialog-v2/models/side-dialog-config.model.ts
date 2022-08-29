@@ -1,4 +1,4 @@
-import { Observable, Subscriber } from 'rxjs';
+import { Observable } from 'rxjs';
 import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.model';
 import { NgForm } from '@angular/forms';
 import { Params } from '@angular/router';
@@ -584,7 +584,7 @@ export interface IV2SideDialog {
   // required
   action: V2SideDialogConfigAction;
   config: IV2SideDialogConfig;
-  responseSubscriber: Subscriber<IV2SideDialogResponse>;
+  responseSubscriber: (response: IV2SideDialogResponse) => void;
 }
 
 /**

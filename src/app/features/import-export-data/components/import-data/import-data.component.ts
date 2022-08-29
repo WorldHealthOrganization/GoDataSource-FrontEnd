@@ -9,7 +9,7 @@ import { ImportExportDataService } from '../../../../core/services/data/import-e
 import { v4 as uuid } from 'uuid';
 import { SavedImportMappingService } from '../../../../core/services/data/saved-import-mapping.data.service';
 import { ISavedImportMappingModel, SavedImportField, SavedImportMappingModel, SavedImportOption } from '../../../../core/models/saved-import-mapping.model';
-import { Observable, Subscriber, throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder/request-query-builder';
 import { catchError } from 'rxjs/operators';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
@@ -312,9 +312,9 @@ export class ImportDataComponent
       total: 0
     };
   mappedFieldsVisible: number[] = [];
-  private triggerImportListRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
+  private triggerImportListRefresh = new DebounceTimeCaller(() => {
     this.filterVisibleData();
-  }));
+  });
 
   // Mapped fields
   mappedFields: ImportableMapField[] = [];

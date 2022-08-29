@@ -1,5 +1,4 @@
 import { Constants } from '../models/constants';
-import { Subscriber } from 'rxjs';
 
 export enum DebounceTimeCallerType {
   RESET_AND_WAIT_FOR_NEXT,
@@ -12,14 +11,14 @@ export class DebounceTimeCaller {
 
   // initialize
   constructor(
-    private subscriber: Subscriber<void>,
+    private subscriber: () => void,
     private time: number = Constants.DEFAULT_FILTER_DEBOUNCE_TIME_MILLISECONDS,
     private type: DebounceTimeCallerType = DebounceTimeCallerType.RESET_AND_WAIT_FOR_NEXT
   ) {}
 
   /**
-     * Clear previous refresh request
-     */
+   * Clear previous refresh request
+   */
   protected clearRefreshTimeout() {
     if (this.refreshTimeoutID) {
       clearTimeout(this.refreshTimeoutID);
@@ -28,9 +27,9 @@ export class DebounceTimeCaller {
   }
 
   /**
-     * Execute subscriber
-     * @param instant True if you don't want to wait for debounce time
-     */
+   * Execute subscriber
+   * @param instant True if you don't want to wait for debounce time
+   */
   call(instant: boolean = false) {
     // no subscriber ?
     if (!this.subscriber) {
@@ -43,21 +42,21 @@ export class DebounceTimeCaller {
       this.clearRefreshTimeout();
 
       // call
-      this.subscriber.next();
+      this.subscriber();
     } else {
       this.callAfterMs(this.time);
     }
   }
 
   /**
-     * Call after a specific number of ms
-     * @param waitForMs Number of ms to wait before calling subscriber
-     */
+   * Call after a specific number of ms
+   * @param waitForMs Number of ms to wait before calling subscriber
+   */
   callAfterMs(waitForMs: number) {
     if (
       this.type === DebounceTimeCallerType.RESET_AND_WAIT_FOR_NEXT || (
         this.type === DebounceTimeCallerType.DONT_RESET_AND_WAIT &&
-                !this.refreshTimeoutID
+        !this.refreshTimeoutID
       )
     ) {
       // stop previous request
@@ -75,17 +74,16 @@ export class DebounceTimeCaller {
         this.refreshTimeoutID = null;
 
         // call
-        this.subscriber.next();
+        this.subscriber();
       }, waitForMs);
     }
   }
 
   /**
-     * Release resources
-     */
+   * Release resources
+   */
   unsubscribe() {
     if (this.subscriber) {
-      this.subscriber.unsubscribe();
       this.subscriber = null;
     }
   }
