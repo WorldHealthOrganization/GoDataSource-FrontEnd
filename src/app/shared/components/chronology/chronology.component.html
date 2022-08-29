@@ -1,4 +1,6 @@
+<!-- Data -->
 <cdk-virtual-scroll-viewport
+  *ngIf="!!entries; else loadingData"
   class="gd-chronology"
   [itemSize]="80">
   <div
@@ -26,3 +28,11 @@
 
   </div>
 </cdk-virtual-scroll-viewport>
+
+<!-- Loading data -->
+<ng-template
+  #loadingData>
+  <mat-progress-spinner
+    diameter="32"
+    mode="indeterminate"></mat-progress-spinner>
+</ng-template>

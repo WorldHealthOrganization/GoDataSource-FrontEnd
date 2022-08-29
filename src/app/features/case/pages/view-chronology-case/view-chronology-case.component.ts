@@ -30,7 +30,7 @@ export class ViewChronologyCaseComponent implements OnInit {
   breadcrumbs: IV2Breadcrumb[] = [];
 
   caseData: CaseModel = new CaseModel();
-  chronologyEntries: ChronologyItem[] = [];
+  chronologyEntries: ChronologyItem[];
 
   // authenticated user details
   authUser: UserModel;
