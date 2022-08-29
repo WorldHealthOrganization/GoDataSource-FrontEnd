@@ -28,7 +28,7 @@ import * as moment from 'moment';
 export class AuditLogsListComponent
   extends ListComponent<AuditLogModel>
   implements OnDestroy {
-  // TODO: Left for changes tree feature inspiration
+  // #TODO: Left for changes tree feature inspiration
   // // date filter
   // dateFilterDefaultValue: {
   //   startDate,
@@ -123,7 +123,7 @@ export class AuditLogsListComponent
       {
         field: 'changedData',
         label: 'LNG_AUDIT_LOG_FIELD_LABEL_CHANGE_DATA',
-        // TODO: Needs changes tree feature,
+        // #TODO: Needs changes tree feature,
         format: {
           type: () => '...'
         }
@@ -134,7 +134,7 @@ export class AuditLogsListComponent
         format: {
           type: (item) => item.userId && this.activatedRoute.snapshot.data.user.map[item.userId] ?
             `${ this.activatedRoute.snapshot.data.user.map[item.userId].name }` :
-            // TODO: Email not received from resolver
+            // #TODO: Email not received from resolver
             //  ( ${ this.activatedRoute.snapshot.data.user.map[item.userId].email } )` :
             ''
         },
@@ -386,7 +386,24 @@ export class AuditLogsListComponent
             types: [
               ExportDataExtension.JSON
             ],
-            encrypt: true,
+            anonymize: {
+              fields: [
+                { label: 'LNG_COMMON_MODEL_FIELD_LABEL_ID', value: 'id' },
+                { label: 'LNG_AUDIT_LOG_FIELD_LABEL_ACTION', value: 'action' },
+                { label: 'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_NAME', value: 'modelName' },
+                { label: 'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_ID', value: 'recordId' },
+                { label: 'LNG_AUDIT_LOG_FIELD_LABEL_CHANGE_DATA', value: 'changedData' },
+                { label: 'LNG_AUDIT_LOG_FIELD_LABEL_USER', value: 'userId' },
+                { label: 'LNG_AUDIT_LOG_FIELD_LABEL_IP_ADDRESS', value: 'userIPAddress' },
+                { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+                { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+                { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+                { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+                { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
+                { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+                { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
+              ]
+            },
             dbColumns: true,
             dbValues: true,
             jsonReplaceUndefinedWithNull: true
@@ -396,7 +413,7 @@ export class AuditLogsListComponent
   }
 
 
-  // TODO: Left for changes tree feature inspiration
+  // #TODO: Left for changes tree feature inspiration
   /**
    * Initialize header filters
    */
@@ -411,7 +428,7 @@ export class AuditLogsListComponent
   //   );
   // }
 
-  // TODO: Left for changes tree feature inspiration
+  // #TODO: Left for changes tree feature inspiration
   /**
    * Add search criteria
    */
