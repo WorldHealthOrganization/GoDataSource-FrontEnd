@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 import { PeoplePossibleDuplicateGroupModel, PeoplePossibleDuplicateModel } from '../../../../core/models/people-possible-duplicate.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { AddressModel } from '../../../../core/models/address.model';
-import { FormControl, NgForm } from '@angular/forms';
+import { UntypedFormControl, NgForm } from '@angular/forms';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import { catchError, share } from 'rxjs/operators';
 import { throwError } from 'rxjs/internal/observable/throwError';
@@ -238,7 +238,7 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
     const newValue: boolean = form.controls.checkAll.value;
 
     // set children checkboxes values
-    _.each(form.controls, (checkbox: FormControl) => {
+    _.each(form.controls, (checkbox: UntypedFormControl) => {
       checkbox.setValue(newValue);
     });
   }
@@ -249,7 +249,7 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
   checkOneToggle(form: NgForm) {
     // set children checkboxes values
     let newValue: boolean = true;
-    _.each(form.controls, (checkbox: FormControl, name: string) => {
+    _.each(form.controls, (checkbox: UntypedFormControl, name: string) => {
       if (name !== 'checkAll') {
         newValue = newValue && checkbox.value;
       }
@@ -265,7 +265,7 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
   hasAtLeastTwoCheckboxChecked(form: NgForm): boolean {
     // set children checkboxes values
     let checkedItems: number = 0;
-    _.each(form.controls, (checkbox: FormControl, name: string) => {
+    _.each(form.controls, (checkbox: UntypedFormControl, name: string) => {
       if (
         name !== 'checkAll' &&
         checkbox.value
@@ -287,7 +287,7 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
   mergeCheckedRecords(form: NgForm) {
     // determine merge ids
     const mergeIds: string[] = [];
-    _.each(form.controls, (checkbox: FormControl, name: string) => {
+    _.each(form.controls, (checkbox: UntypedFormControl, name: string) => {
       if (
         name !== 'checkAll' &&
                 checkbox.value

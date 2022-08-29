@@ -1,6 +1,6 @@
 import { RequestQueryBuilder, RequestSortDirection } from './request-query-builder';
 import * as _ from 'lodash';
-import { Observable, ReplaySubject, Subscriber, Subscription } from 'rxjs';
+import { Observable, ReplaySubject, Subscription } from 'rxjs';
 import { Constants } from '../models/constants';
 import { PageEvent } from '@angular/material/paginator';
 import { DebounceTimeCaller } from './debounce-time-caller';
@@ -109,7 +109,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
   // refresh only after we finish changing data
   // by default each time we get back to a page we should display loading spinner
   private _triggeredByPageChange: boolean = false;
-  private triggerListRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
+  private triggerListRefresh = new DebounceTimeCaller(() => {
     // disabled ?
     if (this.appliedListFilterLoading) {
       return;
@@ -128,7 +128,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
 
     // refresh list
     this.refreshList(triggeredByPageChange);
-  }));
+  });
 
   // disable next load from cache input values ?
   private _disableNextLoadCachedInputValues: boolean = false;
@@ -139,7 +139,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
   }
 
   // refresh only after we finish changing data
-  private triggerListCountRefresh = new DebounceTimeCaller(new Subscriber<void>(() => {
+  private triggerListCountRefresh = new DebounceTimeCaller(() => {
     // disabled ?
     if (this.appliedListFilterLoading) {
       return;
@@ -147,7 +147,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
 
     // refresh list
     this.refreshListCount();
-  }));
+  });
 
   /**
    * Retrieve cached filters

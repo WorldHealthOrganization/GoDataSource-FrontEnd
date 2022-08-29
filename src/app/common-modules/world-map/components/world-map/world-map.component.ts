@@ -454,7 +454,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
               // load styles if necessary
               if (
                 !mapServer.styleUrl ||
-                                !mapServer.styleUrlSource
+                !mapServer.styleUrlSource
               ) {
                 // mark style as being loaded
                 layerData.styleLoaded = true;
@@ -468,7 +468,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
                   .then((glStyle) => {
                     // apply style
                     applyStyle(
-                      layerData.layer,
+                      layerData.layer as VectorTileLayer | VectorLayer<any>,
                       glStyle,
                       mapServer.styleUrlSource,
                       pathStyleUrl

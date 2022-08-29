@@ -12,7 +12,6 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { ScrollingModule as ExperimentalScrollingModule } from '@angular/cdk-experimental/scrolling';
 import { DragDropModule } from '@angular/cdk/drag-drop';
-import { MglTimelineModule } from 'angular-mgl-timeline';
 import * as fromSharedComponents from './components';
 import * as fromSharedDirectives from './directives';
 import * as fromSharedPipes from './pipes';
@@ -26,7 +25,7 @@ import { ColorPickerModule } from 'ngx-color-picker';
 
 @NgModule({
   imports: [
-    AgGridModule.withComponents([]),
+    AgGridModule,
     ColorPickerModule,
     CommonModule,
     DragDropModule,
@@ -37,7 +36,6 @@ import { ColorPickerModule } from 'ngx-color-picker';
     AngularMaterialModule,
     TranslateModule,
     FileUploadModule,
-    MglTimelineModule,
     NgxWigModule,
     NgxMaterialTimepickerModule,
     NgxMatSelectSearchModule,
@@ -64,7 +62,7 @@ import { ColorPickerModule } from 'ngx-color-picker';
   ],
   providers: [],
   exports: [
-    AgGridModule.withComponents([]),
+    AgGridModule,
     CommonModule,
     DragDropModule,
     RouterModule,
@@ -73,7 +71,6 @@ import { ColorPickerModule } from 'ngx-color-picker';
     TranslateModule,
     XtFormsModule,
     AngularMaterialModule,
-    MglTimelineModule,
     ScrollingModule,
     ExperimentalScrollingModule,
     ToastrModule,

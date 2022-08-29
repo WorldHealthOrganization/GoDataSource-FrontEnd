@@ -8,7 +8,6 @@ import { LabResultDataService } from '../../../../core/services/data/lab-result.
 import { ChronologyItem } from '../../../../shared/components/chronology/typings/chronology-item';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { CaseChronology } from './typings/case-chronology';
-import { forkJoin } from 'rxjs/index';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
@@ -18,6 +17,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { EntityType } from '../../../../core/models/entity-type';
 import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-view-chronology-case',
@@ -30,7 +30,7 @@ export class ViewChronologyCaseComponent implements OnInit {
   breadcrumbs: IV2Breadcrumb[] = [];
 
   caseData: CaseModel = new CaseModel();
-  chronologyEntries: ChronologyItem[] = [];
+  chronologyEntries: ChronologyItem[];
 
   // authenticated user details
   authUser: UserModel;

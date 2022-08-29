@@ -1256,7 +1256,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // set max width
     // - but allow user to go beyond that
-    this._agTable.columnApi.getAllColumns().forEach((column) => {
+    this._agTable.columnApi.getColumns().forEach((column) => {
       // no need to resize ?
       if (column.getActualWidth() <= AppListTableV2Component.STANDARD_COLUMN_MAX_DEFAULT_WIDTH) {
         return;
@@ -1274,7 +1274,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // set min width to column depending on the current content
     // - it would've been better if we could've set it to header width, and not cel content too
-    this._agTable.columnApi.getAllColumns().forEach((column) => {
+    this._agTable.columnApi.getColumns().forEach((column) => {
       const colDef = column.getColDef();
       colDef.minWidth = column.getActualWidth();
       column.setColDef(colDef, colDef);
@@ -1286,7 +1286,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    */
   private adjustFixedSizeColumns(): void {
     // some type of columns should have a fixed width
-    this._agTable.columnApi.getAllColumns().forEach((column) => {
+    this._agTable.columnApi.getColumns().forEach((column) => {
       // retrieve column definition
       const colDef: IExtendedColDef = column.getColDef() as IExtendedColDef;
       if (colDef.columnDefinition?.format?.type === V2ColumnFormat.STATUS) {

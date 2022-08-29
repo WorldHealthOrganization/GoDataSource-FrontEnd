@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { AbstractControl, FormControl, NgForm } from '@angular/forms';
+import { AbstractControl, UntypedFormControl, NgForm } from '@angular/forms';
 import * as _ from 'lodash';
 import { I18nService } from './i18n.service';
 import { ToastV2Service } from './toast-v2.service';
@@ -20,7 +20,7 @@ export class FormHelperService {
   /**
    * Retrieve control value
    */
-  getControlValue(control: FormControl): any {
+  getControlValue(control: UntypedFormControl): any {
     return (control as any).getFilteredValue ?
       (control as any).getFilteredValue() :
       control.value;
@@ -34,7 +34,7 @@ export class FormHelperService {
     const fields = {};
 
     // retrieve fields
-    _.forEach(form.controls, (control: FormControl, controlName: string) => {
+    _.forEach(form.controls, (control: UntypedFormControl, controlName: string) => {
       // ignore field ?
       if (controlName.startsWith(FormHelperService.IGNORE_FIELD_PREFIX)) {
         return;
@@ -60,7 +60,7 @@ export class FormHelperService {
     const dirtyFields = {};
 
     // retrieve fields
-    _.forEach(form.controls, (control: FormControl, controlName: string) => {
+    _.forEach(form.controls, (control: UntypedFormControl, controlName: string) => {
       // ignore field ?
       if (controlName.startsWith(FormHelperService.IGNORE_FIELD_PREFIX)) {
         return;
@@ -70,7 +70,7 @@ export class FormHelperService {
       if (control.dirty) {
         if ((control as any).getDirtyFields) {
           _.each((control as any).getDirtyFields(), (
-            childControl: FormControl,
+            childControl: UntypedFormControl,
             childControlName: string
           ) => {
             _.set(dirtyFields, childControlName, childControl.value);

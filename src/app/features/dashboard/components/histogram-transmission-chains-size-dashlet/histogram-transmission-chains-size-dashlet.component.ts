@@ -8,7 +8,7 @@ import * as _ from 'lodash';
 import { Router } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
 import { DebounceTimeCaller } from '../../../../core/helperClasses/debounce-time-caller';
-import { Subscriber, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { TransmissionChainModel } from '../../../../core/models/transmission-chain.model';
@@ -90,10 +90,10 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
   /**
      * Global Filters changed
      */
-  protected refreshDataCaller = new DebounceTimeCaller(new Subscriber<void>(() => {
+  protected refreshDataCaller = new DebounceTimeCaller(() => {
     this._retrievedData = false;
     this.refreshData();
-  }), 100);
+  }, 100);
 
   /**
      * Constructor

@@ -2,9 +2,9 @@ import { Moment } from 'moment';
 import { Observable } from 'rxjs/internal/Observable';
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import { Subscriber } from 'rxjs/internal-compatibility';
 import { share } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
+import { Subscriber } from 'rxjs';
 
 export class TimerCache {
   static readonly INVALIDATE_CACHE_AFTER_N_MS = 60000; // 1 minute

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject, Subscriber, throwError } from 'rxjs';
+import { Observable, Subject, throwError } from 'rxjs';
 import {
   IV2SideDialog,
   IV2SideDialogAdvancedFiltersResponse,
@@ -32,11 +32,10 @@ import * as moment from 'moment';
 import { Moment } from 'moment';
 import { Constants, ExportStatusStep } from '../../models/constants';
 import { ExportLogDataService } from '../data/export-log.data.service';
-import { MatBottomSheet } from '@angular/material/bottom-sheet';
+import { MatBottomSheet, MatBottomSheetRef } from '@angular/material/bottom-sheet';
 import { AppBottomDialogV2Component } from '../../../shared/components-v2/app-bottom-dialog-v2/app-bottom-dialog-v2.component';
 import { IV2BottomDialogConfig, IV2BottomDialogConfigButtonType, IV2BottomDialogConfigData, IV2BottomDialogHandler, IV2BottomDialogResponse } from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { ToastV2Service } from './toast-v2.service';
-import { MatBottomSheetRef } from '@angular/material/bottom-sheet/bottom-sheet-ref';
 import { SavedFilterData, SavedFilterDataAppliedFilter, SavedFilterDataAppliedSort, SavedFilterModel } from '../../models/saved-filters.model';
 import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
 import {
@@ -143,7 +142,10 @@ export class DialogV2Service {
       this._sideDialogSubject$.next({
         action: V2SideDialogConfigAction.OPEN,
         config,
-        responseSubscriber: observer
+        responseSubscriber: (response) => {
+          observer.next(response);
+          observer.complete();
+        }
       });
     });
   }
@@ -408,7 +410,7 @@ export class DialogV2Service {
             color: 'text'
           }]
         },
-        responseSubscriber: new Subscriber<IV2SideDialogResponse>((response) => {
+        responseSubscriber: (response) => {
           // cancelled ?
           if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
             // finished
@@ -744,7 +746,7 @@ export class DialogV2Service {
               // update status periodically
               checkStatusPeriodically();
             });
-        })
+        }
       });
   }
 

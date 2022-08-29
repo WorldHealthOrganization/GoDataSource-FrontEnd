@@ -3,10 +3,8 @@ import { CaseModel } from '../../models/case.model';
 import { ContactModel } from '../../models/contact.model';
 import { EventModel } from '../../models/event.model';
 import { EntityModel, RelationshipModel } from '../../models/entity-and-relationship.model';
-import { throwError } from 'rxjs/index';
-import { catchError } from 'rxjs/internal/operators';
 import { ContactOfContactModel } from '../../models/contact-of-contact.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { DialogV2Service } from './dialog-v2.service';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputAccordion, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { EntityType } from '../../models/entity-type';
@@ -32,6 +30,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { IBasicCount } from '../../models/basic-count.interface';
 import { V2AdvancedFilter, V2AdvancedFilterType } from '../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { v4 as uuid } from 'uuid';
+import { catchError } from 'rxjs/operators';
 
 /**
  * From ?

@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Injectable, Input, OnDestroy, Output } from '@angular/core';
 import { IBasicCount } from '../../../core/models/basic-count.interface';
-import { PageEvent } from '@angular/material/paginator/paginator';
-import { MatPaginatorIntl } from '@angular/material/paginator';
+import { MatPaginatorIntl, PageEvent } from '@angular/material/paginator';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { Subscription } from 'rxjs';
 import { DecimalPipe } from '@angular/common';
