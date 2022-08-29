@@ -19,6 +19,7 @@
 
       <!-- Buttons -->
       <div
+        *ngIf="isOutbreakSelected"
         fxFlex fxLayoutAlign="end" fxLayoutGap="0.8rem"
         class="gd-basic-top-title-buttons-buttons">
 
@@ -246,19 +247,21 @@
     </div>
   </div>
 
-  <ng-template #noData>
+  <!-- No Data icons -->
+  <ng-template
+    #noData>
     <!-- No data -->
     <div
       fxLayout="column" fxLayoutAlign="center center"
-      class="gd-duplicate-records-list-no-records">
+      class="gd-dashboard-no-data">
 
       <!-- Image -->
       <div
-        class="gd-duplicate-records-list-no-records-image"></div>
+        class="gd-dashboard-no-data-image"></div>
 
       <!-- Message -->
       <div
-        class="gd-duplicate-records-list-no-records-text">{{'LNG_COMMON_LABEL_NO_OUTBREAK_SELECTED' | translate}}</div>
+        class="gd-dashboard-no-data-text">{{'LNG_COMMON_LABEL_NO_OUTBREAK_SELECTED' | translate}}</div>
     </div>
   </ng-template>
 </div>
