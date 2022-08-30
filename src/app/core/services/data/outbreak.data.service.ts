@@ -29,7 +29,8 @@ import { ToastV2Service } from '../helper/toast-v2.service';
 @Injectable()
 export class OutbreakDataService {
   // hold the selected (current) Outbreak and emit it on demand
-  selectedOutbreakSubject: BehaviorSubject<OutbreakModel> = new BehaviorSubject<OutbreakModel>(null);
+  private _selectedOutbreakSubject: BehaviorSubject<OutbreakModel> = new BehaviorSubject<OutbreakModel>(null);
+  private _determiningOutbreakSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(null);
 
   /**
      * Constructor
@@ -207,12 +208,21 @@ export class OutbreakDataService {
   }
 
   /**
-     * Get the selected Outbreak Subject
-     * Note: By subscribing to this Subject, the response handler will be executed every time a new value is emitted
-     * @returns {BehaviorSubject<OutbreakModel>}
-     */
+   * Get the selected Outbreak Subject
+   * Note: By subscribing to this Subject, the response handler will be executed every time a new value is emitted
+   * @returns {BehaviorSubject<OutbreakModel>}
+   */
   getSelectedOutbreakSubject(): BehaviorSubject<OutbreakModel> {
-    return this.selectedOutbreakSubject;
+    return this._selectedOutbreakSubject;
+  }
+
+  /**
+   * Get the determining Outbreak Subject
+   * Note: By subscribing to this Subject, the response handler will be executed every time a new value is emitted
+   * @returns {BehaviorSubject<boolean>}
+   */
+  getDeterminingOutbreakSubject(): BehaviorSubject<boolean> {
+    return this._determiningOutbreakSubject;
   }
 
   /**
@@ -247,6 +257,9 @@ export class OutbreakDataService {
    * Otherwise, use the first outbreak in the list
    */
   determineSelectedOutbreak(dontUpdateCacheOnChange?: boolean): Observable<OutbreakModel> {
+    // update determining subject
+    this._determiningOutbreakSubject.next(true);
+
     // check if user has selected any Outbreak (get it from local storage)
     const selectedOutbreakId = this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID);
     if (selectedOutbreakId) {
@@ -257,6 +270,9 @@ export class OutbreakDataService {
             // Outbreak not found; clean it up from local storage since it's outdated
             this.storageService.remove(StorageKey.SELECTED_OUTBREAK_ID);
 
+            // update determining subject
+            this._determiningOutbreakSubject.next(false);
+
             // ...and re-run the routine
             return this.determineSelectedOutbreak();
           }),
@@ -265,6 +281,9 @@ export class OutbreakDataService {
             if (!dontUpdateCacheOnChange) {
               this.setSelectedOutbreak(selectedOutbreak);
             }
+
+            // update determining subject
+            this._determiningOutbreakSubject.next(false);
           })
         );
     }
@@ -277,6 +296,9 @@ export class OutbreakDataService {
           tap((activeOutbreak) => {
             // cache the selected Outbreak
             this.setSelectedOutbreak(activeOutbreak);
+
+            // update determining subject
+            this._determiningOutbreakSubject.next(false);
           })
         );
     }
@@ -294,6 +316,9 @@ export class OutbreakDataService {
             return outbreaks[0];
           }
 
+          // update determining subject
+          this._determiningOutbreakSubject.next(false);
+
           // there is no Outbreak in the system
           return new OutbreakModel();
         })
@@ -309,7 +334,7 @@ export class OutbreakDataService {
     this.storageService.set(StorageKey.SELECTED_OUTBREAK_ID, outbreak.id);
 
     // emit the new value
-    this.selectedOutbreakSubject.next(outbreak);
+    this._selectedOutbreakSubject.next(outbreak);
   }
 
   /**

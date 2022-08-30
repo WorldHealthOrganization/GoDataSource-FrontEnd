@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { ActivatedRoute } from '@angular/router';
@@ -37,7 +37,7 @@ import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputToggle, V2SideDi
   styleUrls: ['./dashboard.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DashboardComponent implements OnDestroy {
+export class DashboardComponent implements OnInit, OnDestroy {
   // children dashlets
   @ViewChild('kpiSection', { static: false }) private _kpiSection: ElementRef;
   @ViewChild('kpiCases', { static: false }) private _kpiCases: AppCasesKpiDashletComponent;
@@ -89,8 +89,10 @@ export class DashboardComponent implements OnDestroy {
   private _authUser: UserModel;
 
   // selected outbreak
+  private _determiningOutbreakSubscriber: Subscription;
   private _outbreakSubscriber: Subscription;
   private _selectedOutbreak: OutbreakModel;
+  loadingSelectedOutbreak: boolean;
   public get isOutbreakSelected(): boolean {
     return !!this._selectedOutbreak?.id;
   }
@@ -179,32 +181,55 @@ export class DashboardComponent implements OnDestroy {
         DashboardModel.canViewContactsNotSeenInXDaysDashlet(this._authUser) ||
         DashboardModel.canViewContactsBecomeCasesDashlet(this._authUser)
     };
+  }
 
+  /**
+   * Component initialized
+   */
+  ngOnInit(): void {
     // subscribe to outbreak changes
     this._outbreakSubscriber = this.outbreakDataService
       .getSelectedOutbreakSubject()
       .subscribe((selectedOutbreak: OutbreakModel) => {
-        if (selectedOutbreak?.id) {
-          // update outbreak
-          this._selectedOutbreak = selectedOutbreak;
+        // update outbreak
+        this._selectedOutbreak = selectedOutbreak;
+
+        // found selected outbreak ?
+        if (this._selectedOutbreak?.id) {
+          // initialize quick actions
+          this.initializeQuickActions();
 
           // redraw data
           this.detectChanges();
         }
       });
 
-    // initialize quick actions
-    this.initializeQuickActions();
+    // subscribe to outbreak determining changes
+    this._determiningOutbreakSubscriber = this.outbreakDataService
+      .getDeterminingOutbreakSubject()
+      .subscribe((determining) => {
+        // determining ?
+        this.loadingSelectedOutbreak = determining;
+
+        // redraw data
+        this.detectChanges();
+      });
   }
 
   /**
    * Release resources
    */
   ngOnDestroy(): void {
-    // outbreak
+    // selected outbreak
     if (this._outbreakSubscriber) {
       this._outbreakSubscriber.unsubscribe();
       this._outbreakSubscriber = undefined;
+    }
+
+    // determining outbreak
+    if (this._determiningOutbreakSubscriber) {
+      this._determiningOutbreakSubscriber.unsubscribe();
+      this._determiningOutbreakSubscriber = undefined;
     }
   }
 
@@ -223,19 +248,18 @@ export class DashboardComponent implements OnDestroy {
     this.quickActions = {
       type: V2ActionType.MENU,
       label: 'LNG_PAGE_DASHBOARD_REPORTS_BUTTON_LABEL',
-      visible: () => !!this._selectedOutbreak?.id && (
-        DashboardModel.canExportCaseClassificationPerLocationReport(this._authUser) ||
+      visible: () => DashboardModel.canExportCaseClassificationPerLocationReport(this._authUser) ||
         DashboardModel.canExportContactFollowUpSuccessRateReport(this._authUser) ||
         DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(this._authUser) ||
         DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(this._authUser) ||
-        DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(this._authUser) || (
+        DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(this._authUser) ||
+        (
           DashboardModel.canExportKpi(this._authUser) && (
             this.visibleDashlets.KPICases ||
             this.visibleDashlets.KPIContacts ||
             this.visibleDashlets.KPICOT
           )
-        )
-      ),
+        ),
       menuOptions: [
         // Export case classification per location report
         {

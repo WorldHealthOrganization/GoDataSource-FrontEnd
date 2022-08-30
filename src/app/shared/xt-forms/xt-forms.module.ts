@@ -9,7 +9,6 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { components } from './components';
 import { validatorDirectives } from './validators';
 import { ScrollingModule } from '@angular/cdk/scrolling';
-import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
 import { NgxPopperjsModule } from 'ngx-popperjs';
 
@@ -22,7 +21,6 @@ import { NgxPopperjsModule } from 'ngx-popperjs';
     NgxMaterialTimepickerModule,
     NgxMatSelectSearchModule,
     NgxPopperjsModule,
-    NgxSliderModule,
     TranslateModule,
     ScrollingModule
   ],
@@ -37,7 +35,6 @@ import { NgxPopperjsModule } from 'ngx-popperjs';
     FlexLayoutModule,
     AngularMaterialModule,
     NgxPopperjsModule,
-    NgxSliderModule,
     ScrollingModule,
     ...components,
     ...validatorDirectives
