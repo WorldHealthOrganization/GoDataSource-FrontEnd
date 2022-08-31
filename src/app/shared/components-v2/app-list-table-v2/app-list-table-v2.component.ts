@@ -1093,7 +1093,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
         // create link
         return url ?
-          `<a class="gd-list-table-link" href="${this.location.prepareExternalUrl(url)}"><span is-link="${url}">${value}</span><a/>` :
+          `<a class="gd-list-table-link" href="${this.location.prepareExternalUrl(url)}"><span is-link="${url}">${value}</span></a>` :
           value;
       };
     } else {
@@ -1176,7 +1176,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           // create links
           return (linkListColumn.links(params.data) || [])
             .map((item) => item.href ?
-              `<a class="gd-list-table-link" href="${this.location.prepareExternalUrl(item.href)}"><span is-link="${item.href}">${item.label}</span><a/>` :
+              `<a class="gd-list-table-link" href="${this.location.prepareExternalUrl(item.href)}"><span is-link="${item.href}">${item.label}</span></a>` :
               item.label
             )
             .join(' / ');
