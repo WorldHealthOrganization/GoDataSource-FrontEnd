@@ -34,7 +34,7 @@ export class AppFormInputV2Component
   @Input() neverFloatLabel: boolean = false;
 
   // autocomplete
-  @Input() autocomplete: string;
+  @Input() autocomplete: string | 'on' | 'off';
 
   // view only
   @Input() viewOnly: boolean;

@@ -20,7 +20,8 @@ export const EnglishUsLang = {
     'LNG_COMMON_LABEL_NO_OUTBREAK_SELECTED': 'There is no outbreak selected',
     'LNG_PAGE_LIST_AUDIT_LOGS_EXPORT_TITLE': 'Export audit logs',
     'LNG_PAGE_LIST_AUDIT_LOGS_EXPORT_BUTTON': 'Export audit logs data',
-    'LNG_PAGE_LIST_AUDIT_LOGS_GROUP_ACTION_EXPORT_SELECTED_AUDIT_LOGS': 'Export the selected audit logs'
+    'LNG_PAGE_LIST_AUDIT_LOGS_GROUP_ACTION_EXPORT_SELECTED_AUDIT_LOGS': 'Export the selected audit logs',
+    'LNG_LAYOUT_MENU_ITEM_SET_SECURITY_QUESTION_LABEL': 'Security questions'
 
 
 
