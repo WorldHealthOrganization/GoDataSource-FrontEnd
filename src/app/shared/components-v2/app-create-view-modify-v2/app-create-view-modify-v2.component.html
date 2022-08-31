@@ -1334,7 +1334,8 @@
                               type="button"
                               mat-icon-button
                               [matTooltip]="'LNG_COMMON_BUTTON_DRAG' | translate"
-                              (mousedown)="notInvalidDragZone()">
+                              (mousedown)="notInvalidDragZone()"
+                              (touchstart)="notInvalidDragZone()">
                               <mat-icon>drag_indicator</mat-icon>
                             </button>
 

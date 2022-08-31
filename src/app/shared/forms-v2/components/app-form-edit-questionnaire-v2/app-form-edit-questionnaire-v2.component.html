@@ -96,7 +96,8 @@
             <mat-icon
               *ngIf="!viewOnly"
               cdkDragHandle
-              (mousedown)="notInvalidDragZone()">drag_indicator</mat-icon>
+              (mousedown)="notInvalidDragZone()"
+              (touchstart)="notInvalidDragZone()">drag_indicator</mat-icon>
 
             <!-- Type -->
             <mat-icon
@@ -262,7 +263,8 @@
             <mat-icon
               *ngIf="!viewOnly"
               cdkDragHandle
-              (mousedown)="notInvalidDragZone()">drag_indicator</mat-icon>
+              (mousedown)="notInvalidDragZone()"
+              (touchstart)="notInvalidDragZone()">drag_indicator</mat-icon>
 
             <!-- Type -->
             <mat-icon
