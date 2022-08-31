@@ -77,8 +77,9 @@
           mat-icon-button
           color="text"
           [matTooltip]="'LNG_COMMON_BUTTON_DRAG' | translate"
-          (mousedown)="notInvalidDragZone();"
-          (click)="$event.stopPropagation();">
+          (mousedown)="notInvalidDragZone()"
+          (touchstart)="notInvalidDragZone()"
+          (click)="$event.stopPropagation()">
           <mat-icon>drag_indicator</mat-icon>
         </button>
 
