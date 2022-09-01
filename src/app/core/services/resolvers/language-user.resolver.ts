@@ -33,7 +33,8 @@ implements Resolve<any> {
         observer.complete();
       } else {
         // display loading
-        const loadingDialog = this.dialogV2Service.showLoadingDialog();
+        const globalLoadingKey: string = 'language';
+        this.dialogV2Service.showGlobalLoadingDialog(globalLoadingKey);
 
         // load language - need to initialize like this because otherwise in some situations languageSubscriber variable isn't found when token expired
         const languageSubscriber = this.i18nService.waitForLanguageInitialization()
@@ -64,7 +65,7 @@ implements Resolve<any> {
                   .pipe(
                     catchError((childErr) => {
                       // hide loading
-                      loadingDialog.close();
+                      this.dialogV2Service.hideGlobalLoadingDialog(globalLoadingKey);
 
                       // display error message
                       alert('Error retrieving languages ( api might be down - please try a hard refresh )');
@@ -75,7 +76,7 @@ implements Resolve<any> {
                   )
                   .subscribe(() => {
                     // hide loading
-                    loadingDialog.close();
+                    this.dialogV2Service.hideGlobalLoadingDialog(globalLoadingKey);
 
                     // redirect to Login page
                     this.router.navigate(['/auth/login']);
@@ -86,7 +87,7 @@ implements Resolve<any> {
               }
 
               // hide loading
-              loadingDialog.close();
+              this.dialogV2Service.hideGlobalLoadingDialog(globalLoadingKey);
 
               // display error message
               alert('Error retrieving languages ( api might be down - please try a hard refresh )');
@@ -105,7 +106,7 @@ implements Resolve<any> {
             }
 
             // hide loading
-            loadingDialog.close();
+            this.dialogV2Service.hideGlobalLoadingDialog(globalLoadingKey);
 
             // this callback is called 99% of the time only when we refresh a page
             // refresh user permissions ?

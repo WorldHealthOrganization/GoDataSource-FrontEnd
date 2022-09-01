@@ -67,6 +67,12 @@ export class DialogV2Service {
   // used to show and update side dialog
   private _sideDialogSubject$: Subject<IV2SideDialog> = new Subject<IV2SideDialog>();
 
+  // global loading
+  private _globalLoading: IV2LoadingDialogHandler;
+  private _globalLoadingInProgress: {
+    [key: string]: true
+  } = {};
+
   /**
    * Side dialog subject handler
    */
@@ -132,6 +138,40 @@ export class DialogV2Service {
 
     // finished creating dialog
     return handler;
+  }
+
+  /**
+   * Show global loading dialog
+   */
+  showGlobalLoadingDialog(key: string): void {
+    // make sure loading is on for this key
+    this._globalLoadingInProgress[key] = true;
+
+    // already loading ?
+    if (this._globalLoading) {
+      return;
+    }
+
+    // show loading
+    this._globalLoading = this.showLoadingDialog();
+  }
+
+  /**
+   * hide global loading dialog
+   * @param key
+   */
+  hideGlobalLoadingDialog(key: string): void {
+    // hide loading is on for this key
+    delete this._globalLoadingInProgress[key];
+
+    // finished ?
+    if (
+      this._globalLoading &&
+      Object.keys(this._globalLoadingInProgress).length < 1
+    ) {
+      this._globalLoading.close();
+      this._globalLoading = undefined;
+    }
   }
 
   /**

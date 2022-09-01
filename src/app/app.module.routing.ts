@@ -10,6 +10,7 @@ import { PermissionExpression } from './core/models/user.model';
 import { DashboardModel } from './core/models/dashboard.model';
 import { LanguageUserResolver } from './core/services/resolvers/language-user.resolver';
 import { NotAuthRedirectGuard } from './core/services/guards/not-auth-redirect-guard.service';
+import { FontResolver } from './core/services/resolvers/font-resolver';
 
 const routes: Routes = [
   // Authentication Module routes
@@ -17,7 +18,8 @@ const routes: Routes = [
     path: ModulePath.AuthenticationModule,
     loadChildren: () => import('./features/authentication/authentication.module').then(m => m.AuthenticationModule),
     resolve: {
-      language: LanguageUserResolver
+      language: LanguageUserResolver,
+      font: FontResolver
     }
   },
 
@@ -29,7 +31,8 @@ const routes: Routes = [
       NotAuthRedirectGuard
     ],
     resolve: {
-      language: LanguageUserResolver
+      language: LanguageUserResolver,
+      font: FontResolver
     },
     children: [
       // Account Module routes
