@@ -119,7 +119,13 @@ export class AppFormSelectLocationSingleV2Component
 
     // emit event
     if (emitEvent) {
+      // emit event
       this.selectedLocationChanged.emit(this.selectedLocation);
+
+      // since we might want to select a child, but we don't know its name we need to select parent first
+      // displaying the list again is a bit ugly, so after selecting the country they need to press the down key which will display the list again with its children this time
+      // tooltip included
+      this.addLocationConditionAndRefresh();
     }
   }
 }
