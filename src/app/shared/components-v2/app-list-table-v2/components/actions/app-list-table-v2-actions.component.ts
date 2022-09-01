@@ -45,4 +45,33 @@ export class AppListTableV2ActionsComponent implements ICellRendererAngularComp 
     this.actions = actionColumnDef.actions;
     this.data = params.data;
   }
+
+  /**
+   * Check if at least one child visible
+   */
+  checkIfAtLeastOneChildVisible(action: V2Action): boolean {
+    // no children ?
+    if (action.type !== V2ActionType.MENU) {
+      return true;
+    }
+
+    // no children ?
+    if (!action.menuOptions?.length) {
+      return false;
+    }
+
+    // at least one child visible ?
+    for (let menuOptionIndex = 0; menuOptionIndex < action.menuOptions.length; menuOptionIndex++) {
+      // visible ?
+      if (
+        !action.menuOptions[menuOptionIndex].visible ||
+        action.menuOptions[menuOptionIndex].visible(this.data)
+      ) {
+        return true;
+      }
+    }
+
+    // no child visible
+    return false;
+  }
 }
