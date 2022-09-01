@@ -955,6 +955,7 @@
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly || input.readonly"
                       useOutbreakLocations="true"
+                      clearable="true"
                       [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
                       (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"
                       (selectedLocationChanged)="addressLocationChanged(input.value.get(parentItemIndex), $event)"></app-form-select-location-single-v2>
@@ -1143,7 +1144,8 @@
                       placeholder="LNG_CASE_FIELD_LABEL_CENTER_DATES_LOCATION"
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly"
-                      useOutbreakLocations="true"></app-form-select-location-single-v2>
+                      useOutbreakLocations="true"
+                      clearable="true"></app-form-select-location-single-v2>
 
                     <!-- Comments -->
                     <app-form-textarea-v2
