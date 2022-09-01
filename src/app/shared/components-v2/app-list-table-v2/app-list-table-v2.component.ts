@@ -1275,7 +1275,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // set min width to column depending on the current content
     // - it would've been better if we could've set it to header width, and not cel content too
     this._agTable.columnApi.getColumns().forEach((column) => {
-      const colDef = column.getColDef();
+      const colDef = column.getUserProvidedColDef();
       colDef.minWidth = column.getActualWidth();
       column.setColDef(colDef, colDef);
     });
@@ -1288,7 +1288,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // some type of columns should have a fixed width
     this._agTable.columnApi.getColumns().forEach((column) => {
       // retrieve column definition
-      const colDef: IExtendedColDef = column.getColDef() as IExtendedColDef;
+      const colDef: IExtendedColDef = column.getUserProvidedColDef() as IExtendedColDef;
       if (colDef.columnDefinition?.format?.type === V2ColumnFormat.STATUS) {
         // determine maximum number of items
         const statusColumn: IV2ColumnStatus = colDef.columnDefinition as IV2ColumnStatus;
@@ -1401,7 +1401,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         const visibleColumns: string[] = [];
         this._agTable.columnApi.getColumnState().forEach((columnState) => {
           // retrieve column definition
-          const colDef: IExtendedColDef = this._agTable.columnApi.getColumn(columnState.colId)?.getColDef() as IExtendedColDef;
+          const colDef: IExtendedColDef = this._agTable.columnApi.getColumn(columnState.colId)?.getUserProvidedColDef() as IExtendedColDef;
           if (
             !colDef ||
             !colDef.columnDefinition ||
@@ -1628,7 +1628,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     const rightPinnedColumns: string[] = [];
     this._agTable.columnApi.getColumnState().forEach((columnState) => {
       // retrieve column definition
-      const colDef: IExtendedColDef = this._agTable.columnApi.getColumn(columnState.colId)?.getColDef() as IExtendedColDef;
+      const colDef: IExtendedColDef = this._agTable.columnApi.getColumn(columnState.colId)?.getUserProvidedColDef() as IExtendedColDef;
 
       // nothing to do ?
       if (
