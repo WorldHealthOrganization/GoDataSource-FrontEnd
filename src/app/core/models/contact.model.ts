@@ -539,7 +539,7 @@ export class ContactModel
     };
     if (
       locationsList &&
-            locationsList.length > 0
+      locationsList.length > 0
     ) {
       locationsMap = {};
       locationsList.forEach((location) => {
