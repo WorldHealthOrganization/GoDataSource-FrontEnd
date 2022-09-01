@@ -8,7 +8,7 @@
     *ngFor="let action of actions">
     <!-- Visible ? -->
     <span
-      *ngIf="!action.visible || action.visible(data)"
+      *ngIf="(!action.visible || action.visible(data)) && checkIfAtLeastOneChildVisible(action)"
       class="gd-list-table-actions-action">
 
       <!-- Icon Type -->
