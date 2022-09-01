@@ -28,6 +28,7 @@ import { OutbreakModel } from './outbreak.model';
 import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { IResolverV2ResponseModel } from '../services/resolvers/data/models/resolver-response.model';
 import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
+import { LocationModel } from './location.model';
 
 export class CaseModel
   extends BaseModel
@@ -55,6 +56,7 @@ export class CaseModel
   addresses: AddressModel[];
   burialPlaceName: string;
   burialLocationId: string;
+  burialLocation: LocationModel;
   classification: string;
   dateOfInfection: string | Moment;
   dateOfOnset: string | Moment;

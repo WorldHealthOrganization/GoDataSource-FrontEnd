@@ -589,6 +589,44 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         sortable: true
       },
       {
+        field: 'dateOfBurial',
+        label: 'LNG_CASE_FIELD_LABEL_DATE_OF_BURIAL',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.DATE
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        },
+        sortable: true
+      },
+      {
+        field: 'burialLocationId',
+        label: 'LNG_CASE_FIELD_LABEL_BURIAL_LOCATION_ID',
+        format: {
+          type: 'burialLocation.name'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_LOCATION,
+          useOutbreakLocations: true,
+          field: 'burialLocationId.parentLocationIdFilter'
+        },
+        link: (data) => {
+          return data.burialLocation?.name ?
+            `/locations/${data.burialLocation.id}/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'burialPlaceName',
+        label: 'LNG_CASE_FIELD_LABEL_BURIAL_PLACE_NAME',
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
         field: 'notACase',
         label: 'LNG_CASE_FIELD_LABEL_NOT_A_CASE',
         notVisible: true,
@@ -2186,6 +2224,9 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       'addresses',
       'dateOfOnset',
       'dateOfReporting',
+      'dateOfBurial',
+      'burialLocationId',
+      'burialPlaceName',
       'wasContact',
       'responsibleUserId',
       'numberOfContacts',
@@ -2228,6 +2269,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
             [locationId: string]: true
           } = {};
           data.forEach((item) => {
+            // addresses
             (item.addresses || []).forEach((address) => {
               // nothing to add ?
               if (!address?.locationId) {
@@ -2237,6 +2279,11 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
               // add location to list
               locationsIdsMap[address.locationId] = true;
             });
+
+            // burial location
+            if (item.burialLocationId) {
+              locationsIdsMap[item.burialLocationId] = true;
+            }
           });
 
           // determine ids
@@ -2271,11 +2318,17 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
 
                 // set locations
                 data.forEach((item) => {
+                  // addresses
                   (item.addresses || []).forEach((address) => {
                     address.location = address.locationId && locationsMap[address.locationId] ?
                       locationsMap[address.locationId] :
                       address.location;
                   });
+
+                  // burial location
+                  item.burialLocation = item.burialLocationId && locationsMap[item.burialLocationId] ?
+                    locationsMap[item.burialLocationId] :
+                    item.burialLocation;
                 });
 
                 // finished
