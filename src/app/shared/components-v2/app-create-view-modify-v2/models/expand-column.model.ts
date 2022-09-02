@@ -14,9 +14,9 @@ interface ICreateViewModifyV2ExpandColumnText {
   // required
   type: CreateViewModifyV2ExpandColumnType.TEXT;
   get: (item: any) => string;
+  link: (item: any) => string[];
 
   // optional
-  link?: (item: any) => string[];
   linkQueryParams?: (item: any) => Params;
 }
 
