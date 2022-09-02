@@ -14,7 +14,6 @@ export class ImageResolver implements Resolve<any> {
     };
   private _loadingKey: string = 'image';
 
-
   /**
    * Constructor
    */
