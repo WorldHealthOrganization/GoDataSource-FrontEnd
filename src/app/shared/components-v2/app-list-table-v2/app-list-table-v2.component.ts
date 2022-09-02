@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, Renderer2 } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, Renderer2 } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { GridReadyEvent, ValueFormatterParams } from '@ag-grid-community/core';
@@ -53,6 +53,7 @@ import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model
 import { IV2ProcessSelectedData } from './models/process-data.model';
 import { HighlightSearchPipe } from '../../pipes/highlight-search/highlight-search';
 import { AppListTableV2ObfuscateComponent } from './components/obfuscate/app-list-table-v2-obfuscate.component';
+import { determineIfSmallScreenMode } from '../../../core/enums/small-screen-mode.enum';
 
 /**
  * Component
@@ -73,6 +74,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   private static readonly STANDARD_SHAPE_PADDING: number = 14;
   private static readonly STANDARD_HEADER_HEIGHT: number = 40;
   private static readonly STANDARD_HEADER_WITH_FILTER_HEIGHT: number = 88;
+
+  // small screen mode ?
+  isSmallScreenMode: boolean = false;
 
   // records
   recordsSubscription: Subscription;
@@ -425,7 +429,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     protected dialogV2Service: DialogV2Service,
     protected authDataService: AuthDataService,
     protected toastV2Service: ToastV2Service
-  ) {}
+  ) {
+    // update small screen mode
+    this.updateRenderMode(true);
+  }
 
   /**
    * Initialize resources
@@ -705,7 +712,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       this.groupActionsSingleRecord
     ) {
       columnDefs.push({
-        pinned: IV2ColumnPinned.LEFT,
+        pinned: this.isSmallScreenMode ?
+          false :
+          IV2ColumnPinned.LEFT,
         headerName: '',
         field: this.keyField,
         checkboxSelection: true,
@@ -823,7 +832,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           this.translateService.instant(column.label) :
           '',
         field: column.field,
-        pinned,
+        pinned: this.isSmallScreenMode ?
+          false :
+          pinned,
         resizable: !column.notResizable,
         columnDefinition: column,
         columnDefinitionData: this,
@@ -832,7 +843,12 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           return this.formatValue(valueFormat);
         },
         cellRenderer: this.handleCellRenderer(column),
-        suppressMovable: (column.format && column.format.type === V2ColumnFormat.ACTIONS) || !!(column as any).notMovable,
+        suppressMovable: this.isSmallScreenMode ?
+          true :
+          (
+            (column.format && column.format.type === V2ColumnFormat.ACTIONS) ||
+            !!(column as any).notMovable
+          ),
         headerComponent: AppListTableV2ColumnHeaderComponent
       });
 
@@ -1608,6 +1624,11 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   saveVisibleAndOrderOfColumns(e?: {
     target: any
   }): void {
+    // if small screen don't save visible columns, pinned etc
+    if (this.isSmallScreenMode) {
+      return;
+    }
+
     // nothing to do ?
     if (
       !this._pageSettingsKey ||
@@ -1936,5 +1957,29 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   generateFiltersFromFilterData(savedData: SavedFilterData): void {
     // set data
     this._advancedFiltersApplied = savedData;
+  }
+
+  /**
+   * Update
+   */
+  @HostListener('window:resize')
+  private updateRenderMode(dontUpdate?: boolean): void {
+    // determine
+    const isSmallScreenMode = determineIfSmallScreenMode();
+
+    // same as before ?
+    if (isSmallScreenMode === this.isSmallScreenMode) {
+      return;
+    }
+
+    // small screen mode ?
+    this.isSmallScreenMode = isSmallScreenMode;
+
+    // must update
+    if (!dontUpdate) {
+      this.updateColumnDefinitions();
+      this.resizeTable();
+      this.detectChanges();
+    }
   }
 }
