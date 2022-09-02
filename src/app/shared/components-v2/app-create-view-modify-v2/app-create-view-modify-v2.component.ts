@@ -1250,6 +1250,13 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     } else {
       // reset
       this.selectedTabParams = undefined;
+
+      // update query url
+      this.updateURL(window.location.href
+        .replace(/&?selectedTabLabel=([^&]+)/i, '')
+        .replace(/\?$/, '')
+        .replace(/\?&/, '?')
+      );
     }
   }
 
