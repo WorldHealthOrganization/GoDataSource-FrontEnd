@@ -11,6 +11,7 @@ import { DashboardModel } from './core/models/dashboard.model';
 import { LanguageUserResolver } from './core/services/resolvers/language-user.resolver';
 import { NotAuthRedirectGuard } from './core/services/guards/not-auth-redirect-guard.service';
 import { FontResolver } from './core/services/resolvers/font-resolver';
+import { ImageResolver } from './core/services/resolvers/image-resolver';
 
 const routes: Routes = [
   // Authentication Module routes
@@ -19,7 +20,8 @@ const routes: Routes = [
     loadChildren: () => import('./features/authentication/authentication.module').then(m => m.AuthenticationModule),
     resolve: {
       language: LanguageUserResolver,
-      font: FontResolver
+      font: FontResolver,
+      image: ImageResolver
     }
   },
 
@@ -32,7 +34,8 @@ const routes: Routes = [
     ],
     resolve: {
       language: LanguageUserResolver,
-      font: FontResolver
+      font: FontResolver,
+      image: ImageResolver
     },
     children: [
       // Account Module routes

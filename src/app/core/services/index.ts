@@ -141,6 +141,7 @@ import { AuditLogModuleDataResolver } from './resolvers/data/audit-log-module.re
 import { EventCategoryDataResolver } from './resolvers/data/event-category.resolver';
 import { FollowUpGroupByDataResolver } from './resolvers/data/follow-up-group-by.resolver';
 import { FontResolver } from './resolvers/font-resolver';
+import { ImageResolver } from './resolvers/image-resolver';
 
 // export the list of services
 export const services: any[] = [
@@ -181,6 +182,7 @@ export const services: any[] = [
   GenderDataResolver,
   HelpCategoryDataResolver,
   IconDataResolver,
+  ImageResolver,
   InstitutionDataResolver,
   InvestigationStatusDataResolver,
   LabNameDataResolver,
