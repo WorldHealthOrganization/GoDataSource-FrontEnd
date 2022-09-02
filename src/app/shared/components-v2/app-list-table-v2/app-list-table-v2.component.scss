@@ -167,26 +167,30 @@
     .gd-list-table-header {
       padding: 1.6rem;
 
-      .gd-list-table-header-left-text {
-        margin-right: 0.4rem;
+      .gd-list-table-header-left {
+        white-space: nowrap;
 
-        &::first-letter {
-          text-transform: capitalize;
-        }
-      }
+        .gd-list-table-header-left-text {
+          margin-right: 0.4rem;
 
-      .gd-list-table-header-left-show-total {
-        line-height: $gd-line-height;
-        padding: 0 0.2rem;
-        @include transition(color 0.24s ease-in-out 0s);
-
-        &:hover,
-        &:focus {
-          color: var(--gd-primary-alt);
+          &::first-letter {
+            text-transform: capitalize;
+          }
         }
 
-        &:active {
-          color: var(--gd-primary);
+        .gd-list-table-header-left-show-total {
+          line-height: $gd-line-height;
+          padding: 0 0.2rem;
+          @include transition(color 0.24s ease-in-out 0s);
+
+          &:hover,
+          &:focus {
+            color: var(--gd-primary-alt);
+          }
+
+          &:active {
+            color: var(--gd-primary);
+          }
         }
       }
 
