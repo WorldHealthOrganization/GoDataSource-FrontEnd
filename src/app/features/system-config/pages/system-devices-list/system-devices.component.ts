@@ -68,7 +68,10 @@ export class SystemDevicesComponent extends ListComponent<DeviceModel> implement
       {
         field: 'description',
         label: 'LNG_SYSTEM_DEVICE_FIELD_LABEL_DESCRIPTION',
-        sortable: true,
+        format: {
+          obfuscated: true,
+          type: 'description'
+        },
         filter: {
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH
