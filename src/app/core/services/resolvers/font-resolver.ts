@@ -91,7 +91,7 @@ export class FontResolver implements Resolve<any>, OnDestroy {
   }
 
   /**
-   * Language loaded, we can display the website pages
+   * Fonts loaded, we can display the website pages
    */
   resolve(): Observable<any> {
     return new Observable((observer: Subscriber<void>) => {
