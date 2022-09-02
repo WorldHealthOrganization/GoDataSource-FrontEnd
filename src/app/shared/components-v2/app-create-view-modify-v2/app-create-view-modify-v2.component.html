@@ -377,7 +377,7 @@
                 <!-- Input -->
                 <div
                   *ngIf="!input.replace || !input.replace.condition(input); else replaceHtml"
-                  class="gd-create-view-modify-bottom-section-content-input"
+                  class="gd-create-view-modify-bottom-section-content-input {{input.cssClasses}}"
                   [class.gd-create-view-modify-bottom-section-content-input-has-textarea]="input.type === CreateViewModifyV2TabInputType.TEXTAREA"
                   [class.gd-create-view-modify-bottom-section-content-input-has-age-dob]="input.type === CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH"
                   [class.gd-create-view-modify-bottom-section-content-input-has-list]="input.type === CreateViewModifyV2TabInputType.LIST"

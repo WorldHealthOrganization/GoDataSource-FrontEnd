@@ -407,6 +407,7 @@ export interface ICreateViewModifyV2TabInputList {
   // optional
   sortable?: boolean;
   readonly?: boolean;
+  cssClasses?: string;
 }
 
 /**
