@@ -2,11 +2,11 @@
 <cdk-virtual-scroll-viewport
   *ngIf="!!entries; else loadingData"
   class="gd-chronology"
-  [itemSize]="80">
+  [itemSize]="renderMode === RenderMode.SMALL ? '200' : '80'">
   <div
     *cdkVirtualFor="let entry of entries; templateCacheSize: 0;"
     class="gd-chronology-item"
-    style="height: 8rem;">
+    [ngStyle]="{height: renderMode === RenderMode.SMALL ? '20rem' : '8rem'}">
 
     <!-- Date -->
     <div class="gd-chronology-item-date">

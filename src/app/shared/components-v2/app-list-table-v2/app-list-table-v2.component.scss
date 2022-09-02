@@ -168,10 +168,9 @@
       padding: 1.6rem;
 
       .gd-list-table-header-left {
-        white-space: nowrap;
-
         .gd-list-table-header-left-text {
           margin-right: 0.4rem;
+          white-space: nowrap;
 
           &::first-letter {
             text-transform: capitalize;
