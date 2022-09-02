@@ -27,6 +27,7 @@
 <mat-accordion
   class="gd-main-menu"
   [class.gd-version-not-visible]="!expanded || !versionData"
+  [class.gd-mobile-device]="isTouchDevice"
   displayMode="flat">
 
   <!-- Menu options -->

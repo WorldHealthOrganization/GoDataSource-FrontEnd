@@ -96,6 +96,15 @@ app-sidenav {
     }
   }
 
+  &.gd-mobile-device {
+    &::-webkit-scrollbar,
+    &::-webkit-scrollbar-thumb {
+      @include transition(all 0.24s ease-in-out 0s);
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
   /* Menu section title */
   .gd-main-menu-group-label {
     color: var(--gd-secondary);

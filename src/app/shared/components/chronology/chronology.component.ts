@@ -14,6 +14,7 @@ import { determineRenderMode, RenderMode } from '../../../core/enums/render-mode
 export class ChronologyComponent {
   // constants
   Constants = Constants;
+  RenderMode = RenderMode;
 
   // entries
   private _entries: ChronologyItem[];

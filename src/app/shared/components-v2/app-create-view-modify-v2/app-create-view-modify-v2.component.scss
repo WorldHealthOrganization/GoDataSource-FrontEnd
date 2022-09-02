@@ -651,6 +651,16 @@
                   }
                 }
               }
+
+              &.gd-create-view-modify-bottom-section-content-input-has-list-one-line-item {
+                .gd-create-view-modify-bottom-section-content-input-list-item {
+                  .gd-create-view-modify-bottom-section-content-input-list-item-content {
+                    border: 0 none;
+                    @include border-radius(0);
+                    padding: 0;
+                  }
+                }
+              }
             }
 
             &.gd-create-view-modify-bottom-section-content-input-has-address {
