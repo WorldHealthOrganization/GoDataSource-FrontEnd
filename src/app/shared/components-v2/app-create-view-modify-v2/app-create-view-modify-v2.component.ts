@@ -664,7 +664,12 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
           this.markFormsAsPristine();
 
           // redirect after create / update
-          this.tabData.redirectAfterCreateUpdate(data);
+          this.tabData.redirectAfterCreateUpdate(
+            data,
+            this.isModify ?
+              this.selectedTabParams :
+              undefined
+          );
         },
         {
           show: () => {

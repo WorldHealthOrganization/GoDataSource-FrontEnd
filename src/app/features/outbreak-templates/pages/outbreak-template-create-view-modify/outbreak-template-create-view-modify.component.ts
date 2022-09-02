@@ -1,7 +1,7 @@
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { OutbreakTemplateModel } from '../../../../core/models/outbreak-template.model';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -203,14 +203,21 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
 
       // create or update
       createOrUpdate: this.initializeProcessData(),
-      redirectAfterCreateUpdate: (data: OutbreakTemplateModel) => {
+      redirectAfterCreateUpdate: (
+        data: OutbreakTemplateModel,
+        extraQueryParams: Params
+      ) => {
         if (!this.isModify) {
           // redirect to view
-          this.router.navigate([
-            '/outbreak-templates',
-            data.id,
-            'view'
-          ]);
+          this.router.navigate(
+            [
+              '/outbreak-templates',
+              data.id,
+              'view'
+            ], {
+              queryParams: extraQueryParams
+            }
+          );
         }
       }
     };

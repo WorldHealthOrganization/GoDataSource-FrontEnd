@@ -2,7 +2,7 @@ import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { EventModel } from '../../../../core/models/event.model';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -241,13 +241,20 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
 
       // create or update
       createOrUpdate: this.initializeProcessData(),
-      redirectAfterCreateUpdate: (data: EventModel) => {
+      redirectAfterCreateUpdate: (
+        data: EventModel,
+        extraQueryParams: Params
+      ) => {
         // redirect to view
-        this.router.navigate([
-          '/events',
-          data.id,
-          'view'
-        ]);
+        this.router.navigate(
+          [
+            '/events',
+            data.id,
+            'view'
+          ], {
+            queryParams: extraQueryParams
+          }
+        );
       }
     };
   }

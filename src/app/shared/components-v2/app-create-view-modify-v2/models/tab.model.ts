@@ -827,7 +827,10 @@ export interface ICreateViewModifyV2 {
   };
   buttons: ICreateViewModifyV2Buttons;
   createOrUpdate: ICreateViewModifyV2CreateOrUpdate;
-  redirectAfterCreateUpdate: (data: any) => void;
+  redirectAfterCreateUpdate: (
+    data: any,
+    extraQueryParams: Params
+  ) => void;
 
   // optional
   modifyGetAllNotOnlyDirtyFields?: boolean;

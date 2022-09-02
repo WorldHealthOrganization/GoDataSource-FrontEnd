@@ -1,7 +1,7 @@
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -51,6 +51,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
    * Constructor
    */
   constructor(
+    protected router: Router,
     private labResultDataService: LabResultDataService,
     private activatedRoute: ActivatedRoute,
     private translateService: TranslateService,
@@ -315,18 +316,18 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
 
       // create or update
       createOrUpdate: this.initializeProcessData(),
-      redirectAfterCreateUpdate: (data: LabResultModel) => {
+      redirectAfterCreateUpdate: (
+        data: LabResultModel,
+        extraQueryParams: Params
+      ) => {
         // redirect to view
-        if (this._personType === EntityType.CASE) {
-          this.redirectService.to([
-            `/lab-results/cases/${this.entityData.id}/${data.id}/view`
-          ]);
-        } else if (this._personType === EntityType.CONTACT) {
-          this.redirectService.to([
-            `/lab-results/contacts/${this.entityData.id}/${data.id}/view`
-          ]);
-        }
-
+        this.router.navigate(
+          this._personType === EntityType.CASE ?
+            [`/lab-results/cases/${this.entityData.id}/${data.id}/view`] :
+            [`/lab-results/contacts/${this.entityData.id}/${data.id}/view`], {
+            queryParams: extraQueryParams
+          }
+        );
       }
     };
   }

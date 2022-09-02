@@ -295,7 +295,10 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
                     // canceled ?
                     if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
                       // redirect to profile
-                      this.tabData.redirectAfterCreateUpdate(null);
+                      this.tabData.redirectAfterCreateUpdate(
+                        null,
+                        undefined
+                      );
 
                       // finished
                       return;

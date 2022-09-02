@@ -1,7 +1,7 @@
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
@@ -37,6 +37,7 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
    * Constructor
    */
   constructor(
+    protected router: Router,
     protected activatedRoute: ActivatedRoute,
     protected helpDataService: HelpDataService,
     protected translateService: TranslateService,
@@ -204,9 +205,16 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
 
       // create or update
       createOrUpdate: this.initializeProcessData(),
-      redirectAfterCreateUpdate: (data: HelpItemModel) => {
+      redirectAfterCreateUpdate: (
+        data: HelpItemModel,
+        extraQueryParams: Params
+      ) => {
         // redirect to view
-        this.redirectService.to([`/help/categories/${data.categoryId}/items/${data.id}/view`]);
+        this.router.navigate(
+          [`/help/categories/${data.categoryId}/items/${data.id}/view`], {
+            queryParams: extraQueryParams
+          }
+        );
       }
     };
 

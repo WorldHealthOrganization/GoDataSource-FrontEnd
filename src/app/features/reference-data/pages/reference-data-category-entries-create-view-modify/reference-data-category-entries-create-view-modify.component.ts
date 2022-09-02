@@ -1,6 +1,6 @@
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
@@ -186,14 +186,21 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
 
       // create or update
       createOrUpdate: this.initializeProcessData(),
-      redirectAfterCreateUpdate: (data: ReferenceDataEntryModel) => {
+      redirectAfterCreateUpdate: (
+        data: ReferenceDataEntryModel,
+        extraQueryParams: Params
+      ) => {
         // redirect to view
-        this.router.navigate([
-          '/reference-data',
-          this.category.id,
-          data.id,
-          'view'
-        ]);
+        this.router.navigate(
+          [
+            '/reference-data',
+            this.category.id,
+            data.id,
+            'view'
+          ], {
+            queryParams: extraQueryParams
+          }
+        );
       }
     };
   }
