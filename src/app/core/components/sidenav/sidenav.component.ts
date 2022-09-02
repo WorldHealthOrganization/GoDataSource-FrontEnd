@@ -20,6 +20,7 @@ import { SystemSettingsVersionModel } from '../../models/system-settings-version
 import { IsActiveMatchOptions } from '@angular/router';
 import { ToastV2Service } from '../../services/helper/toast-v2.service';
 import { MAT_MENU_DEFAULT_OPTIONS } from '@angular/material/menu';
+import { determineIfTouchDevice } from '../../methods/touch-device';
 
 @Component({
   selector: 'app-sidenav',
@@ -42,6 +43,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
   enteredButton = false;
   isMatMenuOpen = false;
   prevButtonTrigger;
+
+  // check if this is a touch device
+  isTouchDevice: boolean = determineIfTouchDevice();
 
   // subscriptions
   outbreakSubscriber: Subscription;
