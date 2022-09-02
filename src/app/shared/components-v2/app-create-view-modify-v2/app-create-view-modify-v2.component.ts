@@ -31,8 +31,9 @@ import { AppListTableV2Component } from '../app-list-table-v2/app-list-table-v2.
 import { PageEvent } from '@angular/material/paginator';
 import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { MatTabGroup } from '@angular/material/tabs';
+import { Location } from '@angular/common';
 
 /**
  * Component
@@ -68,7 +69,19 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   @Input() itemID: string;
 
   // loading item data
-  @Input() loadingItemData: boolean;
+  private _loadingItemData: boolean;
+  @Input() set loadingItemData(loadingItemData: boolean) {
+    // update loading item data
+    this._loadingItemData = loadingItemData;
+
+    // select proper tab
+    if (!this.loadingItemData) {
+      this.selectTabIfPossible();
+    }
+  }
+  get loadingItemData(): boolean {
+    return this._loadingItemData;
+  }
 
   // breadcrumbs
   @Input() breadcrumbs: IV2Breadcrumb[];
@@ -300,7 +313,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   selectedTab: ICreateViewModifyV2Tab | ICreateViewModifyV2TabTable;
   selectedTabParams: {
     selectedTabLabel: string
-  };
+  } = this.activatedRoute.snapshot.queryParams?.selectedTabLabel ? {
+      selectedTabLabel: this.activatedRoute.snapshot.queryParams.selectedTabLabel
+    } : undefined;
   visitedTabs: {
     [tabLabel: string]: true
   } = {};
@@ -329,6 +344,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    * Constructor
    */
   constructor(
+    protected router: Router,
     protected elementRef: ElementRef,
     protected changeDetectorRef: ChangeDetectorRef,
     protected dialogV2Service: DialogV2Service,
@@ -336,7 +352,8 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     protected toastV2Service: ToastV2Service,
     protected authDataService: AuthDataService,
     protected storageService: StorageService,
-    protected activatedRoute: ActivatedRoute
+    protected activatedRoute: ActivatedRoute,
+    protected location: Location
   ) {
     // update render mode
     this.updateRenderMode();
@@ -869,6 +886,10 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     // reset visited tabs
     this.visitedTabs = {};
 
+    // update url
+    const link: string[] = this.expandListColumnRenderer.link(record);
+    this.location.replaceState(link.join('/'));
+
     // change
     this.expandListChangeRecord.emit(record);
   }
@@ -927,6 +948,19 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     this.selectedTabParams = {
       selectedTabLabel: this.selectedTab?.label
     };
+
+    // update query url
+    if (
+      this.activatedRoute.snapshot.queryParams?.selectedTabLabel &&
+      this.activatedRoute.snapshot.queryParams.selectedTabLabel !== this.selectedTabParams.selectedTabLabel
+    ) {
+      this.router.navigate([], {
+        queryParams: {
+          'selectedTabLabel': this.selectedTabParams.selectedTabLabel
+        },
+        queryParamsHandling: 'merge'
+      });
+    }
 
     // already visited ?
     if (this.visitedTabs[tab.label]) {
@@ -1212,23 +1246,19 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     if (
       !this.matTabGroup ||
       !this.tabData?.tabs?.length ||
-      !this.activatedRoute.snapshot.queryParams?.selectedTabLabel
+      !this.selectedTabParams?.selectedTabLabel
     ) {
       return;
     }
 
     // check if we can select tab
-    const selectTabLabel: string = this.activatedRoute.snapshot.queryParams?.selectedTabLabel;
     const visibleTabs = this.tabData.tabs.filter((tab) => !tab.visible || tab.visible());
-    const tabIndex: number = visibleTabs.findIndex((tab) => tab.label === selectTabLabel);
+    const tabIndex: number = visibleTabs.findIndex((tab) => tab.label === this.selectedTabParams.selectedTabLabel);
     if (tabIndex > -1) {
-      // set selected value to propagate value
-      this.selectedTabParams = {
-        selectedTabLabel: selectTabLabel
-      };
-
       // select tab
       this.matTabGroup.selectedIndex = tabIndex;
+    } else {
+      this.selectedTabParams = undefined;
     }
   }
 }

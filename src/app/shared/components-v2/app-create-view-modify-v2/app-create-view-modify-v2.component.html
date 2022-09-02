@@ -132,7 +132,7 @@
                   <a
                     *ngSwitchCase="CreateViewModifyV2ExpandColumnType.TEXT"
                     [routerLink]="expandListColumnRenderer.link(record)"
-                    [queryParams]="expandListColumnRenderer.linkQueryParams ? retrieveSelectedTabQueryParams(expandListColumnRenderer.linkQueryParams(record)) : selectedTabParams">
+                    [queryParams]="selectedTabParams">
                     <span
                       (click)="$event.preventDefault(); $event.stopPropagation(); $event.stopImmediatePropagation(); (record.id === itemID ? undefined : expandListViewRecord(record))">
                       {{ expandListColumnRenderer.get(record) }}
