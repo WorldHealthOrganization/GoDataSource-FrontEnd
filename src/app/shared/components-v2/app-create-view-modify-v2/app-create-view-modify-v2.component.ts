@@ -31,9 +31,8 @@ import { AppListTableV2Component } from '../app-list-table-v2/app-list-table-v2.
 import { PageEvent } from '@angular/material/paginator';
 import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 import { MatTabGroup } from '@angular/material/tabs';
-import { Location } from '@angular/common';
 
 /**
  * Component
@@ -344,7 +343,6 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    * Constructor
    */
   constructor(
-    protected router: Router,
     protected elementRef: ElementRef,
     protected changeDetectorRef: ChangeDetectorRef,
     protected dialogV2Service: DialogV2Service,
@@ -352,8 +350,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     protected toastV2Service: ToastV2Service,
     protected authDataService: AuthDataService,
     protected storageService: StorageService,
-    protected activatedRoute: ActivatedRoute,
-    protected location: Location
+    protected activatedRoute: ActivatedRoute
   ) {
     // update render mode
     this.updateRenderMode();
@@ -887,8 +884,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     this.visitedTabs = {};
 
     // update url
-    const link: string[] = this.expandListColumnRenderer.link(record);
-    this.location.replaceState(link.join('/'));
+    this.updateURL(this.expandListColumnRenderer.link(record).join('/'));
 
     // change
     this.expandListChangeRecord.emit(record);
@@ -950,17 +946,11 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     };
 
     // update query url
-    if (
-      this.activatedRoute.snapshot.queryParams?.selectedTabLabel &&
-      this.activatedRoute.snapshot.queryParams.selectedTabLabel !== this.selectedTabParams.selectedTabLabel
-    ) {
-      this.router.navigate([], {
-        queryParams: {
-          'selectedTabLabel': this.selectedTabParams.selectedTabLabel
-        },
-        queryParamsHandling: 'merge'
-      });
-    }
+    this.updateURL(window.location.href
+      .replace(/&?selectedTabLabel=([^&]+)/i, '')
+      .replace(/\?$/, '')
+      .replace(/\?&/, '?')
+    );
 
     // already visited ?
     if (this.visitedTabs[tab.label]) {
@@ -1258,7 +1248,26 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
       // select tab
       this.matTabGroup.selectedIndex = tabIndex;
     } else {
+      // reset
       this.selectedTabParams = undefined;
     }
+  }
+
+  /**
+   * Update URL
+   */
+  updateURL(url: string): void {
+    // update url
+    const linkUrl: string = url +
+      (
+        this.selectedTabParams?.selectedTabLabel ?
+          `${url.indexOf('?') > -1 ? '&' : '?'}selectedTabLabel=${this.selectedTabParams.selectedTabLabel}` :
+          ''
+      );
+    window.history.replaceState(
+      {},
+      '',
+      linkUrl
+    );
   }
 }
