@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { CreateViewModifyV2Action } from './models/action.model';
 import { CreateViewModifyV2ActionType, CreateViewModifyV2MenuType, CreateViewModifyV2TabInputType, ICreateViewModifyV2, ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputList, ICreateViewModifyV2TabTable } from './models/tab.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
@@ -31,6 +31,8 @@ import { AppListTableV2Component } from '../app-list-table-v2/app-list-table-v2.
 import { PageEvent } from '@angular/material/paginator';
 import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { ActivatedRoute, Params } from '@angular/router';
+import { MatTabGroup } from '@angular/material/tabs';
 
 /**
  * Component
@@ -100,9 +102,25 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
         };
       }
     });
+
+    // select tab if necessary
+    this.selectTabIfPossible();
   }
   get tabData(): ICreateViewModifyV2 {
     return this._tabData;
+  }
+
+  // mat tab group (view / modify page)
+  private _matTabGroup: MatTabGroup;
+  @ViewChild(MatTabGroup) set matTabGroup(matTabGroup: MatTabGroup) {
+    // update value
+    this._matTabGroup = matTabGroup;
+
+    // select tab if necessary
+    this.selectTabIfPossible();
+  }
+  get matTabGroup(): MatTabGroup {
+    return this._matTabGroup;
   }
 
   // age - dob options
@@ -280,6 +298,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
   // visited tabs
   selectedTab: ICreateViewModifyV2Tab | ICreateViewModifyV2TabTable;
+  selectedTabParams: {
+    selectedTabLabel: string
+  };
   visitedTabs: {
     [tabLabel: string]: true
   } = {};
@@ -314,7 +335,8 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     protected formHelper: FormHelperService,
     protected toastV2Service: ToastV2Service,
     protected authDataService: AuthDataService,
-    protected storageService: StorageService
+    protected storageService: StorageService,
+    protected activatedRoute: ActivatedRoute
   ) {
     // update render mode
     this.updateRenderMode();
@@ -897,6 +919,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
     // trigger tab changed
     this.selectedTab = tab;
+    this.selectedTabParams = {
+      selectedTabLabel: this.selectedTab?.label
+    };
 
     // already visited ?
     if (this.visitedTabs[tab.label]) {
@@ -1160,6 +1185,45 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     // stop ?
     if (this._isInvalidDragEvent) {
       document.dispatchEvent(new Event('mouseup'));
+    }
+  }
+
+  /**
+   * Retrieve tab query params with selected tab info too
+   */
+  retrieveSelectedTabQueryParams(baseParams: Params): Params {
+    // attach selected tab info
+    return {
+      ...baseParams,
+      ...this.selectedTabParams
+    };
+  }
+
+  /**
+   * Select tab if possible
+   */
+  selectTabIfPossible(): void {
+    // do we have everything we need ?
+    if (
+      !this.matTabGroup ||
+      !this.tabData?.tabs?.length ||
+      !this.activatedRoute.snapshot.queryParams?.selectedTabLabel
+    ) {
+      return;
+    }
+
+    // check if we can select tab
+    const selectTabLabel: string = this.activatedRoute.snapshot.queryParams?.selectedTabLabel;
+    const visibleTabs = this.tabData.tabs.filter((tab) => !tab.visible || tab.visible());
+    const tabIndex: number = visibleTabs.findIndex((tab) => tab.label === selectTabLabel);
+    if (tabIndex > -1) {
+      // set selected value to propagate value
+      this.selectedTabParams = {
+        selectedTabLabel: selectTabLabel
+      };
+
+      // select tab
+      this.matTabGroup.selectedIndex = tabIndex;
     }
   }
 }

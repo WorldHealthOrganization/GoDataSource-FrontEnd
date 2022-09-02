@@ -132,7 +132,7 @@
                   <a
                     *ngSwitchCase="CreateViewModifyV2ExpandColumnType.TEXT"
                     [routerLink]="expandListColumnRenderer.link ? expandListColumnRenderer.link(record) : undefined"
-                    [queryParams]="expandListColumnRenderer.linkQueryParams ? expandListColumnRenderer.linkQueryParams(record) : undefined">
+                    [queryParams]="expandListColumnRenderer.linkQueryParams ? retrieveSelectedTabQueryParams(expandListColumnRenderer.linkQueryParams(record)) : selectedTabParams">
                     <span
                       (click)="$event.preventDefault(); $event.stopPropagation(); $event.stopImmediatePropagation(); (record.id === itemID ? undefined : expandListViewRecord(record))">
                       {{ expandListColumnRenderer.get(record) }}
@@ -216,7 +216,7 @@
                 type="button"
                 mat-icon-button
                 [routerLink]="tabData.buttons.view.link.link()"
-                [queryParams]="tabData.buttons.view.link.queryParams ? tabData.buttons.view.link.queryParams() : undefined">
+                [queryParams]="tabData.buttons.view.link.queryParams ? retrieveSelectedTabQueryParams(tabData.buttons.view.link.queryParams()) : selectedTabParams">
                 <mat-icon>visibility</mat-icon>
               </a>
             </div>
@@ -343,7 +343,7 @@
                 type="button"
                 mat-flat-button color="primary"
                 [routerLink]="tabData.buttons.modify.link.link()"
-                [queryParams]="tabData.buttons.modify.link.queryParams ? tabData.buttons.modify.link.queryParams() : undefined">
+                [queryParams]="tabData.buttons.modify.link.queryParams ? retrieveSelectedTabQueryParams(tabData.buttons.modify.link.queryParams()) : selectedTabParams">
                 {{'LNG_COMMON_BUTTON_EDIT' | translate}}
               </a>
             </div>
