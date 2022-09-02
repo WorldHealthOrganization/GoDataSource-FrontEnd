@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, Input, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, Input, ViewEncapsulation } from '@angular/core';
 import { ChronologyItem } from './typings/chronology-item';
 import { Constants } from '../../../core/models/constants';
 import { moment } from '../../../core/helperClasses/x-moment';
+import { determineRenderMode, RenderMode } from '../../../core/enums/render-mode.enum';
 
 @Component({
   selector: 'app-chronology',
@@ -56,5 +57,40 @@ export class ChronologyComponent {
   }
   get entries(): ChronologyItem[] {
     return this._entries;
+  }
+
+  // render mode
+  renderMode: RenderMode = RenderMode.FULL;
+
+  /**
+   * Constructor
+   */
+  constructor(
+    private changeDetectorRef: ChangeDetectorRef
+  ) {
+    // update render mode
+    this.updateRenderMode(true);
+  }
+
+  /**
+   * Update website render mode
+   */
+  @HostListener('window:resize')
+  private updateRenderMode(dontUpdate?: boolean): void {
+    // determine render mode
+    const renderMode = determineRenderMode();
+
+    // same as before ?
+    if (renderMode === this.renderMode) {
+      return;
+    }
+
+    // must update
+    this.renderMode = renderMode;
+
+    // update ui
+    if (!dontUpdate) {
+      this.changeDetectorRef.detectChanges();
+    }
   }
 }

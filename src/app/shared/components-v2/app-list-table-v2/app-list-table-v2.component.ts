@@ -1963,7 +1963,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    * Update
    */
   @HostListener('window:resize')
-  private updateRenderMode(dontUpdate: boolean): void {
+  private updateRenderMode(dontUpdate?: boolean): void {
     // determine
     const isSmallScreenMode = determineIfSmallScreenMode();
 
