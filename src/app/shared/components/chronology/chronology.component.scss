@@ -58,7 +58,7 @@
     }
 
     .gd-chronology-item-date {
-      background-color: #E2EBEB;
+      background-color: var(--gd-chronology-date);
       @include border-radius(0.4rem);
       font-size: 1.6rem;
       font-weight: 700;
