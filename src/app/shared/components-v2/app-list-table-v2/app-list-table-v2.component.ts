@@ -53,7 +53,7 @@ import { ILabelValuePairModel } from '../../forms-v2/core/label-value-pair.model
 import { IV2ProcessSelectedData } from './models/process-data.model';
 import { HighlightSearchPipe } from '../../pipes/highlight-search/highlight-search';
 import { AppListTableV2ObfuscateComponent } from './components/obfuscate/app-list-table-v2-obfuscate.component';
-import { determineIfSmallScreenMode } from '../../../core/enums/small-screen-mode.enum';
+import { determineIfSmallScreenMode } from '../../../core/methods/small-screen-mode';
 
 /**
  * Component
