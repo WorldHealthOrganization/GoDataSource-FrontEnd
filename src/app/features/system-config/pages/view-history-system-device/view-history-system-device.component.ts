@@ -152,6 +152,7 @@ export class ViewHistorySystemDeviceComponent extends CreateViewModifyComponent<
             {
               type: CreateViewModifyV2TabInputType.LIST,
               name: 'history',
+              cssClasses: 'gd-create-view-modify-bottom-section-content-input-has-list-one-line-item',
               items: this._devicesHistoryValues,
               readonly: true,
               itemsChanged: undefined,

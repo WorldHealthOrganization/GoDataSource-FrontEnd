@@ -33,6 +33,7 @@
     [ngSwitch]="extendedColDef.columnDefinition.filter.type"
     class="gd-list-table-column-filter"
     (mousedown)="$event.stopPropagation()"
+    (touchstart)="$event.stopPropagation()"
     (keydown)="$event.stopPropagation()">
 
     <!-- Text -->
