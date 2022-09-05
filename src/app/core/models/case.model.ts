@@ -29,6 +29,10 @@ import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-
 import { IResolverV2ResponseModel } from '../services/resolvers/data/models/resolver-response.model';
 import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
 import { LocationModel } from './location.model';
+import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../shared/components-v2/app-list-table-v2/models/column.model';
+import { ReferenceDataEntryModel } from './reference-data.model';
+import { TranslateService } from '@ngx-translate/core';
+import { SafeHtml } from '@angular/platform-browser';
 
 export class CaseModel
   extends BaseModel
@@ -122,6 +126,9 @@ export class CaseModel
   relationship: any;
 
   matchedDuplicateRelationships: EntityMatchedRelationshipModel[];
+
+  // used by ui
+  uiStatusForms: SafeHtml;
 
   /**
    * Advanced filters
@@ -368,6 +375,58 @@ export class CaseModel
 
     // finished
     return advancedFilters;
+  }
+
+  /**
+   * Retrieve statuses forms
+   */
+  static getStatusForms(
+    info: {
+      // required
+      item: CaseModel,
+      translateService: TranslateService,
+      classification: IResolverV2ResponseModel<ReferenceDataEntryModel>,
+      outcome: IResolverV2ResponseModel<ReferenceDataEntryModel>
+    }
+  ): V2ColumnStatusForm[] {
+    // construct list of forms that we need to display
+    const forms: V2ColumnStatusForm[] = [];
+
+    // classification
+    if (
+      info.item.classification &&
+      info.classification.map[info.item.classification]
+    ) {
+      forms.push({
+        type: IV2ColumnStatusFormType.CIRCLE,
+        color: info.classification.map[info.item.classification].getColorCode(),
+        tooltip: info.translateService.instant(info.item.classification)
+      });
+    }
+
+    // outcome
+    if (
+      info.item.outcomeId &&
+      info.outcome.map[info.item.outcomeId]
+    ) {
+      forms.push({
+        type: IV2ColumnStatusFormType.TRIANGLE,
+        color: info.outcome.map[info.item.outcomeId].getColorCode(),
+        tooltip: info.translateService.instant(info.item.outcomeId)
+      });
+    }
+
+    // alerted
+    if (info.item.alerted) {
+      forms.push({
+        type: IV2ColumnStatusFormType.STAR,
+        color: 'var(--gd-danger)',
+        tooltip: info.translateService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+      });
+    }
+
+    // finished
+    return forms;
   }
 
   /**

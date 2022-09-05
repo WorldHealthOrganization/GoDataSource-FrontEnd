@@ -1,6 +1,6 @@
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
@@ -214,13 +214,20 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
 
       // create or update
       createOrUpdate: this.initializeProcessData(),
-      redirectAfterCreateUpdate: (data: UserRoleModel) => {
+      redirectAfterCreateUpdate: (
+        data: UserRoleModel,
+        extraQueryParams: Params
+      ) => {
         // redirect to view
-        this.router.navigate([
-          '/user-roles',
-          data.id,
-          'view'
-        ]);
+        this.router.navigate(
+          [
+            '/user-roles',
+            data.id,
+            'view'
+          ], {
+            queryParams: extraQueryParams
+          }
+        );
       }
     };
   }
@@ -441,8 +448,10 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: UserRoleModel) => item.name,
-      link: (item: UserRoleModel) => ['/user-roles', item.id, 'view']
+      link: (item: UserRoleModel) => ['/user-roles', item.id, 'view'],
+      get: {
+        text: (item: UserRoleModel) => item.name
+      }
     };
   }
 

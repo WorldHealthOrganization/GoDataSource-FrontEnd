@@ -1,6 +1,6 @@
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
@@ -239,13 +239,20 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
 
       // create or update
       createOrUpdate: this.initializeProcessData(),
-      redirectAfterCreateUpdate: (data: LocationModel) => {
+      redirectAfterCreateUpdate: (
+        data: LocationModel,
+        extraQueryParams: Params
+      ) => {
         // redirect to view
-        this.router.navigate([
-          '/locations',
-          data.id,
-          'view'
-        ]);
+        this.router.navigate(
+          [
+            '/locations',
+            data.id,
+            'view'
+          ], {
+            queryParams: extraQueryParams
+          }
+        );
       }
     };
   }
@@ -648,8 +655,10 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: LocationModel) => item.name,
-      link: (item: LocationModel) => ['/locations', item.id, 'view']
+      link: (item: LocationModel) => ['/locations', item.id, 'view'],
+      get: {
+        text: (item: LocationModel) => item.name
+      }
     };
   }
 

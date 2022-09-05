@@ -1,6 +1,6 @@
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, of, throwError } from 'rxjs';
@@ -54,6 +54,9 @@ import { EntityDataService } from '../../../../core/services/data/entity.data.se
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputLinkWithAction, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
+import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
+import { DomSanitizer } from '@angular/platform-browser';
 
 /**
  * Component
@@ -107,6 +110,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
     protected entityDataService: EntityDataService,
     protected systemSettingsDataService: SystemSettingsDataService,
     protected relationshipDataService: RelationshipDataService,
+    protected domSanitizer: DomSanitizer,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
@@ -319,13 +323,20 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
 
       // create or update
       createOrUpdate: this.initializeProcessData(),
-      redirectAfterCreateUpdate: (data: ContactModel) => {
+      redirectAfterCreateUpdate: (
+        data: ContactModel,
+        extraQueryParams: Params
+      ) => {
         // redirect to view
-        this.router.navigate([
-          '/contacts',
-          data.id,
-          'view'
-        ]);
+        this.router.navigate(
+          [
+            '/contacts',
+            data.id,
+            'view'
+          ], {
+            queryParams: extraQueryParams
+          }
+        );
       }
     };
   }
@@ -1994,9 +2005,38 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
    */
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
-      type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: ContactModel) => item.name,
-      link: (item: ContactModel) => ['/contacts', item.id, 'view']
+      type: CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS,
+      link: (item: ContactModel) => ['/contacts', item.id, 'view'],
+      get: {
+        status: (item: ContactModel) => {
+          // must initialize - optimization to not recreate the list everytime there is an event since data won't change ?
+          if (!item.uiStatusForms) {
+            // determine forms
+            const forms: V2ColumnStatusForm[] = ContactModel.getStatusForms({
+              item,
+              translateService: this.translateService,
+              risk: this.activatedRoute.snapshot.data.risk
+            });
+
+            // create html
+            let html: string = '';
+            forms.forEach((form, formIndex) => {
+              html += AppListTableV2Component.renderStatusForm(
+                form,
+                formIndex < forms.length - 1
+              );
+            });
+
+            // convert to safe html
+            item.uiStatusForms = this.domSanitizer.bypassSecurityTrustHtml(html);
+          }
+
+          // finished
+          return item.uiStatusForms;
+        },
+        text: (item: ContactModel) => item.name,
+        details: (item: ContactModel) => item.visualId
+      }
     };
   }
 
@@ -2008,7 +2048,11 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
       'id',
       'firstName',
       'lastName',
-      'middleName'
+      'middleName',
+      'visualId',
+      'riskLevel',
+      'followUp',
+      'questionnaireAnswers'
     ];
   }
 
@@ -2072,6 +2116,14 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
         data.queryBuilder
       )
       .pipe(
+        // process data
+        map((contacts: ContactModel[]) => {
+          return EntityModel.determineAlertness<ContactModel>(
+            this.selectedOutbreak.contactInvestigationTemplate,
+            contacts
+          );
+        }),
+
         // should be the last pipe
         takeUntil(this.destroyed$)
       );

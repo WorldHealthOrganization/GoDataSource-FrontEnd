@@ -1,6 +1,6 @@
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
@@ -205,13 +205,20 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
 
       // create or update
       createOrUpdate: this.initializeProcessData(),
-      redirectAfterCreateUpdate: (data: TeamModel) => {
+      redirectAfterCreateUpdate: (
+        data: TeamModel,
+        extraQueryParams: Params
+      ) => {
         // redirect to view
-        this.router.navigate([
-          '/teams',
-          data.id,
-          'view'
-        ]);
+        this.router.navigate(
+          [
+            '/teams',
+            data.id,
+            'view'
+          ], {
+            queryParams: extraQueryParams
+          }
+        );
       }
     };
   }
@@ -465,8 +472,10 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: TeamModel) => item.name,
-      link: (item: TeamModel) => ['/teams', item.id, 'view']
+      link: (item: TeamModel) => ['/teams', item.id, 'view'],
+      get: {
+        text: (item: TeamModel) => item.name
+      }
     };
   }
 

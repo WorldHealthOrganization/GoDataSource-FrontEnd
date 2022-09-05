@@ -1,10 +1,11 @@
-import { Params } from '@angular/router';
+import { SafeHtml } from '@angular/platform-browser';
 
 /**
  * Column type
  */
 export enum CreateViewModifyV2ExpandColumnType {
-  TEXT
+  TEXT,
+  STATUS_AND_DETAILS
 }
 
 /**
@@ -13,14 +14,32 @@ export enum CreateViewModifyV2ExpandColumnType {
 interface ICreateViewModifyV2ExpandColumnText {
   // required
   type: CreateViewModifyV2ExpandColumnType.TEXT;
-  get: (item: any) => string;
+  link: (item: any) => string[];
+  get: {
+    // required
+    text: (item: any) => string,
 
-  // optional
-  link?: (item: any) => string[];
-  linkQueryParams?: (item: any) => Params;
+    // optional
+    details?: never,
+    status?: never
+  };
+}
+
+/**
+ * Status and details column
+ */
+interface ICreateViewModifyV2ExpandColumnStatusAndDetails {
+  // required
+  type: CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS;
+  link: (item: any) => string[];
+  get: {
+    text: (item: any) => string,
+    details: (item: any) => string,
+    status: (item: any) => SafeHtml
+  };
 }
 
 /**
  * Column types
  */
-export type CreateViewModifyV2ExpandColumn = ICreateViewModifyV2ExpandColumnText;
+export type CreateViewModifyV2ExpandColumn = ICreateViewModifyV2ExpandColumnText | ICreateViewModifyV2ExpandColumnStatusAndDetails;

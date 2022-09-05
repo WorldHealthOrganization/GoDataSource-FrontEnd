@@ -32,6 +32,11 @@ import { TeamModel } from './team.model';
 import { FollowUpModel } from './follow-up.model';
 import { RequestQueryBuilder } from '../helperClasses/request-query-builder';
 import { CaseModel } from './case.model';
+import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IResolverV2ResponseModel } from '../services/resolvers/data/models/resolver-response.model';
+import { ReferenceDataEntryModel } from './reference-data.model';
+import { TranslateService } from '@ngx-translate/core';
+import { SafeHtml } from '@angular/platform-browser';
 
 export interface IFollowUpHistory {
   startDate: string;
@@ -111,6 +116,9 @@ export class ContactModel
   relationship: any;
 
   matchedDuplicateRelationships: EntityMatchedRelationshipModel[];
+
+  // used by ui
+  uiStatusForms: SafeHtml;
 
   /**
    * Advanced filters
@@ -398,6 +406,81 @@ export class ContactModel
 
     // finished
     return advancedFilters;
+  }
+
+  /**
+   * Retrieve statuses forms
+   */
+  static getStatusForms(
+    info: {
+      // required
+      item: ContactModel,
+      translateService: TranslateService,
+      risk: IResolverV2ResponseModel<ReferenceDataEntryModel>
+    }
+  ): V2ColumnStatusForm[] {
+    // construct list of forms that we need to display
+    const forms: V2ColumnStatusForm[] = [];
+
+    // risk
+    if (
+      info.item.riskLevel &&
+      info.risk.map[info.item.riskLevel]
+    ) {
+      forms.push({
+        type: IV2ColumnStatusFormType.TRIANGLE,
+        color: info.risk.map[info.item.riskLevel].getColorCode(),
+        tooltip: info.translateService.instant(info.item.riskLevel)
+      });
+    }
+
+    // as per current date
+    if (
+      info.item.followUp?.startDate &&
+      moment().isSameOrBefore(info.item.followUp?.startDate)
+    ) {
+      forms.push({
+        type: IV2ColumnStatusFormType.SQUARE,
+        color: 'var(--gd-status-follow-up-not-started)',
+        tooltip: info.translateService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_STARTED')
+      });
+    } else if (
+      info.item.followUp?.startDate &&
+      info.item.followUp?.endDate &&
+      moment().isBetween(
+        info.item.followUp?.startDate,
+        info.item.followUp?.endDate,
+        undefined,
+        '[]'
+      )
+    ) {
+      forms.push({
+        type: IV2ColumnStatusFormType.SQUARE,
+        color: 'var(--gd-status-under-follow-up)',
+        tooltip: info.translateService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_UNDER_FOLLOW_UP')
+      });
+    } else if (
+      info.item.followUp?.endDate &&
+      moment().isSameOrAfter(info.item.followUp?.endDate)
+    ) {
+      forms.push({
+        type: IV2ColumnStatusFormType.SQUARE,
+        color: 'var(--gd-status-follow-up-ended)',
+        tooltip: info.translateService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_ENDED_FOLLOW_UP')
+      });
+    }
+
+    // alerted
+    if (info.item.alerted) {
+      forms.push({
+        type: IV2ColumnStatusFormType.STAR,
+        color: 'var(--gd-danger)',
+        tooltip: info.translateService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+      });
+    }
+
+    // finished
+    return forms;
   }
 
   /**

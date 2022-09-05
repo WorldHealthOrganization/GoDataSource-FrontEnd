@@ -689,7 +689,6 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: EntityModel) => item.model.name,
       link: (item: EntityModel) => [
         '/relationships',
         this._entity.type,
@@ -699,7 +698,10 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
           'exposures',
         item.relationship.id,
         'view'
-      ]
+      ],
+      get: {
+        text: (item: EntityModel) => item.model.name
+      }
     };
   }
 

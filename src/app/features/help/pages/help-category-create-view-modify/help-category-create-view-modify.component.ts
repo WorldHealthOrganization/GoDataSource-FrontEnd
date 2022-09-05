@@ -1,7 +1,7 @@
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { HelpCategoryModel } from '../../../../core/models/help-category.model';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
@@ -34,6 +34,7 @@ export class HelpCategoryCreateViewModifyComponent extends CreateViewModifyCompo
    * Constructor
    */
   constructor(
+    protected router: Router,
     protected activatedRoute: ActivatedRoute,
     protected helpDataService: HelpDataService,
     protected translateService: TranslateService,
@@ -189,9 +190,16 @@ export class HelpCategoryCreateViewModifyComponent extends CreateViewModifyCompo
 
       // create or update
       createOrUpdate: this.initializeProcessData(),
-      redirectAfterCreateUpdate: (data: HelpCategoryModel) => {
+      redirectAfterCreateUpdate: (
+        data: HelpCategoryModel,
+        extraQueryParams: Params
+      ) => {
         // redirect to view
-        this.redirectService.to([`/help/categories/${data.id}/view`]);
+        this.router.navigate(
+          [`/help/categories/${data.id}/view`], {
+            queryParams: extraQueryParams
+          }
+        );
       }
     };
   }
@@ -393,10 +401,12 @@ export class HelpCategoryCreateViewModifyComponent extends CreateViewModifyCompo
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: HelpCategoryModel) => item.name ?
-        this.translateService.instant(item.name) :
-        item.name,
-      link: (item: HelpCategoryModel) => ['/help/categories', item.id, 'view']
+      link: (item: HelpCategoryModel) => ['/help/categories', item.id, 'view'],
+      get: {
+        text: (item: HelpCategoryModel) => item.name ?
+          this.translateService.instant(item.name) :
+          item.name
+      }
     };
   }
 

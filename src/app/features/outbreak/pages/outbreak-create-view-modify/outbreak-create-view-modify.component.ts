@@ -1,6 +1,6 @@
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
@@ -231,14 +231,21 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
 
       // create or update
       createOrUpdate: this.initializeProcessData(),
-      redirectAfterCreateUpdate: (data: OutbreakModel) => {
+      redirectAfterCreateUpdate: (
+        data: OutbreakModel,
+        extraQueryParams: Params
+      ) => {
         if (!this.isModify) {
           // redirect to view
-          this.router.navigate([
-            '/outbreaks',
-            data.id,
-            'view'
-          ]);
+          this.router.navigate(
+            [
+              '/outbreaks',
+              data.id,
+              'view'
+            ], {
+              queryParams: extraQueryParams
+            }
+          );
         }
       }
     };
@@ -1116,8 +1123,10 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: OutbreakModel) => item.name,
-      link: (item: OutbreakModel) => ['/outbreaks', item.id, 'view']
+      link: (item: OutbreakModel) => ['/outbreaks', item.id, 'view'],
+      get: {
+        text: (item: OutbreakModel) => item.name
+      }
     };
   }
 

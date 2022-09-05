@@ -1,6 +1,6 @@
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
@@ -171,13 +171,20 @@ export class SystemDevicesCreateViewModifyComponent extends CreateViewModifyComp
 
       // create or update
       createOrUpdate: this.initializeProcessData(),
-      redirectAfterCreateUpdate: (data: DeviceModel) => {
+      redirectAfterCreateUpdate: (
+        data: DeviceModel,
+        extraQueryParams: Params
+      ) => {
         // redirect to view
-        this.router.navigate([
-          '/system-config/devices',
-          data.id,
-          'view'
-        ]);
+        this.router.navigate(
+          [
+            '/system-config/devices',
+            data.id,
+            'view'
+          ], {
+            queryParams: extraQueryParams
+          }
+        );
       }
     };
   }
@@ -331,8 +338,10 @@ export class SystemDevicesCreateViewModifyComponent extends CreateViewModifyComp
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: DeviceModel) => item.name,
-      link: (item: DeviceModel) => ['/system-config/devices', item.id, 'view']
+      link: (item: DeviceModel) => ['/system-config/devices', item.id, 'view'],
+      get: {
+        text: (item: DeviceModel) => item.name
+      }
     };
   }
 

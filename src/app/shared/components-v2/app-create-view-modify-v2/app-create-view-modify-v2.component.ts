@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { CreateViewModifyV2Action } from './models/action.model';
 import { CreateViewModifyV2ActionType, CreateViewModifyV2MenuType, CreateViewModifyV2TabInputType, ICreateViewModifyV2, ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputList, ICreateViewModifyV2TabTable } from './models/tab.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
@@ -14,7 +14,7 @@ import * as _ from 'lodash';
 import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { RequestQueryBuilder, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
 import { V2AdvancedFilter } from '../app-list-table-v2/models/advanced-filter.model';
 import { SavedFilterData } from '../../../core/models/saved-filters.model';
@@ -31,6 +31,8 @@ import { AppListTableV2Component } from '../app-list-table-v2/app-list-table-v2.
 import { PageEvent } from '@angular/material/paginator';
 import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { ActivatedRoute, Params } from '@angular/router';
+import { MatTabGroup } from '@angular/material/tabs';
 
 /**
  * Component
@@ -66,7 +68,19 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   @Input() itemID: string;
 
   // loading item data
-  @Input() loadingItemData: boolean;
+  private _loadingItemData: boolean;
+  @Input() set loadingItemData(loadingItemData: boolean) {
+    // update loading item data
+    this._loadingItemData = loadingItemData;
+
+    // select proper tab
+    if (!this.loadingItemData) {
+      this.selectTabIfPossible();
+    }
+  }
+  get loadingItemData(): boolean {
+    return this._loadingItemData;
+  }
 
   // breadcrumbs
   @Input() breadcrumbs: IV2Breadcrumb[];
@@ -100,9 +114,25 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
         };
       }
     });
+
+    // select tab if necessary
+    this.selectTabIfPossible();
   }
   get tabData(): ICreateViewModifyV2 {
     return this._tabData;
+  }
+
+  // mat tab group (view / modify page)
+  private _matTabGroup: MatTabGroup;
+  @ViewChild(MatTabGroup) set matTabGroup(matTabGroup: MatTabGroup) {
+    // update value
+    this._matTabGroup = matTabGroup;
+
+    // select tab if necessary
+    this.selectTabIfPossible();
+  }
+  get matTabGroup(): MatTabGroup {
+    return this._matTabGroup;
   }
 
   // age - dob options
@@ -150,6 +180,14 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   // list of records
   expandList: boolean = false;
 
+  // page index
+  expandListPageIndex: number = 0;
+  expandListPageCount: {
+    count: number
+  } = {
+      count: 0
+    };
+
   // show search by input ?
   @Input() showSearchByInput: boolean = true;
 
@@ -166,6 +204,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
         }
 
         // reset
+        this.expandListPageIndex = 0;
         this.expandListSearchValue = '';
 
         // remove previous request
@@ -192,7 +231,23 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   private _expandListRecords$: Observable<any[]>;
   @Input() set expandListRecords$(expandListRecords$: Observable<any[]>) {
     // set data
-    this._expandListRecords$ = expandListRecords$;
+    this._expandListRecords$ = expandListRecords$ ?
+      expandListRecords$.pipe(map((data) => {
+        // check if we have more than one page
+        this.expandListPageCount = {
+          count: data.length
+        };
+
+        // remove the last one if it was retrieve just to know that we have more pages
+        // pageSize: Constants.DEFAULT_PAGE_SIZE + 1
+        if (data.length > Constants.DEFAULT_PAGE_SIZE) {
+          data.splice(Constants.DEFAULT_PAGE_SIZE);
+        }
+
+        // finished
+        return data;
+      })) :
+      expandListRecords$;
 
     // must reload data
     this.expandListInitialized = false;
@@ -280,6 +335,11 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
   // visited tabs
   selectedTab: ICreateViewModifyV2Tab | ICreateViewModifyV2TabTable;
+  selectedTabParams: {
+    selectedTabLabel: string
+  } = this.activatedRoute.snapshot.queryParams?.selectedTabLabel ? {
+      selectedTabLabel: this.activatedRoute.snapshot.queryParams.selectedTabLabel
+    } : undefined;
   visitedTabs: {
     [tabLabel: string]: true
   } = {};
@@ -314,7 +374,8 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     protected formHelper: FormHelperService,
     protected toastV2Service: ToastV2Service,
     protected authDataService: AuthDataService,
-    protected storageService: StorageService
+    protected storageService: StorageService,
+    protected activatedRoute: ActivatedRoute
   ) {
     // update render mode
     this.updateRenderMode();
@@ -642,7 +703,12 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
           this.markFormsAsPristine();
 
           // redirect after create / update
-          this.tabData.redirectAfterCreateUpdate(data);
+          this.tabData.redirectAfterCreateUpdate(
+            data,
+            this.isModify ?
+              this.selectedTabParams :
+              undefined
+          );
         },
         {
           show: () => {
@@ -703,8 +769,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   private expandListRefresh(): void {
     // make sure we add pagination
     this._expandListQueryBuilder.paginator.setPage({
-      pageSize: Constants.DEFAULT_PAGE_SIZE,
-      pageIndex: 0
+      // +1 to know that we have more pages
+      pageSize: Constants.DEFAULT_PAGE_SIZE + 1,
+      pageIndex: this.expandListPageIndex
     });
 
     // query only the fields that we need to
@@ -723,6 +790,17 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
         searchBy: this.expandListSearchValue
       }
     );
+  }
+
+  /**
+   * Change expand list page
+   */
+  expandListSetPage(page: PageEvent): void {
+    // set page
+    this.expandListPageIndex = page.pageIndex;
+
+    // refresh page
+    this.expandListRefresh();
   }
 
   /**
@@ -753,6 +831,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
           new RequestQueryBuilder();
         this._expandListAdvancedFiltersApplied = response.filtersApplied;
 
+        // reset
+        this.expandListPageIndex = 0;
+
         // filter
         this.expandListRefresh();
       });
@@ -777,6 +858,10 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
     // search
     this.expandListSearchValueTimeout = setTimeout(() => {
+      // reset
+      this.expandListPageIndex = 0;
+
+      // search
       this.expandListRefresh();
     }, 500);
   }
@@ -795,6 +880,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     ) {
       return;
     }
+
+    // reset
+    this.expandListPageIndex = 0;
 
     // retrieve data
     this.expandListRefresh();
@@ -841,6 +929,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   expandListViewRecord(record: any): void {
     // reset visited tabs
     this.visitedTabs = {};
+
+    // update url
+    this.updateURL(this.expandListColumnRenderer.link(record).join('/'));
 
     // change
     this.expandListChangeRecord.emit(record);
@@ -897,6 +988,16 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
     // trigger tab changed
     this.selectedTab = tab;
+    this.selectedTabParams = {
+      selectedTabLabel: this.selectedTab?.label
+    };
+
+    // update query url
+    this.updateURL(window.location.href
+      .replace(/&?selectedTabLabel=([^&]+)/i, '')
+      .replace(/\?$/, '')
+      .replace(/\?&/, '?')
+    );
 
     // already visited ?
     if (this.visitedTabs[tab.label]) {
@@ -1161,5 +1262,66 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     if (this._isInvalidDragEvent) {
       document.dispatchEvent(new Event('mouseup'));
     }
+  }
+
+  /**
+   * Retrieve tab query params with selected tab info too
+   */
+  retrieveSelectedTabQueryParams(baseParams: Params): Params {
+    // attach selected tab info
+    return {
+      ...baseParams,
+      ...this.selectedTabParams
+    };
+  }
+
+  /**
+   * Select tab if possible
+   */
+  selectTabIfPossible(): void {
+    // do we have everything we need ?
+    if (
+      !this.matTabGroup ||
+      !this.tabData?.tabs?.length ||
+      !this.selectedTabParams?.selectedTabLabel
+    ) {
+      return;
+    }
+
+    // check if we can select tab
+    const visibleTabs = this.tabData.tabs.filter((tab) => !tab.visible || tab.visible());
+    const tabIndex: number = visibleTabs.findIndex((tab) => tab.label === this.selectedTabParams.selectedTabLabel);
+    if (tabIndex > -1) {
+      // select tab
+      this.matTabGroup.selectedIndex = tabIndex;
+    } else {
+      // reset
+      this.selectedTabParams = undefined;
+
+      // update query url
+      this.updateURL(window.location.href
+        .replace(/&?selectedTabLabel=([^&]+)/i, '')
+        .replace(/\?$/, '')
+        .replace(/\?&/, '?')
+      );
+    }
+  }
+
+  /**
+   * Update URL
+   */
+  updateURL(url: string): void {
+    // update url
+    const linkUrl: string = url +
+      (
+        this.selectedTabParams?.selectedTabLabel ?
+          `${url.indexOf('?') > -1 ? '&' : '?'}selectedTabLabel=${this.selectedTabParams.selectedTabLabel}` :
+          ''
+      );
+    window.history.replaceState(
+      {},
+      '',
+      linkUrl
+    );
   }
 }

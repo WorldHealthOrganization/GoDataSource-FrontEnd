@@ -119,6 +119,8 @@
             <!-- Has Data -->
             <ng-template
               #hasData>
+
+              <!-- Items -->
               <cdk-virtual-scroll-viewport
                 [itemSize]="40">
                 <div
@@ -131,16 +133,67 @@
                   <!-- Text -->
                   <a
                     *ngSwitchCase="CreateViewModifyV2ExpandColumnType.TEXT"
-                    [routerLink]="expandListColumnRenderer.link ? expandListColumnRenderer.link(record) : undefined"
-                    [queryParams]="expandListColumnRenderer.linkQueryParams ? expandListColumnRenderer.linkQueryParams(record) : undefined">
+                    class="gd-create-view-modify-list-data-record-is-text"
+                    [routerLink]="expandListColumnRenderer.link(record)"
+                    [queryParams]="selectedTabParams">
                     <span
                       (click)="$event.preventDefault(); $event.stopPropagation(); $event.stopImmediatePropagation(); (record.id === itemID ? undefined : expandListViewRecord(record))">
-                      {{ expandListColumnRenderer.get(record) }}
+                      {{ expandListColumnRenderer.get.text(record) }}
+                    </span>
+                  </a>
+
+                  <!-- Status and details -->
+                  <a
+                    *ngSwitchCase="CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS"
+                    class="gd-create-view-modify-list-data-record-is-status-and-details"
+                    [routerLink]="expandListColumnRenderer.link(record)"
+                    [queryParams]="selectedTabParams">
+                    <span
+                      (click)="$event.preventDefault(); $event.stopPropagation(); $event.stopImmediatePropagation(); (record.id === itemID ? undefined : expandListViewRecord(record))">
+
+                      <!-- Status -->
+                      <span
+                        class="gd-create-view-modify-list-data-record-is-status-and-details-status"
+                        [innerHTML]="expandListColumnRenderer.get.status(record)">
+                      </span>
+
+                      <!-- Text & Details -->
+                      <span
+                        class="gd-create-view-modify-list-data-record-is-status-and-details-details">
+
+                        <!-- Text -->
+                        <span
+                          class="gd-create-view-modify-list-data-record-is-status-and-details-details-text">
+                          {{ expandListColumnRenderer.get.text(record) }}
+                        </span>
+
+                        <!-- Details -->
+                        <span
+                          class="gd-create-view-modify-list-data-record-is-status-and-details-details-details">
+                          {{ expandListColumnRenderer.get.details(record) }}
+                        </span>
+
+                      </span>
+
                     </span>
                   </a>
 
                 </div>
               </cdk-virtual-scroll-viewport>
+
+              <!-- Pagination -->
+              <div>
+                <app-mat-paginator-extended
+                  class="gd-create-view-modify-list-data-paginator"
+                  [pageIndex]="expandListPageIndex"
+                  [pageSize]="Constants.DEFAULT_PAGE_SIZE"
+                  [countData]="expandListPageCount"
+                  hidePageSize="true"
+                  shortRange="true"
+                  (page)="expandListSetPage($event)">
+                </app-mat-paginator-extended>
+              </div>
+
             </ng-template>
           </ng-template>
 
@@ -216,7 +269,7 @@
                 type="button"
                 mat-icon-button
                 [routerLink]="tabData.buttons.view.link.link()"
-                [queryParams]="tabData.buttons.view.link.queryParams ? tabData.buttons.view.link.queryParams() : undefined">
+                [queryParams]="tabData.buttons.view.link.queryParams ? retrieveSelectedTabQueryParams(tabData.buttons.view.link.queryParams()) : selectedTabParams">
                 <mat-icon>visibility</mat-icon>
               </a>
             </div>
@@ -343,7 +396,7 @@
                 type="button"
                 mat-flat-button color="primary"
                 [routerLink]="tabData.buttons.modify.link.link()"
-                [queryParams]="tabData.buttons.modify.link.queryParams ? tabData.buttons.modify.link.queryParams() : undefined">
+                [queryParams]="tabData.buttons.modify.link.queryParams ? retrieveSelectedTabQueryParams(tabData.buttons.modify.link.queryParams()) : selectedTabParams">
                 {{'LNG_COMMON_BUTTON_EDIT' | translate}}
               </a>
             </div>

@@ -193,8 +193,10 @@ export class ViewHelpComponent extends CreateViewModifyComponent<HelpItemModel> 
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: HelpItemModel) => this.translateService.instant(item.title),
-      link: (item: HelpItemModel) => ['/help/categories', item.categoryId, 'items', item.id, 'view-global']
+      link: (item: HelpItemModel) => ['/help/categories', item.categoryId, 'items', item.id, 'view-global'],
+      get: {
+        text: (item: HelpItemModel) => this.translateService.instant(item.title)
+      }
     };
   }
 

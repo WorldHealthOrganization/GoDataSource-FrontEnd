@@ -2,7 +2,7 @@ import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
@@ -36,6 +36,7 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
    * Constructor
    */
   constructor(
+    private router: Router,
     private clusterDataService: ClusterDataService,
     private activatedRoute: ActivatedRoute,
     private translateService: TranslateService,
@@ -187,9 +188,20 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
 
       // create or update
       createOrUpdate: this.initializeProcessData(),
-      redirectAfterCreateUpdate: (data: OutbreakTemplateModel) => {
+      redirectAfterCreateUpdate: (
+        data: OutbreakTemplateModel,
+        extraQueryParams: Params
+      ) => {
         // redirect to view
-        this.redirectService.to([`/clusters/${data.id}/view`]);
+        this.router.navigate(
+          [
+            '/clusters',
+            data.id,
+            'view'
+          ], {
+            queryParams: extraQueryParams
+          }
+        );
       }
     };
   }
@@ -393,8 +405,10 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: ClusterModel) => item.name,
-      link: (item: ClusterModel) => ['/clusters', item.id, 'view']
+      link: (item: ClusterModel) => ['/clusters', item.id, 'view'],
+      get: {
+        text: (item: ClusterModel) => item.name
+      }
     };
   }
 

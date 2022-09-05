@@ -21,7 +21,6 @@ import { LocationDataService } from '../../../../core/services/data/location.dat
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ExportDataExtension, ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
@@ -33,6 +32,7 @@ import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import * as moment from 'moment';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-contacts-of-contacts-list',
@@ -108,7 +108,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
     private contactsOfContactsDataService: ContactsOfContactsDataService,
     private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
-    private i18nService: I18nService,
+    private translateService: TranslateService,
     private locationDataService: LocationDataService,
     private dialogV2Service: DialogV2Service,
     private activatedRoute: ActivatedRoute,
@@ -210,26 +210,11 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
             })
           }
         ],
-        forms: (_column, data: ContactOfContactModel): V2ColumnStatusForm[] => {
-          // construct list of forms that we need to display
-          const forms: V2ColumnStatusForm[] = [];
-
-          // risk
-          const risk = this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>;
-          if (
-            data.riskLevel &&
-            risk.map[data.riskLevel]
-          ) {
-            forms.push({
-              type: IV2ColumnStatusFormType.TRIANGLE,
-              color: risk.map[data.riskLevel].getColorCode(),
-              tooltip: this.i18nService.instant(data.riskLevel)
-            });
-          }
-
-          // finished
-          return forms;
-        }
+        forms: (_column, data: ContactOfContactModel): V2ColumnStatusForm[] => ContactOfContactModel.getStatusForms({
+          item: data,
+          translateService: this.translateService,
+          risk: this.activatedRoute.snapshot.data.risk
+        })
       },
       {
         field: 'location',
@@ -1002,7 +987,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                 url: `outbreaks/${this.selectedOutbreak.id}/contacts-of-contacts/dossier`,
                 async: false,
                 method: ExportDataMethod.POST,
-                fileName: `${this.i18nService.instant(
+                fileName: `${this.translateService.instant(
                   'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE'
                 )} - ${moment().format('YYYY-MM-DD HH:mm')}`,
                 extraFormData: {
@@ -1180,7 +1165,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
               values = values.sort((item1, item2) => {
                 // if same order, compare labels
                 if (item1.order === item2.order) {
-                  return this.i18nService.instant(item1.label).localeCompare(this.i18nService.instant(item2.label));
+                  return this.translateService.instant(item1.label).localeCompare(this.translateService.instant(item2.label));
                 }
 
                 // format order
@@ -1258,7 +1243,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                 url: `/outbreaks/${this.selectedOutbreak.id}/contacts-of-contacts/export`,
                 async: true,
                 method: ExportDataMethod.POST,
-                fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                fileName: `${this.translateService.instant('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
                 queryBuilder: qb,
                 allow: {
                   types: [
@@ -1333,7 +1318,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                   url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
+                  fileName: `${this.translateService.instant('LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
                   queryBuilder: qb,
                   allow: {
                     types: [
