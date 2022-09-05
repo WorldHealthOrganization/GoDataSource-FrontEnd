@@ -131,11 +131,48 @@
                   <!-- Text -->
                   <a
                     *ngSwitchCase="CreateViewModifyV2ExpandColumnType.TEXT"
+                    class="gd-create-view-modify-list-data-record-is-text"
                     [routerLink]="expandListColumnRenderer.link(record)"
                     [queryParams]="selectedTabParams">
                     <span
                       (click)="$event.preventDefault(); $event.stopPropagation(); $event.stopImmediatePropagation(); (record.id === itemID ? undefined : expandListViewRecord(record))">
-                      {{ expandListColumnRenderer.get(record) }}
+                      {{ expandListColumnRenderer.get.text(record) }}
+                    </span>
+                  </a>
+
+                  <!-- Status and details -->
+                  <a
+                    *ngSwitchCase="CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS"
+                    class="gd-create-view-modify-list-data-record-is-status-and-details"
+                    [routerLink]="expandListColumnRenderer.link(record)"
+                    [queryParams]="selectedTabParams">
+                    <span
+                      (click)="$event.preventDefault(); $event.stopPropagation(); $event.stopImmediatePropagation(); (record.id === itemID ? undefined : expandListViewRecord(record))">
+
+                      <!-- Status -->
+                      <span
+                        class="gd-create-view-modify-list-data-record-is-status-and-details-status"
+                        [innerHTML]="expandListColumnRenderer.get.status(record)">
+                      </span>
+
+                      <!-- Text & Details -->
+                      <span
+                        class="gd-create-view-modify-list-data-record-is-status-and-details-details">
+
+                        <!-- Text -->
+                        <span
+                          class="gd-create-view-modify-list-data-record-is-status-and-details-details-text">
+                          {{ expandListColumnRenderer.get.text(record) }}
+                        </span>
+
+                        <!-- Details -->
+                        <span
+                          class="gd-create-view-modify-list-data-record-is-status-and-details-details-details">
+                          {{ expandListColumnRenderer.get.details(record) }}
+                        </span>
+
+                      </span>
+
                     </span>
                   </a>
 

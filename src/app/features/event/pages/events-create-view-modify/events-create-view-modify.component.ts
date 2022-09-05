@@ -265,8 +265,10 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: EventModel) => item.name,
-      link: (item: EventModel) => ['/events', item.id, 'view']
+      link: (item: EventModel) => ['/events', item.id, 'view'],
+      get: {
+        text: (item: EventModel) => item.name
+      }
     };
   }
 

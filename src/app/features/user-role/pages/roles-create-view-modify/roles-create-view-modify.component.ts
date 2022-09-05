@@ -448,8 +448,10 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: UserRoleModel) => item.name,
-      link: (item: UserRoleModel) => ['/user-roles', item.id, 'view']
+      link: (item: UserRoleModel) => ['/user-roles', item.id, 'view'],
+      get: {
+        text: (item: UserRoleModel) => item.name
+      }
     };
   }
 

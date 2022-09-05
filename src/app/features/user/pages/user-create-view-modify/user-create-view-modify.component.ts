@@ -554,8 +554,10 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: UserModel) => item.name,
-      link: (item: UserModel) => ['/users', item.id, 'view']
+      link: (item: UserModel) => ['/users', item.id, 'view'],
+      get: {
+        text: (item: UserModel) => item.name
+      }
     };
   }
 

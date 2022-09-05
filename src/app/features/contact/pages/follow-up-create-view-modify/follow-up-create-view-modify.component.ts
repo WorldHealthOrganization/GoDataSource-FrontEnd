@@ -587,8 +587,10 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: FollowUpModel) => moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
-      link: (item: FollowUpModel) => ['/contacts', `${this._entityData.id}`, 'follow-ups', item.id, 'view']
+      link: (item: FollowUpModel) => ['/contacts', `${this._entityData.id}`, 'follow-ups', item.id, 'view'],
+      get: {
+        text: (item: FollowUpModel) => moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
+      }
     };
   }
 

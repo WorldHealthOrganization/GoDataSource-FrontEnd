@@ -352,8 +352,10 @@ export class LanguagesCreateViewModifyComponent extends CreateViewModifyComponen
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: LanguageModel) => item.name,
-      link: (item: LanguageModel) => ['/languages', item.id, 'view']
+      link: (item: LanguageModel) => ['/languages', item.id, 'view'],
+      get: {
+        text: (item: LanguageModel) => item.name
+      }
     };
   }
 

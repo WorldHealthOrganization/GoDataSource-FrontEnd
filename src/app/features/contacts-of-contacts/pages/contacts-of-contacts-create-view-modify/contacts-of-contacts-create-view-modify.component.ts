@@ -44,6 +44,9 @@ import { SystemSettingsDataService } from '../../../../core/services/data/system
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputLinkWithAction, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
+import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
+import { DomSanitizer } from '@angular/platform-browser';
 
 /**
  * Component
@@ -79,6 +82,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
     protected systemSettingsDataService: SystemSettingsDataService,
     protected entityDataService: EntityDataService,
     protected relationshipDataService: RelationshipDataService,
+    protected domSanitizer: DomSanitizer,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
@@ -1432,9 +1436,38 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
    */
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
-      type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: ContactOfContactModel) => item.name,
-      link: (item: ContactOfContactModel) => ['/contacts-of-contacts', item.id, 'view']
+      type: CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS,
+      link: (item: ContactOfContactModel) => ['/contacts-of-contacts', item.id, 'view'],
+      get: {
+        status: (item: ContactOfContactModel) => {
+          // must initialize - optimization to not recreate the list everytime there is an event since data won't change ?
+          if (!item.uiStatusForms) {
+            // determine forms
+            const forms: V2ColumnStatusForm[] = ContactOfContactModel.getStatusForms({
+              item,
+              translateService: this.translateService,
+              risk: this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>
+            });
+
+            // create html
+            let html: string = '';
+            forms.forEach((form, formIndex) => {
+              html += AppListTableV2Component.renderStatusForm(
+                form,
+                formIndex < forms.length - 1
+              );
+            });
+
+            // convert to safe html
+            item.uiStatusForms = this.domSanitizer.bypassSecurityTrustHtml(html);
+          }
+
+          // finished
+          return item.uiStatusForms;
+        },
+        text: (item: ContactOfContactModel) => item.name,
+        details: (item: ContactOfContactModel) => item.visualId
+      }
     };
   }
 
@@ -1446,7 +1479,9 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
       'id',
       'firstName',
       'lastName',
-      'middleName'
+      'middleName',
+      'visualId',
+      'riskLevel'
     ];
   }
 

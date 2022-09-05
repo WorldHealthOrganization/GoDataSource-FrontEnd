@@ -405,8 +405,10 @@ export class ClusterCreateViewModifyComponent extends CreateViewModifyComponent<
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: ClusterModel) => item.name,
-      link: (item: ClusterModel) => ['/clusters', item.id, 'view']
+      link: (item: ClusterModel) => ['/clusters', item.id, 'view'],
+      get: {
+        text: (item: ClusterModel) => item.name
+      }
     };
   }
 

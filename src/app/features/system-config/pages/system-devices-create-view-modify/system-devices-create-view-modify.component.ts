@@ -338,8 +338,10 @@ export class SystemDevicesCreateViewModifyComponent extends CreateViewModifyComp
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: DeviceModel) => item.name,
-      link: (item: DeviceModel) => ['/system-config/devices', item.id, 'view']
+      link: (item: DeviceModel) => ['/system-config/devices', item.id, 'view'],
+      get: {
+        text: (item: DeviceModel) => item.name
+      }
     };
   }
 

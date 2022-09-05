@@ -791,8 +791,10 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: OutbreakTemplateModel) => item.name,
-      link: (item: OutbreakTemplateModel) => ['/outbreak-templates', item.id, 'view']
+      link: (item: OutbreakTemplateModel) => ['/outbreak-templates', item.id, 'view'],
+      get: {
+        text: (item: OutbreakTemplateModel) => item.name
+      }
     };
   }
 

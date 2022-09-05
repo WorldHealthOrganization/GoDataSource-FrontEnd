@@ -25,7 +25,6 @@ import { LocationDataService } from '../../../../core/services/data/location.dat
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ExportDataExtension, ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
@@ -38,6 +37,7 @@ import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, IV2SideDialogConfigInputText, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import * as moment from 'moment';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-contacts-list',
@@ -131,7 +131,7 @@ export class ContactsListComponent
     private outbreakDataService: OutbreakDataService,
     private dialogV2Service: DialogV2Service,
     private genericDataService: GenericDataService,
-    private i18nService: I18nService,
+    private translateService: TranslateService,
     private entityHelperService: EntityHelperService
   ) {
     super(listHelperService);
@@ -493,71 +493,11 @@ export class ContactsListComponent
             }]
           }
         ],
-        forms: (_column, data: ContactModel): V2ColumnStatusForm[] => {
-          // construct list of forms that we need to display
-          const forms: V2ColumnStatusForm[] = [];
-
-          // risk
-          const risk = this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>;
-          if (
-            data.riskLevel &&
-            risk.map[data.riskLevel]
-          ) {
-            forms.push({
-              type: IV2ColumnStatusFormType.TRIANGLE,
-              color: risk.map[data.riskLevel].getColorCode(),
-              tooltip: this.i18nService.instant(data.riskLevel)
-            });
-          }
-
-          // as per current date
-          if (
-            data.followUp?.startDate &&
-            moment().isSameOrBefore(data.followUp?.startDate)
-          ) {
-            forms.push({
-              type: IV2ColumnStatusFormType.SQUARE,
-              color: 'var(--gd-status-follow-up-not-started)',
-              tooltip: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_NOT_STARTED')
-            });
-          } else if (
-            data.followUp?.startDate &&
-            data.followUp?.endDate &&
-            moment().isBetween(
-              data.followUp?.startDate,
-              data.followUp?.endDate,
-              undefined,
-              '[]'
-            )
-          ) {
-            forms.push({
-              type: IV2ColumnStatusFormType.SQUARE,
-              color: 'var(--gd-status-under-follow-up)',
-              tooltip: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_UNDER_FOLLOW_UP')
-            });
-          } else if (
-            data.followUp?.endDate &&
-            moment().isSameOrAfter(data.followUp?.endDate)
-          ) {
-            forms.push({
-              type: IV2ColumnStatusFormType.SQUARE,
-              color: 'var(--gd-status-follow-up-ended)',
-              tooltip: this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_LABEL_STATUS_ENDED_FOLLOW_UP')
-            });
-          }
-
-          // alerted
-          if (data.alerted) {
-            forms.push({
-              type: IV2ColumnStatusFormType.STAR,
-              color: 'var(--gd-danger)',
-              tooltip: this.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
-            });
-          }
-
-          // finished
-          return forms;
-        }
+        forms: (_column, data: ContactModel): V2ColumnStatusForm[] => ContactModel.getStatusForms({
+          item: data,
+          translateService: this.translateService,
+          risk: this.activatedRoute.snapshot.data.risk
+        })
       },
       {
         field: 'followUp.status',
@@ -879,7 +819,7 @@ export class ContactsListComponent
                             get: () => 'LNG_COMMON_LABEL_CONVERT',
                             data: () => ({
                               name: item.name,
-                              type: this.i18nService.instant(EntityType.CASE)
+                              type: this.translateService.instant(EntityType.CASE)
                             })
                           },
                           message: {
@@ -1463,7 +1403,7 @@ export class ContactsListComponent
                   url: `/outbreaks/${this.selectedOutbreak.id}/contacts/daily-list/export`,
                   async: false,
                   method: ExportDataMethod.GET,
-                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
+                  fileName: `${this.translateService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UP_LIST_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
                   queryBuilder: this.queryBuilder,
                   allow: {
                     types: [ExportDataExtension.PDF]
@@ -1509,7 +1449,7 @@ export class ContactsListComponent
                   url: `/outbreaks/${this.selectedOutbreak.id}/contacts/export-daily-follow-up-form`,
                   async: false,
                   method: ExportDataMethod.GET,
-                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
+                  fileName: `${this.translateService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_DAILY_FOLLOW_UPS_FORM_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
                   queryBuilder: this.queryBuilder,
                   allow: {
                     types: [ExportDataExtension.PDF]
@@ -1581,7 +1521,7 @@ export class ContactsListComponent
                 url: `outbreaks/${this.selectedOutbreak.id}/contacts/dossier`,
                 async: false,
                 method: ExportDataMethod.POST,
-                fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                fileName: `${this.translateService.instant('LNG_PAGE_LIST_CONTACTS_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
                 extraFormData: {
                   append: {
                     contacts: selected
@@ -1756,9 +1696,9 @@ export class ContactsListComponent
               values = values.sort((item1, item2) => {
                 // if same order, compare labels
                 if (item1.order === item2.order) {
-                  return this.i18nService
+                  return this.translateService
                     .instant(item1.label)
-                    .localeCompare(this.i18nService.instant(item2.label));
+                    .localeCompare(this.translateService.instant(item2.label));
                 }
 
                 // format order
@@ -1894,7 +1834,7 @@ export class ContactsListComponent
                 url: `/outbreaks/${this.selectedOutbreak.id}/contacts/export`,
                 async: true,
                 method: ExportDataMethod.POST,
-                fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                fileName: `${this.translateService.instant('LNG_PAGE_LIST_CONTACTS_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
                 queryBuilder: qb,
                 allow: {
                   types: [
@@ -1983,7 +1923,7 @@ export class ContactsListComponent
                 url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
                 async: true,
                 method: ExportDataMethod.POST,
-                fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
+                fileName: `${this.translateService.instant('LNG_PAGE_LIST_CONTACTS_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
                 queryBuilder: qb,
                 allow: {
                   types: [

@@ -10,7 +10,6 @@ import { ApplyListFilter, Constants } from '../../../../core/models/constants';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ActivatedRoute, Params } from '@angular/router';
 import { EntityType } from '../../../../core/models/entity-type';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { EntityModel, RelationshipModel } from '../../../../core/models/entity-and-relationship.model';
@@ -40,6 +39,7 @@ import { LocationModel } from '../../../../core/models/location.model';
 import { IV2FilterBoolean, IV2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ClusterDataService } from '../../../../core/services/data/cluster.data.service';
 import * as moment from 'moment';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-cases-list',
@@ -136,7 +136,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
     private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
     private dialogV2Service: DialogV2Service,
-    private i18nService: I18nService,
+    private translateService: TranslateService,
     private entityHelperService: EntityHelperService,
     private redirectService: RedirectService,
     private clusterDataService: ClusterDataService
@@ -264,48 +264,12 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
             }]
           }
         ],
-        forms: (_column, data: CaseModel): V2ColumnStatusForm[] => {
-          // construct list of forms that we need to display
-          const forms: V2ColumnStatusForm[] = [];
-
-          // classification
-          const classification = this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>;
-          if (
-            data.classification &&
-            classification.map[data.classification]
-          ) {
-            forms.push({
-              type: IV2ColumnStatusFormType.CIRCLE,
-              color: classification.map[data.classification].getColorCode(),
-              tooltip: this.i18nService.instant(data.classification)
-            });
-          }
-
-          // outcome
-          const outcome = this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>;
-          if (
-            data.outcomeId &&
-            outcome.map[data.outcomeId]
-          ) {
-            forms.push({
-              type: IV2ColumnStatusFormType.TRIANGLE,
-              color: outcome.map[data.outcomeId].getColorCode(),
-              tooltip: this.i18nService.instant(data.outcomeId)
-            });
-          }
-
-          // alerted
-          if (data.alerted) {
-            forms.push({
-              type: IV2ColumnStatusFormType.STAR,
-              color: 'var(--gd-danger)',
-              tooltip: this.i18nService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
-            });
-          }
-
-          // finished
-          return forms;
-        }
+        forms: (_column, data: CaseModel): V2ColumnStatusForm[] => CaseModel.getStatusForms({
+          item: data,
+          translateService: this.translateService,
+          classification: this.activatedRoute.snapshot.data.classification,
+          outcome: this.activatedRoute.snapshot.data.outcome
+        })
       },
       {
         field: 'classification',
@@ -1022,7 +986,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                           get: () => 'LNG_COMMON_LABEL_CONVERT',
                           data: () => ({
                             name: item.name,
-                            type: this.i18nService.instant(EntityType.CONTACT)
+                            type: this.translateService.instant(EntityType.CONTACT)
                           })
                         },
                         message: {
@@ -1321,7 +1285,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                         url: `outbreaks/${this.selectedOutbreak.id}/cases/${item.id}/export-empty-case-investigation`,
                         async: false,
                         method: ExportDataMethod.GET,
-                        fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
+                        fileName: `${this.translateService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
                         allow: {
                           types: [
                             ExportDataExtension.ZIP
@@ -1602,7 +1566,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                   url: `outbreaks/${this.selectedOutbreak.id}/cases/export-investigation-template`,
                   async: false,
                   method: ExportDataMethod.GET,
-                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
+                  fileName: `${this.translateService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
                   allow: {
                     types: [
                       ExportDataExtension.ZIP
@@ -1751,7 +1715,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                 url: `outbreaks/${this.selectedOutbreak.id}/cases/dossier`,
                 async: false,
                 method: ExportDataMethod.POST,
-                fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                fileName: `${this.translateService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
                 extraFormData: {
                   append: {
                     cases: selected
@@ -1929,7 +1893,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
               values = values.sort((item1, item2) => {
                 // if same order, compare labels
                 if (item1.order === item2.order) {
-                  return this.i18nService.instant(item1.label).localeCompare(this.i18nService.instant(item2.label));
+                  return this.translateService.instant(item1.label).localeCompare(this.translateService.instant(item2.label));
                 }
 
                 // format order
@@ -2008,7 +1972,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                   url: `/outbreaks/${this.selectedOutbreak.id}/cases/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                  fileName: `${this.translateService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
                   queryBuilder: qb,
                   allow: {
                     types: [
@@ -2095,7 +2059,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                   url: `/outbreaks/${this.selectedOutbreak.id}/relationships/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${this.i18nService.instant('LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
+                  fileName: `${this.translateService.instant('LNG_PAGE_LIST_CASES_EXPORT_RELATIONSHIP_FILE_NAME')} - ${moment().format('YYYY-MM-DD')}`,
                   queryBuilder: qb,
                   allow: {
                     types: [

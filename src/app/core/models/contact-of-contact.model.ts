@@ -24,6 +24,11 @@ import {
 } from './permission.interface';
 import { V2AdvancedFilter, V2AdvancedFilterType } from '../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { ILabelValuePairModel } from '../../shared/forms-v2/core/label-value-pair.model';
+import { SafeHtml } from '@angular/platform-browser';
+import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IResolverV2ResponseModel } from '../services/resolvers/data/models/resolver-response.model';
+import { ReferenceDataEntryModel } from './reference-data.model';
+import { TranslateService } from '@ngx-translate/core';
 
 export class ContactOfContactModel
   extends BaseModel
@@ -70,6 +75,9 @@ export class ContactOfContactModel
 
   responsibleUserId: string;
   responsibleUser: UserModel;
+
+  // used by ui
+  uiStatusForms: SafeHtml;
 
   /**
    * Advanced filters
@@ -174,9 +182,38 @@ export class ContactOfContactModel
   }
 
   /**
-     * Return contact id mask with data replaced
-     * @param contactOfContactIdMask
-     */
+   * Retrieve statuses forms
+   */
+  static getStatusForms(
+    info: {
+      // required
+      item: ContactOfContactModel,
+      translateService: TranslateService,
+      risk: IResolverV2ResponseModel<ReferenceDataEntryModel>
+    }
+  ): V2ColumnStatusForm[] {
+    // construct list of forms that we need to display
+    const forms: V2ColumnStatusForm[] = [];
+
+    // risk
+    if (
+      info.item.riskLevel &&
+      info.risk.map[info.item.riskLevel]
+    ) {
+      forms.push({
+        type: IV2ColumnStatusFormType.TRIANGLE,
+        color: info.risk.map[info.item.riskLevel].getColorCode(),
+        tooltip: info.translateService.instant(info.item.riskLevel)
+      });
+    }
+
+    // finished
+    return forms;
+  }
+
+  /**
+   * Return contact id mask with data replaced
+   */
   static generateContactOfContactIDMask(contactOfContactIdMask: string): string {
     // validate
     if (_.isEmpty(contactOfContactIdMask)) {

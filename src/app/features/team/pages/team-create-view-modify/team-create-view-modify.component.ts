@@ -472,8 +472,10 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: TeamModel) => item.name,
-      link: (item: TeamModel) => ['/teams', item.id, 'view']
+      link: (item: TeamModel) => ['/teams', item.id, 'view'],
+      get: {
+        text: (item: TeamModel) => item.name
+      }
     };
   }
 

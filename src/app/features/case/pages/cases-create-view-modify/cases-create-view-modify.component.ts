@@ -34,7 +34,7 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { FollowUpModel } from '../../../../core/models/follow-up.model';
 import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
-import { catchError, takeUntil } from 'rxjs/operators';
+import { catchError, map, takeUntil } from 'rxjs/operators';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
 import * as _ from 'lodash';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
@@ -56,6 +56,9 @@ import { EntityLabResultService } from '../../../../core/services/helper/entity-
 import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
 import { TeamModel } from '../../../../core/models/team.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
+import { DomSanitizer } from '@angular/platform-browser';
 
 /**
  * Component
@@ -107,6 +110,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     protected entityHelperService: EntityHelperService,
     protected entityLabResultService: EntityLabResultService,
     protected entityFollowUpHelperService: EntityFollowUpHelperService,
+    protected domSanitizer: DomSanitizer,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
@@ -2134,9 +2138,39 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    */
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
-      type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: CaseModel) => item.name,
-      link: (item: CaseModel) => ['/cases', item.id, 'view']
+      type: CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS,
+      link: (item: CaseModel) => ['/cases', item.id, 'view'],
+      get: {
+        status: (item: CaseModel) => {
+          // must initialize - optimization to not recreate the list everytime there is an event since data won't change ?
+          if (!item.uiStatusForms) {
+            // determine forms
+            const forms: V2ColumnStatusForm[] = CaseModel.getStatusForms({
+              item,
+              translateService: this.translateService,
+              classification: this.activatedRoute.snapshot.data.classification,
+              outcome: this.activatedRoute.snapshot.data.outcome
+            });
+
+            // create html
+            let html: string = '';
+            forms.forEach((form, formIndex) => {
+              html += AppListTableV2Component.renderStatusForm(
+                form,
+                formIndex < forms.length - 1
+              );
+            });
+
+            // convert to safe html
+            item.uiStatusForms = this.domSanitizer.bypassSecurityTrustHtml(html);
+          }
+
+          // finished
+          return item.uiStatusForms;
+        },
+        text: (item: CaseModel) => item.name,
+        details: (item: CaseModel) => item.visualId
+      }
     };
   }
 
@@ -2148,7 +2182,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       'id',
       'firstName',
       'lastName',
-      'middleName'
+      'middleName',
+      'visualId',
+      'classification',
+      'outcomeId',
+      'questionnaireAnswers'
     ];
   }
 
@@ -2214,6 +2252,14 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         data.queryBuilder
       )
       .pipe(
+        // process data
+        map((cases: CaseModel[]) => {
+          return EntityModel.determineAlertness<CaseModel>(
+            this.selectedOutbreak.caseInvestigationTemplate,
+            cases
+          );
+        }),
+
         // should be the last pipe
         takeUntil(this.destroyed$)
       );

@@ -510,8 +510,10 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: ReferenceDataEntryModel) => this.translateService.instant(item.value),
-      link: (item: ReferenceDataEntryModel) => ['/reference-data', this.category.id, item.id, 'view']
+      link: (item: ReferenceDataEntryModel) => ['/reference-data', this.category.id, item.id, 'view'],
+      get: {
+        text: (item: ReferenceDataEntryModel) => this.translateService.instant(item.value)
+      }
     };
   }
 

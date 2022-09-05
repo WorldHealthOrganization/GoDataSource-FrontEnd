@@ -841,15 +841,17 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = this.entityData.deleted ? undefined : {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: LabResultModel) => item.sampleIdentifier?.trim().length > 0 ?
-        item.sampleIdentifier :
-        moment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
       link: (item: LabResultModel) => {
         if (this._personType === EntityType.CONTACT) {
           return [`/lab-results/contacts/${this.entityData.id}/${item.id}`];
         } else if (this._personType === EntityType.CASE) {
           return [`/lab-results/cases/${this.entityData.id}/${item.id}`];
         }
+      },
+      get: {
+        text: (item: LabResultModel) => item.sampleIdentifier?.trim().length > 0 ?
+          item.sampleIdentifier :
+          moment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
       }
     };
   }

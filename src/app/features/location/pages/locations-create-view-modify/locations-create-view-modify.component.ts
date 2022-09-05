@@ -655,8 +655,10 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.TEXT,
-      get: (item: LocationModel) => item.name,
-      link: (item: LocationModel) => ['/locations', item.id, 'view']
+      link: (item: LocationModel) => ['/locations', item.id, 'view'],
+      get: {
+        text: (item: LocationModel) => item.name
+      }
     };
   }
 
