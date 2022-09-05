@@ -14,8 +14,8 @@ class CustomMatPaginatorIntl
   languageSubscription: Subscription;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private i18nService: I18nService,
     private parentComponent: MatPaginatorExtendedComponent,
@@ -35,8 +35,8 @@ class CustomMatPaginatorIntl
   }
 
   /**
-     * Destroyed
-     */
+   * Destroyed
+   */
   ngOnDestroy() {
     /// release language listener
     if (this.languageSubscription) {
@@ -46,8 +46,8 @@ class CustomMatPaginatorIntl
   }
 
   /**
-     * Update translations
-     */
+   * Update translations
+   */
   private updateTranslations(): void {
     this.itemsPerPageLabel = this.i18nService.instant('LNG_COMMON_LABEL_PAGINATOR_ITEMS_PER_PAGE');
     this.firstPageLabel = this.i18nService.instant('LNG_COMMON_LABEL_PAGINATOR_FIRST_PAGE');
@@ -57,8 +57,8 @@ class CustomMatPaginatorIntl
   }
 
   /**
-     * Overwrite what is rendered in paginator
-     */
+   * Overwrite what is rendered in paginator
+   */
   getRangeLabel = (
     page: number,
     pageSize: number,
@@ -80,6 +80,11 @@ class CustomMatPaginatorIntl
       pageLabel = `${start}`;
     } else {
       pageLabel = `${start} ${this.i18nService.instant('LNG_COMMON_LABEL_PAGINATOR_RANGE_PAGE_START_END')} ${end}`;
+    }
+
+    // no need to display all range ?
+    if (this.parentComponent.shortRange) {
+      return pageLabel;
     }
 
     // range label
@@ -126,6 +131,8 @@ export class MatPaginatorExtendedComponent {
   @Input() pageIndex: number;
   @Input() pageSize: number;
   @Input() pageSizeOptions: number[];
+  @Input() hidePageSize: boolean;
+  @Input() shortRange: boolean;
 
   // disabled
   @Input() disabled: boolean = false;

@@ -14,7 +14,7 @@ import * as _ from 'lodash';
 import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { RequestQueryBuilder, RequestSortDirection } from '../../../core/helperClasses/request-query-builder';
 import { V2AdvancedFilter } from '../app-list-table-v2/models/advanced-filter.model';
 import { SavedFilterData } from '../../../core/models/saved-filters.model';
@@ -180,6 +180,14 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   // list of records
   expandList: boolean = false;
 
+  // page index
+  expandListPageIndex: number = 0;
+  expandListPageCount: {
+    count: number
+  } = {
+      count: 0
+    };
+
   // show search by input ?
   @Input() showSearchByInput: boolean = true;
 
@@ -196,6 +204,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
         }
 
         // reset
+        this.expandListPageIndex = 0;
         this.expandListSearchValue = '';
 
         // remove previous request
@@ -222,7 +231,23 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   private _expandListRecords$: Observable<any[]>;
   @Input() set expandListRecords$(expandListRecords$: Observable<any[]>) {
     // set data
-    this._expandListRecords$ = expandListRecords$;
+    this._expandListRecords$ = expandListRecords$ ?
+      expandListRecords$.pipe(map((data) => {
+        // check if we have more than one page
+        this.expandListPageCount = {
+          count: data.length
+        };
+
+        // remove the last one if it was retrieve just to know that we have more pages
+        // pageSize: Constants.DEFAULT_PAGE_SIZE + 1
+        if (data.length > Constants.DEFAULT_PAGE_SIZE) {
+          data.splice(Constants.DEFAULT_PAGE_SIZE);
+        }
+
+        // finished
+        return data;
+      })) :
+      expandListRecords$;
 
     // must reload data
     this.expandListInitialized = false;
@@ -744,8 +769,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   private expandListRefresh(): void {
     // make sure we add pagination
     this._expandListQueryBuilder.paginator.setPage({
-      pageSize: Constants.DEFAULT_PAGE_SIZE,
-      pageIndex: 0
+      // +1 to know that we have more pages
+      pageSize: Constants.DEFAULT_PAGE_SIZE + 1,
+      pageIndex: this.expandListPageIndex
     });
 
     // query only the fields that we need to
@@ -764,6 +790,17 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
         searchBy: this.expandListSearchValue
       }
     );
+  }
+
+  /**
+   * Change expand list page
+   */
+  expandListSetPage(page: PageEvent): void {
+    // set page
+    this.expandListPageIndex = page.pageIndex;
+
+    // refresh page
+    this.expandListRefresh();
   }
 
   /**
@@ -794,6 +831,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
           new RequestQueryBuilder();
         this._expandListAdvancedFiltersApplied = response.filtersApplied;
 
+        // reset
+        this.expandListPageIndex = 0;
+
         // filter
         this.expandListRefresh();
       });
@@ -818,6 +858,10 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
     // search
     this.expandListSearchValueTimeout = setTimeout(() => {
+      // reset
+      this.expandListPageIndex = 0;
+
+      // search
       this.expandListRefresh();
     }, 500);
   }
@@ -836,6 +880,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     ) {
       return;
     }
+
+    // reset
+    this.expandListPageIndex = 0;
 
     // retrieve data
     this.expandListRefresh();

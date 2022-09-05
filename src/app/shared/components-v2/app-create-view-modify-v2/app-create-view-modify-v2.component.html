@@ -119,6 +119,8 @@
             <!-- Has Data -->
             <ng-template
               #hasData>
+
+              <!-- Items -->
               <cdk-virtual-scroll-viewport
                 [itemSize]="40">
                 <div
@@ -178,6 +180,20 @@
 
                 </div>
               </cdk-virtual-scroll-viewport>
+
+              <!-- Pagination -->
+              <div>
+                <app-mat-paginator-extended
+                  class="gd-create-view-modify-list-data-paginator"
+                  [pageIndex]="expandListPageIndex"
+                  [pageSize]="Constants.DEFAULT_PAGE_SIZE"
+                  [countData]="expandListPageCount"
+                  hidePageSize="true"
+                  shortRange="true"
+                  (page)="expandListSetPage($event)">
+                </app-mat-paginator-extended>
+              </div>
+
             </ng-template>
           </ng-template>
 

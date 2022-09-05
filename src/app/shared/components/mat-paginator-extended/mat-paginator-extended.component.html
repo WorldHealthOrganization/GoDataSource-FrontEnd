@@ -4,6 +4,7 @@
   [length]="countData?.count"
   [pageSize]="pageSize"
   [pageSizeOptions]="pageSizeOptions"
-  (page)="page.emit($event)"
-  [disabled]="disabled">
+  [hidePageSize]="hidePageSize"
+  [disabled]="disabled"
+  (page)="page.emit($event)">
 </mat-paginator>
