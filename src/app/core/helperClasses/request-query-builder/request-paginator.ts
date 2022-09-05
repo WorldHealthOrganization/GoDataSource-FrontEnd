@@ -18,19 +18,23 @@ export class RequestPaginator {
   // number of elements to skip
   skip: number;
 
+  // retrieve one more to know if we have more pages ?
+  // default - old behavior - do not retrieve one more
+  retrieveOneMore: boolean = false;
+
   // changes listener
   private changesListener: () => void;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(listener?: () => void) {
     this.changesListener = listener;
   }
 
   /**
-     * Trigger change listener
-     */
+   * Trigger change listener
+   */
   private triggerChangeListener(): void {
     // do we have a change listener ?
     if (!this.changesListener) {
@@ -42,10 +46,8 @@ export class RequestPaginator {
   }
 
   /**
-     * Change page
-     * @param {PageEvent} page
-     * @returns {RequestPaginator}
-     */
+   * Change page
+   */
   setPage(
     page: (PageEvent | { pageSize: number, pageIndex: number }),
     disableOnChange: boolean = false
@@ -64,9 +66,8 @@ export class RequestPaginator {
   }
 
   /**
-     * Reset to first page
-     * @returns {RequestPaginator}
-     */
+   * Reset to first page
+   */
   reset(): RequestPaginator {
     // reset ?
     this.skip = 0;
@@ -79,9 +80,8 @@ export class RequestPaginator {
   }
 
   /**
-     * Clear pagination criterias
-     * @returns {RequestPaginator}
-     */
+   * Clear pagination criteria
+   */
   clear(): RequestPaginator {
     // clear
     delete this.limit;
@@ -95,16 +95,15 @@ export class RequestPaginator {
   }
 
   /**
-     * Check if there are any pagination criterias
-     * @returns {boolean}
-     */
+   * Check if there are any pagination criteria
+   */
   isEmpty(): boolean {
     return this.limit === undefined && this.skip === undefined;
   }
 
   /**
-     * Serialize query builder
-     */
+   * Serialize query builder
+   */
   serialize(): ISerializedQueryPaginator {
     return {
       limit: this.limit,
@@ -113,8 +112,8 @@ export class RequestPaginator {
   }
 
   /**
-     * Replace query builder filters with saved ones
-     */
+   * Replace query builder filters with saved ones
+   */
   deserialize(
     serializedValue: string | ISerializedQueryPaginator
   ): void {

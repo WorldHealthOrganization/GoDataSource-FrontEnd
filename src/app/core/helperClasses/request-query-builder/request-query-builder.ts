@@ -279,9 +279,8 @@ export class RequestQueryBuilder {
   }
 
   /**
-     * Build the query to be applied on Loopback requests
-     * @returns {string}
-     */
+   * Build the query to be applied on requests
+   */
   buildQuery(stringified: boolean = true) {
     const filter: any = {};
 
@@ -313,9 +312,9 @@ export class RequestQueryBuilder {
       filter.limit = this.limitResultsNumber;
     }
 
-    // apply pagination criterias
+    // apply pagination criteria
     if (!this.paginator.isEmpty()) {
-      filter.limit = this.paginator.limit;
+      filter.limit = this.paginator.limit + (this.paginator.retrieveOneMore ? 1 : 0);
       filter.skip = this.paginator.skip;
     }
 
@@ -347,11 +346,9 @@ export class RequestQueryBuilder {
   }
 
   /**
-     * Merge current Query Builder with a new one.
-     * Note: 'AND' operator will be applied between the conditions of the two Query Builders
-     * @param {RequestQueryBuilder} queryBuilder
-     * @returns {RequestQueryBuilder}
-     */
+   * Merge current Query Builder with a new one.
+   * Note: 'AND' operator will be applied between the conditions of the two Query Builders
+   */
   merge(queryBuilder: RequestQueryBuilder) {
     // merge includes keeping in mind that some of their properties need to remain how they were set previously
     _.each(queryBuilder.includedRelations, (requestRelationBuilder: RequestRelationBuilder, relationName: string) => {
@@ -396,6 +393,7 @@ export class RequestQueryBuilder {
     if (!queryBuilder.paginator.isEmpty()) {
       this.paginator.limit = queryBuilder.paginator.limit;
       this.paginator.skip = queryBuilder.paginator.skip;
+      this.paginator.retrieveOneMore = this.paginator.retrieveOneMore || queryBuilder.paginator.retrieveOneMore;
     }
 
     // merge deleted
