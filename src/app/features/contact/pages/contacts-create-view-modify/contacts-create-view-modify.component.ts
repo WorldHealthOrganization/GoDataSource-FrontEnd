@@ -2117,10 +2117,10 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
       )
       .pipe(
         // process data
-        map((contact: ContactModel[]) => {
+        map((contacts: ContactModel[]) => {
           return EntityModel.determineAlertness<ContactModel>(
             this.selectedOutbreak.contactInvestigationTemplate,
-            contact
+            contacts
           );
         }),
 
