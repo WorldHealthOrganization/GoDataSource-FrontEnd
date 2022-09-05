@@ -235,11 +235,11 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
       expandListRecords$.pipe(map((data) => {
         // check if we have more than one page
         this.expandListPageCount = {
-          count: data.length
+          count: (this.expandListPageIndex * Constants.DEFAULT_PAGE_SIZE) + data.length
         };
 
         // remove the last one if it was retrieve just to know that we have more pages
-        // pageSize: Constants.DEFAULT_PAGE_SIZE + 1
+        // one more - Constants.DEFAULT_PAGE_SIZE + 1
         if (data.length > Constants.DEFAULT_PAGE_SIZE) {
           data.splice(Constants.DEFAULT_PAGE_SIZE);
         }
@@ -768,9 +768,10 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    */
   private expandListRefresh(): void {
     // make sure we add pagination
+    this._expandListQueryBuilder.paginator.retrieveOneMore = true;
     this._expandListQueryBuilder.paginator.setPage({
       // +1 to know that we have more pages
-      pageSize: Constants.DEFAULT_PAGE_SIZE + 1,
+      pageSize: Constants.DEFAULT_PAGE_SIZE,
       pageIndex: this.expandListPageIndex
     });
 
