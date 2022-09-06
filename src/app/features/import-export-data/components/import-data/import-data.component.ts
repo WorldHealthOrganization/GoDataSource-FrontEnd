@@ -677,8 +677,8 @@ export class ImportDataComponent
   }
 
   /**
-     * Component initialized
-     */
+   * Component initialized
+   */
   ngOnInit() {
     // init array levels
     this.possibleSourceDestinationLevels = [];
@@ -781,7 +781,7 @@ export class ImportDataComponent
         return;
       }
 
-      // we finished with one steppers
+      // we finished with one stepper
       if (this.isOneStep) {
         // display success
         this.toastV2Service.success(
@@ -818,8 +818,8 @@ export class ImportDataComponent
   }
 
   /**
-     * Component destroyed
-     */
+   * Component destroyed
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
@@ -901,11 +901,10 @@ export class ImportDataComponent
     let jsonResponse;
     try {
       jsonResponse = JSON.parse(response);
-    } catch {
-    }
+    } catch {}
     if (
       !response ||
-            !jsonResponse
+      !jsonResponse
     ) {
       // display errors
       this.displayError(
@@ -917,11 +916,37 @@ export class ImportDataComponent
       return;
     }
 
+    // determine if we have invalid file headers
+    const wrongHeaders: (string | null)[] = !jsonResponse.fileHeaders?.length ?
+      [] :
+      jsonResponse.fileHeaders.filter((value) => value === null || value.toString().toLowerCase().startsWith('null'));
+    if (wrongHeaders.length > 0) {
+      // determine unique values
+      const wrongHeadersUnique: {
+        [value: string]: true
+      } = {};
+      wrongHeaders.forEach((value) => {
+        wrongHeadersUnique[value === null ? 'null' : value.toString()] = true;
+      });
+
+      // display errors - maximum of 10 headers to not display a long line
+      this.displayError(
+        'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_RESPONSE_FROM_SERVER',
+        true,
+        {
+          headers: Object.keys(wrongHeadersUnique).splice(0, 10).join(', ')
+        }
+      );
+
+      // finished
+      return;
+    }
+
     // determine what kind of file did we import
     let fileType: ImportDataExtension;
     if (
       item.file.rawFile &&
-            (item.file.rawFile as any).type
+      (item.file.rawFile as any).type
     ) {
       const mimeToFind: string = (item.file.rawFile as any).type.toLowerCase();
       fileType = _.findKey(
@@ -1845,18 +1870,21 @@ export class ImportDataComponent
   }
 
   /**
-     * Display error
-     * @param messageToken
-     * @param hideLoading
-     */
+   * Display error
+   */
   private displayError(
     messageToken: string,
-    hideLoading: boolean = false
+    hideLoading: boolean = false,
+    overwriteTranslationData?: {
+      [key: string]: string
+    }
   ) {
     // display toast
     this.toastV2Service.error(
       messageToken,
-      this.translationData
+      overwriteTranslationData ?
+        overwriteTranslationData :
+        this.translationData
     );
 
     // hide loading ?
