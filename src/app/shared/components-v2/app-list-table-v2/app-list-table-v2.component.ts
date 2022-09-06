@@ -1859,12 +1859,16 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     }
 
     // reset value
-    this.groupedDataOneActive = undefined;
+    this.groupedDataOneActive = false;
+
+    // unselect previous
+    if (this._groupedDataPreviousClickedValue) {
+      delete this._groupedDataPreviousClickedValue.active;
+    }
 
     // same item clicked, then unselect
     if (this._groupedDataPreviousClickedValue === groupValue) {
       // unselect
-      delete this._groupedDataPreviousClickedValue.active;
       this._groupedDataPreviousClickedValue = undefined;
 
       // trigger click
@@ -1872,11 +1876,6 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
       // finished
       return;
-    }
-
-    // unselect previous
-    if (this._groupedDataPreviousClickedValue) {
-      delete this._groupedDataPreviousClickedValue.active;
     }
 
     // select
