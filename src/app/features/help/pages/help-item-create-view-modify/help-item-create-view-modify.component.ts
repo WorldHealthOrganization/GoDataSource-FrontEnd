@@ -377,8 +377,7 @@ export class HelpItemCreateViewModifyComponent extends CreateViewModifyComponent
                   this.activatedRoute.snapshot.data.user
                 );
               }
-            },
-            visible: () => !this.isCreate
+            }
           }
         ]
       }

@@ -292,8 +292,7 @@ export class LanguagesCreateViewModifyComponent extends CreateViewModifyComponen
                   this.activatedRoute.snapshot.data.user
                 );
               }
-            },
-            visible: () => !this.isCreate
+            }
           }
         ]
       }

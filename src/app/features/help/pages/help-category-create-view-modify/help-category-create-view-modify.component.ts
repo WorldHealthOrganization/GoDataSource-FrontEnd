@@ -319,14 +319,14 @@ export class HelpCategoryCreateViewModifyComponent extends CreateViewModifyCompo
                   this.activatedRoute.snapshot.data.user
                 );
               }
-            },
-            visible: () => !this.isCreate
+            }
           },
+
           // Divider
           {
-            type: CreateViewModifyV2MenuType.DIVIDER,
-            visible: () => !this.isCreate
+            type: CreateViewModifyV2MenuType.DIVIDER
           },
+
           // View People
           {
             type: CreateViewModifyV2MenuType.OPTION,

@@ -522,8 +522,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
                     ]
                 );
               }
-            },
-            visible: () => !this.isCreate
+            }
           }
         ]
       }

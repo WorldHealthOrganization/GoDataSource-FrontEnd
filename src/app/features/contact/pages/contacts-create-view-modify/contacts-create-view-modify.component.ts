@@ -12,7 +12,9 @@ import {
   CreateViewModifyV2TabInputType,
   ICreateViewModifyV2Buttons,
   ICreateViewModifyV2CreateOrUpdate,
-  ICreateViewModifyV2Tab, ICreateViewModifyV2TabTable, ICreateViewModifyV2TabTableRecordsList
+  ICreateViewModifyV2Tab,
+  ICreateViewModifyV2TabTable,
+  ICreateViewModifyV2TabTableRecordsList
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -57,6 +59,8 @@ import { RelationshipDataService } from '../../../../core/services/data/relation
 import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
 import { DomSanitizer } from '@angular/platform-browser';
+import { EventModel } from '../../../../core/models/event.model';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 
 /**
  * Component
@@ -90,7 +94,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
 
   // relationship
   private _relationship: RelationshipModel;
-  private _entityId: string;
+  private _parentEntity: CaseModel | EventModel;
 
   /**
    * Constructor
@@ -126,7 +130,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
 
     // get data
     if (this.isCreate) {
-      this._entityId = this.activatedRoute.snapshot.queryParams.entityId;
+      this._parentEntity = this.activatedRoute.snapshot.data.entity;
     }
   }
 
@@ -242,7 +246,53 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
       }
     ];
 
-    // case list page
+    // do we need to display parent entity data ?
+    if (this._parentEntity) {
+      // case / event list & view pages
+      if (this._parentEntity.type === EntityType.CASE) {
+        // case list page
+        if (CaseModel.canList(this.authUser)) {
+          this.breadcrumbs.push({
+            label: 'LNG_PAGE_LIST_CASES_TITLE',
+            action: {
+              link: ['/cases']
+            }
+          });
+        }
+
+        // case view page
+        if (CaseModel.canView(this.authUser)) {
+          this.breadcrumbs.push({
+            label: this._parentEntity.name,
+            action: {
+              link: [`/cases/${this._parentEntity.id}/view`]
+            }
+          });
+        }
+      } else {
+        // event list page
+        if (EventModel.canList(this.authUser)) {
+          this.breadcrumbs.push({
+            label: 'LNG_PAGE_LIST_EVENTS_TITLE',
+            action: {
+              link: ['/events']
+            }
+          });
+        }
+
+        // event view page
+        if (EventModel.canView(this.authUser)) {
+          this.breadcrumbs.push({
+            label: this._parentEntity.name,
+            action: {
+              link: [`/events/${this._parentEntity.id}/view`]
+            }
+          });
+        }
+      }
+    }
+
+    // contact list page
     if (ContactModel.canList(this.authUser)) {
       this.breadcrumbs.push({
         label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
@@ -643,6 +693,44 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
               // update addresses
               this.itemData.addresses = list.items;
             },
+            actionIconButtons: [
+              // copy parent address
+              {
+                icon: 'file_copy',
+                tooltip: 'LNG_PAGE_CREATE_CONTACT_ACTION_COPY_ENTITY_ADDRESS_TOOLTIP',
+                click: (
+                  _input,
+                  addressIndex: number
+                ) => {
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_COPY_PARENT_ENTITY_ADDRESS'
+                      }
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // copy parent address - clone
+                    this.itemData.addresses[addressIndex] = new AddressModel(this._parentEntity.mainAddress);
+
+                    // update ui
+                    this.tabsV2Component.detectChanges();
+                  });
+                },
+                visible: () => {
+                  return this.isCreate &&
+                    !!this._parentEntity?.mainAddress?.typeId;
+                }
+              }
+            ],
             definition: {
               add: {
                 label: 'LNG_ADDRESS_LABEL_ADD_NEW_ADDRESS',
@@ -1571,14 +1659,40 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
                   this.activatedRoute.snapshot.data.user
                 );
               }
+            }
+          },
+
+          // Divider
+          {
+            type: CreateViewModifyV2MenuType.DIVIDER
+          },
+
+          // Add contact of contacts
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_PAGE_MODIFY_CONTACT_ACTION_ADD_CONTACT_OF_CONTACT',
+            action: {
+              link: () => ['/contacts-of-contacts', 'create'],
+              queryParams: () => {
+                return {
+                  entityType: EntityType.CONTACT,
+                  entityId: this.itemData?.id
+                };
+              }
             },
-            visible: () => !this.isCreate
+            visible: () => this.selectedOutbreakIsActive &&
+              ContactModel.canCreate(this.authUser) &&
+              ContactModel.canCreateContactOfContact(this.authUser) &&
+              this.selectedOutbreak.isContactsOfContactsActive
           },
 
           // Divider
           {
             type: CreateViewModifyV2MenuType.DIVIDER,
-            visible: () => !this.isCreate
+            visible: () => this.selectedOutbreakIsActive &&
+              ContactModel.canCreate(this.authUser) &&
+              ContactModel.canCreateContactOfContact(this.authUser) &&
+              this.selectedOutbreak.isContactsOfContactsActive
           },
 
           // Duplicate records marked as not duplicate
@@ -1686,7 +1800,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
 
           // add related entity
           relationship.persons = [{
-            id: this._entityId
+            id: this._parentEntity.id
           }];
         }
 

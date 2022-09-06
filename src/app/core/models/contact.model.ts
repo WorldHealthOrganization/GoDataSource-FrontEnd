@@ -783,9 +783,8 @@ export class ContactModel
   canCreateContactOfContact(user: UserModel): boolean { return ContactModel.canCreateContactOfContact(user); }
 
   /**
-     * Contact Name
-     * @returns {string}
-     */
+   * Contact Name
+   */
   get name(): string {
     const firstName = this.firstName ? this.firstName : '';
     const lastName = this.lastName ? this.lastName : '';
@@ -794,20 +793,31 @@ export class ContactModel
   }
 
   /**
-     * Get the main Address
-     */
+   * Get the main Address
+   */
   get mainAddress(): AddressModel {
     // get main address
-    const mainAddress = _.find(this.addresses, { 'typeId': AddressType.CURRENT_ADDRESS });
-    // do we have main address? Otherwise use any address
-    const address = mainAddress ? mainAddress : this.addresses[0];
+    let mainAddress = _.find(this.addresses, { 'typeId': AddressType.CURRENT_ADDRESS });
 
-    return address ? address : new AddressModel();
+    // do we have main address?
+    // otherwise, use any address
+    mainAddress = mainAddress ?
+      mainAddress :
+      (
+        this.addresses?.length > 0 ?
+          this.addresses[0] :
+          undefined
+      );
+
+    // finished
+    return mainAddress ?
+      mainAddress :
+      new AddressModel();
   }
 
   /**
-     * Get phone numbers
-     */
+   * Get phone numbers
+   */
   get phoneNumbers(): string[] {
     return this.addresses.reduce((acc: string[], address) => {
       if (!_.isEmpty(address.phoneNumber)) {

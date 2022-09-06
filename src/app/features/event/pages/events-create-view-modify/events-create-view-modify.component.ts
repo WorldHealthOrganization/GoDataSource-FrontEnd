@@ -713,14 +713,12 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
                   this.activatedRoute.snapshot.data.user
                 );
               }
-            },
-            visible: () => !this.isCreate
+            }
           },
 
           // Divider
           {
-            type: CreateViewModifyV2MenuType.DIVIDER,
-            visible: () => !this.isCreate
+            type: CreateViewModifyV2MenuType.DIVIDER
           },
 
           // Add contact

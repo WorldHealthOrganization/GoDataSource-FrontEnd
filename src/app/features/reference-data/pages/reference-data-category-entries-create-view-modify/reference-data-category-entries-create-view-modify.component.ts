@@ -431,8 +431,7 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
                   this.activatedRoute.snapshot.data.user
                 );
               }
-            },
-            visible: () => !this.isCreate
+            }
           }
         ]
       }

@@ -84,6 +84,15 @@
 
     </mat-select>
 
+    <!-- Spinner -->
+    <mat-progress-spinner
+      *ngIf="locationLoading"
+      matSuffix
+      diameter="16"
+      mode="indeterminate"
+      color="primary">
+    </mat-progress-spinner>
+
     <!-- Errors -->
     <mat-error
       *ngIf="control?.invalid && control?.touched">

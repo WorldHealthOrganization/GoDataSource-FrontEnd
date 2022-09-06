@@ -278,8 +278,7 @@ export class SystemDevicesCreateViewModifyComponent extends CreateViewModifyComp
                   this.activatedRoute.snapshot.data.user
                 );
               }
-            },
-            visible: () => !this.isCreate
+            }
           },
 
           // History

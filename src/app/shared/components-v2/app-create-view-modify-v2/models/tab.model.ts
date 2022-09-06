@@ -69,6 +69,25 @@ export enum CreateViewModifyV2TabInputType {
 }
 
 /**
+ * Input action button
+ */
+interface ICreateViewModifyV2TabInputActionButton {
+  // required
+  icon: string;
+  click: (
+    input: CreateViewModifyV2TabInput,
+    index?: number
+  ) => void;
+
+  // optional
+  tooltip?: string;
+  visible?: (
+    input: CreateViewModifyV2TabInput,
+    index?: number,
+  ) => boolean;
+}
+
+/**
  * Input - base value
  */
 interface ICreateViewModifyV2TabInputValue<T> {
@@ -408,6 +427,7 @@ export interface ICreateViewModifyV2TabInputList {
   sortable?: boolean;
   readonly?: boolean;
   cssClasses?: string;
+  actionIconButtons?: ICreateViewModifyV2TabInputActionButton[];
 }
 
 /**

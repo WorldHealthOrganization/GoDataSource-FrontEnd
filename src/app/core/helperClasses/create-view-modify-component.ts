@@ -4,7 +4,7 @@ import { OutbreakModel } from '../models/outbreak.model';
 import { UserModel } from '../models/user.model';
 import { ICreateViewModifyV2 } from '../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { ActivatedRoute } from '@angular/router';
-import { Directive, Renderer2 } from '@angular/core';
+import { Directive, Renderer2, ViewChild } from '@angular/core';
 import { TopnavComponent } from '../components/topnav/topnav.component';
 import { AuthDataService } from '../services/data/auth.data.service';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
@@ -16,12 +16,16 @@ import { V2AdvancedFilter } from '../../shared/components-v2/app-list-table-v2/m
 import { CreateViewModifyV2ExpandColumn } from '../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { ICreateViewModifyV2Refresh } from '../../shared/components-v2/app-create-view-modify-v2/models/refresh.model';
 import { RedirectService } from '../services/helper/redirect.service';
+import { AppCreateViewModifyV2Component } from '../../shared/components-v2/app-create-view-modify-v2/app-create-view-modify-v2.component';
 
 @Directive()
 export abstract class CreateViewModifyComponent<T>
   extends ConfirmOnFormChanges {
   // handler for stopping take until
   protected destroyed$: ReplaySubject<boolean> = new ReplaySubject<boolean>();
+
+  // retrieve tabs handler
+  @ViewChild(AppCreateViewModifyV2Component, { static: true }) tabsV2Component: AppCreateViewModifyV2Component;
 
   // page title
   pageTitle: string;

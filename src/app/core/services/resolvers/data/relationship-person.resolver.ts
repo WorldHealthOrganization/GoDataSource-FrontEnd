@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ToastV2Service } from '../../helper/toast-v2.service';
 import { CaseModel } from '../../../models/case.model';
@@ -26,12 +26,26 @@ export class RelationshipPersonDataResolver implements Resolve<CaseModel | Conta
    * Retrieve data
    */
   resolve(route): Observable<CaseModel | ContactModel | EventModel | ContactOfContactModel> {
+    // retrieve data
+    const entityType: EntityType = route.params.entityType || route.queryParams.entityType;
+    const outbreakId: string = this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID);
+    const entityId: string = route.params.entityId || route.queryParams.entityId;
+
+    // nothing to retrieve ?
+    if (
+      !entityType ||
+      !outbreakId ||
+      !entityId
+    ) {
+      return of(null);
+    }
+
     // retrieve
     return this.entityDataService
       .getEntity(
-        route.params.entityType as EntityType,
-        this.storageService.get(StorageKey.SELECTED_OUTBREAK_ID),
-        route.params.entityId
+        entityType,
+        outbreakId,
+        entityId
       )
       .pipe(
         // should be last one
