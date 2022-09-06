@@ -903,7 +903,8 @@ export class ContactsListComponent
                   return !item.deleted &&
                     this.selectedOutbreakIsActive &&
                     ContactModel.canCreate(this.authUser) &&
-                    ContactModel.canCreateContactOfContact(this.authUser);
+                    ContactModel.canCreateContactOfContact(this.authUser) &&
+                    this.selectedOutbreak.isContactsOfContactsActive;
                 }
               },
 

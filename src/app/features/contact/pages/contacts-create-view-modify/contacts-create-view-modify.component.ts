@@ -1659,14 +1659,40 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
                   this.activatedRoute.snapshot.data.user
                 );
               }
+            }
+          },
+
+          // Divider
+          {
+            type: CreateViewModifyV2MenuType.DIVIDER
+          },
+
+          // Add contact of contacts
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_PAGE_MODIFY_CONTACT_ACTION_ADD_CONTACT_OF_CONTACT',
+            action: {
+              link: () => ['/contacts-of-contacts', 'create'],
+              queryParams: () => {
+                return {
+                  entityType: EntityType.CONTACT,
+                  entityId: this.itemData?.id
+                };
+              }
             },
-            visible: () => !this.isCreate
+            visible: () => this.selectedOutbreakIsActive &&
+              ContactModel.canCreate(this.authUser) &&
+              ContactModel.canCreateContactOfContact(this.authUser) &&
+              this.selectedOutbreak.isContactsOfContactsActive
           },
 
           // Divider
           {
             type: CreateViewModifyV2MenuType.DIVIDER,
-            visible: () => !this.isCreate
+            visible: () => this.selectedOutbreakIsActive &&
+              ContactModel.canCreate(this.authUser) &&
+              ContactModel.canCreateContactOfContact(this.authUser) &&
+              this.selectedOutbreak.isContactsOfContactsActive
           },
 
           // Duplicate records marked as not duplicate
