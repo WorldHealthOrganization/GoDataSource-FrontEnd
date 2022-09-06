@@ -39,6 +39,7 @@ import { LabProgressDataResolver } from '../../core/services/resolvers/data/lab-
 import { LabSequenceLaboratoryDataResolver } from '../../core/services/resolvers/data/lab-sequence-laboratory.resolver';
 import { LabSequenceResultDataResolver } from '../../core/services/resolvers/data/lab-sequence-result.resolver';
 import { FollowUpGroupByDataResolver } from '../../core/services/resolvers/data/follow-up-group-by.resolver';
+import { RelationshipPersonDataResolver } from '../../core/services/resolvers/data/relationship-person.resolver';
 
 // Follow-ups list from a - contact / case
 const viewFollowUpsListFoundation: Route = {
@@ -106,7 +107,8 @@ const contactFoundation: Route = {
     labTestResult: LabTestResultDataResolver,
     labResultProgress: LabProgressDataResolver,
     labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
-    labSequenceResult: LabSequenceResultDataResolver
+    labSequenceResult: LabSequenceResultDataResolver,
+    entity: RelationshipPersonDataResolver
   }
 };
 

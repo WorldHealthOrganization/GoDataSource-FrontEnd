@@ -294,8 +294,8 @@ export class EventModel
   }
 
   /**
-     * Get the main Address
-     */
+   * Get the main Address
+   */
   get mainAddress(): AddressModel {
     return this.address;
   }

@@ -1382,6 +1382,19 @@
                             fxLayoutAlign="end"
                             class="gd-create-view-modify-bottom-section-content-input-list-item-buttons">
 
+                            <!-- Extra action buttons -->
+                            <ng-container
+                              *ngFor="let action of input.actionIconButtons">
+                              <button
+                                *ngIf="!action.visible || action.visible(input, itemIndex)"
+                                type="button"
+                                mat-icon-button
+                                [matTooltip]="action.tooltip | translate"
+                                (click)="action.click(input, itemIndex)">
+                                <mat-icon>{{action.icon}}</mat-icon>
+                              </button>
+                            </ng-container>
+
                             <!-- Sort -->
                             <button
                               *ngIf="input.sortable"
