@@ -21,7 +21,8 @@ export const EnglishUsLang = {
     'LNG_PAGE_LIST_AUDIT_LOGS_EXPORT_TITLE': 'Export audit logs',
     'LNG_PAGE_LIST_AUDIT_LOGS_EXPORT_BUTTON': 'Export audit logs data',
     'LNG_PAGE_LIST_AUDIT_LOGS_GROUP_ACTION_EXPORT_SELECTED_AUDIT_LOGS': 'Export the selected audit logs',
-    'LNG_LAYOUT_MENU_ITEM_SET_SECURITY_QUESTION_LABEL': 'Security questions'
+    'LNG_LAYOUT_MENU_ITEM_SET_SECURITY_QUESTION_LABEL': 'Security questions',
+    'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_RESPONSE_FROM_SERVER': 'Invalid headers ({{headers}}...)'
 
 
 
