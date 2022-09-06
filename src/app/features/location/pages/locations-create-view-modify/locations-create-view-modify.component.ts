@@ -477,15 +477,13 @@ export class LocationsCreateViewModifyComponent extends CreateViewModifyComponen
                   this.activatedRoute.snapshot.data.user
                 );
               }
-            },
-            visible: () => !this.isCreate
+            }
           },
 
           // Divider
           {
             type: CreateViewModifyV2MenuType.DIVIDER,
-            visible: () => !this.isCreate &&
-              LocationModel.canListUsage(this.authUser)
+            visible: () => LocationModel.canListUsage(this.authUser)
           },
 
           // See Location usage

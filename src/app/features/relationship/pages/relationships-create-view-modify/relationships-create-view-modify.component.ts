@@ -588,8 +588,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
                   this.activatedRoute.snapshot.data.user
                 );
               }
-            },
-            visible: () => !this.isCreate
+            }
           }
         ]
       }

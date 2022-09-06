@@ -391,8 +391,7 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
                   this.activatedRoute.snapshot.data.user
                 );
               }
-            },
-            visible: () => !this.isCreate
+            }
           }
         ]
       }

@@ -768,8 +768,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
                   this.activatedRoute.snapshot.data.user
                 );
               }
-            },
-            visible: () => !this.isCreate
+            }
           }
         ]
       }

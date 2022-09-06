@@ -494,8 +494,7 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
                   this.activatedRoute.snapshot.data.user
                 );
               }
-            },
-            visible: () => !this.isCreate
+            }
           }
         ]
       }

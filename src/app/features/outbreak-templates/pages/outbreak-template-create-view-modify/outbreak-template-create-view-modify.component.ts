@@ -676,8 +676,7 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
                   this.activatedRoute.snapshot.data.user
                 );
               }
-            },
-            visible: () => !this.isCreate
+            }
           }
         ]
       }

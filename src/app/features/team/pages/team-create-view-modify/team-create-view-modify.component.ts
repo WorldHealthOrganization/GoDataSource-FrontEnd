@@ -344,8 +344,7 @@ export class TeamCreateViewModifyComponent extends CreateViewModifyComponent<Tea
                   this.activatedRoute.snapshot.data.user
                 );
               }
-            },
-            visible: () => !this.isCreate
+            }
           }
         ]
       }

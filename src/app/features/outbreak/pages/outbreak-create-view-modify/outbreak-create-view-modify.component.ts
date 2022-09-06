@@ -983,8 +983,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
                   this.activatedRoute.snapshot.data.user
                 );
               }
-            },
-            visible: () => !this.isCreate
+            }
           }
         ]
       }
