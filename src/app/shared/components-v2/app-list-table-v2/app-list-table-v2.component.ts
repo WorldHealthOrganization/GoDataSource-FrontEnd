@@ -97,6 +97,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // retrieve data
     this.retrieveData();
   }
+  get recordsData(): any[] {
+    return this._recordsData;
+  }
 
   // process rows data
   @Input() processSelectedData: IV2ProcessSelectedData[];
@@ -151,6 +154,12 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       direction: RequestSortDirection
     }
   } = {};
+  get agTable(): {
+    api: GridApi,
+    columnApi: ColumnApi
+  } {
+    return this._agTable;
+  }
 
   // key field used to handle each row (checkbox selection, etc)
   @Input() keyField: string = 'id';
@@ -2119,7 +2128,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           type: V2RowType.EXPAND_ROW,
           visible: false,
           column: null,
-          data: undefined
+          rowData: dataRow
         } as IV2RowExpandRow
       );
     });

@@ -56,7 +56,7 @@ export class AppListTableV2DetailRowComponent implements ICellRendererAngularCom
     switch (this.row?.column?.column?.type) {
       case V2ColumnExpandRowType.CHANGES:
         // convert model data to changes
-        this.changes = this.row.column.column.changes(this.row.data);
+        this.changes = this.row.column.column.changes(this.row.rowData);
 
         // finished
         break;

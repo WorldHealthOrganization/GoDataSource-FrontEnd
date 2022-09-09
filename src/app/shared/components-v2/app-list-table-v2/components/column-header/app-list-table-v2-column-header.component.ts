@@ -7,7 +7,10 @@ import { V2FilterType } from '../../models/filter.model';
 import { ActivatedRoute } from '@angular/router';
 import { ILabelValuePairModel } from '../../../../forms-v2/core/label-value-pair.model';
 import { IResolverV2ResponseModel } from '../../../../../core/services/resolvers/data/models/resolver-response.model';
-import { IV2Column } from '../../models/column.model';
+import { IV2Column, IV2ColumnExpandRow, V2ColumnFormat } from '../../models/column.model';
+import { GridApi } from '@ag-grid-community/core/dist/cjs/es5/gridApi';
+import { ColumnApi } from '@ag-grid-community/core/dist/cjs/es5/columns/columnApi';
+import { IV2RowExpandRow, V2RowType } from '../../models/row.model';
 
 /**
  * Component
@@ -24,6 +27,11 @@ export class AppListTableV2ColumnHeaderComponent implements IHeaderAngularComp {
 
   // component
   component: {
+    agTable: {
+      api: GridApi,
+      columnApi: ColumnApi
+    },
+    recordsData: any[],
     columnSortBy: (
       component: AppListTableV2ColumnHeaderComponent,
       column: IExtendedColDef,
@@ -45,6 +53,7 @@ export class AppListTableV2ColumnHeaderComponent implements IHeaderAngularComp {
   // constants
   RequestSortDirection = RequestSortDirection;
   V2FilterType = V2FilterType;
+  V2ColumnFormat = V2ColumnFormat;
 
   /**
    * Constructor
@@ -117,5 +126,38 @@ export class AppListTableV2ColumnHeaderComponent implements IHeaderAngularComp {
           RequestSortDirection.DESC
       );
     }
+  }
+
+  /**
+   * Expand / Collapse all
+   */
+  expandCollapseAll(expand: boolean): void {
+    // do we have everything initialized ?
+    if (
+      !this.component?.agTable?.api ||
+      !this.component?.recordsData
+    ) {
+      return;
+    }
+
+    // go through rows and expand / collapse
+    this.component.recordsData.forEach((row) => {
+      // not a details row ?
+      const rowCast: IV2RowExpandRow = row;
+      if (rowCast.type !== V2RowType.EXPAND_ROW) {
+        return;
+      }
+
+      // expand / collapse
+      rowCast.visible = expand;
+      if (rowCast.visible) {
+        rowCast.column = this.extendedColDef.columnDefinition as IV2ColumnExpandRow;
+      } else {
+        rowCast.column = null;
+      }
+    });
+
+    // just filter data
+    this.component.agTable.api.onFilterChanged();
   }
 }

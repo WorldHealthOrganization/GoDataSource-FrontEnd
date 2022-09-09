@@ -16,7 +16,6 @@ import { IV2RowExpandRow } from '../../models/row.model';
 })
 export class AppListTableV2DetailColumnComponent implements ICellRendererAngularComp {
   // data
-  data: any;
   dataNoOfChanges: {
     no: number
   } = {
@@ -61,10 +60,9 @@ export class AppListTableV2DetailColumnComponent implements ICellRendererAngular
     // retrieve extended column definition
     const extendedColDef: IExtendedColDef = params.colDef as IExtendedColDef;
     this.expandRowColumnDef = extendedColDef.columnDefinition as IV2ColumnExpandRow;
-    this.data = params.data;
     this.dataNoOfChanges = {
-      no: this.data && this.data[this.expandRowColumnDef.field] ?
-        this.data[this.expandRowColumnDef.field].length :
+      no: params.data && params.data[this.expandRowColumnDef.field] ?
+        params.data[this.expandRowColumnDef.field].length :
         0
     };
     this.gridApi = params.api;
@@ -88,16 +86,13 @@ export class AppListTableV2DetailColumnComponent implements ICellRendererAngular
       // update column that needs to be shown in expanded row details
       if (this.detailsRow.visible) {
         this.detailsRow.column = this.expandRowColumnDef;
-        this.detailsRow.data = this.data;
       } else {
         this.detailsRow.column = null;
-        this.detailsRow.data = undefined;
       }
     } else {
       // expand
       this.detailsRow.visible = true;
       this.detailsRow.column = this.expandRowColumnDef;
-      this.detailsRow.data = this.data;
     }
 
     // filter rows - to display / hide our row

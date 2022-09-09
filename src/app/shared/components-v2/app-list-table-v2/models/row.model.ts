@@ -16,7 +16,7 @@ export interface IV2RowExpandRow {
   type: V2RowType.EXPAND_ROW;
   visible: boolean;
   column: IV2ColumnExpandRow;
-  data: any;
+  rowData: any;
 }
 
 /**
