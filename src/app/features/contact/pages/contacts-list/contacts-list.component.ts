@@ -47,8 +47,8 @@ export class ContactsListComponent
   extends ListComponent<ContactModel>
   implements OnDestroy
 {
-  // anonymize fields
-  anonymizeFields: ILabelValuePairModel[] = [
+  // contact fields
+  contactFields: ILabelValuePairModel[] = [
     { label: 'LNG_CONTACT_FIELD_LABEL_ID', value: 'id' },
     { label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME', value: 'firstName' },
     { label: 'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME', value: 'middleName' },
@@ -94,8 +94,8 @@ export class ContactsListComponent
     { label: 'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value: 'questionnaireAnswers' }
   ];
 
-  // relationship anonymize fields
-  relationshipAnonymizeFields: ILabelValuePairModel[] = [
+  // relationship fields
+  relationshipFields: ILabelValuePairModel[] = [
     { label: 'LNG_RELATIONSHIP_FIELD_LABEL_ID', value: 'id' },
     { label: 'LNG_RELATIONSHIP_FIELD_LABEL_SOURCE', value: 'sourcePerson' },
     { label: 'LNG_RELATIONSHIP_FIELD_LABEL_TARGET', value: 'targetPerson' },
@@ -1508,7 +1508,7 @@ export class ContactsListComponent
         action: {
           click: (selected: string[]) => {
             // remove id from list
-            const anonymizeFields = this.anonymizeFields.filter((item) => {
+            const anonymizeFields = this.contactFields.filter((item) => {
               return item.value !== 'id';
             });
 
@@ -1848,12 +1848,13 @@ export class ContactsListComponent
                   ],
                   encrypt: true,
                   anonymize: {
-                    fields: this.anonymizeFields
+                    fields: this.contactFields
                   },
                   groups: {
                     fields: contactFieldGroups,
                     required: contactFieldGroupsRequires
                   },
+                  fields: this.contactFields,
                   dbColumns: true,
                   dbValues: true,
                   jsonReplaceUndefinedWithNull: true,
@@ -1937,12 +1938,13 @@ export class ContactsListComponent
                   ],
                   encrypt: true,
                   anonymize: {
-                    fields: this.relationshipAnonymizeFields
+                    fields: this.relationshipFields
                   },
                   groups: {
                     fields: relationshipFieldGroups,
                     required: relationshipFieldGroupsRequires
                   },
+                  fields: this.relationshipFields,
                   dbColumns: true,
                   dbValues: true,
                   jsonReplaceUndefinedWithNull: true

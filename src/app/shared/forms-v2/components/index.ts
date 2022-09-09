@@ -19,6 +19,7 @@ import { AppFormFillQuestionnaireV2Component } from './app-form-fill-questionnai
 import { AppFormTimepickerV2Component } from './app-form-timepicker-v2/app-form-timepicker-v2.component';
 import { AppFormColorV2Component } from './app-form-color-v2/app-form-color-v2.component';
 import { AppFormNgxWigV2Component } from './app-form-ngx-wig-v2/app-form-ngx-wig-v2.component';
+import { AppFormToggleIconV2Component } from './app-form-toggle-icon-v2/app-form-toggle-icon-v2.component';
 
 export const components: any[] = [
   AppFormCheckboxV2Component,
@@ -41,5 +42,6 @@ export const components: any[] = [
   AppFormTextareaV2Component,
   AppFormTimepickerV2Component,
   AppFormToggleCheckboxV2Component,
+  AppFormToggleIconV2Component,
   AppFormToggleV2Component
 ];

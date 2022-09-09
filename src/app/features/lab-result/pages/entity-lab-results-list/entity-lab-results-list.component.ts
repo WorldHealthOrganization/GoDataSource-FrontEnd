@@ -42,8 +42,8 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
   // constants
   EntityType = EntityType;
 
-  // lab results anonymize fields
-  anonymizeFields: ILabelValuePairModel[] = [
+  // lab results fields
+  labFields: ILabelValuePairModel[] = [
     { label: 'LNG_LAB_RESULT_FIELD_LABEL_ID', value: 'id' },
     { label: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON_ID', value: 'personId' },
     { label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN', value: 'dateSampleTaken' },
@@ -603,12 +603,13 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
                   ],
                   encrypt: true,
                   anonymize: {
-                    fields: this.anonymizeFields
+                    fields: this.labFields
                   },
                   groups: {
                     fields: labResultsFieldGroups,
                     required: labResultsFieldGroupsRequires
                   },
+                  fields: this.labFields,
                   dbColumns: true,
                   dbValues: true,
                   questionnaireVariables: true,

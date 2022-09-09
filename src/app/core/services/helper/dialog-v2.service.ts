@@ -257,21 +257,42 @@ export class DialogV2Service {
       });
     }
 
+    // add divider for groups and fields
+    if (
+      config.export.allow.groups ||
+      config.export.allow.fields
+    ) {
+      inputs.push({
+        type: V2SideDialogConfigInputType.DIVIDER
+      });
+    }
+
     // groups
     if (config.export.allow.groups) {
       // all
       inputs.push(
         {
-          type: V2SideDialogConfigInputType.DIVIDER
-        }, {
           type: V2SideDialogConfigInputType.CHECKBOX,
           placeholder: 'LNG_COMMON_LABEL_EXPORT_FIELDS_GROUPS_ALL',
           name: 'fieldsGroupAll',
           checked: true,
           change: (data): void => {
-            // not JSON ?
+            // all fields groups checked ?
             if ((data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked) {
+              // clear specific groups
               (data.map.fieldsGroupList as IV2SideDialogConfigInputMultiDropdown).values = [];
+
+              // check all fields and clear specific fields
+              if (data.map.fieldsAll) {
+                (data.map.fieldsAll as IV2SideDialogConfigInputCheckbox).checked = true;
+                (data.map.fieldsList as IV2SideDialogConfigInputMultiDropdown).values = [];
+              }
+            } else {
+              // clear specific fields
+              if (data.map.fieldsAll) {
+                (data.map.fieldsAll as IV2SideDialogConfigInputCheckbox).checked = false;
+                (data.map.fieldsList as IV2SideDialogConfigInputMultiDropdown).values = [];
+              }
             }
           }
         }
@@ -337,10 +358,67 @@ export class DialogV2Service {
               });
             });
           }
-        }, {
-          type: V2SideDialogConfigInputType.DIVIDER
         }
       );
+    }
+
+    // specific fields
+    if (config.export.allow.fields) {
+      // all
+      inputs.push(
+        {
+          type: V2SideDialogConfigInputType.CHECKBOX,
+          placeholder: 'LNG_COMMON_LABEL_EXPORT_FIELDS_ALL',
+          name: 'fieldsAll',
+          checked: true,
+          disabled: (data): boolean => {
+            return !data.map.fieldsGroupAll ?
+              false :
+              !(data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked;
+          },
+          change: (data): void => {
+            // all fields ?
+            if ((data.map.fieldsAll as IV2SideDialogConfigInputCheckbox).checked) {
+              (data.map.fieldsList as IV2SideDialogConfigInputMultiDropdown).values = [];
+            }
+          }
+        }
+      );
+
+      // specific fields
+      inputs.push(
+        {
+          type: V2SideDialogConfigInputType.DROPDOWN_MULTI,
+          placeholder: 'LNG_COMMON_LABEL_EXPORT_FIELDS',
+          name: 'fieldsList',
+          values: [],
+          options: config.export.allow.fields,
+          disabled: (data): boolean => {
+            return (data.map.fieldsAll as IV2SideDialogConfigInputCheckbox).checked || (
+              data.map.fieldsGroupAll &&
+              !(data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked
+            );
+          },
+          validators: {
+            required: (data): boolean => {
+              return !(data.map.fieldsAll as IV2SideDialogConfigInputCheckbox).checked && (
+                !data.map.fieldsGroupAll ||
+                (data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked
+              );
+            }
+          }
+        }
+      );
+    }
+
+    // add divider for groups and fields
+    if (
+      config.export.allow.groups ||
+      config.export.allow.fields
+    ) {
+      inputs.push({
+        type: V2SideDialogConfigInputType.DIVIDER
+      });
     }
 
     // add options title
@@ -468,6 +546,7 @@ export class DialogV2Service {
 
           // do not send the checkbox all value to api
           delete formData.fieldsGroupAll;
+          delete formData.fieldsAll;
 
           // clean form data
           Object.keys(formData).forEach((name) => {

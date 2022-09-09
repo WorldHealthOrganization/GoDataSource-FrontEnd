@@ -25,7 +25,9 @@ export const EnglishUsLang = {
     'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_RESPONSE_FROM_SERVER': 'Invalid headers ({{headers}}...)',
     'LNG_PAGE_MODIFY_CONTACT_ACTION_ADD_CONTACT_OF_CONTACT': 'Add contact of contact',
     'LNG_COMMON_LABEL_NO_OF_CHANGES': '{{no}} changes',
-    'LNG_COMMON_LABEL_SHOW_HIDE_STATUS': 'Show / Hide status'
+    'LNG_COMMON_LABEL_SHOW_HIDE_STATUS': 'Show / Hide status',
+    'LNG_COMMON_LABEL_EXPORT_FIELDS_ALL': 'All fields',
+    'LNG_COMMON_LABEL_EXPORT_FIELDS': 'Fields'
 
 
 

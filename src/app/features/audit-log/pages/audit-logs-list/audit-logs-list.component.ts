@@ -32,6 +32,24 @@ export class AuditLogsListComponent
   extends ListComponent<AuditLogModel>
   implements OnDestroy {
 
+  // audit-log fields
+  private auditLogFields: ILabelValuePairModel[] = [
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_ID', value: 'id' },
+    { label: 'LNG_AUDIT_LOG_FIELD_LABEL_ACTION', value: 'action' },
+    { label: 'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_NAME', value: 'modelName' },
+    { label: 'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_ID', value: 'recordId' },
+    { label: 'LNG_AUDIT_LOG_FIELD_LABEL_CHANGE_DATA', value: 'changedData' },
+    { label: 'LNG_AUDIT_LOG_FIELD_LABEL_USER', value: 'userId' },
+    { label: 'LNG_AUDIT_LOG_FIELD_LABEL_IP_ADDRESS', value: 'userIPAddress' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
+  ];
+
   /**
    * Constructor
    */
@@ -406,23 +424,9 @@ export class AuditLogsListComponent
               ExportDataExtension.JSON
             ],
             anonymize: {
-              fields: [
-                { label: 'LNG_COMMON_MODEL_FIELD_LABEL_ID', value: 'id' },
-                { label: 'LNG_AUDIT_LOG_FIELD_LABEL_ACTION', value: 'action' },
-                { label: 'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_NAME', value: 'modelName' },
-                { label: 'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_ID', value: 'recordId' },
-                { label: 'LNG_AUDIT_LOG_FIELD_LABEL_CHANGE_DATA', value: 'changedData' },
-                { label: 'LNG_AUDIT_LOG_FIELD_LABEL_USER', value: 'userId' },
-                { label: 'LNG_AUDIT_LOG_FIELD_LABEL_IP_ADDRESS', value: 'userIPAddress' },
-                { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
-                { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
-                { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
-                { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
-                { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
-                { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
-                { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
-              ]
+              fields: this.auditLogFields
             },
+            fields: this.auditLogFields,
             dbColumns: true,
             dbValues: true,
             jsonReplaceUndefinedWithNull: true

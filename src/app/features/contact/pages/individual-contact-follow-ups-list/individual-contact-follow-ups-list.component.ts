@@ -39,6 +39,29 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
   // data
   entityData: ContactModel | CaseModel;
 
+  // follow-up fields
+  private followUpFields: ILabelValuePairModel[] = [
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_ID', value: 'id' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT', value: 'contact' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE', value: 'date' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS', value: 'address' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_FILL_LOCATION', value: 'fillLocation' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_INDEX', value: 'index' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM', value: 'teamId' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUSID', value: 'statusId' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED', value: 'targeted' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_COMMENT', value: 'comment' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUserId' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value: 'questionnaireAnswers' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
+  ];
+
   // constants
   EntityType = EntityType;
 
@@ -737,32 +760,13 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
                     ],
                     encrypt: true,
                     anonymize: {
-                      fields: [
-                        { label: 'LNG_FOLLOW_UP_FIELD_LABEL_ID', value: 'id' },
-                        { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT', value: 'contact' },
-                        { label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE', value: 'date' },
-                        { label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS', value: 'address' },
-                        { label: 'LNG_FOLLOW_UP_FIELD_LABEL_FILL_LOCATION', value: 'fillLocation' },
-                        { label: 'LNG_FOLLOW_UP_FIELD_LABEL_INDEX', value: 'index' },
-                        { label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM', value: 'teamId' },
-                        { label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUSID', value: 'statusId' },
-                        { label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED', value: 'targeted' },
-                        { label: 'LNG_FOLLOW_UP_FIELD_LABEL_COMMENT', value: 'comment' },
-                        { label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUserId' },
-                        { label: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value: 'questionnaireAnswers' },
-                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
-                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
-                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
-                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
-                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
-                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
-                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
-                      ]
+                      fields: this.followUpFields
                     },
                     groups: {
                       fields: followUpFieldGroups,
                       required: followUpFieldGroupsRequires
                     },
+                    fields: this.followUpFields,
                     dbColumns: true,
                     dbValues: true,
                     jsonReplaceUndefinedWithNull: true,
