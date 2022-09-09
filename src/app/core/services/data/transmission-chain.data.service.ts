@@ -312,8 +312,6 @@ export class TransmissionChainDataService {
     }
 
     // if bubble graph we must split it into multiple pages
-    // #TODO this should be integrated in the code bellow so we don't do again the logic that was done once...but that would mean that we need to rewrite some of the logic, which might cause other issues
-    // #TODO so until we rewrite the graph component there is no point in stressing out that much with this since we will have to rewrite this entire function since it was written like ...
     // sort chains by size descending
     chainGroupChains.sort((chain1, chain2) => {
       return chain2.chain.chainRelations.length - chain1.chain.chainRelations.length;

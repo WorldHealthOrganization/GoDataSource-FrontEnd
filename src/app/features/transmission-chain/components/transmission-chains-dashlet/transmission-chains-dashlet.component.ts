@@ -1122,7 +1122,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
 
     if (this.colorCriteria.edgeColorCriteria === 'clusterId') {
       // we should check if we have this information, if not we must wait for it to be retrieved
-      // #TODO
       // must refactor this entire function :)
       (this.clusterOptions || []).forEach((item) => {
         this.legend.edgeColor[item.id] = item.colorCode ? item.colorCode : Constants.DEFAULT_COLOR_CHAINS;
@@ -2517,8 +2516,6 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       usedEntityIdsMap[rel.persons[0].id] = true;
       usedEntityIdsMap[rel.persons[1].id] = true;
       remainingRelationships.push(rel);
-
-      // #TODO check if we need to add others relationships because usedEntityIdsMap was changed
     });
 
     // use only the relationships related to person

@@ -45,7 +45,6 @@ export class SavedImportMappingDataResolver implements IMapResolverV2<SavedImpor
       'readOnly',
 
       // required by API - it should be added by api, but at the moment it doesn't work like this
-      // #TODO - changes on API
       'userId'
     );
 
