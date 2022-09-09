@@ -42,8 +42,58 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 })
 export class EventsListComponent
   extends ListComponent<EventModel>
-  implements OnDestroy
-{
+  implements OnDestroy {
+
+  // event fields
+  private eventFields: ILabelValuePairModel[] = [
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_ID', value: 'id' },
+    { label: 'LNG_EVENT_FIELD_LABEL_NAME', value: 'name' },
+    { label: 'LNG_EVENT_FIELD_LABEL_DATE', value: 'date' },
+    { label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION', value: 'description' },
+    { label: 'LNG_EVENT_FIELD_LABEL_ADDRESS', value: 'address' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' },
+    { label: 'LNG_ENTITY_FIELD_LABEL_TYPE', value: 'type' },
+    { label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES', value: 'numberOfExposures' },
+    { label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS', value: 'numberOfContacts' },
+    { label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING', value: 'dateOfReporting' },
+    { label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', value: 'isDateOfReportingApproximate' },
+    { label: 'LNG_EVENT_FIELD_LABEL_END_DATE', value: 'endDate' },
+    { label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUserId' },
+    { label: 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY', value: 'eventCategory' }
+  ];
+
+  // relationship fields
+  private relationshipFields: ILabelValuePairModel[] = [
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_ID', value: 'id' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_SOURCE', value: 'sourcePerson' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_TARGET', value: 'targetPerson' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT', value: 'dateOfFirstContact' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE', value: 'contactDate' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED', value: 'contactDateEstimated' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL', value: 'certaintyLevelId' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE', value: 'exposureTypeId' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY', value: 'exposureFrequencyId' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION', value: 'exposureDurationId' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION', value: 'socialRelationshipTypeId' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL', value: 'socialRelationshipDetail' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER', value: 'clusterId' },
+    { label: 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT', value: 'comment' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
+  ];
+
+
   /**
    * Constructor
    */
@@ -1090,33 +1140,13 @@ export class EventsListComponent
                     ],
                     encrypt: true,
                     anonymize: {
-                      fields: [
-                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_ID', value: 'id' },
-                        { label: 'LNG_EVENT_FIELD_LABEL_NAME', value: 'name' },
-                        { label: 'LNG_EVENT_FIELD_LABEL_DATE', value: 'date' },
-                        { label: 'LNG_EVENT_FIELD_LABEL_DESCRIPTION', value: 'description' },
-                        { label: 'LNG_EVENT_FIELD_LABEL_ADDRESS', value: 'address' },
-                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
-                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
-                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
-                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
-                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
-                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
-                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' },
-                        { label: 'LNG_ENTITY_FIELD_LABEL_TYPE', value: 'type' },
-                        { label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_EXPOSURES', value: 'numberOfExposures' },
-                        { label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS', value: 'numberOfContacts' },
-                        { label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING', value: 'dateOfReporting' },
-                        { label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', value: 'isDateOfReportingApproximate' },
-                        { label: 'LNG_EVENT_FIELD_LABEL_END_DATE', value: 'endDate' },
-                        { label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUserId' },
-                        { label: 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY', value: 'eventCategory' }
-                      ]
+                      fields: this.eventFields
                     },
                     groups: {
                       fields: eventFieldGroups,
                       required: eventFieldGroupsRequires
                     },
+                    fields: this.eventFields,
                     dbColumns: true,
                     dbValues: true,
                     jsonReplaceUndefinedWithNull: true
@@ -1186,34 +1216,13 @@ export class EventsListComponent
                     ],
                     encrypt: true,
                     anonymize: {
-                      fields: [
-                        { label: 'LNG_RELATIONSHIP_FIELD_LABEL_ID', value: 'id' },
-                        { label: 'LNG_RELATIONSHIP_FIELD_LABEL_SOURCE', value: 'sourcePerson' },
-                        { label: 'LNG_RELATIONSHIP_FIELD_LABEL_TARGET', value: 'targetPerson' },
-                        { label: 'LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT', value: 'dateOfFirstContact' },
-                        { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE', value: 'contactDate' },
-                        { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED', value: 'contactDateEstimated' },
-                        { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL', value: 'certaintyLevelId' },
-                        { label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE', value: 'exposureTypeId' },
-                        { label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY', value: 'exposureFrequencyId' },
-                        { label: 'LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION', value: 'exposureDurationId' },
-                        { label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION', value: 'socialRelationshipTypeId' },
-                        { label: 'LNG_RELATIONSHIP_FIELD_LABEL_RELATION_DETAIL', value: 'socialRelationshipDetail' },
-                        { label: 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER', value: 'clusterId' },
-                        { label: 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT', value: 'comment' },
-                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
-                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
-                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
-                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedBy' },
-                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
-                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
-                        { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
-                      ]
+                      fields: this.relationshipFields
                     },
                     groups: {
                       fields: relationshipFieldGroups,
                       required: relationshipFieldGroupsRequires
                     },
+                    fields: this.relationshipFields,
                     dbColumns: true,
                     dbValues: true,
                     jsonReplaceUndefinedWithNull: true
