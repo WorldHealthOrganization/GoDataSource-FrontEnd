@@ -23,7 +23,8 @@ export const EnglishUsLang = {
     'LNG_PAGE_LIST_AUDIT_LOGS_GROUP_ACTION_EXPORT_SELECTED_AUDIT_LOGS': 'Export the selected audit logs',
     'LNG_LAYOUT_MENU_ITEM_SET_SECURITY_QUESTION_LABEL': 'Security questions',
     'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_RESPONSE_FROM_SERVER': 'Invalid headers ({{headers}}...)',
-    'LNG_PAGE_MODIFY_CONTACT_ACTION_ADD_CONTACT_OF_CONTACT': 'Add contact of contact'
+    'LNG_PAGE_MODIFY_CONTACT_ACTION_ADD_CONTACT_OF_CONTACT': 'Add contact of contact',
+    'LNG_COMMON_LABEL_NO_OF_CHANGES': '{{no}} changes'
 
 
 

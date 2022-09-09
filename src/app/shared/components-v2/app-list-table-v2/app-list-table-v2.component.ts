@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, Renderer2 } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { GridReadyEvent, ValueFormatterParams } from '@ag-grid-community/core';
+import { GridReadyEvent, IsFullWidthRowParams, RowHeightParams, RowNode, ValueFormatterParams } from '@ag-grid-community/core';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { TranslateService } from '@ngx-translate/core';
 import * as _ from 'lodash';
@@ -16,6 +16,7 @@ import {
   IV2ColumnBasicFormat,
   IV2ColumnButton,
   IV2ColumnColor,
+  IV2ColumnExpandRow,
   IV2ColumnHTML,
   IV2ColumnIconMaterial,
   IV2ColumnIconURL,
@@ -54,6 +55,9 @@ import { IV2ProcessSelectedData } from './models/process-data.model';
 import { HighlightSearchPipe } from '../../pipes/highlight-search/highlight-search';
 import { AppListTableV2ObfuscateComponent } from './components/obfuscate/app-list-table-v2-obfuscate.component';
 import { determineIfSmallScreenMode } from '../../../core/methods/small-screen-mode';
+import { AppListTableV2DetailRowComponent } from './components/detail/app-list-table-v2-detail-row.component';
+import { AppListTableV2DetailColumnComponent } from './components/detail/app-list-table-v2-detail-column.component';
+import { IV2RowExpandRow, V2RowType } from './models/row.model';
 
 /**
  * Component
@@ -74,6 +78,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   private static readonly STANDARD_SHAPE_PADDING: number = 14;
   private static readonly STANDARD_HEADER_HEIGHT: number = 40;
   private static readonly STANDARD_HEADER_WITH_FILTER_HEIGHT: number = 88;
+  private static readonly STANDARD_ROW_HEIGHT: number = 40;
+  private static readonly STANDARD_DETAILS_ROW_HEIGHT: number = 250;
 
   // small screen mode ?
   isSmallScreenMode: boolean = false;
@@ -91,6 +97,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // retrieve data
     this.retrieveData();
+  }
+  get recordsData(): any[] {
+    return this._recordsData;
   }
 
   // process rows data
@@ -146,6 +155,12 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       direction: RequestSortDirection
     }
   } = {};
+  get agTable(): {
+    api: GridApi,
+    columnApi: ColumnApi
+  } {
+    return this._agTable;
+  }
 
   // key field used to handle each row (checkbox selection, etc)
   @Input() keyField: string = 'id';
@@ -277,6 +292,53 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   // saving columns
   savingColumns: boolean = false;
+
+  // uses expandable rows ?
+  private _needsExpandRow: boolean = false;
+  set needsExpandRow(needsExpandRow: boolean) {
+    // set value
+    const changed: boolean = this._needsExpandRow !== needsExpandRow;
+    this._needsExpandRow = needsExpandRow;
+
+    // update ag grid
+    if (
+      changed &&
+      this._agTable?.api
+    ) {
+      // do we have data ?
+      if (this._recordsData?.length > 0) {
+        // update row data
+        if (!this.needsExpandRow) {
+          // filter out expandable rows, since we don't have any expandable columns anymore
+          this._recordsData = this._recordsData.filter((row) => (row as IV2RowExpandRow).type !== V2RowType.EXPAND_ROW);
+
+          // update rows
+          this._agTable.api.setRowData(this._recordsData);
+        } else {
+          // as a precaution check that we don't have already expandable rows, we shouldn't ...but who knows
+          const hasExpandableRows: boolean = !!this._recordsData.find((row) => (row as IV2RowExpandRow).type === V2RowType.EXPAND_ROW);
+
+          // add expandable rows details
+          if (!hasExpandableRows) {
+            // add expandable rows
+            this._recordsData = this.addExpandableRowDetails(this._recordsData);
+
+            // update rows
+            this._agTable.api.setRowData(this._recordsData);
+          } else {
+            // just filter data
+            this._agTable.api.onFilterChanged();
+          }
+        }
+      } else {
+        // just update to know that we need to filter later
+        this._agTable.api.onFilterChanged();
+      }
+    }
+  }
+  get needsExpandRow(): boolean {
+    return this._needsExpandRow;
+  }
 
   // page settings key
   private _pageSettingsKey: UserSettings;
@@ -414,6 +476,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   // constants
   AppListTableV2LoadingComponent = AppListTableV2LoadingComponent;
   AppListTableV2NoDataComponent = AppListTableV2NoDataComponent;
+  AppListTableV2DetailRowComponent = AppListTableV2DetailRowComponent;
   Constants = Constants;
 
   /**
@@ -473,6 +536,38 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // finished
     return statusHtml;
   }
+
+  /**
+   * Retrieve row height
+   */
+  getRowHeight: (params: RowHeightParams) => number = (params: RowHeightParams): number => {
+    return params.data?.type === V2RowType.EXPAND_ROW ?
+      AppListTableV2Component.STANDARD_DETAILS_ROW_HEIGHT :
+      AppListTableV2Component.STANDARD_ROW_HEIGHT;
+  };
+
+  /**
+   * Is full width row ?
+   */
+  isFullWidthRow: (params: IsFullWidthRowParams) => boolean = (params: IsFullWidthRowParams): boolean => {
+    return params.rowNode?.data?.type === V2RowType.EXPAND_ROW;
+  };
+
+  /**
+   * Hide rows if necessary
+   */
+  doesExternalFilterPass: (node: RowNode) => boolean = (node: RowNode): boolean => {
+    return node.data?.type === V2RowType.EXPAND_ROW ?
+      !!(node.data as IV2RowExpandRow).visible :
+      true;
+  };
+
+  /**
+   * Is external filter present ?
+   */
+  isExternalFilterPresent: () => boolean = (): boolean => {
+    return this.needsExpandRow;
+  };
 
   /**
    * Constructor
@@ -632,8 +727,16 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         // finished
         this.recordsSubscription = undefined;
 
+        // must always have an array
+        data = data || [];
+
+        // add expand rows if necessary
+        if (this.needsExpandRow) {
+          data = this.addExpandableRowDetails(data);
+        }
+
         // set data & hide loading overlay
-        this._recordsData = data || [];
+        this._recordsData = data;
         this._processedSelectedResults = {};
         this._agTable.api.setRowData(this._recordsData);
 
@@ -685,6 +788,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // nothing to do ?
     if (!this._columns) {
       // reset
+      this.needsExpandRow = false;
       this._agTable.api.setColumnDefs(undefined);
 
       // finished
@@ -976,6 +1080,23 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // update column defs
     this._agTable.api.setColumnDefs(columnDefs);
 
+    // determine if we need to display expandable row
+    let needsExpandRow: boolean = false;
+    for (let columnIndex: number = 0; columnIndex < columnDefs.length; columnIndex++) {
+      // retrieve column definition
+      const extendedColDef: IExtendedColDef = columnDefs[columnIndex];
+      if (extendedColDef.columnDefinition?.format?.type === V2ColumnFormat.EXPAND_ROW) {
+        // needs row expansion
+        needsExpandRow = true;
+
+        // finished
+        break;
+      }
+    }
+
+    // update row expand
+    this.needsExpandRow = needsExpandRow;
+
     // re-render page
     this.detectChanges();
   }
@@ -1061,6 +1182,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           case V2ColumnFormat.ACTIONS:
           case V2ColumnFormat.LINK_LIST:
           case V2ColumnFormat.HTML:
+          case V2ColumnFormat.EXPAND_ROW:
 
             // nothing to do here
             return null;
@@ -1212,6 +1334,15 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
             htmlColumn
           );
         };
+      }
+
+      // expand column
+      const expandColumn: IV2ColumnExpandRow = column as IV2ColumnExpandRow;
+      if (
+        expandColumn.format &&
+        expandColumn.format.type === V2ColumnFormat.EXPAND_ROW
+      ) {
+        return AppListTableV2DetailColumnComponent;
       }
 
       // status
@@ -1980,5 +2111,30 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       this.resizeTable();
       this.detectChanges();
     }
+  }
+
+  /**
+   * Add expandable row details
+   */
+  private addExpandableRowDetails(oldData: any[]): any[] {
+    // append details rows
+    const newData: any[] = [];
+    oldData.forEach((dataRow) => {
+      newData.push(
+        // original row
+        dataRow,
+
+        // details row used for details
+        {
+          type: V2RowType.EXPAND_ROW,
+          visible: false,
+          column: null,
+          rowData: dataRow
+        } as IV2RowExpandRow
+      );
+    });
+
+    // finished
+    return newData;
   }
 }

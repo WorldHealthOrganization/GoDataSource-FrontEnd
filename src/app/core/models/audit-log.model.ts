@@ -2,7 +2,11 @@ import * as _ from 'lodash';
 import { UserModel } from './user.model';
 import { IPermissionBasic, IPermissionExportable } from './permission.interface';
 import { PERMISSION } from './permission.model';
+import { ChangeValue } from '../../shared/components-v2/app-changes-v2/models/change.model';
 
+/**
+ * Audit log changes
+ */
 export class AuditLogChangeDataModel {
   field: string;
   oldValue: any;
@@ -15,6 +19,9 @@ export class AuditLogChangeDataModel {
   }
 }
 
+/**
+ * Audit log
+ */
 export class AuditLogModel
 implements
   IPermissionBasic, IPermissionExportable {
@@ -28,6 +35,9 @@ implements
   userIPAddress: string;
   createdAt: string;
   recordId: string;
+
+  // used by ui
+  uiChangeValue: ChangeValue[];
 
   /**
      * Static Permissions - IPermissionBasic

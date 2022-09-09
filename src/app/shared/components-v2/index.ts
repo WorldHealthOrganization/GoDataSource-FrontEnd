@@ -13,14 +13,20 @@ import { AppCreateViewModifyV2Component } from './app-create-view-modify-v2/app-
 import { AppSelectLanguageV2Component } from './app-select-language-v2/app-select-language-v2.component';
 import { AppBasicPageV2Component } from './app-basic-page-v2/app-basic-page-v2.component';
 import { AppListTableV2ObfuscateComponent } from './app-list-table-v2/components/obfuscate/app-list-table-v2-obfuscate.component';
+import { AppListTableV2DetailRowComponent } from './app-list-table-v2/components/detail/app-list-table-v2-detail-row.component';
+import { AppListTableV2DetailColumnComponent } from './app-list-table-v2/components/detail/app-list-table-v2-detail-column.component';
+import { AppChangesV2Component } from './app-changes-v2/app-changes-v2.component';
 
 export const components: any[] = [
   AppBasicPageV2Component,
   AppBottomDialogV2Component,
   AppBreadcrumbV2Component,
+  AppChangesV2Component,
   AppCreateViewModifyV2Component,
   AppListTableV2ActionsComponent,
   AppListTableV2ButtonComponent,
+  AppListTableV2DetailColumnComponent,
+  AppListTableV2DetailRowComponent,
   AppListTableV2Component,
   AppListTableV2ColumnHeaderComponent,
   AppListTableV2LoadingComponent,

@@ -25,6 +25,22 @@
         [class.gd-list-table-column-header-sort-desc]="component.sortByDirection === RequestSortDirection.DESC">north</mat-icon>
     </div>
 
+    <!-- Collapse / Expand All -->
+    <span
+      *ngIf="extendedColDef.columnDefinition.format?.type === V2ColumnFormat.EXPAND_ROW">
+
+      <!-- Expand all -->
+      <mat-icon
+        [matTooltip]="'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_EXPAND_ALL' | translate"
+        (click)="expandCollapseAll(true)">expand_more</mat-icon>
+
+      <!-- Collapse all -->
+      <mat-icon
+        [matTooltip]="'LNG_LIST_PAGES_BUTTON_COLUMN_ACTIONS_COLLAPSE_ALL' | translate"
+        (click)="expandCollapseAll(false)">expand_less</mat-icon>
+
+    </span>
+
   </div>
 
   <!-- Filter -->

@@ -4,6 +4,7 @@ import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/help
 import { AppFormSelectMultipleV2Component } from '../../../forms-v2/components/app-form-select-multiple-v2/app-form-select-multiple-v2.component';
 import { AddressModel } from '../../../../core/models/address.model';
 import * as _ from 'lodash';
+import { ChangeValue } from '../../app-changes-v2/models/change.model';
 
 /**
  * Column pinned
@@ -68,7 +69,15 @@ export enum V2ColumnFormat {
   ICON_URL,
   ICON_MATERIAL,
   LINK_LIST,
-  HTML
+  HTML,
+  EXPAND_ROW
+}
+
+/**
+ * Expand row column type
+ */
+export enum V2ColumnExpandRowType {
+  CHANGES
 }
 
 /**
@@ -321,10 +330,47 @@ export interface IV2ColumnHTML {
 }
 
 /**
+ * Expand row - column of type changes
+ */
+export interface IV2ColumnExpandRowChanges {
+  // required
+  type: V2ColumnExpandRowType.CHANGES;
+  changes: (data: any) => ChangeValue[];
+}
+
+/**
+ * Expand row column types
+ */
+export type IV2ColumnExpandRowTypes = IV2ColumnExpandRowChanges;
+
+/**
+ * Expand row column
+ */
+export interface IV2ColumnExpandRow {
+  // required
+  format: Omit<IV2ColumnBasicFormat, 'type'> & {
+    type: V2ColumnFormat.EXPAND_ROW
+  };
+  field: string;
+  label: string;
+  column: IV2ColumnExpandRowTypes;
+
+  // optional
+  notVisible?: boolean;
+  exclude?: (IV2Column) => boolean;
+  pinned?: IV2ColumnPinned | boolean;
+  notResizable?: boolean;
+  notMovable?: boolean;
+  cssCellClass?: string;
+  sortable?: boolean;
+  filter?: V2Filter;
+}
+
+/**
  * Column
  */
 export type IV2Column = IV2ColumnBasic | IV2ColumnButton | IV2ColumnAge | IV2ColumnDate | IV2ColumnDatetime | IV2ColumnBoolean | IV2ColumnColor
-| IV2ColumnIconURL | IV2ColumnIconMaterial | IV2ColumnAction | IV2ColumnStatus | IV2ColumnLinkList | IV2ColumnHTML;
+| IV2ColumnIconURL | IV2ColumnIconMaterial | IV2ColumnAction | IV2ColumnStatus | IV2ColumnLinkList | IV2ColumnHTML | IV2ColumnExpandRow;
 
 /**
  * Filter handler
