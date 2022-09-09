@@ -1,0 +1,27 @@
+<!-- Render accordingly to column type -->
+<div
+  [ngSwitch]="expandRowColumnDef.column.type"
+  class="gd-list-table-detail-column"
+  fxLayout="row"
+  (click)="expandCollapse()">
+
+  <!-- expand / collapse indication -->
+  <mat-icon>{{expandRowColumnDef && detailsRow?.column === expandRowColumnDef ? 'expand_more' : 'expand_less' }}</mat-icon>
+
+  <!-- Changes -->
+  <span
+    *ngSwitchCase="V2ColumnExpandRowType.CHANGES"
+    fxFlex fxLayoutAlign="start center" fxLayoutGap="0.8rem"
+    [matTooltip]="'LNG_COMMON_LABEL_CHANGES' | translate">
+
+    <!-- Number of changes -->
+    <span>
+      {{ data && data[expandRowColumnDef.field] ? data[expandRowColumnDef.field].length : 0 }}
+    </span>
+
+    <!-- Changes icon - to make it pretty :) -->
+    <mat-icon>change_circle</mat-icon>
+
+  </span>
+
+</div>
