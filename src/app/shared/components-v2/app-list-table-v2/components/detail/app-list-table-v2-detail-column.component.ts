@@ -17,6 +17,11 @@ import { IV2RowExpandRow } from '../../models/row.model';
 export class AppListTableV2DetailColumnComponent implements ICellRendererAngularComp {
   // data
   data: any;
+  dataNoOfChanges: {
+    no: number
+  } = {
+      no: 0
+    };
   expandRowColumnDef: IV2ColumnExpandRow;
   gridApi: GridApi;
 
@@ -57,6 +62,11 @@ export class AppListTableV2DetailColumnComponent implements ICellRendererAngular
     const extendedColDef: IExtendedColDef = params.colDef as IExtendedColDef;
     this.expandRowColumnDef = extendedColDef.columnDefinition as IV2ColumnExpandRow;
     this.data = params.data;
+    this.dataNoOfChanges = {
+      no: this.data && this.data[this.expandRowColumnDef.field] ?
+        this.data[this.expandRowColumnDef.field].length :
+        0
+    };
     this.gridApi = params.api;
     this.detailsRow = this.gridApi.getRowNode((parseInt(params.node.id, 10) + 1).toString()).data as IV2RowExpandRow;
 

@@ -9,19 +9,10 @@
   <mat-icon>{{expandRowColumnDef && detailsRow?.column === expandRowColumnDef ? 'expand_more' : 'expand_less' }}</mat-icon>
 
   <!-- Changes -->
-  <span
+  <div
     *ngSwitchCase="V2ColumnExpandRowType.CHANGES"
-    fxFlex fxLayoutAlign="start center" fxLayoutGap="0.8rem"
-    [matTooltip]="'LNG_COMMON_LABEL_CHANGES' | translate">
-
-    <!-- Number of changes -->
-    <span>
-      {{ data && data[expandRowColumnDef.field] ? data[expandRowColumnDef.field].length : 0 }}
-    </span>
-
-    <!-- Changes icon - to make it pretty :) -->
-    <mat-icon>change_circle</mat-icon>
-
-  </span>
+    fxFlex>
+    {{ 'LNG_COMMON_LABEL_NO_OF_CHANGES' | translate:dataNoOfChanges }}
+  </div>
 
 </div>
