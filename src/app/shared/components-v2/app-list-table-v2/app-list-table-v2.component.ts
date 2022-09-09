@@ -78,6 +78,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   private static readonly STANDARD_SHAPE_PADDING: number = 14;
   private static readonly STANDARD_HEADER_HEIGHT: number = 40;
   private static readonly STANDARD_HEADER_WITH_FILTER_HEIGHT: number = 88;
+  private static readonly STANDARD_ROW_HEIGHT: number = 40;
   private static readonly STANDARD_DETAILS_ROW_HEIGHT: number = 250;
 
   // small screen mode ?
@@ -542,7 +543,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   getRowHeight: (params: RowHeightParams) => number = (params: RowHeightParams): number => {
     return params.data?.type === V2RowType.EXPAND_ROW ?
       AppListTableV2Component.STANDARD_DETAILS_ROW_HEIGHT :
-      40;
+      AppListTableV2Component.STANDARD_ROW_HEIGHT;
   };
 
   /**
