@@ -55,15 +55,12 @@
               class="gd-create-view-modify-list-top-buttons">
 
               <!-- Show / Hide status -->
-              <button
+              <app-form-toggle-icon-v2
                 *ngIf="expandListColumnRenderer?.type === CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS"
-                type="button"
-                mat-icon-button
-                color="secondary"
-                [matTooltip]="'LNG_COMMON_LABEL_SHOW_HIDE_STATUS' | translate"
-                (click)="expandListColumnRenderer.statusVisible = !expandListColumnRenderer.statusVisible">
-                <mat-icon>more_horiz</mat-icon>
-              </button>
+                [(ngModel)]="expandListColumnRenderer.statusVisible"
+                icon="more_horiz"
+                [matTooltip]="'LNG_COMMON_LABEL_SHOW_HIDE_STATUS' | translate">
+              </app-form-toggle-icon-v2>
 
               <!-- Sort and filter -->
               <button
