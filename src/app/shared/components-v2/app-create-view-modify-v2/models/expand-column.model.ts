@@ -23,6 +23,9 @@ interface ICreateViewModifyV2ExpandColumnText {
     details?: never,
     status?: never
   };
+
+  // never
+  statusVisible?: never;
 }
 
 /**
@@ -37,6 +40,7 @@ interface ICreateViewModifyV2ExpandColumnStatusAndDetails {
     details: (item: any) => string,
     status: (item: any) => SafeHtml
   };
+  statusVisible: boolean;
 }
 
 /**
