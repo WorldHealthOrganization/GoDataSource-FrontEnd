@@ -169,7 +169,6 @@ export class ReportCasesDateOnsetListComponent extends ListComponent<ReportCases
                 },
                 action: {
                   link: (item: ReportCasesWithOnsetModel) => {
-                    // #TODO TBD - if this is correct !? (old comment)
                     const relationTypePath: string = _.find(item.relationship.persons, { id: item.primaryCase.id }).source ? 'contacts' : 'exposures';
                     return ['/relationships', EntityType.CASE, item.primaryCase.id, relationTypePath, item.relationship.id, 'view'];
                   }
@@ -246,7 +245,6 @@ export class ReportCasesDateOnsetListComponent extends ListComponent<ReportCases
                 },
                 action: {
                   link: (item: ReportCasesWithOnsetModel) => {
-                    // #TODO TBD - if this is correct !? (old comment)
                     const relationTypePath: string = _.find(item.relationship.persons, { id: item.primaryCase.id }).source ? 'contacts' : 'exposures';
                     return ['/relationships', EntityType.CASE, item.primaryCase.id, relationTypePath, item.relationship.id, 'modify'];
                   }

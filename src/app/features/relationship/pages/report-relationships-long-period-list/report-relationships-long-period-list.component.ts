@@ -174,7 +174,6 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent<Re
                 },
                 action: {
                   link: (item: ReportDifferenceOnsetRelationshipModel) => {
-                    // #TODO TBD - if this is correct !? (old comment)
                     const relationTypePath: string = _.find(item.persons, { id: item.people[0].model.id }).source ? 'contacts' : 'exposures';
                     return ['/relationships', EntityType.CASE, item.people[0].model.id, relationTypePath, item.id, 'view'];
                   }
@@ -251,7 +250,6 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent<Re
                 },
                 action: {
                   link: (item: ReportDifferenceOnsetRelationshipModel) => {
-                    // #TODO TBD - if this is correct !? (old comment)
                     const relationTypePath: string = _.find(item.persons, { id: item.people[0].model.id }).source ? 'contacts' : 'exposures';
                     return ['/relationships', EntityType.CASE, item.people[0].model.id, relationTypePath, item.id, 'modify'];
                   }
