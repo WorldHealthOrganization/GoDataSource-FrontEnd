@@ -35,6 +35,36 @@ import { Constants } from '../../../../core/models/constants';
   templateUrl: './lab-results-list.component.html'
 })
 export class LabResultsListComponent extends ListComponent<LabResultModel> implements OnDestroy {
+
+  // lab fields
+  private labFields: ILabelValuePairModel[] = [
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_ID', value:  'id' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON_ID', value:  'personId' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN', value:  'dateSampleTaken' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED', value:  'dateSampleDelivered' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING', value:  'dateTesting' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT', value:  'dateOfResult' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME', value:  'labName' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID', value:  'sampleIdentifier' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE', value:  'sampleType' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE', value:  'testType' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR', value:  'testedFor' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT', value:  'result' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT', value:  'quantitativeResult' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES', value:  'notes' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS', value:  'status' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE', value:  'sequence' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value:  'questionnaireAnswers' },
+    { label: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON', value:  'person' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value:  'createdAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value:  'createdBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value:  'updatedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value:  'updatedBy' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value:  'deleted' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value:  'deletedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value:  'createdOn' }
+  ];
+
   /**
   * Constructor
   */
@@ -977,38 +1007,13 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                   ],
                   encrypt: true,
                   anonymize: {
-                    fields: [
-                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_ID', value:  'id' },
-                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON_ID', value:  'personId' },
-                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_TAKEN', value:  'dateSampleTaken' },
-                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_SAMPLE_DELIVERED', value:  'dateSampleDelivered' },
-                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_TESTING', value:  'dateTesting' },
-                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_DATE_OF_RESULT', value:  'dateOfResult' },
-                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME', value:  'labName' },
-                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_LAB_ID', value:  'sampleIdentifier' },
-                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_SAMPLE_TYPE', value:  'sampleType' },
-                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_TEST_TYPE', value:  'testType' },
-                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR', value:  'testedFor' },
-                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT', value:  'result' },
-                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_QUANTITATIVE_RESULT', value:  'quantitativeResult' },
-                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_NOTES', value:  'notes' },
-                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_STATUS', value:  'status' },
-                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE', value:  'sequence' },
-                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value:  'questionnaireAnswers' },
-                      { label: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON', value:  'person' },
-                      { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value:  'createdAt' },
-                      { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value:  'createdBy' },
-                      { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value:  'updatedAt' },
-                      { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value:  'updatedBy' },
-                      { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value:  'deleted' },
-                      { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value:  'deletedAt' },
-                      { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value:  'createdOn' }
-                    ]
+                    fields: this.labFields
                   },
                   groups: {
                     fields: labResultsFieldGroups,
                     required: labResultsFieldGroupsRequires
                   },
+                  fields: this.labFields,
                   dbColumns: true,
                   dbValues: true,
                   questionnaireVariables: true,
