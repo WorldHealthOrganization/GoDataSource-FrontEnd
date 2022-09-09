@@ -50,12 +50,24 @@
 
             <!-- Buttons -->
             <div
-              *ngIf="expandList && expandListAdvancedFilters?.length > 0"
-              fxGrow="0"
+              *ngIf="expandList && (expandListAdvancedFilters?.length > 0 || expandListColumnRenderer?.type === CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS)"
+              fxGrow="0" fxLayoutGap="0.8rem"
               class="gd-create-view-modify-list-top-buttons">
+
+              <!-- Show / Hide status -->
+              <button
+                *ngIf="expandListColumnRenderer?.type === CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS"
+                type="button"
+                mat-icon-button
+                color="secondary"
+                [matTooltip]="'LNG_COMMON_LABEL_SHOW_HIDE_STATUS' | translate"
+                (click)="expandListColumnRenderer.statusVisible = !expandListColumnRenderer.statusVisible">
+                <mat-icon>more_horiz</mat-icon>
+              </button>
 
               <!-- Sort and filter -->
               <button
+                *ngIf="expandListAdvancedFilters?.length > 0"
                 type="button"
                 mat-icon-button
                 color="secondary"
@@ -153,6 +165,7 @@
 
                       <!-- Status -->
                       <span
+                        *ngIf="expandListColumnRenderer.statusVisible"
                         class="gd-create-view-modify-list-data-record-is-status-and-details-status"
                         [innerHTML]="expandListColumnRenderer.get.status(record)">
                       </span>

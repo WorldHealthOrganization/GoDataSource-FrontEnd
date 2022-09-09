@@ -2121,6 +2121,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS,
       link: (item: ContactModel) => ['/contacts', item.id, 'view'],
+      statusVisible: true,
       get: {
         status: (item: ContactModel) => {
           // must initialize - optimization to not recreate the list everytime there is an event since data won't change ?

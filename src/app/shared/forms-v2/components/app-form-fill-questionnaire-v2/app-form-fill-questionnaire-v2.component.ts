@@ -29,7 +29,8 @@ import { v4 as uuid } from 'uuid';
 enum FlattenType {
   QUESTION,
   ANSWER,
-  ANSWER_MULTI_DATE
+  ANSWER_MULTI_DATE,
+  CATEGORY
 }
 
 /**
@@ -150,6 +151,18 @@ interface IFlattenNodeQuestion {
   };
 }
 
+/**
+ * Flatten node category
+ */
+interface IFlattenNodeCategory {
+  // required
+  type: FlattenType.CATEGORY;
+  category: string;
+
+  // never
+  collapsed?: never;
+}
+
 @Component({
   selector: 'app-form-fill-questionnaire-v2',
   templateUrl: './app-form-fill-questionnaire-v2.component.html',
@@ -209,6 +222,10 @@ export class AppFormFillQuestionnaireV2Component
   // handlers
   private _nonFlatToFlatWait: any;
 
+  // previous category rendered
+  // used to not render the same category multiple times
+  private _previousRenderedCategory: string;
+
   // handle errors
   private _errorsCount: number;
   private _errors: {
@@ -222,8 +239,8 @@ export class AppFormFillQuestionnaireV2Component
   @Output() errorsChanged = new EventEmitter<string>();
 
   // flattened questions
-  private _allFlattenedQuestions: (IFlattenNodeQuestion | IFlattenNodeAnswerMultiDate | IFlattenNodeAnswer)[] = [];
-  flattenedQuestions: (IFlattenNodeQuestion | IFlattenNodeAnswerMultiDate | IFlattenNodeAnswer)[] = [];
+  private _allFlattenedQuestions: (IFlattenNodeQuestion | IFlattenNodeAnswerMultiDate | IFlattenNodeAnswer | IFlattenNodeCategory)[] = [];
+  flattenedQuestions: (IFlattenNodeQuestion | IFlattenNodeAnswerMultiDate | IFlattenNodeAnswer | IFlattenNodeCategory)[] = [];
 
   // retrieve selected outbreak - since on create, view & modify select outbreak dropdown should be disabled
   private _selectedOutbreak: OutbreakModel = this.activatedRoute.snapshot.data.outbreak;
@@ -357,6 +374,7 @@ export class AppFormFillQuestionnaireV2Component
     }
 
     // flatten
+    this._previousRenderedCategory = undefined;
     this._errors = {};
     this._errorsCount = 0;
     this._allFlattenedQuestions = [];
@@ -382,7 +400,7 @@ export class AppFormFillQuestionnaireV2Component
    * Flatten
    */
   private flatten(
-    accumulator: (IFlattenNodeQuestion | IFlattenNodeAnswerMultiDate | IFlattenNodeAnswer)[],
+    accumulator: (IFlattenNodeQuestion | IFlattenNodeAnswerMultiDate | IFlattenNodeAnswer | IFlattenNodeCategory)[],
     questions: QuestionModel[],
     level: number,
     parent: IFlattenNodeAnswer,
@@ -412,6 +430,25 @@ export class AppFormFillQuestionnaireV2Component
       ) {
         // don't render it
         return;
+      }
+
+      // render category ?
+      if (
+        level === 0 &&
+        question.category &&
+        this._previousRenderedCategory !== question.category
+      ) {
+        // flatten category
+        const flattenedCategory: IFlattenNodeCategory = {
+          type: FlattenType.CATEGORY,
+          category: question.category
+        };
+
+        // render category
+        accumulator.push(flattenedCategory);
+
+        // don't render the same category consecutive
+        this._previousRenderedCategory = flattenedCategory.category;
       }
 
       // translate
