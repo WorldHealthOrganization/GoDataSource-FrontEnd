@@ -39,8 +39,8 @@ import { TranslateService } from '@ngx-translate/core';
   templateUrl: './contacts-of-contacts-list.component.html'
 })
 export class ContactsOfContactsListComponent extends ListComponent<ContactOfContactModel> implements OnDestroy {
-  // anonymize fields
-  private contactsOfContactsAnonymizeFields: ILabelValuePairModel[] = [
+  // contact of contacts fields
+  private contactsOfContactsFields: ILabelValuePairModel[] = [
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME', value: 'firstName' },
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RELATIONSHIP', value: 'relationship' },
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME', value: 'middleName' },
@@ -76,7 +76,9 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
     { label: 'LNG_CONTACT_FIELD_LABEL_DATE_BECOME_CONTACT', value: 'dateBecomeContact' },
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ID', value: 'id' }
   ];
-  private relationshipAnonymizeFields: ILabelValuePairModel[] = [
+
+  // relationship fields
+  private relationshipFields: ILabelValuePairModel[] = [
     { label: 'LNG_RELATIONSHIP_FIELD_LABEL_ID', value: 'id' },
     { label: 'LNG_RELATIONSHIP_FIELD_LABEL_SOURCE', value: 'sourcePerson' },
     { label: 'LNG_RELATIONSHIP_FIELD_LABEL_TARGET', value: 'targetPerson' },
@@ -974,7 +976,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
           click: (selected: string[]) => {
             // remove id from list
             const anonymizeFields =
-              this.contactsOfContactsAnonymizeFields.filter((item) => {
+              this.contactsOfContactsFields.filter((item) => {
                 return item.value !== 'id';
               });
 
@@ -1256,12 +1258,13 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                   ],
                   encrypt: true,
                   anonymize: {
-                    fields: this.contactsOfContactsAnonymizeFields
+                    fields: this.contactsOfContactsFields
                   },
                   groups: {
                     fields: contactsOfContactsFieldGroups,
                     required: contactsOfContactsFieldGroupsRequires
                   },
+                  fields: this.contactsOfContactsFields,
                   dbColumns: true,
                   dbValues: true,
                   jsonReplaceUndefinedWithNull: true
@@ -1331,12 +1334,13 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                     ],
                     encrypt: true,
                     anonymize: {
-                      fields: this.relationshipAnonymizeFields
+                      fields: this.relationshipFields
                     },
                     groups: {
                       fields: relationshipFieldGroups,
                       required: relationshipFieldGroupsRequires
                     },
+                    fields: this.relationshipFields,
                     dbColumns: true,
                     dbValues: true,
                     jsonReplaceUndefinedWithNull: true
