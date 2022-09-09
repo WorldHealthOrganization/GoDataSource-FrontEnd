@@ -47,7 +47,7 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class CasesListComponent extends ListComponent<CaseModel> implements OnDestroy {
   // case anonymize fields
-  private caseAnonymizeFields: ILabelValuePairModel[] = [
+  private caseFields: ILabelValuePairModel[] = [
     { label: 'LNG_CASE_FIELD_LABEL_ID', value: 'id' },
     { label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME', value: 'firstName' },
     { label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME', value: 'middleName' },
@@ -98,7 +98,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
   ];
 
   // relationship anonymize fields
-  private relationshipAnonymizeFields: ILabelValuePairModel[] = [
+  private relationshipFields: ILabelValuePairModel[] = [
     { label: 'LNG_RELATIONSHIP_FIELD_LABEL_ID', value: 'id' },
     { label: 'LNG_RELATIONSHIP_FIELD_LABEL_SOURCE', value: 'sourcePerson' },
     { label: 'LNG_RELATIONSHIP_FIELD_LABEL_TARGET', value: 'targetPerson' },
@@ -1702,7 +1702,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         action: {
           click: (selected: string[]) => {
             // remove id from list
-            const anonymizeFields = this.caseAnonymizeFields.filter((item) => {
+            const anonymizeFields = this.caseFields.filter((item) => {
               return item.value !== 'id';
             });
 
@@ -1985,12 +1985,13 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                     ],
                     encrypt: true,
                     anonymize: {
-                      fields: this.caseAnonymizeFields
+                      fields: this.caseFields
                     },
                     groups: {
                       fields: caseFieldGroups,
                       required: caseFieldGroupsRequires
                     },
+                    fields: this.caseFields,
                     dbColumns: true,
                     dbValues: true,
                     jsonReplaceUndefinedWithNull: true,
@@ -2072,12 +2073,13 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                     ],
                     encrypt: true,
                     anonymize: {
-                      fields: this.relationshipAnonymizeFields
+                      fields: this.relationshipFields
                     },
                     groups: {
                       fields: relationshipFieldGroups,
                       required: relationshipFieldGroupsRequires
                     },
+                    fields: this.relationshipFields,
                     dbColumns: true,
                     dbValues: true,
                     jsonReplaceUndefinedWithNull: true
