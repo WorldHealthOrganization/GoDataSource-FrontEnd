@@ -46,7 +46,7 @@ import { TranslateService } from '@ngx-translate/core';
   templateUrl: './cases-list.component.html'
 })
 export class CasesListComponent extends ListComponent<CaseModel> implements OnDestroy {
-  // case anonymize fields
+  // case fields
   private caseFields: ILabelValuePairModel[] = [
     { label: 'LNG_CASE_FIELD_LABEL_ID', value: 'id' },
     { label: 'LNG_CASE_FIELD_LABEL_FIRST_NAME', value: 'firstName' },
@@ -97,7 +97,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
     { label: 'LNG_CASE_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUserId' }
   ];
 
-  // relationship anonymize fields
+  // relationship fields
   private relationshipFields: ILabelValuePairModel[] = [
     { label: 'LNG_RELATIONSHIP_FIELD_LABEL_ID', value: 'id' },
     { label: 'LNG_RELATIONSHIP_FIELD_LABEL_SOURCE', value: 'sourcePerson' },

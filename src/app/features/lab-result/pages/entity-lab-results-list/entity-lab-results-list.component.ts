@@ -42,7 +42,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
   // constants
   EntityType = EntityType;
 
-  // lab results anonymize fields
+  // lab results fields
   labFields: ILabelValuePairModel[] = [
     { label: 'LNG_LAB_RESULT_FIELD_LABEL_ID', value: 'id' },
     { label: 'LNG_LAB_RESULT_FIELD_LABEL_PERSON_ID', value: 'personId' },
