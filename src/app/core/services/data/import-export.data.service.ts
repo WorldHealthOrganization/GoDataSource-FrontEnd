@@ -32,11 +32,8 @@ export class ImportExportDataService {
   }
 
   /**
-     * Export Data
-     * @param url
-     * @param data
-     * @param queryBuilder
-     */
+   * Export Data
+   */
   exportData(
     url: string,
     data: {
@@ -77,6 +74,15 @@ export class ImportExportDataService {
       // send the fields group list
       completeURL += '&fieldsGroupList=' + JSON.stringify(data.fieldsGroupList);
       delete data.fieldsGroupList;
+    }
+
+    // specific fields ?
+    if (data.fieldsList?.length > 0) {
+      // attach fields
+      queryBuilder.fields(...data.fieldsList);
+
+      // cleanup
+      delete data.fieldsList;
     }
 
     // add flag useDbColumns
@@ -162,10 +168,8 @@ export class ImportExportDataService {
   }
 
   /**
-     * Export Data
-     * @param url
-     * @param data
-     */
+   * Export Data
+   */
   exportPOSTData(
     url: string,
     data: any,
@@ -184,6 +188,15 @@ export class ImportExportDataService {
     if (data.fileType !== undefined) {
       data.type = data.fileType;
       delete data.fileType;
+    }
+
+    // specific fields ?
+    if (data.fieldsList?.length > 0) {
+      // attach fields
+      queryBuilder.fields(...data.fieldsList);
+
+      // cleanup
+      delete data.fieldsList;
     }
 
     // add flag useDbColumns

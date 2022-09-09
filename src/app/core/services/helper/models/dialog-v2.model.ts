@@ -95,6 +95,7 @@ export interface IV2ExportDataConfig {
         // optional
         required?: IV2ExportDataConfigGroupsRequired
       },
+      fields?: ILabelValuePairModel[],
       dbColumns?: boolean,
       dbValues?: boolean,
       jsonReplaceUndefinedWithNull?: boolean,
