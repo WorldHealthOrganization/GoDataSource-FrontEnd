@@ -22,6 +22,21 @@
           [style.paddingLeft.px]="item.level * 20"
           [style.height]="viewOnly ? '4.5rem' : '6rem'">
 
+          <!-- Category -->
+          <div
+            *ngSwitchCase="FlattenType.CATEGORY"
+            class="gd-form-fill-questionnaire-v2-list-item-category"
+            fxLayout="row" fxLayoutAlign="none center">
+
+            <!-- Label -->
+            <div
+              class="gd-form-fill-questionnaire-v2-list-item-category-content"
+              fxFlex>
+              {{item.category | translate}}
+            </div>
+
+          </div>
+
           <!-- Question -->
           <div
             *ngSwitchCase="FlattenType.QUESTION"
