@@ -6,10 +6,6 @@ import { SharedModule } from '../../shared/shared.module';
 
 // components
 import * as fromPages from './pages';
-import * as fromComponents from './components';
-
-// services
-import * as fromServices from './services';
 
 @NgModule({
   imports: [
@@ -17,11 +13,7 @@ import * as fromServices from './services';
     SharedModule
   ],
   declarations: [
-    ...fromPages.pageComponents,
-    ...fromComponents.components
-  ],
-  providers: [
-    ...fromServices.services
+    ...fromPages.pageComponents
   ]
 })
 export class AuditLogModule {
