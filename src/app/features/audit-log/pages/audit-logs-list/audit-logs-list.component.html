@@ -26,29 +26,3 @@
   (resetHeaderFilters)="resetFiltersToSideFilters()"
   (advancedFilterBy)="applySideFilters($event)">
 </app-list-table-v2>
-
-
-
-
-<!-- <mat-card class="page-section page-content">
-    <mat-table #table [dataSource]="auditLogsList$ | async" matSort (matSortChange)="sortBy($event)">
-
-        // #TODO: Left for changes tree feature inspiration
-        <!~~ Changes ~~>
-        <ng-container matColumnDef="changedData">
-            <mat-header-cell *matHeaderCellDef>
-                <div class="table-header-cell" fxLayout="column">
-                    <div class="column-header">{{'LNG_AUDIT_LOG_FIELD_LABEL_CHANGE_DATA' | translate}}</div>
-                    <div class="column-filter">
-                        <!~~ placeholder ~~>
-                    </div>
-                </div>
-            </mat-header-cell>
-
-            <mat-cell *matCellDef="let item">
-                <app-log-entry-changes [value]="item"></app-log-entry-changes>
-            </mat-cell>
-        </ng-container>
-
-    </mat-table>
-</mat-card> -->

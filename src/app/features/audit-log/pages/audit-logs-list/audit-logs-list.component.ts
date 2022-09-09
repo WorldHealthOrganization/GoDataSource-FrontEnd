@@ -5,21 +5,24 @@ import { throwError } from 'rxjs/internal/observable/throwError';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
-import { AuditLogModel } from '../../../../core/models/audit-log.model';
+import { AuditLogChangeDataModel, AuditLogModel } from '../../../../core/models/audit-log.model';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { UserModel, UserRoleModel } from '../../../../core/models/user.model';
 import { AuditLogDataService } from '../../../../core/services/data/audit-log.data.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2ColumnPinned, V2ColumnExpandRowType, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { TranslateService } from '@ngx-translate/core';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ExportDataExtension, ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
-import * as moment from 'moment';
+import { Constants } from '../../../../core/models/constants';
+import { ChangeValue, ChangeValueArray, ChangeValueObject, ChangeValueType } from '../../../../shared/components-v2/app-changes-v2/models/change.model';
+import * as momentOriginal from 'moment';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
   selector: 'app-audit-logs-list',
@@ -28,12 +31,6 @@ import * as moment from 'moment';
 export class AuditLogsListComponent
   extends ListComponent<AuditLogModel>
   implements OnDestroy {
-  // #TODO: Left for changes tree feature inspiration
-  // // date filter
-  // dateFilterDefaultValue: {
-  //   startDate,
-  //   endDate
-  // };
 
   /**
    * Constructor
@@ -117,15 +114,39 @@ export class AuditLogsListComponent
           type: V2ColumnFormat.DATETIME
         },
         filter: {
-          type: V2FilterType.DATE_RANGE
+          type: V2FilterType.DATE_RANGE,
+          value: {
+            startDate: moment().subtract(7, 'days').startOf('day'),
+            endDate: moment().endOf('day')
+          },
+          defaultValue: {
+            startDate: moment().subtract(7, 'days').startOf('day'),
+            endDate: moment().endOf('day')
+          }
         }
       },
       {
         field: 'changedData',
         label: 'LNG_AUDIT_LOG_FIELD_LABEL_CHANGE_DATA',
-        // #TODO: Needs changes tree feature,
         format: {
-          type: () => '...'
+          type: V2ColumnFormat.EXPAND_ROW
+        },
+        column: {
+          type: V2ColumnExpandRowType.CHANGES,
+          changes: (auditLog: AuditLogModel) => {
+            // must process audit log ?
+            if (!auditLog.uiChangeValue) {
+              auditLog.uiChangeValue = auditLog.changedData
+                .map((log) => this.determineChanges(
+                  log,
+                  auditLog.modelName
+                ))
+                .filter((value) => value !== null);
+            }
+
+            // finished
+            return auditLog.uiChangeValue;
+          }
         }
       },
       {
@@ -380,7 +401,7 @@ export class AuditLogsListComponent
           url: '/audit-logs/export',
           async: true,
           method: ExportDataMethod.POST,
-          fileName: `${ this.translateService.instant('LNG_PAGE_LIST_AUDIT_LOGS_TITLE') } - ${ moment().format('YYYY-MM-DD HH:mm') }`,
+          fileName: `${ this.translateService.instant('LNG_PAGE_LIST_AUDIT_LOGS_TITLE') } - ${ momentOriginal().format('YYYY-MM-DD HH:mm') }`,
           queryBuilder: qb,
           allow: {
             types: [
@@ -412,28 +433,222 @@ export class AuditLogsListComponent
       });
   }
 
-
-  // #TODO: Left for changes tree feature inspiration
   /**
-   * Initialize header filters
+   * Determine audit log changes
    */
-  // initializeHeaderFilters() {
-  //   this.dateFilterDefaultValue = {
-  //     startDate: moment().startOf('day').toISOString(),
-  //     endDate: moment().endOf('day').toISOString()
-  //   };
-  //   this.queryBuilder.filter.byDateRange(
-  //     'createdAt',
-  //     this.dateFilterDefaultValue
-  //   );
-  // }
+  private determineChanges(
+    changedData: AuditLogChangeDataModel,
+    modelName: string
+  ): ChangeValue | null {
+    // get changed value data type
+    const changedValueType: ChangeValueType = this.determineChangesType(
+      changedData,
+      modelName
+    );
 
-  // #TODO: Left for changes tree feature inspiration
+    // get changed value in proper format for being displayed in UI
+    switch (changedValueType) {
+      // boolean, number, string, token, date
+      case ChangeValueType.BOOLEAN:
+      case ChangeValueType.NUMBER:
+      case ChangeValueType.STRING:
+      case ChangeValueType.LNG_TOKEN:
+      case ChangeValueType.DATE:
+        if (
+          // omit empty values
+          (
+            (
+              changedData.newValue === undefined ||
+              changedData.newValue === null ||
+              changedData.newValue === ''
+            ) &&
+            (
+              changedData.oldValue === undefined ||
+              changedData.oldValue === null ||
+              changedData.oldValue === ''
+            )
+          ) ||
+          // omit identical values
+          (changedData.newValue === changedData.oldValue)
+        ) {
+          return null;
+        }
+
+        // finished
+        return {
+          type: changedValueType,
+          value: {
+            property: changedData.field,
+            newValue: changedData.newValue,
+            oldValue: changedData.oldValue
+          }
+        };
+
+      // rich content
+      case ChangeValueType.RICH_CONTENT:
+        return {
+          type: changedValueType,
+          property: changedData.field
+        };
+
+      // object, array
+      case ChangeValueType.OBJECT:
+      case ChangeValueType.ARRAY:
+        // value
+        const fieldValue: ChangeValueObject | ChangeValueArray = {
+          type: changedValueType,
+          rootProperty: changedData.field,
+          value: []
+        };
+
+        // add all child properties and their changed values
+        const alreadyProcessed: {
+          [prop: string]: true
+        } = {};
+
+        // collect properties from 'newValue'
+        this.processChangeValue(
+          fieldValue,
+          changedData,
+          modelName,
+          alreadyProcessed,
+          changedData.newValue
+        );
+
+        // collect properties from 'oldValue'
+        this.processChangeValue(
+          fieldValue,
+          changedData,
+          modelName,
+          alreadyProcessed,
+          changedData.oldValue
+        );
+
+        // did we collect any properties?
+        if (fieldValue.value.length === 0) {
+          return null;
+        }
+
+        // finished
+        return fieldValue;
+    }
+
+    return null;
+  }
+
   /**
-   * Add search criteria
+   * Determine audit log changes type
    */
-  // resetFiltersAddDefault() {
-  //   this.initializeHeaderFilters();
-  // }
+  private determineChangesType(
+    changedData: AuditLogChangeDataModel,
+    modelName: string
+  ): ChangeValueType {
+    // get data type based on newValue or oldValue (if newValue is empty)
+    let relevantValue = changedData.newValue;
+    if (
+      changedData.newValue === undefined ||
+      changedData.newValue === null ||
+      changedData.newValue === ''
+    ) {
+      relevantValue = changedData.oldValue;
+    }
+
+    // string ?
+    if (typeof relevantValue === 'string') {
+
+      // do not translate fields: 'id', 'token'
+      if (
+        changedData.field === 'id' ||
+        changedData.field === 'token'
+      ) {
+        return ChangeValueType.STRING;
+      }
+
+      // do not try to display rich content
+      if (
+        (
+          modelName === Constants.DATA_MODULES.HELP_ITEM.value &&
+          (
+            changedData.field === 'content' ||
+            changedData.field === 'translation'
+          )
+        ) || (
+          modelName === Constants.DATA_MODULES.LANGUAGE_TOKEN.value &&
+          changedData.field === 'translation'
+        )
+      ) {
+        return ChangeValueType.RICH_CONTENT;
+      }
+
+      // language token?
+      if (relevantValue.startsWith('LNG_')) {
+        return ChangeValueType.LNG_TOKEN;
+      }
+
+      // date?
+      if (new Date(relevantValue).getTime() > 0) {
+        return ChangeValueType.DATE;
+      }
+
+      // default
+      return ChangeValueType.STRING;
+    }
+
+    // boolean ?
+    if (typeof relevantValue === 'boolean') {
+      return ChangeValueType.BOOLEAN;
+    }
+
+    // number ?
+    if (typeof relevantValue === 'number') {
+      return ChangeValueType.NUMBER;
+    }
+
+    // array
+    if (Array.isArray(relevantValue)) {
+      return ChangeValueType.ARRAY;
+    }
+
+    // object
+    if (typeof relevantValue === 'object') {
+      return ChangeValueType.OBJECT;
+    }
+  }
+
+  /**
+   * Process object / array values
+   */
+  private processChangeValue(
+    fieldValue: ChangeValueObject | ChangeValueArray,
+    parentValue: AuditLogChangeDataModel,
+    modelName: string,
+    alreadyProcessed: {
+      [prop: string]: true
+    },
+    valueObject: any
+  ) {
+    for (const prop in valueObject) {
+      // process only if not already processed
+      if (!alreadyProcessed[prop]) {
+        // mark as processed
+        alreadyProcessed[prop] = true;
+
+        // process
+        const propFieldValue = this.determineChanges(
+          new AuditLogChangeDataModel({
+            field: prop,
+            newValue: _.get(parentValue.newValue, prop, ''),
+            oldValue: _.get(parentValue.oldValue, prop, '')
+          }),
+          modelName
+        );
+
+        // add value to the list of not empty
+        if (propFieldValue) {
+          fieldValue.value.push(propFieldValue);
+        }
+      }
+    }
+  }
 }
 
