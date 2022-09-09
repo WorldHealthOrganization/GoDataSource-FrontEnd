@@ -37,7 +37,8 @@ export class UserDataResolver implements IMapResolverV2<UserModel> {
     qb.fields(
       'id',
       'firstName',
-      'lastName'
+      'lastName',
+      'email'
     );
 
     // sort them
