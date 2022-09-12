@@ -1503,6 +1503,13 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
             // update settings
             this.loadPageSettings();
 
+            // hack to fix tab drawing issue when you move a tab before teh selected tab
+            this.loadingPage = true;
+            setTimeout(() => {
+              this.loadingPage = false;
+              this.detectChanges();
+            });
+
             // close
             response.handler.hide();
           });
