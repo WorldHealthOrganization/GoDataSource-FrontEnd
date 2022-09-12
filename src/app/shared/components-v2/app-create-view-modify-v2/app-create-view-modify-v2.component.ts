@@ -1377,6 +1377,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
     // order tabs
     this.updateTabsOrder();
+
+    // update ui
+    this.detectChanges();
   }
 
   /**
@@ -1502,9 +1505,6 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
             // close
             response.handler.hide();
-
-            // update layout
-            this.detectChanges();
           });
       });
   }
