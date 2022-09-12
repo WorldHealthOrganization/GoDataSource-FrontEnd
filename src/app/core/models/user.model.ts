@@ -66,7 +66,8 @@ export enum UserSettings {
   EVENT_GENERAL = 'eventGeneral',
   CONTACT_GENERAL = 'contactGeneral',
   CONTACT_OF_CONTACTS_GENERAL = 'contactOfContactsGeneral',
-  LAB_RESULT_GENERAL = 'labResultGeneral'
+  LAB_RESULT_GENERAL = 'labResultGeneral',
+  FOLLOW_UP_GENERAL = 'followUpGeneral'
 }
 
 export enum PhoneNumberType {
