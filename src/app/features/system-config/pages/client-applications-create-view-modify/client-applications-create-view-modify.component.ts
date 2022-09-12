@@ -159,11 +159,12 @@ export class ClientApplicationsCreateViewModifyComponent extends CreateViewModif
   }
 
   /**
-   * Initialize tabs - Personal
+   * Initialize tabs - Details
    */
   private initializeTabsDetails(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'details',
       label: 'LNG_PAGE_CREATE_SYSTEM_CLIENT_APPLICATION_TAB_DETAILS_TITLE',
       sections: [
         // Details

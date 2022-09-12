@@ -318,11 +318,12 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
   }
 
   /**
-   * Initialize tabs - Personal
+   * Initialize tabs - Details
    */
   private initializeTabsPersonal(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'details',
       label: this.isCreate ?
         'LNG_PAGE_CREATE_FOLLOW_UP_TAB_DETAILS_TITLE' :
         'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_DETAILS_TITLE',
@@ -432,6 +433,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
     let errors: string = '';
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'questionnaire',
       label: 'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,

@@ -9,6 +9,7 @@ import { TeamModel } from './team.model';
 import { BaseModel } from './base.model';
 
 export enum UserSettings {
+  // fields
   AUDIT_LOG_FIELDS = 'auditLogFields',
   DASHBOARD = 'dashboard',
   CASE_FIELDS = 'caseFields',
@@ -58,7 +59,15 @@ export enum UserSettings {
   ICON_FIELDS = 'iconFields',
   VIEW_PEOPLE_FIELDS = 'viewPeopleFields',
   LANGUAGE_FIELDS = 'languageFields',
-  AVAILABLE_ENTITIES_FIELDS = 'availableEntitiesFields'
+  AVAILABLE_ENTITIES_FIELDS = 'availableEntitiesFields',
+
+  // general settings
+  CASE_GENERAL = 'caseGeneral',
+  EVENT_GENERAL = 'eventGeneral',
+  CONTACT_GENERAL = 'contactGeneral',
+  CONTACT_OF_CONTACTS_GENERAL = 'contactOfContactsGeneral',
+  LAB_RESULT_GENERAL = 'labResultGeneral',
+  FOLLOW_UP_GENERAL = 'followUpGeneral'
 }
 
 export enum PhoneNumberType {

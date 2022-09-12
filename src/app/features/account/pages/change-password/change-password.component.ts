@@ -156,6 +156,7 @@ export class ChangePasswordComponent extends CreateViewModifyComponent<UserModel
   private initializeTabsChangePassword(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'change_password',
       label: 'LNG_PAGE_RESET_PASSWORD_TAB_CHANGE_PASSWORD_TITLE',
       sections: [
         // Details

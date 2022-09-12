@@ -1577,7 +1577,15 @@
             </ng-container>
           </ng-template>
 
-
+          <!-- Order tabs -->
+          <button
+            *ngIf="enableTabReorder && !!tabData?.tabs?.length"
+            type="button"
+            mat-icon-button
+            color="secondary"
+            (click)="configureTabs()">
+            <mat-icon>tune</mat-icon>
+          </button>
 
           <!-- Render tabs - Create layout -->
           <mat-horizontal-stepper

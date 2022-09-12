@@ -625,6 +625,7 @@ interface ICreateViewModifyV2Section {
 export interface ICreateViewModifyV2Tab {
   // required
   type: CreateViewModifyV2TabInputType.TAB;
+  name: string;
   label: string;
   sections: ICreateViewModifyV2Section[];
 
@@ -693,6 +694,7 @@ interface ICreateViewModifyV2TabTableFillQuestionnaire {
 export interface ICreateViewModifyV2TabTable {
   // required
   type: CreateViewModifyV2TabInputType.TAB_TABLE;
+  name: string;
   label: string;
   definition: ICreateViewModifyV2TabTableRecordsList | ICreateViewModifyV2TabTableEditQuestionnaire | ICreateViewModifyV2TabTableFillQuestionnaire;
 

@@ -1,7 +1,7 @@
 import { Observable, ReplaySubject, throwError } from 'rxjs';
 import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { OutbreakModel } from '../models/outbreak.model';
-import { UserModel } from '../models/user.model';
+import { UserModel, UserSettings } from '../models/user.model';
 import { ICreateViewModifyV2 } from '../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { ActivatedRoute } from '@angular/router';
 import { Directive, Renderer2, ViewChild } from '@angular/core';
@@ -90,6 +90,7 @@ export abstract class CreateViewModifyComponent<T>
 
   // constants
   Constants = Constants;
+  UserSettings = UserSettings;
 
   /**
    * Constructor

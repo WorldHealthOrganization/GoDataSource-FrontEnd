@@ -300,6 +300,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
   private initializeTabsDetails(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'details',
       label: this.isCreate ?
         'LNG_PAGE_CREATE_EVENT_TAB_DETAILS_TITLE' :
         'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE',
@@ -438,6 +439,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
     // create tab
     const newTab: ICreateViewModifyV2TabTable = {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'relationships_contacts',
       label: 'LNG_COMMON_BUTTON_EXPOSURES_FROM',
       visible: () => this.isView &&
         EventModel.canListRelationshipContacts(this.authUser),
@@ -556,6 +558,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
     // create tab
     const newTab: ICreateViewModifyV2TabTable = {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'relationships_exposures',
       label: 'LNG_COMMON_BUTTON_EXPOSURES_TO',
       visible: () => this.isView &&
         EventModel.canListRelationshipExposures(this.authUser),

@@ -213,6 +213,7 @@ export class LanguagesCreateViewModifyComponent extends CreateViewModifyComponen
   private initializeTabsDetails(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'details',
       label: this.isCreate ?
         'LNG_PAGE_CREATE_LANGUAGE_TAB_DETAILS_TITLE' :
         'LNG_PAGE_MODIFY_LANGUAGE_TAB_DETAILS_TITLE',

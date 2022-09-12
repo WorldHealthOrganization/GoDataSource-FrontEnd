@@ -315,6 +315,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
     // create tab
     const tab: ICreateViewModifyV2Tab = {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'personal',
       label: this.isCreate ?
         'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_TAB_PERSONAL_TITLE' :
         'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_PERSONAL_TITLE',
@@ -673,6 +674,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
   private initializeTabsEpidemiology(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'infection',
       label: this.isCreate ?
         'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_TAB_INFECTION_TITLE' :
         'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_INFECTION_TITLE',
@@ -780,6 +782,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
   private initializeTabsRelationship(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'relationship',
       label: 'LNG_PAGE_CREATE_CONTACT_OF_CONTACT_TAB_RELATIONSHIP_TITLE',
       visible: () => this.isCreate,
       sections: [
@@ -944,6 +947,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
     // create tab
     const newTab: ICreateViewModifyV2TabTable = {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'relationships_exposures',
       label: 'LNG_COMMON_BUTTON_EXPOSURES_TO',
       visible: () => this.isView &&
         ContactOfContactModel.canListRelationshipExposures(this.authUser),

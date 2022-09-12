@@ -210,6 +210,7 @@ export class HelpCategoryCreateViewModifyComponent extends CreateViewModifyCompo
   private initializeTabsDetails(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'details',
       label: this.isCreate ?
         'LNG_PAGE_CREATE_HELP_CATEGORY_TAB_DETAILS_TITLE' :
         'LNG_PAGE_MODIFY_HELP_CATEGORY_TAB_DETAILS_TITLE',

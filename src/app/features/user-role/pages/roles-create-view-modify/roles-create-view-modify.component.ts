@@ -233,11 +233,12 @@ export class RolesCreateViewModifyComponent extends CreateViewModifyComponent<Us
   }
 
   /**
-   * Initialize tabs - Personal
+   * Initialize tabs - Details
    */
   private initializeTabsPersonal(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'details',
       label: this.isCreate ?
         'LNG_PAGE_CREATE_USER_ROLE_TAB_DETAILS_TITLE' :
         'LNG_PAGE_MODIFY_USER_ROLES_DETAILS_TITLE',

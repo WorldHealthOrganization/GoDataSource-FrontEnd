@@ -379,6 +379,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     // create tab
     const tab: ICreateViewModifyV2Tab = {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'personal',
       label: this.isCreate ?
         'LNG_PAGE_CREATE_CASE_TAB_PERSONAL_TITLE' :
         'LNG_PAGE_MODIFY_CASE_TAB_PERSONAL_TITLE',
@@ -711,6 +712,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   private initializeTabsEpidemiology(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'infection',
       label: this.isCreate ?
         'LNG_PAGE_CREATE_CASE_TAB_INFECTION_TITLE' :
         'LNG_PAGE_MODIFY_CASE_TAB_INFECTION_TITLE',
@@ -1094,6 +1096,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     let errors: string = '';
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'questionnaire',
       label: 'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
@@ -1122,6 +1125,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   private initializeTabsQuestionnaireAsContact(): ICreateViewModifyV2TabTable {
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'questionnaire_as_contact',
       label: `${this.translateService.instant(EntityType.CONTACT)} ${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE')}`,
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
@@ -1147,6 +1151,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     // create tab
     const newTab: ICreateViewModifyV2TabTable = {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'relationships_contacts',
       label: 'LNG_COMMON_BUTTON_EXPOSURES_FROM',
       visible: () => this.isView &&
         CaseModel.canListRelationshipContacts(this.authUser),
@@ -1265,6 +1270,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     // create tab
     const newTab: ICreateViewModifyV2TabTable = {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'relationships_exposures',
       label: 'LNG_COMMON_BUTTON_EXPOSURES_TO',
       visible: () => this.isView &&
         CaseModel.canListRelationshipExposures(this.authUser),
@@ -1383,6 +1389,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     // create tab
     const newTab: ICreateViewModifyV2TabTable = {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'lab_results',
       label: 'LNG_PAGE_MODIFY_CASE_ACTION_SEE_LAB_RESULTS',
       visible: () => this.isView &&
         LabResultModel.canList(this.authUser) &&
@@ -1510,6 +1517,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     // create tab
     const newTab: ICreateViewModifyV2TabTable = {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'follow_ups_registered_as_contact',
       label: 'LNG_PAGE_LIST_FOLLOW_UPS_REGISTERED_AS_CONTACT_TITLE',
       visible: () => this.isView &&
         FollowUpModel.canList(this.authUser) &&

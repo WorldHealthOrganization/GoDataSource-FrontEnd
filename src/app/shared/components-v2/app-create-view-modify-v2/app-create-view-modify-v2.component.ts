@@ -33,6 +33,7 @@ import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ActivatedRoute, Params } from '@angular/router';
 import { MatTabGroup } from '@angular/material/tabs';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSortList, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../app-side-dialog-v2/models/side-dialog-config.model';
 
 /**
  * Component
@@ -45,6 +46,9 @@ import { MatTabGroup } from '@angular/material/tabs';
   encapsulation: ViewEncapsulation.None
 })
 export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
+  // constants
+  private static readonly GENERAL_SETTINGS_TAB_ORDER: string = 'tabsOrder';
+
   // page type
   // - determined from route data
   @Input() action: CreateViewModifyV2Action;
@@ -95,13 +99,20 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   @Input() retrieveAllFormDataOnModify: boolean;
 
   // tabs to render
+  private _tabsDefaultOrder: {
+    [tabKey: string]: number
+  } = {};
   private _tabData: ICreateViewModifyV2;
   @Input() set tabData(tabData: ICreateViewModifyV2) {
     // set data
     this._tabData = tabData;
+    this._tabsDefaultOrder = {};
 
     // set update ui methods
-    (this.tabData?.tabs || []).forEach((tab) => {
+    (this.tabData?.tabs || []).forEach((tab, tabIndex) => {
+      // keep default tab order
+      this._tabsDefaultOrder[tab.name || tab.label] = tabIndex;
+
       // not important ?
       if (tab.type !== CreateViewModifyV2TabInputType.TAB_TABLE) {
         return;
@@ -114,6 +125,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
         };
       }
     });
+
+    // update settings
+    this.loadPageSettings();
 
     // select tab if necessary
     this.selectTabIfPossible();
@@ -336,9 +350,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   // visited tabs
   selectedTab: ICreateViewModifyV2Tab | ICreateViewModifyV2TabTable;
   selectedTabParams: {
-    selectedTabLabel: string
-  } = this.activatedRoute.snapshot.queryParams?.selectedTabLabel ? {
-      selectedTabLabel: this.activatedRoute.snapshot.queryParams.selectedTabLabel
+    selectedTab: string
+  } = this.activatedRoute.snapshot.queryParams?.selectedTab ? {
+      selectedTab: this.activatedRoute.snapshot.queryParams.selectedTab
     } : undefined;
   visitedTabs: {
     [tabLabel: string]: true
@@ -346,6 +360,32 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
   // invalid drag zone
   private _isInvalidDragEvent: boolean = true;
+
+  // enable tabs reordering
+  private _enableTabReorder: boolean = false;
+  @Input() set enableTabReorder(enableTabReorder: boolean) {
+    // set value
+    this._enableTabReorder = enableTabReorder;
+
+    // update settings
+    this.loadPageSettings();
+  }
+  get enableTabReorder(): boolean {
+    return this._enableTabReorder;
+  }
+
+  // user settings key
+  private _pageSettingsKey: string;
+  @Input() set pageSettingsKey(pageSettingsKey: string) {
+    // set value
+    this._pageSettingsKey = pageSettingsKey;
+
+    // update settings
+    this.loadPageSettings();
+  }
+  get pageSettingsKey(): string {
+    return this._pageSettingsKey;
+  }
 
   // render mode
   renderMode: RenderMode = RenderMode.FULL;
@@ -990,12 +1030,12 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     // trigger tab changed
     this.selectedTab = tab;
     this.selectedTabParams = {
-      selectedTabLabel: this.selectedTab?.label
+      selectedTab: this.selectedTab?.name || this.selectedTab?.label
     };
 
     // update query url
     this.updateURL(window.location.href
-      .replace(/&?selectedTabLabel=([^&]+)/i, '')
+      .replace(/&?selectedTab=([^&]+)/i, '')
       .replace(/\?$/, '')
       .replace(/\?&/, '?')
     );
@@ -1284,14 +1324,14 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     if (
       !this.matTabGroup ||
       !this.tabData?.tabs?.length ||
-      !this.selectedTabParams?.selectedTabLabel
+      !this.selectedTabParams?.selectedTab
     ) {
       return;
     }
 
     // check if we can select tab
     const visibleTabs = this.tabData.tabs.filter((tab) => !tab.visible || tab.visible());
-    const tabIndex: number = visibleTabs.findIndex((tab) => tab.label === this.selectedTabParams.selectedTabLabel);
+    const tabIndex: number = visibleTabs.findIndex((tab) => tab.name === this.selectedTabParams.selectedTab || tab.label === this.selectedTabParams.selectedTab);
     if (tabIndex > -1) {
       // select tab
       this.matTabGroup.selectedIndex = tabIndex;
@@ -1301,7 +1341,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
       // update query url
       this.updateURL(window.location.href
-        .replace(/&?selectedTabLabel=([^&]+)/i, '')
+        .replace(/&?selectedTab=([^&]+)/i, '')
         .replace(/\?$/, '')
         .replace(/\?&/, '?')
       );
@@ -1315,8 +1355,8 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     // update url
     const linkUrl: string = url +
       (
-        this.selectedTabParams?.selectedTabLabel ?
-          `${url.indexOf('?') > -1 ? '&' : '?'}selectedTabLabel=${this.selectedTabParams.selectedTabLabel}` :
+        this.selectedTabParams?.selectedTab ?
+          `${url.indexOf('?') > -1 ? '&' : '?'}selectedTab=${this.selectedTabParams.selectedTab}` :
           ''
       );
     window.history.replaceState(
@@ -1324,5 +1364,155 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
       '',
       linkUrl
     );
+  }
+
+  /**
+   * Load page settings
+   */
+  private loadPageSettings(): void {
+    // nothing to do ?
+    if (!this.pageSettingsKey) {
+      return;
+    }
+
+    // order tabs
+    this.updateTabsOrder();
+
+    // update ui
+    this.detectChanges();
+  }
+
+  /**
+   * Load and update tabs order
+   */
+  private updateTabsOrder(): void {
+    // nothing to do ?
+    if (
+      !this.enableTabReorder ||
+      !this.pageSettingsKey ||
+      !this.tabData?.tabs?.length
+    ) {
+      return;
+    }
+
+    // do we have tabs order already saved ?
+    const generalSettings: {
+      [key: string]: any
+    } = this.authDataService
+      .getAuthenticatedUser()
+      .getSettings(this.pageSettingsKey);
+    const tabsOrder: string[] = generalSettings ?
+      generalSettings[AppCreateViewModifyV2Component.GENERAL_SETTINGS_TAB_ORDER] :
+      undefined;
+
+    // nothing to do ?
+    if (!tabsOrder) {
+      return;
+    }
+
+    // convert to easily sort tabs
+    // - could just do a flip
+    const tabsOrderMap: {
+      [tabKey: string]: number
+    } = {};
+    tabsOrder.forEach((tabKey, tabIndex) => {
+      tabsOrderMap[tabKey] = tabIndex;
+    });
+
+    // order tabs
+    this.tabData.tabs.sort((tab1, tab2) => {
+      // determine tab order position
+      const tab1Position: number = tabsOrderMap[tab1.name || tab1.label] ?? this._tabsDefaultOrder[tab1.name || tab1.label];
+      const tab2Position: number = tabsOrderMap[tab2.name || tab2.label] ?? this._tabsDefaultOrder[tab2.name || tab2.label];
+
+      // no information about tabs order ?
+      return tab1Position - tab2Position;
+    });
+  }
+
+  /**
+   * Configure tabs
+   */
+  configureTabs(): void {
+    // construct list of configurable inputs
+    const inputs: V2SideDialogConfigInput[] = [];
+
+    // order tabs
+    inputs.push(
+      {
+        type: V2SideDialogConfigInputType.DIVIDER,
+        placeholder: 'LNG_COMMON_LABEL_TABS_ORDER'
+      },
+      {
+        type: V2SideDialogConfigInputType.SORT_LIST,
+        name: 'sortedItems',
+        items: this.tabData.tabs.map((tab) => ({
+          label: tab.label,
+          value: tab.name || tab.label
+        }))
+      }
+    );
+
+    // display dialog
+    this.dialogV2Service
+      .showSideDialog({
+        title: {
+          get: () => 'LNG_COMMON_LABEL_TABS_SETTINGS'
+        },
+        hideInputFilter: true,
+        inputs,
+        bottomButtons: [{
+          type: IV2SideDialogConfigButtonType.OTHER,
+          label: 'LNG_COMMON_BUTTON_APPLY',
+          color: 'primary'
+        }, {
+          type: IV2SideDialogConfigButtonType.CANCEL,
+          label: 'LNG_COMMON_BUTTON_CANCEL',
+          color: 'text'
+        }]
+      })
+      .subscribe((response) => {
+        // cancelled ?
+        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+          // finished
+          return;
+        }
+
+        // show loading while saving the new order
+        response.handler.loading.show();
+
+        // determine tabs order
+        const tabsOrder: string[] = (response.data.map.sortedItems as IV2SideDialogConfigInputSortList).items
+          .map((item) => item.value);
+
+        // update settings
+        this.authDataService
+          .updateSettingsForCurrentUser({
+            [`${this.pageSettingsKey}.${AppCreateViewModifyV2Component.GENERAL_SETTINGS_TAB_ORDER}`]: tabsOrder
+          })
+          .pipe(
+            catchError((err) => {
+              // error
+              this.toastV2Service.error(err);
+
+              // send error down the road
+              return throwError(err);
+            })
+          )
+          .subscribe(() => {
+            // update settings
+            this.loadPageSettings();
+
+            // hack to fix tab drawing issue when you move a tab before teh selected tab
+            this.loadingPage = true;
+            setTimeout(() => {
+              this.loadingPage = false;
+              this.detectChanges();
+            });
+
+            // close
+            response.handler.hide();
+          });
+      });
   }
 }

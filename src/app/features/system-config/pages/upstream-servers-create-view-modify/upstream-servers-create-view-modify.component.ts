@@ -171,6 +171,7 @@ export class UpstreamServersCreateViewModifyComponent extends CreateViewModifyCo
   private initializeTabsDetails(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'details',
       label: 'LNG_PAGE_CREATE_SYSTEM_UPSTREAM_SERVER_TAB_DETAILS_TITLE',
       sections: [
         // Details
