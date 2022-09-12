@@ -28,7 +28,7 @@ export const EnglishUsLang = {
     'LNG_COMMON_LABEL_SHOW_HIDE_STATUS': 'Show / Hide status',
     'LNG_COMMON_LABEL_EXPORT_FIELDS_ALL': 'All fields',
     'LNG_COMMON_LABEL_EXPORT_FIELDS': 'Fields',
-    'LNG_COMMON_LABEL_TABS_SETTINGS': 'Settings',
+    'LNG_COMMON_LABEL_TABS_SETTINGS': 'Tab configuration',
     'LNG_COMMON_LABEL_TABS_ORDER': 'Tabs order'
 
 

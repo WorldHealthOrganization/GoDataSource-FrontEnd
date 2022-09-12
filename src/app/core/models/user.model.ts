@@ -62,7 +62,11 @@ export enum UserSettings {
   AVAILABLE_ENTITIES_FIELDS = 'availableEntitiesFields',
 
   // general settings
-  CASE_GENERAL = 'caseGeneral'
+  CASE_GENERAL = 'caseGeneral',
+  EVENT_GENERAL = 'eventGeneral',
+  CONTACT_GENERAL = 'contactGeneral',
+  CONTACT_OF_CONTACTS_GENERAL = 'contactOfContactsGeneral',
+  LAB_RESULT_GENERAL = 'labResultGeneral'
 }
 
 export enum PhoneNumberType {
