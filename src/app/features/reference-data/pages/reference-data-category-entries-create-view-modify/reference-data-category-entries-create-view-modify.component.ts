@@ -212,6 +212,7 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
     // create tab
     const tab: ICreateViewModifyV2Tab = {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'details',
       label: 'LNG_COMMON_LABEL_DETAILS',
       sections: [
         // Details

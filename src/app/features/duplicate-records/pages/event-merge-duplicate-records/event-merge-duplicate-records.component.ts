@@ -245,7 +245,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
       // tabs
       tabs: [
         // Personal
-        this.initializeTabDetails()
+        this.initializeTabsDetails()
       ],
 
       // create details
@@ -391,9 +391,10 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
   /**
   * Initialize tab details
   */
-  private initializeTabDetails(): ICreateViewModifyV2Tab {
+  private initializeTabsDetails(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'details',
       label: 'LNG_PAGE_MODIFY_EVENT_TAB_DETAILS_TITLE',
       sections: [
         // Details

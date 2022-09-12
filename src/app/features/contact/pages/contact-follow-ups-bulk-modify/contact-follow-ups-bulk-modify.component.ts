@@ -244,6 +244,7 @@ export class ContactFollowUpsBulkModifyComponent extends CreateViewModifyCompone
     return {
       // Details
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'details',
       label: 'LNG_COMMON_LABEL_DETAILS',
       sections: [
         {

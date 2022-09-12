@@ -142,6 +142,7 @@ export class ViewHelpComponent extends CreateViewModifyComponent<HelpItemModel> 
   private initializeTabsDetails(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'details',
       label: 'LNG_COMMON_LABEL_DETAILS',
       sections: [
         // Details

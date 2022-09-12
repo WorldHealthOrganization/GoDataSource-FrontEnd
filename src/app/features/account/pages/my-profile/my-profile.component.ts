@@ -128,11 +128,12 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
   }
 
   /**
-   * Initialize tabs - Personal
+   * Initialize tabs - My Profile
    */
   private initializeTabsPersonal(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'my_profile',
       label: 'LNG_PAGE_MY_PROFILE_TITLE',
       sections: [
         // Details

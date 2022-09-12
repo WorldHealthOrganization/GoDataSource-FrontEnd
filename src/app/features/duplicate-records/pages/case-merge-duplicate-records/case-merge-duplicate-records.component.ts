@@ -613,14 +613,14 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
       // tabs
       tabs: [
         // Personal
-        this.initializeTabPersonal(),
+        this.initializeTabsPersonal(),
 
         // Epidemiology
-        this.initializeTabEpidemiology(),
+        this.initializeTabsEpidemiology(),
 
         // Questionnaires
-        this.initializeTabQuestionnaire(),
-        this.initializeTabQuestionnaireAsContact()
+        this.initializeTabsQuestionnaire(),
+        this.initializeTabsQuestionnaireAsContact()
       ],
 
       // create details
@@ -641,9 +641,10 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
   /**
    * Initialize tab - Personal
    */
-  private initializeTabPersonal(): ICreateViewModifyV2Tab {
+  private initializeTabsPersonal(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'personal',
       label: 'LNG_PAGE_CASE_MERGE_DUPLICATE_RECORDS_TAB_PERSONAL_TITLE',
       sections: [
         // Details
@@ -873,9 +874,10 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
   /**
     * Initialize tab - Epidemiology
     */
-  private initializeTabEpidemiology(): ICreateViewModifyV2Tab {
+  private initializeTabsEpidemiology(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'infection',
       label: 'LNG_PAGE_CREATE_CASE_TAB_INFECTION_TITLE',
       sections: [
         // Details
@@ -1266,9 +1268,10 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
   /**
    * Initialize tab - Questionnaire
    */
-  private initializeTabQuestionnaire(): ICreateViewModifyV2TabTable {
+  private initializeTabsQuestionnaire(): ICreateViewModifyV2TabTable {
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'questionnaire',
       label: 'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
@@ -1291,9 +1294,10 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
   /**
    * Initialize tab - Questionnaire
    */
-  private initializeTabQuestionnaireAsContact(): ICreateViewModifyV2TabTable {
+  private initializeTabsQuestionnaireAsContact(): ICreateViewModifyV2TabTable {
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'questionnaire_as_contact',
       label: `${this.translateService.instant(EntityType.CONTACT)} ${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE')}`,
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,

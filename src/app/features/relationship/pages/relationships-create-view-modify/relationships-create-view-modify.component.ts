@@ -336,6 +336,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
   ): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: title,
       label: title,
       sections: [
         // Details

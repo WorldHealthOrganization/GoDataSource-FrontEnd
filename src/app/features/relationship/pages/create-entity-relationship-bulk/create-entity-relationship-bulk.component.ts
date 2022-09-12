@@ -291,6 +291,7 @@ export class CreateEntityRelationshipBulkComponent extends CreateViewModifyCompo
     return {
       // Details
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'details',
       label: 'LNG_COMMON_LABEL_DETAILS',
       sections: [
         {

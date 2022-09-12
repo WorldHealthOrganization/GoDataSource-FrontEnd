@@ -229,6 +229,7 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
   private initializeTabsDetails(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'details',
       label: this.isCreate ?
         'LNG_PAGE_CREATE_OUTBREAK_TEMPLATE_TAB_DETAILS' :
         'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_TAB_DETAILS',
@@ -544,6 +545,7 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
   private initializeTabsQuestionnaireCase(): ICreateViewModifyV2TabTable {
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'case_investigation_template',
       label: 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE,
@@ -567,6 +569,7 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
   private initializeTabsQuestionnaireContact(): ICreateViewModifyV2TabTable {
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'contact_investigation_template',
       label: 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE,
@@ -590,6 +593,7 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
   private initializeTabsQuestionnaireFollowUp(): ICreateViewModifyV2TabTable {
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'follow_up_template',
       label: 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE,
@@ -613,6 +617,7 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
   private initializeTabsQuestionnaireLabResult(): ICreateViewModifyV2TabTable {
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'lab_result_template',
       label: 'LNG_PAGE_MODIFY_OUTBREAK_TEMPLATE_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE,

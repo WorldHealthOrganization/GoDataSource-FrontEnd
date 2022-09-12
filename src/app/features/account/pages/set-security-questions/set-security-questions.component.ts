@@ -146,6 +146,7 @@ export class SetSecurityQuestionsComponent extends CreateViewModifyComponent<Use
   private initializeTabsSetSecurityQuestions(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'security_questions',
       label: 'LNG_PAGE_SET_SECURITY_QUESTIONS_TAB_SECURITY_QUESTIONS_TITLE',
       sections: [
         // Set security questions

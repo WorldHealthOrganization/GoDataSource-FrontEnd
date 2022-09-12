@@ -338,6 +338,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
   private initializeTabsDetails(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'details',
       label: this.isCreate ? 'LNG_PAGE_CREATE_LAB_RESULT_TAB_DETAILS' : 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_DETAILS_TITLE',
       sections: [
         {
@@ -652,6 +653,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     let errors: string = '';
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'questionnaire',
       label: 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_QUESTIONNAIRE_TITLE',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,

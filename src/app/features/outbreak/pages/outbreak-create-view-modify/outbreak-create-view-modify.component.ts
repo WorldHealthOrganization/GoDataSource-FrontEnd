@@ -257,6 +257,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
   private initializeTabsDetails(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'details',
       label: this.isCreate ?
         'LNG_PAGE_CREATE_OUTBREAK_TAB_DETAILS' :
         'LNG_PAGE_MODIFY_OUTBREAK_TAB_DETAILS',
@@ -829,6 +830,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     // finished
     return {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'map_servers',
       label: this.isCreate ?
         'LNG_PAGE_CREATE_OUTBREAK_TAB_MAP_SERVERS' :
         'LNG_PAGE_MODIFY_OUTBREAK_TAB_MAP_SERVERS',
@@ -851,6 +853,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
   private initializeTabsQuestionnaireCase(): ICreateViewModifyV2TabTable {
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'case_investigation_template',
       label: 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CASE_INVESTIGATION_QUESTIONNAIRE',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE,
@@ -874,6 +877,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
   private initializeTabsQuestionnaireContact(): ICreateViewModifyV2TabTable {
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'contact_investigation_template',
       label: 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CONTACT_INVESTIGATION_QUESTIONNAIRE',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE,
@@ -897,6 +901,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
   private initializeTabsQuestionnaireFollowUp(): ICreateViewModifyV2TabTable {
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'follow_up_template',
       label: 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CONTACT_FOLLOW_UP_QUESTIONNAIRE',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE,
@@ -920,6 +925,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
   private initializeTabsQuestionnaireLabResult(): ICreateViewModifyV2TabTable {
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'lab_result_template',
       label: 'LNG_PAGE_MODIFY_OUTBREAK_ACTION_CASE_LAB_RESULTS_QUESTIONNAIRE',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE,

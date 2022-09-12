@@ -361,10 +361,10 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
       // tabs
       tabs: [
         // Personal
-        this.initializeTabPersonal(),
+        this.initializeTabsPersonal(),
 
         // // Epidemiology
-        this.initializeTabEpidemiology()
+        this.initializeTabsEpidemiology()
       ],
 
       // create details
@@ -487,9 +487,10 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
   /**
   * Initialize tabs - Personal
   */
-  private initializeTabPersonal(): ICreateViewModifyV2Tab {
+  private initializeTabsPersonal(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'personal',
       label: 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_PERSONAL_TITLE',
       sections: [
         // Details
@@ -719,9 +720,10 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
   /**
   * Initialize tabs - Epidemiology
   */
-  private initializeTabEpidemiology(): ICreateViewModifyV2Tab {
+  private initializeTabsEpidemiology(): ICreateViewModifyV2Tab {
     return {
       type: CreateViewModifyV2TabInputType.TAB,
+      name: 'infection',
       label: 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_INFECTION_TITLE',
       sections: [
         // Details
