@@ -78,9 +78,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   private static readonly STANDARD_COLUMN_ACTION_GAP: number = 8;
   private static readonly STANDARD_SELECT_COLUMN_WIDTH: number = 42;
   private static readonly STANDARD_OBFUSCATED_COLUMN_WIDTH: number = 400;
-  private static readonly STANDARD_SHAPE_SIZE: number = 12;
-  private static readonly STANDARD_SHAPE_GAP: number = 6;
-  private static readonly STANDARD_SHAPE_PADDING: number = 14;
+  static readonly STANDARD_SHAPE_SIZE: number = 12;
+  static readonly STANDARD_SHAPE_GAP: number = 6;
+  static readonly STANDARD_SHAPE_PADDING: number = 14;
   private static readonly STANDARD_HEADER_HEIGHT: number = 40;
   private static readonly STANDARD_HEADER_WITH_FILTER_HEIGHT: number = 88;
   private static readonly STANDARD_ROW_HEIGHT: number = 40;

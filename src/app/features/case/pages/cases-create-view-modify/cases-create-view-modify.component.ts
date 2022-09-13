@@ -2158,6 +2158,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       type: CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS,
       link: (item: CaseModel) => ['/cases', item.id, 'view'],
       statusVisible: true,
+      maxNoOfStatusForms: 3,
       get: {
         status: (item: CaseModel) => {
           // must initialize - optimization to not recreate the list everytime there is an event since data won't change ?

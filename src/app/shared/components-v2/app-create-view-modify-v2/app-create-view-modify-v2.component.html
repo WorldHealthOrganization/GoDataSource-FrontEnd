@@ -165,7 +165,8 @@
                       <span
                         *ngIf="expandListColumnRenderer.statusVisible"
                         class="gd-create-view-modify-list-data-record-is-status-and-details-status"
-                        [innerHTML]="expandListColumnRenderer.get.status(record)">
+                        [innerHTML]="expandListColumnRenderer.get.status(record)"
+                        [style.min-width.px]="expandListColumnRenderer.maxNoOfStatusForms * AppListTableV2Component.STANDARD_SHAPE_SIZE + (expandListColumnRenderer.maxNoOfStatusForms - 1) * AppListTableV2Component.STANDARD_SHAPE_GAP + AppListTableV2Component.STANDARD_SHAPE_PADDING + 2">
                       </span>
 
                       <!-- Text & Details -->

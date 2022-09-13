@@ -403,6 +403,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   FormHelperService = FormHelperService;
   CreateViewModifyV2ExpandColumnType = CreateViewModifyV2ExpandColumnType;
   RenderMode = RenderMode;
+  AppListTableV2Component = AppListTableV2Component;
 
   /**
    * Constructor
