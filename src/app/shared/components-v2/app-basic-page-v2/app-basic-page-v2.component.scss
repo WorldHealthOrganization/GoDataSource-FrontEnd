@@ -18,6 +18,9 @@ app-basic-page-v2 {
         font-size: 2.4rem;
         font-weight: 500;
         line-height: $gd-line-height;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
     
       /* Page top buttons */
@@ -26,10 +29,6 @@ app-basic-page-v2 {
           display: none !important;
         }
 
-        @include breakpoint('xs') {
-          margin-top: 1.6rem;
-        }
-  
         .gd-basic-top-title-buttons-buttons-quick {
           .mat-icon {
             @include transition(all 0.24s ease-in-out 0s);

@@ -58,7 +58,7 @@
               <app-form-toggle-icon-v2
                 *ngIf="expandListColumnRenderer?.type === CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS"
                 [(ngModel)]="expandListColumnRenderer.statusVisible"
-                icon="more_horiz"
+                icon="category"
                 [matTooltip]="'LNG_COMMON_LABEL_SHOW_HIDE_STATUS' | translate">
               </app-form-toggle-icon-v2>
 
@@ -131,11 +131,11 @@
 
               <!-- Items -->
               <cdk-virtual-scroll-viewport
-                [itemSize]="40">
+                [itemSize]="expandListColumnRenderer.type === CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS ? 64 : 40">
                 <div
                   *cdkVirtualFor="let record of expandListRecords; templateCacheSize: 0;"
                   [ngSwitch]="expandListColumnRenderer?.type"
-                  style="height: 4rem;"
+                  [ngStyle]="{height: expandListColumnRenderer.type === CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS ? '6.4rem' : '4rem'}"
                   class="gd-create-view-modify-list-data-record"
                   [class.gd-create-view-modify-list-data-record-active]="record.id === itemID">
 
@@ -158,7 +158,8 @@
                     [routerLink]="expandListColumnRenderer.link(record)"
                     [queryParams]="selectedTabParams">
                     <span
-                      (click)="$event.preventDefault(); $event.stopPropagation(); $event.stopImmediatePropagation(); (record.id === itemID ? undefined : expandListViewRecord(record))">
+                      (click)="$event.preventDefault(); $event.stopPropagation(); $event.stopImmediatePropagation(); (record.id === itemID ? undefined : expandListViewRecord(record))"
+                      [class.gd-create-view-modify-list-data-record-active-statuses]="expandListColumnRenderer.statusVisible">
 
                       <!-- Status -->
                       <span
@@ -260,12 +261,12 @@
 
           <!-- Title & buttons -->
           <div
-            fxLayout="row" fxLayout.lt-md="column"
+            fxLayout="row" fxLayoutGap="0.8rem" fxLayout.lt-md="column"
             class="gd-create-view-modify-top-title-buttons">
 
             <!-- Title & view button -->
             <div
-              fxFlex fxLayoutAlign="start center" fxLayoutGap="1.6rem"
+              fxFlex fxFlex.lt-md="none" fxLayoutAlign="start center" fxLayoutGap="1.6rem"
               class="gd-create-view-modify-top-title-buttons-title">
 
               <!-- Title -->
@@ -287,7 +288,7 @@
             <!-- Buttons -->
             <div
               *ngIf="!isCreate"
-              fxFlex fxLayoutAlign="end" fxLayoutGap="0.8rem"
+              fxLayoutAlign="end" fxLayoutGap="0.8rem" flexGrow="0"
               class="gd-create-view-modify-top-title-buttons-buttons">
 
               <!-- Cancel -->
@@ -1581,9 +1582,10 @@
           <!-- Order tabs -->
           <button
             *ngIf="enableTabReorder && !!tabData?.tabs?.length"
+            class="gd-order-tabs-button"
             type="button"
             mat-icon-button
-            color="secondary"
+            color="primary"
             (click)="configureTabs()">
             <mat-icon>tune</mat-icon>
           </button>

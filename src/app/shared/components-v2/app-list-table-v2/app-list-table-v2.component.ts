@@ -58,6 +58,7 @@ import { determineIfSmallScreenMode } from '../../../core/methods/small-screen-m
 import { AppListTableV2DetailRowComponent } from './components/detail/app-list-table-v2-detail-row.component';
 import { AppListTableV2DetailColumnComponent } from './components/detail/app-list-table-v2-detail-column.component';
 import { IV2RowExpandRow, V2RowType } from './models/row.model';
+import { determineIfTouchDevice } from '../../../core/methods/touch-device';
 
 /**
  * Component
@@ -87,6 +88,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   // small screen mode ?
   isSmallScreenMode: boolean = false;
+
+  // check if this is a touch device
+  isTouchDevice: boolean = determineIfTouchDevice();
 
   // records
   recordsSubscription: Subscription;

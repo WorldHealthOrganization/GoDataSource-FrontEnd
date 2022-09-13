@@ -55,41 +55,45 @@
         </div>
 
         <div
-            class="import-data-file-input"
-            fxLayout="row"
-            (click)="importDataBtn.click()">
+            class="import-data-actions-row"
+            fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="space-between start">
             <div
-                class="import-data-file-input-label">
-                {{ title | translate:translationData }}
+                class="import-data-file-input"
+                fxLayout="row"
+                (click)="importDataBtn.click()">
+                <div
+                    class="import-data-file-input-label">
+                    {{ title | translate:translationData }}
+                </div>
+                <div
+                    fxFlex
+                    class="import-data-file-input-file">
+                    {{ uploader?.queue.length > 0 ? uploader.queue[0].file.name : ('LNG_PAGE_IMPORT_DATA_LABEL_CHOOSE_FILE' | translate) }}
+                </div>
+                <div
+                    class="import-data-file-input-browse">
+                    {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_BROWSE' | translate }}
+                </div>
             </div>
-            <div
-                fxFlex
-                class="import-data-file-input-file">
-                {{ uploader?.queue.length > 0 ? uploader.queue[0].file.name : ('LNG_PAGE_IMPORT_DATA_LABEL_CHOOSE_FILE' | translate) }}
-            </div>
-            <div
-                class="import-data-file-input-browse">
-                {{ 'LNG_PAGE_IMPORT_DATA_BUTTON_BROWSE' | translate }}
-            </div>
-        </div>
 
-        <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-between start">
-            <app-form-input-v2
-                name="decryptPassword"
-                [(ngModel)]="decryptPassword"
-                [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_DECRYPT_PASSWORD' | translate"
-                tooltip="LNG_PAGE_IMPORT_DATA_LABEL_DECRYPT_PASSWORD_DESTINATION"
-                autocomplete="off">
-            </app-form-input-v2>
+            <div fxLayout="row" fxLayout.xs="column" fxLayoutAlign="space-between start">
+                <app-form-input-v2
+                    name="decryptPassword"
+                    [(ngModel)]="decryptPassword"
+                    [placeholder]="'LNG_PAGE_IMPORT_DATA_LABEL_DECRYPT_PASSWORD' | translate"
+                    tooltip="LNG_PAGE_IMPORT_DATA_LABEL_DECRYPT_PASSWORD_DESTINATION"
+                    autocomplete="off">
+                </app-form-input-v2>
 
-            <button
-                mat-flat-button
-                color="primary"
-                [disabled]="!uploader || uploader.queue.length < 1"
-                (click)="uploadFile()"
-                type="button">
-                {{ (isOneStep ? 'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE' : 'LNG_PAGE_IMPORT_DATA_BUTTON_UPLOAD_FILE') | translate }}
-            </button>
+                <button
+                    mat-flat-button
+                    color="primary"
+                    [disabled]="!uploader || uploader.queue.length < 1"
+                    (click)="uploadFile()"
+                    type="button">
+                    {{ (isOneStep ? 'LNG_PAGE_IMPORT_DATA_BUTTON_IMPORT_FILE' : 'LNG_PAGE_IMPORT_DATA_BUTTON_UPLOAD_FILE') | translate }}
+                </button>
+            </div>
         </div>
     </div>
 

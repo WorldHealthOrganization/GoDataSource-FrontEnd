@@ -112,9 +112,11 @@
         .mat-content {
           .mat-expansion-panel-header-title {
             color: var(--gd-background);
+            flex-basis: auto;
           }
 
           .mat-expansion-panel-header-description {
+            flex-basis: auto;
             margin-right: 0;
 
             button.mat-icon-button {
