@@ -399,7 +399,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
           toolTip: this.translateService.instant('LNG_PAGE_DASHBOARD_EPI_CURVE_CLASSIFICATION_TITLE'),
           action: {
             click: () => {
-              this.getEpiCurveDashlet('app-epi-curve-dashlet svg');
+              this.getEpiCurveDashlet(
+                'app-epi-curve-dashlet svg',
+                `${this.translateService.instant('LNG_PAGE_DASHBOARD_EPI_CURVE_CLASSIFICATION_TITLE')} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`
+              );
             }
           },
           visible: () => DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(this._authUser)
@@ -413,7 +416,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
           toolTip: this.translateService.instant('LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE'),
           action: {
             click: () => {
-              this.getEpiCurveDashlet('app-epi-curve-outcome-dashlet svg');
+              this.getEpiCurveDashlet(
+                'app-epi-curve-outcome-dashlet svg',
+                `${this.translateService.instant('LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE')} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`
+              );
             }
           },
           visible: () => DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(this._authUser)
@@ -427,7 +433,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
           toolTip: this.translateService.instant('LNG_PAGE_DASHBOARD_EPI_CURVE_REPORTING_TITLE'),
           action: {
             click: () => {
-              this.getEpiCurveDashlet('app-epi-curve-reporting-dashlet svg');
+              this.getEpiCurveDashlet(
+                'app-epi-curve-reporting-dashlet svg',
+                `${this.translateService.instant('LNG_PAGE_DASHBOARD_EPI_CURVE_REPORTING_TITLE')} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`
+              );
             }
           },
           visible: () => DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(this._authUser)
@@ -566,7 +575,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   /**
    * Get Epi curve dashlet
    */
-  private getEpiCurveDashlet(selector: string) {
+  private getEpiCurveDashlet(selector: string, fileName: string) {
     this.dialogV2Service.showSideDialog({
       // title
       title: {
@@ -649,7 +658,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
               })
             )
             .subscribe((blob) => {
-              this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL');
+              this.downloadFile(blob, fileName);
               loading.close();
             });
         });
