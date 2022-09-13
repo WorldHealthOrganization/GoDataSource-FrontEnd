@@ -293,14 +293,32 @@
               class="gd-create-view-modify-top-title-buttons-buttons">
 
               <!-- Cancel -->
-              <a
-                *ngIf="isView ? (tabData.buttons.viewCancel && (!tabData.buttons.viewCancel.visible || tabData.buttons.viewCancel.visible())) : (tabData.buttons.modifyCancel && (!tabData.buttons.modifyCancel.visible || tabData.buttons.modifyCancel.visible()))"
-                type="button"
-                mat-flat-button color="text"
-                [routerLink]="isView ? tabData.buttons.viewCancel.link.link() : tabData.buttons.modifyCancel.link.link()"
-                [queryParams]="isView ? (tabData.buttons.viewCancel.link.queryParams ? tabData.buttons.viewCancel.link.queryParams() : undefined) : (tabData.buttons.modifyCancel.link.queryParams ? tabData.buttons.modifyCancel.link.queryParams() : undefined)">
-                {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
-              </a>
+              <ng-container
+                *ngIf="isView ? (tabData.buttons.viewCancel && (!tabData.buttons.viewCancel.visible || tabData.buttons.viewCancel.visible())) : (tabData.buttons.modifyCancel && (!tabData.buttons.modifyCancel.visible || tabData.buttons.modifyCancel.visible()))">
+
+                <!-- Big screen TV -->
+                <a
+                  *ngIf="!isSmallScreenMode; else smallScreen"
+                  type="button"
+                  mat-flat-button color="text"
+                  [routerLink]="isView ? tabData.buttons.viewCancel.link.link() : tabData.buttons.modifyCancel.link.link()"
+                  [queryParams]="isView ? (tabData.buttons.viewCancel.link.queryParams ? tabData.buttons.viewCancel.link.queryParams() : undefined) : (tabData.buttons.modifyCancel.link.queryParams ? tabData.buttons.modifyCancel.link.queryParams() : undefined)">
+                  {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
+                </a>
+
+                <!-- Small screen TV -->
+                <ng-template
+                  #smallScreen>
+                  <button
+                    type="button"
+                    mat-flat-button color="secondary"
+                    [routerLink]="isView ? tabData.buttons.viewCancel.link.link() : tabData.buttons.modifyCancel.link.link()"
+                    [queryParams]="isView ? (tabData.buttons.viewCancel.link.queryParams ? tabData.buttons.viewCancel.link.queryParams() : undefined) : (tabData.buttons.modifyCancel.link.queryParams ? tabData.buttons.modifyCancel.link.queryParams() : undefined)">
+                    <mat-icon>backspace</mat-icon>
+                  </button>
+                </ng-template>
+
+              </ng-container>
 
               <!-- Quick Actions -->
               <ng-container
@@ -363,19 +381,29 @@
                 <button
                   #quickMenuTrigger="matMenuTrigger"
                   class="gd-create-view-modify-top-title-buttons-buttons-quick"
-                  [class.gd-create-view-modify-top-title-buttons-buttons-quick-expanded]="quickMenuTrigger.menuOpen"
+                  [class.gd-create-view-modify-top-title-buttons-buttons-quick-expanded]="quickMenuTrigger.menuOpen && !isSmallScreenMode"
                   type="button"
                   mat-flat-button color="secondary"
                   [matMenuTriggerFor]="quickMenu"
                   (menuClosed)="detectChanges()">
 
-                  <!-- Label -->
-                  <span>
-                    {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}}
-                  </span>
+                  <!-- Big screen TV -->
+                  <ng-container
+                    *ngIf="!isSmallScreenMode; else smallScreen">
+                    <!-- Label -->
+                    <span>
+                      {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}}
+                    </span>
 
-                  <!-- Icon -->
-                  <mat-icon>expand_more</mat-icon>
+                    <!-- Icon -->
+                    <mat-icon>expand_more</mat-icon>
+                  </ng-container>
+
+                  <!-- Small screen TV -->
+                  <ng-template
+                    #smallScreen>
+                    <mat-icon>apps</mat-icon>
+                  </ng-template>
                 </button>
 
               </ng-container>
@@ -396,10 +424,18 @@
                   color="primary">
                 </mat-progress-spinner>
 
+                <!-- Big screen TV -->
                 <!-- Label -->
-                <span>
+                <span
+                  *ngIf="!isSmallScreenMode; else smallScreen">
                   {{'LNG_COMMON_BUTTON_SAVE' | translate}}
                 </span>
+
+                <!-- Small screen TV -->
+                <ng-template
+                  #smallScreen>
+                  <mat-icon>save</mat-icon>
+                </ng-template>
               </button>
 
               <!-- Edit -->
@@ -409,7 +445,19 @@
                 mat-flat-button color="primary"
                 [routerLink]="tabData.buttons.modify.link.link()"
                 [queryParams]="tabData.buttons.modify.link.queryParams ? retrieveSelectedTabQueryParams(tabData.buttons.modify.link.queryParams()) : selectedTabParams">
-                {{'LNG_COMMON_BUTTON_EDIT' | translate}}
+
+                <!-- Big screen TV -->
+                <!-- Label -->
+                <span
+                  *ngIf="!isSmallScreenMode; else smallScreen">
+                  {{'LNG_COMMON_BUTTON_EDIT' | translate}}
+                </span>
+
+                <!-- Small screen TV -->
+                <ng-template
+                  #smallScreen>
+                  <mat-icon>edit</mat-icon>
+                </ng-template>
               </a>
             </div>
           </div>

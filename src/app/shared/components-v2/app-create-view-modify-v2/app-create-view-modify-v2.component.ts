@@ -34,6 +34,7 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ActivatedRoute, Params } from '@angular/router';
 import { MatTabGroup } from '@angular/material/tabs';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSortList, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../app-side-dialog-v2/models/side-dialog-config.model';
+import { determineIfSmallScreenMode } from '../../../core/methods/small-screen-mode';
 
 /**
  * Component
@@ -389,6 +390,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
   // render mode
   renderMode: RenderMode = RenderMode.FULL;
+
+  // small screen mode ?
+  isSmallScreenMode: boolean = false;
 
   // refresh data
   @Output() expandListRefreshData = new EventEmitter<ICreateViewModifyV2Refresh>();
@@ -1252,6 +1256,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   private updateRenderMode(): void {
     // determine render mode
     this.renderMode = determineRenderMode();
+
+    // small screen mode ?
+    this.isSmallScreenMode = determineIfSmallScreenMode();
   }
 
   /**
