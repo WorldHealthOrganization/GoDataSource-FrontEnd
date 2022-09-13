@@ -15,7 +15,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { HierarchicalLocationModel } from '../../../../core/models/hierarchical-location.model';
 
 @Component({
@@ -85,6 +85,59 @@ export class LocationUsageListComponent extends ListComponent<any> implements On
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_ACTION_VIEW',
+          action: {
+            link: (item: UsageDetailsItem): string[] => {
+              return [item.viewUrl];
+            }
+          },
+          visible: (item: UsageDetailsItem): boolean => {
+            return item.typePermissions &&
+              item.typePermissions.canView(this.authUser) &&
+              !!item.outbreakId &&
+              !!item.outbreakName &&
+              this.selectedOutbreak?.id &&
+              item.outbreakId === this.selectedOutbreak.id;
+          }
+        },
+
+        // Modify
+        {
+          type: V2ActionType.ICON,
+          icon: 'edit',
+          iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
+          action: {
+            link: (item: UsageDetailsItem): string[] => {
+              return [item.modifyUrl];
+            }
+          },
+          visible: (item: UsageDetailsItem): boolean => {
+            return item.typePermissions &&
+              item.typePermissions.canModify(this.authUser) &&
+              !!item.outbreakId &&
+              !!item.outbreakName &&
+              this.selectedOutbreak?.id &&
+              item.outbreakId === this.selectedOutbreak.id &&
+              item.outbreakId === this.authUser.activeOutbreakId;
+          }
+        }
+      ]
+    };
+  }
+
+  /**
    * Initialize Side Table Columns
    */
   protected initializeTableColumns(): void {
@@ -101,60 +154,6 @@ export class LocationUsageListComponent extends ListComponent<any> implements On
       {
         field: 'outbreakName',
         label: 'LNG_PAGE_LIST_USAGE_LOCATIONS_TYPE_LABEL_OUTBREAK'
-      },
-
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // View
-          {
-            type: V2ActionType.ICON,
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_ACTION_VIEW',
-            action: {
-              link: (item: UsageDetailsItem): string[] => {
-                return [item.viewUrl];
-              }
-            },
-            visible: (item: UsageDetailsItem): boolean => {
-              return item.typePermissions &&
-                item.typePermissions.canView(this.authUser) &&
-                !!item.outbreakId &&
-                !!item.outbreakName &&
-                this.selectedOutbreak?.id &&
-                item.outbreakId === this.selectedOutbreak.id;
-            }
-          },
-
-          // Modify
-          {
-            type: V2ActionType.ICON,
-            icon: 'edit',
-            iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
-            action: {
-              link: (item: UsageDetailsItem): string[] => {
-                return [item.modifyUrl];
-              }
-            },
-            visible: (item: UsageDetailsItem): boolean => {
-              return item.typePermissions &&
-                item.typePermissions.canModify(this.authUser) &&
-                !!item.outbreakId &&
-                !!item.outbreakName &&
-                this.selectedOutbreak?.id &&
-                item.outbreakId === this.selectedOutbreak.id &&
-                item.outbreakId === this.authUser.activeOutbreakId;
-            }
-          }
-        ]
       }
     ];
   }

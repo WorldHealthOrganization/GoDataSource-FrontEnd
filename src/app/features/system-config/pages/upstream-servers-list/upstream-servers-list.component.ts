@@ -16,7 +16,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 
 @Component({
   selector: 'app-upstream-servers-list',
@@ -54,6 +54,174 @@ export class UpstreamServersListComponent extends ListComponent<SystemUpstreamSe
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
+  }
+
+  /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // Start sync
+        {
+          type: V2ActionType.ICON,
+          icon: 'sync',
+          iconTooltip: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_START_SYNC',
+          action: {
+            click: (item: SystemUpstreamServerModel) => {
+              this.startSync(item);
+            }
+          },
+          visible: (): boolean => {
+            return SystemUpstreamServerModel.canSync(this.authUser);
+          }
+        },
+
+        // Disable sync
+        {
+          type: V2ActionType.ICON,
+          icon: 'sync_disabled',
+          iconTooltip: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DISABLE_SYNC',
+          action: {
+            click: (item: SystemUpstreamServerModel) => {
+              this.toggleSyncEnableFlag(item);
+            }
+          },
+          visible: (item: SystemUpstreamServerModel): boolean => {
+            return item.syncEnabled &&
+              SystemUpstreamServerModel.canDisableSync(this.authUser);
+          }
+        },
+
+        // Enable sync
+        {
+          type: V2ActionType.ICON,
+          icon: 'alarm_on',
+          iconTooltip: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_ENABLE_SYNC',
+          action: {
+            click: (item: SystemUpstreamServerModel) => {
+              this.toggleSyncEnableFlag(item);
+            }
+          },
+          visible: (item: SystemUpstreamServerModel): boolean => {
+            return !item.syncEnabled &&
+              SystemUpstreamServerModel.canEnableSync(this.authUser);
+          }
+        },
+
+        // Other actions
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          menuOptions: [
+            // Delete
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DELETE_SERVER'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: SystemUpstreamServerModel): void => {
+                  let systemSettings: SystemSettingsModel;
+
+                  // determine what we need to delete
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_DELETE',
+                        data: () => ({
+                          name: item.name
+                        })
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_DELETE_SYSTEM_UPSTREAM_SERVER',
+                        data: () => ({
+                          name: item.name
+                        })
+                      }
+                    },
+                    initialized: (handler) => {
+                      // display loading
+                      handler.loading.show();
+
+                      // determine if case has exposed contacts
+                      this.systemSettingsDataService
+                        .getSystemSettings()
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            this.toastV2Service.error(err);
+
+                            // hide loading
+                            handler.loading.hide();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe((settings: SystemSettingsModel) => {
+                          systemSettings = settings;
+
+                          // hide loading
+                          handler.loading.hide();
+                        });
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // filter upstream servers
+                    const upstreamServers = systemSettings.upstreamServers.filter((server: SystemUpstreamServerModel) => {
+                      return server.url !== item.url;
+                    });
+
+                    // save upstream servers
+                    this.systemSettingsDataService
+                      .modifySystemSettings({
+                        upstreamServers
+                      })
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
+
+                          // hide loading
+                          loading.close();
+
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                        // hide loading
+                        loading.close();
+
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
+                }
+              },
+              visible: (): boolean => {
+                return SystemUpstreamServerModel.canDelete(this.authUser);
+              }
+            }
+          ]
+        }
+      ]
+    };
   }
 
   /**
@@ -105,175 +273,6 @@ export class UpstreamServersListComponent extends ListComponent<SystemUpstreamSe
         format: {
           type: V2ColumnFormat.BOOLEAN
         }
-      },
-
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // Start sync
-          {
-            type: V2ActionType.ICON,
-            icon: 'sync',
-            iconTooltip: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_START_SYNC',
-            action: {
-              click: (item: SystemUpstreamServerModel) => {
-                this.startSync(item);
-              }
-            },
-            visible: (): boolean => {
-              return SystemUpstreamServerModel.canSync(this.authUser);
-            }
-          },
-
-          // Disable sync
-          {
-            type: V2ActionType.ICON,
-            icon: 'sync_disabled',
-            iconTooltip: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DISABLE_SYNC',
-            action: {
-              click: (item: SystemUpstreamServerModel) => {
-                this.toggleSyncEnableFlag(item);
-              }
-            },
-            visible: (item: SystemUpstreamServerModel): boolean => {
-              return item.syncEnabled &&
-                SystemUpstreamServerModel.canDisableSync(this.authUser);
-            }
-          },
-
-          // Enable sync
-          {
-            type: V2ActionType.ICON,
-            icon: 'alarm_on',
-            iconTooltip: 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_ENABLE_SYNC',
-            action: {
-              click: (item: SystemUpstreamServerModel) => {
-                this.toggleSyncEnableFlag(item);
-              }
-            },
-            visible: (item: SystemUpstreamServerModel): boolean => {
-              return !item.syncEnabled &&
-                SystemUpstreamServerModel.canEnableSync(this.authUser);
-            }
-          },
-
-          // Other actions
-          {
-            type: V2ActionType.MENU,
-            icon: 'more_horiz',
-            menuOptions: [
-              // Delete
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DELETE_SERVER'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: SystemUpstreamServerModel): void => {
-                    let systemSettings: SystemSettingsModel;
-
-                    // determine what we need to delete
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_DELETE',
-                          data: () => ({
-                            name: item.name
-                          })
-                        },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_SYSTEM_UPSTREAM_SERVER',
-                          data: () => ({
-                            name: item.name
-                          })
-                        }
-                      },
-                      initialized: (handler) => {
-                        // display loading
-                        handler.loading.show();
-
-                        // determine if case has exposed contacts
-                        this.systemSettingsDataService
-                          .getSystemSettings()
-                          .pipe(
-                            catchError((err) => {
-                              // show error
-                              this.toastV2Service.error(err);
-
-                              // hide loading
-                              handler.loading.hide();
-
-                              // send error down the road
-                              return throwError(err);
-                            })
-                          )
-                          .subscribe((settings: SystemSettingsModel) => {
-                            systemSettings = settings;
-
-                            // hide loading
-                            handler.loading.hide();
-                          });
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
-
-                      // filter upstream servers
-                      const upstreamServers = systemSettings.upstreamServers.filter((server: SystemUpstreamServerModel) => {
-                        return server.url !== item.url;
-                      });
-
-                      // save upstream servers
-                      this.systemSettingsDataService
-                        .modifySystemSettings({
-                          upstreamServers
-                        })
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
-
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_UPSTREAM_SERVERS_ACTION_DELETE_SUCCESS_MESSAGE');
-
-                          // hide loading
-                          loading.close();
-
-                          // reload data
-                          this.needsRefreshList(true);
-                        });
-                    });
-                  }
-                },
-                visible: (): boolean => {
-                  return SystemUpstreamServerModel.canDelete(this.authUser);
-                }
-              }
-            ]
-          }
-        ]
       }
     ];
   }

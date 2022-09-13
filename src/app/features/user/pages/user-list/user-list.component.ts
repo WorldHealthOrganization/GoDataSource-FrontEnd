@@ -87,6 +87,127 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View User
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_LIST_USERS_ACTION_VIEW_USER',
+          action: {
+            link: (item: UserModel): string[] => {
+              return ['/users', item.id, 'view'];
+            }
+          },
+          visible: (item: UserModel): boolean => {
+            return item.id !== this.authUser.id &&
+              UserModel.canView(this.authUser);
+          }
+        },
+
+        // Modify User
+        {
+          type: V2ActionType.ICON,
+          icon: 'edit',
+          iconTooltip: 'LNG_PAGE_LIST_USERS_ACTION_MODIFY_USER',
+          action: {
+            link: (item: UserModel): string[] => {
+              return ['/users', item.id, 'modify'];
+            }
+          },
+          visible: (item: UserModel): boolean => {
+            return item.id !== this.authUser.id &&
+              UserModel.canModify(this.authUser);
+          }
+        },
+
+        // Other actions
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          menuOptions: [
+            // Delete User
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_USERS_ACTION_DELETE_USER'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: UserModel): void => {
+                  // determine what we need to delete
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_DELETE',
+                        data: () => ({
+                          name: item.name
+                        })
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_DELETE_USER',
+                        data: () => ({
+                          firstName: item.firstName,
+                          lastName: item.lastName
+                        })
+                      }
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // delete the user
+                    this.userDataService
+                      .deleteUser(item.id)
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
+
+                          // hide loading
+                          loading.close();
+
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_LIST_USERS_ACTION_DELETE_USER_SUCCESS_MESSAGE');
+
+                        // hide loading
+                        loading.close();
+
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
+                }
+              },
+              visible: (item: UserModel): boolean => {
+                return item.id !== this.authUser.id &&
+                  item.id !== 'sys_admin' &&
+                  UserModel.canDelete(this.authUser);
+              }
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  /**
    * Initialize Side Table Columns
    */
   protected initializeTableColumns() {
@@ -279,131 +400,6 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
         }
       });
     }
-
-    // rest of columns :)
-    this.tableColumns.push(
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // View User
-          {
-            type: V2ActionType.ICON,
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_LIST_USERS_ACTION_VIEW_USER',
-            action: {
-              link: (item: UserModel): string[] => {
-                return ['/users', item.id, 'view'];
-              }
-            },
-            visible: (item: UserModel): boolean => {
-              return item.id !== this.authUser.id &&
-                UserModel.canView(this.authUser);
-            }
-          },
-
-          // Modify User
-          {
-            type: V2ActionType.ICON,
-            icon: 'edit',
-            iconTooltip: 'LNG_PAGE_LIST_USERS_ACTION_MODIFY_USER',
-            action: {
-              link: (item: UserModel): string[] => {
-                return ['/users', item.id, 'modify'];
-              }
-            },
-            visible: (item: UserModel): boolean => {
-              return item.id !== this.authUser.id &&
-                UserModel.canModify(this.authUser);
-            }
-          },
-
-          // Other actions
-          {
-            type: V2ActionType.MENU,
-            icon: 'more_horiz',
-            menuOptions: [
-              // Delete User
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_USERS_ACTION_DELETE_USER'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: UserModel): void => {
-                    // determine what we need to delete
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_DELETE',
-                          data: () => ({
-                            name: item.name
-                          })
-                        },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_USER',
-                          data: () => ({
-                            firstName: item.firstName,
-                            lastName: item.lastName
-                          })
-                        }
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
-
-                      // delete the user
-                      this.userDataService
-                        .deleteUser(item.id)
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
-
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_USERS_ACTION_DELETE_USER_SUCCESS_MESSAGE');
-
-                          // hide loading
-                          loading.close();
-
-                          // reload data
-                          this.needsRefreshList(true);
-                        });
-                    });
-                  }
-                },
-                visible: (item: UserModel): boolean => {
-                  return item.id !== this.authUser.id &&
-                    item.id !== 'sys_admin' &&
-                    UserModel.canDelete(this.authUser);
-                }
-              }
-            ]
-          }
-        ]
-      }
-    );
   }
 
   /**

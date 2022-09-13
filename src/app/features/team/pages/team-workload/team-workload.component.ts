@@ -114,6 +114,11 @@ export class TeamWorkloadComponent extends ListComponent<any> implements OnDestr
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {}
+
+  /**
    * Initialize Side Table Columns
    */
   protected initializeTableColumns(): void {}

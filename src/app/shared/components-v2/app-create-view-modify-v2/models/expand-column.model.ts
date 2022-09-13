@@ -41,6 +41,7 @@ interface ICreateViewModifyV2ExpandColumnStatusAndDetails {
     status: (item: any) => SafeHtml
   };
   statusVisible: boolean;
+  maxNoOfStatusForms: number;
 }
 
 /**

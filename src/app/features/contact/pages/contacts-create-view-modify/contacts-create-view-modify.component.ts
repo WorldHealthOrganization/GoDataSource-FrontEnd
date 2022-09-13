@@ -1140,29 +1140,31 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
         type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST,
         pageSettingsKey: UserSettings.RELATIONSHIP_FIELDS,
         advancedFilterType: Constants.APP_PAGE.RELATIONSHIPS.value,
-        tableColumns: this.entityHelperService
-          .retrieveTableColumns({
-            selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
-            selectedOutbreak: () => this.selectedOutbreak,
-            entity: this.itemData,
-            relationshipType: RelationshipType.CONTACT,
-            authUser: this.authUser,
-            personType: this.activatedRoute.snapshot.data.personType,
-            cluster: this.activatedRoute.snapshot.data.cluster,
-            options: {
-              certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              exposureFrequency: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              exposureDuration: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              contextOfTransmission: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
-            },
-            refreshList: () => {
-              // reload data
-              const localTab: ICreateViewModifyV2TabTableRecordsList = newTab.definition as ICreateViewModifyV2TabTableRecordsList;
-              localTab.refresh(newTab);
-            }
-          }),
+        tableColumnActions: this.entityHelperService.retrieveTableColumnActions({
+          selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
+          selectedOutbreak: () => this.selectedOutbreak,
+          entity: this.itemData,
+          relationshipType: RelationshipType.CONTACT,
+          authUser: this.authUser,
+          refreshList: () => {
+            // reload data
+            const localTab: ICreateViewModifyV2TabTableRecordsList = newTab.definition as ICreateViewModifyV2TabTableRecordsList;
+            localTab.refresh(newTab);
+          }
+        }),
+        tableColumns: this.entityHelperService.retrieveTableColumns({
+          authUser: this.authUser,
+          personType: this.activatedRoute.snapshot.data.personType,
+          cluster: this.activatedRoute.snapshot.data.cluster,
+          options: {
+            certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            exposureFrequency: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            exposureDuration: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            contextOfTransmission: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+          }
+        }),
         advancedFilters: this.entityHelperService.generateAdvancedFilters({
           options: {
             certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -1259,29 +1261,31 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
         type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST,
         pageSettingsKey: UserSettings.RELATIONSHIP_FIELDS,
         advancedFilterType: Constants.APP_PAGE.RELATIONSHIPS.value,
-        tableColumns: this.entityHelperService
-          .retrieveTableColumns({
-            selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
-            selectedOutbreak: () => this.selectedOutbreak,
-            entity: this.itemData,
-            relationshipType: RelationshipType.EXPOSURE,
-            authUser: this.authUser,
-            personType: this.activatedRoute.snapshot.data.personType,
-            cluster: this.activatedRoute.snapshot.data.cluster,
-            options: {
-              certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              exposureFrequency: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              exposureDuration: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              contextOfTransmission: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
-            },
-            refreshList: () => {
-              // reload data
-              const localTab: ICreateViewModifyV2TabTableRecordsList = newTab.definition as ICreateViewModifyV2TabTableRecordsList;
-              localTab.refresh(newTab);
-            }
-          }),
+        tableColumnActions: this.entityHelperService.retrieveTableColumnActions({
+          selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
+          selectedOutbreak: () => this.selectedOutbreak,
+          entity: this.itemData,
+          relationshipType: RelationshipType.EXPOSURE,
+          authUser: this.authUser,
+          refreshList: () => {
+            // reload data
+            const localTab: ICreateViewModifyV2TabTableRecordsList = newTab.definition as ICreateViewModifyV2TabTableRecordsList;
+            localTab.refresh(newTab);
+          }
+        }),
+        tableColumns: this.entityHelperService.retrieveTableColumns({
+          authUser: this.authUser,
+          personType: this.activatedRoute.snapshot.data.personType,
+          cluster: this.activatedRoute.snapshot.data.cluster,
+          options: {
+            certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            exposureType: (this.activatedRoute.snapshot.data.exposureType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            exposureFrequency: (this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            exposureDuration: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            contextOfTransmission: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
+          }
+        }),
         advancedFilters: this.entityHelperService.generateAdvancedFilters({
           options: {
             certaintyLevel: (this.activatedRoute.snapshot.data.certaintyLevel as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -1379,11 +1383,19 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
         type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST,
         pageSettingsKey: UserSettings.CONTACT_LAB_FIELDS,
         advancedFilterType: Constants.APP_PAGE.CONTACT_LAB_RESULTS.value,
-        tableColumns: this.entityLabResultService.retrieveTableColumns({
+        tableColumnActions: this.entityLabResultService.retrieveTableColumnActions({
           authUser: this.authUser,
           personType: this.itemData.type,
           selectedOutbreak: () => this.selectedOutbreak,
           selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
+          refreshList: () => {
+            // reload data
+            const localTab: ICreateViewModifyV2TabTableRecordsList = newTab.definition as ICreateViewModifyV2TabTableRecordsList;
+            localTab.refresh(newTab);
+          }
+        }),
+        tableColumns: this.entityLabResultService.retrieveTableColumns({
+          authUser: this.authUser,
           user: this.activatedRoute.snapshot.data.user,
           options: {
             labName: (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -1393,11 +1405,6 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
             labResultProgress: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ILabelValuePairModel>).options,
             labSequenceLaboratory: (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
             labSequenceResult: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-          },
-          refreshList: () => {
-            // reload data
-            const localTab: ICreateViewModifyV2TabTableRecordsList = newTab.definition as ICreateViewModifyV2TabTableRecordsList;
-            localTab.refresh(newTab);
           }
         }),
         advancedFilters: this.entityLabResultService.generateAdvancedFilters({
@@ -1506,21 +1513,25 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
         type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST,
         pageSettingsKey: UserSettings.CONTACT_DAILY_FOLLOW_UP_FIELDS,
         advancedFilterType: Constants.APP_PAGE.INDIVIDUAL_CONTACT_FOLLOW_UPS.value,
-        tableColumns: this.entityFollowUpHelperService.retrieveTableColumns({
+        tableColumnActions: this.entityFollowUpHelperService.retrieveTableColumnActions({
           authUser: this.authUser,
           entityData: this.itemData,
           selectedOutbreak: () => this.selectedOutbreak,
           selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
           team: this.activatedRoute.snapshot.data.team,
-          user: this.activatedRoute.snapshot.data.user,
-          options: {
-            dailyFollowUpStatus: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options
-          },
           refreshList: () => {
             // reload data
             const localTab: ICreateViewModifyV2TabTableRecordsList = newTab.definition as ICreateViewModifyV2TabTableRecordsList;
             localTab.refresh(newTab);
+          }
+        }),
+        tableColumns: this.entityFollowUpHelperService.retrieveTableColumns({
+          authUser: this.authUser,
+          team: this.activatedRoute.snapshot.data.team,
+          user: this.activatedRoute.snapshot.data.user,
+          options: {
+            dailyFollowUpStatus: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            yesNoAll: (this.activatedRoute.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options
           }
         }),
         advancedFilters: this.entityFollowUpHelperService.generateAdvancedFilters({
@@ -2131,6 +2142,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
       type: CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS,
       link: (item: ContactModel) => ['/contacts', item.id, 'view'],
       statusVisible: true,
+      maxNoOfStatusForms: 3,
       get: {
         status: (item: ContactModel) => {
           // must initialize - optimization to not recreate the list everytime there is an event since data won't change ?

@@ -10,7 +10,7 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 
 @Component({
   selector: 'app-report-relationships-long-period',
@@ -47,6 +47,168 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent<Re
 
     // ...and re-load the list when the Selected Outbreak is changed
     this.needsRefreshList(true);
+  }
+
+  /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // Other actions
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          menuOptions: [
+            // View people 1
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_VIEW',
+                data: (item: ReportDifferenceOnsetRelationshipModel) => {
+                  return {
+                    name: item.people[0].model.name
+                  };
+                }
+              },
+              action: {
+                link: (item: ReportDifferenceOnsetRelationshipModel) => {
+                  return ['/cases', item.people[0].model.id, 'view'];
+                },
+                linkQueryParams: (): Params => {
+                  return {
+                    longPeriod: true
+                  };
+                }
+              },
+              visible: () => {
+                return CaseModel.canView(this.authUser);
+              }
+            },
+
+            // View people 2
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_VIEW',
+                data: (item: ReportDifferenceOnsetRelationshipModel) => {
+                  return {
+                    name: item.people[1].model.name
+                  };
+                }
+              },
+              action: {
+                link: (item: ReportDifferenceOnsetRelationshipModel) => {
+                  return ['/cases', item.people[1].model.id, 'view'];
+                },
+                linkQueryParams: (): Params => {
+                  return {
+                    longPeriod: true
+                  };
+                }
+              },
+              visible: () => {
+                return CaseModel.canView(this.authUser);
+              }
+            },
+
+            // View relationship
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_VIEW_RELATIONSHIP'
+              },
+              action: {
+                link: (item: ReportDifferenceOnsetRelationshipModel) => {
+                  const relationTypePath: string = _.find(item.persons, { id: item.people[0].model.id }).source ? 'contacts' : 'exposures';
+                  return ['/relationships', EntityType.CASE, item.people[0].model.id, relationTypePath, item.id, 'view'];
+                }
+              },
+              visible: () => {
+                return RelationshipModel.canView(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: () => {
+                return CaseModel.canView(this.authUser) ||
+                  RelationshipModel.canView(this.authUser);
+              }
+            },
+
+            // Modify people 1
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_MODIFY',
+                data: (item: ReportDifferenceOnsetRelationshipModel) => {
+                  return {
+                    name: item.people[0].model.name
+                  };
+                }
+              },
+              action: {
+                link: (item: ReportDifferenceOnsetRelationshipModel) => {
+                  return ['/cases', item.people[0].model.id, 'modify'];
+                },
+                linkQueryParams: (): Params => {
+                  return {
+                    longPeriod: true
+                  };
+                }
+              },
+              visible: () => {
+                return this.selectedOutbreakIsActive &&
+                  CaseModel.canModify(this.authUser);
+              }
+            },
+
+            // Modify people 2
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_MODIFY',
+                data: (item: ReportDifferenceOnsetRelationshipModel) => {
+                  return {
+                    name: item.people[1].model.name
+                  };
+                }
+              },
+              action: {
+                link: (item: ReportDifferenceOnsetRelationshipModel) => {
+                  return ['/cases', item.people[1].model.id, 'modify'];
+                },
+                linkQueryParams: (): Params => {
+                  return {
+                    onset: true
+                  };
+                }
+              },
+              visible: () => {
+                return this.selectedOutbreakIsActive &&
+                  CaseModel.canModify(this.authUser);
+              }
+            },
+
+            // Modify relationship
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_MODIFY_RELATIONSHIP'
+              },
+              action: {
+                link: (item: ReportDifferenceOnsetRelationshipModel) => {
+                  const relationTypePath: string = _.find(item.persons, { id: item.people[0].model.id }).source ? 'contacts' : 'exposures';
+                  return ['/relationships', EntityType.CASE, item.people[0].model.id, relationTypePath, item.id, 'modify'];
+                }
+              },
+              visible: () => {
+                return this.selectedOutbreakIsActive &&
+                  RelationshipModel.canModify(this.authUser);
+              }
+            }
+          ]
+        }
+      ]
+    };
   }
 
   /**
@@ -99,169 +261,6 @@ export class ReportRelationshipsLongPeriodListComponent extends ListComponent<Re
       {
         field: 'differenceBetweenDatesOfOnset',
         label: 'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_LABEL_DIFFERENCE_BETWEEN_DATES'
-      },
-
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // Other actions
-          {
-            type: V2ActionType.MENU,
-            icon: 'more_horiz',
-            menuOptions: [
-              // View people 1
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_VIEW',
-                  data: (item: ReportDifferenceOnsetRelationshipModel) => {
-                    return {
-                      name: item.people[0].model.name
-                    };
-                  }
-                },
-                action: {
-                  link: (item: ReportDifferenceOnsetRelationshipModel) => {
-                    return ['/cases', item.people[0].model.id, 'view'];
-                  },
-                  linkQueryParams: (): Params => {
-                    return {
-                      longPeriod: true
-                    };
-                  }
-                },
-                visible: () => {
-                  return CaseModel.canView(this.authUser);
-                }
-              },
-
-              // View people 2
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_VIEW',
-                  data: (item: ReportDifferenceOnsetRelationshipModel) => {
-                    return {
-                      name: item.people[1].model.name
-                    };
-                  }
-                },
-                action: {
-                  link: (item: ReportDifferenceOnsetRelationshipModel) => {
-                    return ['/cases', item.people[1].model.id, 'view'];
-                  },
-                  linkQueryParams: (): Params => {
-                    return {
-                      longPeriod: true
-                    };
-                  }
-                },
-                visible: () => {
-                  return CaseModel.canView(this.authUser);
-                }
-              },
-
-              // View relationship
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_VIEW_RELATIONSHIP'
-                },
-                action: {
-                  link: (item: ReportDifferenceOnsetRelationshipModel) => {
-                    const relationTypePath: string = _.find(item.persons, { id: item.people[0].model.id }).source ? 'contacts' : 'exposures';
-                    return ['/relationships', EntityType.CASE, item.people[0].model.id, relationTypePath, item.id, 'view'];
-                  }
-                },
-                visible: () => {
-                  return RelationshipModel.canView(this.authUser);
-                }
-              },
-
-              // Divider
-              {
-                visible: () => {
-                  return CaseModel.canView(this.authUser) ||
-                    RelationshipModel.canView(this.authUser);
-                }
-              },
-
-              // Modify people 1
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_MODIFY',
-                  data: (item: ReportDifferenceOnsetRelationshipModel) => {
-                    return {
-                      name: item.people[0].model.name
-                    };
-                  }
-                },
-                action: {
-                  link: (item: ReportDifferenceOnsetRelationshipModel) => {
-                    return ['/cases', item.people[0].model.id, 'modify'];
-                  },
-                  linkQueryParams: (): Params => {
-                    return {
-                      longPeriod: true
-                    };
-                  }
-                },
-                visible: () => {
-                  return this.selectedOutbreakIsActive &&
-                    CaseModel.canModify(this.authUser);
-                }
-              },
-
-              // Modify people 2
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_MODIFY',
-                  data: (item: ReportDifferenceOnsetRelationshipModel) => {
-                    return {
-                      name: item.people[1].model.name
-                    };
-                  }
-                },
-                action: {
-                  link: (item: ReportDifferenceOnsetRelationshipModel) => {
-                    return ['/cases', item.people[1].model.id, 'modify'];
-                  },
-                  linkQueryParams: (): Params => {
-                    return {
-                      onset: true
-                    };
-                  }
-                },
-                visible: () => {
-                  return this.selectedOutbreakIsActive &&
-                    CaseModel.canModify(this.authUser);
-                }
-              },
-
-              // Modify relationship
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_LONG_PERIOD_BETWEEN_ONSET_DATES_ACTION_MODIFY_RELATIONSHIP'
-                },
-                action: {
-                  link: (item: ReportDifferenceOnsetRelationshipModel) => {
-                    const relationTypePath: string = _.find(item.persons, { id: item.people[0].model.id }).source ? 'contacts' : 'exposures';
-                    return ['/relationships', EntityType.CASE, item.people[0].model.id, relationTypePath, item.id, 'modify'];
-                  }
-                },
-                visible: () => {
-                  return this.selectedOutbreakIsActive &&
-                    RelationshipModel.canModify(this.authUser);
-                }
-              }
-            ]
-          }
-        ]
       }
     ];
   }

@@ -89,6 +89,198 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View Location
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_LIST_LOCATIONS_ACTION_VIEW_LOCATION',
+          action: {
+            link: (item: LocationModel): string[] => {
+              return ['/locations', item.id, 'view'];
+            }
+          },
+          visible: (): boolean => {
+            return LocationModel.canView(this.authUser);
+          }
+        },
+
+        // Modify Location
+        {
+          type: V2ActionType.ICON,
+          icon: 'edit',
+          iconTooltip: 'LNG_PAGE_LIST_LOCATIONS_ACTION_MODIFY_LOCATION',
+          action: {
+            link: (item: LocationModel): string[] => {
+              return ['/locations', item.id, 'modify'];
+            }
+          },
+          visible: (): boolean => {
+            return LocationModel.canModify(this.authUser);
+          }
+        },
+
+        // View Location Children
+        {
+          type: V2ActionType.ICON,
+          icon: 'group_work',
+          iconTooltip: 'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN',
+          action: {
+            link: () => {
+              return ['/redirect'];
+            },
+            linkQueryParams: (item: LocationModel) => {
+              return {
+                path: JSON.stringify(['/locations', item.id, 'children'])
+              };
+            }
+          }
+        },
+
+        // Other actions
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          menuOptions: [
+            // Delete Location
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_LOCATION'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: LocationModel): void => {
+                  // determine what we need to delete
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_DELETE',
+                        data: () => ({
+                          name: item.name
+                        })
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_DELETE_LOCATION',
+                        data: () => ({
+                          name: item.name
+                        })
+                      }
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // delete record
+                    this.locationDataService
+                      .deleteLocation(item.id)
+                      .pipe(
+                        catchError((err: {
+                          message: string,
+                          code: ErrorCodes,
+                          details: {
+                            id: string,
+                            model: string
+                          }
+                        }) => {
+                          // hide loading
+                          loading.close();
+
+                          // check if we have a model in use error
+                          if (err.code === ErrorCodes.MODEL_IN_USE) {
+                            this.dialogV2Service.showConfirmDialog({
+                              config: {
+                                title: {
+                                  get: () => 'LNG_DIALOG_LIST_LOCATIONS_IN_USE_LOCATION_DIALOG_TITLE',
+                                  data: () => ({
+                                    name: item.name
+                                  })
+                                },
+                                message: {
+                                  get: () => 'LNG_DIALOG_CONFIRM_LOCATION_USED',
+                                  data: () => ({
+                                    name: item.name
+                                  })
+                                }
+                              }
+                            }).subscribe((answer) => {
+                              // canceled ?
+                              if (answer.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                                // finished
+                                return;
+                              }
+
+                              // redirect to usage page where we can make changes
+                              this.router.navigate(['/locations', err.details.id, 'usage']);
+                            });
+                          } else {
+                            // show error
+                            this.toastV2Service.error(err);
+                          }
+
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                        // hide loading
+                        loading.close();
+
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
+                }
+              },
+              visible: (): boolean => {
+                return LocationModel.canDelete(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: (): boolean => {
+                // visible only if at least one of the previous...
+                return LocationModel.canDelete(this.authUser);
+              }
+            },
+
+            // See Location usage
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_LOCATIONS_ACTION_USAGE'
+              },
+              action: {
+                link: (item: LocationModel) => {
+                  return ['/locations', item.id, 'usage'];
+                }
+              },
+              visible: (): boolean => {
+                return LocationModel.canListUsage(this.authUser);
+              }
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  /**
    * Initialize Side Table Columns
    */
   protected initializeTableColumns() {
@@ -256,199 +448,6 @@ export class LocationsListComponent extends ListComponent<LocationModel> impleme
         filter: {
           type: V2FilterType.DATE_RANGE
         }
-      },
-
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // View Location
-          {
-            type: V2ActionType.ICON,
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_LIST_LOCATIONS_ACTION_VIEW_LOCATION',
-            action: {
-              link: (item: LocationModel): string[] => {
-                return ['/locations', item.id, 'view'];
-              }
-            },
-            visible: (): boolean => {
-              return LocationModel.canView(this.authUser);
-            }
-          },
-
-          // Modify Location
-          {
-            type: V2ActionType.ICON,
-            icon: 'edit',
-            iconTooltip: 'LNG_PAGE_LIST_LOCATIONS_ACTION_MODIFY_LOCATION',
-            action: {
-              link: (item: LocationModel): string[] => {
-                return ['/locations', item.id, 'modify'];
-              }
-            },
-            visible: (): boolean => {
-              return LocationModel.canModify(this.authUser);
-            }
-          },
-
-          // View Location Children
-          {
-            type: V2ActionType.ICON,
-            icon: 'group_work',
-            iconTooltip: 'LNG_PAGE_LIST_LOCATIONS_ACTION_SEE_CHILDREN',
-            action: {
-              link: () => {
-                return ['/redirect'];
-              },
-              linkQueryParams: (item: LocationModel) => {
-                return {
-                  path: JSON.stringify(['/locations', item.id, 'children'])
-                };
-              }
-            }
-          },
-
-          // Other actions
-          {
-            type: V2ActionType.MENU,
-            icon: 'more_horiz',
-            menuOptions: [
-              // Delete Location
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_LOCATION'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: LocationModel): void => {
-                    // determine what we need to delete
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_DELETE',
-                          data: () => ({
-                            name: item.name
-                          })
-                        },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_LOCATION',
-                          data: () => ({
-                            name: item.name
-                          })
-                        }
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
-
-                      // delete record
-                      this.locationDataService
-                        .deleteLocation(item.id)
-                        .pipe(
-                          catchError((err: {
-                            message: string,
-                            code: ErrorCodes,
-                            details: {
-                              id: string,
-                              model: string
-                            }
-                          }) => {
-                            // hide loading
-                            loading.close();
-
-                            // check if we have a model in use error
-                            if (err.code === ErrorCodes.MODEL_IN_USE) {
-                              this.dialogV2Service.showConfirmDialog({
-                                config: {
-                                  title: {
-                                    get: () => 'LNG_DIALOG_LIST_LOCATIONS_IN_USE_LOCATION_DIALOG_TITLE',
-                                    data: () => ({
-                                      name: item.name
-                                    })
-                                  },
-                                  message: {
-                                    get: () => 'LNG_DIALOG_CONFIRM_LOCATION_USED',
-                                    data: () => ({
-                                      name: item.name
-                                    })
-                                  }
-                                }
-                              }).subscribe((answer) => {
-                                // canceled ?
-                                if (answer.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                                  // finished
-                                  return;
-                                }
-
-                                // redirect to usage page where we can make changes
-                                this.router.navigate(['/locations', err.details.id, 'usage']);
-                              });
-                            } else {
-                              // show error
-                              this.toastV2Service.error(err);
-                            }
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_LOCATIONS_ACTION_DELETE_SUCCESS_MESSAGE');
-
-                          // hide loading
-                          loading.close();
-
-                          // reload data
-                          this.needsRefreshList(true);
-                        });
-                    });
-                  }
-                },
-                visible: (): boolean => {
-                  return LocationModel.canDelete(this.authUser);
-                }
-              },
-
-              // Divider
-              {
-                visible: (): boolean => {
-                  // visible only if at least one of the previous...
-                  return LocationModel.canDelete(this.authUser);
-                }
-              },
-
-              // See Location usage
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_LOCATIONS_ACTION_USAGE'
-                },
-                action: {
-                  link: (item: LocationModel) => {
-                    return ['/locations', item.id, 'usage'];
-                  }
-                },
-                visible: (): boolean => {
-                  return LocationModel.canListUsage(this.authUser);
-                }
-              }
-            ]
-          }
-        ]
       }
     ];
   }

@@ -93,7 +93,6 @@ export class EventsListComponent
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_ON', value: 'createdOn' }
   ];
 
-
   /**
    * Constructor
    */
@@ -129,6 +128,326 @@ export class EventsListComponent
 
     // ...and re-load the list when the Selected Outbreak is changed
     this.needsRefreshList(true);
+  }
+
+  /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View Event
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_LIST_EVENTS_ACTION_VIEW_EVENT',
+          action: {
+            link: (data: EventModel): string[] => {
+              return ['/events', data.id, 'view'];
+            }
+          },
+          visible: (item: EventModel): boolean => {
+            return !item.deleted && EventModel.canView(this.authUser);
+          }
+        },
+
+        // Modify Event
+        {
+          type: V2ActionType.ICON,
+          icon: 'edit',
+          iconTooltip: 'LNG_PAGE_LIST_EVENTS_ACTION_MODIFY_EVENT',
+          action: {
+            link: (item: EventModel): string[] => {
+              return ['/events', item.id, 'modify'];
+            }
+          },
+          visible: (item: EventModel): boolean => {
+            return (
+              !item.deleted &&
+              this.selectedOutbreakIsActive &&
+              EventModel.canModify(this.authUser)
+            );
+          }
+        },
+
+        // Other actions
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          menuOptions: [
+            // Delete Event
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_EVENT'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: EventModel): void => {
+                  // determine what we need to delete
+                  this.dialogV2Service
+                    .showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_DELETE',
+                          data: () => ({
+                            name: item.name
+                          })
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_EVENT',
+                          data: () => ({
+                            name: item.name
+                          })
+                        }
+                      }
+                    })
+                    .subscribe((response) => {
+                      // canceled ?
+                      if ( response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading =
+                        this.dialogV2Service.showLoadingDialog();
+
+                      // delete event
+                      this.eventDataService
+                        .deleteEvent(this.selectedOutbreak.id, item.id)
+                        .pipe(
+                          catchError((err) => {
+                            this.toastV2Service.error(err);
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          this.toastV2Service.success('LNG_PAGE_LIST_EVENTS_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                          // hide loading
+                          loading.close();
+
+                          // reload data
+                          this.needsRefreshList(true);
+                        });
+                    });
+                }
+              },
+              visible: (item: EventModel): boolean => {
+                return (
+                  !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  EventModel.canDelete(this.authUser)
+                );
+              }
+            },
+
+            // Divider
+            {
+              visible: (item: EventModel): boolean => {
+                // visible only if at least one of the first two items is visible
+                return (
+                  !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  EventModel.canDelete(this.authUser)
+                );
+              }
+            },
+
+            // Add Contact to Event
+            {
+              label: {
+                get: () => 'LNG_PAGE_ACTION_ADD_CONTACT'
+              },
+              action: {
+                link: (): string[] => {
+                  return ['/contacts', 'create'];
+                },
+                linkQueryParams: (item: EventModel): Params => {
+                  return {
+                    entityType: EntityType.EVENT,
+                    entityId: item.id
+                  };
+                }
+              },
+              visible: (item: EventModel): boolean => {
+                return (
+                  !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  ContactModel.canCreate(this.authUser) &&
+                  EventModel.canCreateContact(this.authUser)
+                );
+              }
+            },
+
+            // Bulk add contacts to event
+            {
+              label: {
+                get: () => 'LNG_PAGE_ACTION_BULK_ADD_CONTACTS'
+              },
+              action: {
+                link: (): string[] => {
+                  return ['/contacts', 'create-bulk'];
+                },
+                linkQueryParams: (item: EventModel): Params => {
+                  return {
+                    entityType: EntityType.EVENT,
+                    entityId: item.id
+                  };
+                }
+              },
+              visible: (item: EventModel): boolean => {
+                return (
+                  !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  ContactModel.canBulkCreate(this.authUser) &&
+                  EventModel.canBulkCreateContact(this.authUser)
+                );
+              }
+            },
+
+            // Divider
+            {
+              visible: (item: EventModel): boolean => {
+                // visible only if at least one of the previous two items is visible
+                return (
+                  !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  ((ContactModel.canCreate(this.authUser) &&
+                      EventModel.canCreateContact(this.authUser)) ||
+                    (ContactModel.canBulkCreate(this.authUser) &&
+                      EventModel.canBulkCreateContact(this.authUser)))
+                );
+              }
+            },
+
+            // See event contacts
+            {
+              label: {
+                get: () => 'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM'
+              },
+              action: {
+                link: (item: EventModel): string[] => {
+                  return [
+                    '/relationships',
+                    EntityType.EVENT,
+                    item.id,
+                    'contacts'
+                  ];
+                }
+              },
+              visible: (item: EventModel): boolean => {
+                return (
+                  !item.deleted &&
+                  RelationshipModel.canList(this.authUser) &&
+                  EventModel.canListRelationshipContacts(this.authUser)
+                );
+              }
+            },
+
+            // See event exposures
+            {
+              label: {
+                get: () => 'LNG_PAGE_ACTION_SEE_EXPOSURES_TO'
+              },
+              action: {
+                link: (item: EventModel): string[] => {
+                  return [
+                    '/relationships',
+                    EntityType.EVENT,
+                    item.id,
+                    'exposures'
+                  ];
+                }
+              },
+              visible: (item: EventModel): boolean => {
+                return (
+                  !item.deleted &&
+                  RelationshipModel.canList(this.authUser) &&
+                  EventModel.canListRelationshipExposures(this.authUser)
+                );
+              }
+            },
+
+            // Restore a deleted event
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_EVENT'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: EventModel) => {
+                  // show confirm dialog to confirm the action
+                  this.dialogV2Service
+                    .showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_RESTORE',
+                          data: () => item as any
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_RESTORE_EVENT',
+                          data: () => item as any
+                        }
+                      }
+                    })
+                    .subscribe((response) => {
+                      // canceled ?
+                      if (
+                        response.button.type ===
+                        IV2BottomDialogConfigButtonType.CANCEL
+                      ) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading =
+                        this.dialogV2Service.showLoadingDialog();
+
+                      // convert
+                      this.eventDataService
+                        .restoreEvent(this.selectedOutbreak.id, item.id)
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            this.toastV2Service.error(err);
+
+                            // hide loading
+                            loading.close();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          // success
+                          this.toastV2Service.success('LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_SUCCESS_MESSAGE');
+
+                          // hide loading
+                          loading.close();
+
+                          // reload data
+                          this.needsRefreshList(true);
+                        });
+                    });
+                }
+              },
+              visible: (item: EventModel): boolean => {
+                return (
+                  item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  EventModel.canRestore(this.authUser)
+                );
+              }
+            }
+          ]
+        }
+      ]
+    };
   }
 
   /**
@@ -489,327 +808,6 @@ export class EventsListComponent
           defaultValue: ''
         },
         sortable: true
-      },
-
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // View Event
-          {
-            type: V2ActionType.ICON,
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_LIST_EVENTS_ACTION_VIEW_EVENT',
-            action: {
-              link: (data: EventModel): string[] => {
-                return ['/events', data.id, 'view'];
-              }
-            },
-            visible: (item: EventModel): boolean => {
-              return !item.deleted && EventModel.canView(this.authUser);
-            }
-          },
-
-          // Modify Event
-          {
-            type: V2ActionType.ICON,
-            icon: 'edit',
-            iconTooltip: 'LNG_PAGE_LIST_EVENTS_ACTION_MODIFY_EVENT',
-            action: {
-              link: (item: EventModel): string[] => {
-                return ['/events', item.id, 'modify'];
-              }
-            },
-            visible: (item: EventModel): boolean => {
-              return (
-                !item.deleted &&
-                this.selectedOutbreakIsActive &&
-                EventModel.canModify(this.authUser)
-              );
-            }
-          },
-
-          // Other actions
-          {
-            type: V2ActionType.MENU,
-            icon: 'more_horiz',
-            menuOptions: [
-              // Delete Event
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_EVENTS_ACTION_DELETE_EVENT'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: EventModel): void => {
-                    // determine what we need to delete
-                    this.dialogV2Service
-                      .showConfirmDialog({
-                        config: {
-                          title: {
-                            get: () => 'LNG_COMMON_LABEL_DELETE',
-                            data: () => ({
-                              name: item.name
-                            })
-                          },
-                          message: {
-                            get: () => 'LNG_DIALOG_CONFIRM_DELETE_EVENT',
-                            data: () => ({
-                              name: item.name
-                            })
-                          }
-                        }
-                      })
-                      .subscribe((response) => {
-                        // canceled ?
-                        if ( response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                          // finished
-                          return;
-                        }
-
-                        // show loading
-                        const loading =
-                          this.dialogV2Service.showLoadingDialog();
-
-                        // delete event
-                        this.eventDataService
-                          .deleteEvent(this.selectedOutbreak.id, item.id)
-                          .pipe(
-                            catchError((err) => {
-                              this.toastV2Service.error(err);
-                              return throwError(err);
-                            })
-                          )
-                          .subscribe(() => {
-                            this.toastV2Service.success('LNG_PAGE_LIST_EVENTS_ACTION_DELETE_SUCCESS_MESSAGE');
-
-                            // hide loading
-                            loading.close();
-
-                            // reload data
-                            this.needsRefreshList(true);
-                          });
-                      });
-                  }
-                },
-                visible: (item: EventModel): boolean => {
-                  return (
-                    !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    EventModel.canDelete(this.authUser)
-                  );
-                }
-              },
-
-              // Divider
-              {
-                visible: (item: EventModel): boolean => {
-                  // visible only if at least one of the first two items is visible
-                  return (
-                    !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    EventModel.canDelete(this.authUser)
-                  );
-                }
-              },
-
-              // Add Contact to Event
-              {
-                label: {
-                  get: () => 'LNG_PAGE_ACTION_ADD_CONTACT'
-                },
-                action: {
-                  link: (): string[] => {
-                    return ['/contacts', 'create'];
-                  },
-                  linkQueryParams: (item: EventModel): Params => {
-                    return {
-                      entityType: EntityType.EVENT,
-                      entityId: item.id
-                    };
-                  }
-                },
-                visible: (item: EventModel): boolean => {
-                  return (
-                    !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    ContactModel.canCreate(this.authUser) &&
-                    EventModel.canCreateContact(this.authUser)
-                  );
-                }
-              },
-
-              // Bulk add contacts to event
-              {
-                label: {
-                  get: () => 'LNG_PAGE_ACTION_BULK_ADD_CONTACTS'
-                },
-                action: {
-                  link: (): string[] => {
-                    return ['/contacts', 'create-bulk'];
-                  },
-                  linkQueryParams: (item: EventModel): Params => {
-                    return {
-                      entityType: EntityType.EVENT,
-                      entityId: item.id
-                    };
-                  }
-                },
-                visible: (item: EventModel): boolean => {
-                  return (
-                    !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    ContactModel.canBulkCreate(this.authUser) &&
-                    EventModel.canBulkCreateContact(this.authUser)
-                  );
-                }
-              },
-
-              // Divider
-              {
-                visible: (item: EventModel): boolean => {
-                  // visible only if at least one of the previous two items is visible
-                  return (
-                    !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    ((ContactModel.canCreate(this.authUser) &&
-                      EventModel.canCreateContact(this.authUser)) ||
-                      (ContactModel.canBulkCreate(this.authUser) &&
-                        EventModel.canBulkCreateContact(this.authUser)))
-                  );
-                }
-              },
-
-              // See event contacts
-              {
-                label: {
-                  get: () => 'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM'
-                },
-                action: {
-                  link: (item: EventModel): string[] => {
-                    return [
-                      '/relationships',
-                      EntityType.EVENT,
-                      item.id,
-                      'contacts'
-                    ];
-                  }
-                },
-                visible: (item: EventModel): boolean => {
-                  return (
-                    !item.deleted &&
-                    RelationshipModel.canList(this.authUser) &&
-                    EventModel.canListRelationshipContacts(this.authUser)
-                  );
-                }
-              },
-
-              // See event exposures
-              {
-                label: {
-                  get: () => 'LNG_PAGE_ACTION_SEE_EXPOSURES_TO'
-                },
-                action: {
-                  link: (item: EventModel): string[] => {
-                    return [
-                      '/relationships',
-                      EntityType.EVENT,
-                      item.id,
-                      'exposures'
-                    ];
-                  }
-                },
-                visible: (item: EventModel): boolean => {
-                  return (
-                    !item.deleted &&
-                    RelationshipModel.canList(this.authUser) &&
-                    EventModel.canListRelationshipExposures(this.authUser)
-                  );
-                }
-              },
-
-              // Restore a deleted event
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_EVENT'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: EventModel) => {
-                    // show confirm dialog to confirm the action
-                    this.dialogV2Service
-                      .showConfirmDialog({
-                        config: {
-                          title: {
-                            get: () => 'LNG_COMMON_LABEL_RESTORE',
-                            data: () => item as any
-                          },
-                          message: {
-                            get: () => 'LNG_DIALOG_CONFIRM_RESTORE_EVENT',
-                            data: () => item as any
-                          }
-                        }
-                      })
-                      .subscribe((response) => {
-                        // canceled ?
-                        if (
-                          response.button.type ===
-                          IV2BottomDialogConfigButtonType.CANCEL
-                        ) {
-                          // finished
-                          return;
-                        }
-
-                        // show loading
-                        const loading =
-                          this.dialogV2Service.showLoadingDialog();
-
-                        // convert
-                        this.eventDataService
-                          .restoreEvent(this.selectedOutbreak.id, item.id)
-                          .pipe(
-                            catchError((err) => {
-                              // show error
-                              this.toastV2Service.error(err);
-
-                              // hide loading
-                              loading.close();
-
-                              // send error down the road
-                              return throwError(err);
-                            })
-                          )
-                          .subscribe(() => {
-                            // success
-                            this.toastV2Service.success('LNG_PAGE_LIST_EVENTS_ACTION_RESTORE_SUCCESS_MESSAGE');
-
-                            // hide loading
-                            loading.close();
-
-                            // reload data
-                            this.needsRefreshList(true);
-                          });
-                      });
-                  }
-                },
-                visible: (item: EventModel): boolean => {
-                  return (
-                    item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    EventModel.canRestore(this.authUser)
-                  );
-                }
-              }
-            ]
-          }
-        ]
       }
     );
   }

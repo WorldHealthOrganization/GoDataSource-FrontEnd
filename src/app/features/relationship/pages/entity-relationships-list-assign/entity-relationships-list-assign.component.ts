@@ -103,6 +103,11 @@ export class EntityRelationshipsListAssignComponent extends ListComponent<CaseMo
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {}
+
+  /**
    * Initialize Side Table Columns
    */
   protected initializeTableColumns() {

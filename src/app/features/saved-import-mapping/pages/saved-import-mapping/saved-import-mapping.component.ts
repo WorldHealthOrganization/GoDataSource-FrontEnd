@@ -57,6 +57,197 @@ export class SavedImportMappingComponent extends ListComponent<SavedImportMappin
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // Other actions
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          menuOptions: [
+            // Delete Saved Filter
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_DELETE_MAPPING'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: SavedImportMappingModel): void => {
+                  // determine what we need to delete
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_DELETE',
+                        data: () => ({
+                          name: item.name
+                        })
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_DELETE_SAVED_IMPORT_MAPPING',
+                        data: () => ({
+                          name: item.name
+                        })
+                      }
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // delete saved import mapping
+                    this.savedImportMappingService.deleteImportMapping(item.id)
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
+
+                          // hide loading
+                          loading.close();
+
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                        // hide loading
+                        loading.close();
+
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
+                }
+              },
+              visible: (item: SavedImportMappingModel): boolean => {
+                return !item.readOnly || SavedImportMappingModel.canDelete(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: (item: SavedImportMappingModel): boolean => {
+                return !item.readOnly || (
+                  SavedImportMappingModel.canDelete(this.authUser) &&
+                  SavedImportMappingModel.canModify(this.authUser)
+                );
+              }
+            },
+
+            // Change Public
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_CHANGE_PUBLIC'
+              },
+              action: {
+                click: (item: SavedImportMappingModel) => {
+                  this.dialogV2Service
+                    .showSideDialog({
+                      // title
+                      title: {
+                        get: () => 'LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_CHANGE_PUBLIC_TITLE'
+                      },
+
+                      // hide search bar
+                      hideInputFilter: true,
+
+                      // inputs
+                      inputs: [
+                        {
+                          type: V2SideDialogConfigInputType.DIVIDER,
+                          placeholder: 'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_IS_PUBLIC'
+                        },
+                        {
+                          type: V2SideDialogConfigInputType.TOGGLE,
+                          value: item.isPublic ?
+                            Constants.FILTER_YES_NO_OPTIONS.YES.value :
+                            Constants.FILTER_YES_NO_OPTIONS.NO.value,
+                          name: 'public',
+                          options: [
+                            {
+                              label: Constants.FILTER_YES_NO_OPTIONS.YES.label,
+                              value: Constants.FILTER_YES_NO_OPTIONS.YES.value
+                            },
+                            {
+                              label: Constants.FILTER_YES_NO_OPTIONS.NO.label,
+                              value: Constants.FILTER_YES_NO_OPTIONS.NO.value
+                            }
+                          ]
+                        }
+                      ],
+
+                      // buttons
+                      bottomButtons: [
+                        {
+                          label: 'LNG_COMMON_BUTTON_UPDATE',
+                          type: IV2SideDialogConfigButtonType.OTHER,
+                          color: 'primary',
+                          key: 'save',
+                          disabled: (_data, handler): boolean => {
+                            return !handler.form ||
+                              handler.form.invalid ||
+                              item.isPublic === ((handler.data.map.public as IV2SideDialogConfigInputToggle).value) as boolean;
+                          }
+                        }, {
+                          type: IV2SideDialogConfigButtonType.CANCEL,
+                          label: 'LNG_COMMON_BUTTON_CANCEL',
+                          color: 'text'
+                        }
+                      ]
+                    })
+                    .subscribe((response) => {
+                      // cancelled ?
+                      if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+                        return;
+                      }
+
+                      // change public
+                      this.savedImportMappingService.modifyImportMapping(item.id, { isPublic: (response.handler.data.map.public as IV2SideDialogConfigInputToggle).value })
+                        .pipe(
+                          catchError((err) => {
+                            this.toastV2Service.error(err);
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          // update our record too
+                          item.isPublic = ((response.handler.data.map.public as IV2SideDialogConfigInputToggle).value) as boolean;
+
+                          // success message
+                          this.toastV2Service.success('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE');
+
+                          // close popup
+                          response.handler.hide();
+
+                          // refresh list
+                          this.needsRefreshList(true);
+                        });
+                    });
+                }
+              },
+              visible: (item: SavedImportMappingModel): boolean => {
+                return !item.readOnly || SavedImportMappingModel.canModify(this.authUser);
+              }
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  /**
    * Initialize Side Table Columns
    */
   protected initializeTableColumns(): void {
@@ -150,197 +341,6 @@ export class SavedImportMappingComponent extends ListComponent<SavedImportMappin
         filter: {
           type: V2FilterType.DATE_RANGE
         }
-      },
-
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // Other actions
-          {
-            type: V2ActionType.MENU,
-            icon: 'more_horiz',
-            menuOptions: [
-              // Delete Saved Filter
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_DELETE_MAPPING'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: SavedImportMappingModel): void => {
-                    // determine what we need to delete
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_DELETE',
-                          data: () => ({
-                            name: item.name
-                          })
-                        },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_SAVED_IMPORT_MAPPING',
-                          data: () => ({
-                            name: item.name
-                          })
-                        }
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
-
-                      // delete saved import mapping
-                      this.savedImportMappingService.deleteImportMapping(item.id)
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
-
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_DELETE_SUCCESS_MESSAGE');
-
-                          // hide loading
-                          loading.close();
-
-                          // reload data
-                          this.needsRefreshList(true);
-                        });
-                    });
-                  }
-                },
-                visible: (item: SavedImportMappingModel): boolean => {
-                  return !item.readOnly || SavedImportMappingModel.canDelete(this.authUser);
-                }
-              },
-
-              // Divider
-              {
-                visible: (item: SavedImportMappingModel): boolean => {
-                  return !item.readOnly || (
-                    SavedImportMappingModel.canDelete(this.authUser) &&
-                    SavedImportMappingModel.canModify(this.authUser)
-                  );
-                }
-              },
-
-              // Change Public
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_CHANGE_PUBLIC'
-                },
-                action: {
-                  click: (item: SavedImportMappingModel) => {
-                    this.dialogV2Service
-                      .showSideDialog({
-                        // title
-                        title: {
-                          get: () => 'LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_CHANGE_PUBLIC_TITLE'
-                        },
-
-                        // hide search bar
-                        hideInputFilter: true,
-
-                        // inputs
-                        inputs: [
-                          {
-                            type: V2SideDialogConfigInputType.DIVIDER,
-                            placeholder: 'LNG_SAVED_IMPORT_MAPPING_FIELD_LABEL_IS_PUBLIC'
-                          },
-                          {
-                            type: V2SideDialogConfigInputType.TOGGLE,
-                            value: item.isPublic ?
-                              Constants.FILTER_YES_NO_OPTIONS.YES.value :
-                              Constants.FILTER_YES_NO_OPTIONS.NO.value,
-                            name: 'public',
-                            options: [
-                              {
-                                label: Constants.FILTER_YES_NO_OPTIONS.YES.label,
-                                value: Constants.FILTER_YES_NO_OPTIONS.YES.value
-                              },
-                              {
-                                label: Constants.FILTER_YES_NO_OPTIONS.NO.label,
-                                value: Constants.FILTER_YES_NO_OPTIONS.NO.value
-                              }
-                            ]
-                          }
-                        ],
-
-                        // buttons
-                        bottomButtons: [
-                          {
-                            label: 'LNG_COMMON_BUTTON_UPDATE',
-                            type: IV2SideDialogConfigButtonType.OTHER,
-                            color: 'primary',
-                            key: 'save',
-                            disabled: (_data, handler): boolean => {
-                              return !handler.form ||
-                                handler.form.invalid ||
-                                item.isPublic === ((handler.data.map.public as IV2SideDialogConfigInputToggle).value) as boolean;
-                            }
-                          }, {
-                            type: IV2SideDialogConfigButtonType.CANCEL,
-                            label: 'LNG_COMMON_BUTTON_CANCEL',
-                            color: 'text'
-                          }
-                        ]
-                      }).subscribe((response) => {
-                        // cancelled ?
-                        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
-                          return;
-                        }
-
-                        // change public
-                        this.savedImportMappingService.modifyImportMapping(item.id, { isPublic: (response.handler.data.map.public as IV2SideDialogConfigInputToggle).value })
-                          .pipe(
-                            catchError((err) => {
-                              this.toastV2Service.error(err);
-                              return throwError(err);
-                            })
-                          )
-                          .subscribe(() => {
-                            // update our record too
-                            item.isPublic = ((response.handler.data.map.public as IV2SideDialogConfigInputToggle).value) as boolean;
-
-                            // success message
-                            this.toastV2Service.success('LNG_PAGE_LIST_SAVED_IMPORT_MAPPING_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE');
-
-                            // close popup
-                            response.handler.hide();
-
-                            // refresh list
-                            this.needsRefreshList(true);
-                          });
-                      });
-                  }
-                },
-                visible: (item: SavedImportMappingModel): boolean => {
-                  return !item.readOnly || SavedImportMappingModel.canModify(this.authUser);
-                }
-              }
-            ]
-          }
-        ]
       }
     ];
   }

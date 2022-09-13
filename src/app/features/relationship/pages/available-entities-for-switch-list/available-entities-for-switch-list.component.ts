@@ -113,6 +113,11 @@ export class AvailableEntitiesForSwitchListComponent extends ListComponent<CaseM
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {}
+
+  /**
    * Initialize Side Table Columns
    */
   protected initializeTableColumns(): void {
