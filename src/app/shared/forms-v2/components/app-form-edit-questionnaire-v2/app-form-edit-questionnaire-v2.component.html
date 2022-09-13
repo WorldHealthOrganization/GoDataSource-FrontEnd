@@ -3,11 +3,13 @@
 
   <!-- Top -->
   <div
+    *ngIf="flattenedQuestions?.length > 0 || !viewOnly"
     class="gd-form-edit-questionnaire-v2-top"
     fxLayout="row" fxLayoutAlign="end" fxLayoutGap="0.8rem">
 
     <!-- Expand All -->
     <button
+      *ngIf="flattenedQuestions?.length > 0"
       type="button"
       mat-flat-button
       color="text"
@@ -17,6 +19,7 @@
 
     <!-- Collapse All -->
     <button
+      *ngIf="flattenedQuestions?.length > 0"
       type="button"
       mat-flat-button
       color="text"
