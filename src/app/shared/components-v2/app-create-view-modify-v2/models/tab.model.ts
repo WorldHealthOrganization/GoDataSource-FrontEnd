@@ -9,7 +9,7 @@ import { VaccineModel } from '../../../../core/models/vaccine.model';
 import { CaseCenterDateRangeModel } from '../../../../core/models/case-center-date-range.model';
 import { Params } from '@angular/router';
 import { IAppFormIconButtonV2 } from '../../../forms-v2/core/app-form-icon-button-v2';
-import { IV2Column } from '../../app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnAction } from '../../app-list-table-v2/models/column.model';
 import { UserSettings } from '../../../../core/models/user.model';
 import { IBasicCount } from '../../../../core/models/basic-count.interface';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
@@ -641,6 +641,7 @@ export interface ICreateViewModifyV2Tab {
 export interface ICreateViewModifyV2TabTableRecordsList {
   // required
   type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST;
+  tableColumnActions: IV2ColumnAction;
   tableColumns: IV2Column[];
   pageSettingsKey: UserSettings;
   advancedFilterType: string;

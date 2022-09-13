@@ -149,6 +149,11 @@ export class ContactRangeFollowUpsListComponent
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {}
+
+  /**
    * Initialize side table columns
    */
   protected initializeTableColumns(): void {}

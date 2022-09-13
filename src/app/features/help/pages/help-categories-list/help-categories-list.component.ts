@@ -56,9 +56,144 @@ export class HelpCategoriesListComponent extends ListComponent<HelpCategoryModel
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View Help Category
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_VIEW_HELP_CATEGORY',
+          action: {
+            link: (item: HelpCategoryModel): string[] => {
+              return ['/help', 'categories', item.id, 'view'];
+            }
+          },
+          visible: (item: HelpCategoryModel): boolean => {
+            return !item.deleted &&
+              HelpCategoryModel.canView(this.authUser);
+          }
+        },
+
+        // Modify Help Category
+        {
+          type: V2ActionType.ICON,
+          icon: 'edit',
+          iconTooltip: 'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_MODIFY_HELP_CATEGORY',
+          action: {
+            link: (item: HelpCategoryModel): string[] => {
+              return ['/help', 'categories', item.id, 'modify'];
+            }
+          },
+          visible: (item: HelpCategoryModel): boolean => {
+            return !item.deleted &&
+              HelpCategoryModel.canModify(this.authUser);
+          }
+        },
+
+        // View Help Items
+        {
+          type: V2ActionType.ICON,
+          icon: 'group_work',
+          iconTooltip: 'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_VIEW_HELP_ITEMS_BUTTON',
+          action: {
+            link: (item: HelpCategoryModel): string[] => {
+              return ['/help', 'categories', item.id, 'items'];
+            }
+          },
+          visible: (item: HelpCategoryModel): boolean => {
+            return !item.deleted &&
+              HelpItemModel.canList(this.authUser);
+          }
+        },
+
+        // Other actions
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          menuOptions: [
+            // Delete
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_DELETE_HELP_CATEGORY'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: HelpCategoryModel): void => {
+                  // determine what we need to delete
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_DELETE',
+                        data: () => ({
+                          name: this.i18nService.instant(item.name)
+                        })
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_DELETE_HELP_CATEGORY',
+                        data: () => ({
+                          name: this.i18nService.instant(item.name)
+                        })
+                      }
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // delete
+                    this.helpDataService
+                      .deleteHelpCategory(item.id)
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
+
+                          // hide loading
+                          loading.close();
+
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                        // hide loading
+                        loading.close();
+
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
+                }
+              },
+              visible: (item: HelpCategoryModel): boolean => {
+                return !item.deleted &&
+                  HelpCategoryModel.canDelete(this.authUser);
+              }
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  /**
    * Initialize Side Table Columns
    */
-  protected initializeTableColumns() {
+  protected initializeTableColumns(): void {
     // default table columns
     this.tableColumns = [
       {
@@ -76,142 +211,6 @@ export class HelpCategoriesListComponent extends ListComponent<HelpCategoryModel
         field: 'order',
         label: 'LNG_HELP_CATEGORY_FIELD_LABEL_ORDER',
         sortable: true
-      },
-
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // View Help Category
-          {
-            type: V2ActionType.ICON,
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_VIEW_HELP_CATEGORY',
-            action: {
-              link: (item: HelpCategoryModel): string[] => {
-                return ['/help', 'categories', item.id, 'view'];
-              }
-            },
-            visible: (item: HelpCategoryModel): boolean => {
-              return !item.deleted &&
-                HelpCategoryModel.canView(this.authUser);
-            }
-          },
-
-          // Modify Help Category
-          {
-            type: V2ActionType.ICON,
-            icon: 'edit',
-            iconTooltip: 'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_MODIFY_HELP_CATEGORY',
-            action: {
-              link: (item: HelpCategoryModel): string[] => {
-                return ['/help', 'categories', item.id, 'modify'];
-              }
-            },
-            visible: (item: HelpCategoryModel): boolean => {
-              return !item.deleted &&
-                HelpCategoryModel.canModify(this.authUser);
-            }
-          },
-
-          // View Help Items
-          {
-            type: V2ActionType.ICON,
-            icon: 'group_work',
-            iconTooltip: 'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_VIEW_HELP_ITEMS_BUTTON',
-            action: {
-              link: (item: HelpCategoryModel): string[] => {
-                return ['/help', 'categories', item.id, 'items'];
-              }
-            },
-            visible: (item: HelpCategoryModel): boolean => {
-              return !item.deleted &&
-                HelpItemModel.canList(this.authUser);
-            }
-          },
-
-          // Other actions
-          {
-            type: V2ActionType.MENU,
-            icon: 'more_horiz',
-            menuOptions: [
-              // Delete
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_DELETE_HELP_CATEGORY'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: HelpCategoryModel): void => {
-                    // determine what we need to delete
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_DELETE',
-                          data: () => ({
-                            name: this.i18nService.instant(item.name)
-                          })
-                        },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_HELP_CATEGORY',
-                          data: () => ({
-                            name: this.i18nService.instant(item.name)
-                          })
-                        }
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
-
-                      // delete
-                      this.helpDataService
-                        .deleteHelpCategory(item.id)
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
-
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_HELP_CATEGORIES_ACTION_DELETE_SUCCESS_MESSAGE');
-
-                          // hide loading
-                          loading.close();
-
-                          // reload data
-                          this.needsRefreshList(true);
-                        });
-                    });
-                  }
-                },
-                visible: (item: HelpCategoryModel): boolean => {
-                  return !item.deleted &&
-                    HelpCategoryModel.canDelete(this.authUser);
-                }
-              }
-            ]
-          }
-        ]
       }
     ];
   }

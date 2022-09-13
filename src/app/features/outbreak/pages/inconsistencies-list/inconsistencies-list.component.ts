@@ -18,7 +18,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 
 @Component({
@@ -65,6 +65,53 @@ export class InconsistenciesListComponent extends ListComponent<CaseModel | Cont
 
     // ...and re-load the list when the Selected Outbreak is changed
     this.needsRefreshList(true);
+  }
+
+  /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_ACTION_VIEW',
+          action: {
+            link: (item: CaseModel | ContactModel | EventModel): string[] => {
+              return [this.getItemRouterLink(item, 'view')];
+            }
+          },
+          visible: (item: CaseModel | ContactModel | EventModel): boolean => {
+            return !item.deleted &&
+              item.canView(this.authUser) &&
+              this.selectedOutbreak?.id === item.outbreakId;
+          }
+        },
+
+        // Modify
+        {
+          type: V2ActionType.ICON,
+          icon: 'edit',
+          iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
+          action: {
+            link: (item: CaseModel | ContactModel | EventModel): string[] => {
+              return [this.getItemRouterLink(item, 'modify')];
+            }
+          },
+          visible: (item: CaseModel | ContactModel | EventModel): boolean => {
+            return !item.deleted &&
+              this.selectedOutbreakIsActive &&
+              item.canModify(this.authUser) &&
+              this.selectedOutbreak?.id === item.outbreakId;
+          }
+        }
+      ]
+    };
   }
 
   /**
@@ -140,54 +187,6 @@ export class InconsistenciesListComponent extends ListComponent<CaseModel | Cont
           // finished
           return forms;
         }
-      },
-
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // View
-          {
-            type: V2ActionType.ICON,
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_ACTION_VIEW',
-            action: {
-              link: (item: CaseModel | ContactModel | EventModel): string[] => {
-                return [this.getItemRouterLink(item, 'view')];
-              }
-            },
-            visible: (item: CaseModel | ContactModel | EventModel): boolean => {
-              return !item.deleted &&
-                item.canView(this.authUser) &&
-                this.selectedOutbreak?.id === item.outbreakId;
-            }
-          },
-
-          // Modify
-          {
-            type: V2ActionType.ICON,
-            icon: 'edit',
-            iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
-            action: {
-              link: (item: CaseModel | ContactModel | EventModel): string[] => {
-                return [this.getItemRouterLink(item, 'modify')];
-              }
-            },
-            visible: (item: CaseModel | ContactModel | EventModel): boolean => {
-              return !item.deleted &&
-                this.selectedOutbreakIsActive &&
-                item.canModify(this.authUser) &&
-                this.selectedOutbreak?.id === item.outbreakId;
-            }
-          }
-        ]
       }
     ];
   }

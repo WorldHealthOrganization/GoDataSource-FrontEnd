@@ -1,6 +1,6 @@
 import { RequestQueryBuilder } from './request-query-builder';
 import { IExtendedColDef } from '../../shared/components-v2/app-list-table-v2/models/extended-column.model';
-import { applyFilterBy, IV2Column } from '../../shared/components-v2/app-list-table-v2/models/column.model';
+import { applyFilterBy, IV2Column, IV2ColumnAction } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 
 /**
  * Applied filters
@@ -8,6 +8,7 @@ import { applyFilterBy, IV2Column } from '../../shared/components-v2/app-list-ta
 export abstract class ListQueryComponent {
   // table columns
   tableColumns: IV2Column[] = [];
+  tableColumnActions: IV2ColumnAction;
 
   // query
   protected queryBuilder: RequestQueryBuilder = new RequestQueryBuilder(this.queryBuilderChangedCallback);
@@ -39,7 +40,7 @@ export abstract class ListQueryComponent {
     // filter
     applyFilterBy(
       this.queryBuilder,
-      data.column.columnDefinition,
+      data.column.columnDefinition as IV2Column,
       data.valueOverwrite
     );
 

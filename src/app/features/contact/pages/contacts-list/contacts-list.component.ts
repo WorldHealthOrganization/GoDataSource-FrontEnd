@@ -157,9 +157,515 @@ export class ContactsListComponent
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View Contact
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CONTACT',
+          action: {
+            link: (data: ContactModel): string[] => {
+              return ['/contacts', data.id, 'view'];
+            }
+          },
+          visible: (item: ContactModel): boolean => {
+            return !item.deleted && ContactModel.canView(this.authUser);
+          }
+        },
+
+        // Modify Contact
+        {
+          type: V2ActionType.ICON,
+          icon: 'edit',
+          iconTooltip: 'LNG_PAGE_LIST_CONTACTS_ACTION_MODIFY_CONTACT',
+          action: {
+            link: (item: ContactModel): string[] => {
+              return ['/contacts', item.id, 'modify'];
+            }
+          },
+          visible: (item: ContactModel): boolean => {
+            return (
+              !item.deleted &&
+              this.selectedOutbreakIsActive &&
+              ContactModel.canModify(this.authUser)
+            );
+          }
+        },
+
+        // Other actions
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          menuOptions: [
+            // Delete Contact
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_CONTACT'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: ContactModel): void => {
+                  // determine what we need to delete
+                  this.dialogV2Service
+                    .showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_DELETE',
+                          data: () => ({ name: item.name })
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_CONTACT',
+                          data: () => ({ name: item.name })
+                        }
+                      }
+                    })
+                    .subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // delete contact
+                      this.contactDataService
+                        .deleteContact(this.selectedOutbreak.id, item.id)
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            this.toastV2Service.error(err);
+
+                            // hide loading
+                            loading.close();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          // success
+                          this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                          // hide loading
+                          loading.close();
+
+                          // reload data
+                          this.needsRefreshList(true);
+                        });
+                    });
+                }
+              },
+              visible: (item: ContactModel): boolean => {
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  ContactModel.canDelete(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: (item: ContactModel): boolean => {
+                // visible only if at least one of the first two items is visible
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  ContactModel.canDelete(this.authUser);
+              }
+            },
+
+            // Convert Contact to Contact
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: ContactModel): void => {
+                  // show confirm dialog to confirm the action
+                  this.dialogV2Service
+                    .showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_CONVERT',
+                          data: () => ({
+                            name: item.name,
+                            type: this.translateService.instant(EntityType.CASE)
+                          })
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_CONVERT_CONTACT_TO_CASE',
+                          data: () => item as any
+                        }
+                      }
+                    })
+                    .subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // convert
+                      this.contactDataService
+                        .convertContactToCase(this.selectedOutbreak.id, item.id)
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            this.toastV2Service.error(err);
+
+                            // hide loading
+                            loading.close();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          // success
+                          this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_TO_CASE_SUCCESS_MESSAGE');
+
+                          // hide loading
+                          loading.close();
+
+                          // reload data
+                          this.needsRefreshList(true);
+                        });
+                    });
+                }
+              },
+              visible: (item: ContactModel): boolean => {
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  ContactModel.canConvertToCase(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: (item: ContactModel): boolean => {
+                // visible only if at least one of the first two items is visible
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  ContactModel.canConvertToCase(this.authUser);
+              }
+            },
+
+            // Add Contact of Contact
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_CONTACT_OF_CONTACT'
+              },
+              action: {
+                link: (): string[] => {
+                  return ['/contacts-of-contacts', 'create'];
+                },
+                linkQueryParams: (item: ContactModel): Params => {
+                  return {
+                    entityType: EntityType.CONTACT,
+                    entityId: item.id
+                  };
+                }
+              },
+              visible: (item: ContactModel): boolean => {
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  ContactModel.canCreate(this.authUser) &&
+                  ContactModel.canCreateContactOfContact(this.authUser) &&
+                  this.selectedOutbreak.isContactsOfContactsActive;
+              }
+            },
+
+            // Bulk add Contacts of Contacts
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_BULK_ADD_CONTACTS'
+              },
+              action: {
+                link: (): string[] => {
+                  return ['/contacts-of-contacts', 'create-bulk'];
+                },
+                linkQueryParams: (item: ContactModel): Params => {
+                  return {
+                    entityType: EntityType.CONTACT_OF_CONTACT,
+                    entityId: item.id
+                  };
+                }
+              },
+              visible: (item: ContactModel): boolean => {
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  ContactModel.canBulkCreate(this.authUser) &&
+                  ContactModel.canBulkCreateContactOfContact(this.authUser) &&
+                  this.selectedOutbreak.isContactsOfContactsActive;
+              }
+            },
+
+            // Divider
+            {
+              visible: (item: ContactModel): boolean => {
+                // visible only if at least one of the previous two items is visible
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  (
+                    (
+                      ContactModel.canCreate(this.authUser) &&
+                      ContactModel.canCreateContactOfContact(this.authUser)
+                    ) || (
+                      ContactModel.canBulkCreate(this.authUser) &&
+                      ContactModel.canBulkCreateContactOfContact(this.authUser)
+                    )
+                  );
+              }
+            },
+
+            // Add Follow-up to Contact
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_FOLLOW_UP'
+              },
+              action: {
+                link: (item: ContactModel): string[] => {
+                  return ['/contacts', item.id, 'follow-ups', 'create'];
+                }
+              },
+              visible: (item: ContactModel): boolean => {
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  FollowUpModel.canCreate(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: (item: ContactModel): boolean => {
+                // visible only if at least one of the previous two items is visible
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  FollowUpModel.canCreate(this.authUser);
+              }
+            },
+
+            // See contact exposures
+            {
+              label: {
+                get: () => 'LNG_PAGE_ACTION_SEE_EXPOSURES_TO'
+              },
+              action: {
+                link: (item: ContactModel): string[] => {
+                  return [
+                    '/relationships',
+                    EntityType.CONTACT,
+                    item.id,
+                    'exposures'
+                  ];
+                }
+              },
+              visible: (item: ContactModel): boolean => {
+                return !item.deleted &&
+                  ContactModel.canListRelationshipExposures(this.authUser);
+              }
+            },
+
+            // See contact contacts of contacts
+            {
+              label: {
+                get: () => 'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM'
+              },
+              action: {
+                link: (item: ContactModel): string[] => {
+                  return ['/relationships', EntityType.CONTACT, item.id, 'contacts'];
+                }
+              },
+              visible: (item: ContactModel): boolean => {
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  ContactModel.canListRelationshipContacts(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: (item: ContactModel): boolean => {
+                // visible only if at least one of the previous two items is visible
+                return !item.deleted &&
+                  ContactModel.canListRelationshipExposures(this.authUser);
+              }
+            },
+
+            // See records detected by the system as duplicates but they were marked as not duplicates
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_SEE_RECORDS_NOT_DUPLICATES'
+              },
+              action: {
+                link: (item: ContactModel): string[] => {
+                  return ['/duplicated-records/contacts', item.id, 'marked-not-duplicates'];
+                }
+              },
+              visible: (item: ContactModel): boolean => {
+                return !item.deleted;
+              }
+            },
+
+            // See contact lab results
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_SEE_LAB_RESULTS'
+              },
+              action: {
+                link: (item: ContactModel): string[] => {
+                  return ['/lab-results', 'contacts', item.id];
+                }
+              },
+              visible: (item: ContactModel): boolean => {
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  LabResultModel.canList(this.authUser) &&
+                  ContactModel.canListLabResult(this.authUser);
+              }
+            },
+
+            // See contact follow-us
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_FOLLOW_UPS'
+              },
+              action: {
+                link: (item: ContactModel): string[] => {
+                  return ['/contacts', 'contact-related-follow-ups', item.id];
+                }
+              },
+              visible: (item: ContactModel): boolean => {
+                return !item.deleted && FollowUpModel.canList(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: (item: ContactModel): boolean => {
+                return !item.deleted && FollowUpModel.canList(this.authUser);
+              }
+            },
+
+            // View Contact movement map
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_MOVEMENT'
+              },
+              action: {
+                link: (item: ContactModel): string[] => {
+                  return ['/contacts', item.id, 'movement'];
+                }
+              },
+              visible: (item: ContactModel): boolean => {
+                return !item.deleted &&
+                  ContactModel.canViewMovementMap(this.authUser);
+              }
+            },
+
+            // View Contact chronology timeline
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CHRONOLOGY'
+              },
+              action: {
+                link: (item: ContactModel): string[] => {
+                  return ['/contacts', item.id, 'chronology'];
+                }
+              },
+              visible: (item: ContactModel): boolean => {
+                return !item.deleted &&
+                  ContactModel.canViewChronologyChart(this.authUser);
+              }
+            },
+
+            // Restore a deleted contact
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_CONTACT'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: ContactModel) => {
+                  // show confirm dialog to confirm the action
+                  this.dialogV2Service
+                    .showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_RESTORE',
+                          data: () => item as any
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_RESTORE_CONTACT',
+                          data: () => item as any
+                        }
+                      }
+                    })
+                    .subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // convert
+                      this.contactDataService
+                        .restoreContact(this.selectedOutbreak.id, item.id)
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            this.toastV2Service.error(err);
+
+                            // hide loading
+                            loading.close();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          // success
+                          this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE');
+
+                          // hide loading
+                          loading.close();
+
+                          // reload data
+                          this.needsRefreshList(true);
+                        });
+                    });
+                }
+              },
+              visible: (item: ContactModel): boolean => {
+                return item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  ContactModel.canRestore(this.authUser);
+              }
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  /**
    * Initialize Table Columns
    */
-  protected initializeTableColumns() {
+  protected initializeTableColumns(): void {
     // address model used to search by phone number, address line, postal code, city....
     const filterAddressModel: AddressModel = new AddressModel({
       geoLocationAccurate: ''
@@ -674,513 +1180,6 @@ export class ContactsListComponent
           type: V2FilterType.DATE_RANGE
         },
         sortable: true
-      },
-
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // View Contact
-          {
-            type: V2ActionType.ICON,
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CONTACT',
-            action: {
-              link: (data: ContactModel): string[] => {
-                return ['/contacts', data.id, 'view'];
-              }
-            },
-            visible: (item: ContactModel): boolean => {
-              return !item.deleted && ContactModel.canView(this.authUser);
-            }
-          },
-
-          // Modify Contact
-          {
-            type: V2ActionType.ICON,
-            icon: 'edit',
-            iconTooltip: 'LNG_PAGE_LIST_CONTACTS_ACTION_MODIFY_CONTACT',
-            action: {
-              link: (item: ContactModel): string[] => {
-                return ['/contacts', item.id, 'modify'];
-              }
-            },
-            visible: (item: ContactModel): boolean => {
-              return (
-                !item.deleted &&
-                this.selectedOutbreakIsActive &&
-                ContactModel.canModify(this.authUser)
-              );
-            }
-          },
-
-          // Other actions
-          {
-            type: V2ActionType.MENU,
-            icon: 'more_horiz',
-            menuOptions: [
-              // Delete Contact
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_CONTACT'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: ContactModel): void => {
-                    // determine what we need to delete
-                    this.dialogV2Service
-                      .showConfirmDialog({
-                        config: {
-                          title: {
-                            get: () => 'LNG_COMMON_LABEL_DELETE',
-                            data: () => ({ name: item.name })
-                          },
-                          message: {
-                            get: () => 'LNG_DIALOG_CONFIRM_DELETE_CONTACT',
-                            data: () => ({ name: item.name })
-                          }
-                        }
-                      })
-                      .subscribe((response) => {
-                        // canceled ?
-                        if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                          // finished
-                          return;
-                        }
-
-                        // show loading
-                        const loading = this.dialogV2Service.showLoadingDialog();
-
-                        // delete contact
-                        this.contactDataService
-                          .deleteContact(this.selectedOutbreak.id, item.id)
-                          .pipe(
-                            catchError((err) => {
-                              // show error
-                              this.toastV2Service.error(err);
-
-                              // hide loading
-                              loading.close();
-
-                              // send error down the road
-                              return throwError(err);
-                            })
-                          )
-                          .subscribe(() => {
-                            // success
-                            this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_DELETE_SUCCESS_MESSAGE');
-
-                            // hide loading
-                            loading.close();
-
-                            // reload data
-                            this.needsRefreshList(true);
-                          });
-                      });
-                  }
-                },
-                visible: (item: ContactModel): boolean => {
-                  return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    ContactModel.canDelete(this.authUser);
-                }
-              },
-
-              // Divider
-              {
-                visible: (item: ContactModel): boolean => {
-                  // visible only if at least one of the first two items is visible
-                  return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    ContactModel.canDelete(this.authUser);
-                }
-              },
-
-              // Convert Contact to Contact
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_TO_CASE'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: ContactModel): void => {
-                    // show confirm dialog to confirm the action
-                    this.dialogV2Service
-                      .showConfirmDialog({
-                        config: {
-                          title: {
-                            get: () => 'LNG_COMMON_LABEL_CONVERT',
-                            data: () => ({
-                              name: item.name,
-                              type: this.translateService.instant(EntityType.CASE)
-                            })
-                          },
-                          message: {
-                            get: () => 'LNG_DIALOG_CONFIRM_CONVERT_CONTACT_TO_CASE',
-                            data: () => item as any
-                          }
-                        }
-                      })
-                      .subscribe((response) => {
-                        // canceled ?
-                        if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                          // finished
-                          return;
-                        }
-
-                        // show loading
-                        const loading = this.dialogV2Service.showLoadingDialog();
-
-                        // convert
-                        this.contactDataService
-                          .convertContactToCase(this.selectedOutbreak.id, item.id)
-                          .pipe(
-                            catchError((err) => {
-                              // show error
-                              this.toastV2Service.error(err);
-
-                              // hide loading
-                              loading.close();
-
-                              // send error down the road
-                              return throwError(err);
-                            })
-                          )
-                          .subscribe(() => {
-                            // success
-                            this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_CONVERT_CONTACT_TO_CASE_SUCCESS_MESSAGE');
-
-                            // hide loading
-                            loading.close();
-
-                            // reload data
-                            this.needsRefreshList(true);
-                          });
-                      });
-                  }
-                },
-                visible: (item: ContactModel): boolean => {
-                  return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    ContactModel.canConvertToCase(this.authUser);
-                }
-              },
-
-              // Divider
-              {
-                visible: (item: ContactModel): boolean => {
-                  // visible only if at least one of the first two items is visible
-                  return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    ContactModel.canConvertToCase(this.authUser);
-                }
-              },
-
-              // Add Contact of Contact
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_CONTACT_OF_CONTACT'
-                },
-                action: {
-                  link: (): string[] => {
-                    return ['/contacts-of-contacts', 'create'];
-                  },
-                  linkQueryParams: (item: ContactModel): Params => {
-                    return {
-                      entityType: EntityType.CONTACT,
-                      entityId: item.id
-                    };
-                  }
-                },
-                visible: (item: ContactModel): boolean => {
-                  return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    ContactModel.canCreate(this.authUser) &&
-                    ContactModel.canCreateContactOfContact(this.authUser) &&
-                    this.selectedOutbreak.isContactsOfContactsActive;
-                }
-              },
-
-              // Bulk add Contacts of Contacts
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_BULK_ADD_CONTACTS'
-                },
-                action: {
-                  link: (): string[] => {
-                    return ['/contacts-of-contacts', 'create-bulk'];
-                  },
-                  linkQueryParams: (item: ContactModel): Params => {
-                    return {
-                      entityType: EntityType.CONTACT_OF_CONTACT,
-                      entityId: item.id
-                    };
-                  }
-                },
-                visible: (item: ContactModel): boolean => {
-                  return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    ContactModel.canBulkCreate(this.authUser) &&
-                    ContactModel.canBulkCreateContactOfContact(this.authUser) &&
-                    this.selectedOutbreak.isContactsOfContactsActive;
-                }
-              },
-
-              // Divider
-              {
-                visible: (item: ContactModel): boolean => {
-                  // visible only if at least one of the previous two items is visible
-                  return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    (
-                      (
-                        ContactModel.canCreate(this.authUser) &&
-                        ContactModel.canCreateContactOfContact(this.authUser)
-                      ) || (
-                        ContactModel.canBulkCreate(this.authUser) &&
-                        ContactModel.canBulkCreateContactOfContact(this.authUser)
-                      )
-                    );
-                }
-              },
-
-              // Add Follow-up to Contact
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_ADD_FOLLOW_UP'
-                },
-                action: {
-                  link: (item: ContactModel): string[] => {
-                    return ['/contacts', item.id, 'follow-ups', 'create'];
-                  }
-                },
-                visible: (item: ContactModel): boolean => {
-                  return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    FollowUpModel.canCreate(this.authUser);
-                }
-              },
-
-              // Divider
-              {
-                visible: (item: ContactModel): boolean => {
-                  // visible only if at least one of the previous two items is visible
-                  return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    FollowUpModel.canCreate(this.authUser);
-                }
-              },
-
-              // See contact exposures
-              {
-                label: {
-                  get: () => 'LNG_PAGE_ACTION_SEE_EXPOSURES_TO'
-                },
-                action: {
-                  link: (item: ContactModel): string[] => {
-                    return [
-                      '/relationships',
-                      EntityType.CONTACT,
-                      item.id,
-                      'exposures'
-                    ];
-                  }
-                },
-                visible: (item: ContactModel): boolean => {
-                  return !item.deleted &&
-                    ContactModel.canListRelationshipExposures(this.authUser);
-                }
-              },
-
-              // See contact contacts of contacts
-              {
-                label: {
-                  get: () => 'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM'
-                },
-                action: {
-                  link: (item: ContactModel): string[] => {
-                    return ['/relationships', EntityType.CONTACT, item.id, 'contacts'];
-                  }
-                },
-                visible: (item: ContactModel): boolean => {
-                  return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    ContactModel.canListRelationshipContacts(this.authUser);
-                }
-              },
-
-              // Divider
-              {
-                visible: (item: ContactModel): boolean => {
-                  // visible only if at least one of the previous two items is visible
-                  return !item.deleted &&
-                    ContactModel.canListRelationshipExposures(this.authUser);
-                }
-              },
-
-              // See records detected by the system as duplicates but they were marked as not duplicates
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_SEE_RECORDS_NOT_DUPLICATES'
-                },
-                action: {
-                  link: (item: ContactModel): string[] => {
-                    return ['/duplicated-records/contacts', item.id, 'marked-not-duplicates'];
-                  }
-                },
-                visible: (item: ContactModel): boolean => {
-                  return !item.deleted;
-                }
-              },
-
-              // See contact lab results
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_SEE_LAB_RESULTS'
-                },
-                action: {
-                  link: (item: ContactModel): string[] => {
-                    return ['/lab-results', 'contacts', item.id];
-                  }
-                },
-                visible: (item: ContactModel): boolean => {
-                  return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    LabResultModel.canList(this.authUser) &&
-                    ContactModel.canListLabResult(this.authUser);
-                }
-              },
-
-              // See contact follow-us
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_FOLLOW_UPS'
-                },
-                action: {
-                  link: (item: ContactModel): string[] => {
-                    return ['/contacts', 'contact-related-follow-ups', item.id];
-                  }
-                },
-                visible: (item: ContactModel): boolean => {
-                  return !item.deleted && FollowUpModel.canList(this.authUser);
-                }
-              },
-
-              // Divider
-              {
-                visible: (item: ContactModel): boolean => {
-                  return !item.deleted && FollowUpModel.canList(this.authUser);
-                }
-              },
-
-              // View Contact movement map
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_MOVEMENT'
-                },
-                action: {
-                  link: (item: ContactModel): string[] => {
-                    return ['/contacts', item.id, 'movement'];
-                  }
-                },
-                visible: (item: ContactModel): boolean => {
-                  return !item.deleted &&
-                    ContactModel.canViewMovementMap(this.authUser);
-                }
-              },
-
-              // View Contact chronology timeline
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_VIEW_CHRONOLOGY'
-                },
-                action: {
-                  link: (item: ContactModel): string[] => {
-                    return ['/contacts', item.id, 'chronology'];
-                  }
-                },
-                visible: (item: ContactModel): boolean => {
-                  return !item.deleted &&
-                    ContactModel.canViewChronologyChart(this.authUser);
-                }
-              },
-
-              // Restore a deleted contact
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_CONTACT'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: ContactModel) => {
-                    // show confirm dialog to confirm the action
-                    this.dialogV2Service
-                      .showConfirmDialog({
-                        config: {
-                          title: {
-                            get: () => 'LNG_COMMON_LABEL_RESTORE',
-                            data: () => item as any
-                          },
-                          message: {
-                            get: () => 'LNG_DIALOG_CONFIRM_RESTORE_CONTACT',
-                            data: () => item as any
-                          }
-                        }
-                      })
-                      .subscribe((response) => {
-                        // canceled ?
-                        if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                          // finished
-                          return;
-                        }
-
-                        // show loading
-                        const loading = this.dialogV2Service.showLoadingDialog();
-
-                        // convert
-                        this.contactDataService
-                          .restoreContact(this.selectedOutbreak.id, item.id)
-                          .pipe(
-                            catchError((err) => {
-                              // show error
-                              this.toastV2Service.error(err);
-
-                              // hide loading
-                              loading.close();
-
-                              // send error down the road
-                              return throwError(err);
-                            })
-                          )
-                          .subscribe(() => {
-                            // success
-                            this.toastV2Service.success('LNG_PAGE_LIST_CONTACTS_ACTION_RESTORE_SUCCESS_MESSAGE');
-
-                            // hide loading
-                            loading.close();
-
-                            // reload data
-                            this.needsRefreshList(true);
-                          });
-                      });
-                  }
-                },
-                visible: (item: ContactModel): boolean => {
-                  return item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    ContactModel.canRestore(this.authUser);
-                }
-              }
-            ]
-          }
-        ]
       }
     ];
   }

@@ -193,18 +193,20 @@ export interface IV2ColumnAction {
   format: Omit<IV2ColumnBasicFormatType, 'type'> & {
     type: V2ColumnFormat.ACTIONS
   };
-  field: string;
-  label: string;
   actions: V2Action[];
 
   // optional
-  notVisible?: boolean;
-  exclude?: (IV2Column) => boolean;
-  pinned?: IV2ColumnPinned | boolean;
-  notResizable?: boolean;
-  cssCellClass?: string;
-  sortable?: never;
+  // notVisible?: boolean;
+  // exclude?: (IV2Column) => boolean;
+  // cssCellClass?: string;
+
+  // never
+  field?: never;
   filter?: never;
+  sortable?: never;
+  // label?: never;
+  // pinned?: never;
+  // notResizable?: never;
 }
 
 /**
@@ -370,7 +372,7 @@ export interface IV2ColumnExpandRow {
  * Column
  */
 export type IV2Column = IV2ColumnBasic | IV2ColumnButton | IV2ColumnAge | IV2ColumnDate | IV2ColumnDatetime | IV2ColumnBoolean | IV2ColumnColor
-| IV2ColumnIconURL | IV2ColumnIconMaterial | IV2ColumnAction | IV2ColumnStatus | IV2ColumnLinkList | IV2ColumnHTML | IV2ColumnExpandRow;
+| IV2ColumnIconURL | IV2ColumnIconMaterial | IV2ColumnStatus | IV2ColumnLinkList | IV2ColumnHTML | IV2ColumnExpandRow;
 
 /**
  * Filter handler

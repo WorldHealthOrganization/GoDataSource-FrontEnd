@@ -100,9 +100,244 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View Lab Results
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_VIEW_LAB_RESULT',
+          action: {
+            link: (item: LabResultModel): string[] => {
+              return ['/lab-results', EntityModel.getLinkForEntityType(item.personType), item.personId, item.id, 'view'];
+            },
+            linkQueryParams: (): { [k: string]: any } => {
+              return {
+                fromLabResultsList: true
+              };
+            }
+          },
+          visible: (item: LabResultModel): boolean => {
+            return !item.deleted &&
+              LabResultModel.canView(this.authUser) &&
+              (
+                (
+                  item.personType === EntityType.CASE &&
+                  CaseModel.canViewLabResult(this.authUser)
+                ) || (
+                  item.personType === EntityType.CONTACT &&
+                  ContactModel.canViewLabResult(this.authUser)
+                )
+              );
+          }
+        },
+
+        // Modify Case Lab Results
+        {
+          type: V2ActionType.ICON,
+          icon: 'edit',
+          iconTooltip: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_MODIFY_LAB_RESULT',
+          action: {
+            link: (item: LabResultModel): string[] => {
+              return ['/lab-results', EntityModel.getLinkForEntityType(item.personType), item.personId, item.id, 'modify'];
+            },
+            linkQueryParams: (): { [k: string]: any } => {
+              return {
+                fromLabResultsList: true
+              };
+            }
+          },
+          visible: (item: LabResultModel): boolean => {
+            return !item.deleted &&
+              this.selectedOutbreakIsActive &&
+              LabResultModel.canModify(this.authUser) &&
+              (
+                (
+                  item.personType === EntityType.CASE &&
+                  CaseModel.canModifyLabResult(this.authUser)
+                ) || (
+                  item.personType === EntityType.CONTACT &&
+                  ContactModel.canModifyLabResult(this.authUser)
+                )
+              );
+          }
+        },
+
+        // Other actions
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          menuOptions: [
+            // Delete Lab Results
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_DELETE_LAB_RESULT'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: LabResultModel): void => {
+                  // confirm
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_DELETE',
+                        data: () => ({
+                          name: `${item.sampleIdentifier}${item.sampleIdentifier && item.dateSampleTaken ? ' - ' : ''}${item.dateSampleTaken ? moment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : ''}`
+                        })
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT'
+                      }
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // delete lab result
+                    this.labResultDataService
+                      .deleteLabResult(this.selectedOutbreak.id, item.id)
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
+
+                          // hide loading
+                          loading.close();
+
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_LIST_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                        // hide loading
+                        loading.close();
+
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
+                }
+              },
+              visible: (item: LabResultModel): boolean => {
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  LabResultModel.canDelete(this.authUser) &&
+                  (
+                    (
+                      item.personType === EntityType.CASE &&
+                      CaseModel.canDeleteLabResult(this.authUser)
+                    ) || (
+                      item.personType === EntityType.CONTACT &&
+                      ContactModel.canDeleteLabResult(this.authUser)
+                    )
+                  );
+              }
+            },
+
+            // Restore
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: LabResultModel) => {
+                  // show confirm dialog to confirm the action
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_RESTORE',
+                        data: () => ({
+                          name: `${item.sampleIdentifier}${item.sampleIdentifier && item.dateSampleTaken ? ' - ' : ''}${item.dateSampleTaken ? moment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : ''}`
+                        })
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_RESTORE_LAB_RESULT'
+                      }
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // restore lab result
+                    this.labResultDataService
+                      .restoreLabResult(
+                        this.selectedOutbreak.id,
+                        EntityModel.getLinkForEntityType(item.personType),
+                        item.personId,
+                        item.id
+                      )
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
+
+                          // hide loading
+                          loading.close();
+
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_LIST_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT_SUCCESS_MESSAGE');
+
+                        // hide loading
+                        loading.close();
+
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
+                }
+              },
+              visible: (item: LabResultModel): boolean => {
+                return item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  LabResultModel.canRestore(this.authUser) &&
+                  (
+                    (
+                      item.personType === EntityType.CASE &&
+                      CaseModel.canRestoreLabResult(this.authUser)
+                    ) || (
+                      item.personType === EntityType.CONTACT &&
+                      ContactModel.canRestoreLabResult(this.authUser)
+                    )
+                  );
+              }
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  /**
   * Initialize Side Table Columns
   */
-  protected initializeTableColumns() {
+  protected initializeTableColumns(): void {
     // default table columns
     this.tableColumns = [
       {
@@ -429,241 +664,6 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
         }
       });
     }
-
-    // rest of columns :)
-    this.tableColumns.push(
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // View Lab Results
-          {
-            type: V2ActionType.ICON,
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_VIEW_LAB_RESULT',
-            action: {
-              link: (item: LabResultModel): string[] => {
-                return ['/lab-results', EntityModel.getLinkForEntityType(item.personType), item.personId, item.id, 'view'];
-              },
-              linkQueryParams: (): { [k: string]: any } => {
-                return {
-                  fromLabResultsList: true
-                };
-              }
-            },
-            visible: (item: LabResultModel): boolean => {
-              return !item.deleted &&
-                LabResultModel.canView(this.authUser) && (
-                (
-                  item.personType === EntityType.CASE &&
-                    CaseModel.canViewLabResult(this.authUser)
-                ) || (
-                  item.personType === EntityType.CONTACT &&
-                    ContactModel.canViewLabResult(this.authUser)
-                )
-              );
-            }
-          },
-
-          // Modify Case Lab Results
-          {
-            type: V2ActionType.ICON,
-            icon: 'edit',
-            iconTooltip: 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_MODIFY_LAB_RESULT',
-            action: {
-              link: (item: LabResultModel): string[] => {
-                return ['/lab-results', EntityModel.getLinkForEntityType(item.personType), item.personId, item.id, 'modify'];
-              },
-              linkQueryParams: (): { [k: string]: any } => {
-                return {
-                  fromLabResultsList: true
-                };
-              }
-            },
-            visible: (item: LabResultModel): boolean => {
-              return !item.deleted &&
-                this.selectedOutbreakIsActive &&
-                LabResultModel.canModify(this.authUser) && (
-                (
-                  item.personType === EntityType.CASE &&
-                    CaseModel.canModifyLabResult(this.authUser)
-                ) || (
-                  item.personType === EntityType.CONTACT &&
-                    ContactModel.canModifyLabResult(this.authUser)
-                )
-              );
-            }
-          },
-
-          // Other actions
-          {
-            type: V2ActionType.MENU,
-            icon: 'more_horiz',
-            menuOptions: [
-              // Delete Lab Results
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_DELETE_LAB_RESULT'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: LabResultModel): void => {
-                    // confirm
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_DELETE',
-                          data: () => ({
-                            name: `${item.sampleIdentifier}${item.sampleIdentifier && item.dateSampleTaken ? ' - ' : ''}${item.dateSampleTaken ? moment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : ''}`
-                          })
-                        },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_LAB_RESULT'
-                        }
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
-
-                      // delete lab result
-                      this.labResultDataService
-                        .deleteLabResult(this.selectedOutbreak.id, item.id)
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
-
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_LAB_RESULTS_ACTION_DELETE_SUCCESS_MESSAGE');
-
-                          // hide loading
-                          loading.close();
-
-                          // reload data
-                          this.needsRefreshList(true);
-                        });
-                    });
-                  }
-                },
-                visible: (item: LabResultModel): boolean => {
-                  return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    LabResultModel.canDelete(this.authUser) && (
-                    (
-                      item.personType === EntityType.CASE &&
-                        CaseModel.canDeleteLabResult(this.authUser)
-                    ) || (
-                      item.personType === EntityType.CONTACT &&
-                        ContactModel.canDeleteLabResult(this.authUser)
-                    )
-                  );
-                }
-              },
-
-              // Restore
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: LabResultModel) => {
-                    // show confirm dialog to confirm the action
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_RESTORE',
-                          data: () => ({
-                            name: `${item.sampleIdentifier}${item.sampleIdentifier && item.dateSampleTaken ? ' - ' : ''}${item.dateSampleTaken ? moment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : ''}`
-                          })
-                        },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_RESTORE_LAB_RESULT'
-                        }
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
-
-                      // restore lab result
-                      this.labResultDataService
-                        .restoreLabResult(
-                          this.selectedOutbreak.id,
-                          EntityModel.getLinkForEntityType(item.personType),
-                          item.personId,
-                          item.id
-                        )
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
-
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_LAB_RESULTS_ACTION_RESTORE_LAB_RESULT_SUCCESS_MESSAGE');
-
-                          // hide loading
-                          loading.close();
-
-                          // reload data
-                          this.needsRefreshList(true);
-                        });
-                    });
-                  }
-                },
-                visible: (item: LabResultModel): boolean => {
-                  return item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    LabResultModel.canRestore(this.authUser) && (
-                    (
-                      item.personType === EntityType.CASE &&
-                        CaseModel.canRestoreLabResult(this.authUser)
-                    ) || (
-                      item.personType === EntityType.CONTACT &&
-                        ContactModel.canRestoreLabResult(this.authUser)
-                    )
-                  );
-                }
-              }
-            ]
-          }
-        ]
-      }
-    );
   }
 
   /**

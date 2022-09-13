@@ -243,7 +243,10 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
       // initialize breadcrumbs
       this.initializeBreadcrumbs();
 
-      // initialize side columns
+      // initialize table column actions
+      this.initializeTableColumnActions();
+
+      // initialize table columns
       this.initializeTableColumns();
 
       // initialize process data
@@ -379,6 +382,11 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
    * Initialize table columns
    */
   protected abstract initializeTableColumns(): void;
+
+  /**
+   * Initialize table column - actions
+   */
+  protected abstract initializeTableColumnActions(): void;
 
   /**
    * Initialize process data

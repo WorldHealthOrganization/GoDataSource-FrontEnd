@@ -57,6 +57,11 @@ export class TransmissionChainsListComponent extends ListComponent<TransmissionC
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {}
+
+  /**
    * Initialize Side Table Columns
    */
   protected initializeTableColumns(): void {

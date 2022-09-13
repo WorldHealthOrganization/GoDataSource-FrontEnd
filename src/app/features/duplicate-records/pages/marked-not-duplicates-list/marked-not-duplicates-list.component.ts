@@ -167,6 +167,141 @@ export class MarkedNotDuplicatesListComponent
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_VIEW_ENTITY',
+          action: {
+            link: (item: CaseModel | ContactModel | ContactOfContactModel): string[] => {
+              return [
+                `/${ EntityModel.getLinkForEntityType(item.type) }`,
+                item.id,
+                'view'
+              ];
+            }
+          },
+          visible: (item: CaseModel | ContactModel | ContactOfContactModel): boolean => {
+            return !item.deleted &&
+              this.selectedOutbreakIsActive &&
+              item.canView(this.authUser);
+          }
+        },
+
+        // Modify
+        {
+          type: V2ActionType.ICON,
+          icon: 'edit',
+          iconTooltip: 'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_MODIFY_ENTITY',
+          action: {
+            link: (item: CaseModel | ContactModel | ContactOfContactModel): string[] => {
+              return [
+                `/${ EntityModel.getLinkForEntityType(item.type) }`,
+                item.id,
+                'modify'
+              ];
+            }
+          },
+          visible: (item: CaseModel | ContactModel | ContactOfContactModel): boolean => {
+            return !item.deleted &&
+              this.selectedOutbreakIsActive &&
+              item.canModify(this.authUser);
+          }
+        },
+
+        // Other actions
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          menuOptions: [
+            // Delete
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_REMOVE_FROM_LIST_ENTITY'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: CaseModel | ContactModel | ContactOfContactModel) => {
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_DELETE',
+                        data: () => ({
+                          name: item.name
+                        })
+                      },
+                      message: {
+                        get: () => 'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_REMOVE_FROM_LIST_ENTITY_CONFIRMATION',
+                        data: () => ({
+                          name: item.name
+                        })
+                      }
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // delete
+                    this.entityDataService
+                      .markPersonAsOrNotADuplicate(
+                        this.selectedOutbreak.id,
+                        this.recordType,
+                        this.recordId,
+                        [],
+                        [item.id]
+                      )
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
+
+                          // hide loading
+                          loading.close();
+
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                        // hide loading
+                        loading.close();
+
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
+                }
+              },
+              visible: (item: CaseModel | ContactModel | ContactOfContactModel): boolean => {
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  item.canModify(this.authUser);
+              }
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  /**
    * Initialize Side Table Columns
    */
   protected initializeTableColumns() {
@@ -270,142 +405,6 @@ export class MarkedNotDuplicatesListComponent
         format: {
           type: 'mainAddress.city'
         }
-      },
-
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // View
-          {
-            type: V2ActionType.ICON,
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_VIEW_ENTITY',
-            action: {
-              link: (item: CaseModel | ContactModel | ContactOfContactModel): string[] => {
-                return [
-                  `/${ EntityModel.getLinkForEntityType(item.type) }`,
-                  item.id,
-                  'view'
-                ];
-              }
-            },
-            visible: (item: CaseModel | ContactModel | ContactOfContactModel): boolean => {
-              return !item.deleted &&
-                this.selectedOutbreakIsActive &&
-                item.canView(this.authUser);
-            }
-          },
-
-          // Modify
-          {
-            type: V2ActionType.ICON,
-            icon: 'edit',
-            iconTooltip: 'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_MODIFY_ENTITY',
-            action: {
-              link: (item: CaseModel | ContactModel | ContactOfContactModel): string[] => {
-                return [
-                  `/${ EntityModel.getLinkForEntityType(item.type) }`,
-                  item.id,
-                  'modify'
-                ];
-              }
-            },
-            visible: (item: CaseModel | ContactModel | ContactOfContactModel): boolean => {
-              return !item.deleted &&
-                this.selectedOutbreakIsActive &&
-                item.canModify(this.authUser);
-            }
-          },
-
-          // Other actions
-          {
-            type: V2ActionType.MENU,
-            icon: 'more_horiz',
-            menuOptions: [
-              // Delete
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_REMOVE_FROM_LIST_ENTITY'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: CaseModel | ContactModel | ContactOfContactModel) => {
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_DELETE',
-                          data: () => ({
-                            name: item.name
-                          })
-                        },
-                        message: {
-                          get: () => 'LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_REMOVE_FROM_LIST_ENTITY_CONFIRMATION',
-                          data: () => ({
-                            name: item.name
-                          })
-                        }
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
-
-                      // delete
-                      this.entityDataService
-                        .markPersonAsOrNotADuplicate(
-                          this.selectedOutbreak.id,
-                          this.recordType,
-                          this.recordId,
-                          [],
-                          [item.id]
-                        )
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
-
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_MARKED_AS_NOT_DUPLICATES_ACTION_DELETE_SUCCESS_MESSAGE');
-
-                          // hide loading
-                          loading.close();
-
-                          // reload data
-                          this.needsRefreshList(true);
-                        });
-                    });
-                  }
-                },
-                visible: (item: CaseModel | ContactModel | ContactOfContactModel): boolean => {
-                  return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    item.canModify(this.authUser);
-                }
-              }
-            ]
-          }
-        ]
       }
     ];
   }

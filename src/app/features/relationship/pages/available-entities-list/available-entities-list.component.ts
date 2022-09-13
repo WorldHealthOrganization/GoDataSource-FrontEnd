@@ -93,6 +93,11 @@ export class AvailableEntitiesListComponent extends ListComponent<CaseModel | Co
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {}
+
+  /**
    * Initialize Side Table Columns
    */
   protected initializeTableColumns(): void {

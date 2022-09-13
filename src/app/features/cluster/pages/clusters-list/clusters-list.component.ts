@@ -52,6 +52,148 @@ export class ClustersListComponent extends ListComponent<ClusterModel> implement
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View Cluster
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_LIST_CLUSTERS_ACTION_VIEW_CLUSTER',
+          action: {
+            link: (item: OutbreakModel): string[] => {
+              return ['/clusters', item.id, 'view'];
+            }
+          },
+          visible: (): boolean => {
+            return ClusterModel.canView(this.authUser);
+          }
+        },
+
+        // Modify Cluster
+        {
+          type: V2ActionType.ICON,
+          icon: 'edit',
+          iconTooltip: 'LNG_PAGE_LIST_CLUSTERS_ACTION_MODIFY_CLUSTER',
+          action: {
+            link: (item: OutbreakModel): string[] => {
+              return ['/clusters', item.id, 'modify'];
+            }
+          },
+          visible: (): boolean => {
+            return this.selectedOutbreakIsActive &&
+              ClusterModel.canModify(this.authUser);
+          }
+        },
+
+        // Other actions
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          menuOptions: [
+            // Delete Cluster
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CLUSTERS_ACTION_DELETE_CLUSTER'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: OutbreakModel): void => {
+                  // show confirm dialog
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_DELETE',
+                        data: () => ({
+                          name: item.name
+                        })
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_DELETE_CLUSTER',
+                        data: () => ({
+                          name: item.name
+                        })
+                      }
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // delete cluster
+                    this.clusterDataService
+                      .deleteCluster(this.selectedOutbreak.id, item.id)
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
+
+                          // hide loading
+                          loading.close();
+
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_LIST_CLUSTERS_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                        // hide loading
+                        loading.close();
+
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
+                }
+              },
+              visible: (): boolean => {
+                return this.selectedOutbreakIsActive &&
+                  ClusterModel.canDelete(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: (): boolean => {
+                // visible only if at least one of the previous...
+                return this.selectedOutbreakIsActive &&
+                  ClusterModel.canDelete(this.authUser);
+              }
+            },
+
+            // View People
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CLUSTERS_ACTION_VIEW_PEOPLE'
+              },
+              action: {
+                link: (item: OutbreakModel): string[] => {
+                  return ['/clusters', item.id, 'people'];
+                }
+              },
+              visible: (): boolean => {
+                return ClusterModel.canListPeople(this.authUser);
+              }
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  /**
    * Initialize side table columns
    */
   protected initializeTableColumns(): void {
@@ -91,149 +233,6 @@ export class ClustersListComponent extends ListComponent<ClusterModel> implement
         format: {
           type: V2ColumnFormat.COLOR
         }
-      },
-
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // View Cluster
-          {
-            type: V2ActionType.ICON,
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_LIST_CLUSTERS_ACTION_VIEW_CLUSTER',
-            action: {
-              link: (item: OutbreakModel): string[] => {
-                return ['/clusters', item.id, 'view'];
-              }
-            },
-            visible: (): boolean => {
-              return ClusterModel.canView(this.authUser);
-            }
-          },
-
-          // Modify Cluster
-          {
-            type: V2ActionType.ICON,
-            icon: 'edit',
-            iconTooltip: 'LNG_PAGE_LIST_CLUSTERS_ACTION_MODIFY_CLUSTER',
-            action: {
-              link: (item: OutbreakModel): string[] => {
-                return ['/clusters', item.id, 'modify'];
-              }
-            },
-            visible: (): boolean => {
-              return this.selectedOutbreakIsActive &&
-                ClusterModel.canModify(this.authUser);
-            }
-          },
-
-          // Other actions
-          {
-            type: V2ActionType.MENU,
-            icon: 'more_horiz',
-            menuOptions: [
-              // Delete Cluster
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CLUSTERS_ACTION_DELETE_CLUSTER'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: OutbreakModel): void => {
-                    // show confirm dialog
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_DELETE',
-                          data: () => ({
-                            name: item.name
-                          })
-                        },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_CLUSTER',
-                          data: () => ({
-                            name: item.name
-                          })
-                        }
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
-
-                      // delete cluster
-                      this.clusterDataService
-                        .deleteCluster(this.selectedOutbreak.id, item.id)
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
-
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_CLUSTERS_ACTION_DELETE_SUCCESS_MESSAGE');
-
-                          // hide loading
-                          loading.close();
-
-                          // reload data
-                          this.needsRefreshList(true);
-                        });
-                    });
-                  }
-                },
-                visible: (): boolean => {
-                  return this.selectedOutbreakIsActive &&
-                    ClusterModel.canDelete(this.authUser);
-                }
-              },
-
-              // Divider
-              {
-                visible: (): boolean => {
-                  // visible only if at least one of the previous...
-                  return this.selectedOutbreakIsActive &&
-                    ClusterModel.canDelete(this.authUser);
-                }
-              },
-
-              // View People
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CLUSTERS_ACTION_VIEW_PEOPLE'
-                },
-                action: {
-                  link: (item: OutbreakModel): string[] => {
-                    return ['/clusters', item.id, 'people'];
-                  }
-                },
-                visible: (): boolean => {
-                  return ClusterModel.canListPeople(this.authUser);
-                }
-              }
-            ]
-          }
-        ]
       }
     ];
   }

@@ -116,6 +116,11 @@ export class DuplicateRecordsListComponent extends ListComponent<any> implements
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {}
+
+  /**
    * Initialize Side Table Columns
    */
   protected initializeTableColumns(): void {}

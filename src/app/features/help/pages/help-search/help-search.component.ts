@@ -7,7 +7,7 @@ import { HelpItemModel } from '../../../../core/models/help-item.model';
 import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { TranslateService } from '@ngx-translate/core';
 import { V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ActivatedRoute } from '@angular/router';
@@ -63,9 +63,31 @@ export class HelpSearchComponent extends ListComponent<HelpItemModel> implements
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View Case
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_GLOBAL_HELP_ACTION_VIEW_HELP_ITEM',
+          action: {
+            link: (item: HelpItemModel) => ['/help', 'categories', item.categoryId, 'items', item.id, 'view-global']
+          }
+        }
+      ]
+    };
+  }
+
+  /**
    * Initialize Side Table Columns
    */
-  protected initializeTableColumns() {
+  protected initializeTableColumns(): void {
     // default table columns
     this.tableColumns = [
       {
@@ -86,29 +108,6 @@ export class HelpSearchComponent extends ListComponent<HelpItemModel> implements
           type: V2FilterType.MULTIPLE_SELECT,
           options: (this.activatedRoute.snapshot.data.helpCategory as IResolverV2ResponseModel<HelpCategoryModel>).options
         }
-      },
-
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // View Case
-          {
-            type: V2ActionType.ICON,
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_GLOBAL_HELP_ACTION_VIEW_HELP_ITEM',
-            action: {
-              link: (item: HelpItemModel) => ['/help', 'categories', item.categoryId, 'items', item.id, 'view-global']
-            }
-          }
-        ]
       }
     ];
   }

@@ -41,8 +41,8 @@ export class RolesListComponent extends ListComponent<UserRoleModel> implements 
   }
 
   /**
-     * Release resources
-     */
+   * Release resources
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
@@ -57,6 +57,153 @@ export class RolesListComponent extends ListComponent<UserRoleModel> implements 
 
     // ...and re-load the list when the Selected Outbreak is changed
     this.needsRefreshList(true);
+  }
+
+  /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View Role
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_LIST_USER_ROLES_ACTION_VIEW_ROLE',
+          action: {
+            link: (item: UserRoleModel): string[] => {
+              return ['/user-roles', item.id, 'view'];
+            }
+          },
+          visible: (): boolean => {
+            return UserRoleModel.canView(this.authUser);
+          }
+        },
+
+        // Modify Role
+        {
+          type: V2ActionType.ICON,
+          icon: 'edit',
+          iconTooltip: 'LNG_PAGE_LIST_USER_ROLES_ACTION_MODIFY_ROLE',
+          action: {
+            link: (item: UserRoleModel): string[] => {
+              return ['/user-roles', item.id, 'modify'];
+            }
+          },
+          visible: (item: UserRoleModel): boolean => {
+            return !this.authUser.hasRole(item.id) &&
+              UserRoleModel.canModify(this.authUser);
+          }
+        },
+
+        // Other actions
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          menuOptions: [
+            // Delete Role
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_USER_ROLES_ACTION_DELETE_ROLE'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: UserRoleModel): void => {
+                  // determine what we need to delete
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_DELETE',
+                        data: () => ({
+                          name: item.name
+                        })
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_DELETE_USER_ROLE',
+                        data: () => ({
+                          name: item.name
+                        })
+                      }
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // delete the role
+                    this.userRoleDataService
+                      .deleteRole(item.id)
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
+
+                          // hide loading
+                          loading.close();
+
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_LIST_USER_ROLES_ACTION_DELETE_USER_ROLE_SUCCESS_MESSAGE');
+
+                        // hide loading
+                        loading.close();
+
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
+                }
+              },
+              visible: (item: UserRoleModel): boolean => {
+                return !this.authUser.hasRole(item.id) &&
+                  UserRoleModel.canDelete(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: (item: UserRoleModel): boolean => {
+                // visible only if at least one of the previous...
+                return !this.authUser.hasRole(item.id) &&
+                  UserRoleModel.canDelete(this.authUser);
+              }
+            },
+
+            // Clone Role
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_USER_ROLES_ACTION_CLONE_ROLE'
+              },
+              action: {
+                link: (): string[] => {
+                  return ['/user-roles/create'];
+                },
+                linkQueryParams: (item: UserRoleModel): Params => {
+                  return {
+                    cloneId: item.id
+                  };
+                }
+              },
+              visible: (): boolean => {
+                return UserRoleModel.canClone(this.authUser);
+              }
+            }
+          ]
+        }
+      ]
+    };
   }
 
   /**
@@ -137,154 +284,6 @@ export class RolesListComponent extends ListComponent<UserRoleModel> implements 
           groupOptionHiddenKey: 'hidden',
           defaultValues: PermissionModel.HIDDEN_PERMISSIONS
         }
-      },
-
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // View Role
-          {
-            type: V2ActionType.ICON,
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_LIST_USER_ROLES_ACTION_VIEW_ROLE',
-            action: {
-              link: (item: UserRoleModel): string[] => {
-                return ['/user-roles', item.id, 'view'];
-              }
-            },
-            visible: (): boolean => {
-              return UserRoleModel.canView(this.authUser);
-            }
-          },
-
-          // Modify Role
-          {
-            type: V2ActionType.ICON,
-            icon: 'edit',
-            iconTooltip: 'LNG_PAGE_LIST_USER_ROLES_ACTION_MODIFY_ROLE',
-            action: {
-              link: (item: UserRoleModel): string[] => {
-                return ['/user-roles', item.id, 'modify'];
-              }
-            },
-            visible: (item: UserRoleModel): boolean => {
-              return !this.authUser.hasRole(item.id) &&
-                UserRoleModel.canModify(this.authUser);
-            }
-          },
-
-          // Other actions
-          {
-            type: V2ActionType.MENU,
-            icon: 'more_horiz',
-            menuOptions: [
-              // Delete Role
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_USER_ROLES_ACTION_DELETE_ROLE'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: UserRoleModel): void => {
-                    // determine what we need to delete
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_DELETE',
-                          data: () => ({
-                            name: item.name
-                          })
-                        },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_USER_ROLE',
-                          data: () => ({
-                            name: item.name
-                          })
-                        }
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
-
-                      // delete the role
-                      this.userRoleDataService
-                        .deleteRole(item.id)
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
-
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_USER_ROLES_ACTION_DELETE_USER_ROLE_SUCCESS_MESSAGE');
-
-                          // hide loading
-                          loading.close();
-
-                          // reload data
-                          this.needsRefreshList(true);
-                        });
-                    });
-                  }
-                },
-                visible: (item: UserRoleModel): boolean => {
-                  return !this.authUser.hasRole(item.id) &&
-                    UserRoleModel.canDelete(this.authUser);
-                }
-              },
-
-              // Divider
-              {
-                visible: (item: UserRoleModel): boolean => {
-                  // visible only if at least one of the previous...
-                  return !this.authUser.hasRole(item.id) &&
-                    UserRoleModel.canDelete(this.authUser);
-                }
-              },
-
-              // Clone Role
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_USER_ROLES_ACTION_CLONE_ROLE'
-                },
-                action: {
-                  link: (): string[] => {
-                    return ['/user-roles/create'];
-                  },
-                  linkQueryParams: (item: UserRoleModel): Params => {
-                    return {
-                      cloneId: item.id
-                    };
-                  }
-                },
-                visible: (): boolean => {
-                  return UserRoleModel.canClone(this.authUser);
-                }
-              }
-            ]
-          }
-        ]
       }
     ];
   }

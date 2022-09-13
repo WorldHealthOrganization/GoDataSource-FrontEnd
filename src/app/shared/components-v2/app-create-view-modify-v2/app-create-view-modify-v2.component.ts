@@ -26,7 +26,7 @@ import { CreateViewModifyV2ExpandColumn, CreateViewModifyV2ExpandColumnType } fr
 import { ICreateViewModifyV2Refresh } from './models/refresh.model';
 import { determineRenderMode, RenderMode } from '../../../core/enums/render-mode.enum';
 import { IExtendedColDef } from '../app-list-table-v2/models/extended-column.model';
-import { applyFilterBy, applyResetOnAllFilters, applySortBy } from '../app-list-table-v2/models/column.model';
+import { applyFilterBy, applyResetOnAllFilters, applySortBy, IV2Column } from '../app-list-table-v2/models/column.model';
 import { AppListTableV2Component } from '../app-list-table-v2/app-list-table-v2.component';
 import { PageEvent } from '@angular/material/paginator';
 import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
@@ -1129,9 +1129,10 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     }
 
     // filter
+    // always a column of type IV2Column if we have a filter
     applyFilterBy(
       tab.definition.queryBuilder,
-      data.column.columnDefinition,
+      data.column.columnDefinition as IV2Column,
       data.valueOverwrite
     );
 

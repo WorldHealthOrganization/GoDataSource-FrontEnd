@@ -126,23 +126,33 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
   }
 
   /**
-   * Initialize Side Table Columns
+   * Table column - actions
    */
-  protected initializeTableColumns(): void {
-    this.tableColumns = this.entityFollowUpHelperService.retrieveTableColumns({
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = this.entityFollowUpHelperService.retrieveTableColumnActions({
       authUser: this.authUser,
       entityData: this.entityData,
       selectedOutbreak: () => this.selectedOutbreak,
       selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
       team: this.route.snapshot.data.team,
+      refreshList: () => {
+        // reload data
+        this.needsRefreshList(true);
+      }
+    });
+  }
+
+  /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {
+    this.tableColumns = this.entityFollowUpHelperService.retrieveTableColumns({
+      authUser: this.authUser,
+      team: this.route.snapshot.data.team,
       user: this.route.snapshot.data.user,
       options: {
         dailyFollowUpStatus: (this.route.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         yesNoAll: (this.route.snapshot.data.yesNoAll as IResolverV2ResponseModel<ILabelValuePairModel>).options
-      },
-      refreshList: () => {
-        // reload data
-        this.needsRefreshList(true);
       }
     });
   }

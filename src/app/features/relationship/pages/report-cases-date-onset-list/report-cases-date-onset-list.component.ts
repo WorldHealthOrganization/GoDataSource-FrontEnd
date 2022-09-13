@@ -12,7 +12,7 @@ import { ReportCasesWithOnsetModel } from '../../../../core/models/report-cases-
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 
 @Component({
   selector: 'app-report-cases-date-onset-list',
@@ -50,6 +50,168 @@ export class ReportCasesDateOnsetListComponent extends ListComponent<ReportCases
 
     // ...and re-load the list when the Selected Outbreak is changed
     this.needsRefreshList(true);
+  }
+
+  /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // Other actions
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          menuOptions: [
+            // View people 1
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW',
+                data: (item: ReportCasesWithOnsetModel) => {
+                  return {
+                    name: item.primaryCase.name
+                  };
+                }
+              },
+              action: {
+                link: (item: ReportCasesWithOnsetModel) => {
+                  return ['/cases', item.primaryCase.id, 'view'];
+                },
+                linkQueryParams: (): Params => {
+                  return {
+                    onset: true
+                  };
+                }
+              },
+              visible: () => {
+                return CaseModel.canView(this.authUser);
+              }
+            },
+
+            // View people 2
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW',
+                data: (item: ReportCasesWithOnsetModel) => {
+                  return {
+                    name: item.secondaryCase.name
+                  };
+                }
+              },
+              action: {
+                link: (item: ReportCasesWithOnsetModel) => {
+                  return ['/cases', item.secondaryCase.id, 'view'];
+                },
+                linkQueryParams: (): Params => {
+                  return {
+                    onset: true
+                  };
+                }
+              },
+              visible: () => {
+                return CaseModel.canView(this.authUser);
+              }
+            },
+
+            // View relationship
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW_RELATIONSHIP'
+              },
+              action: {
+                link: (item: ReportCasesWithOnsetModel) => {
+                  const relationTypePath: string = _.find(item.relationship.persons, { id: item.primaryCase.id }).source ? 'contacts' : 'exposures';
+                  return ['/relationships', EntityType.CASE, item.primaryCase.id, relationTypePath, item.relationship.id, 'view'];
+                }
+              },
+              visible: () => {
+                return RelationshipModel.canView(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: () => {
+                return CaseModel.canView(this.authUser) ||
+                  RelationshipModel.canView(this.authUser);
+              }
+            },
+
+            // Modify people 1
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY',
+                data: (item: ReportCasesWithOnsetModel) => {
+                  return {
+                    name: item.primaryCase.name
+                  };
+                }
+              },
+              action: {
+                link: (item: ReportCasesWithOnsetModel) => {
+                  return ['/cases', item.primaryCase.id, 'modify'];
+                },
+                linkQueryParams: (): Params => {
+                  return {
+                    onset: true
+                  };
+                }
+              },
+              visible: () => {
+                return this.selectedOutbreakIsActive &&
+                  CaseModel.canModify(this.authUser);
+              }
+            },
+
+            // Modify people 2
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY',
+                data: (item: ReportCasesWithOnsetModel) => {
+                  return {
+                    name: item.secondaryCase.name
+                  };
+                }
+              },
+              action: {
+                link: (item: ReportCasesWithOnsetModel) => {
+                  return ['/cases', item.secondaryCase.id, 'modify'];
+                },
+                linkQueryParams: (): Params => {
+                  return {
+                    onset: true
+                  };
+                }
+              },
+              visible: () => {
+                return this.selectedOutbreakIsActive &&
+                  CaseModel.canModify(this.authUser);
+              }
+            },
+
+            // Modify relationship
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY_RELATIONSHIP'
+              },
+              action: {
+                link: (item: ReportCasesWithOnsetModel) => {
+                  const relationTypePath: string = _.find(item.relationship.persons, { id: item.primaryCase.id }).source ? 'contacts' : 'exposures';
+                  return ['/relationships', EntityType.CASE, item.primaryCase.id, relationTypePath, item.relationship.id, 'modify'];
+                }
+              },
+              visible: () => {
+                return this.selectedOutbreakIsActive &&
+                  RelationshipModel.canModify(this.authUser);
+              }
+            }
+          ]
+        }
+      ]
+    };
   }
 
   /**
@@ -94,169 +256,6 @@ export class ReportCasesDateOnsetListComponent extends ListComponent<ReportCases
       {
         field: 'secondaryCase.classification',
         label: `${ this.translateService.instant('LNG_PAGE_LIST_CASES_LABEL_SECONDARY') } ${ this.translateService.instant('LNG_CASE_FIELD_LABEL_CLASSIFICATION') }`
-      },
-
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // Other actions
-          {
-            type: V2ActionType.MENU,
-            icon: 'more_horiz',
-            menuOptions: [
-              // View people 1
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW',
-                  data: (item: ReportCasesWithOnsetModel) => {
-                    return {
-                      name: item.primaryCase.name
-                    };
-                  }
-                },
-                action: {
-                  link: (item: ReportCasesWithOnsetModel) => {
-                    return ['/cases', item.primaryCase.id, 'view'];
-                  },
-                  linkQueryParams: (): Params => {
-                    return {
-                      onset: true
-                    };
-                  }
-                },
-                visible: () => {
-                  return CaseModel.canView(this.authUser);
-                }
-              },
-
-              // View people 2
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW',
-                  data: (item: ReportCasesWithOnsetModel) => {
-                    return {
-                      name: item.secondaryCase.name
-                    };
-                  }
-                },
-                action: {
-                  link: (item: ReportCasesWithOnsetModel) => {
-                    return ['/cases', item.secondaryCase.id, 'view'];
-                  },
-                  linkQueryParams: (): Params => {
-                    return {
-                      onset: true
-                    };
-                  }
-                },
-                visible: () => {
-                  return CaseModel.canView(this.authUser);
-                }
-              },
-
-              // View relationship
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_VIEW_RELATIONSHIP'
-                },
-                action: {
-                  link: (item: ReportCasesWithOnsetModel) => {
-                    const relationTypePath: string = _.find(item.relationship.persons, { id: item.primaryCase.id }).source ? 'contacts' : 'exposures';
-                    return ['/relationships', EntityType.CASE, item.primaryCase.id, relationTypePath, item.relationship.id, 'view'];
-                  }
-                },
-                visible: () => {
-                  return RelationshipModel.canView(this.authUser);
-                }
-              },
-
-              // Divider
-              {
-                visible: () => {
-                  return CaseModel.canView(this.authUser) ||
-                    RelationshipModel.canView(this.authUser);
-                }
-              },
-
-              // Modify people 1
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY',
-                  data: (item: ReportCasesWithOnsetModel) => {
-                    return {
-                      name: item.primaryCase.name
-                    };
-                  }
-                },
-                action: {
-                  link: (item: ReportCasesWithOnsetModel) => {
-                    return ['/cases', item.primaryCase.id, 'modify'];
-                  },
-                  linkQueryParams: (): Params => {
-                    return {
-                      onset: true
-                    };
-                  }
-                },
-                visible: () => {
-                  return this.selectedOutbreakIsActive &&
-                    CaseModel.canModify(this.authUser);
-                }
-              },
-
-              // Modify people 2
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY',
-                  data: (item: ReportCasesWithOnsetModel) => {
-                    return {
-                      name: item.secondaryCase.name
-                    };
-                  }
-                },
-                action: {
-                  link: (item: ReportCasesWithOnsetModel) => {
-                    return ['/cases', item.secondaryCase.id, 'modify'];
-                  },
-                  linkQueryParams: (): Params => {
-                    return {
-                      onset: true
-                    };
-                  }
-                },
-                visible: () => {
-                  return this.selectedOutbreakIsActive &&
-                    CaseModel.canModify(this.authUser);
-                }
-              },
-
-              // Modify relationship
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CASES_DATE_ONSET_ACTION_MODIFY_RELATIONSHIP'
-                },
-                action: {
-                  link: (item: ReportCasesWithOnsetModel) => {
-                    const relationTypePath: string = _.find(item.relationship.persons, { id: item.primaryCase.id }).source ? 'contacts' : 'exposures';
-                    return ['/relationships', EntityType.CASE, item.primaryCase.id, relationTypePath, item.relationship.id, 'modify'];
-                  }
-                },
-                visible: () => {
-                  return this.selectedOutbreakIsActive &&
-                    RelationshipModel.canModify(this.authUser);
-                }
-              }
-            ]
-          }
-        ]
       }
     ];
   }

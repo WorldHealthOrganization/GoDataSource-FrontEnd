@@ -70,7 +70,11 @@ import { IV2RowExpandRow, V2RowType } from './models/row.model';
 })
 export class AppListTableV2Component implements OnInit, OnDestroy {
   // static
+  private static readonly STANDARD_COLUMN_PADDING: number = 8;
+  private static readonly STANDARD_COLUMN_MARGIN: number = 1;
   private static readonly STANDARD_COLUMN_MAX_DEFAULT_WIDTH: number = 400;
+  private static readonly STANDARD_COLUMN_ACTION_WIDTH: number = 24;
+  private static readonly STANDARD_COLUMN_ACTION_GAP: number = 8;
   private static readonly STANDARD_SELECT_COLUMN_WIDTH: number = 42;
   private static readonly STANDARD_OBFUSCATED_COLUMN_WIDTH: number = 400;
   private static readonly STANDARD_SHAPE_SIZE: number = 12;
@@ -133,6 +137,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   get columns(): IV2Column[] {
     return this._columns;
   }
+
+  // table column actions
+  // no need to create setter and call updateColumnDefinitions, because for now columnActions is always initialized before columns, and it shouldn't be changed after that
+  @Input() columnActions: IV2ColumnAction;
 
   // paginator disabled ?
   @Input() paginatorDisabled: boolean = false;
@@ -845,8 +853,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       this._columns.forEach((column) => {
         // set not visible
         const isVisible: boolean = visibleColumnsMap[column.field] !== undefined;
-        column.notVisible = !isVisible &&
-          column.format?.type !== V2ColumnFormat.ACTIONS;
+        column.notVisible = !isVisible;
 
         // update map if found
         if (isVisible) {
@@ -890,8 +897,6 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           format: {
             type: V2ColumnFormat.ACTIONS
           },
-          field: this.keyField,
-          label: '',
           actions: [{
             type: V2ActionType.MENU,
             icon: 'expand_more',
@@ -959,33 +964,29 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
       // determine column pinned value
       let pinned: IV2ColumnPinned | boolean;
-      if (column.format?.type !== V2ColumnFormat.ACTIONS) {
+      if (
+        leftPinnedColumns.length > 0 &&
+        leftPinnedColumnsMap[column.field]
+      ) {
+        pinned = IV2ColumnPinned.LEFT;
+      } else if (
+        rightPinnedColumns.length > 0 &&
+        rightPinnedColumnsMap[column.field]
+      ) {
+        pinned = IV2ColumnPinned.RIGHT;
+      } else {
         if (
-          leftPinnedColumns.length > 0 &&
-          leftPinnedColumnsMap[column.field]
+          column.pinned === true ||
+          column.pinned === IV2ColumnPinned.LEFT &&
+          leftPinnedColumns.length < 1
         ) {
           pinned = IV2ColumnPinned.LEFT;
         } else if (
-          rightPinnedColumns.length > 0 &&
-          rightPinnedColumnsMap[column.field]
+          column.pinned === IV2ColumnPinned.RIGHT &&
+          rightPinnedColumns.length < 1
         ) {
           pinned = IV2ColumnPinned.RIGHT;
-        } else {
-          if (
-            column.pinned === true ||
-            column.pinned === IV2ColumnPinned.LEFT &&
-            leftPinnedColumns.length < 1
-          ) {
-            pinned = IV2ColumnPinned.LEFT;
-          } else if (
-            column.pinned === IV2ColumnPinned.RIGHT &&
-            rightPinnedColumns.length < 1
-          ) {
-            pinned = IV2ColumnPinned.RIGHT;
-          }
         }
-      } else {
-        pinned = column.pinned;
       }
 
       // attach column to list of visible columns
@@ -1007,10 +1008,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         cellRenderer: this.handleCellRenderer(column),
         suppressMovable: this.isSmallScreenMode ?
           true :
-          (
-            (column.format && column.format.type === V2ColumnFormat.ACTIONS) ||
-            !!(column as any).notMovable
-          ),
+          !!(column as any).notMovable,
         headerComponent: AppListTableV2ColumnHeaderComponent
       });
 
@@ -1057,21 +1055,43 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         // render column
         renderColumn(visibleColumnsMap[field]);
       });
-
-      // make sure we render the actions columns
-      this._columns.forEach((column) => {
-        if (
-          column.format?.type === V2ColumnFormat.ACTIONS &&
-          !visibleColumnsMap[column.field]
-        ) {
-          renderColumn(column);
-        }
-      });
     } else {
       // process columns in default order
       this._columns.forEach((column) => {
         renderColumn(column);
       });
+    }
+
+    // attach actions column to the start or to the end depending on if small or big screen
+    if (this.columnActions) {
+      // create action column
+      const actionColumn: IExtendedColDef = {
+        headerName: this.translateService.instant('LNG_COMMON_LABEL_ACTIONS'),
+        field: 'actions',
+        pinned: this.isSmallScreenMode ?
+          false :
+          IV2ColumnPinned.RIGHT,
+        resizable: false,
+        columnDefinition: this.columnActions,
+        columnDefinitionData: this,
+        cellClass: 'gd-cell-no-focus',
+        cellRenderer: this.handleCellRenderer(this.columnActions),
+        suppressMovable: true,
+        headerComponent: AppListTableV2ColumnHeaderComponent
+      };
+
+      // attach column to list of visible columns depending on screen size
+      if (this.isSmallScreenMode) {
+        // add it to the beginning
+        columnDefs.splice(
+          this.groupActions?.length > 0 || this.groupActionsSingleRecord ? 1 : 0,
+          0,
+          actionColumn
+        );
+      } else {
+        // add it to the end
+        columnDefs.push(actionColumn);
+      }
     }
 
     // add suffix legends
@@ -1204,7 +1224,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   /**
    * Custom renderer
    */
-  private handleCellRenderer(column: IV2Column): any {
+  private handleCellRenderer(column: IV2Column | IV2ColumnAction): any {
     // obfuscate ?
     const basicColumn: IV2ColumnBasic = column as IV2ColumnBasic;
     if (basicColumn.format?.obfuscated) {
@@ -1467,6 +1487,26 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           column,
           AppListTableV2Component.STANDARD_OBFUSCATED_COLUMN_WIDTH
         );
+      } else if (colDef.columnDefinition?.format?.type === V2ColumnFormat.ACTIONS) {
+        // number of actions
+        const noActions: number = this.columnActions?.actions?.length ?
+          this.columnActions.actions.length :
+          0;
+
+        // set column width
+        if (noActions > 0) {
+          this._agTable.columnApi.setColumnWidth(
+            column,
+            // width of buttons
+            noActions * AppListTableV2Component.STANDARD_COLUMN_ACTION_WIDTH +
+            // gap between buttons
+            ((noActions - 1) * AppListTableV2Component.STANDARD_COLUMN_ACTION_GAP) +
+            // cell padding (left + right)
+            2 * AppListTableV2Component.STANDARD_COLUMN_PADDING +
+            // cell margin (left + right)
+            2 * AppListTableV2Component.STANDARD_COLUMN_MARGIN
+          );
+        }
       }
     });
   }
@@ -1478,7 +1518,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // construct list of possible columns
     const columns: IV2Column[] = this._columns
       // filter out pinned columns since those are handled by a different button
-      .filter((item) => item.format?.type !== V2ColumnFormat.ACTIONS && (!item.exclude || !item.exclude(item)))
+      .filter((item) => !item.exclude || !item.exclude(item))
       // sort columns by their label
       .sort((v1, v2) => this.translateService.instant(v1.label).localeCompare(this.translateService.instant(v2.label)));
 
@@ -1552,8 +1592,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           if (
             !colDef ||
             !colDef.columnDefinition ||
-            !visibleMap[colDef.columnDefinition.field] ||
-            colDef.columnDefinition.format?.type === V2ColumnFormat.ACTIONS
+            colDef.columnDefinition.format?.type === V2ColumnFormat.ACTIONS ||
+            !visibleMap[colDef.columnDefinition.field]
           ) {
             return;
           }
