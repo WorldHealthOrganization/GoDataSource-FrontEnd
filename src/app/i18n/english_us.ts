@@ -29,7 +29,9 @@ export const EnglishUsLang = {
     'LNG_COMMON_LABEL_EXPORT_FIELDS_ALL': 'All fields',
     'LNG_COMMON_LABEL_EXPORT_FIELDS': 'Fields',
     'LNG_COMMON_LABEL_TABS_SETTINGS': 'Tab configuration',
-    'LNG_COMMON_LABEL_TABS_ORDER': 'Tabs order'
+    'LNG_COMMON_LABEL_TABS_ORDER': 'Tabs order',
+    // eslint-disable-next-line @typescript-eslint/quotes
+    'LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG': "Please make sure that '{{fileName}}' dashlet is visible"
 
 
 

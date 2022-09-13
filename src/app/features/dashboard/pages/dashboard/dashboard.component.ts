@@ -401,7 +401,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             click: () => {
               this.getEpiCurveDashlet(
                 'app-epi-curve-dashlet svg',
-                `${this.translateService.instant('LNG_PAGE_DASHBOARD_EPI_CURVE_CLASSIFICATION_TITLE')} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`
+                'LNG_PAGE_DASHBOARD_EPI_CURVE_CLASSIFICATION_TITLE'
               );
             }
           },
@@ -418,7 +418,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             click: () => {
               this.getEpiCurveDashlet(
                 'app-epi-curve-outcome-dashlet svg',
-                `${this.translateService.instant('LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE')} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`
+                'LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE'
               );
             }
           },
@@ -435,7 +435,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             click: () => {
               this.getEpiCurveDashlet(
                 'app-epi-curve-reporting-dashlet svg',
-                `${this.translateService.instant('LNG_PAGE_DASHBOARD_EPI_CURVE_REPORTING_TITLE')} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`
+                'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORTING_TITLE'
               );
             }
           },
@@ -635,7 +635,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
         .subscribe((pngBase64) => {
           // object not found ?
           if (!pngBase64) {
-            this.toastV2Service.notice('LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG');
+            this.toastV2Service.error(
+              'LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG',
+              { fileName: this.translateService.instant(fileName) }
+            );
             loading.close();
             return;
           }
@@ -658,7 +661,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
               })
             )
             .subscribe((blob) => {
-              this.downloadFile(blob, fileName);
+              this.downloadFile(
+                blob,
+                `${this.translateService.instant(fileName)} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`
+              );
               loading.close();
             });
         });
