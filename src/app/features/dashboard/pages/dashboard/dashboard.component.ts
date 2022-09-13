@@ -396,6 +396,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           label: {
             get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_CLASSIFICATION_TITLE'
           },
+          toolTip: this.translateService.instant('LNG_PAGE_DASHBOARD_EPI_CURVE_CLASSIFICATION_TITLE'),
           action: {
             click: () => {
               this.getEpiCurveDashlet('app-epi-curve-dashlet svg');
@@ -409,6 +410,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           label: {
             get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE'
           },
+          toolTip: this.translateService.instant('LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE'),
           action: {
             click: () => {
               this.getEpiCurveDashlet('app-epi-curve-outcome-dashlet svg');
@@ -422,6 +424,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           label: {
             get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORTING_TITLE'
           },
+          toolTip: this.translateService.instant('LNG_PAGE_DASHBOARD_EPI_CURVE_REPORTING_TITLE'),
           action: {
             click: () => {
               this.getEpiCurveDashlet('app-epi-curve-reporting-dashlet svg');
