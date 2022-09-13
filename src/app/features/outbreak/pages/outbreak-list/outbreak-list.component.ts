@@ -372,6 +372,7 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
                         this.outbreakDataService
                           .getOutbreak(handler.data.map.cloneData.data.id)
                           .subscribe((outbreak: OutbreakModel) => {
+                            // keep outbreak that will be cloned
                             handler.data.map.cloneData.data = outbreak;
 
                             // hide loading
@@ -381,14 +382,13 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
                     })
                     .subscribe((response) => {
                       // canceled ?
-                      if ( response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+                      if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
                         // finished
                         return;
                       }
 
                       // show loading
-                      const loading =
-                        this.dialogV2Service.showLoadingDialog();
+                      const loading = this.dialogV2Service.showLoadingDialog();
 
                       // translate questionnaire questions
                       const translateQuestionnaire = (questions: QuestionModel[]) => {
@@ -409,10 +409,18 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
                         });
                       };
 
-                      const outbreakToClone = response.handler.data.map.cloneData.data;
+                      // determine data of outbreak that we need to clone
+                      let outbreakToClone = response.handler.data.map.cloneData.data;
+                      const countries: {
+                        id: string
+                      }[] = outbreakToClone.countries;
 
-                      // delete the id from the parent outbreak
+                      // sanitize
+                      outbreakToClone = JSON.parse(JSON.stringify(outbreakToClone));
                       delete outbreakToClone.id;
+                      delete outbreakToClone._countryIds;
+                      delete outbreakToClone._countries;
+                      outbreakToClone.countries = countries;
 
                       // set the name for the cloned outbreak
                       outbreakToClone.name = (response.handler.data.inputs[0] as any).value;
@@ -437,6 +445,10 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
                         translateQuestionnaire(outbreakToClone.contactFollowUpTemplate);
                       }
 
+                      // hide side dialog
+                      response.handler.hide();
+
+                      // create outbreak clone
                       this.outbreakDataService
                         .createOutbreak(outbreakToClone)
                         .pipe(
@@ -461,7 +473,7 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
                           })
                         )
                         .subscribe((clonedOutbreak) => {
-
+                          // show success message
                           this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_SUCCESS_MESSAGE');
 
                           // hide loading
