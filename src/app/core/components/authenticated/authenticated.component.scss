@@ -34,6 +34,8 @@ mat-sidenav-container {
       .gd-body-content-left-content {
         height: 100%;
         overflow: hidden;
+        position: relative;
+        z-index: 999;
 
         /* Logo on mobile */
         .gd-body-content-left-content-header {

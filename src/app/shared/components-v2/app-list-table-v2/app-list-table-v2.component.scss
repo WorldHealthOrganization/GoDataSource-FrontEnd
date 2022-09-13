@@ -8,12 +8,17 @@
 
     /* Page title & view button */
     .gd-list-top-tile-buttons-title {
+      overflow: hidden;
+
       span {
         color: var(--gd-primary);
         font-family: $gd-font-family;
         font-size: 2.4rem;
         font-weight: 500;
         line-height: $gd-line-height;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
       .mat-icon-button {
@@ -76,6 +81,15 @@
       &:hover {
         &::-webkit-scrollbar,
         &::-webkit-scrollbar-thumb {
+          opacity: 1;
+          visibility: visible;
+        }
+      }
+
+      &.gd-mobile-device {
+        &::-webkit-scrollbar,
+        &::-webkit-scrollbar-thumb {
+          @include transition(all 0.24s ease-in-out 0s);
           opacity: 1;
           visibility: visible;
         }
@@ -146,16 +160,18 @@
         }
       }
 
-      &:hover {
-        .gd-list-top-grouped-data-value {
-          @include opacity(0.5);
-
-          &:hover {
-            @include opacity(1);
-          }
-
-          &.gd-list-top-grouped-data-value-active {
-            @include opacity(1);
+      @media (hover: hover) {
+        &:hover {
+          .gd-list-top-grouped-data-value {
+            @include opacity(0.5);
+  
+            &:hover {
+              @include opacity(1);
+            }
+  
+            &.gd-list-top-grouped-data-value-active {
+              @include opacity(1);
+            }
           }
         }
       }

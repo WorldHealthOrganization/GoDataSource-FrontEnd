@@ -295,6 +295,10 @@
 
         &.ag-row-selected {
           background-color: rgba(var(--gd-primary-rgb), 0.1);
+
+          &:before {
+            display: none;
+          }
         }
 
         /* AgGrid content cell */
@@ -438,7 +442,7 @@
         font-family: 'Material Icons';
         font-size: 2.4rem;
         height: 2.4rem;
-        line-height: 2.4rem;
+        line-height: 2rem;
         width: 2.4rem;
 
         &:after {

@@ -38,7 +38,7 @@
 
     <!-- Buttons -->
     <div
-      fxFlex fxLayoutAlign="end" fxLayoutGap="0.8rem"
+      fxLayoutAlign="end" fxLayoutGap="0.8rem" flexGrow="0"
       class="gd-list-top-tile-buttons-buttons">
 
       <!-- Hide / show groups -->
@@ -171,6 +171,7 @@
       #displayGroupedData>
       <div
         class="gd-list-top-grouped-data"
+        [class.gd-mobile-device]="isTouchDevice"
         fxLayout="row" fxLayoutAlign="space-between stretch" fxLayoutGap="1.6rem">
 
         <!-- Group value -->
