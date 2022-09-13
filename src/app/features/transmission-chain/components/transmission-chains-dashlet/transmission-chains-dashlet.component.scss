@@ -18,6 +18,9 @@ app-transmission-chains-dashlet {
         font-size: 2.4rem;
         font-weight: 500;
         line-height: $gd-line-height;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
 
       /* Page top buttons */
@@ -28,7 +31,6 @@ app-transmission-chains-dashlet {
 
         @include breakpoint('xs') {
           @include flex_wrap(wrap);
-          margin-top: 1.6rem;
         }
 
         .gd-form-select-single-v2 {
