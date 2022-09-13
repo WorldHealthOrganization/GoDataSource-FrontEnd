@@ -11,7 +11,7 @@
   <!-- Title & buttons -->
   <div
     *ngIf="pageTitle"
-    fxLayout="row"
+    fxLayout="row" fxLayoutGap="0.8rem"
     class="gd-list-top-tile-buttons">
 
     <!-- Title & view button -->
@@ -38,7 +38,7 @@
 
     <!-- Buttons -->
     <div
-      fxFlex fxLayoutAlign="end" fxLayoutGap="0.8rem"
+      fxGrow="0" fxLayoutAlign="end" fxLayoutGap="0.8rem"
       class="gd-list-top-tile-buttons-buttons">
 
       <!-- Hide / show groups -->
@@ -69,20 +69,33 @@
         <button
           #quickMenuTrigger="matMenuTrigger"
           class="gd-list-top-tile-buttons-button-quick"
-          [class.gd-list-top-tile-buttons-button-quick-expanded]="quickMenuTrigger.menuOpen"
+          [class.gd-list-top-tile-buttons-button-quick-expanded]="quickMenuTrigger.menuOpen && !isSmallScreenMode"
           type="button"
           mat-flat-button color="secondary"
           [disabled]="quickActions.disable && quickActions.disable(null)"
           [matMenuTriggerFor]="quickMenu"
           (menuClosed)="detectChanges()">
 
-          <!-- Label -->
-          <span>
-            {{quickActions.label | translate}}
-          </span>
+          <!-- Big screen TV -->
+          <ng-container
+            *ngIf="!isSmallScreenMode; else smallScreen">
 
-          <!-- Icon -->
-          <mat-icon>expand_more</mat-icon>
+            <!-- Label -->
+            <span>
+              {{quickActions.label | translate}}
+            </span>
+
+            <!-- Icon -->
+            <mat-icon>expand_more</mat-icon>
+          </ng-container>
+
+          <!-- Small screen TV -->
+          <ng-template
+            #smallScreen>
+            <!-- Menu icon -->
+            <mat-icon>apps</mat-icon>
+          </ng-template>
+
         </button>
 
         <!-- Floating menu -->
@@ -137,22 +150,40 @@
       </ng-container>
 
       <!-- Add -->
-      <a
-        *ngIf="addAction && (!addAction.visible || addAction.visible(null))"
-        mat-flat-button
-        [routerLink]="addAction.action.link && (!addAction.disable || !addAction.disable(null)) ? addAction.action.link(null) : undefined"
-        [queryParams]="addAction.action.linkQueryParams ? addAction.action.linkQueryParams(null) : undefined"
-        [disabled]="addAction.disable && addAction.disable(null)"
-        (click)="addAction.action.click ? addAction.action.click(null) : undefined">
+      <ng-container
+        *ngIf="addAction && (!addAction.visible || addAction.visible(null))">
 
-        <!-- Icon -->
-        <mat-icon>{{addAction.icon}}</mat-icon>
+        <!-- Big screen TV -->
+        <a
+          *ngIf="!isSmallScreenMode; else smallScreen"
+          mat-flat-button color="primary"
+          [routerLink]="addAction.action.link && (!addAction.disable || !addAction.disable(null)) ? addAction.action.link(null) : undefined"
+          [queryParams]="addAction.action.linkQueryParams ? addAction.action.linkQueryParams(null) : undefined"
+          [disabled]="addAction.disable && addAction.disable(null)"
+          (click)="addAction.action.click ? addAction.action.click(null) : undefined">
 
-        <!-- Label -->
-        <span>{{ addAction.label | translate }}</span>
+          <!-- Icon -->
+          <mat-icon>{{addAction.icon}}</mat-icon>
 
-      </a>
+          <!-- Label -->
+          <span>{{ addAction.label | translate }}</span>
 
+        </a>
+
+        <!-- Tube TV -->
+        <ng-template
+          #smallScreen>
+          <a
+            mat-icon-button color="primary"
+            [matTooltip]="addAction.label | translate"
+            [routerLink]="addAction.action.link && (!addAction.disable || !addAction.disable(null)) ? addAction.action.link(null) : undefined"
+            [queryParams]="addAction.action.linkQueryParams ? addAction.action.linkQueryParams(null) : undefined"
+            [disabled]="addAction.disable && addAction.disable(null)"
+            (click)="addAction.action.click ? addAction.action.click(null) : undefined">
+            <mat-icon>{{addAction.icon}}</mat-icon>
+          </a>
+        </ng-template>
+      </ng-container>
     </div>
   </div>
 
