@@ -1,18 +1,18 @@
 /* #TODO - Handsontable - to be removed at a later stage */
-@import '~handsontable/dist/handsontable.full.min.css';
+@import 'handsontable/dist/handsontable.full.min.css';
 
 /* OpenLayers */
 @import './components/ol.min.css';
 
 /* AG-Grid */
-@import "~@ag-grid-community/core/dist/styles/ag-grid.css";
-@import "~@ag-grid-community/core/dist/styles/ag-theme-balham.css";
+@import '@ag-grid-community/core/dist/styles/ag-grid.css';
+@import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
 
 /* Toastr */
-@import '~ngx-toastr/toastr';
+@import 'ngx-toastr/toastr';
 
 /* popperjs */
-@import "~ngx-popperjs/css/theme-white.css";
+@import 'ngx-popperjs/css/theme-white.css';
 
 /* Global Components */
 @import './components/overlay';
