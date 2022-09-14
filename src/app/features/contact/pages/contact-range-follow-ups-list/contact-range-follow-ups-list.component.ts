@@ -130,14 +130,22 @@ export class ContactRangeFollowUpsListComponent
       format: {
         type: V2ColumnFormat.DATE,
         field: 'person.dateOfLastContact'
+      },
+      filter: {
+        type: V2FilterType.DATE_RANGE,
+        childQueryBuilderKey: 'contact'
       }
     },
     {
-      field: 'endDate',
+      field: 'followUp.endDate',
       label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_DATE_END_FOLLOW_UP',
       format: {
         type: V2ColumnFormat.DATE,
         field: 'person.followUp.endDate'
+      },
+      filter: {
+        type: V2FilterType.DATE_RANGE,
+        childQueryBuilderKey: 'contact'
       }
     }
   ];
