@@ -318,7 +318,8 @@ const routes: Routes = [
       dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
       team: TeamDataResolver,
       followUpGroupBy: FollowUpGroupByDataResolver,
-      occupation: OccupationDataResolver
+      occupation: OccupationDataResolver,
+      risk: RiskDataResolver
     }
   },
   // Create Follow Up

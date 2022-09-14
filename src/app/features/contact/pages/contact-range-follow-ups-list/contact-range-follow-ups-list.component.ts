@@ -208,6 +208,21 @@ export class ContactRangeFollowUpsListComponent
         options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         childQueryBuilderKey: 'contact'
       }
+    },
+    {
+      field: 'riskLevel',
+      label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_RISK',
+      notVisible: true,
+      format: {
+        type: (data) => data.person?.riskLevel ?
+          this.translateService.instant(data.person.riskLevel) :
+          ''
+      },
+      filter: {
+        type: V2FilterType.MULTIPLE_SELECT,
+        options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        childQueryBuilderKey: 'contact'
+      }
     }
   ];
 
