@@ -121,6 +121,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     return this._processedSelectedResults;
   }
 
+  // table column actions
+  // no need to create setter and call updateColumnDefinitions, because for now columnActions is always initialized before columns, and it shouldn't be changed after that
+  @Input() columnActions: IV2ColumnAction;
+
   // columns
   private _columns: IV2Column[];
   @Input() set columns(columns: IV2Column[]) {
@@ -141,10 +145,6 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   get columns(): IV2Column[] {
     return this._columns;
   }
-
-  // table column actions
-  // no need to create setter and call updateColumnDefinitions, because for now columnActions is always initialized before columns, and it shouldn't be changed after that
-  @Input() columnActions: IV2ColumnAction;
 
   // paginator disabled ?
   @Input() paginatorDisabled: boolean = false;
