@@ -44,7 +44,6 @@ import {
   V2SideDialogConfigInputType
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import { FollowUpPage } from '../../typings/follow-up-page';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { IV2DateRange } from '../../../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
 import { EntityType } from '../../../../core/models/entity-type';
@@ -179,12 +178,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           action: {
             link: (item: FollowUpModel): string[] => {
               return ['/contacts', item.personId, 'follow-ups', item.id, 'view'];
-            },
-            linkQueryParams: (): Params => {
-              return {
-                rootPage: this.caseData ? FollowUpPage.CASE_RELATED : FollowUpPage.DAILY,
-                rootCaseId: this.caseData?.id
-              };
             }
           },
           visible: (item: FollowUpModel): boolean => {
@@ -201,12 +194,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           action: {
             link: (item: FollowUpModel): string[] => {
               return ['/contacts', item.personId, 'follow-ups', item.id, 'modify'];
-            },
-            linkQueryParams: (): Params => {
-              return {
-                rootPage: this.caseData ? FollowUpPage.CASE_RELATED : FollowUpPage.DAILY,
-                rootCaseId: this.caseData?.id
-              };
             }
           },
           visible: (item: FollowUpModel): boolean => {

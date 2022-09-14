@@ -47,6 +47,10 @@ export interface IV2ColumnBasic {
   pinned?: IV2ColumnPinned | boolean;
   notResizable?: boolean;
   notMovable?: boolean;
+  lockPosition?: boolean | 'left' | 'right';
+  width?: number;
+  alwaysVisible?: boolean;
+  centerHeader?: boolean;
   link?: (any) => string;
   cssCellClass?: string;
   sortable?: boolean;
@@ -180,6 +184,10 @@ export interface IV2ColumnButton {
   pinned?: IV2ColumnPinned | boolean;
   notResizable?: boolean;
   notMovable?: boolean;
+  lockPosition?: boolean | 'left' | 'right';
+  width?: number;
+  alwaysVisible?: boolean;
+  centerHeader?: boolean;
   cssCellClass?: string;
   sortable?: boolean;
   filter?: V2Filter;
@@ -195,18 +203,13 @@ export interface IV2ColumnAction {
   };
   actions: V2Action[];
 
-  // optional
-  // notVisible?: boolean;
-  // exclude?: (IV2Column) => boolean;
-  // cssCellClass?: string;
-
   // never
   field?: never;
   filter?: never;
   sortable?: never;
-  // label?: never;
-  // pinned?: never;
-  // notResizable?: never;
+  width?: never;
+  alwaysVisible?: never;
+  centerHeader?: never;
 }
 
 /**
@@ -271,9 +274,15 @@ export interface IV2ColumnStatus {
   // optional
   notVisible?: boolean;
   notMovable?: boolean;
+  lockPosition?: boolean | 'left' | 'right';
   exclude?: (IV2Column) => boolean;
   pinned?: IV2ColumnPinned | boolean;
   cssCellClass?: string;
+
+  // never
+  width?: never;
+  alwaysVisible?: never;
+  centerHeader?: never;
   sortable?: never;
   filter?: never;
 }
@@ -299,6 +308,10 @@ export interface IV2ColumnLinkList {
   pinned?: IV2ColumnPinned | boolean;
   notResizable?: boolean;
   notMovable?: boolean;
+  lockPosition?: boolean | 'left' | 'right';
+  width?: number;
+  alwaysVisible?: boolean;
+  centerHeader?: boolean;
   cssCellClass?: string;
   filter?: V2Filter;
 
@@ -324,6 +337,10 @@ export interface IV2ColumnHTML {
   pinned?: IV2ColumnPinned | boolean;
   notResizable?: boolean;
   notMovable?: boolean;
+  lockPosition?: boolean | 'left' | 'right';
+  width?: number;
+  alwaysVisible?: boolean;
+  centerHeader?: boolean;
   cssCellClass?: string;
   filter?: V2Filter;
 
@@ -363,6 +380,10 @@ export interface IV2ColumnExpandRow {
   pinned?: IV2ColumnPinned | boolean;
   notResizable?: boolean;
   notMovable?: boolean;
+  lockPosition?: boolean | 'left' | 'right';
+  width?: number;
+  alwaysVisible?: boolean;
+  centerHeader?: boolean;
   cssCellClass?: string;
   sortable?: boolean;
   filter?: V2Filter;

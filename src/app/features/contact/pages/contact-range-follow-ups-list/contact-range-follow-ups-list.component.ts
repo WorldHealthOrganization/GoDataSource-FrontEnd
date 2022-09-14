@@ -1,7 +1,6 @@
 import { Component, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { FollowUpPage } from '../../typings/follow-up-page';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { catchError, map, takeUntil } from 'rxjs/operators';
@@ -15,7 +14,7 @@ import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/c
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ActivatedRoute } from '@angular/router';
-import { RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
+import { RequestFilterGenerator, RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { EntityType } from '../../../../core/models/entity-type';
 import { Location } from '@angular/common';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
@@ -30,6 +29,8 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { TranslateService } from '@ngx-translate/core';
 import * as momentOriginal from 'moment';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { IV2FilterText, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { AddressModel } from '../../../../core/models/address.model';
 
 @Component({
   selector: 'app-contact-range-follow-ups-list',
@@ -47,7 +48,6 @@ export class ContactRangeFollowUpsListComponent
       field: 'name',
       label: 'LNG_ENTITY_FIELD_LABEL_NAME',
       pinned: IV2ColumnPinned.LEFT,
-      notMovable: true,
       format: {
         type: 'person.name'
       },
@@ -55,6 +55,40 @@ export class ContactRangeFollowUpsListComponent
         return data.person.type === EntityType.CASE ?
           (CaseModel.canView(this.authUser) ? `/cases/${data.person.id}/view` : undefined) :
           (ContactModel.canView(this.authUser) ? `/contacts/${data.person.id}/view` : undefined);
+      },
+      filter: {
+        type: V2FilterType.TEXT,
+        textType: V2FilterTextType.STARTS_WITH,
+        search: (column: IV2Column) => {
+          // value
+          const value: string = (column.filter as IV2FilterText).value;
+
+          // remove previous condition
+          const qb: RequestQueryBuilder = this.queryBuilder.addChildQueryBuilder('contact');
+          qb.filter.removePathCondition('or.firstName');
+          qb.filter.removePathCondition('or.lastName');
+          if (value) {
+            // add new condition
+            qb.filter.where({
+              or: [
+                {
+                  firstName: RequestFilterGenerator.textStartWith(
+                    value,
+                    false
+                  )
+                }, {
+                  lastName: RequestFilterGenerator.textStartWith(
+                    value,
+                    false
+                  )
+                }
+              ]
+            });
+          }
+
+          // refresh list
+          this.needsRefreshList();
+        }
       }
     }, {
       field: 'visualId',
@@ -63,19 +97,30 @@ export class ContactRangeFollowUpsListComponent
         type: 'person.visualId'
       },
       pinned: IV2ColumnPinned.LEFT,
-      notMovable: true
+      filter: {
+        type: V2FilterType.TEXT,
+        textType: V2FilterTextType.STARTS_WITH,
+        childQueryBuilderKey: 'contact'
+      }
     }, {
       field: 'locationId',
       label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
       format: {
         type: 'person.mainAddress.location.name'
       },
-      pinned: IV2ColumnPinned.LEFT,
-      notMovable: true,
       link: (data) => {
         return data.person?.mainAddress?.location?.id && LocationModel.canView(this.authUser) ?
           `/locations/${data.person.mainAddress.location.id}/view` :
           undefined;
+      },
+      filter: {
+        type: V2FilterType.ADDRESS_MULTIPLE_LOCATION,
+        childQueryBuilderKey: 'contact',
+        address: new AddressModel({
+          geoLocationAccurate: ''
+        }),
+        field: 'addresses',
+        fieldIsArray: true
       }
     },
     {
@@ -85,16 +130,98 @@ export class ContactRangeFollowUpsListComponent
         type: V2ColumnFormat.DATE,
         field: 'person.dateOfLastContact'
       },
-      notMovable: true
+      filter: {
+        type: V2FilterType.DATE_RANGE,
+        childQueryBuilderKey: 'contact'
+      }
     },
     {
-      field: 'endDate',
+      field: 'followUp.endDate',
       label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_DATE_END_FOLLOW_UP',
       format: {
         type: V2ColumnFormat.DATE,
         field: 'person.followUp.endDate'
       },
-      notMovable: true
+      filter: {
+        type: V2FilterType.DATE_RANGE,
+        childQueryBuilderKey: 'contact'
+      }
+    },
+    {
+      field: 'followUpTeamId',
+      label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
+      format: {
+        type: (data) => {
+          return data.person.followUpTeamId && (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[data.person.followUpTeamId] ?
+            (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[data.person.followUpTeamId].name :
+            '';
+        }
+      },
+      link: (data) => {
+        return data.person.followUpTeamId &&
+        TeamModel.canView(this.authUser) &&
+        (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[data.person.followUpTeamId] ?
+          `/teams/${data.person.followUpTeamId}/view` :
+          undefined;
+      },
+      filter: {
+        type: V2FilterType.MULTIPLE_SELECT,
+        options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
+        childQueryBuilderKey: 'contact',
+        includeNoValue: true
+      }
+    }, {
+      field: 'type',
+      label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_PERSON_TYPE',
+      notVisible: true,
+      format: {
+        type: (data) => data.person?.type ?
+          this.translateService.instant(data.person.type) :
+          ''
+      },
+      filter: {
+        type: V2FilterType.MULTIPLE_SELECT,
+        childQueryBuilderKey: 'contact',
+        options: [
+          {
+            label: EntityType.CONTACT,
+            value: EntityType.CONTACT
+          }, {
+            label: EntityType.CASE,
+            value: EntityType.CASE
+          }
+        ]
+      }
+    },
+    {
+      field: 'occupation',
+      label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_OCCUPATION',
+      notVisible: true,
+      format: {
+        type: (data) => data.person?.occupation ?
+          this.translateService.instant(data.person.occupation) :
+          ''
+      },
+      filter: {
+        type: V2FilterType.MULTIPLE_SELECT,
+        options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        childQueryBuilderKey: 'contact'
+      }
+    },
+    {
+      field: 'riskLevel',
+      label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_RISK',
+      notVisible: true,
+      format: {
+        type: (data) => data.person?.riskLevel ?
+          this.translateService.instant(data.person.riskLevel) :
+          ''
+      },
+      filter: {
+        type: V2FilterType.MULTIPLE_SELECT,
+        options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        childQueryBuilderKey: 'contact'
+      }
     }
   ];
 
@@ -110,10 +237,7 @@ export class ContactRangeFollowUpsListComponent
     private dialogV2Service: DialogV2Service,
     private translateService: TranslateService
   ) {
-    super(
-      listHelperService,
-      true
-    );
+    super(listHelperService);
 
     // additional information
     this.suffixLegends = [{
@@ -431,7 +555,10 @@ export class ContactRangeFollowUpsListComponent
                   // sort by date ascending
                   return date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
                 })
-                .mapValues((followUpData: FollowUpModel[], date) => {
+                .mapValues((
+                  followUpData: FollowUpModel[],
+                  date
+                ) => {
                   // used ?
                   if (followUpData?.length > 0) {
                     usedDates[date] = true;
@@ -459,12 +586,17 @@ export class ContactRangeFollowUpsListComponent
             while (minDate.isSameOrBefore(maxDate)) {
               // add day to list
               // - exclude dates with no data
-              const formattedDate = minDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-              if (usedDates[formattedDate]) {
+              const formattedFieldDate = minDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+              const formattedLabelDate = minDate.format('YYYY<br />MMM D');
+              if (usedDates[formattedFieldDate]) {
                 daysColumns.push({
-                  field: formattedDate,
-                  label: formattedDate,
+                  field: formattedFieldDate,
+                  label: formattedLabelDate,
                   notMovable: true,
+                  lockPosition: 'right',
+                  width: 65,
+                  alwaysVisible: true,
+                  centerHeader: true,
                   format: {
                     type: V2ColumnFormat.HTML
                   },
@@ -487,9 +619,7 @@ export class ContactRangeFollowUpsListComponent
                         Constants.DEFAULT_COLOR_REF_DATA;
 
                       // construct url
-                      const url: string = data.person.type === EntityType.CASE ?
-                        `/cases/${data.person.id}/follow-ups/${followUp.id}/view?rootPage=${FollowUpPage.RANGE}` :
-                        `/contacts/${data.person.id}/follow-ups/${followUp.id}/view?rootPage=${FollowUpPage.RANGE}`;
+                      const url: string = `/contacts/${data.person.id}/follow-ups/${followUp.id}/${FollowUpModel.canModify(this.authUser) ? 'modify' : 'view'}`;
 
                       // render html
                       html += `<a class="gd-list-table-link" href="${this.location.prepareExternalUrl(url)}">
@@ -518,6 +648,9 @@ export class ContactRangeFollowUpsListComponent
             ...this.defaultTableColumns,
             ...daysColumns
           ];
+
+          // load saved filters
+          this.loadCachedFilters();
 
           // finished
           return followUpsGroupedByContact;

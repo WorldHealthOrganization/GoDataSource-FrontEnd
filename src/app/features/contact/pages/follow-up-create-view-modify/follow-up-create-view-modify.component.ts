@@ -177,6 +177,16 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
         });
       }
 
+      // follow-up dashboard
+      if (FollowUpModel.canListDashboard(this.authUser)) {
+        this.breadcrumbs.push({
+          label: 'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL',
+          action: {
+            link: ['/contacts/range-follow-ups']
+          }
+        });
+      }
+
       // view page
       if (ContactModel.canView(this.authUser)) {
         this.breadcrumbs.push({
@@ -203,6 +213,16 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
           label: 'LNG_PAGE_LIST_CASES_TITLE',
           action: {
             link: ['/cases']
+          }
+        });
+      }
+
+      // follow-up dashboard
+      if (FollowUpModel.canListDashboard(this.authUser)) {
+        this.breadcrumbs.push({
+          label: 'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL',
+          action: {
+            link: ['/contacts/range-follow-ups']
           }
         });
       }

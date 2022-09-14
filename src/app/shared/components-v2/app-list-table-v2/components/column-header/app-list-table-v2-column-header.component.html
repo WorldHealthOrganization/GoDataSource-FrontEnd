@@ -8,20 +8,21 @@
     class="gd-list-table-column-header"
     [class.gd-list-table-column-header-sortable]="extendedColDef.columnDefinition.sortable"
     [class.gd-list-table-column-header-sortable-active]="component.sortByColumn === extendedColDef"
+    [class.gd-list-table-column-header-center]="extendedColDef.columnDefinition.centerHeader"
     (click)="extendedColDef.columnDefinition.sortable ? sort() : undefined">
 
     <!-- Label -->
     <div
       fxFlex
-      class="gd-list-table-column-header-title">
-      {{extendedColDef.headerName}}
+      class="gd-list-table-column-header-title"
+      [innerHTML]="extendedColDef.headerName">
     </div>
 
     <!-- Sort Icon -->
     <div
+      *ngIf="extendedColDef.columnDefinition.sortable && component.sortByColumn === extendedColDef"
       class="gd-list-table-column-header-sort">
       <mat-icon
-        *ngIf="extendedColDef.columnDefinition.sortable && component.sortByColumn === extendedColDef"
         [class.gd-list-table-column-header-sort-desc]="component.sortByDirection === RequestSortDirection.DESC">north</mat-icon>
     </div>
 

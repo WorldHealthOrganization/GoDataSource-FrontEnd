@@ -19,13 +19,11 @@ import { AddressModel } from '../../models/address.model';
 import { FollowUpModel } from '../../models/follow-up.model';
 import { IResolverV2ResponseModel } from '../resolvers/data/models/resolver-response.model';
 import { TeamModel } from '../../models/team.model';
-import { Params } from '@angular/router';
 import { Constants } from '../../models/constants';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, IV2SideDialogConfigInputToggle, V2SideDialogConfigInputType } from '../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { TranslateService } from '@ngx-translate/core';
 import { CaseModel } from '../../models/case.model';
 import { ContactModel } from '../../models/contact.model';
-import { FollowUpPage } from '../../../features/contact/typings/follow-up-page';
 import { OutbreakModel } from '../../models/outbreak.model';
 import * as _ from 'lodash';
 import { LocationModel } from '../../models/location.model';
@@ -71,13 +69,6 @@ export class EntityFollowUpHelperService {
           action: {
             link: (item: FollowUpModel): string[] => {
               return ['/contacts', item.personId, 'follow-ups', item.id, definitions.entityData.type === EntityType.CONTACT ? 'view' : 'history'];
-            },
-            linkQueryParams: (): Params => {
-              return {
-                rootPage: definitions.entityData.type === EntityType.CONTACT ?
-                  FollowUpPage.FOR_CONTACT :
-                  undefined
-              };
             }
           },
           visible: (item: FollowUpModel): boolean => {
@@ -94,13 +85,6 @@ export class EntityFollowUpHelperService {
           action: {
             link: (item: FollowUpModel): string[] => {
               return ['/contacts', item.personId, 'follow-ups', item.id, 'modify'];
-            },
-            linkQueryParams: (): Params => {
-              return {
-                rootPage: definitions.entityData.type === EntityType.CONTACT ?
-                  FollowUpPage.FOR_CONTACT :
-                  undefined
-              };
             }
           },
           visible: (item: FollowUpModel): boolean => {
