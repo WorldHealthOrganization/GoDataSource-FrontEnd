@@ -1070,7 +1070,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     if (this.columnActions) {
       // create action column
       const actionColumn: IExtendedColDef = {
-        headerName: this.translateService.instant('LNG_COMMON_LABEL_ACTIONS'),
+        headerName: '',
         field: 'actions',
         pinned: this.isSmallScreenMode ?
           false :
