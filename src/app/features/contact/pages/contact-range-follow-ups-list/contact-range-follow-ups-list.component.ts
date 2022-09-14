@@ -459,14 +459,14 @@ export class ContactRangeFollowUpsListComponent
               // add day to list
               // - exclude dates with no data
               const formattedFieldDate = minDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-              const formattedLabelDate = minDate.format('YYYY<br />aa');
+              const formattedLabelDate = minDate.format('YYYY<br />MMM D');
               if (usedDates[formattedFieldDate]) {
                 daysColumns.push({
                   field: formattedFieldDate,
                   label: formattedLabelDate,
                   notMovable: true,
                   lockPosition: 'right',
-                  width: 95,
+                  width: 65,
                   alwaysVisible: true,
                   format: {
                     type: V2ColumnFormat.HTML

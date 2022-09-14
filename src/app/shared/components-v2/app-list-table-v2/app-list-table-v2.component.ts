@@ -155,6 +155,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   // has at least one table header filter ?
   hasTableHeaderFilters: boolean = false;
 
+  // allow user to block hiding table filters
+  @Input() canHideTableHeaderFilters: boolean = true;
+
   // ag table api handlers
   private _agTable: {
     api: GridApi,
@@ -242,7 +245,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     this.saveHeaderFilterVisibility();
   }
   get showHeaderFilters(): boolean {
-    return this.hasTableHeaderFilters && this._showHeaderFilters;
+    return this.hasTableHeaderFilters && (
+      !this.canHideTableHeaderFilters ||
+      this._showHeaderFilters
+    );
   }
 
   // grouped data
@@ -859,7 +865,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       // make columns visible
       this._columns.forEach((column) => {
         // set not visible
-        const isVisible: boolean = visibleColumnsMap[column.field] !== undefined;
+        const isVisible: boolean = visibleColumnsMap[column.field] !== undefined ||
+          !!column.alwaysVisible;
         column.notVisible = !isVisible;
 
         // update map if found
@@ -1063,6 +1070,17 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
         // render column
         renderColumn(visibleColumnsMap[field]);
+      });
+
+      // render always visible columns too
+      this._columns.forEach((column) => {
+        // no always visible ?
+        if (!column.alwaysVisible) {
+          return;
+        }
+
+        // render column
+        renderColumn(column);
       });
     } else {
       // process columns in default order

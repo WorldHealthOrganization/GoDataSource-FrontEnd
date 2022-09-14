@@ -356,7 +356,7 @@
 
       <!-- Show / Hide header filters -->
       <button
-        *ngIf="hasTableHeaderFilters"
+        *ngIf="hasTableHeaderFilters && canHideTableHeaderFilters"
         [class.gd-list-table-header-right-header-filters-active]="showHeaderFilters"
         type="button"
         mat-icon-button
