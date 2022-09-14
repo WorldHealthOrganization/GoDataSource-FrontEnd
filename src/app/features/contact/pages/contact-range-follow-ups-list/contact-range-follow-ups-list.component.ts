@@ -31,6 +31,7 @@ import { TranslateService } from '@ngx-translate/core';
 import * as momentOriginal from 'moment';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { IV2FilterText, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { AddressModel } from '../../../../core/models/address.model';
 
 @Component({
   selector: 'app-contact-range-follow-ups-list',
@@ -59,7 +60,6 @@ export class ContactRangeFollowUpsListComponent
       filter: {
         type: V2FilterType.TEXT,
         textType: V2FilterTextType.STARTS_WITH,
-        childQueryBuilderKey: 'contact',
         search: (column: IV2Column) => {
           // value
           const value: string = (column.filter as IV2FilterText).value;
@@ -113,6 +113,15 @@ export class ContactRangeFollowUpsListComponent
         return data.person?.mainAddress?.location?.id && LocationModel.canView(this.authUser) ?
           `/locations/${data.person.mainAddress.location.id}/view` :
           undefined;
+      },
+      filter: {
+        type: V2FilterType.ADDRESS_MULTIPLE_LOCATION,
+        childQueryBuilderKey: 'contact',
+        address: new AddressModel({
+          geoLocationAccurate: ''
+        }),
+        field: 'addresses',
+        fieldIsArray: true
       }
     },
     {
