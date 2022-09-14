@@ -47,7 +47,6 @@ export class ContactRangeFollowUpsListComponent
       field: 'name',
       label: 'LNG_ENTITY_FIELD_LABEL_NAME',
       pinned: IV2ColumnPinned.LEFT,
-      notMovable: true,
       format: {
         type: 'person.name'
       },
@@ -62,16 +61,13 @@ export class ContactRangeFollowUpsListComponent
       format: {
         type: 'person.visualId'
       },
-      pinned: IV2ColumnPinned.LEFT,
-      notMovable: true
+      pinned: IV2ColumnPinned.LEFT
     }, {
       field: 'locationId',
       label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
       format: {
         type: 'person.mainAddress.location.name'
       },
-      pinned: IV2ColumnPinned.LEFT,
-      notMovable: true,
       link: (data) => {
         return data.person?.mainAddress?.location?.id && LocationModel.canView(this.authUser) ?
           `/locations/${data.person.mainAddress.location.id}/view` :
@@ -84,8 +80,7 @@ export class ContactRangeFollowUpsListComponent
       format: {
         type: V2ColumnFormat.DATE,
         field: 'person.dateOfLastContact'
-      },
-      notMovable: true
+      }
     },
     {
       field: 'endDate',
@@ -93,8 +88,7 @@ export class ContactRangeFollowUpsListComponent
       format: {
         type: V2ColumnFormat.DATE,
         field: 'person.followUp.endDate'
-      },
-      notMovable: true
+      }
     }
   ];
 
@@ -465,6 +459,7 @@ export class ContactRangeFollowUpsListComponent
                   field: formattedDate,
                   label: formattedDate,
                   notMovable: true,
+                  lockPosition: 'right',
                   format: {
                     type: V2ColumnFormat.HTML
                   },

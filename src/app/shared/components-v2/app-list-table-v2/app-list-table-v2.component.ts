@@ -893,6 +893,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         checkboxSelection: true,
         cellClass: 'gd-cell-no-focus',
         suppressMovable: true,
+        lockPosition: 'left',
         headerComponent: AppListTableV2SelectionHeaderComponent,
         width: AppListTableV2Component.STANDARD_SELECT_COLUMN_WIDTH,
         valueFormatter: () => '',
@@ -1013,6 +1014,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         suppressMovable: this.isSmallScreenMode ?
           true :
           !!(column as any).notMovable,
+        lockPosition: column.lockPosition,
         headerComponent: AppListTableV2ColumnHeaderComponent
       });
 
@@ -1081,6 +1083,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         cellClass: 'gd-cell-no-focus',
         cellRenderer: this.handleCellRenderer(this.columnActions),
         suppressMovable: true,
+        lockPosition: this.isSmallScreenMode ?
+          'left' :
+          'right',
         headerComponent: AppListTableV2ColumnHeaderComponent
       };
 
