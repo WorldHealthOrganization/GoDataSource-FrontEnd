@@ -652,6 +652,9 @@ export class ContactRangeFollowUpsListComponent
             ...daysColumns
           ];
 
+          // load saved filters
+          this.loadCachedFilters();
+
           // finished
           return followUpsGroupedByContact;
         }),

@@ -1057,7 +1057,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
   /**
    * Load cached filters
    */
-  private loadCachedFilters(): void {
+  protected loadCachedFilters(): void {
     // disabled saved filters for current user ?
     const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
     if (
