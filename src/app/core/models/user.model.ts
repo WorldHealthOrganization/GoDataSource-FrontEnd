@@ -60,6 +60,7 @@ export enum UserSettings {
   VIEW_PEOPLE_FIELDS = 'viewPeopleFields',
   LANGUAGE_FIELDS = 'languageFields',
   AVAILABLE_ENTITIES_FIELDS = 'availableEntitiesFields',
+  FOLLOW_UP_DASHBOARD_FIELDS = 'followUpDashboardFields',
 
   // general settings
   CASE_GENERAL = 'caseGeneral',

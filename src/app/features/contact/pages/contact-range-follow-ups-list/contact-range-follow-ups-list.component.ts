@@ -30,6 +30,7 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { TranslateService } from '@ngx-translate/core';
 import * as momentOriginal from 'moment';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 
 @Component({
   selector: 'app-contact-range-follow-ups-list',
@@ -61,7 +62,11 @@ export class ContactRangeFollowUpsListComponent
       format: {
         type: 'person.visualId'
       },
-      pinned: IV2ColumnPinned.LEFT
+      pinned: IV2ColumnPinned.LEFT,
+      filter: {
+        type: V2FilterType.TEXT,
+        textType: V2FilterTextType.STARTS_WITH
+      }
     }, {
       field: 'locationId',
       label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
@@ -453,13 +458,16 @@ export class ContactRangeFollowUpsListComponent
             while (minDate.isSameOrBefore(maxDate)) {
               // add day to list
               // - exclude dates with no data
-              const formattedDate = minDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-              if (usedDates[formattedDate]) {
+              const formattedFieldDate = minDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+              const formattedLabelDate = minDate.format('YYYY<br />aa');
+              if (usedDates[formattedFieldDate]) {
                 daysColumns.push({
-                  field: formattedDate,
-                  label: formattedDate,
+                  field: formattedFieldDate,
+                  label: formattedLabelDate,
                   notMovable: true,
                   lockPosition: 'right',
+                  width: 95,
+                  alwaysVisible: true,
                   format: {
                     type: V2ColumnFormat.HTML
                   },

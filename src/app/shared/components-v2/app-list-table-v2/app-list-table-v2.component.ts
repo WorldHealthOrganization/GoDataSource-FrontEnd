@@ -139,6 +139,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       }
     });
 
+    // set header height
+    this.updateHeaderHeight();
+
     // update columns definitions
     this.updateColumnDefinitions();
   }
@@ -1465,7 +1468,12 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     this._agTable.columnApi.getColumns().forEach((column) => {
       // retrieve column definition
       const colDef: IExtendedColDef = column.getUserProvidedColDef() as IExtendedColDef;
-      if (colDef.columnDefinition?.format?.type === V2ColumnFormat.STATUS) {
+      if (colDef.columnDefinition?.width) {
+        this._agTable.columnApi.setColumnWidth(
+          column,
+          colDef.columnDefinition.width
+        );
+      } else if (colDef.columnDefinition?.format?.type === V2ColumnFormat.STATUS) {
         // determine maximum number of items
         const statusColumn: IV2ColumnStatus = colDef.columnDefinition as IV2ColumnStatus;
         let maxForms: number = 1;
@@ -1527,7 +1535,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // construct list of possible columns
     const columns: IV2Column[] = this._columns
       // filter out pinned columns since those are handled by a different button
-      .filter((item) => !item.exclude || !item.exclude(item))
+      .filter((item) => !item.alwaysVisible && (!item.exclude || !item.exclude(item)))
       // sort columns by their label
       .sort((v1, v2) => this.translateService.instant(v1.label).localeCompare(this.translateService.instant(v2.label)));
 
@@ -1841,7 +1849,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       }
 
       // visible column ?
-      if (colDef.columnDefinition.field) {
+      if (
+        colDef.columnDefinition.field &&
+        !colDef.columnDefinition.alwaysVisible
+      ) {
         // add to save
         visibleColumns.push(colDef.columnDefinition.field);
 
@@ -1902,6 +1913,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   /**
    * Sort by - used in AppListTableV2ColumnHeaderComponent even if it is marked as not used...
+   * - used externally - do not remove
    */
   columnSortBy(
     component: AppListTableV2ColumnHeaderComponent,
@@ -2015,6 +2027,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   /**
    * Filter by
+   * - used externally - do not remove
    */
   columnFilterBy(
     column: IExtendedColDef,

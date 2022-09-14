@@ -48,6 +48,8 @@ export interface IV2ColumnBasic {
   notResizable?: boolean;
   notMovable?: boolean;
   lockPosition?: boolean | 'left' | 'right';
+  width?: number;
+  alwaysVisible?: boolean;
   link?: (any) => string;
   cssCellClass?: string;
   sortable?: boolean;
@@ -182,6 +184,8 @@ export interface IV2ColumnButton {
   notResizable?: boolean;
   notMovable?: boolean;
   lockPosition?: boolean | 'left' | 'right';
+  width?: number;
+  alwaysVisible?: boolean;
   cssCellClass?: string;
   sortable?: boolean;
   filter?: V2Filter;
@@ -197,18 +201,12 @@ export interface IV2ColumnAction {
   };
   actions: V2Action[];
 
-  // optional
-  // notVisible?: boolean;
-  // exclude?: (IV2Column) => boolean;
-  // cssCellClass?: string;
-
   // never
   field?: never;
   filter?: never;
   sortable?: never;
-  // label?: never;
-  // pinned?: never;
-  // notResizable?: never;
+  width?: never;
+  alwaysVisible?: never;
 }
 
 /**
@@ -277,6 +275,10 @@ export interface IV2ColumnStatus {
   exclude?: (IV2Column) => boolean;
   pinned?: IV2ColumnPinned | boolean;
   cssCellClass?: string;
+
+  // never
+  width?: never;
+  alwaysVisible?: never;
   sortable?: never;
   filter?: never;
 }
@@ -303,6 +305,8 @@ export interface IV2ColumnLinkList {
   notResizable?: boolean;
   notMovable?: boolean;
   lockPosition?: boolean | 'left' | 'right';
+  width?: number;
+  alwaysVisible?: boolean;
   cssCellClass?: string;
   filter?: V2Filter;
 
@@ -329,6 +333,8 @@ export interface IV2ColumnHTML {
   notResizable?: boolean;
   notMovable?: boolean;
   lockPosition?: boolean | 'left' | 'right';
+  width?: number;
+  alwaysVisible?: boolean;
   cssCellClass?: string;
   filter?: V2Filter;
 
@@ -369,6 +375,8 @@ export interface IV2ColumnExpandRow {
   notResizable?: boolean;
   notMovable?: boolean;
   lockPosition?: boolean | 'left' | 'right';
+  width?: number;
+  alwaysVisible?: boolean;
   cssCellClass?: string;
   sortable?: boolean;
   filter?: V2Filter;
