@@ -238,10 +238,7 @@ export class ContactRangeFollowUpsListComponent
     private dialogV2Service: DialogV2Service,
     private translateService: TranslateService
   ) {
-    super(
-      listHelperService,
-      true
-    );
+    super(listHelperService);
 
     // additional information
     this.suffixLegends = [{
