@@ -8,78 +8,78 @@ import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class SavedImportMappingService {
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        private http: HttpClient,
-        private modelHelper: ModelHelperService
-    ) {}
+  constructor(
+    private http: HttpClient,
+    private modelHelper: ModelHelperService
+  ) {}
 
-    /**
+  /**
      * Retrieve the list of saved import mapping
      * @returns {Observable<SavedImportMappingModel[]>}
      */
-    getImportMappingsList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<SavedImportMappingModel[]> {
-        const filter = queryBuilder.buildQuery();
+  getImportMappingsList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<SavedImportMappingModel[]> {
+    const filter = queryBuilder.buildQuery();
 
-        return this.modelHelper.mapObservableListToModel(
-            this.http.get(`import-mappings?filter=${filter}`),
-            SavedImportMappingModel
-        );
-    }
+    return this.modelHelper.mapObservableListToModel(
+      this.http.get(`import-mappings?filter=${filter}`),
+      SavedImportMappingModel
+    );
+  }
 
-    /**
+  /**
      * Retrieve saved import mapping
      */
-    getImportMapping(importMappingId: string): Observable<SavedImportMappingModel> {
-        return this.modelHelper.mapObservableToModel(
-            this.http.get(`import-mappings/${importMappingId}`),
-            SavedImportMappingModel
-        );
-    }
+  getImportMapping(importMappingId: string): Observable<SavedImportMappingModel> {
+    return this.modelHelper.mapObservableToModel(
+      this.http.get(`import-mappings/${importMappingId}`),
+      SavedImportMappingModel
+    );
+  }
 
-    /**
+  /**
      * Return total number of saved import mappings
      * @param queryBuilder
      * @returns {Observable<IBasicCount>}
      */
-    getImportMappingsListCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<IBasicCount> {
-        const whereFilter = queryBuilder.filter.generateCondition(true);
+  getImportMappingsListCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<IBasicCount> {
+    const whereFilter = queryBuilder.filter.generateCondition(true);
 
-        return this.http.get(`import-mappings/count?where=${whereFilter}`, {});
-    }
+    return this.http.get(`import-mappings/count?where=${whereFilter}`, {});
+  }
 
 
-    /**
+  /**
      * Save an import mapping options
      * @param importMappingData
      * @returns {Observable<Object>}
      */
-    createImportMapping(importMappingData: SavedImportMappingModel) {
-        return this.http.post(`import-mappings`, importMappingData);
-    }
+  createImportMapping(importMappingData: SavedImportMappingModel) {
+    return this.http.post('import-mappings', importMappingData);
+  }
 
-    /**
+  /**
      * Modify a saved import mapping
      * @param savedImportMappingId
      * @param savedImportMappingData
      * @returns {Observable<any>}
      */
-    modifyImportMapping(savedImportMappingId: string, savedImportMappingData): Observable<any> {
-        return this.modelHelper.mapObservableToModel(
-            this.http.put(`import-mappings/${savedImportMappingId}`, savedImportMappingData),
-            SavedImportMappingModel
-        );
-    }
+  modifyImportMapping(savedImportMappingId: string, savedImportMappingData): Observable<any> {
+    return this.modelHelper.mapObservableToModel(
+      this.http.put(`import-mappings/${savedImportMappingId}`, savedImportMappingData),
+      SavedImportMappingModel
+    );
+  }
 
-    /**
+  /**
      * Delete a saved import mapping
      * @param savedImportMappingId
      * @returns {Observable<Object>}
      */
-    deleteImportMapping(savedImportMappingId: string) {
-        return this.http.delete(`import-mappings/${savedImportMappingId}`);
-    }
+  deleteImportMapping(savedImportMappingId: string) {
+    return this.http.delete(`import-mappings/${savedImportMappingId}`);
+  }
 
 }

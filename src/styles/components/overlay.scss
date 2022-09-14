@@ -1,0 +1,22 @@
+/* Overlay */
+.cdk-overlay-container {
+  .cdk-overlay-backdrop {
+    background: rgba(0, 0, 0, 0.85);
+
+    &.cdk-overlay-dark-backdrop {
+      background: rgba(0, 0, 0, 0.85);
+    }
+
+    &.mat-overlay-transparent-backdrop {
+      background: transparent;
+    }
+  }
+
+  .mat-dialog-container {
+    background: transparent;
+    @include border-radius(0);
+    @include box-shadow(none);
+    color: var(--gd-background);
+    padding: 1.6rem;
+  }
+}

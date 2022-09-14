@@ -1,0 +1,44 @@
+@import 'mixins';
+
+.gd-follow-up-dashboard-date-column-cell {
+  @include flex(flex);
+  @include flex_direction(row);
+  gap: 0.2rem;
+  height: 2.2rem;
+  white-space: nowrap;
+  width: 100%;
+
+  .gd-list-table-link {
+    @include flex_val(1 1);
+
+    .gd-follow-up-dashboard-date-column-cell-follow-up {
+      @include border-radius(0.4rem);
+      @include flex(flex);
+      @include flex_align_items(center);
+      @include flex_justify(center);
+      height: 100%;
+      @include transition(0.24s ease-in-out 0s);
+      width: 100%;
+
+      .gd-follow-up-dashboard-date-column-cell-follow-up-alerted {
+        background-color: var(--gd-background);
+        @include border-radius(0.4rem);
+        height: 1.6rem;
+        pointer-events: none;  // needs pointer events so links work okay...not to load all data
+        width: auto;
+      }
+    }
+  }
+
+  &:hover {
+    .gd-list-table-link {
+      .gd-follow-up-dashboard-date-column-cell-follow-up {
+        @include opacity(0.5);
+
+        &:hover {
+          @include opacity(1);
+        }
+      }
+    }
+  }
+}

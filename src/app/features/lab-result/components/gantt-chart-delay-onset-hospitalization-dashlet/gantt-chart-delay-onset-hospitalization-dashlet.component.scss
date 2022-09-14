@@ -1,0 +1,58 @@
+@import 'mixins';
+
+app-gantt-chart-delay-onset-hospitalization-dashlet {
+  height: calc(100% - 5.6rem);
+
+  .has-data-wait-for-bind {
+    height: 100%;
+    max-width: 100%;
+    min-height: 40rem;
+
+    @include breakpoint('xs') {
+      min-height: 0;
+    }
+  }
+
+  #gantt-svg-root-hospitalization {
+    height: 100%;
+    margin-bottom: 0.8rem;
+    overflow: auto;
+    width: 100%;
+  }
+
+  .dashlet-no-data {
+    height: 100%;
+    width: 100%;
+  
+    .dashlet-no-data-image {
+      background-image: url(../../../../../assets/images/nothing-found.svg);
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 25rem;
+      width: 25rem;
+  
+      @include breakpoint('xs') {
+        height: 15rem;
+        width: 15rem;
+      }
+    }
+  
+    .dashlet-no-data-text {
+      color: var(--gd-secondary);
+      font-size: 1.6rem;
+      margin-top: 2rem;
+  
+      @include breakpoint('xs') {
+        font-size: 1.4rem;
+      }
+    }
+  }
+
+  .dashlet-loading {
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    @include translate(-50%, -50%);
+  }
+}

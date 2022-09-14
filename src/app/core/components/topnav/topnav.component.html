@@ -1,0 +1,219 @@
+<div
+  fxLayout="row" fxLayoutAlign="space-between center"
+  class="gd-top">
+
+  <!-- Left -->
+  <div
+    fxGrow="0"
+    class="gd-top-left">
+
+    <!-- Logo -->
+    <div
+      *ngIf="renderMode === RenderMode.SMALL"
+      class="gd-top-left-logo"
+      [routerLink]="['/']"
+      tabindex="-1">
+      <img src="../../../../assets/images/gd-logomark.svg" alt="Go.Data Logo" />
+    </div>
+
+    <!-- Show Menu -->
+    <button
+      *ngIf="renderMode !== RenderMode.FULL"
+      type="button"
+      mat-icon-button
+      color="primary"
+      (click)="showMainMenu()">
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <!-- Search -->
+    <app-form-input-v2
+      *ngIf="renderMode !== RenderMode.SMALL"
+      placeholder="LNG_COMMON_LABEL_SEARCH"
+      [(ngModel)]="globalSearchValue"
+      [suffixIconButtons]="globalSearchSuffixButtons"
+      [neverFloatLabel]="true"
+      tooltip="LNG_GLOBAL_ENTITY_SEARCH_ENTITY_ID_LABEL_VALUE_DESCRIPTION"
+      [disabled]="!selectedOutbreak?.id"
+      (keyup.enter)="globalSearch()">
+    </app-form-input-v2>
+
+  </div>
+
+  <!-- Middle -->
+  <div
+    fxFlex fxLayout="row" fxLayoutAlign="center"
+    class="gd-top-middle">
+    <!-- Toast history -->
+    <button
+      *ngIf="ToastV2Service.HISTORY.length > 0"
+      fxLayout="row"
+      class="gd-top-middle-history"
+      mat-flat-button
+      color="warn"
+      (click)="displayHistory()">
+
+      <!-- Icon -->
+      <mat-icon>warning</mat-icon>
+
+      <!-- Message -->
+      <div>{{'LNG_COMMON_LABEL_NOTIFICATION_HISTORY' | translate:ToastV2Service.HISTORY}}</div>
+
+    </button>
+  </div>
+
+  <!-- Right -->
+  <div
+    fxGrow="0" fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="1.6rem" fxLayoutGap.xs="0.8rem"
+    class="gd-top-right">
+
+    <!-- Outbreaks -->
+    <app-form-select-single-v2
+      *ngIf="renderMode !== RenderMode.SMALL && OutbreakModel.canView(authUser)"
+      placeholder="LNG_LAYOUT_SELECTED_OUTBREAK_LABEL"
+      [ngModel]="selectedOutbreak.id"
+      (ngModelChange)="selectOutbreak($event)"
+      [options]="outbreakListOptions"
+      optionTooltipKey="details"
+      [disabled]="outbreakListOptionsLoading || selectedOutbreakDisabled"
+      [loading]="outbreakListOptionsLoading">
+    </app-form-select-single-v2>
+
+    <!-- Mobile responsive buttons -->
+    <ng-container
+      *ngIf="renderMode === RenderMode.SMALL">
+
+      <!-- Outbreaks -->
+      <button
+        *ngIf="OutbreakModel.canView(authUser) && outbreakListOptions?.length > 0"
+        type="button"
+        mat-icon-button
+        [matTooltip]="'LNG_LAYOUT_SELECTED_OUTBREAK_LABEL' | translate"
+        (click)="mobileChangeOutbreak()">
+        <mat-icon>bug_report</mat-icon>
+      </button>
+
+      <!-- Search -->
+      <button
+        type="button"
+        mat-icon-button
+        [matTooltip]="'LNG_COMMON_LABEL_SEARCH' | translate"
+        [disabled]="!selectedOutbreak?.id"
+        (click)="mobileGlobalSearch()">
+        <mat-icon>search</mat-icon>
+      </button>
+
+    </ng-container>
+
+    <!-- Help -->
+    <button
+      *ngIf="contextSearchHelpLoading || contextSearchHelpItems?.length > 0"
+      type="button"
+      mat-icon-button
+      [disabled]="contextSearchHelpLoading"
+      (click)="displayPageHelpDialog()">
+
+      <!-- Icon -->
+      <mat-icon
+        *ngIf="!contextSearchHelpLoading; else loadingHelp">help</mat-icon>
+
+      <!-- Loading -->
+      <ng-template
+        #loadingHelp>
+        <mat-progress-spinner
+          diameter="24"
+          mode="indeterminate"></mat-progress-spinner>
+      </ng-template>
+    </button>
+
+    <!-- Profile -->
+    <button
+      class="gd-top-right-user"
+      type="button"
+      mat-icon-button
+      [matMenuTriggerFor]="profileMenu">
+      <mat-icon>person</mat-icon>
+    </button>
+    <ng-template
+      #menuOption
+      let-link="link"
+      let-label="label">
+      <a
+        mat-menu-item
+        [routerLink]="link"
+        routerLinkActive="gd-top-right-user-menu-option-active"
+        [routerLinkActiveOptions]="activeSetup">
+        {{label | translate}}
+      </a>
+    </ng-template>
+    <mat-menu
+      #profileMenu="matMenu">
+
+      <!-- Name and email -->
+      <div
+        class="gd-top-right-user-menu-option-user"
+        (click)="$event.preventDefault(); $event.stopPropagation(); $event.stopImmediatePropagation();">
+
+        <!-- Name -->
+        <div
+          class="gd-top-right-user-menu-option-user-name">
+          {{ authUser?.name }}
+        </div>
+
+        <!-- Email -->
+        <div
+          class="gd-top-right-user-menu-option-user-email">
+          {{ authUser?.email }}
+        </div>
+
+      </div>
+
+      <!-- Almighty divider -->
+      <mat-divider></mat-divider>
+
+      <!-- My profile -->
+      <ng-template
+        [ngTemplateOutlet]="menuOption"
+        [ngTemplateOutletContext]="{ link: '/account/my-profile', label: 'LNG_LAYOUT_MENU_ITEM_MY_PROFILE_LABEL' }"></ng-template>
+
+      <!-- Almighty divider -->
+      <mat-divider></mat-divider>
+
+      <!-- Saved filters -->
+      <ng-template
+        *ngIf="authUser?.hasPermissions(expressionPermissions.savedFilters)"
+        [ngTemplateOutlet]="menuOption"
+        [ngTemplateOutletContext]="{ link: '/saved-filters', label: 'LNG_LAYOUT_MENU_ITEM_SAVED_FILTERS_LABEL' }"></ng-template>
+
+      <!-- Saved import mappings -->
+      <ng-template
+        *ngIf="authUser?.hasPermissions(expressionPermissions.savedImportMappings)"
+        [ngTemplateOutlet]="menuOption"
+        [ngTemplateOutletContext]="{ link: '/saved-import-mapping', label: 'LNG_LAYOUT_MENU_ITEM_SAVED_IMPORT_MAPPING_LABEL' }"></ng-template>
+
+      <!-- Almighty divider -->
+      <mat-divider></mat-divider>
+
+      <!-- Terms of use -->
+      <a
+        mat-menu-item
+        href="/assets/terms-of-use/Go.Data - Terms of Use and Software License Agreement.pdf"
+        target="_blank">
+        {{'LNG_LAYOUT_MENU_ITEM_TERMS_OF_USE_LABEL' | translate}}
+      </a>
+
+      <!-- Almighty divider -->
+      <mat-divider></mat-divider>
+
+      <!-- Log out -->
+      <div
+        class="gd-top-right-user-menu-option-danger"
+        mat-menu-item
+        (click)="logout()">
+        {{'LNG_LAYOUT_MENU_ITEM_LOGOUT_LABEL' | translate}}
+      </div>
+
+    </mat-menu>
+
+  </div>
+</div>

@@ -1,425 +1,562 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
+import { Component, OnDestroy } from '@angular/core';
 import { CaseModel } from '../../../../core/models/case.model';
-import { ActivatedRoute, Router } from '@angular/router';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { Observable } from 'rxjs';
-import { Constants } from '../../../../core/models/constants';
-import { EntityType } from '../../../../core/models/entity-type';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { EventModel } from '../../../../core/models/event.model';
-import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { NgForm } from '@angular/forms';
-import * as _ from 'lodash';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { catchError, map, share, tap } from 'rxjs/operators';
-import { RelationshipsListComponent } from '../../helper-classes/relationships-list-component';
-import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
-import { AddressType } from '../../../../core/models/address.model';
-import { throwError } from 'rxjs/internal/observable/throwError';
-import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { map, switchMap, takeUntil } from 'rxjs/operators';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ActivatedRoute } from '@angular/router';
+import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import * as _ from 'lodash';
+import { EntityType } from '../../../../core/models/entity-type';
+import { GenericDataService } from '../../../../core/services/data/generic.data.service';
+import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
+import { Constants } from '../../../../core/models/constants';
+import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { TranslateService } from '@ngx-translate/core';
+import { of } from 'rxjs';
+import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { LocationModel } from '../../../../core/models/location.model';
+import { LocationDataService } from '../../../../core/services/data/location.data.service';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 
 @Component({
-    selector: 'app-available-entities-list',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './available-entities-list.component.html',
-    styleUrls: ['./available-entities-list.component.less']
+  selector: 'app-available-entities-list',
+  templateUrl: './available-entities-list.component.html'
 })
-export class AvailableEntitiesListComponent extends RelationshipsListComponent implements OnInit, OnDestroy {
-    breadcrumbs: BreadcrumbItemModel[] = [];
+export class AvailableEntitiesListComponent extends ListComponent<CaseModel | ContactModel | EventModel | ContactOfContactModel> implements OnDestroy {
+  // route
+  private _relationshipType: RelationshipType;
 
-    // entities list relationships
-    entitiesList$: Observable<(CaseModel|ContactModel|EventModel)[]>;
-    entitiesListCount$: Observable<IBasicCount>;
+  // entity
+  private _entity: CaseModel | ContactModel | EventModel;
 
-    // available side filters
-    availableSideFilters: FilterModel[];
+  // selected records
+  private _selectedRecords: string[];
 
-    // saved filters type
-    savedFiltersType = Constants.APP_PAGE.AVAILABLE_ENTITIES_FOR_RELATIONSHIPS.value;
+  /**
+   * Constructor
+   */
+  constructor(
+    protected listHelperService: ListHelperService,
+    protected activatedRoute: ActivatedRoute,
+    protected relationshipDataService: RelationshipDataService,
+    protected genericDataService: GenericDataService,
+    protected translateService: TranslateService,
+    protected locationDataService: LocationDataService,
+    protected entityHelperService: EntityHelperService
+  ) {
+    // parent
+    super(
+      listHelperService,
+      true
+    );
 
-    // reference data
-    genderList$: Observable<any[]>;
-    personTypesList$: Observable<any[]>;
-    personTypesListMap: { [id: string]: ReferenceDataEntryModel };
-    riskLevelsList$: Observable<any[]>;
-    caseClassificationsList$: Observable<any[]>;
+    // disable select outbreak
+    TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = true;
 
-    // provide constants to template
-    Constants = Constants;
-    ReferenceDataCategory = ReferenceDataCategory;
-    EntityType = EntityType;
+    // retrieve data from snapshot
+    this._relationshipType = this.activatedRoute.snapshot.data.relationshipType;
+    this._entity = this.activatedRoute.snapshot.data.entity;
+  }
 
-    fixedTableColumns: string[] = [
-        'checkbox',
-        'hasDuplicate',
-        'lastName',
-        'firstName',
-        'visualId',
-        'age',
-        'gender',
-        'riskLevel',
-        'classification',
-        'place',
-        'address'
-    ];
+  /**
+   * Component destroyed
+   */
+  ngOnDestroy() {
+    // release parent resources
+    super.onDestroy();
 
-    /**
-     * Constructor
-     */
-    constructor(
-        protected listHelperService: ListHelperService,
-        protected router: Router,
-        protected route: ActivatedRoute,
-        protected authDataService: AuthDataService,
-        protected outbreakDataService: OutbreakDataService,
-        protected entityDataService: EntityDataService,
-        private snackbarService: SnackbarService,
-        private genericDataService: GenericDataService,
-        private referenceDataDataService: ReferenceDataDataService,
-        private relationshipDataService: RelationshipDataService
-    ) {
-        super(
-            listHelperService, router, route,
-            authDataService, outbreakDataService, entityDataService
-        );
-    }
+    // enable select outbreak
+    TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = false;
+  }
 
-    /**
-     * Component initialized
-     */
-    ngOnInit() {
-        super.ngOnInit();
+  /**
+   * Selected outbreak was changed
+   */
+  selectedOutbreakChanged(): void {
+    // initialize query builder
+    this.clearQueryBuilder();
 
-        // reference data
-        this.genderList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.GENDER).pipe(share());
-        this.riskLevelsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.RISK_LEVEL).pipe(share());
-        this.caseClassificationsList$ = this.referenceDataDataService.getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION).pipe(share());
-        const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).pipe(share());
-        this.personTypesList$ = personTypes$
-            .pipe(
-                map((data: ReferenceDataCategoryModel) => {
-                    return _.map(data.entries, (entry: ReferenceDataEntryModel) =>
-                        new LabelValuePair(entry.value, entry.id)
-                    );
-                })
-            );
-        personTypes$.subscribe((personTypeCategory: ReferenceDataCategoryModel) => {
-            this.personTypesListMap = _.transform(
-                personTypeCategory.entries,
-                (result, entry: ReferenceDataEntryModel) => {
-                    // groupBy won't work here since groupBy will put an array instead of one value
-                    result[entry.id] = entry;
+    // initialize pagination
+    this.initPaginator();
+
+    // ...and re-load the list when the Selected Outbreak is changed
+    this.needsRefreshList(true);
+  }
+
+  /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {}
+
+  /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {
+    this.tableColumns = [
+      {
+        field: 'lastName',
+        label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
+        sortable: true,
+        pinned: IV2ColumnPinned.LEFT,
+        format: {
+          type: (item: CaseModel | ContactModel | EventModel | ContactOfContactModel): string => {
+            return item.type === EntityType.EVENT ? item.name : item.lastName;
+          }
+        },
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'firstName',
+        label: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
+        sortable: true,
+        pinned: IV2ColumnPinned.LEFT,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'visualId',
+        label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID',
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'statuses',
+        label: 'LNG_COMMON_LABEL_STATUSES',
+        format: {
+          type: V2ColumnFormat.STATUS
+        },
+        notResizable: true,
+        pinned: true,
+        legends: [
+          // person type
+          {
+            title: 'LNG_ENTITY_FIELD_LABEL_TYPE',
+            items: this.activatedRoute.snapshot.data.personType.list.map((item) => {
+              return {
+                form: {
+                  type: IV2ColumnStatusFormType.CIRCLE,
+                  color: item.getColorCode()
                 },
-                {}
+                label: item.id
+              };
+            })
+          }
+        ],
+        forms: (_column, data): V2ColumnStatusForm[] => {
+          // construct list of forms that we need to display
+          const forms: V2ColumnStatusForm[] = [];
+
+          // person type
+          if (
+            data.type &&
+            this.activatedRoute.snapshot.data.personType.map[data.type]
+          ) {
+            forms.push({
+              type: IV2ColumnStatusFormType.CIRCLE,
+              color: this.activatedRoute.snapshot.data.personType.map[data.type].getColorCode(),
+              tooltip: this.translateService.instant(data.type)
+            });
+          }
+
+          // finished
+          return forms;
+        }
+      },
+      {
+        field: 'hasDuplicate',
+        label: 'LNG_PAGE_LIST_AVAILABLE_ENTITIES_HAS_POSSIBLE_RELATIONSHIP_DUPLICATE',
+        format: {
+          type: V2ColumnFormat.BOOLEAN,
+          value: (item) => item.matchedDuplicateRelationships?.length > 0
+        }
+      },
+      {
+        field: 'age',
+        label: 'LNG_ENTITY_FIELD_LABEL_AGE',
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.AGE
+        },
+        filter: {
+          type: V2FilterType.AGE_RANGE,
+          min: 0,
+          max: Constants.DEFAULT_AGE_MAX_YEARS
+        }
+      },
+      {
+        field: 'gender',
+        label: 'LNG_ENTITY_FIELD_LABEL_GENDER',
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        }
+      },
+      {
+        field: 'riskLevel',
+        label: 'LNG_ENTITY_FIELD_LABEL_RISK',
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          includeNoValue: true
+        }
+      },
+      {
+        field: 'classification',
+        label: 'LNG_ENTITY_FIELD_LABEL_CLASSIFICATION',
+        format: {
+          type: (item) => item.classification ?
+            this.translateService.instant(item.classification) :
+            ''
+        },
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        }
+      },
+      {
+        field: 'place',
+        label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
+        format: {
+          type: 'mainAddress.location.name'
+        },
+        link: (data) => {
+          return data.mainAddress?.location?.name ?
+            `/locations/${ data.mainAddress.location.id }/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'fullAddress',
+        label: 'LNG_ENTITY_FIELD_LABEL_ADDRESS',
+        format: {
+          type: 'mainAddress.fullAddress'
+        }
+      }
+    ];
+  }
+
+  /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {
+    // update selected
+    this.processSelectedData = [
+      // all selected records were not deleted ?
+      {
+        key: 'updateSelected',
+        process: (
+          _dataMap,
+          selected
+        ) => {
+          // update selected
+          this._selectedRecords = selected;
+        }
+      }
+    ];
+  }
+
+  /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
+   * Initialize table quick actions
+   */
+  protected initializeQuickActions(): void {}
+
+  /**
+   * Initialize table group actions
+   */
+  protected initializeGroupActions(): void {
+    // trick to display checkboxes
+    this.groupActions = [
+      {
+        visible: () => false
+      }
+    ];
+  }
+
+  /**
+   * Initialize table add action
+   */
+  protected initializeAddAction(): void {
+    this.addAction = {
+      type: V2ActionType.ICON_LABEL,
+      label: 'LNG_COMMON_BUTTON_SELECT',
+      icon: 'add_circle_outline',
+      action: {
+        link: (): string[] => [
+          '/relationships',
+          this._entity.type,
+          this._entity.id,
+          this._relationshipType === RelationshipType.CONTACT ?
+            'contacts' :
+            'exposures',
+          'create'
+        ],
+        linkQueryParams: () => ({
+          selectedEntityIds: this._selectedRecords?.length > 0 ?
+            JSON.stringify(this._selectedRecords) :
+            undefined
+        })
+      },
+      disable: () => {
+        return !this._selectedRecords?.length;
+      }
+    };
+  }
+
+  /**
+   * Initialize table grouped data
+   */
+  protected initializeGroupedData(): void {}
+
+  /**
+   * Initialize breadcrumbs
+   */
+  initializeBreadcrumbs(): void {
+    // set breadcrumbs
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
+        }
+      }, {
+        label: this.entityHelperService.entityMap[this._entity.type].label,
+        action: {
+          link: [this.entityHelperService.entityMap[this._entity.type].link]
+        }
+      }, {
+        label: this._entity.name,
+        action: {
+          link: [
+            this.entityHelperService.entityMap[this._entity.type].link,
+            this._entity.id,
+            'view'
+          ]
+        }
+      }, {
+        label: this._relationshipType === RelationshipType.EXPOSURE ?
+          'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_EXPOSURES_TITLE' :
+          'LNG_PAGE_LIST_ENTITY_RELATIONSHIPS_CONTACTS_TITLE',
+        action: {
+          link: [
+            '/relationships',
+            this._entity.type,
+            this._entity.id,
+            this._relationshipType === RelationshipType.CONTACT ?
+              'contacts' :
+              'exposures'
+          ]
+        }
+      }, {
+        label: 'LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_RELATIONSHIP_TITLE',
+        action: null
+      }
+    ];
+  }
+
+  /**
+   * Clear query builder
+   */
+  clearQueryBuilder(): void {
+    // clear query builder
+    this.queryBuilder.clear();
+
+    // retrieve only available entity types
+    const availableTypes: EntityType[] = this.genericDataService.getAvailableRelatedEntityTypes(
+      this._entity.type,
+      this._relationshipType,
+      Constants.APP_PAGE.AVAILABLE_ENTITIES_FOR_RELATIONSHIPS.value
+    );
+    this.queryBuilder.filter.where({
+      type: {
+        'inq': availableTypes
+      }
+    });
+  }
+
+  /**
+   * Fields retrieved from api to reduce payload size
+   */
+  protected refreshListFields(): string[] {
+    return [
+      'id',
+      'type',
+      'lastName',
+      'firstName',
+      'name',
+      'visualId',
+      'matchedDuplicateRelationships',
+      'age',
+      'gender',
+      'riskLevel',
+      'classification',
+      'address',
+      'addresses'
+    ];
+  }
+
+  /**
+   * Re(load) the Relationships list, based on the applied filter, sort criterias
+   */
+  refreshList(): void {
+    // request data
+    this.records$ = this.relationshipDataService
+      .getEntityAvailablePeople(
+        this.selectedOutbreak.id,
+        this._entity.type,
+        this._entity.id,
+        this.queryBuilder
+      )
+      .pipe(
+        switchMap((data) => {
+          // determine locations that we need to retrieve
+          const locationsIdsMap: {
+            [locationId: string]: true
+          } = {};
+          data.forEach((item) => {
+            // type ?
+            if (item instanceof EventModel) {
+              locationsIdsMap[item.address.locationId] = true;
+            } else {
+              (item.addresses || []).forEach((address) => {
+                // nothing to add ?
+                if (!address?.locationId) {
+                  return;
+                }
+
+                // add location to list
+                locationsIdsMap[address.locationId] = true;
+              });
+            }
+          });
+
+          // determine ids
+          const locationIds: string[] = Object.keys(locationsIdsMap);
+
+          // nothing to retrieve ?
+          if (locationIds.length < 1) {
+            return of(data);
+          }
+
+          // construct location query builder
+          const qb = new RequestQueryBuilder();
+          qb.filter.bySelect(
+            'id',
+            locationIds,
+            false,
+            null
+          );
+
+          // retrieve locations
+          return this.locationDataService
+            .getLocationsList(qb)
+            .pipe(
+              map((locations) => {
+                // map locations
+                const locationsMap: {
+                  [locationId: string]: LocationModel
+                } = {};
+                locations.forEach((location) => {
+                  locationsMap[location.id] = location;
+                });
+
+                // set locations
+                data.forEach((item) => {
+                  // type ?
+                  if (item instanceof EventModel) {
+                    item.address.location = item.address.locationId && locationsMap[item.address.locationId]
+                      ? locationsMap[item.address.locationId]
+                      : item.address.location;
+                  } else {
+                    (item.addresses || []).forEach((address) => {
+                      address.location = address.locationId && locationsMap[address.locationId] ?
+                        locationsMap[address.locationId] :
+                        address.location;
+                    });
+                  }
+                });
+
+                // finished
+                return data;
+              })
             );
-        });
+        })
+      )
+      .pipe(
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
+  }
 
-        // side filters
-        this.generateSideFilters();
+  /**
+   * Get total number of items, based on the applied filters
+   */
+  refreshListCount(applyHasMoreLimit?: boolean): void {
+    // reset
+    this.pageCount = undefined;
+
+    // set apply value
+    if (applyHasMoreLimit !== undefined) {
+      this.applyHasMoreLimit = applyHasMoreLimit;
     }
 
-    /**
-     * Release resources
-     */
-    ngOnDestroy() {
-        // release parent resources
-        super.ngOnDestroy();
+    // remove paginator from query builder
+    const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+    countQueryBuilder.paginator.clear();
+    countQueryBuilder.sort.clear();
+
+    // apply has more limit
+    if (this.applyHasMoreLimit) {
+      countQueryBuilder.flag(
+        'applyHasMoreLimit',
+        true
+      );
     }
 
-    /**
-     * @Overrides parent method
-     */
-    onDataInitialized() {
-        // initialize breadcrumbs
-        this.initializeBreadcrumbs();
-
-        // initialize query builder
-        this.clearQueryBuilder();
-
-        // initialize pagination
-        this.initPaginator();
-        // ...and (re)load the list
-        this.needsRefreshList(true);
-    }
-
-    /**
-     * @Overrides parent method
-     */
-    onPersonLoaded() {
-        // (re)initialize breadcrumbs
-        this.initializeBreadcrumbs();
-    }
-
-    /**
-     * @Overrides parent method
-     */
-    clearQueryBuilder() {
-        // clear query builder
-        this.queryBuilder.clear();
-        // retrieve only available entity types
-        const availableTypes: EntityType[] = this.genericDataService.getAvailableRelatedEntityTypes(
-            this.entityType,
-            this.relationshipType,
-            Constants.APP_PAGE.AVAILABLE_ENTITIES_FOR_RELATIONSHIPS.value
-        );
-        this.queryBuilder.filter.where({
-            type: {
-                'inq': availableTypes
-            }
-        });
-    }
-
-    private initializeBreadcrumbs() {
-        if (
-            this.relationshipType &&
-            this.entity
-        ) {
-            this.breadcrumbs = [
-                new BreadcrumbItemModel(this.entityMap[this.entityType].label, this.entityMap[this.entityType].link),
-                new BreadcrumbItemModel(
-                    this.entity.name,
-                    `${this.entityMap[this.entityType].link}/${this.entityId}/view`
-                ),
-                new BreadcrumbItemModel(
-                    this.relationshipsListPageTitle,
-                    `/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}`
-                ),
-                new BreadcrumbItemModel('LNG_PAGE_LIST_AVAILABLE_ENTITIES_FOR_RELATIONSHIP_TITLE', null, true)
-            ];
-        }
-    }
-
-    /**
-     * Re(load) the available Entities list, based on the applied filter, sort criterias
-     */
-    refreshList(finishCallback: (records: any[]) => void) {
-        if (
-            this.entityType &&
-            this.entityId &&
-            this.selectedOutbreak
-        ) {
-            // retrieve location list
-            this.queryBuilder.include('locations', true);
-
-            // retrieve the list of Relationships
-            this.entitiesList$ = this.relationshipDataService
-                .getEntityAvailablePeople(
-                    this.selectedOutbreak.id,
-                    this.entityType,
-                    this.entityId,
-                    this.queryBuilder
-                )
-                .pipe(
-                    catchError((err) => {
-                        this.snackbarService.showApiError(err);
-                        finishCallback([]);
-                        return throwError(err);
-                    }),
-                    tap(this.checkEmptyList.bind(this)),
-                    tap((data: any[]) => {
-                        finishCallback(data);
-                    })
-                );
-        } else {
-            finishCallback([]);
-        }
-    }
-
-    /**
-     * Get total number of items, based on the applied filters
-     */
-    refreshListCount() {
-        if (
-            this.entityType &&
-            this.entityId &&
-            this.selectedOutbreak
-        ) {
-            // remove paginator from query builder
-            const countQueryBuilder = _.cloneDeep(this.queryBuilder);
-            countQueryBuilder.paginator.clear();
-            countQueryBuilder.sort.clear();
-            this.entitiesListCount$ = this.relationshipDataService
-                .getEntityAvailablePeopleCount(
-                    this.selectedOutbreak.id,
-                    this.entityType,
-                    this.entityId,
-                    this.queryBuilder
-                )
-                .pipe(
-                    catchError((err) => {
-                        this.snackbarService.showApiError(err);
-                        return throwError(err);
-                    }),
-                    share()
-                );
-        }
-    }
-
-    private generateSideFilters() {
-        this.availableSideFilters = [
-            new FilterModel({
-                fieldName: 'type',
-                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_TYPE',
-                type: FilterType.MULTISELECT,
-                options$: this.personTypesList$,
-                sortable: true
-            }),
-            new FilterModel({
-                fieldName: 'firstName',
-                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
-                type: FilterType.TEXT,
-                sortable: true
-            }),
-            new FilterModel({
-                fieldName: 'lastName',
-                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
-                type: FilterType.TEXT,
-                sortable: true
-            }),
-            new FilterModel({
-                fieldName: 'visualId',
-                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID',
-                type: FilterType.TEXT
-            }),
-            new FilterModel({
-                fieldName: 'gender',
-                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_GENDER',
-                type: FilterType.MULTISELECT,
-                options$: this.genderList$,
-                sortable: true
-            }),
-            new FilterModel({
-                fieldName: 'age',
-                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_AGE',
-                type: FilterType.RANGE_AGE,
-                sortable: true
-            }),
-            new FilterModel({
-                fieldName: 'addresses',
-                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_ADDRESS',
-                type: FilterType.ADDRESS,
-                addressFieldIsArray: true
-            }),
-            new FilterModel({
-                fieldName: 'dob',
-                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_DOB',
-                type: FilterType.RANGE_DATE,
-                sortable: true
-            }),
-            new FilterModel({
-                fieldName: 'riskLevel',
-                fieldLabel: 'LNG_ENTITY_FIELD_LABEL_RISK',
-                type: FilterType.MULTISELECT,
-                options$: this.riskLevelsList$,
-                sortable: true
-            }),
-
-        ];
-    }
-
-    /**
-     * @Overrides parent method
-     */
-    public sortBy(
-        data: any,
-        objectDetailsSort?: {
-            [property: string]: string[]
-        }
-    ) {
-        const property = _.get(data, 'active');
-        const direction = _.get(data, 'direction');
-
-        if (
-            property === 'firstName' &&
-            direction
-        ) {
-            // need to sort by firstName ASC, name ASC (so we sort Events aswell)
-
-            // remove previous sort columns, we can sort only by one column at a time
-            this.queryBuilder.sort.clear();
-
-            // retrieve Side filters
-            let queryBuilder;
-            if (
-                this.sideFilter &&
-                (queryBuilder = this.sideFilter.getQueryBuilder())
-            ) {
-                this.queryBuilder.sort.merge(queryBuilder.sort);
-            }
-
-            // apply sort
-            this.queryBuilder.sort.by('firstName', direction);
-            this.queryBuilder.sort.by('name', direction);
-
-            // refresh list
-            this.needsRefreshList(false, false);
-        } else {
-            // call method from parent class
-            super.sortBy(data, objectDetailsSort);
-        }
-    }
-
-    /**
-     * Retrieve Person Type color
-     */
-    getPersonTypeColor(personType: string) {
-        const personTypeData = _.get(this.personTypesListMap, personType);
-        return _.get(personTypeData, 'colorCode', '');
-    }
-
-    selectEntities(form: NgForm) {
-        // get list of selected ids
-        const selectedRecords: false | string[] = this.validateCheckedRecords();
-        if (!selectedRecords) {
-            return;
-        }
-
-        // redirect to next step
-        this.router.navigate(
-            [`/relationships/${this.entityType}/${this.entityId}/${this.relationshipTypeRoutePath}/create`],
-            {
-                queryParams: {
-                    selectedEntityIds: JSON.stringify(selectedRecords)
-                }
-            }
-        );
-    }
-
-    /**
-     * Filter by locations selected in location-drop-down
-     * @param locations
-     */
-    filterByLocation(locations) {
-        // remove previous condition
-        this.queryBuilder.filter.remove('addresses');
-        if (!_.isEmpty(locations)) {
-            // mapping all the locations to get the ids
-            const locationsIds = _.map(locations, (location) => {
-                return location.id;
-            });
-
-            // build query
-            this.queryBuilder.filter.where({
-                addresses: {
-                    elemMatch: {
-                        typeId: AddressType.CURRENT_ADDRESS,
-                        parentLocationIdFilter: {
-                            $in: locationsIds
-                        }
-                    }
-                }
-            });
-        }
-
-        // refresh list
-        this.needsRefreshList();
-    }
+    // count
+    this.relationshipDataService
+      .getEntityAvailablePeopleCount(
+        this.selectedOutbreak.id,
+        this._entity.type,
+        this._entity.id,
+        countQueryBuilder
+      )
+      .pipe(
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      ).subscribe((response) => {
+        this.pageCount = response;
+      });
+  }
 }

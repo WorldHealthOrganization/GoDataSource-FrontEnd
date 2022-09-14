@@ -82,22 +82,12 @@ Use the IDE of your choice (Webstorm recommended).
         - Dev must address all the comments in his PR, fix the code where necessary and REPLY to all comments, so the Reviewer knows that none of the comments were missed
 4. Before assigning the ticket to QA, the developer must close the branch(es) that were merged and are not needed anymore.
 
-### Running unit tests
-
-Run the following command to check if the unit tests are passing:
-
-    npm run test
-
-If you want to debug or run the unit tests one by one, run the following command and use Chrome browser and Developer Tools for debugging (as usual):
-
-    npm run test-debug
-
 ### Managing Language Translations
 
 1. Go.Data supports multiple languages, the base language being English-US.
 2. In development, we are adding support only for the English-US language.
 3. We must NOT have hardcoded strings in our application. All the strings that are being displayed in the UI must be translated.
-4. All the translations (aka Language Tokens) are stored in the API, and can be seen here: https://github.com/ClarisoftTechnologies/Go.Data-API/blob/master/server/config/languages/english_us.json
+4. All the translations (aka Language Tokens) are stored in the API, and can be seen here: https://github.com/ClarisoftTechnologies/Go.Data-API/blob/master/server/install/scripts/migrations/older/data/languages/english_us.json
 5. For development purpose only, FrontEnd developers can add new Language Tokens in "**/src/app/i18n/english_us.ts**" file, so that the changes are reflected in the UI while developing.
    - Note that the Language Tokens in previously mentioned file (english_us.ts) are overriding the values defined in the API.
 6. From time to time, we are cleaning up the "english_us.ts" file, moving all the tokens in the API code.
@@ -106,8 +96,3 @@ If you want to debug or run the unit tests one by one, run the following command
 8. If you want to remove a Language Token that is not being used (anymore), just add a comment in "english_us.ts" and it will be taken into account when merging the file with the API translations (see item #6 from above).
 
 ### Known issues
-
-1. **numbro** npm package must be limited to version **2.1.1** in **package.json** file. It is a dependency of **handsontable** npm package which, by default, installs a newer version which triggers an error in production environment when using cells of type Number (e.g. age Years/Months):
-```
-Uncaught RangeError: toFixed() digits argument must be between 0 and 100
-``` 

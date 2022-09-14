@@ -1,0 +1,22 @@
+@import 'mixins';
+
+.form-icon-fancy {
+  @include flex(flex);
+  @include flex_align_items(center);
+  @include flex_justify(center);
+  height: 2.4rem;
+  width: 2.4rem;
+
+  .mat-icon {
+    color: var(--gd-secondary);
+    height: 2rem;
+    @include transition(all 0.24s ease-in-out 0s);
+    width: 2rem;
+  }
+
+  &:hover {
+    .mat-icon {
+      color: rgba(var(--gd-text-rgb), 0.75);
+    }
+  }
+}

@@ -7,19 +7,16 @@ import { WorldMapMovementModule } from '../../common-modules/world-map-movement/
 
 // components
 import * as fromPages from './pages';
-import * as fromComponents from './components';
 
 @NgModule({
-    imports: [
-        routing,
-        SharedModule,
-        WorldMapMovementModule
-    ],
-    declarations: [
-        ...fromPages.pageComponents,
-        ...fromComponents.components
-    ],
-    entryComponents: []
+  imports: [
+    routing,
+    SharedModule,
+    WorldMapMovementModule
+  ],
+  declarations: [
+    ...fromPages.pageComponents
+  ]
 })
 export class ContactModule {
 }

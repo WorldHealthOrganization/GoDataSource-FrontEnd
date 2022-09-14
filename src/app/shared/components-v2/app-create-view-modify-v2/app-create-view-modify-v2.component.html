@@ -1,0 +1,1894 @@
+<div
+  [class.gd-create-view-modify-view]="isView"
+  [class.gd-create-view-modify-create]="isCreate"
+  [class.gd-create-view-modify-modify]="isModify">
+
+  <!-- Loading data -->
+  <div
+    *ngIf="loadingPage; else dataLoaded"
+    fxLayout="row" fxLayoutAlign="center center"
+    class="gd-create-view-modify-loading-data">
+
+    <!-- Spinner -->
+    <mat-progress-spinner
+      diameter="48"
+      mode="indeterminate"></mat-progress-spinner>
+  </div>
+
+  <!-- Loaded data -->
+  <ng-template
+    #dataLoaded>
+
+    <!-- Sidenav -->
+    <mat-sidenav-container
+      [class.gd-create-view-modify-list-expanded]="expandList"
+      [hasBackdrop]="renderMode !== RenderMode.FULL && expandList"
+      (backdropClick)="expandList = false">
+
+      <!-- Left Side - List of records -->
+      <mat-sidenav
+        *ngIf="isView && expandListColumnRenderer"
+        class="gd-create-view-modify-list"
+        opened="true"
+        [mode]="renderMode === RenderMode.FULL ? 'side' : 'over'"
+        disableClose="true">
+
+        <!-- Top -->
+        <div
+          class="gd-create-view-modify-list-top">
+
+          <div
+            fxLayout="row" fxLayoutAlign="space-between center" fxLayoutGap="1.6rem"
+            class="gd-create-view-modify-list-top-inner">
+
+            <!-- Title -->
+            <div
+              fxFlex
+              class="gd-create-view-modify-list-top-title">
+              {{listTitle | translate}}
+            </div>
+
+            <!-- Buttons -->
+            <div
+              *ngIf="expandList && (expandListAdvancedFilters?.length > 0 || expandListColumnRenderer?.type === CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS)"
+              fxGrow="0" fxLayoutGap="0.8rem"
+              class="gd-create-view-modify-list-top-buttons">
+
+              <!-- Show / Hide status -->
+              <app-form-toggle-icon-v2
+                *ngIf="expandListColumnRenderer?.type === CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS"
+                [(ngModel)]="expandListColumnRenderer.statusVisible"
+                icon="category"
+                [matTooltip]="'LNG_COMMON_LABEL_SHOW_HIDE_STATUS' | translate">
+              </app-form-toggle-icon-v2>
+
+              <!-- Sort and filter -->
+              <button
+                *ngIf="expandListAdvancedFilters?.length > 0"
+                type="button"
+                mat-icon-button
+                color="secondary"
+                [matTooltip]="'LNG_SIDE_FILTERS_TITLE' | translate"
+                (click)="expandListFilter()">
+                <mat-icon>filter_alt</mat-icon>
+              </button>
+
+            </div>
+
+          </div>
+
+          <!-- Search -->
+          <div
+            *ngIf="expandList && showSearchByInput"
+            class="gd-create-view-modify-list-search">
+
+            <app-form-input-v2
+              placeholder="LNG_COMMON_LABEL_SEARCH"
+              [(ngModel)]="expandListSearchValue"
+              [neverFloatLabel]="true"
+              autocomplete="off"
+              [suffixIconButtons]="expandListSearchSuffixButtons"
+              (ngModelChange)="expandListSearch()">
+            </app-form-input-v2>
+
+          </div>
+
+        </div>
+
+        <!-- Content - Table of records -->
+        <div
+          *ngIf="expandList"
+          class="gd-create-view-modify-list-data">
+
+          <!-- Loading data ? -->
+          <mat-progress-spinner
+            *ngIf="expandListLoadingData; else dataLoaded"
+            diameter="48"
+            mode="indeterminate"></mat-progress-spinner>
+
+          <!-- Data -->
+          <ng-template
+            #dataLoaded>
+
+            <!-- No data -->
+            <div
+              *ngIf="expandListRecords.length < 1; else hasData"
+              fxLayout="column" fxLayoutAlign="center center"
+              class="gd-create-view-modify-list-data-no-records">
+
+              <!-- Image -->
+              <div
+                class="gd-create-view-modify-list-data-no-records-image"></div>
+
+              <!-- Message -->
+              <div
+                class="gd-create-view-modify-list-data-no-records-text">{{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}</div>
+            </div>
+
+            <!-- Has Data -->
+            <ng-template
+              #hasData>
+
+              <!-- Items -->
+              <cdk-virtual-scroll-viewport
+                [itemSize]="expandListColumnRenderer.type === CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS ? 64 : 40">
+                <div
+                  *cdkVirtualFor="let record of expandListRecords; templateCacheSize: 0;"
+                  [ngSwitch]="expandListColumnRenderer?.type"
+                  [ngStyle]="{height: expandListColumnRenderer.type === CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS ? '6.4rem' : '4rem'}"
+                  class="gd-create-view-modify-list-data-record"
+                  [class.gd-create-view-modify-list-data-record-active]="record.id === itemID">
+
+                  <!-- Text -->
+                  <a
+                    *ngSwitchCase="CreateViewModifyV2ExpandColumnType.TEXT"
+                    class="gd-create-view-modify-list-data-record-is-text"
+                    [routerLink]="expandListColumnRenderer.link(record)"
+                    [queryParams]="selectedTabParams">
+                    <span
+                      (click)="$event.preventDefault(); $event.stopPropagation(); $event.stopImmediatePropagation(); (record.id === itemID ? undefined : expandListViewRecord(record))">
+                      {{ expandListColumnRenderer.get.text(record) }}
+                    </span>
+                  </a>
+
+                  <!-- Status and details -->
+                  <a
+                    *ngSwitchCase="CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS"
+                    class="gd-create-view-modify-list-data-record-is-status-and-details"
+                    [routerLink]="expandListColumnRenderer.link(record)"
+                    [queryParams]="selectedTabParams">
+                    <span
+                      (click)="$event.preventDefault(); $event.stopPropagation(); $event.stopImmediatePropagation(); (record.id === itemID ? undefined : expandListViewRecord(record))"
+                      [class.gd-create-view-modify-list-data-record-active-statuses]="expandListColumnRenderer.statusVisible">
+
+                      <!-- Status -->
+                      <span
+                        *ngIf="expandListColumnRenderer.statusVisible"
+                        class="gd-create-view-modify-list-data-record-is-status-and-details-status"
+                        [innerHTML]="expandListColumnRenderer.get.status(record)"
+                        [style.min-width.px]="expandListColumnRenderer.maxNoOfStatusForms * AppListTableV2Component.STANDARD_SHAPE_SIZE + (expandListColumnRenderer.maxNoOfStatusForms - 1) * AppListTableV2Component.STANDARD_SHAPE_GAP + AppListTableV2Component.STANDARD_SHAPE_PADDING + 2">
+                      </span>
+
+                      <!-- Text & Details -->
+                      <span
+                        class="gd-create-view-modify-list-data-record-is-status-and-details-details">
+
+                        <!-- Text -->
+                        <span
+                          class="gd-create-view-modify-list-data-record-is-status-and-details-details-text">
+                          {{ expandListColumnRenderer.get.text(record) }}
+                        </span>
+
+                        <!-- Details -->
+                        <span
+                          class="gd-create-view-modify-list-data-record-is-status-and-details-details-details">
+                          {{ expandListColumnRenderer.get.details(record) }}
+                        </span>
+
+                      </span>
+
+                    </span>
+                  </a>
+
+                </div>
+              </cdk-virtual-scroll-viewport>
+
+              <!-- Pagination -->
+              <div>
+                <app-mat-paginator-extended
+                  class="gd-create-view-modify-list-data-paginator"
+                  [pageIndex]="expandListPageIndex"
+                  [pageSize]="Constants.DEFAULT_PAGE_SIZE"
+                  [countData]="expandListPageCount"
+                  hidePageSize="true"
+                  shortRange="true"
+                  (page)="expandListSetPage($event)">
+                </app-mat-paginator-extended>
+              </div>
+
+            </ng-template>
+          </ng-template>
+
+        </div>
+
+        <!-- Expand / Collapse button -->
+        <button
+          *ngIf="renderMode === RenderMode.FULL; else hoverViewListButton"
+          type="button"
+          mat-icon-button
+          (click)="expandCollapseList()"
+          class="gd-create-view-modify-list-expand-collapse-button">
+          <span class="material-icons">{{expandList ? 'chevron_left' : 'chevron_right'}}</span>
+        </button>
+        <ng-template
+          #hoverViewListButton>
+          <button
+            type="button"
+            mat-flat-button
+            (click)="expandCollapseList()"
+            class="gd-create-view-modify-list-expand-collapse-button">
+            <mat-icon
+              [matTooltip]="listTitle | translate">fact_check</mat-icon>
+          </button>
+        </ng-template>
+
+      </mat-sidenav>
+
+      <!-- CONTENT -->
+      <!-- Loading data -->
+      <div
+        *ngIf="loadingItemData; else itemDataLoaded"
+        fxLayout="row" fxLayoutAlign="center center"
+        class="gd-create-view-modify-content-loader">
+
+        <!-- Spinner -->
+        <mat-progress-spinner
+          diameter="48"
+          mode="indeterminate"></mat-progress-spinner>
+      </div>
+
+      <!-- Content -->
+      <ng-template
+        #itemDataLoaded>
+
+        <!-- Top -->
+        <div
+          class="gd-create-view-modify-top">
+
+          <!-- Breadcrumbs -->
+          <app-breadcrumb-v2
+            [breadcrumbs]="breadcrumbs"
+            (detectChanges)="resizeTable()"></app-breadcrumb-v2>
+
+          <!-- Title & buttons -->
+          <div
+            fxLayout="row" fxLayoutGap="0.8rem" fxLayout.lt-md="column"
+            class="gd-create-view-modify-top-title-buttons">
+
+            <!-- Title & view button -->
+            <div
+              fxFlex fxFlex.lt-md="none" fxLayoutAlign="start center" fxLayoutGap="1.6rem"
+              class="gd-create-view-modify-top-title-buttons-title">
+
+              <!-- Title -->
+              <span>
+                {{pageTitle | translate:pageTitleData}}
+              </span>
+
+              <!-- View button -->
+              <a
+                *ngIf="isModify && tabData.buttons.view && (!tabData.buttons.view.visible || tabData.buttons.view.visible())"
+                type="button"
+                mat-icon-button
+                [routerLink]="tabData.buttons.view.link.link()"
+                [queryParams]="tabData.buttons.view.link.queryParams ? retrieveSelectedTabQueryParams(tabData.buttons.view.link.queryParams()) : selectedTabParams">
+                <mat-icon>visibility</mat-icon>
+              </a>
+            </div>
+
+            <!-- Buttons -->
+            <div
+              *ngIf="!isCreate"
+              fxLayoutAlign="end" fxLayoutGap="0.8rem" flexGrow="0"
+              class="gd-create-view-modify-top-title-buttons-buttons">
+
+              <!-- Cancel -->
+              <ng-container
+                *ngIf="isView ? (tabData.buttons.viewCancel && (!tabData.buttons.viewCancel.visible || tabData.buttons.viewCancel.visible())) : (tabData.buttons.modifyCancel && (!tabData.buttons.modifyCancel.visible || tabData.buttons.modifyCancel.visible()))">
+
+                <!-- Big screen TV -->
+                <a
+                  *ngIf="!isSmallScreenMode; else smallScreen"
+                  type="button"
+                  mat-flat-button color="text"
+                  [routerLink]="isView ? tabData.buttons.viewCancel.link.link() : tabData.buttons.modifyCancel.link.link()"
+                  [queryParams]="isView ? (tabData.buttons.viewCancel.link.queryParams ? tabData.buttons.viewCancel.link.queryParams() : undefined) : (tabData.buttons.modifyCancel.link.queryParams ? tabData.buttons.modifyCancel.link.queryParams() : undefined)">
+                  {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
+                </a>
+
+                <!-- Small screen TV -->
+                <ng-template
+                  #smallScreen>
+                  <button
+                    type="button"
+                    mat-flat-button color="secondary"
+                    [routerLink]="isView ? tabData.buttons.viewCancel.link.link() : tabData.buttons.modifyCancel.link.link()"
+                    [queryParams]="isView ? (tabData.buttons.viewCancel.link.queryParams ? tabData.buttons.viewCancel.link.queryParams() : undefined) : (tabData.buttons.modifyCancel.link.queryParams ? tabData.buttons.modifyCancel.link.queryParams() : undefined)">
+                    <mat-icon>backspace</mat-icon>
+                  </button>
+                </ng-template>
+
+              </ng-container>
+
+              <!-- Quick Actions -->
+              <ng-container
+                *ngIf="tabData.buttons.quickActions">
+
+                <!-- Floating menu -->
+                <mat-menu
+                  #quickMenu="matMenu"
+                  class="gd-create-view-modify-top-title-buttons-buttons-quick-options">
+                  <ng-container
+                    *ngFor="let menuOption of tabData.buttons.quickActions.options">
+                    <ng-container
+                      *ngIf="!menuOption.visible || menuOption.visible()"
+                      [ngSwitch]="menuOption.type">
+
+                      <!-- Group label -->
+                      <div
+                        *ngSwitchCase="CreateViewModifyV2MenuType.GROUP"
+                        (click)="$event.preventDefault(); $event.stopPropagation(); $event.stopImmediatePropagation();">
+                        {{menuOption.label | translate}}
+                      </div>
+
+                      <!-- Child Menu link -->
+                      <ng-container
+                        *ngSwitchCase="CreateViewModifyV2MenuType.OPTION">
+
+                        <!-- Link -->
+                        <a
+                          *ngIf="menuOption.action.link; else notLink"
+                          mat-menu-item
+                          class="gd-create-view-modify-top-title-buttons-buttons-quick-options-option"
+                          [routerLink]="menuOption.action.link()"
+                          [queryParams]="menuOption.action.queryParams ? menuOption.action.queryParams() : undefined">
+                          {{menuOption.label | translate}}
+                        </a>
+
+                        <!-- Button -->
+                        <ng-template
+                          #notLink>
+                          <button
+                            type="button"
+                            mat-menu-item
+                            class="gd-create-view-modify-top-title-buttons-buttons-quick-options-option"
+                            (click)="menuOption.action.click()">
+                            {{menuOption.label | translate}}
+                          </button>
+                        </ng-template>
+
+                      </ng-container>
+
+                      <!-- Divider -->
+                      <mat-divider
+                        *ngSwitchCase="CreateViewModifyV2MenuType.DIVIDER"></mat-divider>
+
+                    </ng-container>
+                  </ng-container>
+                </mat-menu>
+
+                <!-- Menu -->
+                <button
+                  #quickMenuTrigger="matMenuTrigger"
+                  class="gd-create-view-modify-top-title-buttons-buttons-quick"
+                  [class.gd-create-view-modify-top-title-buttons-buttons-quick-expanded]="quickMenuTrigger.menuOpen && !isSmallScreenMode"
+                  type="button"
+                  mat-flat-button color="secondary"
+                  [matMenuTriggerFor]="quickMenu"
+                  (menuClosed)="detectChanges()">
+
+                  <!-- Big screen TV -->
+                  <ng-container
+                    *ngIf="!isSmallScreenMode; else smallScreen">
+                    <!-- Label -->
+                    <span>
+                      {{'LNG_COMMON_BUTTON_QUICK_ACTIONS' | translate}}
+                    </span>
+
+                    <!-- Icon -->
+                    <mat-icon>expand_more</mat-icon>
+                  </ng-container>
+
+                  <!-- Small screen TV -->
+                  <ng-template
+                    #smallScreen>
+                    <mat-icon>apps</mat-icon>
+                  </ng-template>
+                </button>
+
+              </ng-container>
+
+              <!-- Save -->
+              <button
+                *ngIf="isModify"
+                type="button"
+                mat-flat-button color="primary"
+                [disabled]="hasPendingForm"
+                (click)="modify()">
+
+                <!-- Pending validators -->
+                <mat-progress-spinner
+                  *ngIf="hasPendingForm"
+                  diameter="16"
+                  mode="indeterminate"
+                  color="primary">
+                </mat-progress-spinner>
+
+                <!-- Big screen TV -->
+                <!-- Label -->
+                <span
+                  *ngIf="!isSmallScreenMode; else smallScreen">
+                  {{'LNG_COMMON_BUTTON_SAVE' | translate}}
+                </span>
+
+                <!-- Small screen TV -->
+                <ng-template
+                  #smallScreen>
+                  <mat-icon>save</mat-icon>
+                </ng-template>
+              </button>
+
+              <!-- Edit -->
+              <a
+                *ngIf="isView && allowEdit && tabData.buttons.modify && (!tabData.buttons.modify.visible || tabData.buttons.modify.visible())"
+                type="button"
+                mat-flat-button color="primary"
+                [routerLink]="tabData.buttons.modify.link.link()"
+                [queryParams]="tabData.buttons.modify.link.queryParams ? retrieveSelectedTabQueryParams(tabData.buttons.modify.link.queryParams()) : selectedTabParams">
+
+                <!-- Big screen TV -->
+                <!-- Label -->
+                <span
+                  *ngIf="!isSmallScreenMode; else smallScreen">
+                  {{'LNG_COMMON_BUTTON_EDIT' | translate}}
+                </span>
+
+                <!-- Small screen TV -->
+                <ng-template
+                  #smallScreen>
+                  <mat-icon>edit</mat-icon>
+                </ng-template>
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Bottom -->
+        <div
+          class="gd-create-view-modify-bottom">
+
+          <!-- Section render -->
+          <ng-template
+            #formRender
+            let-tab="tab">
+            <form
+              #form="ngForm"
+              [ngSwitch]="tab.type">
+
+              <!-- Hack to set form :) -->
+              {{ updateForm(tab, form) }}
+
+              <!-- Input Template -->
+              <ng-template
+                #inputRender
+                let-input="input"
+                let-parentName="parentName"
+                let-parentItemIndex="parentItemIndex"
+                let-parentInput="parentInput">
+
+                <!-- Input -->
+                <div
+                  *ngIf="!input.replace || !input.replace.condition(input); else replaceHtml"
+                  class="gd-create-view-modify-bottom-section-content-input {{input.cssClasses}}"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-textarea]="input.type === CreateViewModifyV2TabInputType.TEXTAREA"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-age-dob]="input.type === CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-list]="input.type === CreateViewModifyV2TabInputType.LIST"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-address]="input.type === CreateViewModifyV2TabInputType.ADDRESS"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-edit-questionnaire]="input.type === CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-fill-questionnaire]="input.type === CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-select-groups]="input.type === CreateViewModifyV2TabInputType.SELECT_GROUPS"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-wysiwyg]="input.type === CreateViewModifyV2TabInputType.WYSIWYG"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-label]="input.type === CreateViewModifyV2TabInputType.LABEL"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-link-list]="input.type === CreateViewModifyV2TabInputType.LINK_LIST"
+                  [class.gd-create-view-modify-bottom-section-content-input-has-label-list]="input.type === CreateViewModifyV2TabInputType.LABEL_LIST"
+                  [ngSwitch]="input.type">
+
+                  <!-- Edit questionnaire -->
+                  <app-form-edit-questionnaire-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [viewOnly]="isView || !input.value.set"
+                    [selectedTab]="selectedTab === tab"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-edit-questionnaire-v2>
+
+                  <!-- Fill questionnaire -->
+                  <app-form-fill-questionnaire-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [viewOnly]="isView || !input.value.set"
+                    [questionnaire]="input.questionnaire"
+                    [selectedTab]="selectedTab === tab"
+                    [disableValidation]="input.disableValidation"
+                    app-questionnaire-answers-validator
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"
+                    (errorsChanged)="input.updateErrors($event)"></app-form-fill-questionnaire-v2>
+
+                  <!-- Text -->
+                  <app-form-input-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.TEXT"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [placeholder]="input.placeholder()"
+                    [tooltip]="input.description ? input.description() : undefined"
+                    [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
+                    [viewOnly]="isView || !input.value.set"
+                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    autocomplete="off"
+                    [suffixIconButtons]="input.suffixIconButtons"
+                    [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
+                    app-regex-validator
+                    [regexExpr]="!isView && input.validators?.regex ? input.validators?.regex().expression : undefined"
+                    [regexExprFlags]="!isView && input.validators?.regex ? input.validators?.regex().flags : undefined"
+                    [regexExprMsg]="!isView && input.validators?.regex ? input.validators?.regex().msg : undefined"
+                    app-has-property-validator
+                    [checkObject]="!isView && input.validators?.notInObject ? input.validators?.notInObject()?.values : undefined"
+                    [checkErrorMsg]="!isView && input.validators?.notInObject ? input.validators?.notInObject()?.err : undefined"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-input-v2>
+
+                  <!-- WYSIWYG -->
+                  <app-form-ngx-wig-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.WYSIWYG"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
+                    [viewOnly]="isView || !input.value.set"
+                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-ngx-wig-v2>
+
+                  <!-- Color -->
+                  <app-form-color-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.COLOR"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [placeholder]="input.placeholder()"
+                    [tooltip]="input.description ? input.description() : undefined"
+                    [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
+                    [viewOnly]="isView || !input.value.set"
+                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-color-v2>
+
+                  <!-- Email -->
+                  <app-form-input-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.EMAIL"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [placeholder]="input.placeholder()"
+                    [tooltip]="input.description ? input.description() : undefined"
+                    [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
+                    [viewOnly]="isView || !input.value.set"
+                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    autocomplete="off"
+                    [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
+                    app-email-validator
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-input-v2>
+
+                  <!-- Async validator text -->
+                  <app-form-input-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [placeholder]="input.placeholder()"
+                    [tooltip]="input.description ? input.description() : undefined"
+                    [viewOnly]="isView || !input.value.set"
+                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    [suffixIconButtons]="input.suffixIconButtons"
+                    autocomplete="off"
+                    [required]="!isView && input.validators.required ? input.validators.required() : undefined"
+                    app-general-async-validator
+                    [asyncValidatorObservable]="!isView ? input.validators.async : undefined"
+                    [maxlength]="255"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-input-v2>
+
+                  <!-- Password -->
+                  <app-form-password-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.PASSWORD"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [placeholder]="input.placeholder()"
+                    [tooltip]="input.description ? input.description() : undefined"
+                    [suffixIconButtons]="input.suffixIconButtons"
+                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
+                    [minlength]="!isView && input.validators?.minlength ? input.validators?.minlength() : undefined"
+                    app-equal-validator
+                    [equalValidatorCompareTo]="!isView && input.validators?.equalValidator ? input.validators?.equalValidator().input : undefined"
+                    [equalValidatorError]="!isView && input.validators?.equalValidator ? input.validators?.equalValidator().err : undefined"
+                    app-trigger-validation-for
+                    [triggerValidationFor]="!isView && input.validators?.validateOther ? input.validators?.validateOther() : undefined"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-password-v2>
+
+                  <!-- Dropdown - single -->
+                  <app-form-select-single-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.SELECT_SINGLE"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [placeholder]="input.placeholder()"
+                    [tooltip]="input.description ? input.description() : undefined"
+                    [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
+                    [viewOnly]="isView || !input.value.set"
+                    [options]="input.options"
+                    [clearable]="true"
+                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    [suffixIconButtons]="input.suffixIconButtons"
+                    [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
+                    app-trigger-validation-for
+                    [triggerValidationFor]="!isView && input.validators?.validateOther ? input.validators?.validateOther() : undefined"
+                    app-not-equal-validator
+                    [notEqualValidatorCompareTo]="!isView && input.validators?.notEqualValidator ? input.validators?.notEqualValidator().input : undefined"
+                    [notEqualValidatorError]="!isView && input.validators?.notEqualValidator ? input.validators?.notEqualValidator().err : undefined"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-select-single-v2>
+
+                  <!-- Dropdown - multiple -->
+                  <app-form-select-multiple-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.SELECT_MULTIPLE"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [placeholder]="input.placeholder()"
+                    [tooltip]="input.description ? input.description() : undefined"
+                    [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
+                    [viewOnly]="isView || !input.value.set"
+                    [options]="input.options"
+                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-select-multiple-v2>
+
+                  <!-- Toggle checkbox -->
+                  <app-form-toggle-checkbox-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [placeholder]="input.placeholder()"
+                    [tooltip]="input.description ? input.description() : undefined"
+                    [viewOnly]="isView || !input.value.set"
+                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    [suffixIconButtons]="input.suffixIconButtons"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-toggle-checkbox-v2>
+
+                  <!-- Location single -->
+                  <app-form-select-location-single-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.LOCATION_SINGLE"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [placeholder]="input.placeholder()"
+                    [viewOnly]="isView || !input.value.set"
+                    [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
+                    [useOutbreakLocations]="input.useOutbreakLocations"
+                    [excludeLocationsIds]="input.excludeLocationsIds"
+                    [clearable]="true"
+                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-select-location-single-v2>
+
+                  <!-- Location multiple -->
+                  <app-form-select-location-multiple-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.LOCATION_MULTIPLE"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [placeholder]="input.placeholder()"
+                    [viewOnly]="isView || !input.value.set"
+                    [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
+                    [useOutbreakLocations]="input.useOutbreakLocations"
+                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-select-location-multiple-v2>
+
+                  <!-- Textarea -->
+                  <app-form-textarea-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.TEXTAREA"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [placeholder]="input.placeholder()"
+                    [viewOnly]="isView || !input.value.set"
+                    [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
+                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    [suffixIconButtons]="input.suffixIconButtons"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-textarea-v2>
+
+                  <!-- Select groups -->
+                  <app-form-select-groups-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.SELECT_GROUPS"
+                    fxFlex
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [placeholder]="input.placeholder()"
+                    [groups]="input.groups"
+                    [groupLabelKey]="input.groupLabelKey"
+                    [groupValueKey]="input.groupValueKey"
+                    [groupOptionsKey]="input.groupOptionsKey"
+                    [groupOptionLabelKey]="input.groupOptionLabelKey"
+                    [groupOptionValueKey]="input.groupOptionValueKey"
+                    [groupNoneLabel]="input.groupNoneLabel"
+                    [groupPartialLabel]="input.groupPartialLabel"
+                    [groupAllLabel]="input.groupAllLabel"
+                    [groupTooltipKey]="input.groupTooltipKey"
+                    [groupOptionTooltipKey]="input.groupOptionTooltipKey"
+                    [groupNoneTooltip]="input.groupNoneTooltip"
+                    [groupPartialTooltip]="input.groupPartialTooltip"
+                    [groupAllTooltip]="input.groupAllTooltip"
+                    [groupOptionHiddenKey]="input.groupOptionHiddenKey"
+                    [defaultValues]="input.defaultValues"
+                    [groupOptionFormatMethod]="input.groupOptionFormatMethod"
+                    [viewOnly]="isView || !input.value.set"
+                    [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
+                    app-group-option-requirements-validator
+                    [appGroupRequiredOptions]="input.groups"
+                    [appGroupKey]="input.groupValueKey"
+                    [appGroupOptionsKey]="input.groupOptionsKey"
+                    [appGroupOptionsValueKey]="input.groupOptionValueKey"
+                    [appGroupOptionsLabelKey]="input.groupOptionLabelKey"
+                    [appGroupOptionsRequirementsKey]="input.appGroupOptionsRequirementsKey"
+                    [requiredWithoutDefaultValues]="input.requiredWithoutDefaultValues"
+                    (groupSelectionChanged)="input.groupSelectionChanged($event)"
+                    (groupOptionCheckStateChanged)="input.groupOptionCheckStateChanged($event)"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-select-groups-v2>
+
+                  <!-- Number -->
+                  <app-form-number-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.NUMBER"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [placeholder]="input.placeholder()"
+                    [tooltip]="input.description ? input.description() : undefined"
+                    [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
+                    [viewOnly]="isView || !input.value.set"
+                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    autocomplete="off"
+                    [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-number-v2>
+
+                  <!-- Lat / Lng -->
+                  <div
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.LAT_LNG"
+                    fxFlex fxLayout="row wrap" fxLayout.lt-md="column" fxLayoutGap="1.6rem" fxLayoutGap.lt-md="0"
+                    [ngModelGroup]="parentName ? parentName + '[' + input.name + ']' : input.name">
+
+                    <!-- Lat -->
+                    <app-form-number-v2
+                      fxFlex="calc(50% - 0.8rem)" fxFlex.xs="100%"
+                      [(ngModel)]="input.value.get().lat"
+                      name="lat"
+                      placeholder="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT"
+                      tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT_DESCRIPTION"
+                      [viewOnly]="isView"
+                      [required]="!isView && input.value.get().lng"
+                      app-min-max-validator
+                      [min]="-90"
+                      [minNumber]="-90"
+                      [max]="90"
+                      [maxNumber]="90"></app-form-number-v2>
+
+                    <!-- Lng -->
+                    <app-form-number-v2
+                      fxFlex="calc(50% - 0.8rem)" fxFlex.xs="100%"
+                      [(ngModel)]="input.value.get().lng"
+                      name="lng"
+                      placeholder="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG"
+                      tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG_DESCRIPTION"
+                      [viewOnly]="isView"
+                      [required]="!isView && input.value.get().lat"
+                      app-min-max-validator
+                      [min]="-180"
+                      [minNumber]="-180"
+                      [max]="180"
+                      [maxNumber]="180"></app-form-number-v2>
+
+                  </div>
+
+                  <!-- List Text -->
+                  <app-form-input-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.LIST_TEXT"
+                    fxFlex
+                    [(ngModel)]="parentInput.items[parentItemIndex]"
+                    [name]="parentName + '[' + parentItemIndex + ']'"
+                    [placeholder]="input.placeholder(input, parentInput, parentItemIndex)"
+                    [tooltip]="input.description ? input.description() : undefined"
+                    [noValueLabel]="input.noValueLabel ? input.noValueLabel(): '—'"
+                    [viewOnly]="isView"
+                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    autocomplete="off"
+                    [required]="true"
+                    (ngModelChange)="markArrayItemsAsDirty(form, parentName); "></app-form-input-v2>
+
+                  <!-- Location Identifier -->
+                  <div
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.LOCATION_IDENTIFIER"
+                    fxFlex fxLayout="row wrap" fxLayout.lt-md="column" fxLayoutGap="1.6rem" fxLayoutGap.lt-md="0"
+                    [ngModelGroup]="parentName ? parentName + '[' + parentItemIndex + ']' : input.name">
+
+                    <!-- Code -->
+                    <app-form-input-v2
+                      fxFlex
+                      [(ngModel)]="input.value.get(parentItemIndex).code"
+                      name="code"
+                      placeholder="LNG_LOCATION_FIELD_LABEL_IDENTIFIER_CODE"
+                      [viewOnly]="isView"
+                      required="true"
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
+
+                    <!-- Description -->
+                    <app-form-input-v2
+                      fxFlex
+                      [(ngModel)]="input.value.get(parentItemIndex).description"
+                      name="description"
+                      placeholder="LNG_LOCATION_FIELD_LABEL_IDENTIFIER_DESCRIPTION"
+                      [viewOnly]="isView"
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
+
+                  </div>
+
+                  <!-- Age - Dob -->
+                  <div
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.AGE_DATE_OF_BIRTH"
+                    fxLayout="row" fxLayout.xs="column" fxLayoutGap="1.6rem">
+
+                    <!-- Age / Dob option -->
+                    <div
+                      *ngIf="!isView"
+                      fxFlex="calc(50% - 0.8rem)" fxFlex.xs="calc(100% - 0.8rem)">
+                      <app-form-toggle-v2
+                        [(ngModel)]="input.ageChecked"
+                        [name]="FormHelperService.IGNORE_FIELD_PREFIX + (parentName ? parentName + '[ageDob]' : 'ageDob')"
+                        [options]="ageDOBOptions"
+                        (ngModelChange)="markArrayItemsAsDirty(tab.form, parentName ? parentName + '[' + input.name.age + ']' : input.name.age); markArrayItemsAsDirty(tab.form, parentName ? parentName + '[' + input.name.dob + ']' : input.name.dob)"></app-form-toggle-v2>
+                    </div>
+
+                    <!-- Age -->
+                    <div
+                      *ngIf="input.ageChecked; else dob"
+                      fxFlex="calc(50% - 0.8rem)" fxFlex.xs="calc(100% - 0.8rem)" fxLayout="row" fxLayoutGap="1.6rem">
+
+                      <!-- Years -->
+                      <app-form-number-v2
+                        *ngIf="input.ageTypeYears; else months"
+                        fxFlex="calc(50% - 0.8rem)"
+                        [ngModel]="input.value.age.years.get()"
+                        [name]="parentName ? parentName + '[' + input.name.age + '][years]' : (input.name.age + '[years]')"
+                        [placeholder]="isView && input.ageChecked ? ('LNG_ENTITY_FIELD_LABEL_AGE' | translate) + ' - ' + ('LNG_AGE_FIELD_LABEL_YEARS' | translate) : 'LNG_AGE_FIELD_LABEL_YEARS'"
+                        [tooltip]="input.description?.age"
+                        [viewOnly]="isView || !input.value.age.years.set"
+                        app-min-max-validator
+                        [minNumber]="0"
+                        [min]="0"
+                        [maxNumber]="Constants.DEFAULT_AGE_MAX_YEARS"
+                        [max]="Constants.DEFAULT_AGE_MAX_YEARS"
+                        (ngModelChange)="input.value.age.years.set($event); ageNgModelDob.control.markAsDirty();"></app-form-number-v2>
+
+                      <!-- Months -->
+                      <ng-template
+                        #months>
+                        <app-form-number-v2
+                          fxFlex="calc(50% - 0.8rem)" fxFlex.xs="calc(100% - 0.8rem)"
+                          [ngModel]="input.value.age.months.get()"
+                          [name]="parentName ? parentName + '[' + input.name.age + '][months]' : (input.name.age + '[months]')"
+                          [placeholder]="isView && input.ageChecked ? ('LNG_ENTITY_FIELD_LABEL_AGE' | translate) + ' - ' + ('LNG_AGE_FIELD_LABEL_MONTHS' | translate) : 'LNG_AGE_FIELD_LABEL_MONTHS'"
+                          [tooltip]="input.description?.age"
+                          [viewOnly]="isView || !input.value.age.months.set"
+                          app-min-max-validator
+                          [minNumber]="0"
+                          [min]="0"
+                          [maxNumber]="11"
+                          [max]="11"
+                          (ngModelChange)="input.value.age.months.set($event); ageNgModelDob.control.markAsDirty();"></app-form-number-v2>
+                      </ng-template>
+
+                      <!-- Type -->
+                      <app-form-select-single-v2
+                        *ngIf="!isView"
+                        fxFlex="calc(50% - 0.8rem)"
+                        [(ngModel)]="input.ageTypeYears"
+                        [name]="FormHelperService.IGNORE_FIELD_PREFIX + (parentName ? parentName + '[ageDobType]' : 'ageDobType')"
+                        placeholder="LNG_AGE_FIELD_LABEL_TYPE"
+                        [options]="ageTypeOptions"
+                        (ngModelChange)="input.ageTypeYears ? input.value.age.months.set(0) : input.value.age.years.set(0)"></app-form-select-single-v2>
+
+                      <!-- Keep dob information -->
+                      <input
+                        #ageNgModelDob="ngModel"
+                        type="hidden"
+                        [ngModel]="input.value.dob.get()"
+                        [name]="parentName ? parentName + '[' + input.name.dob + ']' : input.name.dob" />
+
+                    </div>
+
+                    <!-- Dob -->
+                    <ng-template
+                      #dob>
+
+                      <!-- Date -->
+                      <app-form-date-v2
+                        fxFlex="calc(50% - 0.8rem)" fxFlex.xs="calc(100% - 0.8rem)"
+                        [ngModel]="input.value.dob.get()"
+                        [name]="parentName ? parentName + '[' + input.name.dob + ']' : input.name.dob"
+                        placeholder="LNG_ENTITY_FIELD_LABEL_DOB"
+                        [tooltip]="input.description?.dob"
+                        [viewOnly]="isView || !input.value.dob.set"
+                        (ngModelChange)="input.value.dob.set($event); ageNgModelYears.control.markAsDirty(); ageNgModelMonths.control.markAsDirty();"></app-form-date-v2>
+
+                      <!-- Keep age information -->
+                      <input
+                        #ageNgModelYears="ngModel"
+                        type="hidden"
+                        [ngModel]="input.value.age.years.get()"
+                        [name]="parentName ? parentName + '[' + input.name.age + '][years]' : (input.name.age + '[years]')" />
+                      <input
+                        #ageNgModelMonths="ngModel"
+                        type="hidden"
+                        [ngModel]="input.value.age.months.get()"
+                        [name]="parentName ? parentName + '[' + input.name.age + '][months]' : (input.name.age + '[months]')" />
+                    </ng-template>
+                  </div>
+
+                  <!-- Date -->
+                  <app-form-date-v2
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.DATE"
+                    fxFlex
+                    [ngModel]="input.value.get(parentItemIndex)"
+                    [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
+                    [placeholder]="input.placeholder()"
+                    [tooltip]="input.description ? input.description() : undefined"
+                    [viewOnly]="isView || !input.value.set"
+                    [disabled]="!isView && input.disabled ? input.disabled(input) : undefined"
+                    autocomplete="off"
+                    [suffixIconButtons]="input.suffixIconButtons"
+                    [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
+                    [minDate]="input.minDate"
+                    [maxDate]="input.maxDate"
+                    app-date-validator
+                    [dateSameOrBefore]="!isView && input.validators?.dateSameOrBefore ? input.validators?.dateSameOrBefore() : undefined"
+                    [dateSameOrAfter]="!isView && input.validators?.dateSameOrAfter ? input.validators?.dateSameOrAfter() : undefined"
+                    (ngModelChange)="input.value.set($event, parentItemIndex)"></app-form-date-v2>
+
+                  <!-- Document -->
+                  <div
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.DOCUMENT"
+                    fxFlex fxLayout="row wrap" fxLayout.lt-md="column" fxLayoutGap="1.6rem" fxLayoutGap.lt-md="0"
+                    [ngModelGroup]="parentName ? parentName + '[' + parentItemIndex + ']' : input.name">
+
+                    <!-- Type -->
+                    <app-form-select-single-v2
+                      fxFlex
+                      [(ngModel)]="input.value.get(parentItemIndex).type"
+                      name="type"
+                      placeholder="LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE"
+                      tooltip="LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE_DESCRIPTION"
+                      [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly"
+                      [options]="input.typeOptions"
+                      required="true"
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-select-single-v2>
+
+                    <!-- Date -->
+                    <app-form-input-v2
+                      fxFlex
+                      [(ngModel)]="input.value.get(parentItemIndex).number"
+                      name="number"
+                      placeholder="LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER"
+                      tooltip="LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER_DESCRIPTION"
+                      [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly"
+                      required="true"
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
+
+                  </div>
+
+                  <!-- Address -->
+                  <div
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.ADDRESS"
+                    fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem"
+                    class="gd-create-view-modify-bottom-section-content-input-list-multiple-rows"
+                    [ngModelGroup]="parentName ? parentName + '[' + parentItemIndex + ']' : input.name">
+
+                    <!-- Type -->
+                    <app-form-select-single-v2
+                      [(ngModel)]="input.value.get(parentItemIndex).typeId"
+                      name="typeId"
+                      placeholder="LNG_ADDRESS_FIELD_LABEL_TYPE"
+                      tooltip="LNG_ADDRESS_FIELD_LABEL_TYPE_DESCRIPTION"
+                      [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly || input.readonly"
+                      [options]="input.typeOptions"
+                      [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-select-single-v2>
+
+                    <!-- Date -->
+                    <app-form-date-v2
+                      [(ngModel)]="input.value.get(parentItemIndex).date"
+                      name="date"
+                      placeholder="LNG_ADDRESS_FIELD_LABEL_DATE"
+                      tooltip="LNG_ADDRESS_FIELD_LABEL_DATE_DESCRIPTION"
+                      [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly || input.readonly"
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-date-v2>
+
+                    <!-- Email address -->
+                    <app-form-input-v2
+                      [(ngModel)]="input.value.get(parentItemIndex).emailAddress"
+                      name="emailAddress"
+                      placeholder="LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS"
+                      tooltip="LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS_DESCRIPTION"
+                      [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly || input.readonly"
+                      app-email-validator
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
+
+                    <!-- Phone number -->
+                    <app-form-input-v2
+                      [(ngModel)]="input.value.get(parentItemIndex).phoneNumber"
+                      name="phoneNumber"
+                      placeholder="LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER"
+                      tooltip="LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER_DESCRIPTION"
+                      [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly || input.readonly"
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
+
+                    <!-- Location -->
+                    <app-form-select-location-single-v2
+                      [(ngModel)]="input.value.get(parentItemIndex).locationId"
+                      name="locationId"
+                      placeholder="LNG_ADDRESS_FIELD_LABEL_LOCATION"
+                      [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly || input.readonly"
+                      useOutbreakLocations="true"
+                      clearable="true"
+                      [required]="!isView && input.validators?.required ? input.validators?.required() : undefined"
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"
+                      (selectedLocationChanged)="addressLocationChanged(input.value.get(parentItemIndex), $event)"></app-form-select-location-single-v2>
+
+                    <!-- City -->
+                    <app-form-input-v2
+                      [(ngModel)]="input.value.get(parentItemIndex).city"
+                      name="city"
+                      placeholder="LNG_ADDRESS_FIELD_LABEL_CITY"
+                      tooltip="LNG_ADDRESS_FIELD_LABEL_CITY_DESCRIPTION"
+                      [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly || input.readonly"
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
+
+                    <!-- Postal code -->
+                    <app-form-input-v2
+                      [(ngModel)]="input.value.get(parentItemIndex).postalCode"
+                      name="postalCode"
+                      placeholder="LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE"
+                      tooltip="LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE_DESCRIPTION"
+                      [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly || input.readonly"
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
+
+                    <!-- Address line 1 -->
+                    <app-form-input-v2
+                      [(ngModel)]="input.value.get(parentItemIndex).addressLine1"
+                      name="addressLine1"
+                      placeholder="LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1"
+                      tooltip="LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1_DESCRIPTION"
+                      [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly || input.readonly"
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-input-v2>
+
+                    <!-- Lat & Lng -->
+                    <div
+                      fxLayout="row wrap" fxLayout.xs="column" fxLayoutGap="1.6rem" fxLayoutGap.xs="0"
+                      ngModelGroup="geoLocation"
+                      class="gd-create-view-modify-bottom-section-content-input-coordinates">
+
+                      <!-- Lat -->
+                      <app-form-number-v2
+                        fxFlex="calc(50% - 0.8rem)" fxFlex.xs="100%"
+                        [(ngModel)]="input.value.get(parentItemIndex).geoLocation.lat"
+                        name="lat"
+                        placeholder="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT"
+                        tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT_DESCRIPTION"
+                        [viewOnly]="isView"
+                        [disabled]="parentInput?.readonly || input.readonly"
+                        [required]="!isView && input.value.get(parentItemIndex).geoLocation.lng"
+                        app-min-max-validator
+                        [min]="-90"
+                        [minNumber]="-90"
+                        [max]="90"
+                        [maxNumber]="90"
+                        (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-number-v2>
+
+                      <!-- Lng -->
+                      <app-form-number-v2
+                        fxFlex="calc(50% - 0.8rem)" fxFlex.xs="100%"
+                        [(ngModel)]="input.value.get(parentItemIndex).geoLocation.lng"
+                        name="lng"
+                        placeholder="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG"
+                        tooltip="LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG_DESCRIPTION"
+                        [viewOnly]="isView"
+                        [disabled]="parentInput?.readonly || input.readonly"
+                        [required]="!isView && input.value.get(parentItemIndex).geoLocation.lat"
+                        app-min-max-validator
+                        [min]="-180"
+                        [minNumber]="-180"
+                        [max]="180"
+                        [maxNumber]="180"
+                        (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-number-v2>
+
+                    </div>
+
+                    <!-- Geo location accurate -->
+                    <app-form-toggle-checkbox-v2
+                      [(ngModel)]="input.value.get(parentItemIndex).geoLocationAccurate"
+                      name="geoLocationAccurate"
+                      placeholder="LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES"
+                      [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly || input.readonly"
+                      (ngModelChange)="parentName ? markArrayItemsAsDirty(form, parentName) : undefined"></app-form-toggle-checkbox-v2>
+
+                  </div>
+
+                  <!-- Vaccine -->
+                  <div
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.VACCINE"
+                    fxFlex fxLayout="row wrap" fxLayout.lt-md="column" fxLayoutGap="1.6rem" fxLayoutGap.lt-md="0"
+                    [ngModelGroup]="parentName ? parentName + '[' + parentItemIndex + ']' : input.name">
+
+                    <!-- Vaccine -->
+                    <app-form-select-single-v2
+                      fxFlex
+                      [(ngModel)]="input.value.get(parentItemIndex).vaccine"
+                      name="vaccine"
+                      placeholder="LNG_ENTITY_FIELD_LABEL_VACCINE"
+                      [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly"
+                      [options]="input.vaccineOptions"
+                      required="true"></app-form-select-single-v2>
+
+                    <!-- Date -->
+                    <app-form-date-v2
+                      fxFlex
+                      [(ngModel)]="input.value.get(parentItemIndex).date"
+                      name="date"
+                      placeholder="LNG_ENTITY_FIELD_LABEL_VACCINE_DATE"
+                      [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly"></app-form-date-v2>
+
+                    <!-- Vaccine status -->
+                    <app-form-select-single-v2
+                      fxFlex
+                      [(ngModel)]="input.value.get(parentItemIndex).status"
+                      name="status"
+                      placeholder="LNG_ENTITY_FIELD_LABEL_VACCINE_STATUS"
+                      [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly"
+                      [options]="input.vaccineStatusOptions"
+                      required="true"></app-form-select-single-v2>
+
+                  </div>
+
+                  <!-- Center date range -->
+                  <div
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.CENTER_DATE_RANGE"
+                    fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem"
+                    class="gd-create-view-modify-bottom-section-content-input-list-multiple-rows"
+                    [ngModelGroup]="parentName ? parentName + '[' + parentItemIndex + ']' : input.name">
+
+                    <!-- Type -->
+                    <app-form-select-single-v2
+                      [(ngModel)]="input.value.get(parentItemIndex).typeId"
+                      name="typeId"
+                      placeholder="LNG_CASE_FIELD_LABEL_DATE_RANGE_TYPE_ID"
+                      [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly"
+                      [options]="input.typeOptions"
+                      required="true"></app-form-select-single-v2>
+
+                    <!-- From & To -->
+                    <div
+                      fxLayout="row wrap" fxLayout.xs="column" fxLayoutGap="1.6rem" fxLayoutGap.xs="0">
+
+                      <!-- Date range - start -->
+                      <app-form-date-v2
+                        fxFlex="calc(50% - 0.8rem)" fxFlex.xs="100%"
+                        [(ngModel)]="input.value.get(parentItemIndex).startDate"
+                        name="startDate"
+                        placeholder="LNG_FORM_RANGE_FIELD_LABEL_FROM"
+                        [viewOnly]="isView"
+                        [disabled]="parentInput?.readonly"
+                        app-date-validator
+                        dateSameOrBefore="endDate"
+                        [dateSameOrAfter]="input.startDateValidators?.dateSameOrAfter ? input.startDateValidators?.dateSameOrAfter() : undefined"></app-form-date-v2>
+
+                      <!-- Date range - end -->
+                      <app-form-date-v2
+                        fxFlex="calc(50% - 0.8rem)" fxFlex.xs="100%"
+                        [(ngModel)]="input.value.get(parentItemIndex).endDate"
+                        name="endDate"
+                        placeholder="LNG_FORM_RANGE_FIELD_LABEL_TO"
+                        [viewOnly]="isView"
+                        [disabled]="parentInput?.readonly"
+                        app-date-validator
+                        dateSameOrAfter="startDate"></app-form-date-v2>
+
+                    </div>
+
+                    <!-- Center name -->
+                    <app-form-select-single-v2
+                      [(ngModel)]="input.value.get(parentItemIndex).centerName"
+                      name="centerName"
+                      placeholder="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME"
+                      [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly"
+                      [options]="input.centerOptions"></app-form-select-single-v2>
+
+                    <!-- Location -->
+                    <app-form-select-location-single-v2
+                      [(ngModel)]="input.value.get(parentItemIndex).locationId"
+                      name="locationId"
+                      placeholder="LNG_CASE_FIELD_LABEL_CENTER_DATES_LOCATION"
+                      [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly"
+                      useOutbreakLocations="true"
+                      clearable="true"></app-form-select-location-single-v2>
+
+                    <!-- Comments -->
+                    <app-form-textarea-v2
+                      [(ngModel)]="input.value.get(parentItemIndex).comments"
+                      name="comments"
+                      placeholder="LNG_CASE_FIELD_LABEL_CENTER_DATES_COMMENTS"
+                      [viewOnly]="isView"
+                      [disabled]="parentInput?.readonly"></app-form-textarea-v2>
+
+                  </div>
+
+                  <!-- Map server -->
+                  <div
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.MAP_SERVER"
+                    fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem"
+                    class="gd-create-view-modify-bottom-section-content-input-list-multiple-rows"
+                    [ngModelGroup]="parentName ? parentName + '[' + parentItemIndex + ']' : input.name">
+
+                    <!-- Name -->
+                    <app-form-input-v2
+                      [(ngModel)]="input.value.get(parentItemIndex).name"
+                      name="name"
+                      placeholder="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_NAME"
+                      tooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_NAME_DESCRIPTION"
+                      [viewOnly]="isView"
+                      required="true"></app-form-input-v2>
+
+                    <!-- Vector type -->
+                    <app-form-select-single-v2
+                      [(ngModel)]="input.value.get(parentItemIndex).type"
+                      name="type"
+                      placeholder="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_TYPE"
+                      tooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_TYPE_DESCRIPTION"
+                      [viewOnly]="isView"
+                      [options]="input.vectorTypeOptions"></app-form-select-single-v2>
+
+                    <!-- Url -->
+                    <app-form-input-v2
+                      [(ngModel)]="input.value.get(parentItemIndex).url"
+                      name="url"
+                      placeholder="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_URL"
+                      tooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_URL_DESCRIPTION"
+                      class="gd-create-view-modify-bottom-section-content-input-url"
+                      [viewOnly]="isView"
+                      required="true"></app-form-input-v2>
+
+                    <!-- Show only if specific type -->
+                    <ng-container
+                      *ngIf="input.value.get(parentItemIndex).type === Constants.OUTBREAK_MAP_SERVER_TYPES.VECTOR_TILE_VECTOR_TILE_LAYER.value">
+
+                      <!-- Style Url -->
+                      <app-form-input-v2
+                        [(ngModel)]="input.value.get(parentItemIndex).styleUrl"
+                        name="styleUrl"
+                        placeholder="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_STYLE"
+                        tooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_STYLE_DESCRIPTION"
+                        class="gd-create-view-modify-bottom-section-content-input-url"
+                        [viewOnly]="isView"
+                        app-general-async-validator
+                        [asyncValidatorObservable]="input.styleAsyncValidator(input, parentItemIndex)"></app-form-input-v2>
+
+                      <!-- Style source -->
+                      <app-form-select-single-v2
+                        [(ngModel)]="input.value.get(parentItemIndex).styleUrlSource"
+                        name="styleUrlSource"
+                        placeholder="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_STYLE_SOURCE"
+                        tooltip="LNG_OUTBREAK_FIELD_LABEL_MAP_SERVER_STYLE_SOURCE_DESCRIPTION"
+                        [viewOnly]="isView"
+                        [options]="input.styleSourceOptions[input.value.get(parentItemIndex).styleUrl]"
+                        [required]="!!input.value.get(parentItemIndex).styleUrl"></app-form-select-single-v2>
+
+                    </ng-container>
+
+                  </div>
+
+                  <!-- Label -->
+                  <div
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.LABEL"
+                    fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem"
+                    class="gd-create-view-modify-bottom-section-content-input-label">
+                    {{input.value.get() | translate}}
+                  </div>
+
+                  <!-- Link List -->
+                  <div
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.LINK_LIST"
+                    fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem"
+                    class="gd-create-view-modify-bottom-section-content-input-link-list">
+
+                    <!-- Label -->
+                    <div
+                      class="gd-create-view-modify-bottom-section-content-input-link-list-label">
+                      <strong>
+                        {{input.label.get() | translate}}
+                      </strong>
+                    </div>
+
+                    <!-- Links -->
+                    <div
+                      class="gd-create-view-modify-bottom-section-content-input-link-list-links">
+                      <ng-container
+                        *ngFor="let link of input.links; let linkIndex = index;">
+
+                        <!-- Separator -->
+                        <span
+                          *ngIf="linkIndex > 0"
+                          class="gd-create-view-modify-bottom-section-content-input-link-list-links-separator">, </span>
+
+                        <!-- Link -->
+                        <a
+                          class="gd-create-view-modify-bottom-section-content-input-link-list-links-link"
+                          [routerLink]="link.action.link()"
+                          [queryParams]="link.action.queryParams ? link.action.queryParams() : undefined">{{link.label | translate}}</a>
+
+                      </ng-container>
+                    </div>
+                  </div>
+
+                  <!-- Label List -->
+                  <div
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.LABEL_LIST"
+                    fxFlex fxLayout="row wrap" fxLayoutGap="1.6rem"
+                    class="gd-create-view-modify-bottom-section-content-input-label-list">
+
+                    <!-- Label -->
+                    <div
+                      class="gd-create-view-modify-bottom-section-content-input-label-list-label">
+                      <strong>
+                        {{input.label.get() | translate}}
+                      </strong>
+                    </div>
+
+                    <!-- Labels -->
+                    <div
+                      class="gd-create-view-modify-bottom-section-content-input-label-list-labels">
+                      <ng-container
+                        *ngFor="let label of input.labels; let labelIndex = index;">
+
+                        <!-- Separator -->
+                        <span
+                          *ngIf="labelIndex > 0"
+                          class="gd-create-view-modify-bottom-section-content-input-label-list-labels-separator">, </span>
+
+                        <!-- Label -->
+                        <span
+                          class="gd-create-view-modify-bottom-section-content-input-label-list-labels-label">{{label | translate}}</span>
+
+                      </ng-container>
+                    </div>
+                  </div>
+
+                  <!-- List -->
+                  <div
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.LIST">
+
+                    <!-- Handle empty lists -->
+                    <input
+                      type="hidden"
+                      [ngModel]="input.items"
+                      [name]="input.name" />
+
+                    <!-- List Items -->
+                    <div
+                      class="gd-create-view-modify-bottom-section-content-input-list gd-create-view-modify-bottom-section-content-input-list-{{input.name}}"
+                      cdkDropList [cdkDropListData]="input.items" (cdkDropListDropped)="dropItem($event, input, tab.form)">
+
+                      <!-- Display items -->
+                      <ng-container
+                        *ngIf="(!isView && input.definition.add) || input.items?.length > 0; else emptyList">
+                        <div
+                          *ngFor="let item of input.items; let itemIndex = index; trackBy: trackByIndex"
+                          class="gd-create-view-modify-bottom-section-content-input-list-item"
+                          cdkDrag cdkDragLockAxis="y" [cdkDragData]="item" [cdkDragDisabled]="!input.sortable || isView" cdkDragBoundary=".gd-create-view-modify-bottom-section-content-input-list-{{input.name}}" (cdkDragStarted)="dragStarted()" cdkDragPreviewContainer="parent">
+
+                          <!-- Custom drag&drop placeholder -->
+                          <div class="gd-drag-custom-placeholder" *cdkDragPlaceholder></div>
+
+                          <!-- Sort & Remove buttons -->
+                          <div
+                            *ngIf="!isView"
+                            fxLayoutAlign="end"
+                            class="gd-create-view-modify-bottom-section-content-input-list-item-buttons">
+
+                            <!-- Extra action buttons -->
+                            <ng-container
+                              *ngFor="let action of input.actionIconButtons">
+                              <button
+                                *ngIf="!action.visible || action.visible(input, itemIndex)"
+                                type="button"
+                                mat-icon-button
+                                [matTooltip]="action.tooltip | translate"
+                                (click)="action.click(input, itemIndex)">
+                                <mat-icon>{{action.icon}}</mat-icon>
+                              </button>
+                            </ng-container>
+
+                            <!-- Sort -->
+                            <button
+                              *ngIf="input.sortable"
+                              cdkDragHandle
+                              type="button"
+                              mat-icon-button
+                              [matTooltip]="'LNG_COMMON_BUTTON_DRAG' | translate"
+                              (mousedown)="notInvalidDragZone()"
+                              (touchstart)="notInvalidDragZone()">
+                              <mat-icon>drag_indicator</mat-icon>
+                            </button>
+
+                            <!-- Remove -->
+                            <button
+                              type="button"
+                              mat-icon-button
+                              color="warn"
+                              [matTooltip]="input.definition.remove.label | translate"
+                              (click)="removeListItem(input, itemIndex, form);">
+                              <mat-icon>delete</mat-icon>
+                            </button>
+                          </div>
+
+                          <!-- Inputs -->
+                          <div
+                            fxLayout="row wrap" fxLayoutGap="1.6rem"
+                            class="gd-create-view-modify-bottom-section-content-input-list-item-content">
+                            <ng-container
+                              *ngTemplateOutlet="inputRender; context: { input: input.definition.input, parentName: input.name, parentItemIndex: itemIndex, parentInput: input }"></ng-container>
+                          </div>
+
+                        </div>
+                      </ng-container>
+
+                      <!-- Empty list -->
+                      <ng-template
+                        #emptyList>
+                        <div
+                          class="gd-create-view-modify-bottom-section-content-input-list-empty">
+                          <mat-icon>sentiment_very_dissatisfied</mat-icon>
+                          {{'LNG_COMMON_LABEL_EMPTY_TABLE' | translate}}
+                        </div>
+                      </ng-template>
+                    </div>
+
+                    <!-- Add -->
+                    <div
+                      *ngIf="!isView && input.definition.add">
+                      <button
+                        type="button"
+                        mat-flat-button
+                        color="text"
+                        (click)="addListItem(input, form)">
+
+                        <!-- + Icon -->
+                        <mat-icon>add</mat-icon>
+
+                        <!-- Label -->
+                        <span>
+                          {{input.definition.add.label | translate}}
+                        </span>
+                      </button>
+                    </div>
+
+                  </div>
+
+                </div>
+
+                <!-- Input replaced with html -->
+                <ng-template
+                  #replaceHtml>
+                  <div
+                    class="gd-create-view-modify-bottom-section-content-input-replaced"
+                    [innerHTML]="input.replace.html | safeHtml"></div>
+                </ng-template>
+              </ng-template>
+
+
+
+              <!-- Render Section -->
+              <ng-container
+                *ngSwitchCase="CreateViewModifyV2TabInputType.TAB">
+                <div
+                  *ngFor="let section of tab.sections"
+                  class="gd-create-view-modify-bottom-section">
+                  <ng-container
+                    *ngIf="!section.visible || section.visible()">
+                    <!-- Section title -->
+                    <div
+                      class="gd-create-view-modify-bottom-section-title">
+                      {{section.label | translate}}
+                    </div>
+
+                    <!-- Section content -->
+                    <div
+                      class="gd-create-view-modify-bottom-section-content"
+                      fxLayout="row wrap" fxLayoutGap="1.6rem">
+
+                      <!-- Input render -->
+                      <ng-container
+                        *ngFor="let input of section.inputs">
+                        <ng-container
+                          *ngIf="!input.visible || input.visible()">
+                          <ng-container
+                            *ngTemplateOutlet="inputRender; context: { input, parentName: '', parentItemIndex: undefined, parentInput: undefined }"></ng-container>
+                        </ng-container>
+                      </ng-container>
+
+                    </div>
+                  </ng-container>
+                </div>
+              </ng-container>
+
+              <!-- Render tab table -->
+              <ng-container
+                *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE">
+                <ng-container
+                  *ngTemplateOutlet="inputRender; context: { input: tab.definition, parentName: '', parentItemIndex: undefined, parentInput: undefined }"></ng-container>
+              </ng-container>
+
+            </form>
+          </ng-template>
+
+
+
+          <!-- Table render -->
+          <ng-template
+            #tableRender
+            let-tab="tab">
+            <ng-container
+              [ngSwitch]="tab.definition.type">
+
+              <!-- Records list -->
+              <ng-container
+                *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST">
+                <app-list-table-v2
+                  *ngIf="visitedTabs[tab.label]"
+                  #listTable
+                  [records$]="tab.definition.records$"
+                  [columnActions]="tab.definition.tableColumnActions"
+                  [columns]="tab.definition.tableColumns"
+                  [pageCount]="tab.definition.pageCount"
+                  [pageSize]="tab.definition.queryBuilder.paginator.limit"
+                  [pageIndex]="tab.definition.pageIndex"
+                  [pageSettingsKey]="tab.definition.pageSettingsKey"
+                  [filtersApplied]="!tab.definition.queryBuilder.isEmptyOnlyFilters()"
+                  [advancedFilterType]="tab.definition.advancedFilterType"
+                  [advancedFilters]="tab.definition.advancedFilters"
+                  (refreshData)="refreshTabList(tab, true)"
+                  (refreshDataCount)="tab.definition.refreshCount(tab, false)"
+                  (pageChange)="tabListPageChange(tab, $event)"
+                  (sortBy)="tabListSortBy(listTable, tab, $event)"
+                  (filterBy)="tabListFilterBy(tab, $event)"
+                  (resetHeaderFilters)="tabListResetHeaderFilters(listTable, tab)"
+                  (advancedFilterBy)="tabListFilterByAdvanced(listTable, tab, $event)">
+                </app-list-table-v2>
+              </ng-container>
+
+              <!-- Edit questionnaire -->
+              <ng-template
+                *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE"
+                [ngTemplateOutlet]="formRender"
+                [ngTemplateOutletContext]="{ tab }"></ng-template>
+
+              <!-- Fill questionnaire -->
+              <ng-template
+                *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE"
+                [ngTemplateOutlet]="formRender"
+                [ngTemplateOutletContext]="{ tab }"></ng-template>
+
+            </ng-container>
+          </ng-template>
+
+          <!-- Order tabs -->
+          <button
+            *ngIf="enableTabReorder && !!tabData?.tabs?.length"
+            class="gd-order-tabs-button"
+            type="button"
+            mat-icon-button
+            color="primary"
+            (click)="configureTabs()">
+            <mat-icon>tune</mat-icon>
+          </button>
+
+          <!-- Render tabs - Create layout -->
+          <mat-horizontal-stepper
+            *ngIf="isCreate; else viewModify"
+            linear>
+            <ng-container
+              *ngFor="let tab of tabData.tabs; let tabIndex = index">
+              <mat-step
+                *ngIf="!tab.visible || tab.visible()"
+                [stepControl]="tab.form">
+
+                <!-- Tab Label -->
+                <div
+                  *matStepLabel>
+                  <!-- Label -->
+                  <span>{{tab.label | translate}}</span>
+
+                  <!-- Invalid -->
+                  <ng-container
+                    *ngIf="tab.form?.touched && tab.form?.invalid">
+                    <popper-content
+                      #popperContent>
+                      <div
+                        [innerHtml]="('LNG_COMMON_LABEL_INVALID_TAB' | translate) + (!tab.invalidHTMLSuffix ? '' : tab.invalidHTMLSuffix(tab)) | safeHtml">
+                      </div>
+                    </popper-content>
+                    <mat-icon
+                      tabindex="-1"
+                      [popper]="popperContent"
+                      popperTrigger="hover"
+                      popperApplyClass="gd-form-input-v2-tooltip"
+                      popperPreventOverflow="true"
+                      popperPositionFixed="true"
+                      popperAppendTo="body"
+                      color="warn"
+                      (click)="$event.stopPropagation()">warning</mat-icon>
+                  </ng-container>
+                </div>
+
+                <!-- Content -->
+                <div
+                  class="gd-create-view-modify-bottom-content"
+                  [class.gd-create-view-modify-bottom-content-edit-questionnaire]="tab.type === CreateViewModifyV2TabInputType.TAB_TABLE && tab.definition.type === CreateViewModifyV2TabInputType.TAB_TABLE_EDIT_QUESTIONNAIRE"
+                  [class.gd-create-view-modify-bottom-content-fill-questionnaire]="tab.type === CreateViewModifyV2TabInputType.TAB_TABLE && tab.definition.type === CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE"
+                  [ngSwitch]="tab.type">
+
+                  <!-- Tab -->
+                  <ng-template
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.TAB"
+                    [ngTemplateOutlet]="formRender"
+                    [ngTemplateOutletContext]="{ tab }"></ng-template>
+
+                  <!-- Tab table -->
+                  <ng-template
+                    *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE"
+                    [ngTemplateOutlet]="tableRender"
+                    [ngTemplateOutletContext]="{ tab }"></ng-template>
+                </div>
+
+                <!-- Bottom -->
+                <div
+                  class="gd-create-view-modify-bottom-bottom"
+                  fxLayoutAlign="space-between">
+                  <!-- Left -->
+                  <div
+                    fxFlex>
+                    <!-- Cancel -->
+                    <a
+                      *ngIf="!tabData.buttons.createCancel.visible || tabData.buttons.createCancel.visible()"
+                      type="button"
+                      mat-flat-button color="text"
+                      [routerLink]="tabData.buttons.createCancel.link.link()"
+                      [queryParams]="tabData.buttons.createCancel.link.queryParams ? tabData.buttons.createCancel.link.queryParams() : undefined">
+                      {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
+                    </a>
+                  </div>
+
+                  <!-- Right -->
+                  <div
+                    fxFlex fxLayoutAlign="end" fxLayoutGap="0.8rem">
+                    <!-- Previous -->
+                    <button
+                      *ngIf="tabIndex > 0"
+                      mat-flat-button color="secondary"
+                      type="button"
+                      matStepperPrevious>
+                      <!-- Label -->
+                      <span>
+                        {{'LNG_STEPPER_BUTTON_BACK' | translate}}
+                      </span>
+                    </button>
+
+                    <!-- Next -->
+                    <button
+                      mat-flat-button color="primary"
+                      type="button"
+                      matStepperNext
+                      (click)="tab.form ? tab.form.ngSubmit.emit() : undefined">
+
+                      <!-- Pending validators -->
+                      <mat-progress-spinner
+                        *ngIf="tab.form?.pending"
+                        diameter="16"
+                        mode="indeterminate"
+                        color="primary">
+                      </mat-progress-spinner>
+
+                      <!-- Label -->
+                      <span>
+                        {{'LNG_STEPPER_BUTTON_NEXT' | translate}}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+
+              </mat-step>
+            </ng-container>
+
+            <!-- Final step -->
+            <mat-step>
+
+              <!-- Tab Label -->
+              <div
+                *matStepLabel>
+                {{'LNG_STEPPER_FINAL_STEP_LABEL' | translate}}
+              </div>
+
+              <!-- Content -->
+              <div
+                class="gd-create-view-modify-bottom-content-final-step">
+
+                <!-- Message -->
+                <div
+                  [innerHTML]="tabData.create.finalStep.message() | safeHtml"></div>
+
+                <!-- General details -->
+                <div
+                  [innerHTML]="'LNG_STEPPER_FINAL_STEP_TEXT' | translate:tabData.create.finalStep | safeHtml"></div>
+
+              </div>
+
+              <!-- Bottom -->
+              <div
+                class="gd-create-view-modify-bottom-bottom"
+                fxLayoutAlign="space-between">
+                <!-- Left -->
+                <div
+                  fxFlex>
+                  <!-- Cancel -->
+                  <a
+                    *ngIf="!tabData.buttons.createCancel.visible || tabData.buttons.createCancel.visible()"
+                    type="button"
+                    mat-flat-button color="text"
+                    [routerLink]="tabData.buttons.createCancel.link.link()"
+                    [queryParams]="tabData.buttons.createCancel.link.queryParams ? tabData.buttons.createCancel.link.queryParams() : undefined">
+                    {{'LNG_COMMON_BUTTON_CANCEL' | translate}}
+                  </a>
+                </div>
+
+                <!-- Right -->
+                <div
+                  fxFlex fxLayoutAlign="end" fxLayoutGap="0.8rem">
+                  <!-- Previous -->
+                  <button
+                    mat-flat-button color="secondary"
+                    type="button"
+                    matStepperPrevious>
+                    <!-- Label -->
+                    <span>
+                      {{'LNG_STEPPER_BUTTON_BACK' | translate}}
+                    </span>
+                  </button>
+
+                  <!-- Create -->
+                  <button
+                    mat-flat-button color="primary"
+                    type="button"
+                    (click)="create()">
+                    {{tabData.create.finalStep.buttonLabel | translate}}
+                  </button>
+                </div>
+              </div>
+
+            </mat-step>
+          </mat-horizontal-stepper>
+
+          <!-- Render tabs - View / Modify layout -->
+          <ng-template
+            #viewModify>
+            <mat-tab-group
+              (selectedIndexChange)="visitTab($event)">
+              <ng-container
+                *ngFor="let tab of tabData.tabs">
+                <mat-tab
+                  *ngIf="!tab.visible || tab.visible()"
+                  [bodyClass]="tab.type === CreateViewModifyV2TabInputType.TAB_TABLE ? 'gd-create-view-modify-tab-list' : undefined">
+
+                  <!-- Label & valid -->
+                  <ng-template
+                    mat-tab-label>
+
+                    <!-- Label -->
+                    <span>{{tab.label | translate}}</span>
+
+                    <!-- Invalid -->
+                    <ng-container
+                      *ngIf="isModify && tab.form?.invalid">
+                      <popper-content
+                        #popperContent>
+                        <div
+                          [innerHtml]="('LNG_COMMON_LABEL_INVALID_TAB' | translate) + (!tab.invalidHTMLSuffix ? '' : tab.invalidHTMLSuffix(tab)) | safeHtml">
+                        </div>
+                      </popper-content>
+                      <mat-icon
+                        tabindex="-1"
+                        [popper]="popperContent"
+                        popperTrigger="hover"
+                        popperApplyClass="gd-form-input-v2-tooltip"
+                        popperPreventOverflow="true"
+                        popperPositionFixed="true"
+                        popperAppendTo="body"
+                        color="warn"
+                        (click)="$event.stopPropagation()">warning</mat-icon>
+                    </ng-container>
+                  </ng-template>
+
+                  <!-- Content -->
+                  <div
+                    class="gd-create-view-modify-bottom-content"
+                    [ngSwitch]="tab.type">
+
+                    <!-- Tab -->
+                    <ng-template
+                      *ngSwitchCase="CreateViewModifyV2TabInputType.TAB"
+                      [ngTemplateOutlet]="formRender"
+                      [ngTemplateOutletContext]="{ tab }"></ng-template>
+
+                    <!-- Table tab -->
+                    <ng-template
+                      *ngSwitchCase="CreateViewModifyV2TabInputType.TAB_TABLE"
+                      [ngTemplateOutlet]="tableRender"
+                      [ngTemplateOutletContext]="{ tab }"></ng-template>
+                  </div>
+                </mat-tab>
+              </ng-container>
+            </mat-tab-group>
+          </ng-template>
+
+        </div>
+
+      </ng-template>
+    </mat-sidenav-container>
+  </ng-template>
+</div>

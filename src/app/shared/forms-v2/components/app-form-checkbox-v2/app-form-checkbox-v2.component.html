@@ -1,0 +1,37 @@
+<div
+  class="gd-form-checkbox-v2"
+  fxLayout="row" fxLayoutGap="1.6rem">
+
+  <!-- Checkbox -->
+  <mat-checkbox
+    fxFlex
+    [(ngModel)]="value"
+    [disabled]="disabled"
+    (click)="onTouchItem()"
+    (change)="onTouchItem()"
+    color="primary">
+    {{ placeholder | translate }}
+  </mat-checkbox>
+
+  <!-- Tooltip -->
+  <ng-container
+    *ngIf="tooltipButton?.tooltip"
+    matPrefix>
+    <popper-content
+      #popperContent>
+      <div
+        [innerHtml]="tooltipButton.tooltip | safeHtml">
+      </div>
+    </popper-content>
+    <mat-icon
+      tabindex="-1"
+      [popper]="popperContent"
+      popperTrigger="hover"
+      popperApplyClass="gd-form-input-v2-tooltip"
+      popperPreventOverflow="true"
+      popperPositionFixed="true"
+      popperAppendTo="body"
+      (click)="$event.stopPropagation()">{{tooltipButton.icon}}</mat-icon>
+  </ng-container>
+
+</div>

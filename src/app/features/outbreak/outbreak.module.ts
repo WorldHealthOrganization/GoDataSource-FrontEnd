@@ -7,21 +7,14 @@ import { SharedModule } from '../../shared/shared.module';
 import * as fromPages from './pages';
 // services
 
-import * as fromServices from './services';
-
 @NgModule({
-    imports: [
-        routing,
-        SharedModule
+  imports: [
+    routing,
+    SharedModule
 
-    ],
-    declarations: [
-        ...fromPages.pageComponents
-    ],
-    providers: [
-        ...fromServices.services
-    ],
-    entryComponents: []
+  ],
+  declarations: [
+    ...fromPages.pageComponents
+  ]
 })
-export class OutbreakModule {
-}
+export class OutbreakModule {}

@@ -1,0 +1,93 @@
+@import 'mixins';
+@import 'font';
+
+/* Form Radio Toggle */
+.gd-form-toggle-v2 {
+  .mat-button-toggle-group {
+    border: 0.1rem solid var(--gd-secondary);
+    @include border-radius(0.4rem);
+    @include flex(flex);
+    @include flex_align_items(center);
+    @include flex_justify(space-between);
+
+    .mat-button-toggle {
+      color: var(--gd-text);
+      font-family: $gd-font-family;
+      @include transition(all 0.24s ease-in-out 0s);
+      width: 100%;
+
+      + .mat-button-toggle {
+        border-left: 0.1rem solid var(--gd-secondary);
+      }
+
+      &.mat-button-toggle-appearance-standard {
+        background: var(--gd-background);
+        color: var(--gd-text);
+      }
+
+      .mat-button-toggle-button {
+        .mat-button-toggle-label-content {
+          @include flex(flex);
+          @include flex_align_items(center);
+          line-height: 4rem;
+          padding: 0 1.6rem;
+
+          /* Icon */
+          .mat-icon {
+            color: var(--gd-secondary);
+            font-size: 2.4rem;
+            height: 2.4rem;
+            margin-right: 0.8rem;
+            @include transition(all 0.24s ease-in-out 0s);
+            width: 2.4rem;
+          }
+        }
+      }
+
+      .mat-button-toggle-focus-overlay,
+      .mat-ripple {
+        display: none;
+      }
+
+      &.mat-button-toggle-disabled {
+        background: rgba(var(--gd-secondary-rgb), 0.15);
+        border-color: rgba(var(--gd-secondary-rgb), 0.5);
+        color: var(--gd-secondary);
+  
+        .mat-button-toggle-button {
+          .mat-button-toggle-label-content {
+            .mat-icon {
+              color: var(--gd-secondary);
+            }
+          }
+        }
+      }
+
+      &.mat-button-toggle-checked {
+        background-color: var(--gd-primary);
+        color: var(--gd-background);
+
+        .mat-button-toggle-button {
+          .mat-button-toggle-label-content {
+            .mat-icon {
+              color: var(--gd-background);
+            }
+          }
+        }
+
+        &.mat-button-toggle-disabled {
+          background: rgba(var(--gd-primary-rgb), 0.25);
+          color: var(--gd-background);
+    
+          .mat-button-toggle-button {
+            .mat-button-toggle-label-content {
+              .mat-icon {
+                color: var(--gd-background);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,146 +1,282 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
+import { Component, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
+import { takeUntil, tap } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { Constants } from '../../../../core/models/constants';
-import { Router } from '@angular/router';
-import { VisibleColumnModel } from '../../../../shared/components/side-columns/model';
-import { HelpDataService } from '../../../../core/services/data/help.data.service';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { HelpItemModel } from '../../../../core/models/help-item.model';
-import { HelpCategoryModel } from '../../../../core/models/help-category.model';
-import * as _ from 'lodash';
-import { catchError, tap } from 'rxjs/operators';
-import { UserModel } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { HoverRowAction } from '../../../../shared/components';
-import { throwError } from 'rxjs/internal/observable/throwError';
+import { HelpDataService } from '../../../../core/services/data/help.data.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { TranslateService } from '@ngx-translate/core';
+import { V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { ActivatedRoute } from '@angular/router';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { HelpCategoryModel } from '../../../../core/models/help-category.model';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputText, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 
 @Component({
-    selector: 'app-help-search',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './help-search.component.html',
-    styleUrls: ['./help-search.component.less']
+  selector: 'app-help-search',
+  templateUrl: './help-search.component.html'
 })
-export class HelpSearchComponent extends ListComponent implements OnInit, OnDestroy {
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_GLOBAL_HELP_TITLE', '/help', true)
-    ];
+export class HelpSearchComponent extends ListComponent<HelpItemModel> implements OnDestroy {
+  // help items
+  helpItemsList$: Observable<HelpItemModel[]>;
 
-    // authenticated user
-    authUser: UserModel;
+  // search by
+  private _searchedTerm: string = '';
 
-    helpItemsList$: Observable<HelpItemModel[]>;
+  /**
+   * Constructor
+   */
+  constructor(
+    protected listHelperService: ListHelperService,
+    private helpDataService: HelpDataService,
+    private translateService: TranslateService,
+    private activatedRoute: ActivatedRoute,
+    private dialogV2Service: DialogV2Service
+  ) {
+    super(
+      listHelperService,
+      true
+    );
+  }
 
-    helpCategoriesList$: Observable<HelpCategoryModel[]>;
+  /**
+   * Release resources
+   */
+  ngOnDestroy() {
+    // release parent resources
+    super.onDestroy();
+  }
 
-    // provide constants to template
-    Constants = Constants;
-    HelpCategoryModel = HelpCategoryModel;
+  /**
+   * Component initialized
+   */
+  initialized(): void {
+    // initialize pagination
+    // this page doesn't have pagination
 
-    searchedTerm: string = '';
+    // ...and re-load the list when the Selected Outbreak is changed
+    this.needsRefreshList(true);
+  }
 
-    recordActions: HoverRowAction[] = [
-        // View Help Item
-        new HoverRowAction({
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_GLOBAL_HELP_ACTION_VIEW_HELP_ITEM',
-            click: (item: HelpItemModel) => {
-                this.router.navigate(['/help', 'categories', item.categoryId, 'items', item.id, 'view-global']);
-            }
-        })
-    ];
-
-    /**
-     * Constructor
-     */
-    constructor(
-        protected listHelperService: ListHelperService,
-        private router: Router,
-        private authDataService: AuthDataService,
-        private helpDataService: HelpDataService,
-        private snackbarService: SnackbarService
-    ) {
-        super(listHelperService);
-    }
-
-    /**
-     * Component initialized
-     */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
-
-        this.helpCategoriesList$ = this.helpDataService.getHelpCategoryList();
-
-        // ...and re-load the list
-        this.needsRefreshList(true);
-        // initialize Side Table Columns
-        this.initializeSideTableColumns();
-    }
-
-    /**
-     * Release resources
-     */
-    ngOnDestroy() {
-        // release parent resources
-        super.ngOnDestroy();
-    }
-
-    /**
-     * Initialize Side Table Columns
-     */
-    initializeSideTableColumns() {
-        // default table columns
-        this.tableColumns = [
-            new VisibleColumnModel({
-                field: 'title',
-                label: 'LNG_HELP_ITEM_FIELD_LABEL_TITLE'
-            }),
-            new VisibleColumnModel({
-                field: 'categoryId',
-                label: 'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY'
-            })
-        ];
-    }
-
-    /**
-     * Re(load) the items list
-     */
-    refreshList(finishCallback: (records: any[]) => void) {
-        this.queryBuilder.filter.where({approved: true}, true);
-        // retrieve the list of items
-        if (_.isEmpty(this.searchedTerm)) {
-            this.queryBuilder.filter.remove('token');
-            this.helpItemsList$ = this.helpDataService.getHelpItemsList(this.queryBuilder);
-        } else {
-            this.helpItemsList$ = this.helpDataService.getHelpItemsListSearch(this.queryBuilder, this.searchedTerm);
+  /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View Case
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_GLOBAL_HELP_ACTION_VIEW_HELP_ITEM',
+          action: {
+            link: (item: HelpItemModel) => ['/help', 'categories', item.categoryId, 'items', item.id, 'view-global']
+          }
         }
+      ]
+    };
+  }
 
-        this.helpItemsList$ = this.helpItemsList$
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    finishCallback([]);
-                    return throwError(err);
-                }),
-                tap(this.checkEmptyList.bind(this)),
-                tap((data: any[]) => {
-                    finishCallback(data);
+  /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {
+    // default table columns
+    this.tableColumns = [
+      {
+        field: 'title',
+        label: 'LNG_HELP_ITEM_FIELD_LABEL_TITLE',
+        sortable: true
+      },
+      {
+        field: 'categoryId',
+        label: 'LNG_HELP_ITEM_FIELD_LABEL_CATEGORY',
+        format: {
+          type: (item) => item.category?.name ?
+            this.translateService.instant(item.category.name) :
+            ''
+        },
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.helpCategory as IResolverV2ResponseModel<HelpCategoryModel>).options
+        }
+      }
+    ];
+  }
+
+  /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {
+    this.advancedFilters = HelpItemModel.generateAdvancedFilters({
+      options: {
+        helpCategory: (this.activatedRoute.snapshot.data.helpCategory as IResolverV2ResponseModel<HelpCategoryModel>).options
+      }
+    });
+  }
+
+  /**
+   * Initialize table quick actions
+   */
+  protected initializeQuickActions(): void {
+    this.quickActions = {
+      type: V2ActionType.MENU,
+      label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
+      menuOptions: [
+        // Search
+        {
+          label: {
+            get: () => 'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'
+          },
+          action: {
+            click: () => {
+              this.dialogV2Service
+                .showSideDialog({
+                  title: {
+                    get: () => 'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER'
+                  },
+                  hideInputFilter: true,
+                  inputs: [{
+                    type: V2SideDialogConfigInputType.TEXT,
+                    name: 'searchedTerm',
+                    placeholder: 'LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER',
+                    value: this._searchedTerm
+                  }],
+                  bottomButtons: [{
+                    type: IV2SideDialogConfigButtonType.OTHER,
+                    label: 'LNG_COMMON_BUTTON_APPLY',
+                    color: 'primary'
+                  }, {
+                    type: IV2SideDialogConfigButtonType.CANCEL,
+                    label: 'LNG_COMMON_BUTTON_CANCEL',
+                    color: 'text'
+                  }]
                 })
-            );
+                .subscribe((response) => {
+                  // cancelled ?
+                  if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+                    // finished
+                    return;
+                  }
+
+                  // close dialog
+                  response.handler.hide();
+
+                  // set data
+                  this._searchedTerm = (response.data.map.searchedTerm as IV2SideDialogConfigInputText).value;
+
+                  // refresh list
+                  this.needsRefreshList();
+                });
+            }
+          }
+        }
+      ]
+    };
+  }
+
+  /**
+   * Initialize table group actions
+   */
+  protected initializeGroupActions(): void {}
+
+  /**
+   * Initialize table add action
+   */
+  protected initializeAddAction(): void {}
+
+  /**
+   * Initialize table grouped data
+   */
+  protected initializeGroupedData(): void {}
+
+  /**
+   * Initialize breadcrumbs
+   */
+  protected initializeBreadcrumbs(): void {
+    // set breadcrumbs
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
+        }
+      }, {
+        label: 'LNG_PAGE_GLOBAL_HELP_TITLE',
+        action: {
+          link: ['/help']
+        }
+      }
+    ];
+  }
+
+  /**
+   * Fields retrieved from api to reduce payload size
+   */
+  protected refreshListFields(): string[] {
+    return [
+      'id',
+      'title',
+      'category'
+    ];
+  }
+
+  /**
+   * Re(load) the items list
+   */
+  refreshList() {
+    // remove paginator
+    this.queryBuilder.paginator.clear();
+
+    // only approved
+    this.queryBuilder.filter.where({ approved: true }, true);
+
+    // retrieve the list of items
+    if (!this._searchedTerm) {
+      this.queryBuilder.filter.remove('token');
+      this.helpItemsList$ = this.helpDataService.getHelpItemsList(this.queryBuilder);
+    } else {
+      this.helpItemsList$ = this.helpDataService.getHelpItemsListSearch(this.queryBuilder, this._searchedTerm);
     }
 
+    // retrieve data
+    this.records$ = this.helpItemsList$
+      .pipe(
+        // update page count
+        tap((helpItems: []) => {
+          this.pageCount = {
+            count: helpItems.length,
+            hasMore: false
+          };
+        }),
 
-    /**
-     * Filter the list by a text field
-     * @param {string} value
-     */
-    filterByTextFieldHelpSearch(value: string) {
-        this.searchedTerm = value;
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
+  }
 
-        // refresh list
-        this.needsRefreshList();
-    }
+  /**
+   * Get total number of items, based on the applied filters
+   */
+  refreshListCount() { }
 }

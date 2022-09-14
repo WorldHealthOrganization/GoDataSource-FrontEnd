@@ -1,34 +1,90 @@
-<div class="authenticated app-theme" fxLayout="column" *ngIf="authUser">
-    <!-- Debug -->
-    <app-form-debug *ngIf="debugVisible"></app-form-debug>
-    <!-- End of Debug -->
+<mat-sidenav-container
+  class="gd-body-content"
+  [class.gd-body-content-full]="renderMode === RenderMode.FULL"
+  [class.gd-body-content-medium]="renderMode === RenderMode.MEDIUM"
+  [class.gd-body-content-small]="renderMode === RenderMode.SMALL"
+  [hasBackdrop]="hoveringMenu"
+  (backdropClick)="hoveringMenu = false">
 
-    <mat-sidenav-container class="sidenav-container">
+  <!-- Left Side - Logo & Main Menu -->
+  <mat-sidenav
+    class="gd-body-content-left"
+    [class.gd-body-content-left-expanded]="expandMenu"
+    [class.gd-body-content-left-hovering]="hoveringMenu"
+    opened="true"
+    [mode]="renderMode === RenderMode.FULL ? 'side' : 'over'"
+    fixedInViewport="true"
+    disableClose="true">
 
-        <mat-sidenav #snav mode="over" fixedInViewport>
-            <app-sidenav></app-sidenav>
-        </mat-sidenav>
+    <!-- Content -->
+    <div
+      class="gd-body-content-left-content">
 
-        <mat-sidenav-content>
+      <!-- Logo and Close button -->
+      <div
+        [class.gd-body-content-left-content-header]="hoveringMenu">
 
-            <button class="sidenav-toggle" mat-raised-button color="accent" (click)="snav.toggle()">
-                {{ 'LNG_LAYOUT_MENU_BUTTON_LABEL' | translate }}
-            </button>
+        <!-- Logo -->
+        <div
+          class="gd-body-content-left-content-logo"
+          [routerLink]="['/']"
+          tabindex="-1">
+          <img src="../../../../assets/images/gd-logo.svg" alt="Go.Data Logo" />
+        </div>
 
-            <!-- global search entities by identifier -->
-            <app-global-entity-search>
-            </app-global-entity-search>
+        <!-- Close button -->
+        <button
+          *ngIf="hoveringMenu"
+          type="button"
+          mat-icon-button
+          (click)="hoveringMenu = false">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
 
-            <!-- context help - display help items based on the page you are on -->
-            <div *ngIf="contextSearchHelpItems"
-                class="context-help-trigger"
-                (click)="displayHelpDialog()">
-                <span class="xt-icon">help</span>
-            </div>
+      <!-- Main Menu -->
+      <div
+        class="gd-body-content-left-content-menu">
+        <app-sidenav
+          [expanded]="expandMenu || hoveringMenu"></app-sidenav>
+      </div>
 
-            <router-outlet></router-outlet>
+    </div>
 
-        </mat-sidenav-content>
-    </mat-sidenav-container>
+    <!-- Expand / Collapse button -->
+    <button
+      *ngIf="renderMode === RenderMode.FULL"
+      type="button"
+      mat-icon-button
+      (click)="expandMenu = !expandMenu"
+      class="gd-expand-collapse-button">
+      <span class="material-icons">{{expandMenu ? 'chevron_left' : 'chevron_right'}}</span>
+    </button>
 
-</div>
+  </mat-sidenav>
+
+  <!-- Right side - top bar & page content -->
+  <mat-sidenav-content
+    class="gd-body-content-right"
+    [class.gd-body-content-right-expanded]="expandMenu"
+    [class.gd-body-content-right-fullscreen]="fullScreen">
+
+    <!-- Top bar -->
+    <div
+      class="gd-body-content-right-top">
+      <app-topnav
+        (showHoverMenu)="hoveringMenu = true"></app-topnav>
+    </div>
+
+    <!-- Bottom part - page content -->
+    <div
+      class="gd-body-content-right-bottom">
+      <router-outlet></router-outlet>
+    </div>
+
+  </mat-sidenav-content>
+</mat-sidenav-container>
+
+<!-- Used for side dialogs -->
+<app-side-dialog-v2
+  #sideDialog></app-side-dialog-v2>

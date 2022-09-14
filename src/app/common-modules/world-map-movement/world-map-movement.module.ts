@@ -7,18 +7,17 @@ import { WorldMapModule } from '../world-map/world-map.module';
 import * as fromComponents from './components';
 
 @NgModule({
-    imports: [
-        SharedModule,
-        WorldMapModule
-    ],
-    declarations: [
-        ...fromComponents.components
-    ],
-    providers: [],
-    exports: [
-        ...fromComponents.components
-    ],
-    entryComponents: []
+  imports: [
+    SharedModule,
+    WorldMapModule
+  ],
+  declarations: [
+    ...fromComponents.components
+  ],
+  providers: [],
+  exports: [
+    ...fromComponents.components
+  ]
 })
 export class WorldMapMovementModule {
 }

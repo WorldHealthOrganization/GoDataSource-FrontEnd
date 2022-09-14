@@ -1,0 +1,986 @@
+<mat-sidenav-container
+  class="gd-app-side-dialog-v2"
+  hasBackdrop="true"
+  (backdropClick)="loading || config?.dontCloseOnBackdrop ? undefined : hide(true)">
+  <mat-sidenav
+    #sideNav
+    mode="over"
+    fixedInViewport
+    position="end"
+    disableClose="true">
+
+    <!-- Sidenav content -->
+    <div
+      class="gd-app-side-dialog-v2-content"
+      [style.width]="config?.width"
+      fxLayout="column">
+
+      <!-- Top Bar -->
+      <div
+        fxGrow="0" fxLayout="column"
+        class="gd-app-side-dialog-v2-content-top">
+
+        <!-- Title & Close button -->
+        <div
+          fxLayout="row" fxLayoutAlign="space-between center"
+          class="gd-app-side-dialog-v2-content-tb">
+
+          <!-- Title -->
+          <div
+            class="gd-app-side-dialog-v2-content-top-title"
+            fxFlex>
+            {{config?.title.get() | translate:(config?.title.data ? config?.title.data() : undefined)}}
+          </div>
+
+          <!-- Close button -->
+          <button
+            class="gd-app-side-dialog-v2-content-top-close"
+            type="button"
+            mat-icon-button
+            (click)="hide(true)"
+            [disabled]="!!loading">
+            <mat-icon>close</mat-icon>
+          </button>
+
+        </div>
+
+        <!-- Filter -->
+        <div
+          *ngIf="!loading && !config?.hideInputFilter"
+          class="gd-app-side-dialog-v2-content-filter">
+
+          <!-- Search -->
+          <app-form-input-v2
+            placeholder="LNG_COMMON_LABEL_SEARCH"
+            [(ngModel)]="filterByValue"
+            neverFloatLabel="true"
+            (ngModelChange)="filterInputs()"
+            autocomplete="off"
+            [suffixIconButtons]="filterByValue ? filterSuffixIconButtons : undefined">
+          </app-form-input-v2>
+
+        </div>
+
+      </div>
+
+      <!-- Inputs -->
+      <form
+        #form="ngForm"
+        [hidden]="!!loading"
+        fxFlex
+        class="gd-app-side-dialog-v2-content-middle">
+
+        <!-- Common -->
+        <ng-template
+          #commonPart
+          let-input="input">
+          <ng-container
+            *ngIf="!input.visible || input.visible(dialogHandler.data, dialogHandler, input)"
+            [ngSwitch]="input.type">
+
+            <!-- Divider -->
+            <div
+              *ngSwitchCase="V2SideDialogConfigInputType.DIVIDER"
+              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-divider {{input.cssClasses}}"
+              [class.gd-app-side-dialog-v2-content-middle-item-input-divider-has-title]="!!input.placeholder"
+              [class.gd-app-side-dialog-v2-content-middle-item-input-divider-has-title-multiple-lines]="!!input.placeholderMultipleLines">{{input.placeholder | translate}}</div>
+
+            <!-- Checkbox -->
+            <app-form-checkbox-v2
+              *ngSwitchCase="V2SideDialogConfigInputType.CHECKBOX"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
+              [(ngModel)]="input.checked"
+              [name]="input.name"
+              [placeholder]="input.placeholder"
+              [tooltip]="input.tooltip"
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
+              (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-checkbox-v2>
+
+            <!-- Text -->
+            <app-form-input-v2
+              *ngSwitchCase="V2SideDialogConfigInputType.TEXT"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
+              [(ngModel)]="input.value"
+              [name]="input.name"
+              [placeholder]="input.placeholder"
+              [tooltip]="input.tooltip"
+              autocomplete="off"
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
+              [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
+              app-general-async-validator
+              [asyncValidatorObservable]="input.validators?.async ? input.validators?.async(dialogHandler.data, dialogHandler, input) : undefined"
+              asyncValidatorTouchOnError="true"
+              app-not-number-validator
+              [notNumberValidatorDisabled]="!input.validators?.notNumber || !input.validators.notNumber(dialogHandler.data, dialogHandler, input)"
+              app-has-property-validator
+              [checkObject]="input.validators?.notInObject ? input.validators?.notInObject(dialogHandler.data, dialogHandler, input)?.values : undefined"
+              [checkErrorMsg]="input.validators?.notInObject ? input.validators?.notInObject(dialogHandler.data, dialogHandler, input)?.err : undefined"
+              app-no-spaces-validator
+              [noSpacesValidatorDisabled]="!input.validators?.noSpace || !input.validators.noSpace(dialogHandler.data, dialogHandler, input)"
+              app-regex-validator
+              [regexExpr]="input.validators?.regex ? input.validators?.regex().expression : undefined"
+              [regexExprFlags]="input.validators?.regex ? input.validators?.regex().flags : undefined"
+              [regexExprMsg]="input.validators?.regex ? input.validators?.regex().msg : undefined"
+              (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-input-v2>
+
+            <!-- Textarea -->
+            <app-form-textarea-v2
+              *ngSwitchCase="V2SideDialogConfigInputType.TEXTAREA"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
+              [(ngModel)]="input.value"
+              [name]="input.name"
+              [placeholder]="input.placeholder"
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
+              [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
+              (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-textarea-v2>
+
+            <!-- Time-picker -->
+            <app-form-timepicker-v2
+              *ngSwitchCase="V2SideDialogConfigInputType.TIMEPICKER"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
+              [(ngModel)]="input.value"
+              [name]="input.name"
+              [placeholder]="input.placeholder"
+              [tooltip]="input.tooltip"
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
+              [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
+              (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-timepicker-v2>
+
+            <!-- Date -->
+            <app-form-date-v2
+              *ngSwitchCase="V2SideDialogConfigInputType.DATE"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
+              [(ngModel)]="input.value"
+              [name]="input.name"
+              [placeholder]="input.placeholder"
+              [tooltip]="input.tooltip"
+              autocomplete="off"
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
+              [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
+              (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-date-v2>
+
+            <!-- Date Range -->
+            <app-form-date-range-v2
+              *ngSwitchCase="V2SideDialogConfigInputType.DATE_RANGE"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
+              [(ngModel)]="input.value"
+              [name]="input.name"
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
+              [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
+              (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-date-range-v2>
+
+            <!-- Number -->
+            <app-form-number-v2
+              *ngSwitchCase="V2SideDialogConfigInputType.NUMBER"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
+              [(ngModel)]="input.value"
+              [name]="input.name"
+              [placeholder]="input.placeholder"
+              [tooltip]="input.tooltip"
+              autocomplete="off"
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
+              [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
+              app-min-max-validator
+              [minNumber]="input.validators?.minMax ? input.validators?.minMax(dialogHandler.data, dialogHandler, input).min : undefined"
+              [maxNumber]="input.validators?.minMax ? input.validators?.minMax(dialogHandler.data, dialogHandler, input).max : undefined"
+              (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-number-v2>
+
+            <!-- Number Range -->
+            <app-form-number-range-v2
+              *ngSwitchCase="V2SideDialogConfigInputType.NUMBER_RANGE"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
+              [(ngModel)]="input.value"
+              [name]="input.name"
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
+              [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
+              (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-number-range-v2>
+
+            <!-- Dropdown - single -->
+            <app-form-select-single-v2
+              *ngSwitchCase="V2SideDialogConfigInputType.DROPDOWN_SINGLE"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
+              [(ngModel)]="input.value"
+              [name]="input.name"
+              [placeholder]="input.placeholder"
+              [tooltip]="input.tooltip"
+              [options]="input.options"
+              [clearable]="input.clearable"
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
+              [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
+              (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-select-single-v2>
+
+            <!-- Dropdown - multiple -->
+            <app-form-select-multiple-v2
+              *ngSwitchCase="V2SideDialogConfigInputType.DROPDOWN_MULTI"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
+              [(ngModel)]="input.values"
+              [name]="input.name"
+              [placeholder]="input.placeholder"
+              [tooltip]="input.tooltip"
+              [options]="input.options"
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
+              [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
+              (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-select-multiple-v2>
+
+            <!-- Location - single -->
+            <app-form-select-location-single-v2
+              *ngSwitchCase="V2SideDialogConfigInputType.LOCATION_SINGLE"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
+              [(ngModel)]="input.value"
+              [name]="input.name"
+              [placeholder]="input.placeholder"
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
+              [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
+              [useOutbreakLocations]="input.useOutbreakLocations"
+              [clearable]="input.clearable"
+              (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"
+              (selectedLocationChanged)="input.locationChanged ? input.locationChanged($event) : undefined">
+            </app-form-select-location-single-v2>
+
+            <!-- Location - multiple -->
+            <app-form-select-location-multiple-v2
+              *ngSwitchCase="V2SideDialogConfigInputType.LOCATION_MULTIPLE"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
+              [(ngModel)]="input.value"
+              [name]="input.name"
+              [placeholder]="input.placeholder"
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
+              [required]="input.validators?.required && input.validators?.required(dialogHandler.data, dialogHandler, input)"
+              [useOutbreakLocations]="input.useOutbreakLocations"
+              (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined">
+            </app-form-select-location-multiple-v2>
+
+            <!-- Toggle -->
+            <app-form-toggle-v2
+              *ngSwitchCase="V2SideDialogConfigInputType.TOGGLE"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
+              [(ngModel)]="input.value"
+              [name]="input.name"
+              [options]="input.options"
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
+              (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-toggle-v2>
+
+            <!-- Toggle checkbox -->
+            <app-form-toggle-checkbox-v2
+              *ngSwitchCase="V2SideDialogConfigInputType.TOGGLE_CHECKBOX"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
+              [(ngModel)]="input.value"
+              [name]="input.name"
+              [placeholder]="input.placeholder"
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
+              (ngModelChange)="input.change ? input.change(dialogHandler.data, dialogHandler, input) : undefined"></app-form-toggle-checkbox-v2>
+
+            <!-- Key-Value -->
+            <div
+              *ngSwitchCase="V2SideDialogConfigInputType.KEY_VALUE"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
+              fxLayout="row" fxLayoutAlign="start" fxLayoutGap="1.6rem">
+
+              <!-- Key -->
+              <div
+                class="gd-app-side-dialog-v2-content-middle-item-input-key">{{input.placeholder | translate}}</div>
+
+              <!-- Value -->
+              <div
+                class="gd-app-side-dialog-v2-content-middle-item-input-value">{{input.value | translate}}</div>
+
+            </div>
+
+            <!-- Group -->
+            <div
+              *ngSwitchCase="V2SideDialogConfigInputType.GROUP"
+              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-group {{input.cssClasses}}"
+              fxFlex>
+              <!-- Items -->
+              <ng-template
+                *ngFor="let groupItem of input.inputs"
+                [ngTemplateOutlet]="commonPart"
+                [ngTemplateOutletContext]="{ input: groupItem }"></ng-template>
+            </div>
+
+            <!-- Button -->
+            <button
+              *ngSwitchCase="V2SideDialogConfigInputType.BUTTON"
+              type="button"
+              mat-flat-button
+              [color]="input.color"
+              (click)="input.click(dialogHandler.data, dialogHandler, input)">
+              {{input.placeholder | translate}}
+            </button>
+
+            <!-- Row -->
+            <div
+              *ngSwitchCase="V2SideDialogConfigInputType.ROW"
+              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-row {{input.cssClasses}}">
+              <!-- Items -->
+              <ng-template
+                *ngFor="let rowItem of input.inputs"
+                [ngTemplateOutlet]="commonPart"
+                [ngTemplateOutletContext]="{ input: rowItem }"></ng-template>
+            </div>
+
+            <!-- HTML -->
+            <div
+              *ngSwitchCase="V2SideDialogConfigInputType.HTML"
+              class="gd-app-side-dialog-v2-content-middle-item-input {{input.cssClasses}}"
+              [innerHTML]="input.placeholder ? (input.placeholder | translate | safeHtml) : undefined">
+            </div>
+
+            <!-- Link -->
+            <a
+              *ngSwitchCase="V2SideDialogConfigInputType.LINK"
+              mat-flat-button
+              color="text"
+              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-link {{input.cssClasses}}"
+              [routerLink]="input.link(dialogHandler.data, dialogHandler, input)"
+              [queryParams]="input.linkQueryParams ? input.linkQueryParams(dialogHandler.data, dialogHandler, input) : undefined"
+              [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)"
+              (click)="hide(true)">
+              {{input.placeholder | translate}}
+            </a>
+
+            <!-- Link with action -->
+            <div
+              *ngSwitchCase="V2SideDialogConfigInputType.LINK_WITH_ACTION"
+              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-link-with-action {{input.cssClasses}}">
+
+              <!-- Link -->
+              <a
+                mat-flat-button
+                color="text"
+                class="gd-app-side-dialog-v2-content-middle-item-input-link {{input.cssClasses}}"
+                [routerLink]="input.link(dialogHandler.data, dialogHandler, input)"
+                [queryParams]="input.linkQueryParams ? input.linkQueryParams(dialogHandler.data, dialogHandler, input) : undefined"
+                [disabled]="input.disabled && input.disabled(dialogHandler.data, dialogHandler, input)">
+                {{input.placeholder | translate}}
+              </a>
+
+              <!-- Action -->
+              <div>
+                <ng-template
+                  [ngTemplateOutlet]="commonPart"
+                  [ngTemplateOutletContext]="{ input: input.actions }"></ng-template>
+              </div>
+
+            </div>
+
+            <!-- Accordion -->
+            <div
+              *ngSwitchCase="V2SideDialogConfigInputType.ACCORDION"
+              fxLayout="column"
+              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-accordion {{input.cssClasses}}">
+
+              <!-- Title -->
+              <div
+                class="gd-app-side-dialog-v2-content-middle-item-input-accordion-title">{{input.placeholder | translate}}</div>
+
+              <!-- Accordion -->
+              <mat-accordion>
+                <ng-container
+                  *ngFor="let panel of input.panels">
+                  <mat-expansion-panel
+                    *ngIf="!panel.visible || panel.visible(dialogHandler.data, dialogHandler, panel)"
+                    class="gd-app-side-dialog-v2-content-middle-item-input-panel {{panel.cssClasses}}"
+                    [class.gd-app-side-dialog-v2-content-middle-item-input-panel-not-expandable]="!panel.inputs || panel.inputs.length < 1"
+                    [style.height]="filteredInputs === false || (filteredInputs && !filteredInputs[input.name] && !filteredInputs[panel.name] && !filteredForceParent[panel.name]) ? 0 : undefined"
+                    [disabled]="panel.disabled && panel.disabled(dialogHandler.data, dialogHandler, panel)"
+                    togglePosition="before">
+
+                    <!-- Panel header -->
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>{{panel.placeholder | translate}}</mat-panel-title>
+                      <mat-panel-description
+                        *ngIf="panel.iconButton"
+                        fxLayoutAlign="end center">
+                        <button
+                          type="button"
+                          mat-icon-button
+                          [color]="panel.iconButton.color"
+                          [disabled]="panel.iconButton.disabled && panel.iconButton.disabled(dialogHandler.data, dialogHandler, panel.iconButton)"
+                          (click)="$event.stopPropagation(); panel.iconButton.click(dialogHandler.data, dialogHandler, panel.iconButton);"><mat-icon>{{panel.iconButton.icon}}</mat-icon></button>
+                      </mat-panel-description>
+                    </mat-expansion-panel-header>
+
+                    <!-- Inputs -->
+                    <div
+                      *ngFor="let panelInput of panel.inputs"
+                      [hidden]="filteredInputs === false || (filteredInputs && !filteredInputs[input.name] && !filteredInputs[panel.name] && !filteredInputs[panelInput.name])">
+                      <ng-template
+                        [ngTemplateOutlet]="commonPart"
+                        [ngTemplateOutletContext]="{ input: panelInput }"></ng-template>
+                    </div>
+
+                  </mat-expansion-panel>
+                </ng-container>
+              </mat-accordion>
+
+            </div>
+
+            <!-- Sort List -->
+            <div
+              *ngSwitchCase="V2SideDialogConfigInputType.SORT_LIST"
+              fxLayout="column" fxLayoutGap="1.6rem"
+              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-sort-list {{input.cssClasses}}"
+              cdkDropList [cdkDropListData]="input.items" (cdkDropListDropped)="dropItem($event, input)">
+
+              <!-- Item -->
+              <div
+                *ngFor="let item of input.items"
+                cdkDrag cdkDragLockAxis="y" [cdkDragData]="item" (cdkDragStarted)="dragStarted($event)"
+                class="gd-app-side-dialog-v2-content-middle-item-input-sort-list-item"
+                fxLayout="row" fxLayoutAlign="start center">
+
+                <!-- Sort -->
+                <mat-icon
+                  cdkDragHandle
+                  (mousedown)="notInvalidDragZone()"
+                  (touchstart)="notInvalidDragZone()"
+                  class="gd-app-side-dialog-v2-content-middle-item-input-sort-list-item-icon">drag_indicator</mat-icon>
+
+                <!-- Label -->
+                <div
+                  class="gd-app-side-dialog-v2-content-middle-item-input-sort-list-item-label">
+                  {{item.label | translate}}
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- Filter list -->
+            <div
+              *ngSwitchCase="V2SideDialogConfigInputType.FILTER_LIST"
+              fxLayout="column" fxLayoutGap="1.6rem"
+              class="gd-app-side-dialog-v2-content-middle-item-input gd-app-side-dialog-v2-content-middle-item-input-filter-list {{input.cssClasses}}"
+              [class.gd-app-side-dialog-v2-content-middle-item-input-filter-list-operator-hidden]="!!input.operatorHide">
+
+              <!-- Filter & Sort tabs -->
+              <mat-tab-group
+                mat-align-tabs="center">
+
+                <!-- Filter tab -->
+                <mat-tab
+                  [label]="'LNG_SIDE_FILTERS_SECTION_FILTER_TITLE' | translate">
+
+                  <!-- Operator -->
+                  <app-form-toggle-v2
+                    *ngIf="!input.operatorHide"
+                    [(ngModel)]="input.operatorValue"
+                    [name]="input.name + 'Operator'"
+                    [options]="operatorOptions"
+                    required="true">
+                  </app-form-toggle-v2>
+
+                  <!-- Buttons -->
+                  <div
+                    fxLayout="row" fxLayoutAlign="space-between"
+                    class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-buttons">
+
+                    <!-- Add -->
+                    <button
+                      type="button"
+                      mat-flat-button color="primary"
+                      [disabled]="!!input.disableAdd"
+                      (click)="addAdvancedFilter(input)">
+                      {{'LNG_SIDE_FILTERS_ADD_ANOTHER_FILTER_BUTTON' | translate}}
+                    </button>
+
+                    <!-- Reset filters -->
+                    <button
+                      type="button"
+                      mat-flat-button color="text"
+                      [disabled]="!!input.disableReset"
+                      (click)="resetAdvancedFilter()">
+                      {{'LNG_COMMON_BUTTON_RESET_FILTERS' | translate}}
+                    </button>
+
+                  </div>
+
+                  <!-- Filters -->
+                  <div
+                    fxLayout="column" fxLayoutGap="0.8rem"
+                    class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-container">
+
+                    <div
+                      *ngFor="let filter of input.filters"
+                      fxLayout="row" fxLayoutAlign="start start"
+                      class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item"
+                      [class.gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-no-value]="!filter.filterBy.value">
+
+                      <!-- Left -->
+                      <div
+                        fxFlex
+                        class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-left">
+
+                        <!-- Filter Type -->
+                        <app-form-select-single-v2
+                          [(ngModel)]="filter.filterBy.value"
+                          [name]="filter.filterBy.name"
+                          [options]="filter.filterBy.options"
+                          [placeholder]="filter.filterBy.placeholder"
+                          (ngModelChange)="filter.filterBy.change(dialogHandler.data, dialogHandler, filter)"
+                          required="true">
+                        </app-form-select-single-v2>
+
+                        <!-- Filter setup -->
+                        <div
+                          *ngIf="filter.filterBy.value"
+                          class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-left-inner">
+
+                          <!-- Filter Comparator -->
+                          <app-form-select-single-v2
+                            *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type !== V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS"
+                            [(ngModel)]="filter.comparator.value"
+                            [name]="filter.comparator.name"
+                            [options]="filter.comparator.options"
+                            [placeholder]="filter.comparator.placeholder"
+                            (ngModelChange)="filter.comparator.change(dialogHandler.data, dialogHandler, filter)"
+                            required="true">
+                          </app-form-select-single-v2>
+
+                          <!-- Filter Value -->
+                          <ng-container
+                            *ngIf="filter.comparator.value || input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS">
+
+                            <!-- Text / Address phone number -->
+                            <app-form-input-v2
+                              *ngIf="(
+                                input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.TEXT ||
+                                input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.PHONE_NUMBER ||
+                                input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.ADDRESS_PHONE_NUMBER || (
+                                    input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.ADDRESS &&
+                                    filter.comparator.value === V2AdvancedFilterComparatorType.CONTAINS
+                                )
+                              ) && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                              [(ngModel)]="filter.value"
+                              [name]="filter.name"
+                              placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD"
+                              autocomplete="off"
+                              required="true"></app-form-input-v2>
+
+                            <!-- Number -->
+                            <app-form-number-v2
+                              *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.NUMBER"
+                              [(ngModel)]="filter.value"
+                              [name]="filter.name"
+                              placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD"
+                              autocomplete="off"
+                              required="true">
+                            </app-form-number-v2>
+
+                            <!-- Single select -->
+                            <app-form-select-single-v2
+                              *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.SELECT
+                                && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                              [(ngModel)]="filter.value"
+                              [name]="filter.name"
+                              placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+                              [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.options"
+                              allowDisabledToBeSelected="true"
+                              required="true">
+                            </app-form-select-single-v2>
+
+                            <!-- Multiple select -->
+                            <app-form-select-multiple-v2
+                              *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.MULTISELECT
+                                && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                              [(ngModel)]="filter.value"
+                              [name]="filter.name"
+                              placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+                              [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.options"
+                              allowDisabledToBeSelected="true"
+                              [required]="!input.optionsAsLabelValueMap[filter.filterBy.value].data.optional">
+                            </app-form-select-multiple-v2>
+
+                            <!-- Number / Age range -->
+                            <app-form-number-range-v2
+                              *ngIf="(
+                                input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_AGE ||
+                                input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_NUMBER
+                              ) && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                              [(ngModel)]="filter.value"
+                              [name]="filter.name"
+                              [min]="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_AGE ? 0 : undefined"
+                              [max]="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_AGE ? Constants.DEFAULT_AGE_MAX_YEARS : undefined"
+                              [fromHidden]="filter.comparator.value === V2AdvancedFilterComparatorType.BEFORE"
+                              [toHidden]="filter.comparator.value === V2AdvancedFilterComparatorType.AFTER"
+                              required="true">
+                            </app-form-number-range-v2>
+
+                            <!-- Date range -->
+                            <app-form-date-range-v2
+                              *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.RANGE_DATE
+                                && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                              [(ngModel)]="filter.value"
+                              [name]="filter.name"
+                              [fromHidden]="filter.comparator.value === V2AdvancedFilterComparatorType.BEFORE"
+                              [toHidden]="filter.comparator.value === V2AdvancedFilterComparatorType.AFTER"
+                              required="true">
+                            </app-form-date-range-v2>
+
+                            <!-- Date -->
+                            <app-form-date-v2
+                              *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.DATE"
+                              [(ngModel)]="filter.value"
+                              [name]="filter.name"
+                              placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+                              autocomplete="off"
+                              required="true">
+                            </app-form-date-v2>
+
+                            <!-- Location - single -->
+                            <app-form-select-location-single-v2
+                              *ngIf="(
+                                input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.LOCATION_SINGLE || (
+                                  input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.ADDRESS &&
+                                  filter.comparator.value === V2AdvancedFilterComparatorType.WITHIN
+                                )
+                              ) && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                              [(ngModel)]="filter.value"
+                              [name]="filter.name"
+                              placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION"
+                              useOutbreakLocations="true"
+                              [required]="!input.optionsAsLabelValueMap[filter.filterBy.value].data.optional"
+                              [clearable]="!!input.optionsAsLabelValueMap[filter.filterBy.value].data.clearable"
+                              (selectedLocationChanged)="filter.comparator.value !== V2AdvancedFilterComparatorType.WITHIN ? undefined : (filter.extraValues.location = $event)">
+                            </app-form-select-location-single-v2>
+
+                            <!-- Location - multiple -->
+                            <app-form-select-location-multiple-v2
+                              *ngIf="(
+                                input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.LOCATION_MULTIPLE || (
+                                  input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.ADDRESS &&
+                                  filter.comparator.value === V2AdvancedFilterComparatorType.LOCATION
+                                )
+                              ) && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                              [(ngModel)]="filter.value"
+                              [name]="filter.name"
+                              placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_LOCATION"
+                              useOutbreakLocations="true"
+                              required="true">
+                            </app-form-select-location-multiple-v2>
+
+                            <!-- Address Within Radius -->
+                            <app-form-number-v2
+                              *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.ADDRESS &&
+                                filter.comparator.value === V2AdvancedFilterComparatorType.WITHIN"
+                              [(ngModel)]="filter.extraValues.radius.value"
+                              [name]="filter.extraValues.radius.name"
+                              placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_WITHIN_MAX_DISTANCE"
+                              autocomplete="off"
+                              required="true">
+                            </app-form-number-v2>
+
+                            <!-- Groups select -->
+                            <app-form-select-groups-v2
+                              *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.SELECT_GROUPS
+                                && filter.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                              [name]="filter.name"
+                              placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+                              required="true"
+                              [groups]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groups"
+                              [groupLabelKey]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupLabelKey"
+                              [groupValueKey]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupValueKey"
+                              [groupOptionsKey]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupOptionsKey"
+                              [groupOptionLabelKey]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupOptionLabelKey"
+                              [groupOptionValueKey]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupOptionValueKey"
+                              [groupNoneLabel]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupNoneLabel"
+                              [groupPartialLabel]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupPartialLabel"
+                              [groupAllLabel]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupAllLabel"
+                              [groupTooltipKey]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupTooltipKey"
+                              [groupOptionTooltipKey]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupOptionTooltipKey"
+                              [groupNoneTooltip]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupNoneTooltip"
+                              [groupPartialTooltip]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupPartialTooltip"
+                              [groupAllTooltip]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupAllTooltip"
+                              [groupOptionHiddenKey]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupOptionHiddenKey"
+                              [groupOptionFormatMethod]="input.optionsAsLabelValueMap[filter.filterBy.value].data.groupOptionFormatMethod"
+                              [defaultValues]="input.optionsAsLabelValueMap[filter.filterBy.value].data.defaultValues"
+                              [(ngModel)]="filter.value">
+                            </app-form-select-groups-v2>
+
+                            <!-- Questionnaire answers -->
+                            <ng-container
+                              *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.type === V2AdvancedFilterType.QUESTIONNAIRE_ANSWERS">
+                              <!-- Question -->
+                              <app-form-select-single-v2
+                                [(ngModel)]="filter.value"
+                                [name]="filter.name"
+                                placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION"
+                                [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptions"
+                                optionTooltipKey="label"
+                                sortDisabled="true"
+                                (ngModelChange)="resetQuestionnaireFilter(filter)"
+                                required="true">
+                              </app-form-select-single-v2>
+
+                              <!-- Filter details -->
+                              <ng-container
+                                *ngIf="filter.value">
+                                <!-- Last answer or any of them -->
+                                <app-form-select-single-v2
+                                  *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.multiAnswerParent"
+                                  [(ngModel)]="filter.extraValues.whichAnswer.value"
+                                  [name]="filter.extraValues.whichAnswer.name"
+                                  [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL_QUESTION_WHICH_ANSWER' | translate"
+                                  [options]="questionWhichAnswerOptions"
+                                  required="true">
+                                </app-form-select-single-v2>
+
+                                <!-- Which Answer Date -->
+                                <app-form-date-range-v2
+                                  *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.multiAnswerParent"
+                                  [(ngModel)]="filter.extraValues.whichAnswerDate.value"
+                                  [name]="filter.extraValues.whichAnswerDate.name"
+                                  required="true">
+                                </app-form-date-range-v2>
+
+                                <!-- Comparator used accordingly to field type -->
+                                <app-form-select-single-v2
+                                  *ngIf="V2AdvancedFilterQuestionComparators[input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType] &&
+                                    V2AdvancedFilterComparatorOptions[V2AdvancedFilterQuestionComparators[input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType]] &&
+                                    V2AdvancedFilterComparatorOptions[V2AdvancedFilterQuestionComparators[input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType]].length > 1"
+                                  [(ngModel)]="filter.extraValues.comparator.value"
+                                  [name]="filter.extraValues.comparator.name"
+                                  [placeholder]="'LNG_SIDE_FILTERS_COMPARATOR_LABEL' | translate"
+                                  [options]="V2AdvancedFilterComparatorOptions[V2AdvancedFilterQuestionComparators[input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType]]"
+                                  (ngModelChange)="resetQuestionnaireFilter(filter, 'filterValue')"
+                                  required="true">
+                                </app-form-select-single-v2>
+
+                                <!-- TEXT Filter -->
+                                <app-form-input-v2
+                                  *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType === Constants.ANSWER_TYPES.FREE_TEXT.value &&
+                                    filter.extraValues.comparator.value && filter.extraValues.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.extraValues.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                                  [(ngModel)]="filter.extraValues.filterValue.value"
+                                  [name]="filter.extraValues.filterValue.name"
+                                  placeholder="LNG_SIDE_FILTERS_COMPARATOR_LABEL_KEYWORD"
+                                  autocomplete="off"
+                                  required="true">
+                                </app-form-input-v2>
+
+                                <!-- DATE RANGE Filter -->
+                                <app-form-date-range-v2
+                                  *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType === Constants.ANSWER_TYPES.DATE_TIME.value &&
+                                    filter.extraValues.comparator.value && filter.extraValues.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.extraValues.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                                  [(ngModel)]="filter.extraValues.filterValue.value"
+                                  [name]="filter.extraValues.filterValue.name"
+                                  [fromHidden]="filter.extraValues.comparator.value === V2AdvancedFilterComparatorType.BEFORE"
+                                  [toHidden]="filter.extraValues.comparator.value === V2AdvancedFilterComparatorType.AFTER"
+                                  required="true">
+                                </app-form-date-range-v2>
+
+                                <!-- SELECT Filter -->
+                                <app-form-select-multiple-v2
+                                  *ngIf="(
+                                    input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value ||
+                                    input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value
+                                  ) && filter.extraValues.comparator.value && filter.extraValues.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.extraValues.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                                  [(ngModel)]="filter.extraValues.filterValue.value"
+                                  [name]="filter.extraValues.filterValue.name"
+                                  placeholder="LNG_LAYOUT_LIST_DEFAULT_FILTER_PLACEHOLDER"
+                                  [options]="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answers"
+                                  required="true">
+                                </app-form-select-multiple-v2>
+
+                                <!-- NUMBER Filter -->
+                                <app-form-number-range-v2
+                                  *ngIf="input.optionsAsLabelValueMap[filter.filterBy.value].data.templateOptionsMap[filter.value]?.data.question.answerType === Constants.ANSWER_TYPES.NUMERIC.value &&
+                                    filter.extraValues.comparator.value && filter.extraValues.comparator.value !== V2AdvancedFilterComparatorType.HAS_VALUE && filter.extraValues.comparator.value !== V2AdvancedFilterComparatorType.DOESNT_HAVE_VALUE"
+                                  [(ngModel)]="filter.extraValues.filterValue.value"
+                                  [name]="filter.extraValues.filterValue.name"
+                                  [fromHidden]="filter.extraValues.comparator.value === V2AdvancedFilterComparatorType.BEFORE"
+                                  [toHidden]="filter.extraValues.comparator.value === V2AdvancedFilterComparatorType.AFTER"
+                                  required="true">
+                                </app-form-number-range-v2>
+
+                                <!-- File Filter -->
+                                <!-- Handled by comparator -->
+                                <!-- NOTHING TO DO HERE -->
+
+                              </ng-container>
+                            </ng-container>
+
+                          </ng-container>
+
+                        </div>
+
+                      </div>
+
+                      <!-- Right -->
+                      <button
+                        fxGrow="0"
+                        class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-right"
+                        type="button"
+                        mat-icon-button
+                        color="warn"
+                        [matTooltip]="'LNG_COMMON_BUTTON_DELETE_FILTERS' | translate"
+                        [disabled]="!!input.disableDelete"
+                        (click)="removeAdvancedFilter(input, filter)">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+
+                    </div>
+
+                  </div>
+
+                </mat-tab>
+
+                <!-- Sort tab -->
+                <mat-tab
+                  *ngIf="input.sortableOptionsAsLabelValue?.length > 0"
+                  [label]="'LNG_SIDE_FILTERS_SECTION_SORT_TITLE' | translate">
+
+                  <!-- Buttons -->
+                  <div
+                    fxLayout="row" fxLayoutAlign="space-between"
+                    class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-buttons">
+
+                    <!-- Add -->
+                    <button
+                      type="button"
+                      mat-flat-button color="primary"
+                      (click)="addAdvancedSort(input)">
+                      {{'LNG_SIDE_FILTERS_ADD_ANOTHER_SORT_BUTTON' | translate}}
+                    </button>
+
+                    <!-- Reset filters -->
+                    <button
+                      type="button"
+                      mat-flat-button color="text"
+                      (click)="resetAdvancedFilter()">
+                      {{'LNG_COMMON_BUTTON_RESET_FILTERS' | translate}}
+                    </button>
+
+                  </div>
+
+                  <!-- Sorts -->
+                  <div
+                    fxLayout="column" fxLayoutGap="0.8rem"
+                    class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-container">
+
+                    <div
+                      *ngFor="let sort of input.sorts"
+                      fxLayout="row" fxLayoutAlign="start start"
+                      class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item"
+                      [class.gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-no-value]="!sort.sortBy.value">
+
+                      <!-- Left -->
+                      <div
+                        fxFlex
+                        class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-left">
+
+                        <!-- Sort by -->
+                        <app-form-select-single-v2
+                          [(ngModel)]="sort.sortBy.value"
+                          [name]="sort.sortBy.name"
+                          [options]="sort.sortBy.options"
+                          [placeholder]="sort.sortBy.placeholder"
+                          required="true">
+                        </app-form-select-single-v2>
+
+                        <!-- Sort by setup -->
+                        <div
+                          *ngIf="sort.sortBy.value"
+                          class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-left-inner">
+
+                          <!-- Order -->
+                          <app-form-select-single-v2
+                            [(ngModel)]="sort.order.value"
+                            [name]="sort.order.name"
+                            [options]="sort.order.options"
+                            [placeholder]="sort.order.placeholder"
+                            required="true">
+                          </app-form-select-single-v2>
+
+                        </div>
+
+                      </div>
+
+                      <!-- Right -->
+                      <button
+                        fxGrow="0"
+                        class="gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-right"
+                        type="button"
+                        mat-icon-button
+                        color="warn"
+                        [matTooltip]="'LNG_COMMON_BUTTON_DELETE_SORTS' | translate"
+                        (click)="removeAdvancedSort(input, sort)">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+
+                    </div>
+
+                  </div>
+
+                </mat-tab>
+
+              </mat-tab-group>
+
+            </div>
+
+          </ng-container>
+        </ng-template>
+
+        <!-- Render root inputs -->
+        <div
+          *ngFor="let input of config?.inputs"
+          class="gd-app-side-dialog-v2-content-middle-item"
+          [class.gd-app-side-dialog-v2-content-middle-item-has-sort-list]="input.type === V2SideDialogConfigInputType.SORT_LIST"
+          [hidden]="filteredInputs === false || (filteredInputs && !filteredInputs[input.name] && !filteredForceParent[input.name])">
+          <ng-template
+            [ngTemplateOutlet]="commonPart"
+            [ngTemplateOutletContext]="{ input }"></ng-template>
+        </div>
+
+        <!-- No matches after search -->
+        <div
+          *ngIf="filteredInputs === false"
+          class="gd-app-side-dialog-v2-content-middle-not-found">
+          <mat-icon>search_off</mat-icon>
+          {{'LNG_COMMON_LABEL_NOTHING_FOUND' | translate}}
+        </div>
+      </form>
+
+      <!-- Bottom Bar -->
+      <div
+        [style.visibility]="loading ? 'hidden': 'visible'"
+        fxGrow="0" fxLayout="row" [fxLayoutAlign]="config?.bottomButtons.length > 1 ? 'space-between' : 'end'" fxLayoutGap="1.6rem"
+        class="gd-app-side-dialog-v2-content-bottom">
+
+        <!-- Buttons -->
+        <button
+          *ngFor="let button of config?.bottomButtons"
+          type="button"
+          mat-flat-button [color]="button.color"
+          class="gd-app-side-dialog-v2-content-bottom-button"
+          [disabled]="button.disabled && button.disabled(dialogHandler.data, dialogHandler, button)"
+          (click)="clickedButton(button)">
+          {{button.label | translate}}
+        </button>
+
+      </div>
+
+      <!-- Loading data -->
+      <div
+        *ngIf="loading"
+        class="gd-app-side-dialog-v2-content-loading"
+        [style.max-width]="config?.width"
+        fxLayout="column" fxLayoutAlign="start center">
+
+        <!-- Spinner -->
+        <mat-progress-spinner
+          class="gd-app-side-dialog-v2-content-loading-spinner"
+          mode="indeterminate"
+          diameter="32"></mat-progress-spinner>
+
+        <!-- Message -->
+        <div
+          *ngIf="loading.message"
+          class="gd-app-side-dialog-v2-content-loading-message">
+          {{loading.message | translate:loading.messageData}}
+        </div>
+      </div>
+    </div>
+
+  </mat-sidenav>
+</mat-sidenav-container>

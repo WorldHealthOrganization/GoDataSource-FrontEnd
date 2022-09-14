@@ -10,7 +10,7 @@ export * from './my-profile/my-profile.component';
 
 // export the list of all page components
 export const pageComponents: any[] = [
-    ChangePasswordComponent,
-    SetSecurityQuestionsComponent,
-    MyProfileComponent
+  ChangePasswordComponent,
+  SetSecurityQuestionsComponent,
+  MyProfileComponent
 ];

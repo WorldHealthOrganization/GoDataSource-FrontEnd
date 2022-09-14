@@ -3,5 +3,5 @@ import { WorldMapMovementComponent } from './world-map-movement/world-map-moveme
 
 // export the list of all components
 export const components: any[] = [
-    WorldMapMovementComponent
+  WorldMapMovementComponent
 ];

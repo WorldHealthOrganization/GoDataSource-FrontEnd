@@ -9,83 +9,83 @@ import { IBasicCount } from '../../models/basic-count.interface';
 
 @Injectable()
 export class SystemBackupDataService {
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        private http: HttpClient,
-        private modelHelper: ModelHelperService
-    ) {
-    }
+  constructor(
+    private http: HttpClient,
+    private modelHelper: ModelHelperService
+  ) {
+  }
 
-    /**
+  /**
      * Create backup
      */
-    createBackup(backupSettings: any = null): Observable<BackupModel> {
-        return this.modelHelper.mapObservableToModel(
-            this.http.post('backups', backupSettings),
-            BackupModel
-        );
-    }
+  createBackup(backupSettings: any = null): Observable<BackupModel> {
+    return this.modelHelper.mapObservableToModel(
+      this.http.post('backups', backupSettings),
+      BackupModel
+    );
+  }
 
-    /**
+  /**
      * Retrieve the list of backups
      */
-    getBackupList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<BackupModel[]> {
-        // sort backup list by descending date
-        const qb = new RequestQueryBuilder();
+  getBackupList(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<BackupModel[]> {
+    // sort backup list by descending date
+    const qb = new RequestQueryBuilder();
 
-        if (queryBuilder.sort.isEmpty()) {
-            qb.sort.by('date', RequestSortDirection.DESC);
-        }
-
-        // include user data
-        queryBuilder.include(`user`);
-        qb.merge(queryBuilder);
-
-        const filter = qb.buildQuery();
-        return this.modelHelper.mapObservableListToModel(
-            this.http.get(`backups?filter=${filter}`),
-            BackupModel
-        );
+    if (queryBuilder.sort.isEmpty()) {
+      qb.sort.by('date', RequestSortDirection.DESC);
     }
 
-    /**
+    // include user data
+    queryBuilder.include('user');
+    qb.merge(queryBuilder);
+
+    const filter = qb.buildQuery();
+    return this.modelHelper.mapObservableListToModel(
+      this.http.get(`backups?filter=${filter}`),
+      BackupModel
+    );
+  }
+
+  /**
      * Get total number of entries based on the applied filter
      * @returns {Observable<IBasicCount>}
      */
-    getBackupListCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<IBasicCount> {
-        const whereFilter = queryBuilder.filter.generateCondition(true);
-        return this.http.get(`backups/count?where=${whereFilter}`);
-    }
+  getBackupListCount(queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()): Observable<IBasicCount> {
+    const whereFilter = queryBuilder.filter.generateCondition(true);
+    return this.http.get(`backups/count?where=${whereFilter}`);
+  }
 
-    /**
+  /**
      * Delete an existing backup
      * @param {string} backupId
      * @returns {Observable<any>}
      */
-    deleteBackup(backupId: string): Observable<any> {
-        return this.http.delete(`backups/${backupId}`);
-    }
+  deleteBackup(backupId: string): Observable<any> {
+    return this.http.delete(`backups/${backupId}`);
+  }
 
-    /**
+  /**
      * Retrieve a backup
      * @param {string} backupId
      * @returns {Observable<BackupModel>}
      */
-    getBackup(backupId: string): Observable<BackupModel> {
-        return this.modelHelper.mapObservableToModel(
-            this.http.get(`backups/${backupId}`),
-            BackupModel
-        );
-    }
+  getBackup(backupId: string): Observable<BackupModel> {
+    return this.modelHelper.mapObservableToModel(
+      this.http.get(`backups/${backupId}`),
+      BackupModel
+    );
+  }
 
-    /**
+  /**
      * Restore backup
      * @param backupId
      */
-    restoreBackup(backupId: string): Observable<any> {
-        return this.http.post(`backups/${backupId}/restore`, {});
-    }
+  restoreBackup(backupId: string): Observable<any> {
+    return this.http.post(`backups/${backupId}/restore`, {});
+  }
 }
 

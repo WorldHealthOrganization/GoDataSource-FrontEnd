@@ -1,0 +1,102 @@
+<div
+  class="gd-form-color-v2">
+
+  <!-- Input data -->
+  <mat-form-field
+    *ngIf="!viewOnly; else viewOnlyTemplate"
+    appearance="outline">
+
+    <!-- Place holder -->
+    <mat-label>
+      {{ placeholder | translate }}
+    </mat-label>
+
+    <!-- Left - Icon buttons -->
+    <ng-container
+      *ngIf="tooltipButton?.tooltip"
+      matPrefix>
+      <popper-content
+        #popperContent>
+        <div
+          [innerHtml]="tooltipButton.tooltip | safeHtml">
+        </div>
+      </popper-content>
+      <mat-icon
+        tabindex="-1"
+        [popper]="popperContent"
+        popperTrigger="hover"
+        popperApplyClass="gd-form-color-v2-tooltip"
+        popperPreventOverflow="true"
+        popperPositionFixed="true"
+        popperAppendTo="body"
+        (click)="$event.stopPropagation()">{{tooltipButton.icon}}</mat-icon>
+    </ng-container>
+
+    <!-- Color -->
+    <div
+      [style.backgroundColor]="value"
+      matPrefix></div>
+
+    <!-- Input -->
+    <input
+      matInput
+      [(ngModel)]="value"
+      (blur)="onTouchItem()"
+      [errorStateMatcher]="errMatcher"
+      [disabled]="disabled"
+      [required]="required"
+      readonly="true"
+      autocomplete="off"
+      [colorPicker]="value"
+      cpOutputFormat="hex"
+      [cpUseRootViewContainer]="true"
+      cpDialogDisplay="popup"
+      (colorPickerChange)="value = $event">
+
+    <!-- Errors -->
+    <mat-error
+      *ngIf="control?.invalid && control?.touched">
+      {{ getErrorMessages() }}
+    </mat-error>
+
+  </mat-form-field>
+
+  <!-- View only -->
+  <ng-template
+    #viewOnlyTemplate>
+    <div
+      fxLayout="row" fxLayoutGap="1.6rem"
+      class="gd-form-color-v2-viewonly">
+      <!-- Label -->
+      <div
+        *ngIf="placeholder"
+        class="gd-form-color-v2-viewonly-label">
+        {{ placeholder | translate }}:
+      </div>
+
+      <!-- Value -->
+      <div
+        class="gd-form-color-v2-viewonly-value">
+
+        <!-- Has Value -->
+        <ng-container
+          *ngIf="value; else noValue">
+
+          <!-- Color -->
+          <div
+            [style.backgroundColor]="value"></div>
+
+          <!-- Hex -->
+          <span>{{value}}</span>
+
+        </ng-container>
+
+        <!-- No value -->
+        <ng-template
+          #noValue>
+          {{noValueLabel}}
+        </ng-template>
+      </div>
+    </div>
+  </ng-template>
+</div>

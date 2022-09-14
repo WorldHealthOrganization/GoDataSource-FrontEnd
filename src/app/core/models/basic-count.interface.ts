@@ -2,5 +2,6 @@
  * Basic
  */
 export interface IBasicCount {
-    count?: number;
+  count?: number;
+  hasMore?: boolean;
 }

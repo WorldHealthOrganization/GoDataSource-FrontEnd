@@ -1,0 +1,38 @@
+/* Tooltips */
+/* Material */
+.mat-tooltip-panel {
+  pointer-events: none;
+
+  .mat-tooltip {
+    background: var(--gd-text);
+    font-family: $gd-font-family;
+    margin: 0.4rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
+
+/* Popper */
+div.ngxp__container {
+  &.gd-form-input-v2-tooltip {
+    background: var(--gd-text);
+    border: 0 none;
+    @include border-radius(0.4rem);
+    @include box-shadow(none);
+    color: var(--gd-background);
+    font-family: $gd-font-family;
+    font-size: 1rem;
+    margin: 0;
+    max-width: 25rem;
+    overflow: hidden;
+    padding: 0.4rem 0.8rem;
+    text-overflow: ellipsis;
+
+    &.ngxp__animation {
+      animation: ngxp-fadeIn 200ms cubic-bezier(0, 0, 0.2, 1) forwards;
+    }
+
+    .ngxp__arrow {
+      display: none;
+    }
+  }
+}

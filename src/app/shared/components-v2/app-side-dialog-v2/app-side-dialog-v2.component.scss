@@ -1,0 +1,701 @@
+@import 'mixins';
+@import 'font';
+
+/* Slide-in panel */
+.gd-app-side-dialog-v2 {
+  &.mat-drawer-container {
+    background-color: var(--gd-background);
+    color: var(--gd-text);
+
+    .mat-drawer,
+    .mat-sidenav {
+      background-color: var(--gd-background);
+      color: var(--gd-text);
+    }
+  }
+
+  /* Overlay */
+  .mat-drawer-backdrop {
+    background-color: rgba(0, 0, 0, 0.85);
+    display: block;
+    @include opacity(0);
+    position: fixed;
+    @include transition(all 0.24s ease-in-out 0s);
+    visibility: hidden;
+
+    &.mat-drawer-shown {
+      @include opacity(1);
+      visibility: visible;
+    }
+  }
+
+  .mat-sidenav {
+    .gd-app-side-dialog-v2-content {
+      height: 100%;
+      min-width: 33rem;
+      position: relative;
+
+      @include breakpoint('xs') {
+        max-width: 90vw;
+        min-width: 30rem;
+      }
+
+      /* Slide-in panel header */
+      .gd-app-side-dialog-v2-content-top {
+        .gd-app-side-dialog-v2-content-tb {
+          border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+          padding: 1.6rem;
+
+          /* Slide-in panel title */
+          .gd-app-side-dialog-v2-content-top-title {
+            font-family: $gd-font-family;
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: $gd-line-height;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          /* Slide-in panel close button */
+          .gd-app-side-dialog-v2-content-top-close {
+            height: 3.7rem;
+            margin-left: 1.6rem;
+            width: 3.7rem;
+          }
+        }
+
+        /* Slide-in panel search */
+        .gd-app-side-dialog-v2-content-filter {
+          border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+
+          .gd-form-input-v2 {
+            .mat-form-field {
+              background: rgba(var(--gd-secondary-rgb), 0.15);
+              @include transition(all 0.24s ease-in-out 0s);
+
+              &.mat-focused {
+                background: rgba(var(--gd-primary-rgb), 0.15);
+              }
+
+              .mat-form-field-wrapper {
+                .mat-form-field-flex {
+                  .mat-form-field-outline,
+                  .mat-form-field-outline-thick {
+                    color: transparent;
+
+                    .mat-form-field-outline-start,
+                    .mat-form-field-outline-gap,
+                    .mat-form-field-outline-end {
+                      border-width: 0;
+                      @include border-radius(0);
+                    }
+                  }
+                }
+
+                .mat-form-field-subscript-wrapper {
+                  min-height: 0;
+                  padding: 0;
+                }
+              }
+
+              &.mat-form-field-disabled {
+                @include opacity(0.5);
+              }
+            }
+          }
+        }
+      }
+
+      /* Slide-in panel content */
+      .gd-app-side-dialog-v2-content-middle {
+        overflow-x: hidden;
+        overflow-y: overlay;
+        padding: 1.6rem 1.6rem 0;
+
+        /* Slide-in panel content item */
+        .gd-app-side-dialog-v2-content-middle-item {
+          margin-bottom: 0.8rem;
+
+          &:last-child {
+            margin-bottom: 0;
+
+            .gd-app-side-dialog-v2-content-middle-item-input-row {
+              &:after {
+                display: none;
+              }
+            }
+          }
+
+          /* Slide-in panel divider */
+          .gd-app-side-dialog-v2-content-middle-item-input-divider {
+            padding-bottom: 0.8rem;
+            position: relative;
+
+            &:before {
+              background: rgba(var(--gd-secondary-rgb), 0.25);
+              content: '';
+              display: block;
+              height: 0.1rem;
+              left: -1.6rem;
+              position: absolute;
+              top: 0;
+              width: calc(100% + 3.2rem);
+            }
+
+            /* Slide-in panel divider with title */
+            &.gd-app-side-dialog-v2-content-middle-item-input-divider-has-title {
+              color: var(--gd-secondary);
+              font-size: 1.2rem;
+              height: 1.8rem;
+              letter-spacing: 0.2rem;
+              margin: 0 0 1.6rem;
+              padding-bottom: 0;
+              text-transform: uppercase;
+              white-space: nowrap;
+
+              &:before {
+                display: none;
+              }
+
+              &.gd-app-side-dialog-v2-content-middle-item-input-divider-has-title-multiple-lines {
+                height: auto;
+                white-space: normal;
+              }
+            }
+          }
+
+          /* Slide-in panel checkboxes */
+          .gd-form-checkbox-v2 {
+            margin-bottom: 1.6rem;
+          }
+
+          /* Slide-in panel links */
+          .gd-app-side-dialog-v2-content-middle-item-input-link {
+            line-height: 2.4rem;
+            margin-bottom: 1.6rem;
+            padding: 0;
+
+            .mat-button-focus-overlay,
+            .mat-ripple {
+              display: none;
+            }
+          }
+
+          /* Slide-in panel links with actions */
+          .gd-app-side-dialog-v2-content-middle-item-input-link-with-action {
+            padding: 0.8rem 0;
+            position: relative;
+
+            &:before {
+              background: rgba(var(--gd-secondary-rgb), 0.25);
+              bottom: -0.8rem;
+              content: '';
+              display: block;
+              height: 0.1rem;
+              left: -1.6rem;
+              position: absolute;
+              width: calc(100% + 3.2rem);
+            }
+
+            .gd-app-side-dialog-v2-content-middle-item-input-link {
+              margin-bottom: 0.8rem;
+            }
+          }
+
+          /* Slide-in panel accordions */
+          .gd-app-side-dialog-v2-content-middle-item-input-accordion-title {
+            color: var(--gd-secondary);
+            font-size: 1.2rem;
+            height: 1.8rem;
+            letter-spacing: 0.2rem;
+            margin: 0 0 1.6rem;
+            padding-bottom: 0;
+            text-transform: uppercase;
+            white-space: nowrap;
+
+            &:empty {
+              display: none;
+            }
+          }
+
+          .gd-app-side-dialog-v2-content-middle-item-input-accordion {
+            margin-bottom: 2.4rem;
+
+            .mat-expansion-panel-body {
+              .gd-app-side-dialog-v2-content-middle-item-input {
+                margin-top: 0.8rem;
+                position: relative;
+
+                &:before {
+                  background: rgba(var(--gd-secondary-rgb), 0.05);
+                  content: '';
+                  display: block;
+                  height: calc(100% + 0.8rem);
+                  left: -0.8rem;
+                  @include opacity(0);
+                  position: absolute;
+                  top: -0.4rem;
+                  visibility: hidden;
+                  width: calc(100% + 1.6rem);
+                }
+
+                &:hover {
+                  &:before {
+                    @include opacity(1);
+                    visibility: visible;
+                  }
+                }
+
+                &.gd-app-side-dialog-v2-content-middle-item-input-divider {
+                  margin-top: 0;
+
+                  &:before {
+                    display: none;
+                  }
+                }
+              }
+  
+              .gd-app-side-dialog-v2-content-middle-item-input-link {
+                margin: 0;
+
+                &:before {
+                  display: none;
+                }
+              }
+            }
+
+            .gd-type-error {
+              .mat-expansion-panel-body {
+                .gd-app-side-dialog-v2-content-middle-item-input {
+                  &:before {
+                    display: none;
+                  }
+                }
+              }
+            }
+
+            &.gd-no-max-height {
+              .mat-expansion-panel-body {
+                max-height: 100%;
+
+                .gd-app-side-dialog-v2-content-middle-item-input {
+                  &:before {
+                    display: none;
+                  }
+                }
+              }
+            }
+          }
+
+          .gd-app-side-dialog-v2-content-middle-item-input {
+            .gd-app-side-dialog-v2-content-middle-item-input-key {
+              color: var(--gd-secondary);
+              width: 30%;
+            }
+
+            .gd-app-side-dialog-v2-content-middle-item-input-value {
+              width: 70%;
+            }
+          }
+
+          /* Slide-in panel filters */
+          .gd-app-side-dialog-v2-content-middle-item-input-filter-list {
+            margin-top: -0.8rem;
+
+            /* Filters - tabs */
+            .mat-tab-group {
+              margin: 0 -1.6rem;
+              max-width: calc(100% + 3.2rem);
+
+              .mat-tab-header {
+                border-bottom-color: rgba(var(--gd-secondary-rgb), 0.25);
+                margin-bottom: 1.6rem;
+                padding: 0 1.6rem;
+              }
+
+              .mat-tab-body-wrapper {
+                .mat-tab-body {
+                  .mat-tab-body-content {
+                    padding: 0 1.6rem;
+                  }
+
+                  + .mat-tab-body-active {
+                    .gd-app-side-dialog-v2-content-middle-item-input-filter-list-container {
+                      height: calc(100vh - 31.7rem); /* Fallback for browsers which cannot support Custom Properties */
+                      height: calc((var(--vh, 1vh) * 100) - 31.7rem);
+                    }
+                  }
+                }
+              }
+            }
+
+            &.gd-app-side-dialog-v2-content-middle-item-input-filter-list-operator-hidden {
+              .gd-app-side-dialog-v2-content-middle-item-input-filter-list-container {
+                height: calc(100vh - 31.7rem); /* Fallback for browsers which cannot support Custom Properties */
+                height: calc((var(--vh, 1vh) * 100) - 31.7rem);
+              }
+            }
+
+            /* Filters - and/or operator */
+            .gd-form-toggle-v2 {
+              margin-bottom: 1.6rem;
+            }
+
+            /* Filters - top buttons */
+            .gd-app-side-dialog-v2-content-middle-item-input-filter-list-buttons {
+              margin-bottom: 1.6rem;
+              position: relative;
+
+              &:after {
+                background: rgba(var(--gd-secondary-rgb), 0.25);
+                bottom: -1.6rem;
+                content: '';
+                display: block;
+                height: 0.1rem;
+                left: -1.6rem;
+                position: absolute;
+                width: calc(100% + 3.2rem);
+              }
+            }
+
+            /* Filters - scrollable container with all filters */
+            .gd-app-side-dialog-v2-content-middle-item-input-filter-list-container {
+              height: calc(100vh - 37.6rem); /* Fallback for browsers which cannot support Custom Properties */
+              height: calc((var(--vh, 1vh) * 100) - 37.6rem);
+              margin: 0 -1.6rem;
+              overflow-y: overlay;
+              padding: 1.6rem;
+            }
+
+            /* Filters - filter item */
+            .gd-app-side-dialog-v2-content-middle-item-input-filter-list-item {
+              /* Filters - filter item - delete button */
+              .gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-right {
+                @include border-radius(0 0.4rem 0.4rem 0);
+                font-size: 1.6rem;
+                height: 2.4rem;
+                min-width: 2.4rem;
+                padding: 0.4rem;
+                width: 2.4rem;
+
+                .mat-icon {
+                  font-size: 1.6rem;
+                }
+              }
+
+              /* Filters - filter item - empty */
+              &.gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-no-value {
+                .gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-left {
+                  /* Filters - filter item - parent select */
+                  > app-form-select-single-v2 {
+                    .gd-form-select-single-v2 {
+                      .mat-form-field {
+                        .mat-form-field-wrapper {
+                          .mat-form-field-flex {
+                            .mat-form-field-outline,
+                            .mat-form-field-outline-thick {
+                              .mat-form-field-outline-end {
+                                @include border-radius(0 0 0.4rem 0);
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+
+              /* Filters - filter item - with value */
+              &:not(.gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-no-value) {
+                .gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-left {
+                  border: 0.1rem solid var(--gd-secondary);
+                  border-top: 0 none;
+                  @include border-radius(0.4rem 0 0.4rem 0.4rem);
+                  margin-bottom: 1.6rem;
+
+                  /* Filters - filter item - parent select */
+                  > app-form-select-single-v2 {
+                    .gd-form-select-single-v2 {
+                      .mat-form-field {
+                        .mat-form-field-wrapper {
+                          .mat-form-field-flex {
+                            background: rgba(var(--gd-secondary-rgb), 0.1);
+
+                            .mat-form-field-outline,
+                            .mat-form-field-outline-thick {
+                              .mat-form-field-outline-start {
+                                border-left: 0 none;
+                                @include border-radius(0.4rem 0 0 0);
+                              }
+  
+                              .mat-form-field-outline-end {
+                                border-right: 0 none;
+                                @include border-radius(0);
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+
+                  .gd-app-side-dialog-v2-content-middle-item-input-filter-list-item-left-inner {
+                    padding: 0 1.6rem;
+
+                    .gd-form-number-v2,
+                    .gd-form-date-v2 {
+                      .mat-form-field {
+                        .mat-form-field-wrapper {
+                          .mat-form-field-flex {
+                            .mat-form-field-infix {
+                              width: 8rem;
+                            }
+                          }
+                        }
+                      }
+                    }
+
+                    .gd-form-select-single-v2,
+                    .gd-form-select-multiple-v2,
+                    .gd-form-select-location-single-v2,
+                    .gd-form-select-location-multiple-v2 {
+                      .mat-form-field {
+                        .mat-form-field-wrapper {
+                          .mat-form-field-flex {
+                            .mat-form-field-infix {
+                              .mat-select-multiple {
+                                .mat-select-trigger {
+                                  .mat-select-value {
+                                    width: calc(100% - 2.4rem);
+
+                                    .mat-select-value-text {
+                                      @include flex(flex);
+
+                                      > mat-select-trigger {
+                                        overflow: hidden;
+                                        text-overflow: ellipsis;
+                                        white-space: nowrap;
+                                      }
+
+                                      .gd-form-select-multiple-v2-panel-inner {
+                                        display: inline-block !important;
+                                        height: 2.4rem;
+                                        max-height: 2.4rem;
+                                        overflow: hidden;
+                                        padding-right: 0;
+                                        text-overflow: ellipsis;
+                                        white-space: nowrap;
+                                      }
+                                    }
+                                  }
+
+                                  .mat-select-arrow-wrapper {
+                                    right: 0.8rem;
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+
+                    .gd-form-select-groups-v2 {
+                      .mat-form-field {
+                        .mat-form-field-wrapper {
+                          .mat-form-field-flex {
+                            .mat-form-field-infix {
+                              .mat-select-multiple {
+                                .mat-select-trigger {
+                                  .mat-select-value {
+                                    width: calc(100% - 2.4rem);
+
+                                    .mat-select-value-text {
+                                      @include flex(flex);
+
+                                      > mat-select-trigger {
+                                        overflow: hidden;
+                                        text-overflow: ellipsis;
+                                        white-space: nowrap;
+
+                                        > div {
+                                          overflow: hidden;
+                                          text-overflow: ellipsis;
+                                          white-space: nowrap;
+                                        }
+                                      }
+
+                                      .gd-form-select-groups-v2-group-selected {
+                                        display: inline-block !important;
+                                        height: 2.4rem;
+                                        max-height: 2.4rem;
+                                        overflow: hidden;
+                                        padding-right: 0;
+                                        text-overflow: ellipsis;
+                                        white-space: nowrap;
+                                      }
+                                    }
+                                  }
+
+                                  .mat-select-arrow-wrapper {
+                                    right: 0.8rem;
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+
+                        &.mat-form-field-invalid {
+                          .mat-form-field-wrapper {
+                            .mat-form-field-flex {
+                              .mat-form-field-infix {
+                                .mat-select.mat-select-multiple {
+                                  height: 2.4rem;
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          .gd-app-side-dialog-v2-content-middle-item-input-row {
+            @include flex_align_items(center);
+            @include flex(flex);
+            @include flex_direction(row);
+            @include flex_wrap(wrap);
+            gap: 0.8rem;
+            padding-bottom: 0.8rem;
+            position: relative;
+
+            &:after {
+              background: rgba(var(--gd-secondary-rgb), 0.25);
+              bottom: 0;
+              content: '';
+              display: block;
+              height: 0.1rem;
+              left: -1.6rem;
+              position: absolute;
+              width: calc(100% + 3.2rem);
+            }
+          }
+
+          /* Sort List */
+          &.gd-app-side-dialog-v2-content-middle-item-has-sort-list {
+            height: calc(100% - 3.4rem);
+          }
+
+          .gd-app-side-dialog-v2-content-middle-item-input-sort-list {
+            height: 100%;
+            margin: 0 -1.6rem;
+            overflow-y: overlay;
+            padding: 0 1.6rem;
+
+            .gd-app-side-dialog-v2-content-middle-item-input-sort-list-item {
+              &.cdk-drag-placeholder {
+                background: rgba(var(--gd-primary-alt-rgb), 0.25);
+                border: 0.2rem dotted var(--gd-primary-alt);
+                @include border-radius(0.4rem);
+                height: 3rem;
+                @include transition(transform 250ms cubic-bezier(0, 0, 0.2, 1));
+              }
+
+              .gd-app-side-dialog-v2-content-middle-item-input-sort-list-item-icon {
+                color: rgba(var(--gd-secondary-rgb), 0.5);
+                height: 2rem;
+                @include transition(color 0.24s ease-in-out 0s);
+                width: 2rem;
+          
+                &.cdk-drag-handle {
+                  cursor: grab;
+          
+                  &:hover,
+                  &:focus,
+                  &:active {
+                    color: var(--gd-primary);
+                  }
+                }
+              }
+
+              .gd-app-side-dialog-v2-content-middle-item-input-sort-list-item-label {
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                display: -webkit-box;
+                display: -moz-box;
+                max-height: 4.2rem;
+                overflow: hidden;
+                padding-left: 0.8rem;
+              }
+            }
+          }
+        }
+
+        /* Slide-in panel not found */
+        .gd-app-side-dialog-v2-content-middle-not-found {
+          color: var(--gd-secondary);
+          font-size: 1.8rem;
+          font-style: italic;
+          text-align: center;
+
+          .mat-icon {
+            color: rgba(var(--gd-secondary-rgb), 0.15);
+            display: block;
+            font-size: 10rem;
+            height: 10rem;
+            margin: 1.6rem auto;
+            width: 10rem;
+          }
+        }
+      }
+
+      /* Slide-in panel footer */
+      .gd-app-side-dialog-v2-content-bottom {
+        border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+        padding: 1.6rem;
+
+        .gd-app-side-dialog-v2-content-bottom-button {
+          text-transform: capitalize;
+        }
+      }
+
+      /* Slide-in panel loading spinner */
+      .gd-app-side-dialog-v2-content-loading {
+        left: 50%;
+        min-height: 12.8rem;
+        padding: 1.6rem;
+        position: absolute;
+        text-align: center;
+        top: 50%;
+        @include translate(-50%, -50%);
+        width: 100%;
+
+        .gd-app-side-dialog-v2-content-loading-spinner {
+          margin-bottom: 1.6rem;
+        }
+
+        .gd-app-side-dialog-v2-content-loading-message {
+          height: 4.8rem;
+        }
+      }
+    }
+
+    &.ng-animating {
+      .mat-expansion-panel {
+        &:not(.gd-main-menu-option) {
+          .mat-expansion-panel-content {
+            height: 0;
+            visibility: hidden;
+          }
+        }
+      }
+    }
+  }
+}

@@ -8,18 +8,18 @@ import { EntityType } from './entity-type';
  * Model representing a Case, a Contact or an Event
  */
 export class RangeFollowUpsModel {
-    person: ContactModel | CaseModel;
-    followUps: FollowUpModel[];
+  person: ContactModel | CaseModel;
+  followUps: FollowUpModel[];
 
-    constructor(data = null) {
-        const contactData = _.get(data, 'contact');
-        if (contactData) {
-            this.person = contactData.type === EntityType.CASE ?
-                new CaseModel(contactData) :
-                new ContactModel(contactData);
-        }
-        this.followUps = _.map(_.get(data, 'followUps'), (followUpData) => {
-            return new FollowUpModel(followUpData, false);
-        });
+  constructor(data = null) {
+    const contactData = _.get(data, 'contact');
+    if (contactData) {
+      this.person = contactData.type === EntityType.CASE ?
+        new CaseModel(contactData) :
+        new ContactModel(contactData);
     }
+    this.followUps = _.map(_.get(data, 'followUps'), (followUpData) => {
+      return new FollowUpModel(followUpData, false);
+    });
+  }
 }

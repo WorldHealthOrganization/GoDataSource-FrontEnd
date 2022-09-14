@@ -1,137 +1,292 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
+import { Component, OnDestroy } from '@angular/core';
+import { takeUntil, tap } from 'rxjs/operators';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { IconModel } from '../../../../core/models/icon.model';
 import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { UserModel } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { HoverRowAction, LoadingDialogModel } from '../../../../shared/components';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { catchError, tap } from 'rxjs/operators';
-import { moment } from '../../../../core/helperClasses/x-moment';
-import { throwError } from 'rxjs/internal/observable/throwError';
-import { IconModel } from '../../../../core/models/icon.model';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ExportDataExtension, ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import * as moment from 'moment';
 
 @Component({
-    selector: 'app-reference-data-categories-list',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './reference-data-categories-list.component.html',
-    styleUrls: ['./reference-data-categories-list.component.less']
+  selector: 'app-reference-data-categories-list',
+  templateUrl: './reference-data-categories-list.component.html'
 })
-export class ReferenceDataCategoriesListComponent extends ListComponent implements OnInit, OnDestroy {
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE', '..', true)
-    ];
+export class ReferenceDataCategoriesListComponent
+  extends ListComponent<ReferenceDataCategoryModel>
+  implements OnDestroy {
+  /**
+   * Constructor
+   */
+  constructor(
+    protected listHelperService: ListHelperService,
+    private referenceDataDataService: ReferenceDataDataService,
+    private i18nService: I18nService,
+    private dialogV2Service: DialogV2Service
+  ) {
+    super(
+      listHelperService,
+      true
+    );
+  }
 
-    // authenticated user
-    authUser: UserModel;
+  /**
+   * Release resources
+   */
+  ngOnDestroy() {
+    // release parent resources
+    super.onDestroy();
+  }
 
-    // constants
-    ReferenceDataCategoryModel = ReferenceDataCategoryModel;
-    IconModel = IconModel;
+  /**
+   * Component initialized
+   */
+  initialized(): void {
+    // initialize pagination
+    this.initPaginator();
 
-    // list of entries grouped by category
-    referenceData$: Observable<ReferenceDataCategoryModel[]>;
+    // ...and re-load the list when the Selected Outbreak is changed
+    this.needsRefreshList(true);
+  }
 
-    referenceDataExporFileName: string = moment().format('YYYY-MM-DD');
-
-    loadingDialog: LoadingDialogModel;
-
-    fixedTableColumns: string[] = [
-        'categoryName',
-        'entries'
-    ];
-
-    recordActions: HoverRowAction[] = [
-        // View Items
-        new HoverRowAction({
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_ACTION_VIEW_CATEGORY',
-            click: (item: ReferenceDataCategoryModel) => {
-                this.router.navigate(['/reference-data', item.id]);
-            },
-            visible: (item: ReferenceDataCategoryModel): boolean => {
-                return ReferenceDataEntryModel.canList(this.authUser);
+  /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View reference data
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_ACTION_VIEW_CATEGORY',
+          action: {
+            link: (item: ReferenceDataCategoryModel): string[] => {
+              return ['/reference-data', item.id];
             }
-        })
-    ];
-
-    /**
-     * Constructor
-     */
-    constructor(
-        protected listHelperService: ListHelperService,
-        private router: Router,
-        private referenceDataDataService: ReferenceDataDataService,
-        private authDataService: AuthDataService,
-        private i18nService: I18nService,
-        private dialogService: DialogService,
-        private snackbarService: SnackbarService
-    ) {
-        super(listHelperService);
-    }
-
-    /**
-     * Component initialized
-     */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
-
-        this.needsRefreshList(true);
-
-        // add page title
-        this.referenceDataExporFileName = this.i18nService.instant('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE') +
-            ' - ' +
-            this.referenceDataExporFileName;
-    }
-
-    /**
-     * Release resources
-     */
-    ngOnDestroy() {
-        // release parent resources
-        super.ngOnDestroy();
-    }
-
-    /**
-     * Re(load) the Reference Data Categories list
-     */
-    refreshList(finishCallback: (records: any[]) => void) {
-        // load reference data
-        this.referenceData$ = this.referenceDataDataService
-            .getReferenceData()
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    finishCallback([]);
-                    return throwError(err);
-                }),
-                tap((data: any[]) => {
-                    finishCallback(data);
-                })
-            );
-    }
-
-    /**
-     * Display loading dialog
-     */
-    showLoadingDialog() {
-        this.loadingDialog = this.dialogService.showLoadingDialog();
-    }
-    /**
-     * Hide loading dialog
-     */
-    closeLoadingDialog() {
-        if (this.loadingDialog) {
-            this.loadingDialog.close();
-            this.loadingDialog = null;
+          },
+          visible: (): boolean => {
+            return ReferenceDataEntryModel.canList(this.authUser);
+          }
         }
-    }
+      ]
+    };
+  }
+
+  /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {
+    // default table columns
+    this.tableColumns = [
+      {
+        field: 'name',
+        label: 'LNG_REFERENCE_DATA_CATEGORY_FIELD_LABEL_CATEGORY_NAME',
+        pinned: IV2ColumnPinned.LEFT
+      },
+      {
+        field: 'entries',
+        label: 'LNG_REFERENCE_DATA_CATEGORY_FIELD_LABEL_ENTRIES',
+        format: {
+          type: V2ColumnFormat.LINK_LIST
+        },
+        links: (item: ReferenceDataCategoryModel) => item.entries?.length > 0 ?
+          item.entries.map((entry) => {
+            return {
+              label: this.i18nService.instant(entry.value),
+              href: ReferenceDataEntryModel.canView(this.authUser) ?
+                `/reference-data/${item.id}/${entry.id}/view` :
+                null
+            };
+          }) :
+          []
+      },
+      {
+        field: 'entriesCount',
+        label: 'LNG_REFERENCE_DATA_CATEGORY_FIELD_LABEL_ENTRIES_COUNT',
+        format: {
+          type: (item: ReferenceDataCategoryModel) => item.entries?.length ?
+            item.entries.length.toString() :
+            '0'
+        }
+      }
+    ];
+  }
+
+  /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
+   * Initialize table quick actions
+   */
+  protected initializeQuickActions(): void {
+    this.quickActions = {
+      type: V2ActionType.MENU,
+      label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
+      visible: (): boolean => {
+        return IconModel.canList(this.authUser) || ReferenceDataCategoryModel.canImport(this.authUser) || ReferenceDataCategoryModel.canExport(this.authUser);
+      },
+      menuOptions: [
+        // Manage icons
+        {
+          label: {
+            get: () => 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_MANAGE_ICONS_BUTTON'
+          },
+          action: {
+            link: () => ['/reference-data', 'manage-icons', 'list']
+          },
+          visible: (): boolean => {
+            return IconModel.canList(this.authUser);
+          }
+        },
+
+        // Divider
+        {
+          visible: (): boolean => {
+            return IconModel.canList(this.authUser);
+          }
+        },
+
+        // Import reference data
+        {
+          label: {
+            get: () => 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_IMPORT_BUTTON'
+          },
+          action: {
+            link: () => ['/import-export-data', 'reference-data', 'import']
+          },
+          visible: (): boolean => {
+            return ReferenceDataCategoryModel.canImport(this.authUser);
+          }
+        },
+
+        // Export reference data
+        {
+          label: {
+            get: () => 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_BUTTON'
+          },
+          action: {
+            click: () => {
+              this.dialogV2Service.showExportData({
+                title: {
+                  get: () => 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_TITLE'
+                },
+                export: {
+                  url: 'reference-data/export',
+                  async: true,
+                  method: ExportDataMethod.GET,
+                  fileName: `${ this.i18nService.instant('LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_EXPORT_TITLE') } - ${ moment().format('YYYY-MM-DD HH:mm') }`,
+                  queryBuilder: this.queryBuilder,
+                  allow: {
+                    types: [
+                      ExportDataExtension.CSV,
+                      ExportDataExtension.XLS,
+                      ExportDataExtension.XLSX,
+                      ExportDataExtension.JSON,
+                      ExportDataExtension.ODS,
+                      ExportDataExtension.PDF
+                    ],
+                    dbColumns: true,
+                    dbValues: true,
+                    jsonReplaceUndefinedWithNull: true
+                  }
+                }
+              });
+            }
+          },
+          visible: (): boolean => {
+            return ReferenceDataCategoryModel.canExport(this.authUser);
+          }
+        }
+      ]
+    };
+  }
+
+  /**
+   * Initialize table group actions
+   */
+  protected initializeGroupActions(): void {}
+
+  /**
+   * Initialize table add action
+   */
+  protected initializeAddAction(): void {}
+
+  /**
+   * Initialize table grouped data
+   */
+  protected initializeGroupedData(): void {}
+
+  /**
+   * Initialize breadcrumbs
+   */
+  protected initializeBreadcrumbs(): void {
+    // set breadcrumbs
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
+        }
+      }, {
+        label: 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE',
+        action: null
+      }
+    ];
+  }
+
+  /**
+   * Fields retrieved from api to reduce payload size
+   */
+  protected refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) the Reference Data Categories list
+   */
+  refreshList(): void {
+    // load reference data
+    this.records$ = this.referenceDataDataService
+      .getReferenceData()
+      .pipe(
+        // update page count
+        tap((entities) => {
+          this.pageCount = {
+            count: entities.length,
+            hasMore: false
+          };
+        }),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
+  }
+
+  /**
+  * Get total number of items, based on the applied filters
+  */
+  refreshListCount() {}
 }
