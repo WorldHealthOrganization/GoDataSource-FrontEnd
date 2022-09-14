@@ -15,7 +15,7 @@ import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/c
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { ActivatedRoute } from '@angular/router';
-import { RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
+import { RequestFilterGenerator, RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { EntityType } from '../../../../core/models/entity-type';
 import { Location } from '@angular/common';
 import { V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
@@ -30,7 +30,7 @@ import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.serv
 import { TranslateService } from '@ngx-translate/core';
 import * as momentOriginal from 'moment';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { IV2FilterText, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 
 @Component({
   selector: 'app-contact-range-follow-ups-list',
@@ -55,6 +55,41 @@ export class ContactRangeFollowUpsListComponent
         return data.person.type === EntityType.CASE ?
           (CaseModel.canView(this.authUser) ? `/cases/${data.person.id}/view` : undefined) :
           (ContactModel.canView(this.authUser) ? `/contacts/${data.person.id}/view` : undefined);
+      },
+      filter: {
+        type: V2FilterType.TEXT,
+        textType: V2FilterTextType.STARTS_WITH,
+        childQueryBuilderKey: 'contact',
+        search: (column: IV2Column) => {
+          // value
+          const value: string = (column.filter as IV2FilterText).value;
+
+          // remove previous condition
+          const qb: RequestQueryBuilder = this.queryBuilder.addChildQueryBuilder('contact');
+          qb.filter.removePathCondition('or.firstName');
+          qb.filter.removePathCondition('or.lastName');
+          if (value) {
+            // add new condition
+            qb.filter.where({
+              or: [
+                {
+                  firstName: RequestFilterGenerator.textStartWith(
+                    value,
+                    false
+                  )
+                }, {
+                  lastName: RequestFilterGenerator.textStartWith(
+                    value,
+                    false
+                  )
+                }
+              ]
+            });
+          }
+
+          // refresh list
+          this.needsRefreshList();
+        }
       }
     }, {
       field: 'visualId',
