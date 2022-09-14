@@ -29,7 +29,8 @@ export const EnglishUsLang = {
     'LNG_COMMON_LABEL_EXPORT_FIELDS_ALL': 'All fields',
     'LNG_COMMON_LABEL_EXPORT_FIELDS': 'Fields',
     'LNG_COMMON_LABEL_TABS_SETTINGS': 'Tab configuration',
-    'LNG_COMMON_LABEL_TABS_ORDER': 'Tabs order'
+    'LNG_COMMON_LABEL_TABS_ORDER': 'Tabs order',
+    'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_DATE_END_FOLLOW_UP': 'End of follow-up'
 
 
 

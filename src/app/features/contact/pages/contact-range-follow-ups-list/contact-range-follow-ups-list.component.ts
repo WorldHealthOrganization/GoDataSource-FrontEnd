@@ -65,7 +65,8 @@ export class ContactRangeFollowUpsListComponent
       pinned: IV2ColumnPinned.LEFT,
       filter: {
         type: V2FilterType.TEXT,
-        textType: V2FilterTextType.STARTS_WITH
+        textType: V2FilterTextType.STARTS_WITH,
+        childQueryBuilderKey: 'contact'
       }
     }, {
       field: 'locationId',
@@ -468,6 +469,7 @@ export class ContactRangeFollowUpsListComponent
                   lockPosition: 'right',
                   width: 65,
                   alwaysVisible: true,
+                  centerHeader: true,
                   format: {
                     type: V2ColumnFormat.HTML
                   },

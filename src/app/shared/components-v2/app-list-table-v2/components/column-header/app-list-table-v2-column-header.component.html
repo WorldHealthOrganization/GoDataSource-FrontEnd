@@ -4,10 +4,11 @@
 
   <!-- Header -->
   <div
-    fxLayout="row" fxLayoutGap="1.6rem"
+    fxLayout="row" [fxLayoutGap]="extendedColDef.columnDefinition.sortable || extendedColDef.columnDefinition.format?.type === V2ColumnFormat.EXPAND_ROW ? '1.6rem' : '0rem'"
     class="gd-list-table-column-header"
     [class.gd-list-table-column-header-sortable]="extendedColDef.columnDefinition.sortable"
     [class.gd-list-table-column-header-sortable-active]="component.sortByColumn === extendedColDef"
+    [class.gd-list-table-column-header-center]="extendedColDef.columnDefinition.centerHeader"
     (click)="extendedColDef.columnDefinition.sortable ? sort() : undefined">
 
     <!-- Label -->
@@ -19,9 +20,9 @@
 
     <!-- Sort Icon -->
     <div
+      *ngIf="extendedColDef.columnDefinition.sortable && component.sortByColumn === extendedColDef"
       class="gd-list-table-column-header-sort">
       <mat-icon
-        *ngIf="extendedColDef.columnDefinition.sortable && component.sortByColumn === extendedColDef"
         [class.gd-list-table-column-header-sort-desc]="component.sortByDirection === RequestSortDirection.DESC">north</mat-icon>
     </div>
 

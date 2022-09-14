@@ -50,6 +50,7 @@ export interface IV2ColumnBasic {
   lockPosition?: boolean | 'left' | 'right';
   width?: number;
   alwaysVisible?: boolean;
+  centerHeader?: boolean;
   link?: (any) => string;
   cssCellClass?: string;
   sortable?: boolean;
@@ -186,6 +187,7 @@ export interface IV2ColumnButton {
   lockPosition?: boolean | 'left' | 'right';
   width?: number;
   alwaysVisible?: boolean;
+  centerHeader?: boolean;
   cssCellClass?: string;
   sortable?: boolean;
   filter?: V2Filter;
@@ -207,6 +209,7 @@ export interface IV2ColumnAction {
   sortable?: never;
   width?: never;
   alwaysVisible?: never;
+  centerHeader?: never;
 }
 
 /**
@@ -279,6 +282,7 @@ export interface IV2ColumnStatus {
   // never
   width?: never;
   alwaysVisible?: never;
+  centerHeader?: never;
   sortable?: never;
   filter?: never;
 }
@@ -307,6 +311,7 @@ export interface IV2ColumnLinkList {
   lockPosition?: boolean | 'left' | 'right';
   width?: number;
   alwaysVisible?: boolean;
+  centerHeader?: boolean;
   cssCellClass?: string;
   filter?: V2Filter;
 
@@ -335,6 +340,7 @@ export interface IV2ColumnHTML {
   lockPosition?: boolean | 'left' | 'right';
   width?: number;
   alwaysVisible?: boolean;
+  centerHeader?: boolean;
   cssCellClass?: string;
   filter?: V2Filter;
 
@@ -377,6 +383,7 @@ export interface IV2ColumnExpandRow {
   lockPosition?: boolean | 'left' | 'right';
   width?: number;
   alwaysVisible?: boolean;
+  centerHeader?: boolean;
   cssCellClass?: string;
   sortable?: boolean;
   filter?: V2Filter;
