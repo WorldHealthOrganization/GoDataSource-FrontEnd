@@ -171,6 +171,43 @@ export class ContactRangeFollowUpsListComponent
         childQueryBuilderKey: 'contact',
         includeNoValue: true
       }
+    }, {
+      field: 'type',
+      label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_PERSON_TYPE',
+      notVisible: true,
+      format: {
+        type: (data) => data.person?.type ?
+          this.translateService.instant(data.person.type) :
+          ''
+      },
+      filter: {
+        type: V2FilterType.MULTIPLE_SELECT,
+        childQueryBuilderKey: 'contact',
+        options: [
+          {
+            label: EntityType.CONTACT,
+            value: EntityType.CONTACT
+          }, {
+            label: EntityType.CASE,
+            value: EntityType.CASE
+          }
+        ]
+      }
+    },
+    {
+      field: 'occupation',
+      label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_OCCUPATION',
+      notVisible: true,
+      format: {
+        type: (data) => data.person?.occupation ?
+          this.translateService.instant(data.person.occupation) :
+          ''
+      },
+      filter: {
+        type: V2FilterType.MULTIPLE_SELECT,
+        options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        childQueryBuilderKey: 'contact'
+      }
     }
   ];
 

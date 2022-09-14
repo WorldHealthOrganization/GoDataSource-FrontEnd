@@ -317,7 +317,8 @@ const routes: Routes = [
       yesNoAll: YesNoAllDataResolver,
       dailyFollowUpStatus: DailyFollowUpStatusDataResolver,
       team: TeamDataResolver,
-      followUpGroupBy: FollowUpGroupByDataResolver
+      followUpGroupBy: FollowUpGroupByDataResolver,
+      occupation: OccupationDataResolver
     }
   },
   // Create Follow Up
