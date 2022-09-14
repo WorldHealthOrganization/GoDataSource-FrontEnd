@@ -10,16 +10,15 @@ import * as fromPages from './pages';
 import * as fromComponents from './components';
 
 @NgModule({
-    imports: [
-        routing,
-        SharedModule,
-        WorldMapModule
-    ],
-    declarations: [
-        ...fromPages.pageComponents,
-        ...fromComponents.components
-    ],
-    entryComponents: []
+  imports: [
+    routing,
+    SharedModule,
+    WorldMapModule
+  ],
+  declarations: [
+    ...fromPages.pageComponents,
+    ...fromComponents.components
+  ]
 })
 export class TransmissionChainModule {
 }

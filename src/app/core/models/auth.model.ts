@@ -5,26 +5,26 @@ import { UserModel } from './user.model';
  * Token information
  */
 export interface ITokenInfo {
-    ttl: number;
-    isValid: boolean;
-    approximatedExpireInSeconds: number;
-    approximatedExpireInSecondsReal: number;
+  ttl: number;
+  isValid: boolean;
+  approximatedExpireInSeconds: number;
+  approximatedExpireInSecondsReal: number;
 }
 
 export class IAuthTwoFactor {
-    twoFA: boolean;
+  twoFA: boolean;
 }
 
 export class AuthModel {
-    token: string;
-    userId: string;
-    user: UserModel;
+  token: string;
+  userId: string;
+  user: UserModel;
 
-    /**
+  /**
      * Constructor
      */
-    constructor(data) {
-        this.token = _.get(data, 'id');
-        this.userId = _.get(data, 'userId');
-    }
+  constructor(data) {
+    this.token = _.get(data, 'id');
+    this.userId = _.get(data, 'userId');
+  }
 }

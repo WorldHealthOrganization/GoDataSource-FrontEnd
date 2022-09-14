@@ -1,331 +1,385 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { UserModel } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { Observable } from 'rxjs';
-import { CaseModel } from '../../../../core/models/case.model';
-import { ContactModel } from '../../../../core/models/contact.model';
-import { EventModel } from '../../../../core/models/event.model';
-import { EntityType } from '../../../../core/models/entity-type';
-import { InconsistencyModel } from '../../../../core/models/inconsistency.model';
+import { Component, OnDestroy } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
+import { takeUntil, tap } from 'rxjs/operators';
 import { InconsistencyIssueEnum } from '../../../../core/enums/inconsistency-issue.enum';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { CaseModel } from '../../../../core/models/case.model';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
+import { ContactModel } from '../../../../core/models/contact.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { EntityType } from '../../../../core/models/entity-type';
+import { EventModel } from '../../../../core/models/event.model';
+import { InconsistencyModel } from '../../../../core/models/inconsistency.model';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ReferenceDataCategory, ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { catchError, share, tap } from 'rxjs/operators';
-import { HoverRowAction } from '../../../../shared/components';
-import { throwError } from 'rxjs/internal/observable/throwError';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 
 @Component({
-    selector: 'app-inconsistencies-list',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './inconsistencies-list.component.html',
-    styleUrls: ['./inconsistencies-list.component.less']
+  selector: 'app-inconsistencies-list',
+  templateUrl: './inconsistencies-list.component.html'
 })
-export class InconsistenciesListComponent extends ListComponent implements OnInit, OnDestroy {
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [];
+export class InconsistenciesListComponent extends ListComponent<CaseModel | ContactModel | EventModel | ContactOfContactModel> implements OnDestroy {
+  // Outbreak
+  private _outbreak: OutbreakModel;
 
-    // Outbreak
-    outbreak: OutbreakModel;
+  /**
+  * Constructor
+  */
+  constructor(
+    protected listHelperService: ListHelperService,
+    private outbreakDataService: OutbreakDataService,
+    private i18nService: I18nService,
+    private route: ActivatedRoute
+  ) {
+    // parent
+    super(
+      listHelperService,
+      true
+    );
 
-    // authenticated user
-    authUser: UserModel;
+    // get data
+    this._outbreak = this.route.snapshot.data.outbreak.map[this.route.snapshot.params.outbreakId];
+  }
 
-    // entities
-    entitiesList$: Observable<(CaseModel | ContactModel | EventModel)[]>;
+  /**
+   * Release resources
+   */
+  ngOnDestroy() {
+    // release parent resources
+    super.onDestroy();
+  }
 
-    personTypesListMap: { [id: string]: ReferenceDataEntryModel };
+  /**
+   * Selected outbreak was changed
+   */
+  selectedOutbreakChanged(): void {
+    // initialize pagination
+    // this page doesn't have pagination
 
-    // constants
-    EntityType = EntityType;
-    ReferenceDataCategory = ReferenceDataCategory;
+    // ...and re-load the list when the Selected Outbreak is changed
+    this.needsRefreshList(true);
+  }
 
-    fixedTableColumns: string[] = [
-        'lastName',
-        'firstName',
-        'inconsistencies'
+  /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_ACTION_VIEW',
+          action: {
+            link: (item: CaseModel | ContactModel | EventModel): string[] => {
+              return [this.getItemRouterLink(item, 'view')];
+            }
+          },
+          visible: (item: CaseModel | ContactModel | EventModel): boolean => {
+            return !item.deleted &&
+              item.canView(this.authUser) &&
+              this.selectedOutbreak?.id === item.outbreakId;
+          }
+        },
+
+        // Modify
+        {
+          type: V2ActionType.ICON,
+          icon: 'edit',
+          iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
+          action: {
+            link: (item: CaseModel | ContactModel | EventModel): string[] => {
+              return [this.getItemRouterLink(item, 'modify')];
+            }
+          },
+          visible: (item: CaseModel | ContactModel | EventModel): boolean => {
+            return !item.deleted &&
+              this.selectedOutbreakIsActive &&
+              item.canModify(this.authUser) &&
+              this.selectedOutbreak?.id === item.outbreakId;
+          }
+        }
+      ]
+    };
+  }
+
+  /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {
+    this.tableColumns = [
+      {
+        field: 'firstName',
+        label: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
+        color: 'warn',
+        format: {
+          type: (item) => item.type === EntityType.EVENT ? item.name : item.firstName
+        },
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'lastName',
+        label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'inconsistencies',
+        label: 'LNG_ENTITY_FIELD_LABEL_INCONSISTENCIES',
+        format: {
+          type: (item) => this.inconsistencyToText(item)
+        }
+      },
+      {
+        field: 'statuses',
+        label: 'LNG_COMMON_LABEL_STATUSES',
+        format: {
+          type: V2ColumnFormat.STATUS
+        },
+        notResizable: true,
+        legends: [
+          // person type
+          {
+            title: 'LNG_ENTITY_FIELD_LABEL_TYPE',
+            items: (this.route.snapshot.data.personType as IResolverV2ResponseModel<ReferenceDataEntryModel>).list.map((item) => {
+              return {
+                form: {
+                  type: IV2ColumnStatusFormType.CIRCLE,
+                  color: item.getColorCode()
+                },
+                label: item.id
+              };
+            })
+          }
+        ],
+        forms: (_column, data): V2ColumnStatusForm[] => {
+          // construct list of forms that we need to display
+          const forms: V2ColumnStatusForm[] = [];
+
+          // person type
+          if (
+            data.type &&
+            (this.route.snapshot.data.personType as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[data.type]
+          ) {
+            forms.push({
+              type: IV2ColumnStatusFormType.CIRCLE,
+              color: (this.route.snapshot.data.personType as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[data.type].getColorCode(),
+              tooltip: this.i18nService.instant(data.type)
+            });
+          }
+
+          // finished
+          return forms;
+        }
+      }
+    ];
+  }
+
+  /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
+   * Initialize table quick actions
+   */
+  protected initializeQuickActions(): void {}
+
+  /**
+   * Initialize table group actions
+   */
+  protected initializeGroupActions(): void {}
+
+  /**
+   * Initialize table add action
+   */
+  protected initializeAddAction(): void {}
+
+  /**
+   * Initialize table grouped data
+   */
+  protected initializeGroupedData(): void {}
+
+  /**
+   * Initialize breadcrumbs
+   */
+  protected initializeBreadcrumbs(): void {
+    // set breadcrumbs
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
+        }
+      }
     ];
 
-    recordActions: HoverRowAction[] = [
-        // View Item
-        new HoverRowAction({
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_ACTION_VIEW',
-            click: (item: CaseModel | ContactModel | EventModel) => {
-                this.router.navigateByUrl(this.getItemRouterLink(item, 'view'));
-            },
-            visible: (item: CaseModel | ContactModel | EventModel): boolean => {
-                return !item.deleted &&
-                    this.authUser &&
-                    this.canViewItem(item);
-            }
+    // add list breadcrumb only if we have permission
+    if (OutbreakModel.canList(this.authUser)) {
+      this.breadcrumbs.push(
+        {
+          label: 'LNG_PAGE_LIST_OUTBREAKS_TITLE',
+          action: {
+            link: ['/outbreaks']
+          }
+        }
+      );
+    }
+
+    // add outbreak details ?
+    if (OutbreakModel.canModify(this.authUser)) {
+      this.breadcrumbs.push(
+        {
+          label: this._outbreak.name,
+          action: {
+            link: [`/outbreaks/${ this._outbreak.id }/modify`]
+          }
+        }
+      );
+    } else if (OutbreakModel.canView(this.authUser)) {
+      this.breadcrumbs.push(
+        {
+          label: this._outbreak.name,
+          action: {
+            link: [`/outbreaks/${ this._outbreak.id }/view`]
+          }
+        }
+      );
+    }
+
+    // add inconsistencies breadcrumb
+    this.breadcrumbs.push(
+      {
+        label: 'LNG_PAGE_LIST_INCONSISTENCIES_TITLE',
+        action: null
+      }
+    );
+  }
+
+  /**
+   * Fields retrieved from api to reduce payload size
+   */
+  protected refreshListFields(): string[] {
+    return [];
+  }
+
+  /**
+   * Re(load) list
+   */
+  refreshList() {
+    // remove paginator
+    this.queryBuilder.paginator.clear();
+
+    // retrieve data
+    this.records$ = this.outbreakDataService
+      .getPeopleInconsistencies(this._outbreak.id, this.queryBuilder)
+      .pipe(
+        // update page count
+        tap((entitiesList: []) => {
+          this.pageCount = {
+            count: entitiesList.length,
+            hasMore: false
+          };
         }),
 
-        // Modify Item
-        new HoverRowAction({
-            icon: 'settings',
-            iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
-            click: (item: CaseModel | ContactModel | EventModel) => {
-                this.router.navigateByUrl(this.getItemRouterLink(item, 'modify'));
-            },
-            visible: (item: CaseModel | ContactModel | EventModel): boolean => {
-                return !item.deleted &&
-                    this.authUser &&
-                    this.outbreak &&
-                    this.authUser.activeOutbreakId === this.outbreak.id &&
-                    this.canModifyItem(item);
-            }
-        })
-    ];
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
+  }
 
-    /**
-     * Constructor
-     */
-    constructor(
-        protected listHelperService: ListHelperService,
-        private router: Router,
-        private snackbarService: SnackbarService,
-        private outbreakDataService: OutbreakDataService,
-        private authDataService: AuthDataService,
-        private i18nService: I18nService,
-        private route: ActivatedRoute,
-        private referenceDataDataService: ReferenceDataDataService
-    ) {
-        super(listHelperService);
+  /**
+   * Get total number of items, based on the applied filters
+   */
+  refreshListCount(): void { }
+
+  /**
+   * Get the link to redirect to view page depending on item type and action
+   */
+  private getItemRouterLink(
+    item: CaseModel | ContactModel | EventModel,
+    action: string
+  ) {
+    switch (item.type) {
+      case EntityType.CASE:
+        return `/cases/${item.id}/${action}`;
+      case EntityType.CONTACT:
+        return `/contacts/${item.id}/${action}`;
+      case EntityType.EVENT:
+        return `/events/${item.id}/${action}`;
     }
+  }
 
-    /**
-     * Component initialized
-     */
-    ngOnInit() {
-        // update breadcrumbs
-        this.initializeBreadcrumbs();
+  /**
+   * Inconsistencies
+   */
+  private inconsistencyToText(item: CaseModel | ContactModel | EventModel): string {
+    // construct inconsistencies text
+    let text: string = '';
+    _.each(item.inconsistencies, (inconsistency: InconsistencyModel) => {
+      // determine label
+      let label: string;
+      switch (inconsistency.issue) {
+        case InconsistencyIssueEnum.LNG_PAGE_INCONSISTENCY_LABEL_BIGGER:
+          label = 'LNG_PAGE_INCONSISTENCY_LABEL_BIGGER';
+          break;
+        case InconsistencyIssueEnum.LNG_PAGE_INCONSISTENCY_LABEL_BIGGER_OR_EQUAL:
+          label = 'LNG_PAGE_INCONSISTENCY_LABEL_BIGGER_OR_EQUAL';
+          break;
+        case InconsistencyIssueEnum.LNG_PAGE_INCONSISTENCY_LABEL_SMALLER:
+          label = 'LNG_PAGE_INCONSISTENCY_LABEL_SMALLER';
+          break;
+        case InconsistencyIssueEnum.LNG_PAGE_INCONSISTENCY_LABEL_SMALLER_OR_EQUAL:
+          label = 'LNG_PAGE_INCONSISTENCY_LABEL_SMALLER_OR_EQUAL';
+          break;
+        case InconsistencyIssueEnum.LNG_PAGE_INCONSISTENCY_LABEL_NOT_EQUAL:
+          label = 'LNG_PAGE_INCONSISTENCY_LABEL_NOT_EQUAL';
+          break;
+        case InconsistencyIssueEnum.LNG_PAGE_INCONSISTENCY_LABEL_EQUAL:
+          label = 'LNG_PAGE_INCONSISTENCY_LABEL_EQUAL';
+          break;
+      }
 
-        // reference data
-        const personTypes$ = this.referenceDataDataService.getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE).pipe(share());
-        personTypes$.subscribe((personTypeCategory: ReferenceDataCategoryModel) => {
-            this.personTypesListMap = _.transform(
-                personTypeCategory.entries,
-                (result, entry: ReferenceDataEntryModel) => {
-                    // groupBy won't work here since groupBy will put an array instead of one value
-                    result[entry.id] = entry;
-                },
-                {}
-            );
-        });
-
-        // authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
-
-        // retrieve route params
-        this.route.params
-            .subscribe((params: { outbreakId }) => {
-                this.outbreakDataService
-                    .getOutbreak(params.outbreakId)
-                    .subscribe((outbreak: OutbreakModel) => {
-                        // outbreak
-                        this.outbreak = outbreak;
-
-                        // update breadcrumbs
-                        this.initializeBreadcrumbs();
-
-                        // ...and re-load the list when the Selected Outbreak is changed
-                        this.needsRefreshList(true);
-                    });
-            });
-    }
-
-    /**
-     * Release resources
-     */
-    ngOnDestroy() {
-        // release parent resources
-        super.ngOnDestroy();
-    }
-
-    /**
-     * Re(load) list
-     */
-    refreshList(finishCallback: (records: any[]) => void) {
-        if (this.outbreak) {
-            this.entitiesList$ = this.outbreakDataService
-                .getPeopleInconsistencies(this.outbreak.id, this.queryBuilder)
-                .pipe(
-                    catchError((err) => {
-                        this.snackbarService.showApiError(err);
-                        finishCallback([]);
-                        return throwError(err);
-                    }),
-                    tap(this.checkEmptyList.bind(this)),
-                    tap((data: any[]) => {
-                        finishCallback(data);
-                    })
-                );
-        } else {
-            finishCallback([]);
+      // translate label
+      label = this.i18nService.instant(
+        label, {
+          date1: inconsistency.dates.length > 0 ? this.i18nService.instant(inconsistency.dates[0].label) : '—',
+          date2: inconsistency.dates.length > 1 ? this.i18nService.instant(inconsistency.dates[1].label) : '—'
         }
-    }
+      );
 
-    /**
-     * Init breadcrumbs
-     */
-    initializeBreadcrumbs() {
-        // reset
-        this.breadcrumbs = [];
+      // append inconsistency
+      text += (text.length < 1 ? '' : ' / ') + label;
+    });
 
-        // add list breadcrumb only if we have permission
-        if (OutbreakModel.canList(this.authUser)) {
-            this.breadcrumbs.push(
-                new BreadcrumbItemModel('LNG_PAGE_LIST_OUTBREAKS_TITLE', '/outbreaks')
-            );
-        }
-
-        // add outbreak details ?
-        if (this.outbreak) {
-            if (OutbreakModel.canModify(this.authUser)) {
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel(
-                        this.outbreak.name,
-                        `/outbreaks/${this.outbreak.id}/modify`
-                    )
-                );
-            } else if (OutbreakModel.canView(this.authUser)) {
-                this.breadcrumbs.push(
-                    new BreadcrumbItemModel(
-                        this.outbreak.name,
-                        `/outbreaks/${this.outbreak.id}/view`
-                    )
-                );
-            }
-        }
-
-        // add inconsistencies breadcrumb
-        this.breadcrumbs.push(
-            new BreadcrumbItemModel(
-                'LNG_PAGE_LIST_INCONSISTENCIES_TITLE',
-                '.',
-                true
-            )
-        );
-    }
-
-    /**
-     * Retrieve Person Type color
-     */
-    getPersonTypeColor(personType: string) {
-        const personTypeData = _.get(this.personTypesListMap, personType);
-        return _.get(personTypeData, 'colorCode', '');
-    }
-
-    /**
-     * Get the link to redirect to view page depending on item type and action
-     * @param {Object} item
-     * @param {string} action
-     * @returns {string}
-     */
-    getItemRouterLink (item: CaseModel | ContactModel | EventModel, action: string) {
-        switch (item.type) {
-            case EntityType.CASE:
-                return `/cases/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
-            case EntityType.CONTACT:
-                return `/contacts/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
-            case EntityType.EVENT:
-                return `/events/${item.id}/${action === 'view' ? 'view' : 'modify'}`;
-        }
-    }
-
-    /**
-     * Check if we can view item
-     * @param {Object} item
-     * @returns {boolean}
-     */
-    canViewItem(item: CaseModel | ContactModel | EventModel): boolean {
-        // check if we can modify item
-        switch (item.type) {
-            case EntityType.CASE:
-                return CaseModel.canView(this.authUser);
-            case EntityType.CONTACT:
-                return ContactModel.canView(this.authUser);
-            case EntityType.EVENT:
-                return EventModel.canView(this.authUser);
-        }
-
-        // :)
-        return false;
-    }
-
-    /**
-     * Check if we can modify item
-     * @param {Object} item
-     * @returns {boolean}
-     */
-    canModifyItem(item: CaseModel | ContactModel | EventModel): boolean {
-        // check if we can modify item
-        switch (item.type) {
-            case EntityType.CASE:
-                return CaseModel.canModify(this.authUser);
-            case EntityType.CONTACT:
-                return ContactModel.canModify(this.authUser);
-            case EntityType.EVENT:
-                return EventModel.canModify(this.authUser);
-        }
-
-        // :)
-        return false;
-    }
-
-    /**
-     * Inconsistencies
-     * @param item
-     */
-    inconsistencyToText(item: CaseModel | ContactModel | EventModel): string {
-        // construct inconsistencies text
-        let text: string = '';
-        _.each(item.inconsistencies, (inconsistency: InconsistencyModel) => {
-            // determine label
-            let label: string;
-            switch (inconsistency.issue) {
-                case InconsistencyIssueEnum.LNG_PAGE_INCONSISTENCY_LABEL_BIGGER:
-                    label = 'LNG_PAGE_INCONSISTENCY_LABEL_BIGGER';
-                    break;
-                case InconsistencyIssueEnum.LNG_PAGE_INCONSISTENCY_LABEL_BIGGER_OR_EQUAL:
-                    label = 'LNG_PAGE_INCONSISTENCY_LABEL_BIGGER_OR_EQUAL';
-                    break;
-                case InconsistencyIssueEnum.LNG_PAGE_INCONSISTENCY_LABEL_SMALLER:
-                    label = 'LNG_PAGE_INCONSISTENCY_LABEL_SMALLER';
-                    break;
-                case InconsistencyIssueEnum.LNG_PAGE_INCONSISTENCY_LABEL_SMALLER_OR_EQUAL:
-                    label = 'LNG_PAGE_INCONSISTENCY_LABEL_SMALLER_OR_EQUAL';
-                    break;
-                case InconsistencyIssueEnum.LNG_PAGE_INCONSISTENCY_LABEL_NOT_EQUAL:
-                    label = 'LNG_PAGE_INCONSISTENCY_LABEL_NOT_EQUAL';
-                    break;
-                case InconsistencyIssueEnum.LNG_PAGE_INCONSISTENCY_LABEL_EQUAL:
-                    label = 'LNG_PAGE_INCONSISTENCY_LABEL_EQUAL';
-                    break;
-            }
-
-            // translate label
-            label = this.i18nService.instant(
-                label, {
-                    date1: inconsistency.dates.length > 0 ? this.i18nService.instant(inconsistency.dates[0].label) : '-',
-                    date2: inconsistency.dates.length > 1 ? this.i18nService.instant(inconsistency.dates[1].label) : '-'
-                }
-            );
-
-            // append inconsistency
-            text += (text.length < 1 ? '' : ' / ') + label;
-        });
-
-        // finished
-        return text;
-    }
+    // finished
+    return text;
+  }
 }

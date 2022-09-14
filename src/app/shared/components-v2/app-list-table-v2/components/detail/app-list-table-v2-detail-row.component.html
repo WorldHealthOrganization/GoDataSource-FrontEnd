@@ -1,0 +1,12 @@
+<!-- Render accordingly to column type -->
+<div
+  [ngSwitch]="row?.column?.column?.type"
+  class="gd-list-table-detail-row"
+  fxLayout="row">
+
+  <!-- Changes -->
+  <app-changes-v2
+    *ngSwitchCase="V2ColumnExpandRowType.CHANGES"
+    [changes]="changes"></app-changes-v2>
+
+</div>

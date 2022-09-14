@@ -6,5 +6,5 @@ export * from './cloud-backup/cloud-backup.component';
 
 // export the list of all page components
 export const pageComponents: any[] = [
-    CloudBackupComponent
+  CloudBackupComponent
 ];

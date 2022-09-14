@@ -1,0 +1,111 @@
+@import 'mixins';
+
+app-world-map-movement {
+  @include flex(flex);
+  height: 100%;
+
+  @include breakpoint('xs') {
+    height: auto;
+  }
+
+  .location-map {
+    @include flex(flex);
+    @include flex_direction(row);
+    height: 100%;
+    width: 100%;
+
+    @include breakpoint('xs') {
+      @include flex_direction(column);
+    }
+
+    .movement-timeline-title {
+      border-bottom: 1px solid rgba(var(--gd-secondary-rgb), 0.5);
+      color: var(--gd-primary-alt);
+      font-weight: bold;
+      padding: 0.8rem;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .location-timeline {
+      border-right: 1px solid rgba(var(--gd-secondary-rgb), 0.5);
+      width: 35rem;
+
+      @include breakpoint('sm') {
+        width: 25rem;
+      }
+
+      @include breakpoint('xs') {
+        border-right: 0 none;
+        height: calc(100% - 50rem);
+        width: 100%;
+      }
+
+      .movement-timeline-locations {
+        height: calc(100% - 9.1rem);
+        overflow-y: overlay;
+
+        .movement-timeline-locations-item {
+          cursor: pointer;
+          margin-bottom: 0.8rem;
+          padding: 0.8rem;
+          @include transition(background-color 0.24s ease-in-out 0s);
+
+          &:hover {
+            background-color: rgba(var(--gd-secondary-rgb), 0.15);
+          }
+        }
+      }
+
+      .movement-timeline-view-all {
+        border-top: 1px solid rgba(var(--gd-secondary-rgb), 0.5);
+        padding: 0.8rem;
+        text-align: center;
+      }
+    }
+
+    .movement-map {
+      @include flex(flex);
+      @include flex_direction(column);
+      width: calc(100% - 35rem);
+
+      @include breakpoint('sm') {
+        width: calc(100% - 25rem);
+      }
+
+      @include breakpoint('xs') {
+        border-top: 1px solid rgba(var(--gd-secondary-rgb), 0.5);
+        height: 50rem;
+        width: 100%;
+      }
+    }
+
+    .movement-map-no-data {
+      height: 100%;
+    
+      .movement-map-no-data-image {
+        background-image: url(../../../../../assets/images/nothing-found.svg);
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
+        height: 25rem;
+        width: 25rem;
+    
+        @include breakpoint('xs') {
+          height: 15rem;
+          width: 15rem;
+        }
+      }
+    
+      .movement-map-no-data-text {
+        color: var(--gd-secondary);
+        font-size: 1.6rem;
+        margin-top: 2rem;
+    
+        @include breakpoint('xs') {
+          font-size: 1.4rem;
+        }
+      }
+    }
+  }
+}

@@ -1,156 +1,129 @@
 {
-    "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
-    "version": 1,
-    "newProjectRoot": "projects",
-    "projects": {
-        "go-data-front-end": {
-            "root": "",
-            "sourceRoot": "src",
-            "projectType": "application",
-            "prefix": "app",
-            "schematics": {
-                "@schematics/angular:component": {
-                    "styleext": "less"
-                }
-            },
-            "architect": {
-                "build": {
-                    "builder": "@angular-devkit/build-angular:browser",
-                    "options": {
-                        "outputPath": "dist",
-                        "index": "src/index.html",
-                        "main": "src/main.ts",
-                        "polyfills": "src/polyfills.ts",
-                        "tsConfig": "src/tsconfig.app.json",
-                        "assets": [
-                            "src/assets",
-                            "src/favicon.ico"
-                        ],
-                        "styles": [
-                            "src/styles/external/materialdesignicons.min.css",
-                            "src/styles/external/googleapisfont.css",
-                            "src/styles/material-theme.scss",
-                            "src/assets/fonts/xtIcon/style.css",
-                            "node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
-                            "node_modules/@ng-select/ng-select/themes/material.theme.css",
-                            "src/styles/general.less"
-                        ],
-                        "scripts": []
-                    },
-                    "configurations": {
-                        "production": {
-                            "fileReplacements": [
-                                {
-                                    "replace": "src/environments/environment.ts",
-                                    "with": "src/environments/environment.prod.ts"
-                                }
-                            ],
-                            "optimization": true,
-                            "outputHashing": "all",
-                            "sourceMap": false,
-                            "extractCss": true,
-                            "namedChunks": false,
-                            "aot": true,
-                            "extractLicenses": true,
-                            "vendorChunk": false,
-                            "buildOptimizer": true
-                        }
-                    }
-                },
-                "serve": {
-                    "builder": "@angular-devkit/build-angular:dev-server",
-                    "options": {
-                        "browserTarget": "go-data-front-end:build"
-                    },
-                    "configurations": {
-                        "production": {
-                            "browserTarget": "go-data-front-end:build:production"
-                        }
-                    }
-                },
-                "extract-i18n": {
-                    "builder": "@angular-devkit/build-angular:extract-i18n",
-                    "options": {
-                        "browserTarget": "go-data-front-end:build"
-                    }
-                },
-                "test": {
-                    "builder": "@angular-devkit/build-angular:karma",
-                    "options": {
-                        "main": "src/test.ts",
-                        "polyfills": "src/polyfills.ts",
-                        "tsConfig": "src/tsconfig.spec.json",
-                        "karmaConfig": "src/karma.conf.js",
-                        "styles": [
-                            "src/styles/general.less",
-                            "src/styles/material-theme.scss"
-                        ],
-                        "scripts": [],
-                        "assets": [
-                            "src/assets",
-                            "src/favicon.ico"
-                        ]
-                    }
-                },
-                "test-debug": {
-                    "builder": "@angular-devkit/build-angular:karma",
-                    "options": {
-                        "main": "src/test.ts",
-                        "polyfills": "src/polyfills.ts",
-                        "tsConfig": "src/tsconfig.spec.json",
-                        "karmaConfig": "src/karma.conf.debug.js",
-                        "styles": [
-                            "src/styles/general.less",
-                            "src/styles/material-theme.scss"
-                        ],
-                        "scripts": [],
-                        "assets": [
-                            "src/assets",
-                            "src/favicon.ico"
-                        ]
-                    }
-                },
-                "lint": {
-                    "builder": "@angular-devkit/build-angular:tslint",
-                    "options": {
-                        "tsConfig": [
-                            "src/tsconfig.app.json",
-                            "src/tsconfig.spec.json"
-                        ],
-                        "exclude": [
-                            "**/node_modules/**"
-                        ]
-                    }
-                }
-            }
-        },
-        "go-data-front-end-e2e": {
-            "root": "e2e/",
-            "projectType": "application",
-            "architect": {
-                "e2e": {
-                    "builder": "@angular-devkit/build-angular:protractor",
-                    "options": {
-                        "protractorConfig": "e2e/protractor.conf.js",
-                        "devServerTarget": "go-data-front-end:serve"
-                    },
-                    "configurations": {
-                        "production": {
-                            "devServerTarget": "go-data-front-end:serve:production"
-                        }
-                    }
-                },
-                "lint": {
-                    "builder": "@angular-devkit/build-angular:tslint",
-                    "options": {
-                        "tsConfig": "e2e/tsconfig.e2e.json",
-                        "exclude": [
-                            "**/node_modules/**"
-                        ]
-                    }
-                }
-            }
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "cli": {
+    "analytics": false,
+    "defaultCollection": "@angular-eslint/schematics"
+  },
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "go-data-front-end": {
+      "root": "",
+      "sourceRoot": "src",
+      "projectType": "application",
+      "prefix": "app",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "less"
         }
-    },
-    "defaultProject": "go-data-front-end"
+      },
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist",
+            "index": "src/index.html",
+            "main": "src/main.ts",
+            "polyfills": "src/polyfills.ts",
+            "tsConfig": "src/tsconfig.app.json",
+            "assets": [
+              "src/assets",
+              "src/favicon.ico"
+            ],
+            "styles": [
+              "src/styles/material-theme.scss",
+              "node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
+              "src/styles/app.scss"
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "src/styles/"
+              ]
+            },
+            "scripts": [],
+            "allowedCommonJsDependencies": [
+              "c3",
+              "clone-deep",
+              "core-js",
+              "cytoscape",
+              "cytoscape-cola",
+              "cytoscape-dagre",
+              "dom-to-image",
+              "earcut",
+              "file-saver",
+              "lodash",
+              "lru-cache",
+              "luxon",
+              "mapbox-to-css-font",
+              "moment",
+              "numbro",
+              "pikaday",
+              "rbush",
+              "rxjs",
+              "web-worker",
+              "webfont-matcher",
+              "xml-utils"
+            ],
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "256kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            }
+          },
+          "defaultConfiguration": ""
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "go-data-front-end:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "go-data-front-end:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "go-data-front-end:build"
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "defaultProject": "go-data-front-end"
 }

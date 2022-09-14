@@ -1,0 +1,10 @@
+<mat-paginator
+  [class.gd-list-table-bottom-disabled]="disabled"
+  [pageIndex]="pageIndex"
+  [length]="countData?.count"
+  [pageSize]="pageSize"
+  [pageSizeOptions]="pageSizeOptions"
+  [hidePageSize]="hidePageSize"
+  [disabled]="disabled"
+  (page)="page.emit($event)">
+</mat-paginator>

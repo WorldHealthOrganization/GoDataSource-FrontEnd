@@ -1,32 +1,42 @@
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 
 export class ChronologyItem {
-    public label: string;
-    public date: string | Moment;
-    public daysSincePreviousEvent: number;
-    public type: string;
-    public translateData: {
-        [key: string]: string
-    } = {};
+  // date
+  private _date: Moment;
+  public set date(date: string | Moment) {
+    // make sure that date is a date :)
+    this._date = date ? moment(date) : null;
+  }
+  get date(): Moment {
+    return this._date;
+  }
 
-    constructor(data: {
-        // required
-        label: string,
-        date: string | Moment,
+  // data
+  public label: string;
+  public daysSincePreviousEvent: number;
+  public type: string;
+  public translateData: {
+    [key: string]: string
+  } = {};
 
-        // optional
-        type?: string,
-        translateData?: {
-            [key: string]: string
-        }
-    }) {
-        // assign properties
-        Object.assign(
-            this,
-            data
-        );
+  /**
+   * Constructor
+   */
+  constructor(data: {
+    // required
+    label: string,
+    date: string | Moment,
 
-        // make sure that date is a date :)
-        this.date = this.date ? moment(this.date) : this.date;
+    // optional
+    type?: string,
+    translateData?: {
+      [key: string]: string
     }
+  }) {
+    // assign properties
+    Object.assign(
+      this,
+      data
+    );
+  }
 }

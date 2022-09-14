@@ -1,0 +1,28 @@
+.gd-changes-v2 {
+  .gd-changes-v2-diff {
+    .gd-changes-v2-diff-field {
+      font-weight: bold;
+    }
+
+    .gd-changes-v2-diff-changes {
+      padding: 0.2rem 0 0.2rem 1.6rem;
+
+      &.gd-changes-v2-diff-changes-is-collapsable {
+        cursor: pointer;
+      }
+
+      .gd-changes-v2-diff-changes-old {
+        color: var(--gd-danger);
+        text-decoration: line-through;
+      }
+
+      .gd-changes-v2-diff-changes-new {
+        color: var(--gd-success);
+      }
+
+      .gd-changes-v2-diff-changes-rich-content {
+        font-style: italic;
+      }
+    }
+  }
+}

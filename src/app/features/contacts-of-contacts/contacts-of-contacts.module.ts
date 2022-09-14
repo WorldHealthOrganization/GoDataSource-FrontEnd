@@ -5,15 +5,14 @@ import { routing } from './contacts-of-contacts.module.routing';
 import { WorldMapMovementModule } from '../../common-modules/world-map-movement/world-map-movement.module';
 
 @NgModule({
-    imports: [
-        routing,
-        SharedModule,
-        WorldMapMovementModule
-    ],
-    declarations: [
-        ...fromPages.pageComponents
-    ],
-    entryComponents: []
+  imports: [
+    routing,
+    SharedModule,
+    WorldMapMovementModule
+  ],
+  declarations: [
+    ...fromPages.pageComponents
+  ]
 })
 export class ContactsOfContactsModule {
 }

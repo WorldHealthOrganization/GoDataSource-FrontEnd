@@ -10,16 +10,15 @@ import * as fromPages from './pages';
 import * as fromComponents from './components';
 
 @NgModule({
-    imports: [
-        routing,
-        SharedModule,
-        NgxChartsModule
-    ],
-    declarations: [
-        ...fromPages.pageComponents,
-        ...fromComponents.components
-    ],
-    entryComponents: []
+  imports: [
+    routing,
+    SharedModule,
+    NgxChartsModule
+  ],
+  declarations: [
+    ...fromPages.pageComponents,
+    ...fromComponents.components
+  ]
 })
 export class DashboardModule {
 }

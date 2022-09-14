@@ -1,0 +1,47 @@
+<div
+  class="gd-list-table-selection-header">
+  <!-- Menu -->
+  <button
+    *ngIf="action.menuOptions?.length > 0"
+    #menuTrigger="matMenuTrigger"
+    class="gd-list-table-selection-header-button"
+    [class.gd-list-table-selection-header-button-expanded]="menuTrigger.menuOpen"
+    type="button"
+    mat-icon-button
+    [disabled]="action.disable && action.disable(component.selectedRows)"
+    [matMenuTriggerFor]="menu"
+    (menuClosed)="changeDetectorRef.detectChanges()">
+    <mat-icon>{{action.icon}}</mat-icon>
+  </button>
+
+  <!-- Floating menu -->
+  <mat-menu
+    #menu="matMenu"
+    class="gd-list-table-selection-header-menu">
+    <ng-container
+      *ngFor="let menuOption of action.menuOptions">
+      <ng-container
+        *ngIf="!menuOption.visible || menuOption.visible(component.selectedRows)">
+
+        <!-- Child Menu link -->
+        <a
+          *ngIf="menuOption.label; else divider"
+          mat-menu-item
+          class="gd-list-table-selection-header-button {{menuOption.cssClasses}}"
+          [routerLink]="menuOption.action.link && (!menuOption.disable || !menuOption.disable(component.selectedRows)) ? menuOption.action.link(component.selectedRows) : undefined"
+          [queryParams]="menuOption.action.linkQueryParams ? menuOption.action.linkQueryParams(component.selectedRows) : undefined"
+          [disabled]="menuOption.disable && menuOption.disable(component.selectedRows)"
+          (click)="menuOption.action.click ? menuOption.action.click(component.selectedRows) : undefined">
+          {{menuOption.label.get(component.selectedRows) | translate:(menuOption.label.data ? menuOption.label.data(component.selectedRows) : undefined)}}
+        </a>
+
+        <!-- Divider -->
+        <ng-template
+          #divider>
+          <mat-divider></mat-divider>
+        </ng-template>
+
+      </ng-container>
+    </ng-container>
+  </mat-menu>
+</div>

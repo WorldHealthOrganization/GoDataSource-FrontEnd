@@ -1,0 +1,119 @@
+<!-- Top -->
+<div
+  class="gd-changes-v2">
+
+  <!-- Render each change -->
+  <div
+    *ngFor="let change of changes"
+    [ngSwitch]="change.type"
+    class="gd-changes-v2-diff"
+    fxLayout="column" fxLayoutGap="2px">
+
+    <!-- Field name - collapsable -->
+    <span
+      *ngIf="change.type === ChangeValueType.OBJECT || change.type === ChangeValueType.ARRAY; else notCollapsable"
+      class="gd-changes-v2-diff-field"
+      fxLayout="row" fxLayoutAlign="start center"
+      (click)="change.expanded = !change.expanded">
+
+      <!-- Collapse / Expand -->
+      <mat-icon>{{change.expanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+
+      <!-- Property -->
+      <span>
+        {{ change.rootProperty }}
+      </span>
+    </span>
+
+    <!-- Field name - Not collapsable -->
+    <ng-template
+      #notCollapsable>
+      <span
+        class="gd-changes-v2-diff-field">
+        {{change.type === ChangeValueType.RICH_CONTENT ? change.property : change.value.property}}
+      </span>
+    </ng-template>
+
+    <!-- Change -->
+    <div
+      fxLayout="column"
+      class="gd-changes-v2-diff-changes"
+      [class.gd-changes-v2-diff-changes-is-collapsable]="change.type === ChangeValueType.OBJECT || change.type === ChangeValueType.ARRAY">
+
+      <!-- String -->
+      <ng-container
+        *ngSwitchCase="ChangeValueType.STRING">
+        <!-- Old value -->
+        <span class="gd-changes-v2-diff-changes-old">{{change.value.oldValue}}</span>
+        <!-- New value -->
+        <span class="gd-changes-v2-diff-changes-new">{{change.value.newValue}}</span>
+      </ng-container>
+
+      <!-- Number -->
+      <ng-container
+        *ngSwitchCase="ChangeValueType.NUMBER">
+        <!-- Old value -->
+        <span class="gd-changes-v2-diff-changes-old">{{change.value.oldValue}}</span>
+        <!-- New value -->
+        <span class="gd-changes-v2-diff-changes-new">{{change.value.newValue}}</span>
+      </ng-container>
+
+      <!-- Boolean -->
+      <ng-container
+        *ngSwitchCase="ChangeValueType.BOOLEAN">
+        <!-- Old value -->
+        <span class="gd-changes-v2-diff-changes-old">{{change.value.oldValue ? 'true' : 'false'}}</span>
+        <!-- New value -->
+        <span class="gd-changes-v2-diff-changes-new">{{change.value.newValue ? 'true' : 'false'}}</span>
+      </ng-container>
+
+      <!-- Language token -->
+      <ng-container
+        *ngSwitchCase="ChangeValueType.LNG_TOKEN">
+        <!-- Old value -->
+        <span class="gd-changes-v2-diff-changes-old">{{change.value.oldValue | translate}}</span>
+        <!-- New value -->
+        <span class="gd-changes-v2-diff-changes-new">{{change.value.newValue | translate}}</span>
+      </ng-container>
+
+      <!-- Date -->
+      <ng-container
+        *ngSwitchCase="ChangeValueType.DATE">
+        <!-- Old value -->
+        <span class="gd-changes-v2-diff-changes-old">{{change.value.oldValue | dateTimeDefault}}</span>
+        <!-- New value -->
+        <span class="gd-changes-v2-diff-changes-new">{{change.value.newValue | dateTimeDefault}}</span>
+      </ng-container>
+
+      <!-- Rich content -->
+      <ng-container
+        *ngSwitchCase="ChangeValueType.RICH_CONTENT">
+        <div
+          fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="3px"
+          [matTooltip]="'LNG_PAGE_LIST_AUDIT_LOGS_RICH_TEXT_DESCRIPTION' | translate">
+          <mat-icon>info</mat-icon>
+          <span
+            class="gd-changes-v2-diff-changes-rich-content">{{'LNG_PAGE_LIST_AUDIT_LOGS_RICH_TEXT_LABEL' | translate}}</span>
+        </div>
+      </ng-container>
+
+      <!-- Object -->
+      <ng-container
+        *ngSwitchCase="ChangeValueType.OBJECT">
+        <app-changes-v2
+          *ngIf="change.expanded"
+          [changes]="change.value"></app-changes-v2>
+      </ng-container>
+
+      <!-- Array -->
+      <ng-container
+        *ngSwitchCase="ChangeValueType.ARRAY">
+        <app-changes-v2
+          *ngIf="change.expanded"
+          [changes]="change.value"></app-changes-v2>
+      </ng-container>
+
+    </div>
+
+  </div>
+</div>

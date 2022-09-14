@@ -1,0 +1,28 @@
+<div
+  class="app-form-ngx-wig-v2">
+
+  <!-- Input data -->
+  <ngx-wig
+    *ngIf="!viewOnly; else viewOnlyTemplate"
+    #ngxWig
+    [(ngModel)]="value"
+    buttons="list1, list2, _, bold, underline, italic, _, linkCustom, insertImageCustom"
+    [disabled]="disabled">
+  </ngx-wig>
+
+  <!-- View only -->
+  <ng-template
+    #viewOnlyTemplate>
+    <div
+      fxLayout="row" fxLayoutGap="1.6rem"
+      class="app-form-ngx-wig-v2-viewonly">
+
+      <!-- Value -->
+      <div
+        class="app-form-ngx-wig-v2-viewonly-value"
+        [innerHTML]="(value ? value : noValueLabel) | safeHtml">
+      </div>
+
+    </div>
+  </ng-template>
+</div>

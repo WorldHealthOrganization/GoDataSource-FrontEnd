@@ -1,787 +1,673 @@
-import { Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { UserModel, UserSettings } from '../../../../core/models/user.model';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { DashboardDashlet, DashboardKpiGroup } from '../../../../core/enums/dashboard.enum';
-import * as _ from 'lodash';
-import { DashletSettingsModel, UserSettingsDashboardModel } from '../../../../core/models/user-settings-dashboard.model';
-import { Observable ,  Subscription } from 'rxjs';
-import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
-import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { DomService } from '../../../../core/services/helper/dom.service';
-import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
-import * as domtoimage from 'dom-to-image';
-import * as FileSaver from 'file-saver';
-import { AppliedFilterModel, FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
-import { LoadingDialogModel } from '../../../../shared/components';
-import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { ActivatedRoute } from '@angular/router';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { Constants } from '../../../../core/models/constants';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { catchError, map, share } from 'rxjs/operators';
-import { throwError } from 'rxjs';
-import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
-import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
-import { moment, Moment } from '../../../../core/helperClasses/x-moment';
-import { ReferenceDataCategory } from '../../../../core/models/reference-data.model';
-import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { SavedFilterData, SavedFilterDataAppliedFilter } from '../../../../core/models/saved-filters.model';
+import * as _ from 'lodash';
+import { Moment, moment } from '../../../../core/helperClasses/x-moment';
+import { RequestFilterOperator, RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
-import { MatExpansionPanel } from '@angular/material';
-
-interface IKpiGroup {
-    id: DashboardKpiGroup;
-    title: string;
-    dashlets: DashboardDashlet[];
-    hasAccess: (user: UserModel) => boolean;
-    permissions: {
-        [dashboardDashlet: string]: {
-            hasAccess: (user: UserModel) => boolean
-        }
-    };
-}
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { UserModel } from '../../../../core/models/user.model';
+import { ExportDataExtension, ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
+import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { Subscription } from 'rxjs/internal/Subscription';
+import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
+import { TranslateService } from '@ngx-translate/core';
+import * as momentOriginal from 'moment';
+import { DomService } from '../../../../core/services/helper/dom.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
+import * as FileSaver from 'file-saver';
+import { AppCasesKpiDashletComponent } from '../../components/app-cases-kpi-dashlet/app-cases-kpi-dashlet.component';
+import { AppContactsKpiDashletComponent } from '../../components/app-contacts-kpi-dashlet/app-contacts-kpi-dashlet.component';
+import { AppCotKpiDashletComponent } from '../../components/app-cot-kpi-dashlet/app-cot-kpi-dashlet.component';
+import * as domtoimage from 'dom-to-image';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputToggle, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 
 @Component({
-    selector: 'app-dashboard',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './dashboard.component.html',
-    styleUrls: ['./dashboard.component.less']
+  selector: 'app-dashboard',
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_DASHBOARD_TITLE', '.', true)
-    ];
+  // children dashlets
+  @ViewChild('kpiSection', { static: false }) private _kpiSection: ElementRef;
+  @ViewChild('kpiCases', { static: false }) private _kpiCases: AppCasesKpiDashletComponent;
+  @ViewChild('kpiContacts', { static: false }) private _kpiContacts: AppContactsKpiDashletComponent;
+  @ViewChild('kpiCOT', { static: false }) private _kpiCOT: AppCotKpiDashletComponent;
 
-    kpiGroups: IKpiGroup[] = [
-        // Cases KPIs
-        {
-            id: DashboardKpiGroup.CASE,
-            title: 'LNG_PAGE_DASHBOARD_CASES_KPI_TITLE',
-            dashlets: [
-                DashboardDashlet.CASES_DECEASED,
-                DashboardDashlet.CASES_HOSPITALISED,
-                DashboardDashlet.CASES_WITH_LESS_THAN_X_CONTACTS,
-                DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_AMONG_KNOWN_CONTACTS,
-                DashboardDashlet.SUSPECT_CASES_REFUSING_TO_BE_TRANSFERRED_TO_A_TREATMENT_UNIT,
-                DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_OUTSIDE_THE_TRANSMISSION_CHAINS,
-                DashboardDashlet.SUSPECT_CASES_WITH_PENDING_LAB_RESULT,
-                DashboardDashlet.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS
-            ],
-            hasAccess: (user: UserModel): boolean => {
-                // can we check fo group permissions ?
-                if (
-                    !this.kpiGroupsMap ||
-                    !this.kpiGroupsMap[DashboardKpiGroup.CASE]
-                ) {
-                    return false;
-                }
+  // quick actions
+  quickActions: IV2ActionMenuLabel;
 
-                // check that we have at least one group permission
-                const group: IKpiGroup = this.kpiGroupsMap[DashboardKpiGroup.CASE];
-                for (const dashletKey in group.permissions) {
-                    if (group.permissions[dashletKey].hasAccess(user)) {
-                        return true;
-                    }
-                }
+  // used to filter dashlets
+  globalFilterDate: string | Moment = moment();
+  globalFilterLocationId: string = undefined;
+  globalFilterClassificationId: string[] = [];
 
-                // we don't have rights in this group
-                return false;
-            },
-            permissions: {
-                [DashboardDashlet.CASES_DECEASED]: {
-                    hasAccess: (user: UserModel): boolean => {
-                        return DashboardModel.canViewCaseDeceasedDashlet(user);
-                    }
-                },
-                [DashboardDashlet.CASES_HOSPITALISED]: {
-                    hasAccess: (user: UserModel): boolean => {
-                        return DashboardModel.canViewCaseHospitalizedDashlet(user);
-                    }
-                },
-                [DashboardDashlet.CASES_WITH_LESS_THAN_X_CONTACTS]: {
-                    hasAccess: (user: UserModel): boolean => {
-                        return DashboardModel.canViewCaseWithLessThanXCotactsDashlet(user);
-                    }
-                },
-                [DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_AMONG_KNOWN_CONTACTS]: {
-                    hasAccess: (user: UserModel): boolean => {
-                        return DashboardModel.canViewNewCasesInPreviousXDaysAmongKnownContactsDashlet(user);
-                    }
-                },
-                [DashboardDashlet.SUSPECT_CASES_REFUSING_TO_BE_TRANSFERRED_TO_A_TREATMENT_UNIT]: {
-                    hasAccess: (user: UserModel): boolean => {
-                        return DashboardModel.canViewCasesRefusingTreatmentDashlet(user);
-                    }
-                },
-                [DashboardDashlet.NEW_CASES_IN_THE_PREVIOUS_X_DAYS_OUTSIDE_THE_TRANSMISSION_CHAINS]: {
-                    hasAccess: (user: UserModel): boolean => {
-                        return DashboardModel.canViewNewCasesFromKnownCOTDashlet(user);
-                    }
-                },
-                [DashboardDashlet.SUSPECT_CASES_WITH_PENDING_LAB_RESULT]: {
-                    hasAccess: (user: UserModel): boolean => {
-                        return DashboardModel.canViewCasesWithPendingLabResultsDashlet(user);
-                    }
-                },
-                [DashboardDashlet.CASES_NOT_IDENTIFIED_THROUGH_CONTACTS]: {
-                    hasAccess: (user: UserModel): boolean => {
-                        return DashboardModel.canViewCasesNotIdentifiedThroughContactsDashlet(user);
-                    }
-                }
-            }
+  // applied filters
+  private _advancedFiltersApplied: SavedFilterData = new SavedFilterData({
+    appliedFilterOperator: RequestFilterOperator.AND,
+    appliedFilters: [
+      // date
+      new SavedFilterDataAppliedFilter({
+        filter: {
+          uniqueKey: 'dateLNG_GLOBAL_FILTERS_FIELD_LABEL_DATE'
         },
-        // Contacts KPIs
-        {
-            id: DashboardKpiGroup.CONTACT,
-            title: 'LNG_PAGE_DASHBOARD_CONTACTS_KPI_TITLE',
-            dashlets: [
-                DashboardDashlet.CONTACTS_PER_CASE_MEAN,
-                DashboardDashlet.CONTACTS_PER_CASE_MEDIAN,
-                DashboardDashlet.CONTACTS_ON_THE_FOLLOW_UP_LIST,
-                DashboardDashlet.CONTACTS_LOST_TO_FOLLOW_UP,
-                DashboardDashlet.CONTACTS_NOT_SEEN_IN_X_DAYS,
-                DashboardDashlet.CONTACTS_BECOMING_CASES_IN_TIME_AND_SPACE,
-                DashboardDashlet.CONTACTS_SEEN_EACH_DAY,
-                DashboardDashlet.CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP
-            ],
-            hasAccess: (user: UserModel): boolean => {
-                // can we check fo group permissions ?
-                if (
-                    !this.kpiGroupsMap ||
-                    !this.kpiGroupsMap[DashboardKpiGroup.CONTACT]
-                ) {
-                    return false;
-                }
+        comparator: V2AdvancedFilterComparatorType.DATE,
+        value: this.globalFilterDate
+      }),
 
-                // check that we have at least one group permission
-                const group: IKpiGroup = this.kpiGroupsMap[DashboardKpiGroup.CONTACT];
-                for (const dashletKey in group.permissions) {
-                    if (group.permissions[dashletKey].hasAccess(user)) {
-                        return true;
-                    }
-                }
-
-                // we don't have rights in this group
-                return false;
-            },
-            permissions: {
-                [DashboardDashlet.CONTACTS_PER_CASE_MEAN]: {
-                    hasAccess: (user: UserModel): boolean => {
-                        return DashboardModel.canViewContactsPerCaseMeanDashlet(user);
-                    }
-                },
-                [DashboardDashlet.CONTACTS_PER_CASE_MEDIAN]: {
-                    hasAccess: (user: UserModel): boolean => {
-                        return DashboardModel.canViewContactsPerCaseMedianDashlet(user);
-                    }
-                },
-                [DashboardDashlet.CONTACTS_ON_THE_FOLLOW_UP_LIST]: {
-                    hasAccess: (user: UserModel): boolean => {
-                        return DashboardModel.canViewContactsFromFollowUpsDashlet(user);
-                    }
-                },
-                [DashboardDashlet.CONTACTS_LOST_TO_FOLLOW_UP]: {
-                    hasAccess: (user: UserModel): boolean => {
-                        return DashboardModel.canViewContactsLostToFollowUpsDashlet(user);
-                    }
-                },
-                [DashboardDashlet.CONTACTS_NOT_SEEN_IN_X_DAYS]: {
-                    hasAccess: (user: UserModel): boolean => {
-                        return DashboardModel.canViewContactsNotSeenInXDaysDashlet(user);
-                    }
-                },
-                [DashboardDashlet.CONTACTS_BECOMING_CASES_IN_TIME_AND_SPACE]: {
-                    hasAccess: (user: UserModel): boolean => {
-                        return DashboardModel.canViewContactsBecomeCasesDashlet(user);
-                    }
-                },
-                [DashboardDashlet.CONTACTS_SEEN_EACH_DAY]: {
-                    hasAccess: (user: UserModel): boolean => {
-                        return DashboardModel.canViewContactsSeenDashlet(user);
-                    }
-                },
-                [DashboardDashlet.CONTACTS_WITH_SUCCESSFUL_FOLLOW_UP]: {
-                    hasAccess: (user: UserModel): boolean => {
-                        return DashboardModel.canViewContactsWithSuccessfulFollowUpsDashlet(user);
-                    }
-                }
-            }
+      // location
+      new SavedFilterDataAppliedFilter({
+        filter: {
+          uniqueKey: 'locationIdLNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION'
         },
-        // Transmission Chains KPIs
-        {
-            id: DashboardKpiGroup.TRANSMISSION_CHAIN,
-            title: 'LNG_PAGE_DASHBOARD_CHAINS_OF_TRANSMISSION_KPI_TITLE',
-            dashlets: [
-                DashboardDashlet.INDEPENDENT_TRANSMISSION_CHAINS,
-                DashboardDashlet.ACTIVE_TRANSMISSION_CHAINS,
-                DashboardDashlet.TRANSMISSION_CHAINS_FROM_CONTACTS_WHO_BECAME_CASES
-            ],
-            hasAccess: (user: UserModel): boolean => {
-                // can we check fo group permissions ?
-                if (
-                    !this.kpiGroupsMap ||
-                    !this.kpiGroupsMap[DashboardKpiGroup.TRANSMISSION_CHAIN]
-                ) {
-                    return false;
-                }
+        comparator: V2AdvancedFilterComparatorType.LOCATION,
+        value: this.globalFilterLocationId
+      }),
 
-                // check that we have at least one group permission
-                const group: IKpiGroup = this.kpiGroupsMap[DashboardKpiGroup.TRANSMISSION_CHAIN];
-                for (const dashletKey in group.permissions) {
-                    if (group.permissions[dashletKey].hasAccess(user)) {
-                        return true;
-                    }
-                }
+      // classification
+      new SavedFilterDataAppliedFilter({
+        filter: {
+          uniqueKey: 'classificationIdLNG_GLOBAL_FILTERS_FIELD_LABEL_CLASSIFICATION'
+        },
+        comparator: V2AdvancedFilterComparatorType.NONE,
+        value: this.globalFilterClassificationId
+      })
+    ]
+  });
 
-                // we don't have rights in this group
-                return false;
-            },
-            permissions: {
-                [DashboardDashlet.INDEPENDENT_TRANSMISSION_CHAINS]: {
-                    hasAccess: (user: UserModel): boolean => {
-                        return DashboardModel.canViewIndependentCOTDashlet(user);
-                    }
-                },
-                [DashboardDashlet.ACTIVE_TRANSMISSION_CHAINS]: {
-                    hasAccess: (user: UserModel): boolean => {
-                        return DashboardModel.canViewActiveCOTDashlet(user);
-                    }
-                },
-                [DashboardDashlet.TRANSMISSION_CHAINS_FROM_CONTACTS_WHO_BECAME_CASES]: {
-                    hasAccess: (user: UserModel): boolean => {
-                        return DashboardModel.canViewNewChainsFromContactsWhoBecameCasesDashlet(user);
-                    }
-                }
-            }
-        }
-    ];
-    kpiGroupsMap: {
-        [id: string]: IKpiGroup
-    } = {};
+  // authenticated user details
+  private _authUser: UserModel;
 
+  // selected outbreak
+  private _determiningOutbreakSubscriber: Subscription;
+  private _outbreakSubscriber: Subscription;
+  private _selectedOutbreak: OutbreakModel;
+  loadingSelectedOutbreak: boolean;
+  public get isOutbreakSelected(): boolean {
+    return !!this._selectedOutbreak?.id;
+  }
+
+  // visible dashlets
+  visibleDashlets: {
+    CaseSummary: boolean,
+    CasesPerLocation: boolean,
+    Hospitalized: boolean,
+    COTHistogram: boolean,
+    EPICurveClassification: boolean,
+    EPICurveOutcome: boolean,
+    EPICurveReporting: boolean,
+    FollowUpOverview: boolean,
+    ContactStatus: boolean,
+    KPICases: boolean,
+    KPIContacts: boolean,
+    KPICOT: boolean
+  } = {
+      CaseSummary: false,
+      CasesPerLocation: false,
+      Hospitalized: false,
+      COTHistogram: false,
+      EPICurveClassification: false,
+      EPICurveOutcome: false,
+      EPICurveReporting: false,
+      FollowUpOverview: false,
+      ContactStatus: false,
+      KPICases: false,
+      KPIContacts: false,
+      KPICOT: false
+    };
+
+  /**
+   * Constructor
+   */
+  constructor(
+    private changeDetectorRef: ChangeDetectorRef,
+    private dialogV2Service: DialogV2Service,
+    private activatedRoute: ActivatedRoute,
+    private outbreakDataService: OutbreakDataService,
+    private translateService: TranslateService,
+    private domService: DomService,
+    private toastV2Service: ToastV2Service,
+    private importExportDataService: ImportExportDataService,
+    authDataService: AuthDataService
+  ) {
     // authenticated user
-    authUser: UserModel;
+    this._authUser = authDataService.getAuthenticatedUser();
 
-    // provide constants to template
-    DashboardDashlet = DashboardDashlet;
-    DashboardModel = DashboardModel;
+    // determine visible dashlets
+    this.visibleDashlets = {
+      // Old Dashlets
+      CaseSummary: DashboardModel.canViewCaseSummaryDashlet(this._authUser),
+      CasesPerLocation: DashboardModel.canViewCasePerLocationLevelDashlet(this._authUser),
+      Hospitalized: DashboardModel.canViewCaseHospitalizedPieChartDashlet(this._authUser),
+      COTHistogram: DashboardModel.canViewCotSizeHistogramDashlet(this._authUser),
+      EPICurveClassification: DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(this._authUser),
+      EPICurveOutcome: DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(this._authUser),
+      EPICurveReporting: DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(this._authUser),
+      FollowUpOverview: DashboardModel.canViewContactFollowUpReportDashlet(this._authUser),
+      ContactStatus: DashboardModel.canViewContactStatusReportDashlet(this._authUser),
 
-    selectedOutbreak: OutbreakModel;
+      // KPI - cases
+      KPICases: DashboardModel.canViewCaseDeceasedDashlet(this._authUser) ||
+        DashboardModel.canViewCaseHospitalizedDashlet(this._authUser) ||
+        DashboardModel.canViewCaseWithLessThanXCotactsDashlet(this._authUser) ||
+        DashboardModel.canViewNewCasesInPreviousXDaysAmongKnownContactsDashlet(this._authUser) ||
+        DashboardModel.canViewCasesRefusingTreatmentDashlet(this._authUser) ||
+        DashboardModel.canViewNewCasesFromKnownCOTDashlet(this._authUser) ||
+        DashboardModel.canViewCasesWithPendingLabResultsDashlet(this._authUser) ||
+        DashboardModel.canViewCasesNotIdentifiedThroughContactsDashlet(this._authUser),
 
-    // flag if there aren't any outbreaks in the system
-    noOutbreaksInSystem: boolean = false;
-    // do architecture is x32?
-    x86Architecture: boolean = false;
+      // KPI - contacts
+      KPIContacts: DashboardModel.canViewContactsPerCaseMeanDashlet(this._authUser) ||
+        DashboardModel.canViewContactsPerCaseMedianDashlet(this._authUser) ||
+        DashboardModel.canViewContactsFromFollowUpsDashlet(this._authUser) ||
+        DashboardModel.canViewContactsLostToFollowUpsDashlet(this._authUser) ||
+        DashboardModel.canViewContactsNotSeenInXDaysDashlet(this._authUser) ||
+        DashboardModel.canViewContactsBecomeCasesDashlet(this._authUser) ||
+        DashboardModel.canViewContactsSeenDashlet(this._authUser) ||
+        DashboardModel.canViewContactsWithSuccessfulFollowUpsDashlet(this._authUser),
 
-    // constants
-    ExportDataExtension = ExportDataExtension;
+      // KPI - COT
+      KPICOT: DashboardModel.canViewIndependentCOTDashlet(this._authUser) ||
+        DashboardModel.canViewContactsNotSeenInXDaysDashlet(this._authUser) ||
+        DashboardModel.canViewContactsBecomeCasesDashlet(this._authUser)
+    };
+  }
 
-    casesByClassificationAndLocationReportUrl: string = '';
-    contactsFollowupSuccessRateReportUrl: string = '';
+  /**
+   * Component initialized
+   */
+  ngOnInit(): void {
+    // subscribe to outbreak changes
+    this._outbreakSubscriber = this.outbreakDataService
+      .getSelectedOutbreakSubject()
+      .subscribe((selectedOutbreak: OutbreakModel) => {
+        // update outbreak
+        this._selectedOutbreak = selectedOutbreak;
 
-    loadingDialog: LoadingDialogModel;
+        // found selected outbreak ?
+        if (this._selectedOutbreak?.id) {
+          // initialize quick actions
+          this.initializeQuickActions();
 
-    // available side filters
-    availableSideFilters: FilterModel[] = [];
+          // redraw data
+          this.detectChanges();
+        }
+      });
 
-    globalFilterDate: Moment = moment();
-    globalFilterLocationId: string;
-    globalFilterClassificationId: string[] = [];
+    // subscribe to outbreak determining changes
+    this._determiningOutbreakSubscriber = this.outbreakDataService
+      .getDeterminingOutbreakSubject()
+      .subscribe((determining) => {
+        // determining ?
+        this.loadingSelectedOutbreak = determining;
 
-    @ViewChild('kpiSection') private kpiSection: ElementRef;
-    @ViewChildren('kpiSectionGroup') private kpiSectionGroup: QueryList<MatExpansionPanel>;
+        // redraw data
+        this.detectChanges();
+      });
+  }
 
-    // subscribers
-    outbreakSubscriber: Subscription;
-
-    Constants = Constants;
-
-    epiCurveViewType;
-    epiCurveViewTypes$: Observable<any[]>;
-
-    caseClassificationsList$: Observable<LabelValuePair[]>;
-
-    /**
-     * Constructor
-     */
-    constructor(
-        private authDataService: AuthDataService,
-        private outbreakDataService: OutbreakDataService,
-        private domService: DomService,
-        private importExportDataService: ImportExportDataService,
-        private i18nService: I18nService,
-        private genericDataService: GenericDataService,
-        private dialogService: DialogService,
-        protected snackbarService: SnackbarService,
-        private systemSettingsDataService: SystemSettingsDataService,
-        private referenceDataDataService: ReferenceDataDataService
-    ) {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
+  /**
+   * Release resources
+   */
+  ngOnDestroy(): void {
+    // selected outbreak
+    if (this._outbreakSubscriber) {
+      this._outbreakSubscriber.unsubscribe();
+      this._outbreakSubscriber = undefined;
     }
 
-    /**
-     * Component initialized
-     */
-    ngOnInit() {
-        // map kpi groups
-        this.kpiGroupsMap = {};
-        this.kpiGroups.forEach((group) => {
-            this.kpiGroupsMap[group.id] = group;
-        });
+    // determining outbreak
+    if (this._determiningOutbreakSubscriber) {
+      this._determiningOutbreakSubscriber.unsubscribe();
+      this._determiningOutbreakSubscriber = undefined;
+    }
+  }
 
-        this.caseClassificationsList$ = this.referenceDataDataService
-            .getReferenceDataByCategoryAsLabelValue(ReferenceDataCategory.CASE_CLASSIFICATION)
-            .pipe(
-                map((records: LabelValuePair[]) => {
-                    return _.filter(
-                        records,
-                        (record: LabelValuePair) => {
-                            return record.value !== Constants.CASE_CLASSIFICATION.NOT_A_CASE;
-                        }
-                    );
-                }),
-                share()
-            );
+  /**
+   * Refresh template
+   */
+  detectChanges(): void {
+    this.changeDetectorRef.detectChanges();
+  }
 
-        this.initializeDashlets();
+  /**
+   * Initialize quick actions
+   */
+  initializeQuickActions(): void {
+    // initialize quick actions
+    this.quickActions = {
+      type: V2ActionType.MENU,
+      label: 'LNG_PAGE_DASHBOARD_REPORTS_BUTTON_LABEL',
+      visible: () => DashboardModel.canExportCaseClassificationPerLocationReport(this._authUser) ||
+        DashboardModel.canExportContactFollowUpSuccessRateReport(this._authUser) ||
+        DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(this._authUser) ||
+        DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(this._authUser) ||
+        DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(this._authUser) ||
+        (
+          DashboardModel.canExportKpi(this._authUser) && (
+            this.visibleDashlets.KPICases ||
+            this.visibleDashlets.KPIContacts ||
+            this.visibleDashlets.KPICOT
+          )
+        ),
+      menuOptions: [
+        // Export case classification per location report
+        {
+          label: {
+            get: () => 'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL'
+          },
+          action: {
+            click: () => {
+              // initialization
+              const qb = new RequestQueryBuilder();
 
-        // get Outbreaks list to check if there are any in the system
-        this.outbreakDataService
-            .getOutbreaksCount()
-            .subscribe((outbreaksCount) => {
-                this.noOutbreaksInSystem = !outbreaksCount.count;
-            });
+              // date
+              if (this.globalFilterDate) {
+                qb.filter.byDateRange(
+                  'dateOfReporting', {
+                    endDate: moment(this.globalFilterDate).endOf('day').format()
+                  }
+                );
+              }
 
-        this.outbreakSubscriber = this.outbreakDataService
-            .getSelectedOutbreakSubject()
-            .subscribe((selectedOutbreak: OutbreakModel) => {
-                if (selectedOutbreak && selectedOutbreak.id) {
-                    this.selectedOutbreak = selectedOutbreak;
-                    this.casesByClassificationAndLocationReportUrl = `/outbreaks/${this.selectedOutbreak.id}/cases/per-classification-per-location-level-report/download/`;
-                    this.contactsFollowupSuccessRateReportUrl = `/outbreaks/${this.selectedOutbreak.id}/contacts/per-location-level-tracing-report/download/`;
+              // location
+              if (this.globalFilterLocationId) {
+                qb.filter.byEquality(
+                  'addresses.parentLocationIdFilter',
+                  this.globalFilterLocationId
+                );
+              }
+
+              // classification
+              // since we display all classifications in the exported file, it would be strange to filter them by classification
+              // so there is nothing to filter here
+              // if (this.globalFilterClassificationId) {
+              //     qb.filter.bySelect(
+              //         'classification',
+              //         this.globalFilterClassificationId,
+              //         false,
+              //         null
+              //     );
+              // }
+
+              // export
+              this.dialogV2Service.showExportData({
+                title: {
+                  get: () => 'LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL'
+                },
+                export: {
+                  url: `/outbreaks/${this._selectedOutbreak.id}/cases/per-classification-per-location-level-report/download/`,
+                  async: false,
+                  method: ExportDataMethod.GET,
+                  fileName: `${this.translateService.instant('LNG_PAGE_DASHBOARD_CASES_BY_CLASSIFICATION_LOCATION_REPORT_LABEL')} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`,
+                  queryBuilder: qb,
+                  allow: {
+                    types: [
+                      ExportDataExtension.PDF
+                    ]
+                  }
                 }
-            });
+              });
+            }
+          },
+          visible: () => DashboardModel.canExportCaseClassificationPerLocationReport(this._authUser)
+        },
 
-        // check if platform architecture is x32
-        this.systemSettingsDataService
-            .getAPIVersion()
-            .subscribe((versionData: SystemSettingsVersionModel) => {
-                if (versionData.arch === Constants.PLATFORM_ARCH.X86) {
-                    this.x86Architecture = true;
+        // Export contact follow-up success rate
+        {
+          label: {
+            get: () => 'LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL'
+          },
+          action: {
+            click: () => {
+              // initialization
+              const qb = new RequestQueryBuilder();
+
+              // date filters
+              if (this.globalFilterDate) {
+                // pdf report
+                qb.filter.flag(
+                  'dateOfFollowUp',
+                  moment(this.globalFilterDate).startOf('day').format()
+                );
+
+                // same as list view
+                qb.filter.byDateRange(
+                  'dateOfReporting', {
+                    endDate: moment(this.globalFilterDate).endOf('day').format()
+                  }
+                );
+              }
+
+              // location
+              if (this.globalFilterLocationId) {
+                qb.filter.byEquality(
+                  'addresses.parentLocationIdFilter',
+                  this.globalFilterLocationId
+                );
+              }
+
+              // classification
+              // there is no need to filter by classification since this api filters contacts and not cases...
+              // if (this.globalFilterClassificationId) {
+              //     qb.filter.bySelect(
+              //         'classification',
+              //         this.globalFilterClassificationId,
+              //         false,
+              //         null
+              //     );
+              // }
+
+              // export
+              this.dialogV2Service.showExportData({
+                title: {
+                  get: () => 'LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL'
+                },
+                export: {
+                  url: `/outbreaks/${this._selectedOutbreak.id}/contacts/per-location-level-tracing-report/download/`,
+                  async: false,
+                  method: ExportDataMethod.GET,
+                  fileName: `${this.translateService.instant('LNG_PAGE_DASHBOARD_CONTACTS_FOLLOWUP_SUCCESS_RATE_REPORT_LABEL')} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`,
+                  queryBuilder: qb,
+                  allow: {
+                    types: [
+                      ExportDataExtension.PDF
+                    ]
+                  }
                 }
-            });
+              });
+            }
+          },
+          visible: () => DashboardModel.canExportContactFollowUpSuccessRateReport(this._authUser)
+        },
 
-        // load epi curves types
-        this.epiCurveViewTypes$ = this.genericDataService
-            .getEpiCurvesTypes()
-            .pipe(map((data: LabelValuePair[]) => {
-                // keep only those types to which we have access
-                return data.filter((item: LabelValuePair): boolean => {
-                    switch (item.value) {
-                        case Constants.EPI_CURVE_TYPES.CLASSIFICATION.value:
-                            return DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(this.authUser);
-                        case Constants.EPI_CURVE_TYPES.OUTCOME.value:
-                            return DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(this.authUser);
-                        case Constants.EPI_CURVE_TYPES.REPORTING.value:
-                            return DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(this.authUser);
-                        default:
-                            // NOT SUPPORTED
-                            return false;
+        // Export EPI - Classification
+        {
+          label: {
+            get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_CLASSIFICATION_TITLE'
+          },
+          action: {
+            click: () => {
+              this.getEpiCurveDashlet('app-epi-curve-dashlet svg');
+            }
+          },
+          visible: () => DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(this._authUser)
+        },
+
+        // Export EPI - Outcome
+        {
+          label: {
+            get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE'
+          },
+          action: {
+            click: () => {
+              this.getEpiCurveDashlet('app-epi-curve-outcome-dashlet svg');
+            }
+          },
+          visible: () => DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(this._authUser)
+        },
+
+        // Export EPI - Reporting Classification
+        {
+          label: {
+            get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORTING_TITLE'
+          },
+          action: {
+            click: () => {
+              this.getEpiCurveDashlet('app-epi-curve-reporting-dashlet svg');
+            }
+          },
+          visible: () => DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(this._authUser)
+        },
+
+        // Export KPI
+        {
+          label: {
+            get: () => 'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL'
+          },
+          action: {
+            click: () => {
+              // display error message if we try to render empty item
+              if (
+                !this._kpiCases.dashlet.expanded &&
+                !this._kpiContacts.dashlet.expanded &&
+                !this._kpiCOT.dashlet.expanded
+              ) {
+                // err
+                this.toastV2Service.error('LNG_PAGE_DASHBOARD_KPIS_ELEMENTS_NOT_VISIBLE_ERROR_MSG');
+
+                // finished
+                return;
+              }
+
+              // convert dom container to image
+              const loading = this.dialogV2Service.showLoadingDialog();
+              setTimeout(() => {
+                (domtoimage as any)
+                  .toPng(
+                    this._kpiSection.nativeElement, {
+                      filter: (node) => {
+                        return node.tagName !== 'A';
+                      }
                     }
-                });
-            }));
-
-        // set default epi curve
-        if (DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(this.authUser)) {
-            this.epiCurveViewType = Constants.EPI_CURVE_TYPES.CLASSIFICATION.value;
-        } else if (DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(this.authUser)) {
-            this.epiCurveViewType = Constants.EPI_CURVE_TYPES.OUTCOME.value;
-        } else if (DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(this.authUser)) {
-            this.epiCurveViewType = Constants.EPI_CURVE_TYPES.REPORTING.value;
-        } else {
-            // NOT SUPPORTED
-        }
-
-        // initialize Side Filters
-        this.initializeSideFilters();
-    }
-
-    /**
-     * Component destroyed
-     */
-    ngOnDestroy() {
-        // outbreak subscriber
-        if (this.outbreakSubscriber) {
-            this.outbreakSubscriber.unsubscribe();
-            this.outbreakSubscriber = null;
-        }
-    }
-
-    /**
-     * Initialize Side Filters
-     */
-    private initializeSideFilters() {
-        // set available side filters
-        this.availableSideFilters = [
-            new FilterModel({
-                fieldName: 'locationId',
-                fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION',
-                type: FilterType.LOCATION,
-                required: true,
-                multipleOptions: false,
-                value: this.globalFilterLocationId
-            }),
-            new FilterModel({
-                fieldName: 'date',
-                fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE',
-                type: FilterType.DATE,
-                required: true,
-                maxDate: moment(),
-                value: this.globalFilterDate
-            }),
-            new FilterModel({
-                fieldName: 'classificationId',
-                fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_CLASSIFICATION',
-                type: FilterType.MULTISELECT,
-                required: true,
-                options$: this.caseClassificationsList$,
-                value: this.globalFilterClassificationId
-            })
-        ];
-    }
-
-    private initializeDashlets() {
-        const userDashboardSettings: UserSettingsDashboardModel = this.authUser.getSettings(UserSettings.DASHBOARD);
-        _.each(this.kpiGroups, (group) => {
-            _.each(group.dashlets, (dashlet) => {
-                // add the dashlet to the list (if it's not already existing)
-                userDashboardSettings.addDashletIfNotExists(new DashletSettingsModel({
-                    name: dashlet,
-                    kpiGroup: group.id
-                }));
-            });
-        });
-
-        // Update dashlets order based on authenticated user's settings
-        this.refreshDashletsOrder();
-    }
-
-    /**
-     * Update dashlets order based on authenticated user's settings
-     */
-    private refreshDashletsOrder() {
-        const dashboardSettings = this.authUser.getSettings(UserSettings.DASHBOARD);
-        _.each(this.kpiGroups, (group) => {
-            group.dashlets.sort((a, b) => {
-                const dashletA = dashboardSettings.getDashlet(a);
-                const dashletB = dashboardSettings.getDashlet(b);
-
-                if (dashletA && dashletB) {
-                    return dashletA.order - dashletB.order;
-                } else {
-                    return 1;
-                }
-            });
-        });
-    }
-
-    /**
-     * Persist user's settings for the dashboard
-     */
-    private persistUserDashboardSettings(): Observable<any> {
-        return this.authDataService.updateSettingsForCurrentUser(
-            UserSettings.DASHBOARD,
-            this.authUser.getSettings(UserSettings.DASHBOARD)
-        );
-    }
-
-    /**
-     * Check if a dashlet is visible for current user
-     * @param name
-     */
-    isDashletVisible(name: string): boolean {
-        return _.get(
-            this.authUser.getSettings(UserSettings.DASHBOARD).getDashlet(name),
-            'visible',
-            true
-        );
-    }
-
-    /**
-     * Hide a dashlet for current user
-     * @param name
-     */
-    hideDashlet(name: string) {
-        this.authUser.getSettings(UserSettings.DASHBOARD).hideDashlet(name);
-
-        this.refreshDashletsOrder();
-
-        // persist changes
-        this.persistUserDashboardSettings().subscribe();
-    }
-
-    moveDashletBefore(name: string) {
-        this.authUser.getSettings(UserSettings.DASHBOARD).moveDashletBefore(name);
-
-        this.refreshDashletsOrder();
-
-        // persist changes
-        this.persistUserDashboardSettings().subscribe();
-    }
-
-    moveDashletAfter(name: string) {
-        this.authUser.getSettings(UserSettings.DASHBOARD).moveDashletAfter(name);
-
-        this.refreshDashletsOrder();
-
-        // persist changes
-        this.persistUserDashboardSettings().subscribe();
-    }
-
-    showAllDashlets(kpiGroup: string) {
-        this.authUser.getSettings(UserSettings.DASHBOARD).showAllDashlets(kpiGroup);
-        // persist changes
-        this.persistUserDashboardSettings().subscribe();
-    }
-
-    /**
-     * generate EPI curve report - image will be exported as pdf
-     */
-    generateEpiCurveReport() {
-        this.showLoadingDialog();
-        switch (this.epiCurveViewType) {
-            case Constants.EPI_CURVE_TYPES.CLASSIFICATION.value:
-                this.getEpiCurveDashlet('app-epi-curve-dashlet svg');
-                break;
-            case Constants.EPI_CURVE_TYPES.OUTCOME.value:
-                this.getEpiCurveDashlet('app-epi-curve-outcome-dashlet svg');
-                break;
-            case Constants.EPI_CURVE_TYPES.REPORTING.value:
-                this.getEpiCurveDashlet('app-epi-curve-reporting-dashlet svg');
-                break;
-        }
-    }
-
-    /**
-     * Get Epi curve dashlet
-     */
-    private getEpiCurveDashlet(selector: string) {
-        this.domService
-            .getPNGBase64(selector, '#tempCanvas')
-            .subscribe((pngBase64) => {
-                // object not found ?
-                if (!pngBase64) {
-                    this.snackbarService.showError('LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG');
-                    this.closeLoadingDialog();
-                    return;
-                }
-
-                // export
-                this.importExportDataService
-                    .exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
-                    .pipe(
+                  )
+                  .then((dataUrl) => {
+                    const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
+                    this.importExportDataService
+                      .exportImageToPdf({ image: dataBase64, responseType: 'blob', splitFactor: 1 })
+                      .pipe(
                         catchError((err) => {
-                            this.snackbarService.showApiError(err);
-                            this.closeLoadingDialog();
-                            return throwError(err);
+                          this.toastV2Service.error(err);
+                          loading.close();
+                          return throwError(err);
                         })
-                    )
-                    .subscribe((blob) => {
-                        this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL');
-                    });
-            });
-    }
-
-    /**
-     * Generate KPIs report
-     */
-    generateKpisReport() {
-        // display error message if we try to render empty item
-        let atLeastOneIsExpanded: boolean = false;
-        this.kpiSectionGroup.forEach((item) => {
-            if (item.expanded) {
-                atLeastOneIsExpanded = true;
-            }
-        });
-        if (!atLeastOneIsExpanded) {
-            this.snackbarService.showError('LNG_PAGE_DASHBOARD_KPIS_ELEMENTS_NOT_VISIBLE_ERROR_MSG');
-            return;
-        }
-
-        // render
-        this.showLoadingDialog();
-        (domtoimage as any).toPng(this.kpiSection.nativeElement)
-            .then((dataUrl) => {
-                const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
-
-                this.importExportDataService
-                    .exportImageToPdf({image: dataBase64, responseType: 'blob', splitFactor: 1})
-                    .pipe(
-                        catchError((err) => {
-                            this.snackbarService.showApiError(err);
-                            this.closeLoadingDialog();
-                            return throwError(err);
-                        })
-                    )
-                    .subscribe((blob) => {
+                      )
+                      .subscribe((blob) => {
                         this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL');
-                    });
-            });
-    }
-
-    /**
-     * Download File
-     * @param blob
-     * @param fileNameToken
-     */
-    private downloadFile(
-        blob,
-        fileNameToken,
-        extension: string = 'pdf'
-    ) {
-        const fileName = this.i18nService.instant(fileNameToken);
-        FileSaver.saveAs(
-            blob,
-            `${fileName}.${extension}`
-        );
-        this.closeLoadingDialog();
-    }
-
-    /**
-     * Apply side filters
-     * @param data
-     */
-    applySideFilters(filters: AppliedFilterModel[]) {
-        // retrieve date & location filters
-        // retrieve location filter
-        const dateFilter: AppliedFilterModel = _.find(filters, { filter: { fieldName: 'date' } });
-        const locationFilter: AppliedFilterModel = _.find(filters, { filter: { fieldName: 'locationId' } });
-        const classificationFilter: AppliedFilterModel = _.find(filters, { filter: { fieldName: 'classificationId' } });
-
-        // set filters
-        this.globalFilterDate = _.isEmpty(dateFilter.value) ? undefined : moment(dateFilter.value);
-        this.globalFilterLocationId = _.isEmpty(locationFilter.value) ? undefined : locationFilter.value;
-        this.globalFilterClassificationId = _.isEmpty(classificationFilter.value) ? undefined : classificationFilter.value;
-    }
-
-    /**
-     * Display loading dialog
-     */
-    showLoadingDialog() {
-        this.loadingDialog = this.dialogService.showLoadingDialog();
-    }
-
-    /**
-     * Hide loading dialog
-     */
-    closeLoadingDialog() {
-        if (this.loadingDialog) {
-            this.loadingDialog.close();
-            this.loadingDialog = null;
-        }
-    }
-
-    /**
-     * Cases by classification and location qb
-     */
-    qbCaseByClassification(): RequestQueryBuilder {
-        // initialization
-        const qb = new RequestQueryBuilder();
-
-        // date
-        if (this.globalFilterDate) {
-            qb.filter.byDateRange(
-                'dateOfOnset', {
-                    endDate: this.globalFilterDate.endOf('day').format()
-                }
-            );
-        }
-
-        // location
-        if (this.globalFilterLocationId) {
-            qb.filter.byEquality(
-                'addresses.parentLocationIdFilter',
-                this.globalFilterLocationId
-            );
-        }
-
-        // classification
-        // since we display all classifications in the exported file, it would be strange to filter them by classification
-        // so there is nothing to filter here
-        // if (this.globalFilterClassificationId) {
-        //     qb.filter.bySelect(
-        //         'classification',
-        //         this.globalFilterClassificationId,
-        //         false,
-        //         null
-        //     );
-        // }
-
-        // finished
-        return qb;
-    }
-
-    /**
-     * Contacts follow up success rate
-     */
-    qbContactsFollowUpSuccessRate(): RequestQueryBuilder {
-        // initialization
-        const qb = new RequestQueryBuilder();
-
-        // date filters
-        if (this.globalFilterDate) {
-            // pdf report
-            qb.filter.flag(
-                'dateOfFollowUp',
-                this.globalFilterDate.startOf('day').format()
-            );
-
-            // same as list view
-            qb.filter.byDateRange(
-                'dateOfReporting', {
-                    endDate: this.globalFilterDate.endOf('day').format()
-                }
-            );
-        }
-
-        // location
-        if (this.globalFilterLocationId) {
-            qb.filter.byEquality(
-                'addresses.parentLocationIdFilter',
-                this.globalFilterLocationId
-            );
-        }
-
-        // classification
-        // there is no need to filter by classification since this api filters contacts and not cases...
-        // if (this.globalFilterClassificationId) {
-        //     qb.filter.bySelect(
-        //         'classification',
-        //         this.globalFilterClassificationId,
-        //         false,
-        //         null
-        //     );
-        // }
-
-        // finished
-        return qb;
-    }
-
-    /**
-     * Check if we have kpi group access
-     */
-    hasKpiAccess(): boolean {
-        // check if there is at least one group that has access
-        for (const group of this.kpiGroups) {
-            if (group.hasAccess(this.authUser)) {
-                return true;
+                        loading.close();
+                      });
+                  });
+              });
             }
+          },
+          visible: () => DashboardModel.canExportKpi(this._authUser) && (
+            this.visibleDashlets.KPICases ||
+            this.visibleDashlets.KPIContacts ||
+            this.visibleDashlets.KPICOT
+          )
+        }
+      ]
+    };
+  }
+
+  /**
+   * Show advanced filters
+   */
+  showAdvancedFilters(): void {
+    // show advanced filters dialog
+    this.dialogV2Service
+      .showAdvancedFiltersDialog(
+        Constants.APP_PAGE.DASHBOARD.value,
+        [
+          // Date
+          {
+            type: V2AdvancedFilterType.DATE,
+            field: 'date',
+            label: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE',
+            filterBy: (_qb, filter) => {
+              this.globalFilterDate = filter.value;
+            }
+          },
+
+          // Location
+          {
+            type: V2AdvancedFilterType.LOCATION_SINGLE,
+            field: 'locationId',
+            label: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION',
+            optional: true,
+            clearable: true,
+            filterBy: (_qb, filter) => {
+              this.globalFilterLocationId = filter.value ?
+                filter.value :
+                undefined;
+            }
+          },
+
+          // Classification
+          {
+            type: V2AdvancedFilterType.MULTISELECT,
+            field: 'classificationId',
+            label: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_CLASSIFICATION',
+            options: (this.activatedRoute.snapshot.data.classification as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            optional: true,
+            allowedComparators: [
+              _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
+            ],
+            filterBy: (_qb, filter) => {
+              this.globalFilterClassificationId = filter.value;
+            }
+          }
+        ],
+        this._advancedFiltersApplied,
+        {
+          operatorHide: true,
+          disableAdd: true,
+          disableReset: true,
+          disableDelete: true
+        }
+      )
+      .subscribe((response) => {
+        // cancelled ?
+        if (!response) {
+          return;
         }
 
-        // we don't have access
-        return false;
-    }
+        // set data
+        this._advancedFiltersApplied = response.filtersApplied;
+
+        // update ui
+        this.detectChanges();
+      });
+  }
+
+  /**
+   * Get Epi curve dashlet
+   */
+  private getEpiCurveDashlet(selector: string) {
+    this.dialogV2Service.showSideDialog({
+      // title
+      title: {
+        get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_EXPORT_FORMAT'
+      },
+
+      // inputs
+      hideInputFilter: true,
+      inputs: [
+        {
+          type: V2SideDialogConfigInputType.TOGGLE,
+          value: false,
+          name: 'exportFormat',
+          options: [
+            {
+              label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_EXPORT_FORMAT_MULTI_PAGE',
+              value: false
+            },
+            {
+              label: 'LNG_PAGE_DASHBOARD_EPI_CURVE_EXPORT_FORMAT_SINGLE_PAGE',
+              value: true
+            }
+          ]
+        }
+      ],
+
+      // buttons
+      bottomButtons: [
+        {
+          label: 'LNG_COMMON_BUTTON_EXPORT',
+          type: IV2SideDialogConfigButtonType.OTHER,
+          color: 'primary',
+          key: 'save'
+        }, {
+          type: IV2SideDialogConfigButtonType.CANCEL,
+          label: 'LNG_COMMON_BUTTON_CANCEL',
+          color: 'text'
+        }
+      ]
+    }).subscribe((response) => {
+      // cancelled ?
+      if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+        return;
+      }
+
+      // determine export format
+      const exportAsSinglePage: boolean = (response.data.map.exportFormat as IV2SideDialogConfigInputToggle).value as boolean;
+
+      // export
+      const loading = this.dialogV2Service.showLoadingDialog();
+      this.domService
+        .getPNGBase64(
+          selector,
+          '#tempCanvas',
+          1
+        )
+        .subscribe((pngBase64) => {
+          // object not found ?
+          if (!pngBase64) {
+            this.toastV2Service.notice('LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG');
+            loading.close();
+            return;
+          }
+
+          // export
+          this.importExportDataService
+            .exportImageToPdf({
+              image: pngBase64,
+              responseType: 'blob',
+              splitFactor: 1,
+              splitType: exportAsSinglePage ?
+                'grid' :
+                'auto'
+            })
+            .pipe(
+              catchError((err) => {
+                this.toastV2Service.error(err);
+                loading.close();
+                return throwError(err);
+              })
+            )
+            .subscribe((blob) => {
+              this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL');
+              loading.close();
+            });
+        });
+
+      // close popup
+      response.handler.hide();
+    });
+  }
+
+  /**
+   * Download File
+   */
+  private downloadFile(
+    blob,
+    fileNameToken,
+    extension: string = 'pdf'
+  ) {
+    const fileName = this.translateService.instant(fileNameToken);
+    FileSaver.saveAs(
+      blob,
+      `${fileName}.${extension}`
+    );
+  }
 }

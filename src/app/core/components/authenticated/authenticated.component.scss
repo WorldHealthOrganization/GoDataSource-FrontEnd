@@ -1,0 +1,192 @@
+@import 'mixins';
+
+mat-sidenav-container {
+  /* Variables */
+  --gd-menu-width-expanded: 33rem;
+  --gd-menu-width-collapsed: 7rem;
+  --gd-top-bar-height: 7rem;
+
+  /* Authenticated body layout */
+  &.gd-body-content {
+    background-color: transparent;
+    color: var(--gd-text);
+    height: 100vh; /* Fallback for browsers which cannot support Custom Properties */
+    height: calc(var(--vh, 1vh) * 100);
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+    width: 100vw;
+
+    /* Left side */
+    .gd-body-content-left {
+      border-right: 0 none;
+      @include box-shadow(0.2rem 7rem 0.2rem rgba(var(--gd-text-rgb), 0.1));
+      color: var(--gd-text);
+      overflow: visible;
+      @include transition(all 0.24s ease-in-out 0s);
+      width: var(--gd-menu-width-collapsed);
+
+      @include breakpoint('lt-md') {
+        width: 0;
+      }
+
+      /* Left content */
+      .gd-body-content-left-content {
+        height: 100%;
+        overflow: hidden;
+        position: relative;
+        z-index: 999;
+
+        /* Logo on mobile */
+        .gd-body-content-left-content-header {
+          @include flex_align_items(center);
+          @include flex(flex);
+          @include flex_direction(row);
+          @include flex_justify(space-between);
+
+          /* Mobile Menu Close Trigger */
+          > button.mat-icon-button {
+            margin: 0 2.4rem;
+          }
+        }
+
+        /* Logo */
+        .gd-body-content-left-content-logo {
+          cursor: pointer;
+          display: block;
+          height: var(--gd-top-bar-height);
+          overflow: hidden;
+          padding: 1.6rem 0.8rem;
+          @include transition(all 0.24s ease-in-out 0s);
+
+          @include breakpoint('gt-md') {
+            width: 100%;
+          }
+
+          img {
+            height: 3.8rem;
+            max-width: 18.05rem;
+            width: 18.05rem;
+          }
+        }
+
+        /* Menu */
+        .gd-body-content-left-content-menu {
+          height: calc(100% - var(--gd-top-bar-height));
+          position: relative;
+
+          /* Top gradient which appears only when collapsed menu has scrollbar */
+          &:before {
+            background: -moz-linear-gradient(top, var(--gd-background) 0%, transparent 100%);
+            background: -webkit-linear-gradient(top, var(--gd-background) 0%, transparent 100%);
+            background: linear-gradient(to bottom, var(--gd-background) 0%, transparent 100%);
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#00ffffff',GradientType=0 );
+            content: '';
+            display: none;
+            height: 1rem;
+            left: 0;
+            position: absolute;
+            top: 0;
+            width: 100%;
+
+            @media screen and (max-height: 950px) {
+              display: block;
+            }
+          }
+        }
+      }
+
+      /* Left side expanded */
+      &.gd-body-content-left-expanded,
+      &.gd-body-content-left-hovering {
+        width: var(--gd-menu-width-expanded);
+
+        .gd-body-content-left-content {
+          .gd-body-content-left-content-logo {
+            padding-left: 2.4rem;
+            padding-right: 2.4rem;
+          }
+
+          .gd-body-content-left-content-menu {
+            &:before {
+              display: none;
+            }
+          }
+        }
+      }
+
+      /* Expand / collapse button */
+      .gd-expand-collapse-button {
+        background: var(--gd-background);
+        border: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.5);
+        @include border-radius(50%);
+        color: rgba(var(--gd-secondary-rgb), 0.5);
+        font-size: 2rem;
+        height: 2rem;
+        left: calc(100% - 1rem);
+        line-height: 1;
+        min-width: 0;
+        padding: 0;
+        position: absolute;
+        top: calc(var(--gd-top-bar-height) + 1.6rem);
+        width: 2rem;
+        z-index: 1000;
+
+        .material-icons {
+          font-size: 2rem;
+          @include flex(flex);
+          @include flex_align_items(center);
+          @include flex_justify(center);
+          height: 1.8rem;
+          vertical-align: baseline;
+          width: 1.8rem;
+        }
+      }
+    }
+
+    /* Right side */
+    .gd-body-content-right {
+      @include breakpoint('gt-md') {
+        margin: 0 0 0 var(--gd-menu-width-collapsed) !important;
+        @include transition(all 0.24s ease-in-out 0s);
+        width: calc(100% - var(--gd-menu-width-collapsed));
+      }
+
+      &.gd-body-content-right-expanded {
+        @include breakpoint('gt-md') {
+          margin-left: var(--gd-menu-width-expanded) !important;
+          width: calc(100% - var(--gd-menu-width-expanded));
+        }
+      }
+
+      /* Top bar */
+      .gd-body-content-right-top {
+        background: var(--gd-background);
+        @include box-shadow(0.2rem 0.2rem 0.2rem rgba(var(--gd-text-rgb), 0.1));
+        color: var(--gd-text);
+        height: var(--gd-top-bar-height);
+        position: relative;
+        z-index: 1000;
+      }
+
+      /* Page content */
+      .gd-body-content-right-bottom {
+        background: rgba(var(--gd-secondary-rgb), 0.1);
+        color: var(--gd-text);
+        height: calc(100vh - var(--gd-top-bar-height)); /* Fallback for browsers which cannot support Custom Properties */
+        height: calc((var(--vh, 1vh) * 100) - var(--gd-top-bar-height));
+        padding: 1.2rem 4rem 4rem;
+        overflow-x: hidden;
+        overflow-y: overlay;
+
+        @include breakpoint('lt-md') {
+          padding: 1.2rem 2rem 2rem;
+        }
+      }
+
+      &.gd-body-content-right-fullscreen {
+        z-index: auto;
+      }
+    }
+  }
+}

@@ -1,4 +1,3 @@
-// modules
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -7,74 +6,80 @@ import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { XtFormsModule } from './xt-forms/xt-forms.module';
 import { AngularMaterialModule } from './angular-material/angular-material.module';
-import { NgSelectModule } from '@ng-select/ng-select';
-import { MglTimelineModule } from 'angular-mgl-timeline';
 import { FileUploadModule } from 'ng2-file-upload';
 import { NgxWigModule } from 'ngx-wig';
-import { HotTableModule } from '@handsontable/angular';
 import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { ScrollingModule as ExperimentalScrollingModule } from '@angular/cdk-experimental/scrolling';
-import { MdePopoverModule } from '@material-extended/mde';
-
-// components
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import * as fromSharedComponents from './components';
 import * as fromSharedDirectives from './directives';
 import * as fromSharedPipes from './pipes';
+import * as formV2Components from './forms-v2/components';
+import * as v2Components from './components-v2';
+import { AgGridModule } from '@ag-grid-community/angular';
+import { ToastrModule } from 'ngx-toastr';
+import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
+import { HotTableModule } from '@handsontable/angular';
+import { ColorPickerModule } from 'ngx-color-picker';
 
 @NgModule({
-    imports: [
-        CommonModule,
-        RouterModule,
-        NgSelectModule,
-        FormsModule,
-        FlexLayoutModule,
-        XtFormsModule,
-        AngularMaterialModule,
-        TranslateModule,
-        MdePopoverModule,
-        MglTimelineModule,
-        FileUploadModule,
-        NgxWigModule,
-        NgxMatSelectSearchModule,
-        HotTableModule.forRoot(),
-        ScrollingModule,
-        ExperimentalScrollingModule
-    ],
-    declarations: [
-        ...fromSharedComponents.components,
-        ...fromSharedDirectives.directives,
-        ...fromSharedPipes.pipes
-    ],
-    providers: [],
-    exports: [
-        CommonModule,
-        RouterModule,
-        NgSelectModule,
-        FormsModule,
-        FlexLayoutModule,
-        TranslateModule,
-        XtFormsModule,
-        AngularMaterialModule,
-        MdePopoverModule,
-        MglTimelineModule,
-        ScrollingModule,
-        ExperimentalScrollingModule,
-        ...fromSharedDirectives.directives,
-        ...fromSharedPipes.pipes,
-        ...fromSharedComponents.components
-    ],
-    entryComponents: [
-        fromSharedComponents.MultipleSnackbarComponent,
-        fromSharedComponents.DialogComponent,
-        fromSharedComponents.ModifyContactFollowUpQuestionnaireDialogComponent,
-        fromSharedComponents.LoadingDialogComponent,
-        fromSharedComponents.ViewCotNodeDialogComponent,
-        fromSharedComponents.ViewCotEdgeDialogComponent,
-        fromSharedComponents.ViewHelpDialogComponent,
-        fromSharedComponents.ViewHelpDetailsDialogComponent,
-        fromSharedComponents.LocationDialogComponent
-    ]
+  imports: [
+    AgGridModule,
+    ColorPickerModule,
+    CommonModule,
+    DragDropModule,
+    RouterModule,
+    FormsModule,
+    FlexLayoutModule,
+    XtFormsModule,
+    AngularMaterialModule,
+    TranslateModule,
+    FileUploadModule,
+    NgxWigModule,
+    NgxMaterialTimepickerModule,
+    NgxMatSelectSearchModule,
+    HotTableModule.forRoot(),
+    ScrollingModule,
+    ExperimentalScrollingModule,
+    ToastrModule.forRoot({
+      extendedTimeOut: 5000,
+      enableHtml: true,
+      progressBar: true,
+      progressAnimation: 'decreasing',
+      positionClass: 'toast-top-center',
+      maxOpened: 5,
+      newestOnTop: false,
+      closeButton: false
+    })
+  ],
+  declarations: [
+    ...fromSharedComponents.components,
+    ...fromSharedDirectives.directives,
+    ...fromSharedPipes.pipes,
+    ...formV2Components.components,
+    ...v2Components.components
+  ],
+  providers: [],
+  exports: [
+    AgGridModule,
+    CommonModule,
+    DragDropModule,
+    RouterModule,
+    FormsModule,
+    FlexLayoutModule,
+    TranslateModule,
+    XtFormsModule,
+    AngularMaterialModule,
+    ScrollingModule,
+    ExperimentalScrollingModule,
+    ToastrModule,
+    ...fromSharedDirectives.directives,
+    ...fromSharedPipes.pipes,
+    ...fromSharedComponents.components,
+    ...formV2Components.components,
+    ...v2Components.components
+  ]
 })
 export class SharedModule {
 }

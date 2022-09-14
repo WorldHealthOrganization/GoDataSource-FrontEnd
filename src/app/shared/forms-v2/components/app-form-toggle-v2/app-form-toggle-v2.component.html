@@ -1,0 +1,26 @@
+<div
+  class="gd-form-toggle-v2">
+
+  <mat-button-toggle-group
+    [(ngModel)]="value"
+    [name]="name"
+    [disabled]="disabled"
+    (blur)="onTouchItem()">
+
+    <mat-button-toggle
+      *ngFor="let option of options"
+      [value]="option.value">
+
+      <!-- Icon -->
+      <mat-icon>{{option.value === value ? 'radio_button_checked' : 'radio_button_unchecked'}}</mat-icon>
+
+      <!-- Label -->
+      <span>
+        {{option.label | translate}}
+      </span>
+
+    </mat-button-toggle>
+
+  </mat-button-toggle-group>
+
+</div>

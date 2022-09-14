@@ -1,0 +1,347 @@
+@import 'mixins';
+
+/* Fill Questionnaire */
+.gd-form-fill-questionnaire-v2 {
+  height: 100%;
+
+  /* Questionnaire List */
+  .gd-form-fill-questionnaire-v2-list {
+    height: calc(100% - 3.9rem);
+
+    @include breakpoint('xxs') {
+      height: calc(100% - 6.1rem);
+    }
+
+    .gd-create-view-modify-view & {
+      height: 100%;
+    }
+
+    .cdk-virtual-scroll-viewport {
+      height: 100%;
+      overflow-y: overlay;
+      overflow-x: hidden;
+    }
+  }
+
+  /* Questionnaire Legend Section */
+  .gd-form-fill-questionnaire-v2-legend {
+    border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.25);
+    padding: 0.8rem 0;
+
+    .gd-form-fill-questionnaire-v2-legend-title {
+      color: var(--gd-secondary);
+      font-size: 1.2rem;
+      margin-left: 0.8rem;
+      text-transform: uppercase;
+    }
+
+    .gd-form-fill-questionnaire-v2-legend-items {
+      .gd-form-fill-questionnaire-v2-legend-items-item {
+        @include flex_align_items(center);
+        @include flex(flex);
+        @include flex_direction(row);
+        font-size: 1.2rem;
+        margin-left: 0.8rem;
+
+        .mat-icon {
+          font-size: 2.4rem;
+          height: 2.2rem;
+          margin-right: 0.4rem;
+          width: 2.2rem;
+        }
+      }
+    }
+  }
+}
+
+/* Questionnaire List Item */
+.gd-form-fill-questionnaire-v2-list-item {
+  @include transition(background-color 0.24s ease-in-out 0s);
+
+  @include breakpoint('xxs') {
+    padding-left: 0 !important;
+  }
+
+  /* Question */
+  .gd-form-fill-questionnaire-v2-list-item-question {
+    height: 100%;
+    padding-right: 1.6rem;
+
+    > .mat-icon {
+      color: rgba(var(--gd-secondary-rgb), 0.5);
+      height: 2rem;
+      margin-left: 0.8rem;
+      @include transition(color 0.24s ease-in-out 0s);
+      width: 2rem;
+    }
+
+    .gd-form-fill-questionnaire-v2-list-item-question-content {
+      @include flex(inline-flex);
+      @include flex_align_items(center);
+
+      .gd-form-fill-questionnaire-v2-list-item-question-content-number {
+        padding-left: 0.8rem;
+      }
+
+      .gd-form-fill-questionnaire-v2-list-item-question-content-title {
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        display: -webkit-box;
+        display: -moz-box;
+        max-height: 4.2rem;
+        overflow: hidden;
+        padding-left: 0.8rem;
+      }
+
+      .gd-form-fill-questionnaire-v2-list-item-question-content-required {
+        color: var(--gd-danger);
+        padding-left: 0.8rem;
+      }
+    }
+
+    .gd-form-fill-questionnaire-v2-list-item-question-buttons {
+      .mat-icon-button {
+        font-size: 1.6rem;
+        height: 2.4rem;
+        margin-left: 0.8rem;
+        min-width: 2.4rem;
+        padding: 0.4rem;
+        width: 2.4rem;
+
+        .mat-icon {
+          font-size: 1.6rem;
+        }
+      }
+    }
+  }
+
+  /* Answer */
+  .gd-form-fill-questionnaire-v2-list-item-answer {
+    height: 100%;
+    padding-right: 4.8rem;
+
+    .gd-create-view-modify-view & {
+      padding: 0 1.6rem 0 0.4rem;
+    }
+
+    > * {
+      width: 100%;
+
+      .mat-form-field {
+        .mat-form-field-wrapper {
+          .mat-form-field-subscript-wrapper {
+            min-height: 0;
+          }
+        }
+      }
+    }
+
+    > .gd-form-fill-questionnaire-v2-list-item-answer-number {
+      width: auto;
+
+      @include breakpoint('xxs') {
+        display: none;
+      }
+    }
+
+    > .mat-icon {
+      color: rgba(var(--gd-secondary-rgb), 0.5);
+      height: 2rem;
+      @include transition(color 0.24s ease-in-out 0s);
+      width: 2rem;
+
+      @include breakpoint('xxs') {
+        width: 3.6rem;
+      }
+    }
+
+    &.gd-form-fill-questionnaire-v2-list-item-answer-multiple {
+      padding-left: 4rem;
+
+      @include breakpoint('xxs') {
+        padding-left: 4.6rem;
+
+        .gd-create-view-modify-view & {
+          padding-left: 0.8rem;
+        }
+      }
+    }
+
+    &.gd-form-fill-questionnaire-v2-list-item-answer-file {
+      > .gd-form-fill-questionnaire-v2-list-item-answer-number {
+        + div {
+          @include flex(flex);
+          @include flex_align_items(center);
+        }
+      }
+
+      .gd-form-fill-questionnaire-v2-list-item-answer-file-name {
+        color: var(--gd-primary);
+
+        ~ .mat-icon-button {
+          font-size: 1.6rem;
+          height: 2.4rem;
+          margin-left: 0.8rem;
+          min-width: 2.4rem;
+          padding: 0.4rem;
+          width: 2.4rem;
+  
+          .mat-icon {
+            font-size: 1.6rem;
+          }
+        }
+      }
+
+      .gd-form-fill-questionnaire-v2-list-item-answer-file-name-no-file {
+        color: var(--gd-secondary);
+        font-size: 1.2rem;
+        font-style: italic;
+
+        .gd-create-view-modify-view & {
+          color: var(--gd-text);
+          font-size: 1.4rem;
+          font-style: normal;
+        }
+      }
+    }
+  }
+
+  .gd-form-fill-questionnaire-v2-list-item-answer-multi-date {
+    height: 100%;
+    padding-right: 1.6rem;
+    position: relative;
+
+    &:before {
+      background: rgba(var(--gd-success-rgb), 0.05);
+      content: '';
+      display: block;
+      height: 100%;
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: calc(100% + 20rem);
+      z-index: -1;
+    }
+
+    > .mat-icon {
+      color: rgba(var(--gd-secondary-rgb), 0.5);
+      height: 2rem;
+      @include transition(color 0.24s ease-in-out 0s);
+      width: 2rem;
+    }
+
+    .gd-form-fill-questionnaire-v2-list-item-answer-multi-date-content {
+      padding-left: 0.8rem;
+
+      > * {
+        width: 100%;
+  
+        .mat-form-field {
+          .mat-form-field-wrapper {
+            .mat-form-field-subscript-wrapper {
+              min-height: 0;
+            }
+          }
+        }
+      }
+    }
+
+    .gd-form-fill-questionnaire-v2-list-item-answer-multi-date-buttons {
+      .mat-icon-button {
+        font-size: 1.6rem;
+        height: 2.4rem;
+        margin-left: 0.8rem;
+        min-width: 2.4rem;
+        padding: 0.4rem;
+        width: 2.4rem;
+
+        .mat-icon {
+          font-size: 1.6rem;
+        }
+      }
+    }
+  }
+
+  &.gd-form-fill-questionnaire-v2-list-item-inactive {
+    background: rgba(var(--gd-secondary-rgb), 0.1);
+
+    .gd-form-fill-questionnaire-v2-list-item-question {
+      .gd-form-fill-questionnaire-v2-list-item-question-content {
+        @include opacity(0.5);
+      }
+    }
+
+    .gd-form-fill-questionnaire-v2-list-item-answer {
+      @include opacity(0.5);
+    }
+
+    .gd-form-fill-questionnaire-v2-list-item-answer-multi-date {
+      @include opacity(0.5);
+      padding-right: 4.8rem;
+
+      &:before {
+        display: none;
+      }
+    }
+
+    &:hover {
+      background: rgba(var(--gd-secondary-rgb), 0.1);
+    }
+  }
+
+  &.gd-form-fill-questionnaire-v2-list-item-markup {
+    background-color: rgba(var(--gd-warning-rgb), 0.1);
+    color: var(--gd-primary-alt);
+    font-weight: 700;
+    padding-right: 1.6rem;
+
+    &:hover {
+      background-color: rgba(var(--gd-warning-rgb), 0.1);
+    }
+  }
+
+  .gd-form-fill-questionnaire-v2-list-item-category {
+    background-color: rgba(var(--gd-warning-rgb), 0.2);
+    height: 100%;
+    padding-left: 3.6rem;
+
+    .gd-form-fill-questionnaire-v2-list-item-category-content {
+      color: var(--gd-primary-alt);
+      font-size: 2rem;
+      font-weight: 700;
+    }
+  }
+
+  &:hover {
+    background-color: rgba(var(--gd-primary-alt-rgb), 0.05);
+  }
+}
+
+/* Empty Questionnaire */
+.gd-form-fill-questionnaire-v2-empty {
+  height: 100%;
+
+  .gd-form-fill-questionnaire-v2-empty-image {
+    background-image: url(../../../../../assets/images/nothing-found.svg);
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 25rem;
+    width: 25rem;
+
+    @include breakpoint('xs') {
+      height: 15rem;
+      width: 15rem;
+    }
+  }
+
+  .gd-form-fill-questionnaire-v2-empty-text {
+    color: var(--gd-secondary);
+    font-size: 1.6rem;
+    margin-top: 2rem;
+
+    @include breakpoint('xs') {
+      font-size: 1.4rem;
+    }
+  }
+}

@@ -1,415 +1,850 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
+import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
-import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { AddressModel, AddressType } from '../../../../core/models/address.model';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { DocumentModel } from '../../../../core/models/document.model';
-import * as _ from 'lodash';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { Constants } from '../../../../core/models/constants';
-import { NgForm } from '@angular/forms';
 import { EntityType } from '../../../../core/models/entity-type';
-import { catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
-import { VaccineModel } from '../../../../core/models/vaccine.model';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { AuthDataService } from '../../../../core/services/data/auth.data.service';
+import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { ICreateViewModifyV2Refresh } from '../../../../shared/components-v2/app-create-view-modify-v2/models/refresh.model';
+import { CreateViewModifyV2TabInputType, ICreateViewModifyV2Buttons, ICreateViewModifyV2CreateOrUpdate, ICreateViewModifyV2Tab } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import { TranslateService } from '@ngx-translate/core';
+import { UserModel } from '../../../../core/models/user.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
-    selector: 'app-contact-of-contact-merge-duplicate',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './contact-of-contact-merge-duplicate.component.html',
-    styleUrls: ['./contact-of-contact-merge-duplicate.component.less']
+  selector: 'app-contact-of-contact-merge-duplicate',
+  templateUrl: './contact-of-contact-merge-duplicate.component.html'
 })
-export class ContactOfContactMergeDuplicateComponent extends ConfirmOnFormChanges implements OnInit {
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE', '/duplicated-records'),
-        new BreadcrumbItemModel('LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_TITLE', '.', true)
-    ];
+export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyComponent<ContactOfContactModel> implements OnDestroy {
+  // data
+  private _mergeRecordIds: string[];
+  private _uniqueOptions: {
+    firstName: ILabelValuePairModel[],
+    middleName: ILabelValuePairModel[],
+    lastName: ILabelValuePairModel[],
+    gender: ILabelValuePairModel[],
+    pregnancyStatus: ILabelValuePairModel[],
+    occupation: ILabelValuePairModel[],
+    age: ILabelValuePairModel[],
+    dob: ILabelValuePairModel[],
+    visualId: ILabelValuePairModel[],
+    responsibleUserId: ILabelValuePairModel[],
+    dateOfReporting: ILabelValuePairModel[],
+    isDateOfReportingApproximate: ILabelValuePairModel[],
+    riskLevel: ILabelValuePairModel[],
+    riskReason: ILabelValuePairModel[]
+  };
+  private _ageContactOfContactID: string;
 
-    contactOfContactData: ContactOfContactModel = new ContactOfContactModel();
+  /**
+   * Constructor
+   */
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private outbreakDataService: OutbreakDataService,
+    private translateService: TranslateService,
+    protected toastV2Service: ToastV2Service,
+    authDataService: AuthDataService,
+    renderer2: Renderer2,
+    redirectService: RedirectService
+  ) {
+    super(
+      toastV2Service,
+      renderer2,
+      redirectService,
+      activatedRoute,
+      authDataService
+    );
 
-    selectedOutbreak: OutbreakModel;
+    // retrieve contacts ids
+    this._mergeRecordIds = JSON.parse(this.activatedRoute.snapshot.queryParams.ids);
+  }
 
-    // loading
-    displayLoading: boolean = false;
+  /**
+   * Release resources
+   */
+  ngOnDestroy(): void {
+    // parent
+    super.onDestroy();
+  }
 
-    address: AddressModel = new AddressModel();
+  /**
+    * Create new item model if needed
+    */
+  protected createNewItem(): ContactOfContactModel {
+    return null;
+  }
 
-    mergeRecordIds: string[];
-    mergeRecords: EntityModel[];
+  /**
+    * Retrieve item
+    */
+  protected retrieveItem(_record?: ContactOfContactModel): Observable<ContactOfContactModel> {
+    return new Observable<ContactOfContactModel>((subscriber) => {
+      // retrieve records
+      const qb = new RequestQueryBuilder();
+      qb.filter.bySelect(
+        'id',
+        this._mergeRecordIds,
+        true,
+        null
+      );
 
-    uniqueOptions: {
-        firstName: {
-            options: LabelValuePair[],
-            value: any
-        },
-        middleName: {
-            options: LabelValuePair[],
-            value: any
-        },
-        lastName: {
-            options: LabelValuePair[],
-            value: any
-        },
-        gender: {
-            options: LabelValuePair[],
-            value: any
-        },
-        pregnancyStatus: {
-            options: LabelValuePair[],
-            value: any
-        },
-        occupation: {
-            options: LabelValuePair[],
-            value: any
-        },
-        ageDob: {
-            options: LabelValuePair[],
-            value: any
-        },
-        visualId: {
-            options: LabelValuePair[],
-            value: any
-        },
-        riskLevel:  {
-            options: LabelValuePair[],
-            value: any
-        },
-        riskReason: {
-            options: LabelValuePair[],
-            value: any
-        },
-        dateOfReporting: {
-            options: LabelValuePair[],
-            value: any
-        },
-        isDateOfReportingApproximate: {
-            options: LabelValuePair[],
-            value: any
-        },
-        currentAddresses: {
-            options: LabelValuePair[],
-            value: any
-        }
-    };
+      // retrieve
+      this.outbreakDataService
+        .getPeopleList(this.selectedOutbreak.id, qb)
+        .pipe(
+          catchError((err) => {
+            subscriber.error(err);
+            return throwError(err);
+          })
+        )
+        .subscribe((mergeRecords) => {
+          // determine data
+          this._uniqueOptions = {
+            firstName: this.getFieldOptions(
+              mergeRecords,
+              'firstName'
+            ).options,
+            middleName: this.getFieldOptions(
+              mergeRecords,
+              'middleName'
+            ).options,
+            lastName: this.getFieldOptions(
+              mergeRecords,
+              'lastName'
+            ).options,
+            gender: this.getFieldOptions(
+              mergeRecords,
+              'gender'
+            ).options,
+            pregnancyStatus: this.getFieldOptions(
+              mergeRecords,
+              'pregnancyStatus'
+            ).options,
+            occupation: this.getFieldOptions(
+              mergeRecords,
+              'occupation'
+            ).options,
+            age: this.getFieldOptions(
+              mergeRecords,
+              'age'
+            ).options,
+            dob: this.getFieldOptions(
+              mergeRecords,
+              'dob'
+            ).options,
+            visualId: this.getFieldOptions(
+              mergeRecords,
+              'visualId'
+            ).options,
+            responsibleUserId: this.getFieldOptions(
+              mergeRecords,
+              'responsibleUserId'
+            ).options,
+            dateOfReporting: this.getFieldOptions(
+              mergeRecords,
+              'dateOfReporting'
+            ).options,
+            isDateOfReportingApproximate: this.getFieldOptions(
+              mergeRecords,
+              'isDateOfReportingApproximate'
+            ).options,
+            riskLevel: this.getFieldOptions(
+              mergeRecords,
+              'riskLevel'
+            ).options,
+            riskReason: this.getFieldOptions(
+              mergeRecords,
+              'riskReason'
+            ).options
+          };
 
-    // constants
-    Constants = Constants;
+          // auto-select if only one value
+          const data: ContactOfContactModel = new ContactOfContactModel();
+          data.firstName = this._uniqueOptions.firstName.length === 1 ?
+            this._uniqueOptions.firstName[0].value :
+            data.firstName;
+          data.middleName = this._uniqueOptions.middleName.length === 1 ?
+            this._uniqueOptions.middleName[0].value :
+            data.middleName;
+          data.lastName = this._uniqueOptions.lastName.length === 1 ?
+            this._uniqueOptions.lastName[0].value :
+            data.lastName;
+          data.gender = this._uniqueOptions.gender.length === 1 ?
+            this._uniqueOptions.gender[0].value :
+            data.gender;
+          data.pregnancyStatus = this._uniqueOptions.pregnancyStatus.length === 1 ?
+            this._uniqueOptions.pregnancyStatus[0].value :
+            data.pregnancyStatus;
+          data.occupation = this._uniqueOptions.occupation.length === 1 ?
+            this._uniqueOptions.occupation[0].value :
+            data.occupation;
+          this._ageContactOfContactID = this._uniqueOptions.age.length === 1 ?
+            this._uniqueOptions.age[0].value :
+            undefined;
+          data.age = this._ageContactOfContactID !== undefined ?
+            this._uniqueOptions.age.find((ageItem) => ageItem.value === this._ageContactOfContactID).data :
+            data.age;
+          data.dob = this._uniqueOptions.dob.length === 1 ?
+            this._uniqueOptions.dob[0].value :
+            data.dob;
+          data.visualId = this._uniqueOptions.visualId.length === 1 ?
+            this._uniqueOptions.visualId[0].value :
+            data.visualId;
+          data.responsibleUserId = this._uniqueOptions.responsibleUserId.length === 1 ?
+            this._uniqueOptions.responsibleUserId[0].value :
+            data.responsibleUserId;
+          data.dateOfReporting = this._uniqueOptions.dateOfReporting.length === 1 ?
+            this._uniqueOptions.dateOfReporting[0].value :
+            data.dateOfReporting;
+          data.isDateOfReportingApproximate = this._uniqueOptions.isDateOfReportingApproximate.length === 1 ?
+            this._uniqueOptions.isDateOfReportingApproximate[0].value :
+            data.isDateOfReportingApproximate;
+          data.riskLevel = this._uniqueOptions.riskLevel.length === 1 ?
+            this._uniqueOptions.riskLevel[0].value :
+            data.riskLevel;
+          data.riskReason = this._uniqueOptions.riskReason.length === 1 ?
+            this._uniqueOptions.riskReason[0].value :
+            data.riskReason;
 
-    /**
-     * Constructor
-     */
-    constructor(
-        private router: Router,
-        private route: ActivatedRoute,
-        private outbreakDataService: OutbreakDataService,
-        private snackbarService: SnackbarService,
-        private formHelper: FormHelperService,
-        private i18nService: I18nService
-    ) {
-        super();
-    }
+          // initialize documents, addresses ...
+          const addedDocs: {
+            [key: string]: true
+          } = {};
+          data.documents = [];
+          let currentAddress: AddressModel;
+          data.addresses = [];
+          data.vaccinesReceived = [];
 
-    /**
-     * Component initialized
-     */
-    ngOnInit() {
-        // get merge ids
-        // retrieve query params
-        this.displayLoading = true;
-        this.route.queryParams
-            .subscribe((params: { ids }) => {
-                // record ids
-                this.mergeRecordIds = JSON.parse(params.ids);
+          // go through records and determine data
+          mergeRecords.forEach((item) => {
+            // determine documents
+            ((item.model as ContactOfContactModel).documents || []).forEach((doc) => {
+              // determine doc key
+              const key: string = `${ doc.type ? doc.type.trim() : '' }${ doc.number ? doc.number.trim() : '' }`;
 
-                // get selected outbreak
-                this.outbreakDataService
-                    .getSelectedOutbreak()
-                    .subscribe((selectedOutbreak: OutbreakModel) => {
-                        this.selectedOutbreak = selectedOutbreak;
+              // add to list ?
+              if (
+                key &&
+                !addedDocs[key]
+              ) {
+                // add to list
+                data.documents.push(doc);
 
-                        // retrieve records
-                        const qb = new RequestQueryBuilder();
-                        qb.filter.bySelect(
-                            'id',
-                            this.mergeRecordIds,
-                            true,
-                            null
-                        );
-
-                        this.outbreakDataService
-                            .getPeopleList(this.selectedOutbreak.id, qb)
-                            .subscribe((recordMerge) => {
-                                // merge records
-                                this.mergeRecords = recordMerge;
-                                // determine unique values
-                                this.determineUniqueValues();
-                                // hide loading dialog
-                                this.displayLoading = false;
-                            });
-                    });
+                // make sure we don't add it again
+                addedDocs[key] = true;
+              }
             });
-    }
 
-    /**
-     * Determine dropdown values
-     */
-    determineUniqueValues() {
-        // initialize
-        this.uniqueOptions = {
-            firstName: {
-                options: [],
-                value: undefined
-            },
-            middleName: {
-                options: [],
-                value: undefined
-            },
-            lastName: {
-                options: [],
-                value: undefined
-            },
-            gender: {
-                options: [],
-                value: undefined
-            },
-            pregnancyStatus: {
-                options: [],
-                value: undefined
-            },
-            occupation: {
-                options: [],
-                value: undefined
-            },
-            ageDob: {
-                options: [],
-                value: undefined
-            },
-            visualId: {
-                options: [],
-                value: undefined
-            },
-            riskLevel: {
-                options: [],
-                value: undefined
-            },
-            riskReason: {
-                options: [],
-                value: undefined
-            },
-            dateOfReporting: {
-                options: [],
-                value: undefined
-            },
-            isDateOfReportingApproximate: {
-                options: [],
-                value: undefined
-            },
-            currentAddresses: {
-                options: [],
-                value: undefined
-            }
-        };
-
-        // determine uniques values
-        if (this.mergeRecords) {
-            this.uniqueOptions.firstName = EntityModel.uniqueStringOptions(this.mergeRecords, 'firstName');
-            this.uniqueOptions.middleName = EntityModel.uniqueStringOptions(this.mergeRecords, 'middleName');
-            this.uniqueOptions.lastName = EntityModel.uniqueStringOptions(this.mergeRecords, 'lastName');
-            this.uniqueOptions.gender = EntityModel.uniqueStringOptions(this.mergeRecords, 'gender');
-            this.uniqueOptions.pregnancyStatus = EntityModel.uniqueStringOptions(this.mergeRecords, 'pregnancyStatus');
-            this.uniqueOptions.occupation = EntityModel.uniqueStringOptions(this.mergeRecords, 'occupation');
-            this.uniqueOptions.ageDob = EntityModel.uniqueAgeDobOptions(
-                this.mergeRecords,
-                this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
-                this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
-            );
-            this.uniqueOptions.visualId = EntityModel.uniqueStringOptions(this.mergeRecords, 'visualId');
-            this.uniqueOptions.riskLevel = EntityModel.uniqueStringOptions(this.mergeRecords, 'riskLevel');
-            this.uniqueOptions.riskReason = EntityModel.uniqueStringOptions(this.mergeRecords, 'riskReason');
-            this.uniqueOptions.dateOfReporting = EntityModel.uniqueDateOptions(this.mergeRecords, 'dateOfReporting');
-            this.uniqueOptions.isDateOfReportingApproximate = EntityModel.uniqueBooleanOptions(this.mergeRecords, 'isDateOfReportingApproximate');
-
-            // merge all vaccines
-            this.determineVaccines();
-
-            // merge all documents
-            this.determineDocuments();
-
-            // merge all addresses, keep just one current address
-            this.determineAddresses();
-        }
-    }
-
-    /**
-     * Determine vaccines
-     */
-    private determineVaccines() {
-        // merge all vaccines
-        this.contactOfContactData.vaccinesReceived = [];
-        _.each(this.mergeRecords, (ent: EntityModel) => {
-            _.each((ent.model as ContactOfContactModel).vaccinesReceived, (vac: VaccineModel) => {
-                if (vac.vaccine) {
-                    this.contactOfContactData.vaccinesReceived.push(vac);
-                }
-            });
-        });
-    }
-
-    /**
-     * Determine documents
-     */
-    private determineDocuments() {
-        // merge all documents
-        this.contactOfContactData.documents = [];
-        _.each(this.mergeRecords, (ent: EntityModel) => {
-            _.each((ent.model as ContactOfContactModel).documents, (doc: DocumentModel) => {
-                if (doc.number || doc.type) {
-                    this.contactOfContactData.documents.push(doc);
-                }
-            });
-        });
-    }
-
-    /**
-     * Determine address
-     */
-    private determineAddresses() {
-        // merge all addresses, keep just one current address
-        let currentAddress: AddressModel;
-        this.contactOfContactData.addresses = [];
-        _.each(this.mergeRecords, (ent: EntityModel) => {
-            _.each((ent.model as ContactOfContactModel).addresses, (address: AddressModel) => {
-                if (
-                    address.locationId ||
-                    address.fullAddress
-                ) {
-                    // current address ?
-                    // if we have multiple current addresses then we need to change them to previously addresses
-                    if (address.typeId === AddressType.CURRENT_ADDRESS) {
-                        if (address.date) {
-                            // we have multiple current addresses ?
-                            if (currentAddress) {
-                                // address is newer?
-                                if (moment(currentAddress.date).isBefore(moment(address.date))) {
-                                    currentAddress.typeId = AddressType.PREVIOUS_ADDRESS;
-                                    this.contactOfContactData.addresses.push(currentAddress);
-                                    currentAddress = address;
-                                } else {
-                                    address.typeId = AddressType.PREVIOUS_ADDRESS;
-                                    this.contactOfContactData.addresses.push(address);
-                                }
-                            } else {
-                                currentAddress = address;
-                            }
-                        } else {
-                            this.uniqueOptions.currentAddresses.options.push(new LabelValuePair(
-                                address.fullAddress,
-                                address
-                            ));
-                        }
+            // determine addresses
+            ((item.model as ContactOfContactModel).addresses || []).forEach((address) => {
+              // add to list ?
+              if (
+                address.locationId ||
+                address.fullAddress
+              ) {
+                // current address ?
+                // if we have multiple current addresses then we change them to previously addresses and keep the freshest one by address.date
+                if (address.typeId === AddressType.CURRENT_ADDRESS) {
+                  if (address.date) {
+                    // we have multiple current addresses ?
+                    if (currentAddress) {
+                      // address is newer?
+                      if (
+                        !currentAddress.date ||
+                        moment(currentAddress.date).isBefore(moment(address.date))
+                      ) {
+                        currentAddress.typeId = AddressType.PREVIOUS_ADDRESS;
+                        data.addresses.push(currentAddress);
+                        currentAddress = address;
+                      } else {
+                        address.typeId = AddressType.PREVIOUS_ADDRESS;
+                        data.addresses.push(address);
+                      }
                     } else {
-                        this.contactOfContactData.addresses.push(address);
+                      currentAddress = address;
                     }
+                  } else {
+                    if (currentAddress) {
+                      // make it previous address
+                      address.typeId = AddressType.PREVIOUS_ADDRESS;
+                      data.addresses.push(address);
+                    } else {
+                      currentAddress = address;
+                    }
+                  }
+                } else {
+                  data.addresses.push(address);
                 }
+              }
             });
+
+            // determine vaccines
+            ((item.model as ContactOfContactModel).vaccinesReceived || []).forEach((vaccine) => {
+              if (vaccine.vaccine) {
+                // add to list
+                data.vaccinesReceived.push(vaccine);
+              }
+            });
+          });
+
+          // do we have a recent current address ?
+          if (currentAddress) {
+            // put it first
+            data.addresses.unshift(currentAddress);
+          }
+
+          // finish
+          subscriber.next(data);
+          subscriber.complete();
         });
+    });
+  }
 
-        // do we have a current address ?
-        if (currentAddress) {
-            this.uniqueOptions.currentAddresses.options.push(new LabelValuePair(
-                `${currentAddress.fullAddress} ( ${moment(currentAddress.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)} )`,
-                currentAddress
-            ));
+  /**
+   * Data initialized
+   */
+  protected initializedData(): void {}
+
+  /**
+   * Initialize page title
+   */
+  protected initializePageTitle(): void {
+    this.pageTitle = 'LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_TITLE';
+    this.pageTitleData = undefined;
+  }
+
+  /**
+   * Initialize breadcrumbs
+   */
+  protected initializeBreadcrumbs(): void {
+    // reset breadcrumbs
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
         }
-
-        // preselect current address?
-        if (this.uniqueOptions.currentAddresses.options.length === 1) {
-            this.uniqueOptions.currentAddresses.value = this.uniqueOptions.currentAddresses.options[0].value;
-            this.address = this.uniqueOptions.currentAddresses.value;
+      },
+      {
+        label: 'LNG_PAGE_LIST_DUPLICATE_RECORDS_TITLE',
+        action: {
+          link: ['/duplicated-records']
         }
-    }
+      },
+      {
+        label: 'LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_TITLE',
+        action: null
+      }
+    ];
+  }
 
-    /**
-    /**
-     * Address changed
-     * @param data
-     */
-    changedAddress(data: LabelValuePair) {
-        this.address = data ? data.value : new AddressModel();
-    }
+  /**
+      * Initialize tabs
+      */
+  protected initializeTabs(): void {
+    this.tabData = {
+      // tabs
+      tabs: [
+        // Personal
+        this.initializeTabsPersonal(),
 
-    /**
-     * Create Contact of contact
-     * @param {NgForm[]} stepForms
-     */
-    createNewContactOfContact(stepForms: NgForm[]) {
-        // get forms fields
-        const dirtyFields: any = this.formHelper.mergeFields(stepForms);
+        // // Epidemiology
+        this.initializeTabsEpidemiology()
+      ],
 
-        // sanitize current Address
-        if (dirtyFields.address) {
-            // initialize addresses if there are no other addresses
-            if (!dirtyFields.addresses) {
-                dirtyFields.addresses = [];
+      // create details
+      create: null,
+
+      // buttons
+      buttons: this.initializeButtons(),
+
+      // create or update
+      createOrUpdate: this.initializeProcessData(),
+      redirectAfterCreateUpdate: () => {
+        // redirect to view
+        this.redirectService.to(['/duplicated-records']);
+      }
+    };
+  }
+
+  /**
+   * Initialize expand list column renderer fields
+   */
+  protected initializeExpandListColumnRenderer(): void {}
+
+  /**
+  * Initialize expand list query fields
+  */
+  protected initializeExpandListQueryFields(): void {}
+
+  /**
+   * Initialize expand list advanced filters
+   */
+  protected initializeExpandListAdvancedFilters(): void {}
+
+  /**
+   * Refresh expand list
+   */
+  refreshExpandList(_data: ICreateViewModifyV2Refresh): void {}
+
+  /**
+   * Initialize buttons
+   */
+  private initializeButtons(): ICreateViewModifyV2Buttons {
+    return {
+      view: {
+        link: {
+          link: () => null
+        },
+        visible: () => false
+      },
+      modify: {
+        link: {
+          link: () => null
+        },
+        visible: () => false
+      },
+      createCancel: {
+        link: {
+          link: () => ['/duplicated-records']
+        }
+      },
+      viewCancel: {
+        link: {
+          link: () => null
+        },
+        visible: () => false
+      },
+      modifyCancel: {
+        link: {
+          link: () => ['/duplicated-records']
+        }
+      },
+      quickActions: undefined
+    };
+  }
+
+  /**
+  * Initialize process data
+  */
+  private initializeProcessData(): ICreateViewModifyV2CreateOrUpdate {
+    return (
+      _type,
+      data,
+      finished
+    ) => {
+      // age
+      if (data.age) {
+        data.age = this.itemData.age;
+      }
+
+      // finished
+      this.outbreakDataService
+        .mergePeople(
+          this.selectedOutbreak.id,
+          EntityType.CONTACT_OF_CONTACT,
+          this._mergeRecordIds,
+          data
+        )
+        .pipe(
+          // handle error
+          catchError((err) => {
+            // show error
+            finished(err, undefined);
+
+            // finished
+            return throwError(err);
+          }),
+
+          // should be the last pipe
+          takeUntil(this.destroyed$)
+        )
+        .subscribe((item) => {
+          // success creating / updating event
+          this.toastV2Service.success('LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACTS_SUCCESS_MESSAGE');
+
+          // finished with success
+          finished(undefined, item);
+        });
+    };
+  }
+
+  /**
+  * Initialize tabs - Personal
+  */
+  private initializeTabsPersonal(): ICreateViewModifyV2Tab {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB,
+      name: 'personal',
+      label: 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_PERSONAL_TITLE',
+      sections: [
+        // Details
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DETAILS',
+          inputs: [
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'firstName',
+              placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME',
+              description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_FIRST_NAME_DESCRIPTION',
+              options: this._uniqueOptions.firstName,
+              value: {
+                get: () => this.itemData.firstName,
+                set: (value) => {
+                  this.itemData.firstName = value;
+                }
+              },
+              validators: {
+                required: () => true
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'middleName',
+              placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME',
+              description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME_DESCRIPTION',
+              options: this._uniqueOptions.middleName,
+              value: {
+                get: () => this.itemData.middleName,
+                set: (value) => {
+                  this.itemData.middleName = value;
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'lastName',
+              placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME',
+              description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME_DESCRIPTION',
+              options: this._uniqueOptions.lastName,
+              value: {
+                get: () => this.itemData.lastName,
+                set: (value) => {
+                  this.itemData.lastName = value;
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'gender',
+              placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER',
+              description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER_DESCRIPTION',
+              options: this._uniqueOptions.gender,
+              value: {
+                get: () => this.itemData.gender,
+                set: (value) => {
+                  // set gender
+                  this.itemData.gender = value;
+
+                  // reset pregnancy ?
+                  if (this.itemData.gender === Constants.GENDER_MALE) {
+                    // reset
+                    this.itemData.pregnancyStatus = null;
+                  }
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'pregnancyStatus',
+              placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
+              description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS_DESCRIPTION',
+              options: this._uniqueOptions.pregnancyStatus,
+              value: {
+                get: () => this.itemData.pregnancyStatus,
+                set: (value) => {
+                  this.itemData.pregnancyStatus = value;
+                }
+              },
+              disabled: () => {
+                return this.itemData.gender === Constants.GENDER_MALE;
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'occupation',
+              placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION',
+              description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION_DESCRIPTION',
+              options: this._uniqueOptions.occupation,
+              value: {
+                get: () => this.itemData.occupation,
+                set: (value) => {
+                  this.itemData.occupation = value;
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'age',
+              placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE',
+              description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE_DESCRIPTION',
+              options: this._uniqueOptions.age,
+              value: {
+                get: () => this._ageContactOfContactID,
+                set: (value: any) => {
+                  this._ageContactOfContactID = value ?
+                    value :
+                    undefined;
+                  this.itemData.age = this._ageContactOfContactID !== undefined ?
+                    this._uniqueOptions.age.find((ageItem) => ageItem.value === this._ageContactOfContactID).data :
+                    undefined;
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'dob',
+              placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOB',
+              description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOB_DESCRIPTION',
+              options: this._uniqueOptions.dob,
+              value: {
+                get: () => this.itemData.dob as any,
+                set: (value) => {
+                  this.itemData.dob = value;
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'visualId',
+              placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID',
+              description: () => this.translateService.instant(
+                'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
+                this.selectedOutbreak.contactOfContactIdMask
+              ),
+              options: this._uniqueOptions.visualId,
+              value: {
+                get: () => this.itemData.visualId,
+                set: (value) => {
+                  this.itemData.visualId = value;
+                }
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'responsibleUserId',
+              placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+              description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID_DESCRIPTION',
+              options: this._uniqueOptions.responsibleUserId,
+              value: {
+                get: () => this.itemData.responsibleUserId,
+                set: (value) => {
+                  this.itemData.responsibleUserId = value;
+                }
+              },
+              replace: {
+                condition: () => !UserModel.canListForFilters(this.authUser),
+                html: this.translateService.instant('LNG_PAGE_CREATE_CONTACT_OF_CONTACT_CANT_SET_RESPONSIBLE_ID_TITLE')
+              }
             }
+          ]
+        },
 
-            // add current address
-            dirtyFields.addresses.push(dirtyFields.address);
-
-            // remove unnecessary data
-            delete dirtyFields.address;
-            delete dirtyFields.selectedAddress;
-        }
-
-        // sanitize age & dob information
-        if (dirtyFields.ageDob) {
-            dirtyFields.age = dirtyFields.ageDob.age;
-            dirtyFields.dob = dirtyFields.ageDob.dob;
-
-            // remove unnecessary data
-            delete dirtyFields.ageDob;
-        }
-
-        // merge records
-        if (!_.isEmpty(dirtyFields)) {
-            if (this.formHelper.isFormsSetValid(stepForms)) {
-                // add the new Contact of Contact
-                this.displayLoading = true;
-                this.outbreakDataService
-                    .mergePeople(
-                        this.selectedOutbreak.id,
-                        EntityType.CONTACT_OF_CONTACT,
-                        this.mergeRecordIds,
-                        dirtyFields
-                    )
-                    .pipe(
-                        catchError((err) => {
-                            this.displayLoading = false;
-                            this.snackbarService.showApiError(err);
-                            return throwError(err);
-                        })
-                    )
-                    .subscribe(() => {
-                        this.snackbarService.showSuccess('LNG_PAGE_CONTACT_OF_CONTACT_MERGE_DUPLICATE_RECORDS_MERGE_CONTACTS_SUCCESS_MESSAGE');
-
-                        // navigate to listing page
-                        this.disableDirtyConfirm();
-                        this.router.navigate(['/duplicated-records']);
-                    });
-            } else {
-                this.snackbarService.showError('LNG_FORM_ERROR_FORM_INVALID');
+        // Documents
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DOCUMENTS',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.LIST,
+            name: 'documents',
+            readonly: true,
+            items: this.itemData.documents,
+            itemsChanged: (list) => {
+              // update documents
+              this.itemData.documents = list.items;
+            },
+            definition: {
+              add: undefined,
+              remove: {
+                label: 'LNG_COMMON_BUTTON_DELETE',
+                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_DOCUMENT'
+              },
+              input: {
+                type: CreateViewModifyV2TabInputType.DOCUMENT,
+                typeOptions: (this.activatedRoute.snapshot.data.documentType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                value: {
+                  get: (index: number) => {
+                    return this.itemData.documents[index];
+                  }
+                }
+              }
             }
+          }]
+        },
+
+        // Addresses
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_ADDRESSES',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.LIST,
+            name: 'addresses',
+            readonly: true,
+            items: this.itemData.addresses,
+            itemsChanged: (list) => {
+              // update addresses
+              this.itemData.addresses = list.items;
+            },
+            definition: {
+              add: undefined,
+              remove: {
+                label: 'LNG_COMMON_BUTTON_DELETE',
+                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_ADDRESS'
+              },
+              input: {
+                type: CreateViewModifyV2TabInputType.ADDRESS,
+                typeOptions: (this.activatedRoute.snapshot.data.addressType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                value: {
+                  get: (index: number) => {
+                    return this.itemData.addresses[index];
+                  }
+                },
+                validators: {
+                  required: () => true
+                }
+              }
+            }
+          }]
         }
+      ]
+    };
+  }
+
+  /**
+  * Initialize tabs - Epidemiology
+  */
+  private initializeTabsEpidemiology(): ICreateViewModifyV2Tab {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB,
+      name: 'infection',
+      label: 'LNG_PAGE_MODIFY_CONTACT_OF_CONTACT_TAB_INFECTION_TITLE',
+      sections: [
+        // Details
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DETAILS',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'dateOfReporting',
+            placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING',
+            description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_DESCRIPTION',
+            options: this._uniqueOptions.dateOfReporting,
+            value: {
+              get: () => this.itemData.dateOfReporting as any,
+              set: (value) => {
+                this.itemData.dateOfReporting = value;
+              }
+            },
+            validators: {
+              required: () => true
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'isDateOfReportingApproximate',
+            placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE',
+            description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE_DESCRIPTION',
+            options: this._uniqueOptions.isDateOfReportingApproximate,
+            value: {
+              get: () => this.itemData.isDateOfReportingApproximate as any,
+              set: (value) => {
+                this.itemData.isDateOfReportingApproximate = value as any;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'riskLevel',
+            placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL',
+            description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL_DESCRIPTION',
+            options: this._uniqueOptions.riskLevel,
+            value: {
+              get: () => this.itemData.riskLevel,
+              set: (value) => {
+                this.itemData.riskLevel = value;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'riskReason',
+            placeholder: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON',
+            description: () => 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON_DESCRIPTION',
+            options: this._uniqueOptions.riskReason,
+            value: {
+              get: () => this.itemData.riskReason,
+              set: (value) => {
+                this.itemData.riskReason = value;
+              }
+            }
+          }]
+        },
+
+        // Vaccines
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VACCINES_RECEIVED_DETAILS',
+          inputs: [{
+            type: CreateViewModifyV2TabInputType.LIST,
+            name: 'vaccinesReceived',
+            readonly: true,
+            items: this.itemData.vaccinesReceived,
+            itemsChanged: (list) => {
+              // update documents
+              this.itemData.vaccinesReceived = list.items;
+            },
+            definition: {
+              add: undefined,
+              remove: {
+                label: 'LNG_COMMON_BUTTON_DELETE',
+                confirmLabel: 'LNG_DIALOG_CONFIRM_DELETE_VACCINE'
+              },
+              input: {
+                type: CreateViewModifyV2TabInputType.VACCINE,
+                vaccineOptions: (this.activatedRoute.snapshot.data.vaccine as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                vaccineStatusOptions: (this.activatedRoute.snapshot.data.vaccineStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+                value: {
+                  get: (index: number) => {
+                    return this.itemData.vaccinesReceived[index];
+                  }
+                }
+              }
+            }
+          }]
+        }
+      ]
+    };
+  }
+
+  // get field unique options
+  private getFieldOptions(
+    mergeRecords: EntityModel[],
+    key: string
+  ): { options: ILabelValuePairModel[], value: any } {
+    switch (key) {
+      case 'age': return EntityModel.uniqueAgeOptions(
+        mergeRecords,
+        this.translateService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
+        this.translateService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
+      );
+      case 'dob': return EntityModel.uniqueDobOptions(mergeRecords);
+      case 'dateOfReporting': return EntityModel.uniqueDateOptions(mergeRecords, key);
+      case 'isDateOfReportingApproximate': return EntityModel.uniqueBooleanOptions(mergeRecords, key);
+      case 'responsibleUserId': {
+        const uniqueUserOptions = EntityModel.uniqueStringOptions(mergeRecords, key);
+        uniqueUserOptions.options.forEach(
+          (labelValuePair) => {
+            labelValuePair.label = (this.activatedRoute.snapshot.data.users as IResolverV2ResponseModel<UserModel>).map[labelValuePair.value] ?
+              (this.activatedRoute.snapshot.data.users as IResolverV2ResponseModel<UserModel>).map[labelValuePair.value].name :
+              labelValuePair.label;
+          });
+        return uniqueUserOptions;
+      }
+      default: return EntityModel.uniqueStringOptions(mergeRecords, key);
     }
+  }
 }
-

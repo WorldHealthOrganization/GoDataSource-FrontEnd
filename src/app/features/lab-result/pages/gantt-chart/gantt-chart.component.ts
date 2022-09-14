@@ -1,258 +1,258 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
-import { AppliedFilterModel, FilterModel, FilterType } from '../../../../shared/components/side-filters/model';
-import * as _ from 'lodash';
 import { DomService } from '../../../../core/services/helper/dom.service';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import * as FileSaver from 'file-saver';
-import { LoadingDialogModel } from '../../../../shared/components/index';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
 import { GanttChartDelayOnsetDashletComponent } from '../../components/gantt-chart-delay-onset-dashlet/gantt-chart-delay-onset-dashlet.component';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { Observable } from 'rxjs';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { Constants } from '../../../../core/models/constants';
 import { throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-import { SystemSettingsVersionModel } from '../../../../core/models/system-settings-version.model';
-import { SystemSettingsDataService } from '../../../../core/services/data/system-settings.data.service';
+import { Constants } from '../../../../core/models/constants';
+import { catchError } from 'rxjs/operators';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { UserModel } from '../../../../core/models/user.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { GanttChartModel } from '../../../../core/models/gantt-chart.model';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IV2Breadcrumb } from '../../../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
+import { IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { V2AdvancedFilter, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
+import { IV2LoadingDialogHandler } from '../../../../shared/components-v2/app-loading-dialog-v2/models/loading-dialog-v2.model';
+import { ActivatedRoute } from '@angular/router';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { IV2SideDialogAdvancedFiltersResponse } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 
 @Component({
-    selector: 'app-gantt-chart',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './gantt-chart.component.html',
-    styleUrls: ['./gantt-chart.component.less']
+  selector: 'app-gantt-chart',
+  templateUrl: './gantt-chart.component.html'
 })
 export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit {
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [];
+  // breadcrumbs
+  breadcrumbs: IV2Breadcrumb[] = [];
 
-    // selected outbreak ID
-    outbreakId: string;
+  // selected outbreak ID
+  outbreakId: string;
 
-    // available side filters
-    availableSideFilters: FilterModel[] = [];
+  globalFilterDate: Moment;
+  globalFilterLocationId: string;
+  loadingDialog: IV2LoadingDialogHandler;
 
-    globalFilterDate: Moment;
-    globalFilterLocationId: string;
-    loadingDialog: LoadingDialogModel;
+  @ViewChild('ganttChart') private ganttChart: GanttChartDelayOnsetDashletComponent;
 
-    @ViewChild('ganttChart') private ganttChart: GanttChartDelayOnsetDashletComponent;
+  ganttChartTypesOptions: ILabelValuePairModel[];
+  ganttChartType: any;
 
-    ganttChartTypes: Observable<any[]>;
-    ganttChartType: any;
+  // constants
+  Constants = Constants;
 
-    // constants
-    Constants = Constants;
-    GanttChartModel = GanttChartModel;
+  // authenticated user
+  private _authUser: UserModel;
 
-    // do architecture is x32?
-    x86Architecture: boolean = false;
+  // quick actions
+  quickActions: IV2ActionMenuLabel;
 
-    // authenticated user
-    authUser: UserModel;
+  // advanced filters
+  advancedFilters: V2AdvancedFilter[];
 
-    /**
+  /**
      * Constructor
      */
-    constructor(
-        private domService: DomService,
-        private importExportDataService: ImportExportDataService,
-        private i18nService: I18nService,
-        private dialogService: DialogService,
-        private genericDataService: GenericDataService,
-        protected snackbarService: SnackbarService,
-        private systemSettingsDataService: SystemSettingsDataService,
-        private authDataService: AuthDataService
-    ) {
-        super();
-    }
+  constructor(
+    private domService: DomService,
+    private importExportDataService: ImportExportDataService,
+    private i18nService: I18nService,
+    private toastV2Service: ToastV2Service,
+    private dialogV2Service: DialogV2Service,
+    authDataService: AuthDataService,
+    activatedRoute: ActivatedRoute
+  ) {
+    // parent
+    super();
 
-    /**
+    // get the authenticated user
+    this._authUser = authDataService.getAuthenticatedUser();
+
+    // get data
+    this.ganttChartTypesOptions = (activatedRoute.snapshot.data.ganttChartType as IResolverV2ResponseModel<ILabelValuePairModel>).options
+      .filter((record) => {
+        switch (record.value) {
+          case Constants.GANTT_CHART_TYPES.GANTT_CHART_LAB_TEST.value:
+            return GanttChartModel.canViewDelayOnsetLabTesting(this._authUser);
+          case Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value:
+            return GanttChartModel.canViewDelayOnsetHospitalization(this._authUser);
+          default:
+            // not supported
+            return false;
+        }
+      });
+  }
+
+  /**
      * Component initialized
      */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
-
-        // initialize Side Filters
-        this.initializeSideFilters();
-
-        // load gantt types
-        this.ganttChartTypes = this.genericDataService
-            .getGanttChartTypes()
-            .pipe(
-                map((records: LabelValuePair[]) => {
-                    return records.filter((record: LabelValuePair): boolean => {
-                        switch (record.value) {
-                            case Constants.GANTT_CHART_TYPES.GANTT_CHART_LAB_TEST.value:
-                                return GanttChartModel.canViewDelayOnsetLabTesting(this.authUser);
-                            case Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value:
-                                return GanttChartModel.canViewDelayOnsetHospitalization(this.authUser);
-                            default:
-                                // not supported
-                                return false;
-                        }
-                    });
-                })
-            );
-
-        // check if platform architecture is x32
-        this.systemSettingsDataService
-            .getAPIVersion()
-            .subscribe((versionData: SystemSettingsVersionModel) => {
-                if (versionData.arch === Constants.PLATFORM_ARCH.X86) {
-                    this.x86Architecture = true;
-                }
-            });
-
-        // select visible chart accordingly to user rights
-        if (GanttChartModel.canViewDelayOnsetLabTesting(this.authUser)) {
-            this.ganttChartType = Constants.GANTT_CHART_TYPES.GANTT_CHART_LAB_TEST.value;
-        } else if (GanttChartModel.canViewDelayOnsetHospitalization(this.authUser)) {
-            this.ganttChartType = Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value;
-        } else {
-            // NOT SUPPORTED
-        }
-
-        // initialize breadcrumbs
-        this.initializeBreadcrumbs();
+  ngOnInit() {
+    // select visible chart accordingly to user rights
+    if (GanttChartModel.canViewDelayOnsetLabTesting(this._authUser)) {
+      this.ganttChartType = Constants.GANTT_CHART_TYPES.GANTT_CHART_LAB_TEST.value;
+    } else if (GanttChartModel.canViewDelayOnsetHospitalization(this._authUser)) {
+      this.ganttChartType = Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value;
+    } else {
+      // NOT SUPPORTED
     }
 
-    /**
+    // initialize breadcrumbs
+    this.initializeBreadcrumbs();
+
+    // quick actions
+    this.quickActions = {
+      type: V2ActionType.MENU,
+      label: 'LNG_COMMON_BUTTON_QUICK_ACTIONS',
+      visible: () => (this.ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_LAB_TEST.value && GanttChartModel.canExportDelayOnsetLabTesting(this._authUser)) ||
+        (this.ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value && GanttChartModel.canExportDelayOnsetHospitalization(this._authUser)),
+      menuOptions: [
+        // Export
+        {
+          label: {
+            get: () => 'LNG_PAGE_DASHBOARD_GANTT_CHART_REPORT_LABEL'
+          },
+          action: {
+            click: () => {
+              this.generateGanttChartReport();
+            }
+          },
+          visible: () => (this.ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_LAB_TEST.value && GanttChartModel.canExportDelayOnsetLabTesting(this._authUser)) ||
+            (this.ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value && GanttChartModel.canExportDelayOnsetHospitalization(this._authUser))
+        }
+      ]
+    };
+
+    // advanced filters
+    this.advancedFilters = [{
+      type: V2AdvancedFilterType.LOCATION_SINGLE,
+      field: 'locationId',
+      label: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION',
+      filterBy: (_qb, filter) => {
+        // set filters
+        this.globalFilterLocationId = filter.value;
+      }
+    }, {
+      type: V2AdvancedFilterType.DATE,
+      field: 'date',
+      label: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE',
+      filterBy: (_qb, filter) => {
+        // set filters
+        this.globalFilterDate = moment(filter.value);
+      }
+    }];
+  }
+
+  /**
      * Initialize breadcrumbs
      */
-    initializeBreadcrumbs() {
-        // reset
-        this.breadcrumbs = [];
+  initializeBreadcrumbs() {
+    // reset
+    this.breadcrumbs = [{
+      label: 'LNG_COMMON_LABEL_HOME',
+      action: {
+        link: DashboardModel.canViewDashboard(this._authUser) ?
+          ['/dashboard'] :
+          ['/account/my-profile']
+      }
+    }];
 
-        // set current page title
-        this.breadcrumbs.push(
-            new BreadcrumbItemModel('LNG_PAGE_GANTT_CHART_TITLE', '/gantt-chart')
-        );
-    }
+    // current page
+    this.breadcrumbs.push({
+      label: 'LNG_PAGE_GANTT_CHART_TITLE',
+      action: null
+    });
+  }
 
-    /**
-     * Initialize Side Filters
-     */
-    private initializeSideFilters() {
-        // set available side filters
-        this.availableSideFilters = [
-            new FilterModel({
-                fieldName: 'locationId',
-                fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION',
-                type: FilterType.LOCATION,
-                required: true,
-                multipleOptions: false
-            }),
-            new FilterModel({
-                fieldName: 'date',
-                fieldLabel: 'LNG_GLOBAL_FILTERS_FIELD_LABEL_DATE',
-                type: FilterType.DATE,
-                required: true,
-                maxDate: moment()
-            })
-        ];
-    }
-
-    /**
-     * Apply side filters
-     * @param data
-     */
-    applySideFilters(filters: AppliedFilterModel[]) {
-        // retrieve date & location filters
-        // retrieve location filter
-        const dateFilter: AppliedFilterModel = _.find(filters, { filter: { fieldName: 'date' } });
-        const locationFilter: AppliedFilterModel = _.find(filters, { filter: { fieldName: 'locationId' } });
-
-        // set filters
-        this.globalFilterDate = _.isEmpty(dateFilter.value) ? undefined : moment(dateFilter.value);
-        this.globalFilterLocationId = _.isEmpty(locationFilter.value) ? undefined : locationFilter.value;
-    }
-
-    /**
+  /**
      * generate Gantt chart report - image will be exported as pdf
      */
-    generateGanttChartReport() {
-        // check if we have data to export
-        if (
-            !this.ganttChart ||
+  generateGanttChartReport() {
+    // check if we have data to export
+    if (
+      !this.ganttChart ||
             !this.ganttChart.hasData()
-        ) {
-            this.snackbarService.showError('LNG_PAGE_DASHLET_GANTT_CHART_NO_DATA_LABEL');
-        } else {
-            this.showLoadingDialog();
-            let ganttChartName = 'app-gantt-chart-delay-onset-dashlet svg';
-            if (this.ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value) {
-                ganttChartName = 'app-gantt-chart-delay-onset-hospitalization-dashlet svg';
-            }
+    ) {
+      this.toastV2Service.error('LNG_PAGE_DASHLET_GANTT_CHART_NO_DATA_LABEL');
+    } else {
+      this.showLoadingDialog();
+      let ganttChartName = 'app-gantt-chart-delay-onset-dashlet svg';
+      if (this.ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value) {
+        ganttChartName = 'app-gantt-chart-delay-onset-hospitalization-dashlet svg';
+      }
 
-            // export graph as png image
-            this.domService
-                .getPNGBase64(ganttChartName, '#tempCanvas')
-                .subscribe((pngBase64) => {
-                    this.importExportDataService
-                        .exportImageToPdf({image: pngBase64, responseType: 'blob', splitFactor: 1})
-                        .pipe(
-                            catchError((err) => {
-                                this.snackbarService.showApiError(err);
-                                this.closeLoadingDialog();
-                                return throwError(err);
-                            })
-                        )
-                        .subscribe((blob) => {
-                            this.downloadFile(blob, 'LNG_PAGE_GANTT_CHART_REPORT_LABEL');
-                            this.closeLoadingDialog();
-                        });
-                });
-        }
+      // export graph as png image
+      this.domService
+        .getPNGBase64(ganttChartName, '#tempCanvas')
+        .subscribe((pngBase64) => {
+          this.importExportDataService
+            .exportImageToPdf({ image: pngBase64, responseType: 'blob', splitFactor: 1 })
+            .pipe(
+              catchError((err) => {
+                this.toastV2Service.error(err);
+                this.closeLoadingDialog();
+                return throwError(err);
+              })
+            )
+            .subscribe((blob) => {
+              this.downloadFile(blob, 'LNG_PAGE_GANTT_CHART_REPORT_LABEL');
+              this.closeLoadingDialog();
+            });
+        });
     }
+  }
 
-    /**
+  /**
      * Download File
      * @param blob
      * @param fileNameToken
      */
-    private downloadFile(
-        blob,
-        fileNameToken,
-        extension: string = 'pdf'
-    ) {
-        const fileName = this.i18nService.instant(fileNameToken);
-        FileSaver.saveAs(
-            blob,
-            `${fileName}.${extension}`
-        );
-    }
+  private downloadFile(
+    blob,
+    fileNameToken,
+    extension: string = 'pdf'
+  ) {
+    const fileName = this.i18nService.instant(fileNameToken);
+    FileSaver.saveAs(
+      blob,
+      `${fileName}.${extension}`
+    );
+  }
 
-    /**
+  /**
      * Display loading dialog
      */
-    showLoadingDialog() {
-        this.loadingDialog = this.dialogService.showLoadingDialog();
-    }
+  showLoadingDialog() {
+    this.loadingDialog = this.dialogV2Service.showLoadingDialog();
+  }
 
-    /**
+  /**
      * Hide loading dialog
      */
-    closeLoadingDialog() {
-        if (this.loadingDialog) {
-            this.loadingDialog.close();
-            this.loadingDialog = null;
-        }
+  closeLoadingDialog() {
+    if (this.loadingDialog) {
+      this.loadingDialog.close();
+      this.loadingDialog = null;
+    }
+  }
+
+  /**
+   * Filter
+   */
+  advancedFilterBy(response: IV2SideDialogAdvancedFiltersResponse): void {
+    // reset date ?
+    if (!response.filtersApplied?.appliedFilters.find((item) => item.filter.uniqueKey === 'dateLNG_GLOBAL_FILTERS_FIELD_LABEL_DATE')) {
+      this.globalFilterDate = undefined;
     }
 
-    /**
-     * Switch between gantt types
-     */
-    updateChartType($event) {
-        this.ganttChartType = $event.value;
+    // reset location ?
+    if (!response.filtersApplied?.appliedFilters.find((item) => item.filter.uniqueKey === 'locationIdLNG_GLOBAL_FILTERS_FIELD_LABEL_LOCATION')) {
+      this.globalFilterLocationId = undefined;
     }
+  }
 }

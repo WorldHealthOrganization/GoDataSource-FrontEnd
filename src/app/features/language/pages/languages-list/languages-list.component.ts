@@ -1,274 +1,381 @@
-import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { Observable } from 'rxjs';
-import { AuthDataService } from '../../../../core/services/data/auth.data.service';
-import { UserModel } from '../../../../core/models/user.model';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { DialogService, ExportDataExtension } from '../../../../core/services/helper/dialog.service';
-import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { LanguageDataService } from '../../../../core/services/data/language.data.service';
-import { LanguageModel } from '../../../../core/models/language.model';
-import { DialogAnswer, DialogAnswerButton, HoverRowAction, HoverRowActionType, LoadingDialogModel } from '../../../../shared/components';
-import { CacheKey, CacheService } from '../../../../core/services/helper/cache.service';
-import { TopnavComponent } from '../../../../shared/components/topnav/topnav.component';
-import { catchError, share, tap } from 'rxjs/operators';
-import { throwError } from 'rxjs';
-import { Router } from '@angular/router';
+import { Component, OnDestroy } from '@angular/core';
 import * as _ from 'lodash';
-import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { throwError } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { LanguageModel } from '../../../../core/models/language.model';
+import { LanguageDataService } from '../../../../core/services/data/language.data.service';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ExportDataExtension, ExportDataMethod } from '../../../../core/services/helper/models/dialog-v2.model';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 
 @Component({
-    selector: 'app-languages-list',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './languages-list.component.html',
-    styleUrls: ['./languages-list.component.less']
+  selector: 'app-languages-list',
+  templateUrl: './languages-list.component.html'
 })
-export class LanguagesListComponent extends ListComponent implements OnInit, OnDestroy {
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_LANGUAGES_TITLE', '.', true)
-    ];
+export class LanguagesListComponent
+  extends ListComponent<LanguageModel>
+  implements OnDestroy {
 
-    // constants
-    LanguageModel = LanguageModel;
+  /**
+   * Constructor
+   */
+  constructor(
+    protected listHelperService: ListHelperService,
+    private languageDataService: LanguageDataService,
+    private toastV2Service: ToastV2Service,
+    private dialogV2Service: DialogV2Service
+  ) {
+    super(listHelperService);
+  }
 
-    // authenticated user
-    authUser: UserModel;
+  /**
+   * Release resources
+   */
+  ngOnDestroy() {
+    // release parent resources
+    super.onDestroy();
+  }
 
-    // list of existing languages
-    languagesList$: Observable<LanguageModel[]>;
-    languagesListCount$: Observable<IBasicCount>;
+  /**
+   * Initialized
+   */
+  initialized(): void {
+    // initialize pagination
+    this.initPaginator();
 
-    @ViewChild('topNav') topNav: TopnavComponent;
+    // ...and re-load the list when the Selected Outbreak is changed
+    this.needsRefreshList(true);
+  }
 
-    loadingDialog: LoadingDialogModel;
-
-    recordActions: HoverRowAction[] = [
+  /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
         // View Language
-        new HoverRowAction({
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_LIST_LANGUAGES_ACTION_VIEW_LANGUAGE',
-            click: (item: LanguageModel) => {
-                this.router.navigate(['/languages', item.id, 'view']);
-            },
-            visible: (item: LanguageModel): boolean => {
-                return LanguageModel.canView(this.authUser);
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_LIST_LANGUAGES_ACTION_VIEW_LANGUAGE',
+          action: {
+            link: (item: LanguageModel): string[] => {
+              return ['/languages', item.id, 'view'];
             }
-        }),
+          },
+          visible: (): boolean => {
+            return LanguageModel.canView(this.authUser);
+          }
+        },
 
         // Modify Language
-        new HoverRowAction({
-            icon: 'settings',
-            iconTooltip: 'LNG_PAGE_LIST_LANGUAGES_ACTION_MODIFY_LANGUAGE',
-            click: (item: LanguageModel) => {
-                this.router.navigate(['/languages', item.id, 'modify']);
-            },
-            visible: (item: LanguageModel): boolean => {
-                return !item.readOnly &&
-                    LanguageModel.canModify(this.authUser);
+        {
+          type: V2ActionType.ICON,
+          icon: 'edit',
+          iconTooltip: 'LNG_PAGE_LIST_LANGUAGES_ACTION_MODIFY_LANGUAGE',
+          action: {
+            link: (item: LanguageModel): string[] => {
+              return ['/languages', item.id, 'modify'];
             }
-        }),
+          },
+          visible: (item: LanguageModel): boolean => {
+            return !item.readOnly &&
+              LanguageModel.canModify(this.authUser);
+          }
+        },
 
         // Other actions
-        new HoverRowAction({
-            type: HoverRowActionType.MENU,
-            icon: 'moreVertical',
-            menuOptions: [
-                // Delete Language
-                new HoverRowAction({
-                    menuOptionLabel: 'LNG_PAGE_LIST_LANGUAGES_ACTION_DELETE_LANGUAGE',
-                    click: (item: LanguageModel) => {
-                        this.deleteLanguage(item);
-                    },
-                    visible: (item: LanguageModel): boolean => {
-                        return !item.readOnly &&
-                            LanguageModel.canDelete(this.authUser);
-                    },
-                    class: 'mat-menu-item-delete'
-                }),
-
-                // Divider
-                new HoverRowAction({
-                    type: HoverRowActionType.DIVIDER,
-                    visible: (item: LanguageModel): boolean => {
-                        // visible only if at least one of the previous...
-                        return !item.readOnly &&
-                            LanguageModel.canDelete(this.authUser);
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          menuOptions: [
+            // Delete
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_LANGUAGES_ACTION_DELETE_LANGUAGE'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: LanguageModel): void => {
+                  // determine what we need to delete
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_DELETE',
+                        data: () => ({
+                          name: item.name
+                        })
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_DELETE_LANGUAGE',
+                        data: () => ({
+                          name: item.name
+                        })
+                      }
                     }
-                }),
-
-                // Export Language Tokens
-                new HoverRowAction({
-                    menuOptionLabel: 'LNG_PAGE_LIST_LANGUAGES_ACTION_EXPORT_TOKENS',
-                    click: (item: LanguageModel) => {
-                        this.downloadLanguage(item);
-                    },
-                    visible: (item: LanguageModel): boolean => {
-                        return LanguageModel.canExportTokens(this.authUser);
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
                     }
-                }),
 
-                // import Language Tokens
-                new HoverRowAction({
-                    menuOptionLabel: 'LNG_PAGE_LIST_LANGUAGES_ACTION_IMPORT_TOKENS',
-                    click: (item: LanguageModel) => {
-                        this.router.navigate(['/import-export-data', 'language-data', item.id, 'import-tokens']);
-                    },
-                    visible: (): boolean => {
-                        return LanguageModel.canImportTokens(this.authUser);
-                    },
-                    class: 'mat-menu-item-delete'
-                })
-            ]
-        })
-    ];
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
 
-    /**
-     * Constructor
-     */
-    constructor(
-        protected listHelperService: ListHelperService,
-        private router: Router,
-        private languageDataService: LanguageDataService,
-        private authDataService: AuthDataService,
-        private snackbarService: SnackbarService,
-        private dialogService: DialogService,
-        private cacheService: CacheService
-    ) {
-        super(listHelperService);
-    }
-
-    /**
-     * Component initialized
-     */
-    ngOnInit() {
-        // get the authenticated user
-        this.authUser = this.authDataService.getAuthenticatedUser();
-
-        // initialize pagination
-        this.initPaginator();
-
-        // ...and re-load the list when the Selected Outbreak is changed
-        this.needsRefreshList(true);
-    }
-
-    /**
-     * Release resources
-     */
-    ngOnDestroy() {
-        // release parent resources
-        super.ngOnDestroy();
-    }
-
-    /**
-     * Table columns
-     */
-    tableHeaderColumns(): string[] {
-        return [
-            'name'
-        ];
-    }
-
-    /**
-     * Re(load) the Languages list
-     */
-    refreshList(finishCallback: (records: any[]) => void) {
-        // retrieve the list of Languages
-        this.languagesList$ = this.languageDataService
-            .getLanguagesList(this.queryBuilder)
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    finishCallback([]);
-                    return throwError(err);
-                }),
-                tap(this.checkEmptyList.bind(this)),
-                tap((data: any[]) => {
-                    finishCallback(data);
-                })
-            );
-    }
-
-    /**
-     * Get total number of items, based on the applied filters
-     */
-    refreshListCount() {
-        // remove paginator from query builder
-        const countQueryBuilder = _.cloneDeep(this.queryBuilder);
-        countQueryBuilder.paginator.clear();
-        countQueryBuilder.sort.clear();
-        this.languagesListCount$ = this.languageDataService
-            .getLanguagesCount(countQueryBuilder)
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    return throwError(err);
-                }),
-                share()
-            );
-    }
-
-    /**
-     * Delete language
-     * @param {LanguageModel} language
-     */
-    deleteLanguage(language: LanguageModel) {
-        // show confirm dialog
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_LANGUAGE', language)
-            .subscribe((answer: DialogAnswer) => {
-                if (answer.button === DialogAnswerButton.Yes) {
-                    // delete language
+                    // delete
                     this.languageDataService
-                        .deleteLanguage(language.id)
-                        .pipe(
-                            catchError((err) => {
-                                this.snackbarService.showApiError(err);
-                                return throwError(err);
-                            })
-                        )
-                        .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_LANGUAGES_ACTION_DELETE_SUCCESS_MESSAGE');
+                      .deleteLanguage(item.id)
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
 
-                            // clear cache
-                            this.cacheService.remove(CacheKey.LANGUAGES);
-                            this.topNav.refreshLanguageList();
+                          // hide loading
+                          loading.close();
 
-                            // reload data
-                            this.needsRefreshList(true);
-                        });
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_LIST_LANGUAGES_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                        // hide loading
+                        loading.close();
+
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
                 }
-            });
-    }
+              },
+              visible: (item: LanguageModel): boolean => {
+                return !item.readOnly &&
+                  LanguageModel.canDelete(this.authUser);
+              }
+            },
 
-    /**
-     * Download Language
-     * @param language
-     */
-    downloadLanguage(language: LanguageModel) {
-        // display export dialog
-        this.dialogService.showExportDialog({
-            message: 'LNG_PAGE_LIST_LANGUAGES_ACTION_EXPORT_TOKENS_DIALOG_TITLE',
-            url: `languages/${language.id}/language-tokens/export`,
-            fileName: language.name,
-            fileType: ExportDataExtension.XLSX,
-            exportStart: () => { this.showLoadingDialog(); },
-            exportFinished: () => { this.closeLoadingDialog(); }
-        });
-    }
+            // Divider
+            {
+              visible: (item: LanguageModel): boolean => {
+                // visible only if at least one of the previous...
+                return !item.readOnly &&
+                  LanguageModel.canDelete(this.authUser);
+              }
+            },
 
-    /**
-     * Display loading dialog
-     */
-    showLoadingDialog() {
-        this.loadingDialog = this.dialogService.showLoadingDialog();
-    }
-    /**
-     * Hide loading dialog
-     */
-    closeLoadingDialog() {
-        if (this.loadingDialog) {
-            this.loadingDialog.close();
-            this.loadingDialog = null;
+            // Export Language Tokens
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_LANGUAGES_ACTION_EXPORT_TOKENS'
+              },
+              action: {
+                click: (item: LanguageModel) => {
+                  this.dialogV2Service
+                    .showExportData({
+                      title: {
+                        get: () => 'LNG_PAGE_LIST_LANGUAGES_ACTION_EXPORT_TOKENS_DIALOG_TITLE'
+                      },
+                      export: {
+                        url: `languages/${ item.id }/language-tokens/export`,
+                        async: false,
+                        method: ExportDataMethod.GET,
+                        fileName: item.name,
+                        allow: {
+                          types: [ExportDataExtension.XLSX]
+                        }
+                      }
+                    });
+                }
+              },
+              visible: (): boolean => {
+                return LanguageModel.canExportTokens(this.authUser);
+              }
+            },
+
+            // Import Language Tokens
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_LANGUAGES_ACTION_IMPORT_TOKENS'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                link: (item: LanguageModel) => {
+                  return ['/import-export-data', 'language-data', item.id, 'import-tokens'];
+                }
+              },
+              visible: (): boolean => {
+                return LanguageModel.canImportTokens(this.authUser);
+              }
+            }
+          ]
         }
+      ]
+    };
+  }
+
+  /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {
+    // default table columns
+    this.tableColumns = [
+      {
+        field: 'name',
+        label: 'LNG_LANGUAGE_FIELD_LABEL_NAME',
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      }
+    ];
+  }
+
+  /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
+   * Initialize table quick actions
+   */
+  protected initializeQuickActions(): void {}
+
+  /**
+   * Initialize table group actions
+   */
+  protected initializeGroupActions(): void {}
+
+  /**
+   * Initialize table add action
+   */
+  protected initializeAddAction(): void {
+    this.addAction = {
+      type: V2ActionType.ICON_LABEL,
+      label: 'LNG_COMMON_BUTTON_ADD',
+      icon: 'add_circle_outline',
+      action: {
+        link: (): string[] => ['./create']
+      },
+      visible: (): boolean => {
+        return LanguageModel.canCreate(this.authUser);
+      }
+    };
+  }
+
+  /**
+   * Initialize table grouped data
+   */
+  protected initializeGroupedData(): void {}
+
+  /**
+   * Initialize breadcrumbs
+   */
+  protected initializeBreadcrumbs(): void {
+    // set breadcrumbs
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
+        }
+      },
+      {
+        label: 'LNG_PAGE_LIST_LANGUAGES_TITLE',
+        action: null
+      }
+    ];
+  }
+
+  /**
+   * Fields retrieved from api to reduce payload size
+   */
+  protected refreshListFields(): string[] {
+    return [
+      'id',
+      'name',
+      'readOnly'
+    ];
+  }
+
+  /**
+   * Re(load) the Languages list
+   */
+  refreshList() {
+    // retrieve the list of Languages
+    this.records$ = this.languageDataService
+      .getLanguagesList(this.queryBuilder)
+      .pipe(
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
+  }
+
+  /**
+   * Get total number of items, based on the applied filters
+   */
+  refreshListCount(applyHasMoreLimit?: boolean) {
+    // reset
+    this.pageCount = undefined;
+
+    // set apply value
+    if (applyHasMoreLimit !== undefined) {
+      this.applyHasMoreLimit = applyHasMoreLimit;
     }
+
+    // remove paginator from query builder
+    const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+    countQueryBuilder.paginator.clear();
+    countQueryBuilder.sort.clear();
+
+    // apply has more limit
+    if (this.applyHasMoreLimit) {
+      countQueryBuilder.flag(
+        'applyHasMoreLimit',
+        true
+      );
+    }
+
+    // count
+    this.languageDataService
+      .getLanguagesCount(countQueryBuilder)
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        }),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      )
+      .subscribe((response) => {
+        this.pageCount = response;
+      });
+  }
 }

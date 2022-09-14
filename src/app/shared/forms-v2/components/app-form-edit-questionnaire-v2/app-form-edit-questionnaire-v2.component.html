@@ -1,0 +1,483 @@
+<div
+  class="gd-form-edit-questionnaire-v2">
+
+  <!-- Top -->
+  <div
+    class="gd-form-edit-questionnaire-v2-top"
+    fxLayout="row" fxLayoutAlign="end" fxLayoutGap="0.8rem">
+
+    <!-- Expand All -->
+    <button
+      type="button"
+      mat-flat-button
+      color="text"
+      (click)="collapseExpandAllQuestions(value, false); nonFlatToFlat()">
+      {{'LNG_QUESTIONNAIRE_TEMPLATE_EXPAND_ALL' | translate}}
+    </button>
+
+    <!-- Collapse All -->
+    <button
+      type="button"
+      mat-flat-button
+      color="text"
+      (click)="collapseExpandAllQuestions(value, true); nonFlatToFlat()">
+      {{'LNG_QUESTIONNAIRE_TEMPLATE_COLLAPSE_ALL' | translate}}
+    </button>
+
+    <!-- Add question -->
+    <button
+      *ngIf="!viewOnly"
+      type="button"
+      mat-flat-button
+      color="primary"
+      (click)="addQuestion(undefined)">
+      {{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW' | translate}}
+    </button>
+
+  </div>
+
+  <!-- Records -->
+  <div
+    class="gd-form-edit-questionnaire-v2-list">
+
+    <!-- Records -->
+    <ng-container
+      *ngIf="flattenedQuestions?.length > 0; else noQuestions">
+      <cdk-virtual-scroll-viewport
+        #cdkViewport
+        class="gd-form-edit-questionnaire-v2-list-{{name}}"
+        cdkDropList [cdkDropListData]="flattenedQuestions" [cdkDropListSortPredicate]="canDrop" (cdkDropListDropped)="dropItem($event)"
+        [minBufferPx]="maxBufferPx ? maxBufferPx : bufferToRender"
+        [maxBufferPx]="maxBufferPx ? maxBufferPx : bufferToRender"
+        [itemSize]="45">
+
+        <!-- Item -->
+        <div
+          *cdkVirtualFor="let item of flattenedQuestions; templateCacheSize: 0"
+          class="gd-form-edit-questionnaire-v2-item"
+          [class.gd-form-edit-questionnaire-v2-item-inactive]="item.data.inactive || item.oneParentIsInactive"
+          [class.gd-form-edit-questionnaire-v2-item-markup]="item.data.answerType === Constants.ANSWER_TYPES.MARKUP.value"
+          cdkDrag cdkDragLockAxis="y" cdkDragBoundary=".gd-form-edit-questionnaire-v2-list-{{name}}" [cdkDragData]="item" [cdkDragDisabled]="viewOnly" (cdkDragStarted)="dragStarted($event)"
+          [ngSwitch]="item.type"
+          [style.paddingLeft.px]="item.level * 28"
+          style="height: 4.5rem">
+
+          <!-- Custom drag&drop placeholder -->
+          <div class="gd-drag-custom-placeholder" *cdkDragPlaceholder></div>
+
+          <!-- Question -->
+          <div
+            *ngSwitchCase="FlattenType.QUESTION"
+            class="gd-form-edit-questionnaire-v2-item-question"
+            fxLayout="row" fxLayoutAlign="none center">
+
+            <!-- Collapse / Expand -->
+            <mat-icon
+              [style.visibility]="item.canCollapseOrExpand ? 'visible' : 'hidden'"
+              (click)="expandCollapse(item)">{{item.data.collapsed ? 'expand_more' : 'expand_less'}}</mat-icon>
+
+            <!-- Expand All -->
+            <mat-icon
+              *ngIf="item.canCollapseOrExpand && !item.data.collapsed"
+              [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_EXPAND_ALL' | translate"
+              (click)="collapseExpandAllQuestions(item.data.answers, false); nonFlatToFlat()">
+              expand
+            </mat-icon>
+
+            <!-- Collapse All -->
+            <mat-icon
+              *ngIf="item.canCollapseOrExpand && !item.data.collapsed"
+              [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_COLLAPSE_ALL' | translate"
+              (click)="collapseExpandAllQuestions(item.data.answers, true); nonFlatToFlat()">
+              compress
+            </mat-icon>
+
+            <!-- Sort -->
+            <mat-icon
+              *ngIf="!viewOnly"
+              cdkDragHandle
+              (mousedown)="notInvalidDragZone()"
+              (touchstart)="notInvalidDragZone()">drag_indicator</mat-icon>
+
+            <!-- Type -->
+            <mat-icon
+              fxGrow="0">help</mat-icon>
+
+            <!-- Label & icons -->
+            <div
+              class="gd-form-edit-questionnaire-v2-item-question-content"
+              fxFlex>
+
+              <!-- Number -->
+              <span
+                *ngIf="!!item.no"
+                class="gd-form-edit-questionnaire-v2-item-question-content-number">{{item.no}}.</span>
+
+              <!-- Label -->
+              <span
+                class="gd-form-edit-questionnaire-v2-item-question-content-title">{{item.data.text}}</span>
+
+              <!-- Icons -->
+              <span
+                *ngIf="renderMode === RenderMode.MEDIUM"
+                class="gd-form-edit-questionnaire-v2-item-question-content-icons">
+
+                <!-- Answer type -->
+                <mat-icon
+                  [matTooltip]="item.data.answerType ? (item.data.answerType | translate) : undefined">spellcheck</mat-icon>
+
+                <!-- Category -->
+                <mat-icon
+                  [matTooltip]="item.data.category ? (item.data.category | translate) : undefined">folder_special</mat-icon>
+
+                <!-- Multiple answers -->
+                <mat-icon
+                  *ngIf="item.data.multiAnswer">format_list_numbered_rtl</mat-icon>
+
+                <!-- Required -->
+                <mat-icon
+                  *ngIf="item.data.required">stars</mat-icon>
+
+                <!-- Inactive -->
+                <mat-icon
+                  *ngIf="item.data.inactive"
+                  color="warn">do_not_disturb</mat-icon>
+              </span>
+
+              <!-- Labels instead of icons -->
+              <span
+                *ngIf="renderMode === RenderMode.FULL"
+                class="gd-form-edit-questionnaire-v2-item-question-content-icons-labels">
+
+                <!-- Answer type -->
+                <span
+                  *ngIf="item.data.answerType">
+                  {{item.data.answerType | translate}}
+                </span>
+
+                <!-- Category -->
+                <span
+                  *ngIf="item.data.category">
+                  {{item.data.category | translate}}
+                </span>
+
+                <!-- Multiple answers -->
+                <span
+                  *ngIf="item.data.multiAnswer">
+                  {{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER' | translate}}
+                </span>
+
+                <!-- Required -->
+                <span
+                  *ngIf="item.data.required"
+                  class="required">
+                  {{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED' | translate}}
+                </span>
+
+                <!-- Inactive -->
+                <span
+                  *ngIf="item.data.inactive">
+                  {{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_INACTIVE' | translate}}
+                </span>
+              </span>
+
+            </div>
+
+            <!-- Buttons -->
+            <div
+              class="gd-form-edit-questionnaire-v2-item-question-buttons"
+              fxGrow="0">
+
+              <!-- Add answer -->
+              <button
+                *ngIf="!viewOnly && item.canHaveChildren"
+                type="button"
+                mat-icon-button
+                [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW' | translate"
+                (click)="addAnswer(item.data)">
+                <mat-icon>playlist_add</mat-icon>
+              </button>
+
+              <!-- Edit question -->
+              <button
+                type="button"
+                mat-icon-button
+                [matTooltip]="(viewOnly ? 'LNG_COMMON_BUTTON_VIEW' : 'LNG_COMMON_BUTTON_UPDATE') | translate"
+                (click)="viewEditQuestion(item.data, item.parent?.data)">
+                <mat-icon>{{viewOnly ? 'visibility' : 'edit'}}</mat-icon>
+              </button>
+
+              <!-- Clone question -->
+              <button
+                *ngIf="!viewOnly && item.data.answerType !== Constants.ANSWER_TYPES.MARKUP.value"
+                type="button"
+                mat-icon-button
+                [matTooltip]="'LNG_COMMON_BUTTON_CLONE' | translate"
+                (click)="cloneItem(item)">
+                <mat-icon>content_copy</mat-icon>
+              </button>
+
+              <!-- Delete question -->
+              <button
+                *ngIf="!viewOnly"
+                type="button"
+                mat-icon-button
+                color="warn"
+                [matTooltip]="'LNG_COMMON_BUTTON_DELETE' | translate"
+                (click)="deleteItem(item)">
+                <mat-icon>delete</mat-icon>
+              </button>
+
+            </div>
+
+          </div>
+
+          <!-- Answer -->
+          <div
+            *ngSwitchCase="FlattenType.ANSWER"
+            class="gd-form-edit-questionnaire-v2-item-answer"
+            fxLayout="row" fxLayoutAlign="none center">
+
+            <!-- Collapse / Expand -->
+            <mat-icon
+              [style.visibility]="item.canCollapseOrExpand ? 'visible' : 'hidden'"
+              (click)="expandCollapse(item)">{{item.data.collapsed ? 'expand_more' : 'expand_less'}}</mat-icon>
+
+            <!-- Expand All -->
+            <mat-icon
+              *ngIf="item.canCollapseOrExpand && !item.data.collapsed"
+              [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_EXPAND_ALL' | translate"
+              (click)="collapseExpandAllQuestions(item.data.additionalQuestions, false); nonFlatToFlat()">
+              expand
+            </mat-icon>
+
+            <!-- Collapse All -->
+            <mat-icon
+              *ngIf="item.canCollapseOrExpand && !item.data.collapsed"
+              [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_COLLAPSE_ALL' | translate"
+              (click)="collapseExpandAllQuestions(item.data.additionalQuestions, true); nonFlatToFlat()">
+              compress
+            </mat-icon>
+
+            <!-- Sort -->
+            <mat-icon
+              *ngIf="!viewOnly"
+              cdkDragHandle
+              (mousedown)="notInvalidDragZone()"
+              (touchstart)="notInvalidDragZone()">drag_indicator</mat-icon>
+
+            <!-- Type -->
+            <mat-icon
+              fxGrow="0">font_download</mat-icon>
+
+            <!-- Label & icons -->
+            <div
+              class="gd-form-edit-questionnaire-v2-item-answer-content"
+              fxFlex>
+
+              <!-- Label -->
+              <span
+                class="gd-form-edit-questionnaire-v2-item-answer-content-title">{{item.data.label}}</span>
+
+              <!-- Icons -->
+              <span
+                *ngIf="renderMode !== RenderMode.SMALL"
+                class="gd-form-edit-questionnaire-v2-item-answer-content-icons">
+                <!-- Alert -->
+                <mat-icon
+                  *ngIf="item.data.alert">notification_important</mat-icon>
+              </span>
+
+            </div>
+
+            <!-- Buttons -->
+            <div
+              class="gd-form-edit-questionnaire-v2-item-answer-buttons"
+              fxGrow="0">
+
+              <!-- Add question -->
+              <button
+                *ngIf="!viewOnly"
+                type="button"
+                mat-icon-button
+                [matTooltip]="'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW' | translate"
+                (click)="addQuestion(item.data)">
+                <mat-icon>post_add</mat-icon>
+              </button>
+
+              <!-- Edit answer -->
+              <button
+                type="button"
+                mat-icon-button
+                [matTooltip]="(viewOnly ? 'LNG_COMMON_BUTTON_VIEW' : 'LNG_COMMON_BUTTON_UPDATE') | translate"
+                (click)="viewEditAnswer(item.data, item.parent.data)">
+                <mat-icon>{{viewOnly ? 'visibility' : 'edit'}}</mat-icon>
+              </button>
+
+              <!-- Clone answer -->
+              <button
+                *ngIf="!viewOnly"
+                type="button"
+                mat-icon-button
+                [matTooltip]="'LNG_COMMON_BUTTON_CLONE' | translate"
+                (click)="cloneItem(item)">
+                <mat-icon>content_copy</mat-icon>
+              </button>
+
+              <!-- Delete answer -->
+              <button
+                *ngIf="!viewOnly"
+                type="button"
+                mat-icon-button
+                color="warn"
+                [matTooltip]="'LNG_COMMON_BUTTON_DELETE' | translate"
+                (click)="deleteItem(item)">
+                <mat-icon>delete</mat-icon>
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </cdk-virtual-scroll-viewport>
+    </ng-container>
+
+    <!-- No questions image -->
+    <ng-template
+      #noQuestions>
+      <div
+        fxLayout="column" fxLayoutAlign="center center"
+        class="gd-form-edit-questionnaire-v2-empty">
+
+        <!-- Image -->
+        <div
+          class="gd-form-edit-questionnaire-v2-empty-image"></div>
+
+        <!-- Message -->
+        <div
+          class="gd-form-edit-questionnaire-v2-empty-text">{{'LNG_QUESTIONNAIRE_LABEL_EDIT_NO_QUESTIONS' | translate}}</div>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Legend -->
+  <div
+    *ngIf="flattenedQuestions?.length > 0"
+    class="gd-form-edit-questionnaire-v2-legend"
+    fxLayout="row" fxLayoutAlign="start center">
+
+    <!-- Header -->
+    <div
+      class="gd-form-edit-questionnaire-v2-legend-title">
+      {{'LNG_COMMON_LABEL_LEGEND' | translate}}
+    </div>
+
+    <!-- Items -->
+    <div
+      class="gd-form-edit-questionnaire-v2-legend-items"
+      fxLayout="row wrap" fxLayoutAlign="start center">
+
+      <!-- Drag -->
+      <div
+        *ngIf="!viewOnly"
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        <mat-icon>drag_indicator</mat-icon>
+        <span>{{'LNG_COMMON_BUTTON_DRAG' | translate}}</span>
+      </div>
+
+      <!-- Answer type -->
+      <div
+        *ngIf="renderMode === RenderMode.MEDIUM"
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        <mat-icon>spellcheck</mat-icon>
+        <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_ANSWER_TYPE' | translate}}</span>
+      </div>
+
+      <!-- Category -->
+      <div
+        *ngIf="renderMode === RenderMode.MEDIUM"
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        <mat-icon>folder_special</mat-icon>
+        <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_CATEGORY' | translate}}</span>
+      </div>
+
+      <!-- Multiple answers -->
+      <div
+        *ngIf="renderMode === RenderMode.MEDIUM"
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        <mat-icon>format_list_numbered_rtl</mat-icon>
+        <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_MULTI_ANSWER' | translate}}</span>
+      </div>
+
+      <!-- Required -->
+      <div
+        *ngIf="renderMode === RenderMode.MEDIUM"
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        <mat-icon>stars</mat-icon>
+        <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_REQUIRED' | translate}}</span>
+      </div>
+
+      <!-- Inactive -->
+      <div
+        *ngIf="renderMode === RenderMode.MEDIUM"
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        <mat-icon
+          color="warn">do_not_disturb</mat-icon>
+        <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_FIELD_LABEL_INACTIVE' | translate}}</span>
+      </div>
+
+      <!-- Alert -->
+      <div
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        <mat-icon
+          color="primary">notification_important</mat-icon>
+        <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_FIELD_LABEL_ALERT' | translate}}</span>
+      </div>
+
+      <!-- Add question -->
+      <div
+        *ngIf="!viewOnly"
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        <mat-icon>post_add</mat-icon>
+        <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_BUTTON_ADD_NEW' | translate}}</span>
+      </div>
+
+      <!-- Add answers -->
+      <div
+        *ngIf="!viewOnly"
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        <mat-icon>playlist_add</mat-icon>
+        <span>{{'LNG_QUESTIONNAIRE_TEMPLATE_QUESTION_ANSWER_BUTTON_ADD_NEW' | translate}}</span>
+      </div>
+
+      <!-- Edit -->
+      <div
+        *ngIf="!viewOnly"
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        <mat-icon>edit</mat-icon>
+        <span>{{'LNG_COMMON_BUTTON_UPDATE' | translate}}</span>
+      </div>
+
+      <!-- Clone question / answer -->
+      <div
+        *ngIf="!viewOnly"
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        <mat-icon>content_copy</mat-icon>
+        <span>{{'LNG_COMMON_BUTTON_CLONE' | translate}}</span>
+      </div>
+
+      <!-- Delete -->
+      <div
+        *ngIf="!viewOnly"
+        class="gd-form-edit-questionnaire-v2-legend-items-item">
+        <mat-icon>delete</mat-icon>
+        <span>{{'LNG_COMMON_BUTTON_DELETE' | translate}}</span>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

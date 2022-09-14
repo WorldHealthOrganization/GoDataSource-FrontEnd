@@ -1,9 +1,9 @@
 import * as _ from 'lodash';
 
 export class ContactFollowUpsModel {
-    count: number;
+  count: number;
 
-    constructor(data = null) {
-        this.count = _.get(data, 'count');
-    }
+  constructor(data = null) {
+    this.count = _.get(data, 'count');
+  }
 }

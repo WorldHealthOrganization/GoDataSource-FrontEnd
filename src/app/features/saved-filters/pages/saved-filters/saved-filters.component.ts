@@ -1,181 +1,470 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import { BreadcrumbItemModel } from '../../../../shared/components/breadcrumbs/breadcrumb-item.model';
-import { Observable } from 'rxjs';
-import { ListComponent } from '../../../../core/helperClasses/list-component';
-import { SnackbarService } from '../../../../core/services/helper/snackbar.service';
-import { SavedFiltersService } from '../../../../core/services/data/saved-filters.data.service';
+import { Component, OnDestroy } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
-import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
-import { catchError, share, tap } from 'rxjs/operators';
-import { GenericDataService } from '../../../../core/services/data/generic.data.service';
-import { Constants } from '../../../../core/models/constants';
-import { LabelValuePair } from '../../../../core/models/label-value-pair';
-import { DialogService } from '../../../../core/services/helper/dialog.service';
-import { DialogAnswer, DialogAnswerButton } from '../../../../shared/components/dialog/dialog.component';
 import { throwError } from 'rxjs';
-import { HoverRowAction, HoverRowActionType } from '../../../../shared/components';
-import { IBasicCount } from '../../../../core/models/basic-count.interface';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { ListComponent } from '../../../../core/helperClasses/list-component';
+import { Constants } from '../../../../core/models/constants';
+import { DashboardModel } from '../../../../core/models/dashboard.model';
+import { SavedFilterModel } from '../../../../core/models/saved-filters.model';
+import { UserModel } from '../../../../core/models/user.model';
+import { SavedFiltersService } from '../../../../core/services/data/saved-filters.data.service';
+import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
+import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
+import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputToggle, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 
 @Component({
-    selector: 'app-saved-filters',
-    encapsulation: ViewEncapsulation.None,
-    templateUrl: './saved-filters.component.html',
-    styleUrls: ['./saved-filters.component.less']
+  selector: 'app-saved-filters',
+  templateUrl: './saved-filters.component.html'
 })
-export class SavedFiltersComponent extends ListComponent implements OnInit, OnDestroy {
-    // breadcrumbs
-    breadcrumbs: BreadcrumbItemModel[] = [
-        new BreadcrumbItemModel('LNG_PAGE_LIST_SAVED_FILTERS_TITLE', '.', true)
-    ];
+export class SavedFiltersComponent extends ListComponent<SavedFilterModel> implements OnDestroy {
+  /**
+   * Constructor
+   */
+  constructor(
+    protected listHelperService: ListHelperService,
+    private savedFiltersService: SavedFiltersService,
+    private toastV2Service: ToastV2Service,
+    private activatedRoute: ActivatedRoute,
+    private dialogV2Service: DialogV2Service
+  ) {
+    super(listHelperService);
+  }
 
-    yesNoOptionsList$: Observable<any[]>;
+  /**
+   * Release resources
+   */
+  ngOnDestroy() {
+    // release parent resources
+    super.onDestroy();
+  }
 
-    pagesWithSavedFilters: LabelValuePair[] = _.map(Constants.APP_PAGE, (page) => {
-        return new LabelValuePair(page.label, page.value);
-    });
+  /**
+   * Component initialized
+   */
+  initialized(): void {
+    // initialize pagination
+    this.initPaginator();
 
-    savedFiltersList$: Observable<SavedFilterModel[]>;
-    savedFiltersListCount$: Observable<IBasicCount>;
+    // ...and re-load the list when the Selected Outbreak is changed
+    this.needsRefreshList(true);
+  }
 
-    fixedTableColumns: string[] = [
-        'name',
-        'public',
-        'filter-keys'
-    ];
-
-    recordActions: HoverRowAction[] = [
+  /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
         // Other actions
-        new HoverRowAction({
-            type: HoverRowActionType.MENU,
-            icon: 'moreVertical',
-            menuOptions: [
-                // Delete Saved Filter
-                new HoverRowAction({
-                    menuOptionLabel: 'LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER',
-                    click: (item: SavedFilterModel) => {
-                        this.deleteFilter(item.id);
-                    },
-                    visible: (item: SavedFilterModel): boolean => {
-                        return !item.readOnly;
-                    },
-                    class: 'mat-menu-item-delete'
-                })
-            ]
-        })
-    ];
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          menuOptions: [
+            // Delete Saved Filter
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: SavedFilterModel): void => {
+                  // determine what we need to delete
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_DELETE',
+                        data: () => ({
+                          name: item.name
+                        })
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_DELETE_SAVED_FILTER',
+                        data: () => ({
+                          name: item.name
+                        })
+                      }
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
 
-    /**
-     * Constructor
-     */
-    constructor(
-        protected listHelperService: ListHelperService,
-        private savedFiltersService: SavedFiltersService,
-        private snackbarService: SnackbarService,
-        private genericDataService: GenericDataService,
-        private dialogService: DialogService
-    ) {
-        super(listHelperService);
-    }
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
 
-    /**
-     * Component initialized
-     */
-    ngOnInit() {
-        this.yesNoOptionsList$ = this.genericDataService.getFilterYesNoOptions();
+                    // delete saved filter
+                    this.savedFiltersService.deleteFilter(item.id)
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
 
-        // initialize pagination
-        this.initPaginator();
-        // ...and re-load the list
-        this.needsRefreshList(true);
-    }
+                          // hide loading
+                          loading.close();
 
-    /**
-     * Release resources
-     */
-    ngOnDestroy() {
-        // release parent resources
-        super.ngOnDestroy();
-    }
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER_SUCCESS_MESSAGE');
 
-    /**
-     * Re(load) the Saved filters list, based on the applied filter, sort criterias
-     */
-    refreshList(finishCallback: (records: any[]) => void) {
-        this.savedFiltersList$ = this.savedFiltersService
-            .getSavedFiltersList(this.queryBuilder)
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    finishCallback([]);
-                    return throwError(err);
-                }),
-                tap(this.checkEmptyList.bind(this)),
-                tap((data: any[]) => {
-                    finishCallback(data);
-                })
-            );
-    }
+                        // hide loading
+                        loading.close();
 
-    /**
-     * Get total number of items, based on the applied filters
-     */
-    refreshListCount() {
-        const countQueryBuilder = _.cloneDeep(this.queryBuilder);
-        countQueryBuilder.paginator.clear();
-        countQueryBuilder.sort.clear();
-        this.savedFiltersListCount$ = this.savedFiltersService
-            .getSavedFiltersListCount(countQueryBuilder)
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    return throwError(err);
-                }),
-                share()
-            );
-    }
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
+                }
+              },
+              visible: (item: SavedFilterModel): boolean => {
+                return !item.readOnly || SavedFilterModel.canDelete(this.authUser);
+              }
+            },
 
-    /**
-     * Set a saved filter public if it's created by the current user
-     * @param savedFilterId
-     * @param isPublic
-     */
-    setPublicItem(savedFilterId: string, isPublic: boolean) {
-        this.savedFiltersService.modifyFilter(savedFilterId, {isPublic : isPublic})
-            .pipe(
-                catchError((err) => {
-                    this.snackbarService.showApiError(err);
-                    return throwError(err);
-                })
-            )
-            .subscribe(() => {
-                this.snackbarService.showSuccess(`LNG_PAGE_LIST_SAVED_FILTERS_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE`);
-            });
-    }
+            // Divider
+            {
+              visible: (item: SavedFilterModel): boolean => {
+                return !item.readOnly || (
+                  SavedFilterModel.canDelete(this.authUser) &&
+                  SavedFilterModel.canModify(this.authUser)
+                );
+              }
+            },
 
-    /**
-     * Delete a saved filter
-     * @param filterId
-     */
-    deleteFilter(filterId: string) {
-        this.dialogService.showConfirm('LNG_DIALOG_CONFIRM_DELETE_SAVED_FILTER')
-            .subscribe((answer: DialogAnswer) => {
-                if (answer.button === DialogAnswerButton.Yes) {
-                    this.savedFiltersService.deleteFilter(filterId)
+            // Change Public
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_SAVED_FILTERS_ACTION_CHANGE_PUBLIC'
+              },
+              action: {
+                click: (item: SavedFilterModel) => {
+                  this.dialogV2Service
+                    .showSideDialog({
+                      // title
+                      title: {
+                        get: () => 'LNG_PAGE_LIST_SAVED_FILTERS_CHANGE_PUBLIC_TITLE'
+                      },
+
+                      // hide search bar
+                      hideInputFilter: true,
+
+                      // inputs
+                      inputs: [
+                        {
+                          type: V2SideDialogConfigInputType.DIVIDER,
+                          placeholder: 'LNG_SAVED_FILTERS_FIELD_LABEL_PUBLIC'
+                        },
+                        {
+                          type: V2SideDialogConfigInputType.TOGGLE,
+                          value: item.isPublic ?
+                            Constants.FILTER_YES_NO_OPTIONS.YES.value :
+                            Constants.FILTER_YES_NO_OPTIONS.NO.value,
+                          name: 'public',
+                          options: [
+                            {
+                              label: Constants.FILTER_YES_NO_OPTIONS.YES.label,
+                              value: Constants.FILTER_YES_NO_OPTIONS.YES.value
+                            },
+                            {
+                              label: Constants.FILTER_YES_NO_OPTIONS.NO.label,
+                              value: Constants.FILTER_YES_NO_OPTIONS.NO.value
+                            }
+                          ]
+                        }
+                      ],
+
+                      // buttons
+                      bottomButtons: [
+                        {
+                          label: 'LNG_COMMON_BUTTON_UPDATE',
+                          type: IV2SideDialogConfigButtonType.OTHER,
+                          color: 'primary',
+                          key: 'save',
+                          disabled: (_data, handler): boolean => {
+                            return !handler.form ||
+                              handler.form.invalid ||
+                              item.isPublic === ((handler.data.map.public as IV2SideDialogConfigInputToggle).value) as boolean;
+                          }
+                        }, {
+                          type: IV2SideDialogConfigButtonType.CANCEL,
+                          label: 'LNG_COMMON_BUTTON_CANCEL',
+                          color: 'text'
+                        }
+                      ]
+                    })
+                    .subscribe((response) => {
+                      // cancelled ?
+                      if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+                        return;
+                      }
+
+                      // change public
+                      this.savedFiltersService.modifyFilter(item.id, { isPublic: (response.handler.data.map.public as IV2SideDialogConfigInputToggle).value })
                         .pipe(
-                            catchError((err) => {
-                                this.snackbarService.showApiError(err);
-                                return throwError(err);
-                            })
+                          catchError((err) => {
+                            this.toastV2Service.error(err);
+                            return throwError(err);
+                          })
                         )
                         .subscribe(() => {
-                            this.snackbarService.showSuccess('LNG_PAGE_LIST_SAVED_FILTERS_ACTION_DELETE_FILTER_SUCCESS_MESSAGE');
+                          // update our record too
+                          item.isPublic = ((response.handler.data.map.public as IV2SideDialogConfigInputToggle).value) as boolean;
 
-                            // reload data
-                            this.needsRefreshList(true);
+                          // success message
+                          this.toastV2Service.success('LNG_PAGE_LIST_SAVED_FILTERS_ACTION_MODIFY_FILTER_SUCCESS_MESSAGE');
+
+                          // close popup
+                          response.handler.hide();
+
+                          // refresh list
+                          this.needsRefreshList(true);
                         });
+                    });
                 }
-        });
+              },
+              visible: (item: SavedFilterModel): boolean => {
+                return !item.readOnly || SavedFilterModel.canModify(this.authUser);
+              }
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {
+    this.tableColumns = [
+      {
+        field: 'name',
+        label: 'LNG_SAVED_FILTERS_FIELD_LABEL_NAME',
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'isPublic',
+        label: 'LNG_SAVED_FILTERS_FIELD_LABEL_PUBLIC',
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      },
+      {
+        field: 'filterKey',
+        label: 'LNG_SAVED_FILTERS_FIELD_LABEL_FOR_PAGE',
+        sortable: true,
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: Object.values(Constants.APP_PAGE).map((item) => ({
+            label: item.label,
+            value: item.value
+          }))
+        }
+      },
+      {
+        field: 'createdBy',
+        label: 'LNG_SAVED_FILTERS_FIELD_LABEL_CREATED_BY',
+        format: {
+          type: (item) => item.createdBy && this.activatedRoute.snapshot.data.user.map[item.createdBy] ?
+            this.activatedRoute.snapshot.data.user.map[item.createdBy].name :
+            ''
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        exclude: (): boolean => {
+          return !UserModel.canView(this.authUser);
+        },
+        link: (data) => {
+          return data.createdBy ?
+            `/users/${ data.createdBy }/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'updatedBy',
+        label: 'LNG_SAVED_FILTERS_FIELD_LABEL_UPDATED_BY',
+        format: {
+          type: (item) => item.updatedBy && this.activatedRoute.snapshot.data.user.map[item.updatedBy] ?
+            this.activatedRoute.snapshot.data.user.map[item.updatedBy].name :
+            ''
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          includeNoValue: true
+        },
+        exclude: (): boolean => {
+          return !UserModel.canView(this.authUser);
+        },
+        link: (data) => {
+          return data.updatedBy ?
+            `/users/${ data.updatedBy }/view` :
+            undefined;
+        }
+      },
+      {
+        field: 'updatedAt',
+        label: 'LNG_SAVED_FILTERS_FIELD_LABEL_UPDATED_AT',
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.DATETIME
+        },
+        filter: {
+          type: V2FilterType.DATE_RANGE
+        }
+      }
+    ];
+  }
+
+  /**
+   * Initialize process data
+   */
+  protected initializeProcessSelectedData(): void {}
+
+  /**
+   * Initialize table infos
+   */
+  protected initializeTableInfos(): void {}
+
+  /**
+   * Initialize Table Advanced Filters
+   */
+  protected initializeTableAdvancedFilters(): void {}
+
+  /**
+   * Initialize table quick actions
+   */
+  protected initializeQuickActions(): void {}
+
+  /**
+   * Initialize table group actions
+   */
+  protected initializeGroupActions(): void {}
+
+  /**
+   * Initialize table add action
+   */
+  protected initializeAddAction(): void {}
+
+  /**
+   * Initialize table grouped data
+   */
+  protected initializeGroupedData(): void {}
+
+  /**
+   * Initialize breadcrumbs
+   */
+  protected initializeBreadcrumbs(): void {
+    // set breadcrumbs
+    this.breadcrumbs = [
+      {
+        label: 'LNG_COMMON_LABEL_HOME',
+        action: {
+          link: DashboardModel.canViewDashboard(this.authUser) ?
+            ['/dashboard'] :
+            ['/account/my-profile']
+        }
+      }, {
+        label: 'LNG_PAGE_LIST_SAVED_FILTERS_TITLE',
+        action: null
+      }
+    ];
+  }
+
+  /**
+   * Fields retrieved from api to reduce payload size
+   */
+  protected refreshListFields(): string[] {
+    return [
+      'id',
+      'name',
+      'isPublic',
+      'filterKey',
+      'createdBy',
+      'updatedBy',
+      'updatedAt'
+    ];
+  }
+
+  /**
+   * Re(load) the Saved filters list, based on the applied filter, sort criterias
+   */
+  refreshList() {
+    // retrieve list
+    this.records$ = this.savedFiltersService
+      .getSavedFiltersList(this.queryBuilder)
+      .pipe(
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      );
+  }
+
+  /**
+   * Get total number of items, based on the applied filters
+   */
+  refreshListCount(applyHasMoreLimit?: boolean) {
+    // reset
+    this.pageCount = undefined;
+
+    // set apply value
+    if (applyHasMoreLimit !== undefined) {
+      this.applyHasMoreLimit = applyHasMoreLimit;
     }
 
+    const countQueryBuilder = _.cloneDeep(this.queryBuilder);
+    countQueryBuilder.paginator.clear();
+    countQueryBuilder.sort.clear();
+
+    // apply has more limit
+    if (this.applyHasMoreLimit) {
+      countQueryBuilder.flag(
+        'applyHasMoreLimit',
+        true
+      );
+    }
+
+    this.savedFiltersService
+      .getSavedFiltersListCount(countQueryBuilder)
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          return throwError(err);
+        }),
+
+        // should be the last pipe
+        takeUntil(this.destroyed$)
+      )
+      .subscribe((response) => {
+        this.pageCount = response;
+      });
+  }
 }

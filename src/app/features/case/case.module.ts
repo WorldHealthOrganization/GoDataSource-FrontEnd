@@ -9,15 +9,14 @@ import { WorldMapMovementModule } from '../../common-modules/world-map-movement/
 import * as fromPages from './pages';
 
 @NgModule({
-    imports: [
-        routing,
-        SharedModule,
-        WorldMapMovementModule
-    ],
-    declarations: [
-        ...fromPages.pageComponents
-    ],
-    entryComponents: []
+  imports: [
+    routing,
+    SharedModule,
+    WorldMapMovementModule
+  ],
+  declarations: [
+    ...fromPages.pageComponents
+  ]
 })
 export class CaseModule {
 }

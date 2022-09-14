@@ -1,62 +1,52 @@
-<div fxLayout="column" fxLayoutGap="20px">
+<div class="gd-relationship-summary" fxLayout="column">
+  <div class="gd-relationship-summary-header" fxLayout="row" fxLayoutAlign="space-between center">
+    <span class="gd-relationship-summary-header-title">
+      {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_RELATIONSHIP_SUMMARY_TITLE' | translate }}
+    </span>
 
-    <div fxLayout="row" fxLayoutAlign="space-between center">
-        <span class="relationship-type">{{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_RELATIONSHIP_SUMMARY_TITLE' | translate }}</span>
+    <button class="gd-relationship-summary-header-close" type="button" mat-icon-button color="secondary" (click)="onRemove()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 
-        <span class="xt-icon" (click)="onRemove()">close</span>
+  <div class="gd-relationship-summary-content">
+    <div fxLayout="column" fxLayoutGap="0.8rem">
+      <div *ngFor="let data of relationshipData" fxLayout="row" fxLayoutGap="0.8rem">
+        <span class="gd-relationship-summary-content-label">
+          {{data.label | translate}}:
+        </span>
+        <span class="gd-relationship-summary-content-value">
+          {{data.value | translate}}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="gd-relationship-summary-footer" fxLayout="column" fxLayoutGap="0.8rem">
+    <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="0.8rem">
+      <button *ngIf="canReverseRelation && RelationshipModel.canReverse(authUser) && entityCanReverse"
+        (click)="reverseExistingRelationship()"
+        [matTooltip]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_REVERSE_RELATIONSHIP_TOOLTIP' | translate"
+        mat-flat-button color="primary" type="button">
+        {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_REVERSE_RELATIONSHIP' | translate }}
+      </button>
+
+      <a *ngIf="RelationshipModel.canModify(authUser) && entityCanModify" mat-flat-button color="primary"
+        (click)="onModifyRelationship()">
+        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_RELATIONSHIP' | translate}}
+      </a>
+
+      <a *ngIf="RelationshipModel.canDelete(authUser) && entityCanDelete" mat-flat-button color="warn"
+        (click)="onDeleteRelationship()">
+        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_DELETE_RELATIONSHIP' | translate}}
+      </a>
     </div>
 
-    <div class="relationship-summary-wrapper">
-        <div fxLayout="column" fxLayoutGap="10px">
-            <div
-                *ngFor="let data of relationshipData"
-                fxLayout="row" fxLayoutGap="10px"
-            >
-                <span class="label">{{data.label | translate}}:</span>
-                <span class="value">{{data.value | translate}}</span>
-            </div>
-        </div>
+    <div *ngIf="RelationshipModel.canView(authUser) && entityCanView" fxLayout="row" fxLayoutAlign="center center"
+      fxLayoutGap="0.8rem">
+      <a [href]="relationshipLink" target="_blank" mat-flat-button color="secondary">
+        {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_RELATIONSHIP' | translate}}
+      </a>
     </div>
-
-    <div fxLayout="column" fxLayoutGap="10px">
-        <div
-            fxLayout="row" fxLayoutAlign="end" fxLayoutGap="10px">
-            <button
-                *ngIf="canReverseRelation && RelationshipModel.canReverse(authUser) && entityCanReverse"
-                (click)="reverseExistingRelationship()"
-                [matTooltip]="'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_REVERSE_RELATIONSHIP_TOOLTIP' | translate"
-                mat-raised-button type="button">
-                {{ 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_REVERSE_RELATIONSHIP' | translate }}
-            </button>
-
-            <a
-                *ngIf="RelationshipModel.canModify(authUser) && entityCanModify"
-                mat-raised-button
-                color="accent"
-                (click)="onModifyRelationship()">
-                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_MODIFY_RELATIONSHIP' | translate}}
-            </a>
-
-            <a
-                *ngIf="RelationshipModel.canDelete(authUser) && entityCanDelete"
-                mat-raised-button
-                color="warn"
-                (click)="onDeleteRelationship()">
-                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_DELETE_RELATIONSHIP' | translate}}
-            </a>
-        </div>
-
-        <div
-            *ngIf="RelationshipModel.canView(authUser) && entityCanView"
-            fxLayout="row" fxLayoutAlign="end" fxLayoutGap="10px">
-            <a
-                [href]="relationshipLink"
-                target="_blank"
-                mat-raised-button
-                color="primary"
-            >
-                {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_ACTION_VIEW_RELATIONSHIP' | translate}}
-            </a>
-        </div>
-    </div>
+  </div>
 </div>

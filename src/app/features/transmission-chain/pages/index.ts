@@ -12,8 +12,8 @@ export * from './transmission-chains-snapshot-list/transmission-chains-snapshot-
 
 // export the list of all page components
 export const pageComponents: any[] = [
-    TransmissionChainsListComponent,
-    TransmissionChainsGraphComponent,
-    CaseCountMapComponent,
-    TransmissionChainsSnapshotListComponent
+  TransmissionChainsListComponent,
+  TransmissionChainsGraphComponent,
+  CaseCountMapComponent,
+  TransmissionChainsSnapshotListComponent
 ];
