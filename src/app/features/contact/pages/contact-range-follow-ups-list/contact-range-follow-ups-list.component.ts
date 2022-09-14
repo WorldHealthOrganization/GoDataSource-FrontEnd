@@ -466,7 +466,10 @@ export class ContactRangeFollowUpsListComponent
                   // sort by date ascending
                   return date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
                 })
-                .mapValues((followUpData: FollowUpModel[], date) => {
+                .mapValues((
+                  followUpData: FollowUpModel[],
+                  date
+                ) => {
                   // used ?
                   if (followUpData?.length > 0) {
                     usedDates[date] = true;

@@ -144,6 +144,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // update columns definitions
     this.updateColumnDefinitions();
+
+    // some type of columns should have a fixed width
+    this.adjustFixedSizeColumns();
   }
   get columns(): IV2Column[] {
     return this._columns;
@@ -772,11 +775,11 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           this._agTable.api.showNoRowsOverlay();
         }
 
-        // some type of columns should have a fixed width
-        this.adjustFixedSizeColumns();
-
         // unselect everything
         this._agTable.api.deselectAll();
+
+        // some type of columns should have a fixed width
+        this.adjustFixedSizeColumns();
 
         // re-render page
         this.detectChanges();
@@ -1482,6 +1485,11 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    * Some type of columns should have a fixed width
    */
   private adjustFixedSizeColumns(): void {
+    // nothing to do ?
+    if (!this._agTable?.columnApi) {
+      return;
+    }
+
     // some type of columns should have a fixed width
     this._agTable.columnApi.getColumns().forEach((column) => {
       // retrieve column definition
