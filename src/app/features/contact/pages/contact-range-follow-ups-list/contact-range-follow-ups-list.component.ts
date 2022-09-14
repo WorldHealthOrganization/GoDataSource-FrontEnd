@@ -1,7 +1,6 @@
 import { Component, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { FollowUpPage } from '../../typings/follow-up-page';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { catchError, map, takeUntil } from 'rxjs/operators';
@@ -620,9 +619,7 @@ export class ContactRangeFollowUpsListComponent
                         Constants.DEFAULT_COLOR_REF_DATA;
 
                       // construct url
-                      const url: string = data.person.type === EntityType.CASE ?
-                        `/cases/${data.person.id}/follow-ups/${followUp.id}/view?rootPage=${FollowUpPage.RANGE}` :
-                        `/contacts/${data.person.id}/follow-ups/${followUp.id}/view?rootPage=${FollowUpPage.RANGE}`;
+                      const url: string = `/contacts/${data.person.id}/follow-ups/${followUp.id}/${FollowUpModel.canModify(this.authUser) ? 'modify' : 'view'}`;
 
                       // render html
                       html += `<a class="gd-list-table-link" href="${this.location.prepareExternalUrl(url)}">
