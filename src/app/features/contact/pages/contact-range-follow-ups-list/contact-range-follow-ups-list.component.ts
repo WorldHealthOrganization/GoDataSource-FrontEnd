@@ -147,6 +147,30 @@ export class ContactRangeFollowUpsListComponent
         type: V2FilterType.DATE_RANGE,
         childQueryBuilderKey: 'contact'
       }
+    },
+    {
+      field: 'followUpTeamId',
+      label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
+      format: {
+        type: (data) => {
+          return data.person.followUpTeamId && (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[data.person.followUpTeamId] ?
+            (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[data.person.followUpTeamId].name :
+            '';
+        }
+      },
+      link: (data) => {
+        return data.person.followUpTeamId &&
+        TeamModel.canView(this.authUser) &&
+        (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[data.person.followUpTeamId] ?
+          `/teams/${data.person.followUpTeamId}/view` :
+          undefined;
+      },
+      filter: {
+        type: V2FilterType.MULTIPLE_SELECT,
+        options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
+        childQueryBuilderKey: 'contact',
+        includeNoValue: true
+      }
     }
   ];
 
