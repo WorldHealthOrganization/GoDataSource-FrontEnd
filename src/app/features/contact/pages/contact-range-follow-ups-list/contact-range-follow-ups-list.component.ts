@@ -479,6 +479,14 @@ export class ContactRangeFollowUpsListComponent
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
         relationshipLabel: personLabel
       },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'type',
+        childQueryBuilderKey: 'contact',
+        options: this._personTypeOptions,
+        label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_PERSON_TYPE',
+        relationshipLabel: personLabel
+      },
 
       // follow-up
       {
