@@ -301,6 +301,7 @@ export class ContactRangeFollowUpsListComponent
       filter: {
         type: V2FilterType.MULTIPLE_SELECT,
         options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        childQueryBuilderKey: 'contact',
         includeNoValue: true
       },
       exclude: (): boolean => {

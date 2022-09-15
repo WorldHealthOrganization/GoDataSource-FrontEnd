@@ -704,6 +704,9 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
     // apply list filters which is mandatory
     this.mergeListFilterToMainFilter();
 
+    // update cached filters
+    this.updateCachedFilters();
+
     // refresh
     this.needsRefreshList(
       true,
