@@ -527,6 +527,36 @@ export class ContactRangeFollowUpsListComponent
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
         options: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
+      },
+      {
+        type: V2AdvancedFilterType.LOCATION_MULTIPLE,
+        field: 'address',
+        label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
+        relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'address.phoneNumber',
+        label: 'LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER',
+        relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'address.emailAddress',
+        label: 'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS',
+        relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'address.addressLine1',
+        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS',
+        relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'address.city',
+        label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+        relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
       }
     ];
 
