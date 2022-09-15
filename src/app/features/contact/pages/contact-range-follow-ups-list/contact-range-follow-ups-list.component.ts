@@ -537,42 +537,58 @@ export class ContactRangeFollowUpsListComponent
             );
 
             // get grouped followups by contact & date
+            const followUpDates: string[] = [];
+            const followUpGrouped: {
+              [date: string]: FollowUpModel[]
+            } = {};
+            for (let followUpIndex: number = 0; followUpIndex < data.followUps?.length; followUpIndex++) {
+              // get data
+              const followUp: FollowUpModel = data.followUps[followUpIndex];
+
+              // no date ?
+              // - there is no need to add this follow-up
+              if (!followUp.date) {
+                continue;
+              }
+
+              // process date
+              followUp.date = moment(followUp.date).startOf('day');
+
+              // determine min & max dates
+              if (followUp.statusId) {
+                minDate = minDate ?
+                  (followUp.date.isBefore(minDate) ? moment(followUp.date) : minDate) :
+                  moment(followUp.date);
+                maxDate = maxDate ?
+                  (followUp.date.isAfter(maxDate) ? moment(followUp.date) : maxDate) :
+                  moment(followUp.date);
+              }
+
+              // init ?
+              const formattedDate: string = followUp.date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+              if (!followUpGrouped[formattedDate]) {
+                followUpGrouped[formattedDate] = [];
+              }
+
+              // group
+              followUpDates.push(formattedDate);
+              followUpGrouped[formattedDate].push(followUp);
+
+              // date used
+              usedDates[formattedDate] = true;
+            }
+
+            // sort follow-ups
+            followUpDates.forEach((date) => {
+              followUpGrouped[date].sort((a, b) => {
+                return (a.date as Moment).valueOf() - (b.date as Moment).valueOf();
+              });
+            });
+
+            // finished
             return {
               person: data.person,
-              followUps: _.chain(data.followUps)
-                .groupBy((followUp: FollowUpModel) => {
-                  // determine min & max dates
-                  const date = moment(followUp.date).startOf('day');
-                  if (followUp.statusId) {
-                    minDate = minDate ?
-                      (date.isBefore(minDate) ? date : minDate) :
-                      date;
-                    maxDate = maxDate ?
-                      (date.isAfter(maxDate) ? moment(date) : maxDate) :
-                      moment(date);
-                  }
-
-                  // sort by date ascending
-                  return date.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-                })
-                .mapValues((
-                  followUpData: FollowUpModel[],
-                  date
-                ) => {
-                  // used ?
-                  if (followUpData?.length > 0) {
-                    usedDates[date] = true;
-                  }
-
-                  // sort
-                  return _.sortBy(
-                    followUpData,
-                    (followUp: FollowUpModel) => {
-                      return moment(followUp.date);
-                    }
-                  );
-                })
-                .value()
+              followUps: followUpGrouped
             };
           });
 
@@ -586,12 +602,11 @@ export class ContactRangeFollowUpsListComponent
             while (minDate.isSameOrBefore(maxDate)) {
               // add day to list
               // - exclude dates with no data
-              const formattedFieldDate = minDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-              const formattedLabelDate = minDate.format('YYYY<br />MMM D');
+              const formattedFieldDate: string = minDate.format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
               if (usedDates[formattedFieldDate]) {
                 daysColumns.push({
                   field: formattedFieldDate,
-                  label: formattedLabelDate,
+                  label: minDate.format('YYYY<br />MMM D'),
                   notMovable: true,
                   lockPosition: 'right',
                   width: 65,

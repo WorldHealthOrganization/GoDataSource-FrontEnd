@@ -15,11 +15,11 @@ import { Moment } from '../helperClasses/x-moment';
 export class FollowUpModel
   extends BaseModel
   implements
-        IPermissionBasic,
-        IPermissionRestorable,
-        IPermissionBasicBulk,
-        IPermissionExportable,
-        IPermissionFollowUp {
+    IPermissionBasic,
+    IPermissionRestorable,
+    IPermissionBasicBulk,
+    IPermissionExportable,
+    IPermissionFollowUp {
   id: string;
   date: string | Moment;
   address: AddressModel;
@@ -42,8 +42,8 @@ export class FollowUpModel
   responsibleUser: UserModel;
 
   /**
-     * Determine alertness
-     */
+   * Determine alertness
+   */
   static determineAlertness(
     template: QuestionModel[],
     entities: FollowUpModel[]
@@ -51,68 +51,78 @@ export class FollowUpModel
     // map alert question answers to object for easy find
     const alertQuestionAnswers: {
       [question_variable: string]: {
-        [answer_value: string]: boolean
+        [answer_value: string]: true
       }
     } = QuestionModel.determineAlertAnswers(template);
 
     // map alert value to follow-ups
-    return _.map(entities, (followUpData: FollowUpModel) => {
+    entities.forEach((followUpData: FollowUpModel) => {
       // check if we need to mark follow-up as alerted because of questionnaire answers
       followUpData.alerted = false;
-      _.each(followUpData.questionnaireAnswers, (
-        answers: IAnswerData[],
-        questionVariable: string
-      ) => {
-        // retrieve answer value
-        // only the newest one is of interest, the old ones shouldn't trigger an alert
-        // the first item should be the newest
-        const answerKey = _.get(answers, '0.value', undefined);
+      if (followUpData.questionnaireAnswers) {
+        const props: string[] = Object.keys(followUpData.questionnaireAnswers);
+        for (let propIndex: number = 0; propIndex < props.length; propIndex++) {
+          // get answer data
+          const questionVariable: string = props[propIndex];
+          const answers: IAnswerData[] = followUpData.questionnaireAnswers[questionVariable];
 
-        // there is no point in checking the value if there isn't one
-        if (
-          _.isEmpty(answerKey) &&
-                    !_.isNumber(answerKey)
-        ) {
-          return;
-        }
+          // retrieve answer value
+          // only the newest one is of interest, the old ones shouldn't trigger an alert
+          // the first item should be the newest
+          const answerKey = answers?.length > 0 ?
+            answers[0].value :
+            undefined;
 
-        // at least one alerted ?
-        if (_.isArray(answerKey)) {
-          // go through all answers
-          _.each(answerKey, (childAnswerKey: string) => {
-            if (_.get(alertQuestionAnswers, `[${questionVariable}][${childAnswerKey}]`)) {
-              // alerted
-              followUpData.alerted = true;
-
-              // stop each
-              return false;
-            }
-          });
-
-          // stop ?
-          if (followUpData.alerted) {
-            // stop each
-            return false;
+          // there is no point in checking the value if there isn't one
+          if (
+            !answerKey &&
+            typeof answerKey !== 'number'
+          ) {
+            continue;
           }
-        } else {
-          if (_.get(alertQuestionAnswers, `[${questionVariable}][${answerKey}]`)) {
+
+          // at least one alerted ?
+          if (Array.isArray(answerKey)) {
+            // go through all answers
+            for (let answerKeyIndex: number = 0; answerKeyIndex < answerKey.length; answerKeyIndex++) {
+              if (
+                alertQuestionAnswers[questionVariable] &&
+                alertQuestionAnswers[questionVariable][answerKey[answerKeyIndex]]
+              ) {
+                // alerted
+                followUpData.alerted = true;
+
+                // stop
+                break;
+              }
+            }
+
+            // stop ?
+            if (followUpData.alerted) {
+              // stop
+              break;
+            }
+          } else if (
+            alertQuestionAnswers[questionVariable] &&
+            alertQuestionAnswers[questionVariable][answerKey]
+          ) {
             // alerted
             followUpData.alerted = true;
 
-            // stop each
-            return false;
+            // stop
+            break;
           }
         }
-      });
-
-      // finished
-      return followUpData;
+      }
     });
+
+    // finished
+    return entities;
   }
 
   /**
-     * Static Permissions - IPermissionBasic
-     */
+   * Static Permissions - IPermissionBasic
+   */
   static canView(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_VIEW) : false; }
   static canList(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_LIST) : false; }
   static canCreate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_CREATE) : false; }
@@ -120,34 +130,34 @@ export class FollowUpModel
   static canDelete(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_DELETE) : false; }
 
   /**
-     * Static Permissions - IPermissionRestorable
-     */
+   * Static Permissions - IPermissionRestorable
+   */
   static canRestore(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_RESTORE) : false; }
 
   /**
-     * Static Permissions - IPermissionBasicBulk
-     */
+   * Static Permissions - IPermissionBasicBulk
+   */
   static canBulkCreate(): boolean { return false; }
   static canBulkModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.FOLLOW_UP_BULK_MODIFY) : false); }
   static canBulkDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.FOLLOW_UP_BULK_DELETE) : false); }
   static canBulkRestore(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.FOLLOW_UP_BULK_RESTORE) : false); }
 
   /**
-     * Static Permissions - IPermissionExportable
-     */
+   * Static Permissions - IPermissionExportable
+   */
   static canExport(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_EXPORT) : false; }
 
   /**
-     * Static Permissions - IPermissionFollowUp
-     */
+   * Static Permissions - IPermissionFollowUp
+   */
   static canListDashboard(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_LIST_RANGE) : false; }
   static canGenerate(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_GENERATE) : false; }
   static canExportRange(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_EXPORT_RANGE) : false; }
   static canExportDailyForm(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.FOLLOW_UP_EXPORT_DAILY_FORM) : false; }
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     data = null,
     includeContact: boolean = true
@@ -194,8 +204,8 @@ export class FollowUpModel
   }
 
   /**
-     * Permissions - IPermissionBasic
-     */
+   * Permissions - IPermissionBasic
+   */
   canView(user: UserModel): boolean { return FollowUpModel.canView(user); }
   canList(user: UserModel): boolean { return FollowUpModel.canList(user); }
   canCreate(user: UserModel): boolean { return FollowUpModel.canCreate(user); }
@@ -203,26 +213,26 @@ export class FollowUpModel
   canDelete(user: UserModel): boolean { return FollowUpModel.canDelete(user); }
 
   /**
-     * Permissions - IPermissionRestorable
-     */
+   * Permissions - IPermissionRestorable
+   */
   canRestore(user: UserModel): boolean { return FollowUpModel.canRestore(user); }
 
   /**
-     * Permissions - IPermissionBasicBulk
-     */
+   * Permissions - IPermissionBasicBulk
+   */
   canBulkCreate(): boolean { return FollowUpModel.canBulkCreate(); }
   canBulkModify(user: UserModel): boolean { return FollowUpModel.canBulkModify(user); }
   canBulkDelete(user: UserModel): boolean { return FollowUpModel.canBulkDelete(user); }
   canBulkRestore(user: UserModel): boolean { return FollowUpModel.canBulkRestore(user); }
 
   /**
-     * Permissions - IPermissionExportable
-     */
+   * Permissions - IPermissionExportable
+   */
   canExport(user: UserModel): boolean { return FollowUpModel.canExport(user); }
 
   /**
-     * Permissions - IPermissionFollowUp
-     */
+   * Permissions - IPermissionFollowUp
+   */
   canListDashboard(user: UserModel): boolean { return FollowUpModel.canListDashboard(user); }
   canGenerate(user: UserModel): boolean { return FollowUpModel.canGenerate(user); }
   canExportRange(user: UserModel): boolean { return FollowUpModel.canExportRange(user); }
