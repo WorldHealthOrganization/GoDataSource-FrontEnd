@@ -42,6 +42,11 @@ export class ContactRangeFollowUpsListComponent
   extends ListComponent<any>
   implements OnDestroy {
 
+  // filter address
+  private _filterAddress: AddressModel = new AddressModel({
+    geoLocationAccurate: ''
+  });
+
   // default table columns
   defaultTableColumns: IV2Column[] = [
     {
@@ -116,9 +121,7 @@ export class ContactRangeFollowUpsListComponent
       filter: {
         type: V2FilterType.ADDRESS_MULTIPLE_LOCATION,
         childQueryBuilderKey: 'contact',
-        address: new AddressModel({
-          geoLocationAccurate: ''
-        }),
+        address: this._filterAddress,
         field: 'addresses',
         fieldIsArray: true
       }
