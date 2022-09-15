@@ -1511,7 +1511,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
         FollowUpModel.canList(this.authUser),
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_RECORDS_LIST,
-        pageSettingsKey: UserSettings.CONTACT_DAILY_FOLLOW_UP_FIELDS,
+        pageSettingsKey: UserSettings.CONTACT_RELATED_DAILY_FOLLOW_UP_FIELDS,
         advancedFilterType: Constants.APP_PAGE.INDIVIDUAL_CONTACT_FOLLOW_UPS.value,
         tableColumnActions: this.entityFollowUpHelperService.retrieveTableColumnActions({
           authUser: this.authUser,

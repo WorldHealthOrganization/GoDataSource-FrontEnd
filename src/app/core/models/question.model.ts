@@ -76,40 +76,52 @@ export class QuestionModel {
     template: QuestionModel[]
   ): {
       [question_variable: string]: {
-        [answer_value: string]: boolean
+        [answer_value: string]: true
       }
-    } {
+    }
+  {
     // map alert question answers to object for easy find
     const alertQuestionAnswers: {
       [question_variable: string]: {
-        [answer_value: string]: boolean
+        [answer_value: string]: true
       }
     } = {};
     const mapQuestions = (questions: QuestionModel[]) => {
       // get alerted answers
-      _.each(questions, (question: QuestionModel) => {
-        // alert applies only to those questions that have option values
-        if (
-          question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value ||
-                    question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value
-        ) {
-          _.each(question.answers, (answer: AnswerModel) => {
-            // answer alert ?
-            if (answer.alert) {
-              _.set(
-                alertQuestionAnswers,
-                `[${question.variable}][${answer.value}]`,
-                true
-              );
-            }
+      if (questions) {
+        for (let questionIndex: number = 0; questionIndex < questions.length; questionIndex++) {
+          const question: QuestionModel = questions[questionIndex];
+          // alert applies only to those questions that have option values
+          if (
+            (
+              question.answerType === Constants.ANSWER_TYPES.SINGLE_SELECTION.value ||
+              question.answerType === Constants.ANSWER_TYPES.MULTIPLE_OPTIONS.value
+            ) &&
+            question.answers?.length > 0
+          ) {
+            for (let answerIndex: number = 0; answerIndex < question.answers.length; answerIndex++) {
+              // get data
+              const answer: AnswerModel = question.answers[answerIndex];
 
-            // go through all sub questions
-            if (!_.isEmpty(answer.additionalQuestions)) {
-              mapQuestions(answer.additionalQuestions);
+              // answer alert ?
+              if (answer.alert) {
+                // init
+                if (!alertQuestionAnswers[question.variable]) {
+                  alertQuestionAnswers[question.variable] = {};
+                }
+
+                // alert
+                alertQuestionAnswers[question.variable][answer.value] = true;
+              }
+
+              // go through all sub questions
+              if (answer.additionalQuestions?.length > 0) {
+                mapQuestions(answer.additionalQuestions);
+              }
             }
-          });
+          }
         }
-      });
+      }
     };
 
     // get alerted answers

@@ -770,11 +770,6 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           this._recordsDataMap[record[this.keyField]] = record;
         });
 
-        // no records found ?
-        if (this._recordsData.length < 1) {
-          this._agTable.api.showNoRowsOverlay();
-        }
-
         // unselect everything
         this._agTable.api.deselectAll();
 
