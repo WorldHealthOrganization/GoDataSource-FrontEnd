@@ -508,6 +508,30 @@ export class ContactRangeFollowUpsListComponent
         relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
       }
     ];
+
+    // restricted filters - user
+    if (UserModel.canListForFilters(this.authUser)) {
+      this.advancedFilters.push(
+        // person
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'responsibleUserId',
+          childQueryBuilderKey: 'contact',
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+          relationshipLabel: personLabel
+        },
+
+        // follow-up
+        {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'responsibleUserId',
+          options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+          label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID',
+          relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
+        }
+      );
+    }
   }
 
   /**
