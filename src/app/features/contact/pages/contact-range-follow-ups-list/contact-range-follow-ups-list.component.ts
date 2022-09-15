@@ -893,6 +893,7 @@ export class ContactRangeFollowUpsListComponent
           this.loadCachedFilters();
 
           // we need to focus back header filter input in which we were writing
+          // - otherwise if we are a slow writer it will take focus before we finish writing in the header column of type text / date etc and you will press keyboard keys for nothing
           // #TODO
 
           // finished
