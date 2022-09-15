@@ -48,6 +48,17 @@ export class ContactRangeFollowUpsListComponent
     geoLocationAccurate: ''
   });
 
+  // person type options
+  private _personTypeOptions: ILabelValuePairModel[] = [
+    {
+      label: EntityType.CONTACT,
+      value: EntityType.CONTACT
+    }, {
+      label: EntityType.CASE,
+      value: EntityType.CASE
+    }
+  ];
+
   // default table columns
   defaultTableColumns: IV2Column[] = [
     {
@@ -248,15 +259,7 @@ export class ContactRangeFollowUpsListComponent
       filter: {
         type: V2FilterType.MULTIPLE_SELECT,
         childQueryBuilderKey: 'contact',
-        options: [
-          {
-            label: EntityType.CONTACT,
-            value: EntityType.CONTACT
-          }, {
-            label: EntityType.CASE,
-            value: EntityType.CASE
-          }
-        ]
+        options: this._personTypeOptions
       }
     },
     {
@@ -392,90 +395,109 @@ export class ContactRangeFollowUpsListComponent
    * Initialize Table Advanced Filters
    */
   protected initializeTableAdvancedFilters(): void {
+    // data
+    const personLabel: string = `${this.translateService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')} / ${this.translateService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')}`;
+
+    // advanced filters
     this.advancedFilters = [
       // case / contact
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'firstName',
         label: 'LNG_ENTITY_FIELD_LABEL_FIRST_NAME',
-        childQueryBuilderKey: 'contact'
+        childQueryBuilderKey: 'contact',
+        relationshipLabel: personLabel
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'lastName',
         label: 'LNG_ENTITY_FIELD_LABEL_LAST_NAME',
-        childQueryBuilderKey: 'contact'
+        childQueryBuilderKey: 'contact',
+        relationshipLabel: personLabel
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'visualId',
         label: 'LNG_ENTITY_FIELD_LABEL_VISUAL_ID',
-        childQueryBuilderKey: 'contact'
+        childQueryBuilderKey: 'contact',
+        relationshipLabel: personLabel
       },
       {
         type: V2AdvancedFilterType.LOCATION_MULTIPLE,
         field: 'addresses',
         label: 'LNG_CONTACT_FIELD_LABEL_ADDRESS_LOCATION',
-        childQueryBuilderKey: 'contact'
+        childQueryBuilderKey: 'contact',
+        relationshipLabel: personLabel
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'addresses.phoneNumber',
         label: 'LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER',
-        childQueryBuilderKey: 'contact'
+        childQueryBuilderKey: 'contact',
+        relationshipLabel: personLabel
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'addresses.emailAddress',
         label: 'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS',
-        childQueryBuilderKey: 'contact'
+        childQueryBuilderKey: 'contact',
+        relationshipLabel: personLabel
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'addresses.addressLine1',
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS',
-        childQueryBuilderKey: 'contact'
+        childQueryBuilderKey: 'contact',
+        relationshipLabel: personLabel
       },
       {
         type: V2AdvancedFilterType.TEXT,
         field: 'addresses.city',
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
-        childQueryBuilderKey: 'contact'
+        childQueryBuilderKey: 'contact',
+        relationshipLabel: personLabel
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfLastContact',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
-        childQueryBuilderKey: 'contact'
+        childQueryBuilderKey: 'contact',
+        relationshipLabel: personLabel
       },
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'followUp.endDate',
         label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_DATE_END_FOLLOW_UP',
-        childQueryBuilderKey: 'contact'
+        childQueryBuilderKey: 'contact',
+        relationshipLabel: personLabel
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'followUpTeamId',
+        childQueryBuilderKey: 'contact',
+        options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
+        relationshipLabel: personLabel
       },
 
       // follow-up
       {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'date',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE'
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
+        relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
       }, {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'teamId',
-        label: `${this.translateService.instant('LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP')} ${this.translateService.instant('LNG_FOLLOW_UP_FIELD_LABEL_TEAM')}`,
-        options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options
-      }, {
-        type: V2AdvancedFilterType.MULTISELECT,
-        field: 'followUpTeamId',
-        childQueryBuilderKey: 'contact',
-        label: `${this.translateService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')} / ${this.translateService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')} ${this.translateService.instant('LNG_FOLLOW_UP_FIELD_LABEL_TEAM')}`,
-        options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
+        options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
+        relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
       }, {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'statusId',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
-        options: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        options: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        relationshipLabel: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP'
       }
     ];
   }
