@@ -398,63 +398,73 @@ export class EntityModel {
     // map alert question answers to object for easy find
     const alertQuestionAnswers: {
       [question_variable: string]: {
-        [answer_value: string]: boolean
+        [answer_value: string]: true
       }
     } = QuestionModel.determineAlertAnswers(template);
 
-    // map alert value to cases
-    return _.map(entities, (itemData: T) => {
-      // check if we need to mark case as alerted because of questionnaire answers
-      itemData.alerted = false;
-      _.each(itemData.questionnaireAnswers, (
-        answers: IAnswerData[],
-        questionVariable: string
-      ) => {
-        // retrieve answer value
-        // only the newest one is of interest, the old ones shouldn't trigger an alert
-        // the first item should be the newest
-        const answerKey = _.get(answers, '0.value', undefined);
+    // map alert value to follow-ups
+    entities.forEach((entity: T) => {
+      // check if we need to mark follow-up as alerted because of questionnaire answers
+      entity.alerted = false;
+      if (entity.questionnaireAnswers) {
+        const props: string[] = Object.keys(entity.questionnaireAnswers);
+        for (let propIndex: number = 0; propIndex < props.length; propIndex++) {
+          // get answer data
+          const questionVariable: string = props[propIndex];
+          const answers: IAnswerData[] = entity.questionnaireAnswers[questionVariable];
 
-        // there is no point in checking the value if there isn't one
-        if (
-          _.isEmpty(answerKey) &&
-          !_.isNumber(answerKey)
-        ) {
-          return;
-        }
+          // retrieve answer value
+          // only the newest one is of interest, the old ones shouldn't trigger an alert
+          // the first item should be the newest
+          const answerKey = answers?.length > 0 ?
+            answers[0].value :
+            undefined;
 
-        // at least one alerted ?
-        if (_.isArray(answerKey)) {
-          // go through all answers
-          _.each(answerKey, (childAnswerKey: string) => {
-            if (_.get(alertQuestionAnswers, `[${questionVariable}][${childAnswerKey}]`)) {
-              // alerted
-              itemData.alerted = true;
+          // there is no point in checking the value if there isn't one
+          if (
+            !answerKey &&
+            typeof answerKey !== 'number'
+          ) {
+            continue;
+          }
 
-              // stop each
-              return false;
+          // at least one alerted ?
+          if (Array.isArray(answerKey)) {
+            // go through all answers
+            for (let answerKeyIndex: number = 0; answerKeyIndex < answerKey.length; answerKeyIndex++) {
+              if (
+                alertQuestionAnswers[questionVariable] &&
+                alertQuestionAnswers[questionVariable][answerKey[answerKeyIndex]]
+              ) {
+                // alerted
+                entity.alerted = true;
+
+                // stop
+                break;
+              }
             }
-          });
 
-          // stop ?
-          if (itemData.alerted) {
-            // stop each
-            return false;
-          }
-        } else {
-          if (_.get(alertQuestionAnswers, `[${questionVariable}][${answerKey}]`)) {
+            // stop ?
+            if (entity.alerted) {
+              // stop
+              break;
+            }
+          } else if (
+            alertQuestionAnswers[questionVariable] &&
+            alertQuestionAnswers[questionVariable][answerKey]
+          ) {
             // alerted
-            itemData.alerted = true;
+            entity.alerted = true;
 
-            // stop each
-            return false;
+            // stop
+            break;
           }
         }
-      });
-
-      // finished
-      return itemData;
+      }
     });
+
+    // finished
+    return entities;
   }
 
   /**
