@@ -125,6 +125,68 @@ export class ContactRangeFollowUpsListComponent
         field: 'addresses',
         fieldIsArray: true
       }
+    }, {
+      field: 'phoneNumber',
+      label: 'LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER',
+      notVisible: true,
+      format: {
+        type: 'person.mainAddress.phoneNumber'
+      },
+      filter: {
+        type: V2FilterType.ADDRESS_PHONE_NUMBER,
+        childQueryBuilderKey: 'contact',
+        address: this._filterAddress,
+        field: 'addresses',
+        fieldIsArray: true
+      }
+    },
+    {
+      field: 'emailAddress',
+      label: 'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS',
+      notVisible: true,
+      format: {
+        type: 'person.mainAddress.emailAddress'
+      },
+      filter: {
+        type: V2FilterType.ADDRESS_FIELD,
+        childQueryBuilderKey: 'contact',
+        address: this._filterAddress,
+        addressField: 'emailAddress',
+        field: 'addresses',
+        fieldIsArray: true
+      }
+    },
+    {
+      field: 'addressLine1',
+      label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS',
+      notVisible: true,
+      format: {
+        type: 'person.mainAddress.addressLine1'
+      },
+      filter: {
+        type: V2FilterType.ADDRESS_FIELD,
+        childQueryBuilderKey: 'contact',
+        address: this._filterAddress,
+        addressField: 'addressLine1',
+        field: 'addresses',
+        fieldIsArray: true
+      }
+    },
+    {
+      field: 'city',
+      label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+      notVisible: true,
+      format: {
+        type: 'person.mainAddress.city'
+      },
+      filter: {
+        type: V2FilterType.ADDRESS_FIELD,
+        childQueryBuilderKey: 'contact',
+        address: this._filterAddress,
+        addressField: 'city',
+        field: 'addresses',
+        fieldIsArray: true
+      }
     },
     {
       field: 'dateOfLastContact',
@@ -669,6 +731,9 @@ export class ContactRangeFollowUpsListComponent
 
           // load saved filters
           this.loadCachedFilters();
+
+          // we need to focus back header filter input in which we were writing
+          // #TODO
 
           // finished
           return followUpsGroupedByContact;
