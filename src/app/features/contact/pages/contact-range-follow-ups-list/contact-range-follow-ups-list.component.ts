@@ -113,6 +113,11 @@ export class ContactRangeFollowUpsListComponent
       format: {
         type: 'person.visualId'
       },
+      link: (data) => {
+        return data.person.type === EntityType.CASE ?
+          (CaseModel.canView(this.authUser) ? `/cases/${data.person.id}/view` : undefined) :
+          (ContactModel.canView(this.authUser) ? `/contacts/${data.person.id}/view` : undefined);
+      },
       pinned: IV2ColumnPinned.LEFT,
       filter: {
         type: V2FilterType.TEXT,
@@ -485,6 +490,22 @@ export class ContactRangeFollowUpsListComponent
         childQueryBuilderKey: 'contact',
         options: this._personTypeOptions,
         label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_PERSON_TYPE',
+        relationshipLabel: personLabel
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'occupation',
+        childQueryBuilderKey: 'contact',
+        options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_OCCUPATION',
+        relationshipLabel: personLabel
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'riskLevel',
+        childQueryBuilderKey: 'contact',
+        options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        label: 'LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_RISK',
         relationshipLabel: personLabel
       },
 
