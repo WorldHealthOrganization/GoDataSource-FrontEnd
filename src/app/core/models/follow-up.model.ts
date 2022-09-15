@@ -11,6 +11,8 @@ import { OutbreakModel } from './outbreak.model';
 import { EntityType } from './entity-type';
 import { CaseModel } from './case.model';
 import { Moment } from '../helperClasses/x-moment';
+import { TranslateService } from '@ngx-translate/core';
+import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 
 export class FollowUpModel
   extends BaseModel
@@ -118,6 +120,32 @@ export class FollowUpModel
 
     // finished
     return entities;
+  }
+
+  /**
+   * Retrieve statuses forms
+   */
+  static getStatusForms(
+    info: {
+      // required
+      item: FollowUpModel,
+      translateService: TranslateService
+    }
+  ): V2ColumnStatusForm[] {
+    // construct list of forms that we need to display
+    const forms: V2ColumnStatusForm[] = [];
+
+    // alerted
+    if (info.item.alerted) {
+      forms.push({
+        type: IV2ColumnStatusFormType.STAR,
+        color: 'var(--gd-danger)',
+        tooltip: info.translateService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+      });
+    }
+
+    // finished
+    return forms;
   }
 
   /**
