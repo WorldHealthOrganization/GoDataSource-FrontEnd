@@ -419,6 +419,12 @@ export class ContactRangeFollowUpsListComponent
         childQueryBuilderKey: 'contact'
       },
       {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'addresses.phoneNumber',
+        label: 'LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER',
+        childQueryBuilderKey: 'contact'
+      },
+      {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfLastContact',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
