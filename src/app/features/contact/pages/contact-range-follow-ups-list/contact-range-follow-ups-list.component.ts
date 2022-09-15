@@ -215,7 +215,7 @@ export class ContactRangeFollowUpsListComponent
     },
     {
       field: 'followUpTeamId',
-      label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
+      label: `${this.translateService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')} / ${this.translateService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')} ${this.translateService.instant('LNG_FOLLOW_UP_FIELD_LABEL_TEAM')}`,
       format: {
         type: (data) => {
           return data.person.followUpTeamId && (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[data.person.followUpTeamId] ?
@@ -425,6 +425,24 @@ export class ContactRangeFollowUpsListComponent
         childQueryBuilderKey: 'contact'
       },
       {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'addresses.emailAddress',
+        label: 'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS',
+        childQueryBuilderKey: 'contact'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'addresses.addressLine1',
+        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS',
+        childQueryBuilderKey: 'contact'
+      },
+      {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'addresses.city',
+        label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
+        childQueryBuilderKey: 'contact'
+      },
+      {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'dateOfLastContact',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
@@ -445,7 +463,13 @@ export class ContactRangeFollowUpsListComponent
       }, {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'teamId',
-        label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
+        label: `${this.translateService.instant('LNG_PAGE_LIST_RANGE_FOLLOW_UPS_FIELD_LABEL_FOLLOW_UP')} ${this.translateService.instant('LNG_FOLLOW_UP_FIELD_LABEL_TEAM')}`,
+        options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options
+      }, {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'followUpTeamId',
+        childQueryBuilderKey: 'contact',
+        label: `${this.translateService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')} / ${this.translateService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')} ${this.translateService.instant('LNG_FOLLOW_UP_FIELD_LABEL_TEAM')}`,
         options: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options
       }, {
         type: V2AdvancedFilterType.MULTISELECT,
