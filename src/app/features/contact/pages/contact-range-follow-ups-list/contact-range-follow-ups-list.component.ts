@@ -31,6 +31,7 @@ import * as momentOriginal from 'moment';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { IV2FilterText, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { AddressModel } from '../../../../core/models/address.model';
+import { UserModel } from '../../../../core/models/user.model';
 
 @Component({
   selector: 'app-contact-range-follow-ups-list',
@@ -286,6 +287,29 @@ export class ContactRangeFollowUpsListComponent
         type: V2FilterType.MULTIPLE_SELECT,
         options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         childQueryBuilderKey: 'contact'
+      }
+    },
+    {
+      field: 'responsibleUserId',
+      label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID',
+      notVisible: true,
+      format: {
+        type: (item) => item.person?.responsibleUserId && (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).map[item.person?.responsibleUserId] ?
+          (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).map[item.person?.responsibleUserId].name :
+          ''
+      },
+      filter: {
+        type: V2FilterType.MULTIPLE_SELECT,
+        options: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options,
+        includeNoValue: true
+      },
+      exclude: (): boolean => {
+        return !UserModel.canListForFilters(this.authUser);
+      },
+      link: (data) => {
+        return data.person?.responsibleUserId ?
+          `/users/${ data.person?.responsibleUserId }/view` :
+          undefined;
       }
     }
   ];

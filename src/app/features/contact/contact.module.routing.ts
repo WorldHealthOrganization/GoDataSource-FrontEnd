@@ -319,7 +319,8 @@ const routes: Routes = [
       team: TeamDataResolver,
       followUpGroupBy: FollowUpGroupByDataResolver,
       occupation: OccupationDataResolver,
-      risk: RiskDataResolver
+      risk: RiskDataResolver,
+      user: UserDataResolver
     }
   },
   // Create Follow Up
