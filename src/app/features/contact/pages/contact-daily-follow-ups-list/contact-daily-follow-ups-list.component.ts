@@ -975,7 +975,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'address.geoLocation.lat',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
         notVisible: true,
-        sortable: true,
         format: {
           type: 'address.geoLocation.lat'
         }
@@ -984,7 +983,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'address.geoLocation.lng',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
         notVisible: true,
-        sortable: true,
         format: {
           type: 'address.geoLocation.lng'
         }
