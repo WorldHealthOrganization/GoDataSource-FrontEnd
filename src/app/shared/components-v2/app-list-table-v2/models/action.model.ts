@@ -103,7 +103,6 @@ interface IV2ActionMenuOption {
   action: IV2ActionClick | IV2ActionLink;
 
   // optional
-  toolTip?: string;
   cssClasses?: (data: any) => string;
   visible?: (data: any) => boolean;
   disable?: (data: any) => boolean;

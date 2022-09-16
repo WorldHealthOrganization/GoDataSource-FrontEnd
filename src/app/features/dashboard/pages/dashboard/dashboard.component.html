@@ -117,10 +117,7 @@
                     class="gd-basic-top-title-buttons-buttons-quick-options-option {{menuOption.cssClasses}}"
                     [routerLink]="menuOption.action.link && (!menuOption.disable || !menuOption.disable(null)) ? menuOption.action.link(null) : undefined"
                     [queryParams]="menuOption.action.linkQueryParams ? menuOption.action.linkQueryParams(null) : undefined"
-                    [disabled]="menuOption.disable && menuOption.disable(null)"
-                    [matTooltip]="menuOption.toolTip? menuOption.toolTip : undefined"
-                    matTooltipPosition="after"
-                    matTooltipTouchGestures="off">
+                    [disabled]="menuOption.disable && menuOption.disable(null)">
                     {{menuOption.label.get(null) | translate:(menuOption.label.data ? menuOption.label.data(null) : undefined)}}
                   </a>
 
@@ -132,10 +129,7 @@
                       mat-menu-item
                       class="gd-basic-top-title-buttons-buttons-quick-options-option {{menuOption.cssClasses}}"
                       [disabled]="menuOption.disable && menuOption.disable(null)"
-                      (click)="menuOption.action.click ? menuOption.action.click(null) : undefined"
-                      [matTooltip]="menuOption.toolTip? menuOption.toolTip : undefined"
-                      matTooltipPosition="after"
-                      matTooltipTouchGestures="off">
+                      (click)="menuOption.action.click ? menuOption.action.click(null) : undefined">
                       {{menuOption.label.get(null) | translate:(menuOption.label.data ? menuOption.label.data(null) : undefined)}}
                     </button>
                   </ng-template>
