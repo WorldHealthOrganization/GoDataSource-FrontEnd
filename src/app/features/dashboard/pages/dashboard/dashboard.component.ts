@@ -34,6 +34,8 @@ import { determineIfSmallScreenMode } from '../../../../core/methods/small-scree
 import { CaseSummaryDashletComponent } from '../../components/case-summary-dashlet/case-summary-dashlet.component';
 import { CasesByGeographicLocationDashletComponent } from '../../components/case-by-geographic-location-dashlet/case-by-geographic-location-dashlet.component';
 import { CasesHospitalizedPieChartDashletComponent } from '../../components/cases-hospitalized-pie-chart-dashlet/cases-hospitalized-pie-chart-dashlet.component';
+import { HistogramTransmissionChainsSizeDashletComponent } from '../../components/histogram-transmission-chains-size-dashlet/histogram-transmission-chains-size-dashlet.component';
+import { EpiCurveDashletComponent } from '../../components/epi-curve-dashlet/epi-curve-dashlet.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -46,6 +48,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   @ViewChild('caseSummary', { static: false }) private _caseSummary: CaseSummaryDashletComponent;
   @ViewChild('casesPerLocation', { static: false }) private _casesPerLocation: CasesByGeographicLocationDashletComponent;
   @ViewChild('hospitalized', { static: false }) private _hospitalized: CasesHospitalizedPieChartDashletComponent;
+  @ViewChild('cotHistogram', { static: false }) private _cotHistogram: HistogramTransmissionChainsSizeDashletComponent;
+  @ViewChild('epiCurveClassification', { static: false }) private _epiCurveClassification: EpiCurveDashletComponent;
   @ViewChild('kpiSection', { static: false }) private _kpiSection: ElementRef;
   @ViewChild('kpiCases', { static: false }) private _kpiCases: AppCasesKpiDashletComponent;
   @ViewChild('kpiContacts', { static: false }) private _kpiContacts: AppContactsKpiDashletComponent;
@@ -69,6 +73,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
     // expand / collapse - hospitalized
     if (this._hospitalized?.dashlet) {
       this._hospitalized.dashlet.expanded = expanded;
+    }
+
+    // expand / collapse - cotHistogram
+    if (this._cotHistogram) {
+      this._cotHistogram.expanded = expanded;
+    }
+
+    // expand / collapse - epiCurveClassification
+    if (this._epiCurveClassification) {
+      this._epiCurveClassification.expanded = expanded;
     }
 
     // expand / collapse - kpiCases
@@ -96,6 +110,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
     ) && (
       !this._hospitalized?.dashlet ||
       this._hospitalized.dashlet.expanded
+    ) && (
+      !this._cotHistogram ||
+      this._cotHistogram.expanded
+    ) && (
+      !this._epiCurveClassification ||
+      this._epiCurveClassification.expanded
     ) && (
       !this._kpiCases?.dashlet ||
       this._kpiCases.dashlet.expanded

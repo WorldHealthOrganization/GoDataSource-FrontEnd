@@ -202,6 +202,7 @@
     <!-- Histogram - chains of transmission size -->
     <app-histogram-transmission-chains-size-dashlet
       *ngIf="visibleDashlets.COTHistogram"
+      #cotHistogram
       [globalFilterDate]="globalFilterDate"
       [globalFilterLocationId]="globalFilterLocationId"
       [globalFilterClassificationId]="globalFilterClassificationId"
@@ -211,6 +212,7 @@
     <!-- Epidemiological Curve - CLASSIFICATION -->
     <app-epi-curve-dashlet
       *ngIf="visibleDashlets.EPICurveClassification"
+      #epiCurveClassification
       [globalFilterDate]="globalFilterDate"
       [globalFilterLocationId]="globalFilterLocationId"
       [globalFilterClassificationId]="globalFilterClassificationId"
