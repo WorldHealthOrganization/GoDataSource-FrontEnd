@@ -859,7 +859,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'phoneNumber',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER',
-        sortable: true,
         format: {
           type: 'address.phoneNumber'
         },
