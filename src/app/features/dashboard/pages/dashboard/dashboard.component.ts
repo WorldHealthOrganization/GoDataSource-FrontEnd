@@ -762,7 +762,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         .subscribe((pngBase64) => {
           // object not found ?
           if (!pngBase64) {
-            this.toastV2Service.error(
+            this.toastV2Service.notice(
               'LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG',
               { fileName: this.translateService.instant(fileName) }
             );
