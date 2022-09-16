@@ -64,6 +64,174 @@ export class ClientApplicationsListComponent
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // Download client application config file
+        {
+          type: V2ActionType.ICON,
+          icon: 'file_download',
+          iconTooltip: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE',
+          action: {
+            click: (item: SystemClientApplicationModel) => {
+              this.downloadConfFile(item);
+            }
+          },
+          visible: (item: SystemClientApplicationModel): boolean => {
+            return SystemClientApplicationModel.canDownloadConfFile(this.authUser) && item.active;
+          }
+        },
+
+        // Disable client application
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility_off',
+          iconTooltip: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DISABLE',
+          action: {
+            click: (item: SystemClientApplicationModel) => {
+              this.toggleActiveFlag(item, false);
+            }
+          },
+          visible: (item: SystemClientApplicationModel): boolean => {
+            return item.active &&
+              SystemClientApplicationModel.canDisable(this.authUser);
+          }
+        },
+
+        // Enable client application
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_ENABLE',
+          action: {
+            click: (item: SystemClientApplicationModel) => {
+              this.toggleActiveFlag(item, true);
+            }
+          },
+          visible: (item: SystemClientApplicationModel): boolean => {
+            return !item.active &&
+              SystemClientApplicationModel.canEnable(this.authUser);
+          }
+        },
+
+        // Other actions
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          menuOptions: [
+            // Delete
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DELETE'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: SystemClientApplicationModel): void => {
+                  let systemSettings: SystemSettingsModel;
+
+                  // determine what we need to delete
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_DELETE',
+                        data: () => ({
+                          name: item.name
+                        })
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_DELETE_CLIENT_APPLICATION',
+                        data: () => ({
+                          name: item.name
+                        })
+                      }
+                    },
+                    initialized: (handler) => {
+                      // display loading
+                      handler.loading.show();
+
+                      // determine if case has exposed contacts
+                      this.systemSettingsDataService
+                        .getSystemSettings()
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            this.toastV2Service.error(err);
+
+                            // hide loading
+                            handler.loading.hide();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe((settings: SystemSettingsModel) => {
+                          systemSettings = settings;
+
+                          // hide loading
+                          handler.loading.hide();
+                        });
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // filter client applications and remove client application
+                    const filteredClientApplications = systemSettings.clientApplications.filter((clientApp: SystemClientApplicationModel) => {
+                      return clientApp.id !== item.id;
+                    });
+
+                    // save upstream servers
+                    this.systemSettingsDataService
+                      .modifySystemSettings({
+                        clientApplications: filteredClientApplications
+                      })
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
+
+                          // hide loading
+                          loading.close();
+
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                        // hide loading
+                        loading.close();
+
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
+                }
+              },
+              visible: (): boolean => {
+                return SystemClientApplicationModel.canDelete(this.authUser);
+              }
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  /**
    * Initialize Side Table Columns
    */
   protected initializeTableColumns() {
@@ -122,178 +290,6 @@ export class ClientApplicationsListComponent
         }
       );
     }
-
-    // rest of columns :)
-    this.tableColumns.push(
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // Download client application config file
-          {
-            type: V2ActionType.ICON,
-            icon: 'file_download',
-            iconTooltip: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DOWNLOAD_CONF_FILE',
-            action: {
-              click: (item: SystemClientApplicationModel) => {
-                this.downloadConfFile(item);
-              }
-            },
-            visible: (item: SystemClientApplicationModel): boolean => {
-              return SystemClientApplicationModel.canDownloadConfFile(this.authUser) && item.active;
-            }
-          },
-
-          // Disable client application
-          {
-            type: V2ActionType.ICON,
-            icon: 'visibility_off',
-            iconTooltip: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DISABLE',
-            action: {
-              click: (item: SystemClientApplicationModel) => {
-                this.toggleActiveFlag(item, false);
-              }
-            },
-            visible: (item: SystemClientApplicationModel): boolean => {
-              return item.active &&
-                SystemClientApplicationModel.canDisable(this.authUser);
-            }
-          },
-
-          // Enable client application
-          {
-            type: V2ActionType.ICON,
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_ENABLE',
-            action: {
-              click: (item: SystemClientApplicationModel) => {
-                this.toggleActiveFlag(item, true);
-              }
-            },
-            visible: (item: SystemClientApplicationModel): boolean => {
-              return !item.active &&
-                SystemClientApplicationModel.canEnable(this.authUser);
-            }
-          },
-
-          // Other actions
-          {
-            type: V2ActionType.MENU,
-            icon: 'more_horiz',
-            menuOptions: [
-              // Delete
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DELETE'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: SystemClientApplicationModel): void => {
-                    let systemSettings: SystemSettingsModel;
-
-                    // determine what we need to delete
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_DELETE',
-                          data: () => ({
-                            name: item.name
-                          })
-                        },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_CLIENT_APPLICATION',
-                          data: () => ({
-                            name: item.name
-                          })
-                        }
-                      },
-                      initialized: (handler) => {
-                        // display loading
-                        handler.loading.show();
-
-                        // determine if case has exposed contacts
-                        this.systemSettingsDataService
-                          .getSystemSettings()
-                          .pipe(
-                            catchError((err) => {
-                              // show error
-                              this.toastV2Service.error(err);
-
-                              // hide loading
-                              handler.loading.hide();
-
-                              // send error down the road
-                              return throwError(err);
-                            })
-                          )
-                          .subscribe((settings: SystemSettingsModel) => {
-                            systemSettings = settings;
-
-                            // hide loading
-                            handler.loading.hide();
-                          });
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
-
-                      // filter client applications and remove client application
-                      const filteredClientApplications = systemSettings.clientApplications.filter((clientApp: SystemClientApplicationModel) => {
-                        return clientApp.id !== item.id;
-                      });
-
-                      // save upstream servers
-                      this.systemSettingsDataService
-                        .modifySystemSettings({
-                          clientApplications: filteredClientApplications
-                        })
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
-
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_CLIENT_APPLICATIONS_ACTION_DELETE_SUCCESS_MESSAGE');
-
-                          // hide loading
-                          loading.close();
-
-                          // reload data
-                          this.needsRefreshList(true);
-                        });
-                    });
-                  }
-                },
-                visible: (): boolean => {
-                  return SystemClientApplicationModel.canDelete(this.authUser);
-                }
-              }
-            ]
-          }
-        ]
-      }
-    );
   }
 
   /**

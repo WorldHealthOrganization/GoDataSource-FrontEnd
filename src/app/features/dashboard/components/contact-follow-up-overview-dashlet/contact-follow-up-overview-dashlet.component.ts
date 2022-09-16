@@ -191,7 +191,7 @@ export class ContactFollowUpOverviewDashletComponent implements OnInit, OnDestro
     };
 
     // build chart data
-    _.forEach(metricData, (metric) => {
+    (metricData || []).forEach((metric) => {
       // create the array with categories ( dates displayed on x axis )
       this.chartDataCategories.push(moment(metric.day).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT));
 

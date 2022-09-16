@@ -80,6 +80,135 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View backup path
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_SYSTEM_BACKUPS_ACTION_VIEW_BACKUP_PATH',
+          action: {
+            click: (item: BackupModel) => {
+              this.showBackupData(item);
+            }
+          },
+          visible: (item: BackupModel): boolean => {
+            return item.status !== Constants.SYSTEM_BACKUP_STATUS.PENDING.value &&
+              BackupModel.canView(this.authUser);
+          }
+        },
+
+        // Restore backup
+        {
+          type: V2ActionType.ICON,
+          icon: 'restore',
+          iconTooltip: 'LNG_PAGE_SYSTEM_BACKUPS_ACTION_RESTORE_BACKUP',
+          action: {
+            click: (item: BackupModel) => {
+              this.restoreBackup(item);
+            }
+          },
+          visible: (item: BackupModel): boolean => {
+            return item.status === Constants.SYSTEM_BACKUP_STATUS.SUCCESS.value &&
+              BackupModel.canRestore(this.authUser);
+          }
+        },
+
+        // Other actions
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          menuOptions: [
+            // Delete backup
+            {
+              label: {
+                get: () => 'LNG_PAGE_SYSTEM_BACKUPS_ACTION_DELETE_BACKUP'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: BackupModel): void => {
+                  // determine what we need to delete
+                  this.dialogV2Service
+                    .showConfirmDialog({
+                      config: {
+                        title: {
+                          get: () => 'LNG_COMMON_LABEL_DELETE',
+                          data: () => (
+                            {
+                              name: item.description ?
+                                item.description :
+                                '—'
+                            }
+                          )
+                        },
+                        message: {
+                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_BACKUP',
+                          data: () => (
+                            {
+                              location: item.location ?
+                                item.location :
+                                '—'
+                            }
+                          )
+                        }
+                      }
+                    })
+                    .subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // delete backup
+                      this.systemBackupDataService
+                        .deleteBackup(item.id)
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            this.toastV2Service.error(err);
+
+                            // hide loading
+                            loading.close();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          // success
+                          this.toastV2Service.success('LNG_PAGE_SYSTEM_BACKUPS_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                          // hide loading
+                          loading.close();
+
+                          // reload data
+                          this.needsRefreshList(true);
+                        });
+                    });
+                }
+              },
+              visible: (item: BackupModel): boolean => {
+                return item.status !== Constants.SYSTEM_BACKUP_STATUS.PENDING.value &&
+                  BackupModel.canDelete(this.authUser);
+              }
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  /**
    * Initialize Side Table Columns
    */
   protected initializeTableColumns() {
@@ -172,136 +301,6 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH
         }
-      },
-
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // View backup path
-          {
-            type: V2ActionType.ICON,
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_SYSTEM_BACKUPS_ACTION_VIEW_BACKUP_PATH',
-            action: {
-              click: (item: BackupModel) => {
-                this.showBackupData(item);
-              }
-            },
-            visible: (item: BackupModel): boolean => {
-              return item.status !== Constants.SYSTEM_BACKUP_STATUS.PENDING.value &&
-                BackupModel.canView(this.authUser);
-            }
-          },
-
-          // Restore backup
-          {
-            type: V2ActionType.ICON,
-            icon: 'restore',
-            iconTooltip: 'LNG_PAGE_SYSTEM_BACKUPS_ACTION_RESTORE_BACKUP',
-            action: {
-              click: (item: BackupModel) => {
-                this.restoreBackup(item);
-              }
-            },
-            visible: (item: BackupModel): boolean => {
-              return item.status === Constants.SYSTEM_BACKUP_STATUS.SUCCESS.value &&
-                BackupModel.canRestore(this.authUser);
-            }
-          },
-
-          // Other actions
-          {
-            type: V2ActionType.MENU,
-            icon: 'more_horiz',
-            menuOptions: [
-              // Delete backup
-              {
-                label: {
-                  get: () => 'LNG_PAGE_SYSTEM_BACKUPS_ACTION_DELETE_BACKUP'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: BackupModel): void => {
-                    // determine what we need to delete
-                    this.dialogV2Service
-                      .showConfirmDialog({
-                        config: {
-                          title: {
-                            get: () => 'LNG_COMMON_LABEL_DELETE',
-                            data: () => (
-                              {
-                                name: item.description ?
-                                  item.description :
-                                  '—'
-                              }
-                            )
-                          },
-                          message: {
-                            get: () => 'LNG_DIALOG_CONFIRM_DELETE_BACKUP',
-                            data: () => (
-                              {
-                                location: item.location ?
-                                  item.location :
-                                  '—'
-                              }
-                            )
-                          }
-                        }
-                      })
-                      .subscribe((response) => {
-                        // canceled ?
-                        if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                          // finished
-                          return;
-                        }
-
-                        // show loading
-                        const loading = this.dialogV2Service.showLoadingDialog();
-
-                        // delete backup
-                        this.systemBackupDataService
-                          .deleteBackup(item.id)
-                          .pipe(
-                            catchError((err) => {
-                              // show error
-                              this.toastV2Service.error(err);
-
-                              // hide loading
-                              loading.close();
-
-                              // send error down the road
-                              return throwError(err);
-                            })
-                          )
-                          .subscribe(() => {
-                            // success
-                            this.toastV2Service.success('LNG_PAGE_SYSTEM_BACKUPS_ACTION_DELETE_SUCCESS_MESSAGE');
-
-                            // hide loading
-                            loading.close();
-
-                            // reload data
-                            this.needsRefreshList(true);
-                          });
-                      });
-                  }
-                },
-                visible: (item: BackupModel): boolean => {
-                  return item.status !== Constants.SYSTEM_BACKUP_STATUS.PENDING.value &&
-                    BackupModel.canDelete(this.authUser);
-                }
-              }
-            ]
-          }
-        ]
       }
     ];
   }

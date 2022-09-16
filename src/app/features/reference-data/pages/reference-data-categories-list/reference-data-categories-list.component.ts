@@ -55,6 +55,33 @@ export class ReferenceDataCategoriesListComponent
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View reference data
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_ACTION_VIEW_CATEGORY',
+          action: {
+            link: (item: ReferenceDataCategoryModel): string[] => {
+              return ['/reference-data', item.id];
+            }
+          },
+          visible: (): boolean => {
+            return ReferenceDataEntryModel.canList(this.authUser);
+          }
+        }
+      ]
+    };
+  }
+
+  /**
    * Initialize Side Table Columns
    */
   protected initializeTableColumns(): void {
@@ -90,34 +117,6 @@ export class ReferenceDataCategoriesListComponent
             item.entries.length.toString() :
             '0'
         }
-      },
-
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // View reference data
-          {
-            type: V2ActionType.ICON,
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_ACTION_VIEW_CATEGORY',
-            action: {
-              link: (item: ReferenceDataCategoryModel): string[] => {
-                return ['/reference-data', item.id];
-              }
-            },
-            visible: (): boolean => {
-              return ReferenceDataEntryModel.canList(this.authUser);
-            }
-          }
-        ]
       }
     ];
   }

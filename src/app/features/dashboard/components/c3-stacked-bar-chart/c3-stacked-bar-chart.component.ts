@@ -23,9 +23,11 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
 
   maxTickCulling: number = 1;
 
+  timeoutCall: any;
+
   ngOnInit() {
     // render c3 object
-    this.render();
+    this.ngOnChanges();
   }
 
   ngOnDestroy(): void {
@@ -33,11 +35,27 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
   }
 
   ngOnChanges(): any {
+    // stop previous
+    if (this.timeoutCall) {
+      clearTimeout(this.timeoutCall);
+      this.timeoutCall = undefined;
+    }
+
     // render c3 object
-    this.render();
+    this.timeoutCall = setTimeout(() => {
+      this.timeoutCall = undefined;
+      this.render();
+    });
   }
 
   private destroyChart() {
+    // stop render
+    if (this.timeoutCall) {
+      clearTimeout(this.timeoutCall);
+      this.timeoutCall = undefined;
+    }
+
+    // destroy chart
     if (this.chart) {
       this.chart.destroy();
       this.chart = null;

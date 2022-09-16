@@ -121,14 +121,27 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
   }
 
   /**
-   * Initialize Side Table Columns
+   * Table column - actions
    */
-  protected initializeTableColumns() {
-    this.tableColumns = this.entityLabResultService.retrieveTableColumns({
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = this.entityLabResultService.retrieveTableColumnActions({
       authUser: this.authUser,
       personType: this.personType,
       selectedOutbreak: () => this.selectedOutbreak,
       selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
+      refreshList: () => {
+        // reload data
+        this.needsRefreshList(true);
+      }
+    });
+  }
+
+  /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {
+    this.tableColumns = this.entityLabResultService.retrieveTableColumns({
+      authUser: this.authUser,
       user: this.activatedRoute.snapshot.data.user,
       options: {
         labName: (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -138,10 +151,6 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
         labResultProgress: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ILabelValuePairModel>).options,
         labSequenceLaboratory: (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         labSequenceResult: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-      },
-      refreshList: () => {
-        // reload data
-        this.needsRefreshList(true);
       }
     });
   }

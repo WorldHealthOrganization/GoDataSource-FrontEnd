@@ -8,11 +8,11 @@
     <!-- Title & buttons -->
     <div
       class="gd-dashboard-top-title-buttons"
-      fxLayout="row" fxLayout.xs="column">
+      fxLayout="row" fxLayoutGap="0.8rem" fxLayout.xs="column">
 
       <!-- Title -->
       <div
-        fxFlex
+        fxFlex fxFlex.xs="none"
         class="gd-basic-top-title-buttons-title">
         {{'LNG_PAGE_DASHBOARD_TITLE' | translate}}
       </div>
@@ -20,8 +20,27 @@
       <!-- Buttons -->
       <div
         *ngIf="isOutbreakSelected"
-        fxFlex fxLayoutAlign="end" fxLayoutGap="0.8rem"
+        fxLayoutAlign="end" fxLayoutGap="0.8rem" flexGrow="0"
         class="gd-basic-top-title-buttons-buttons">
+
+        <!-- Expand / Collapse All -->
+        <button
+          *ngIf="!isSmallScreenMode; else smallScreenExpandCollapseAll"
+          type="button"
+          mat-flat-button
+          color="text"
+          (click)="allExpanded = !allExpanded">
+          {{(allExpanded ? 'LNG_PAGE_DASHBOARD_COLLAPSE_ALL' : 'LNG_PAGE_DASHBOARD_EXPAND_ALL') | translate}}
+        </button>
+        <ng-template
+          #smallScreenExpandCollapseAll>
+          <app-form-toggle-icon-v2
+            class="gd-form-toggle-icon-v2-big"
+            [(ngModel)]="allExpanded"
+            [icon]="allExpanded ? 'expand_less' : 'expand_more'"
+            [matTooltip]="(allExpanded ? 'LNG_PAGE_DASHBOARD_COLLAPSE_ALL' : 'LNG_PAGE_DASHBOARD_EXPAND_ALL') | translate">
+          </app-form-toggle-icon-v2>
+        </ng-template>
 
         <!-- Advanced filters -->
         <button
@@ -29,8 +48,15 @@
           mat-flat-button
           color="primary"
           (click)="showAdvancedFilters()">
+
+          <!-- Icon -->
           <mat-icon>filter_alt</mat-icon>
-          {{'LNG_SIDE_FILTERS_TITLE' | translate}}
+
+          <!-- Label -->
+          <span
+            *ngIf="!isSmallScreenMode">
+            {{'LNG_SIDE_FILTERS_TITLE' | translate}}
+          </span>
         </button>
 
         <!-- Quick actions -->
@@ -42,20 +68,33 @@
           <button
             #quickMenuTrigger="matMenuTrigger"
             class="gd-basic-top-title-buttons-buttons-quick"
-            [class.gd-basic-top-title-buttons-buttons-quick-expanded]="quickMenuTrigger.menuOpen"
+            [class.gd-basic-top-title-buttons-buttons-quick-expanded]="quickMenuTrigger.menuOpen && !isSmallScreenMode"
             type="button"
             mat-flat-button color="secondary"
             [disabled]="quickActions.disable && quickActions.disable(null)"
             [matMenuTriggerFor]="quickMenu"
             (menuClosed)="detectChanges()">
 
-            <!-- Label -->
-            <span>
-              {{quickActions.label | translate}}
-            </span>
+            <!-- Big screen TV -->
+            <ng-container
+              *ngIf="!isSmallScreenMode; else smallScreen">
 
-            <!-- Icon -->
-            <mat-icon>expand_more</mat-icon>
+              <!-- Label -->
+              <span>
+                {{quickActions.label | translate}}
+              </span>
+
+              <!-- Icon -->
+              <mat-icon>expand_more</mat-icon>
+            </ng-container>
+
+            <!-- Small screen TV -->
+            <ng-template
+              #smallScreen>
+              <!-- Menu icon -->
+              <mat-icon>apps</mat-icon>
+            </ng-template>
+
           </button>
 
           <!-- Floating menu -->
@@ -138,6 +177,7 @@
       <!-- Summary -->
       <app-case-summary-dashlet
         *ngIf="visibleDashlets.CaseSummary"
+        #caseSummary
         [globalFilterDate]="globalFilterDate"
         [globalFilterLocationId]="globalFilterLocationId"
         [globalFilterClassificationId]="globalFilterClassificationId"
@@ -147,6 +187,7 @@
       <!-- Location -->
       <app-case-by-geographic-location-dashlet
         *ngIf="visibleDashlets.CasesPerLocation"
+        #casesPerLocation
         [globalFilterDate]="globalFilterDate"
         [globalFilterLocationId]="globalFilterLocationId"
         [globalFilterClassificationId]="globalFilterClassificationId"
@@ -156,6 +197,7 @@
       <!-- Hospitalized -->
       <app-cases-hospitalized-pie-chart-dashlet
         *ngIf="visibleDashlets.Hospitalized"
+        #hospitalized
         [globalFilterDate]="globalFilterDate"
         [globalFilterLocationId]="globalFilterLocationId"
         [globalFilterClassificationId]="globalFilterClassificationId"
@@ -166,6 +208,7 @@
     <!-- Histogram - chains of transmission size -->
     <app-histogram-transmission-chains-size-dashlet
       *ngIf="visibleDashlets.COTHistogram"
+      #cotHistogram
       [globalFilterDate]="globalFilterDate"
       [globalFilterLocationId]="globalFilterLocationId"
       [globalFilterClassificationId]="globalFilterClassificationId"
@@ -175,6 +218,7 @@
     <!-- Epidemiological Curve - CLASSIFICATION -->
     <app-epi-curve-dashlet
       *ngIf="visibleDashlets.EPICurveClassification"
+      #epiCurveClassification
       [globalFilterDate]="globalFilterDate"
       [globalFilterLocationId]="globalFilterLocationId"
       [globalFilterClassificationId]="globalFilterClassificationId"
@@ -184,6 +228,7 @@
     <!-- Epidemiological Curve - OUTCOME -->
     <app-epi-curve-outcome-dashlet
       *ngIf="visibleDashlets.EPICurveOutcome"
+      #epiCurveOutcome
       [globalFilterDate]="globalFilterDate"
       [globalFilterLocationId]="globalFilterLocationId"
       [globalFilterClassificationId]="globalFilterClassificationId"
@@ -193,6 +238,7 @@
     <!-- Epidemiological Curve - REPORTING CLASSIFICATION -->
     <app-epi-curve-reporting-dashlet
       *ngIf="visibleDashlets.EPICurveReporting"
+      #epiCurveReporting
       [globalFilterDate]="globalFilterDate"
       [globalFilterLocationId]="globalFilterLocationId"
       [globalFilterClassificationId]="globalFilterClassificationId"
@@ -202,6 +248,7 @@
     <!-- Contact follow-up overview -->
     <app-contact-follow-up-overview-dashlet
       *ngIf="visibleDashlets.FollowUpOverview"
+      #followUpOverview
       [globalFilterDate]="globalFilterDate"
       [globalFilterLocationId]="globalFilterLocationId"
       [globalFilterClassificationId]="globalFilterClassificationId"
@@ -211,6 +258,7 @@
     <!-- Cases based on contact status -->
     <app-cases-based-on-contact-status-dashlet
       *ngIf="visibleDashlets.ContactStatus"
+      #contactStatus
       [globalFilterDate]="globalFilterDate"
       [globalFilterLocationId]="globalFilterLocationId"
       [globalFilterClassificationId]="globalFilterClassificationId"

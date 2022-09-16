@@ -69,6 +69,124 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View reference data
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_VIEW_ENTRY',
+          action: {
+            link: (item: ReferenceDataEntryModel): string[] => {
+              return ['/reference-data', item.categoryId, item.id, 'view'];
+            }
+          },
+          visible: (): boolean => {
+            return ReferenceDataEntryModel.canView(this.authUser);
+          }
+        },
+
+        // Modify reference data
+        {
+          type: V2ActionType.ICON,
+          icon: 'edit',
+          iconTooltip: 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_MODIFY_ENTRY',
+          action: {
+            link: (item: ReferenceDataEntryModel): string[] => {
+              return ['/reference-data', item.categoryId, item.id, 'modify'];
+            }
+          },
+          visible: (): boolean => {
+            return ReferenceDataEntryModel.canModify(this.authUser);
+          }
+        },
+
+        // Other actions
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          visible: (item: ReferenceDataEntryModel): boolean => {
+            return !item.readonly &&
+              ReferenceDataEntryModel.canDelete(this.authUser);
+          },
+          menuOptions: [
+            // Delete Lab Results
+            {
+              label: {
+                get: () => 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_DELETE_ENTRY'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: ReferenceDataEntryModel): void => {
+                  // confirm
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_DELETE',
+                        data: () => ({
+                          name: `${ this.translateService.instant(item.value) }`
+                        })
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_DELETE_REFERENCE_DATA_ENTRY'
+                      }
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // delete reference data
+                    this.referenceDataDataService
+                      .deleteEntry(item.id)
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
+
+                          // hide loading
+                          loading.close();
+
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_DELETE_ENTRY_SUCCESS_MESSAGE');
+
+                        // hide loading
+                        loading.close();
+
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
+                }
+              },
+              visible: (item: ReferenceDataEntryModel): boolean => {
+                return !item.readonly &&
+                  ReferenceDataEntryModel.canDelete(this.authUser);
+              }
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  /**
    * Initialize Side Table Columns
    */
   protected initializeTableColumns() {
@@ -172,125 +290,6 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
         format: {
           type: V2ColumnFormat.DATETIME
         }
-      },
-
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // View reference data
-          {
-            type: V2ActionType.ICON,
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_VIEW_ENTRY',
-            action: {
-              link: (item: ReferenceDataEntryModel): string[] => {
-                return ['/reference-data', item.categoryId, item.id, 'view'];
-              }
-            },
-            visible: (): boolean => {
-              return ReferenceDataEntryModel.canView(this.authUser);
-            }
-          },
-
-          // Modify reference data
-          {
-            type: V2ActionType.ICON,
-            icon: 'edit',
-            iconTooltip: 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_MODIFY_ENTRY',
-            action: {
-              link: (item: ReferenceDataEntryModel): string[] => {
-                return ['/reference-data', item.categoryId, item.id, 'modify'];
-              }
-            },
-            visible: (): boolean => {
-              return ReferenceDataEntryModel.canModify(this.authUser);
-            }
-          },
-
-          // Other actions
-          {
-            type: V2ActionType.MENU,
-            icon: 'more_horiz',
-            visible: (item: ReferenceDataEntryModel): boolean => {
-              return !item.readonly &&
-                ReferenceDataEntryModel.canDelete(this.authUser);
-            },
-            menuOptions: [
-              // Delete Lab Results
-              {
-                label: {
-                  get: () => 'LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_DELETE_ENTRY'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: ReferenceDataEntryModel): void => {
-                    // confirm
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_DELETE',
-                          data: () => ({
-                            name: `${ this.translateService.instant(item.value) }`
-                          })
-                        },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_REFERENCE_DATA_ENTRY'
-                        }
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
-
-                      // delete reference data
-                      this.referenceDataDataService
-                        .deleteEntry(item.id)
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
-
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_REFERENCE_DATA_CATEGORY_ENTRIES_LIST_ACTION_DELETE_ENTRY_SUCCESS_MESSAGE');
-
-                          // hide loading
-                          loading.close();
-
-                          // reload data
-                          this.needsRefreshList(true);
-                        });
-                    });
-                  }
-                },
-                visible: (item: ReferenceDataEntryModel): boolean => {
-                  return !item.readonly &&
-                    ReferenceDataEntryModel.canDelete(this.authUser);
-                }
-              }
-            ]
-          }
-        ]
       }
     ];
 

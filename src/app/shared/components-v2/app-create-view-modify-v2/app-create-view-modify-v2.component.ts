@@ -26,7 +26,7 @@ import { CreateViewModifyV2ExpandColumn, CreateViewModifyV2ExpandColumnType } fr
 import { ICreateViewModifyV2Refresh } from './models/refresh.model';
 import { determineRenderMode, RenderMode } from '../../../core/enums/render-mode.enum';
 import { IExtendedColDef } from '../app-list-table-v2/models/extended-column.model';
-import { applyFilterBy, applyResetOnAllFilters, applySortBy } from '../app-list-table-v2/models/column.model';
+import { applyFilterBy, applyResetOnAllFilters, applySortBy, IV2Column } from '../app-list-table-v2/models/column.model';
 import { AppListTableV2Component } from '../app-list-table-v2/app-list-table-v2.component';
 import { PageEvent } from '@angular/material/paginator';
 import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
@@ -34,6 +34,7 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ActivatedRoute, Params } from '@angular/router';
 import { MatTabGroup } from '@angular/material/tabs';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSortList, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../app-side-dialog-v2/models/side-dialog-config.model';
+import { determineIfSmallScreenMode } from '../../../core/methods/small-screen-mode';
 
 /**
  * Component
@@ -390,6 +391,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   // render mode
   renderMode: RenderMode = RenderMode.FULL;
 
+  // small screen mode ?
+  isSmallScreenMode: boolean = false;
+
   // refresh data
   @Output() expandListRefreshData = new EventEmitter<ICreateViewModifyV2Refresh>();
 
@@ -403,6 +407,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   FormHelperService = FormHelperService;
   CreateViewModifyV2ExpandColumnType = CreateViewModifyV2ExpandColumnType;
   RenderMode = RenderMode;
+  AppListTableV2Component = AppListTableV2Component;
 
   /**
    * Constructor
@@ -1129,9 +1134,10 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     }
 
     // filter
+    // always a column of type IV2Column if we have a filter
     applyFilterBy(
       tab.definition.queryBuilder,
-      data.column.columnDefinition,
+      data.column.columnDefinition as IV2Column,
       data.valueOverwrite
     );
 
@@ -1250,6 +1256,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   private updateRenderMode(): void {
     // determine render mode
     this.renderMode = determineRenderMode();
+
+    // small screen mode ?
+    this.isSmallScreenMode = determineIfSmallScreenMode();
   }
 
   /**

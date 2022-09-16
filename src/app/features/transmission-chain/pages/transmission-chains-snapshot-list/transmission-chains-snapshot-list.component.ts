@@ -56,6 +56,97 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent<CotSn
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // Other actions
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          menuOptions: [
+            // Delete
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_ASYNC_COT_ACTION_DELETE_SNAPSHOT'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: CotSnapshotModel): void => {
+                  // determine what we need to delete
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_DELETE',
+                        data: () => ({
+                          name: item.name
+                        })
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_DELETE_COT_SNAPSHOT',
+                        data: () => ({
+                          name: item.name
+                        })
+                      }
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // delete
+                    this.transmissionChainDataService
+                      .deleteSnapshot(
+                        this.selectedOutbreak.id,
+                        item.id
+                      )
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
+
+                          // hide loading
+                          loading.close();
+
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_LIST_ASYNC_COT_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                        // hide loading
+                        loading.close();
+
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
+                }
+              },
+              visible: (item: CotSnapshotModel): boolean => {
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  CotSnapshotModel.canDelete(this.authUser);
+              }
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  /**
    * Initialize Side Table Columns
    */
   protected initializeTableColumns() {
@@ -102,98 +193,6 @@ export class TransmissionChainsSnapshotListComponent extends ListComponent<CotSn
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH
         }
-      },
-
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // Other actions
-          {
-            type: V2ActionType.MENU,
-            icon: 'more_horiz',
-            menuOptions: [
-              // Delete
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_ASYNC_COT_ACTION_DELETE_SNAPSHOT'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: CotSnapshotModel): void => {
-                    // determine what we need to delete
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_DELETE',
-                          data: () => ({
-                            name: item.name
-                          })
-                        },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_COT_SNAPSHOT',
-                          data: () => ({
-                            name: item.name
-                          })
-                        }
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
-
-                      // delete
-                      this.transmissionChainDataService
-                        .deleteSnapshot(
-                          this.selectedOutbreak.id,
-                          item.id
-                        )
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
-
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_ASYNC_COT_ACTION_DELETE_SUCCESS_MESSAGE');
-
-                          // hide loading
-                          loading.close();
-
-                          // reload data
-                          this.needsRefreshList(true);
-                        });
-                    });
-                  }
-                },
-                visible: (item: CotSnapshotModel): boolean => {
-                  return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    CotSnapshotModel.canDelete(this.authUser);
-                }
-              }
-            ]
-          }
-        ]
       }
     ];
   }

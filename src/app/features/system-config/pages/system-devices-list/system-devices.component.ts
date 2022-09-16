@@ -11,7 +11,7 @@ import { ListHelperService } from '../../../../core/services/helper/list-helper.
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 
 @Component({
@@ -48,6 +48,212 @@ export class SystemDevicesComponent extends ListComponent<DeviceModel> implement
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
+  }
+
+  /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_VIEW',
+          action: {
+            link: (item: DeviceModel): string[] => {
+              return ['/system-config', 'devices', item.id, 'view'];
+            }
+          },
+          visible: (): boolean => {
+            return DeviceModel.canView(this.authUser);
+          }
+        },
+
+        // Modify
+        {
+          type: V2ActionType.ICON,
+          icon: 'edit',
+          iconTooltip: 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_MODIFY',
+          action: {
+            link: (item: DeviceModel): string[] => {
+              return ['/system-config', 'devices', item.id, 'modify'];
+            }
+          },
+          visible: (): boolean => {
+            return DeviceModel.canModify(this.authUser);
+          }
+        },
+
+        // Other actions
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          menuOptions: [
+            // Delete
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: DeviceModel): void => {
+                  // determine what we need to delete
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_DELETE',
+                        data: () => ({
+                          name: item.name
+                        })
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_DELETE_DEVICE',
+                        data: () => ({
+                          name: item.name
+                        })
+                      }
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // delete device
+                    this.deviceDataService
+                      .deleteDevice(item.id)
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
+
+                          // hide loading
+                          loading.close();
+
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                        // hide loading
+                        loading.close();
+
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
+                }
+              },
+              visible: (): boolean => {
+                return DeviceModel.canDelete(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: (): boolean => {
+                // visible only if at least one of the previous...
+                return DeviceModel.canDelete(this.authUser);
+              }
+            },
+
+            // Wipe
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_WIPE'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: DeviceModel): void => {
+                  // determine what we need to wipe
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_DELETE',
+                        data: () => ({
+                          name: item.name
+                        })
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_WIPE_DEVICE',
+                        data: () => ({
+                          name: item.name
+                        })
+                      }
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // wipe device
+                    this.deviceDataService
+                      .wipeDevice(item.id)
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
+
+                          // hide loading
+                          loading.close();
+
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_WIPE_SUCCESS_MESSAGE');
+
+                        // hide loading
+                        loading.close();
+
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
+                }
+              },
+              visible: (): boolean => {
+                // for now let use do another wipe even if one is in progress, because parse might fails..and status might remain pending..which might cause issues if we can't send a new notification
+                // [Constants.DEVICE_WIPE_STATUS.READY.value, Constants.DEVICE_WIPE_STATUS.PENDING.value].includes(item.status)
+                return DeviceModel.canWipe(this.authUser);
+              }
+            },
+
+            // View Device History
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_VIEW_HISTORY'
+              },
+              action: {
+                link: (item: DeviceModel) => ['/system-config', 'devices', item.id, 'history']
+              },
+              visible: (): boolean => {
+                return DeviceModel.canListHistory(this.authUser);
+              }
+            }
+          ]
+        }
+      ]
+    };
   }
 
   /**
@@ -132,213 +338,6 @@ export class SystemDevicesComponent extends ListComponent<DeviceModel> implement
         filter: {
           type: V2FilterType.DATE_RANGE
         }
-      },
-
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // View
-          {
-            type: V2ActionType.ICON,
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_VIEW',
-            action: {
-              link: (item: DeviceModel): string[] => {
-                return ['/system-config', 'devices', item.id, 'view'];
-              }
-            },
-            visible: (): boolean => {
-              return DeviceModel.canView(this.authUser);
-            }
-          },
-
-          // Modify
-          {
-            type: V2ActionType.ICON,
-            icon: 'edit',
-            iconTooltip: 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_MODIFY',
-            action: {
-              link: (item: DeviceModel): string[] => {
-                return ['/system-config', 'devices', item.id, 'modify'];
-              }
-            },
-            visible: (): boolean => {
-              return DeviceModel.canModify(this.authUser);
-            }
-          },
-
-          // Other actions
-          {
-            type: V2ActionType.MENU,
-            icon: 'more_horiz',
-            menuOptions: [
-              // Delete
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: DeviceModel): void => {
-                    // determine what we need to delete
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_DELETE',
-                          data: () => ({
-                            name: item.name
-                          })
-                        },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_DEVICE',
-                          data: () => ({
-                            name: item.name
-                          })
-                        }
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
-
-                      // delete device
-                      this.deviceDataService
-                        .deleteDevice(item.id)
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
-
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_DELETE_SUCCESS_MESSAGE');
-
-                          // hide loading
-                          loading.close();
-
-                          // reload data
-                          this.needsRefreshList(true);
-                        });
-                    });
-                  }
-                },
-                visible: (): boolean => {
-                  return DeviceModel.canDelete(this.authUser);
-                }
-              },
-
-              // Divider
-              {
-                visible: (): boolean => {
-                  // visible only if at least one of the previous...
-                  return DeviceModel.canDelete(this.authUser);
-                }
-              },
-
-              // Wipe
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_WIPE'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: DeviceModel): void => {
-                    // determine what we need to wipe
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_DELETE',
-                          data: () => ({
-                            name: item.name
-                          })
-                        },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_WIPE_DEVICE',
-                          data: () => ({
-                            name: item.name
-                          })
-                        }
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
-
-                      // wipe device
-                      this.deviceDataService
-                        .wipeDevice(item.id)
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
-
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_WIPE_SUCCESS_MESSAGE');
-
-                          // hide loading
-                          loading.close();
-
-                          // reload data
-                          this.needsRefreshList(true);
-                        });
-                    });
-                  }
-                },
-                visible: (): boolean => {
-                  // for now let use do another wipe even if one is in progress, because parse might fails..and status might remain pending..which might cause issues if we can't send a new notification
-                  // [Constants.DEVICE_WIPE_STATUS.READY.value, Constants.DEVICE_WIPE_STATUS.PENDING.value].includes(item.status)
-                  return DeviceModel.canWipe(this.authUser);
-                }
-              },
-
-              // View Device History
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_SYSTEM_DEVICES_ACTION_VIEW_HISTORY'
-                },
-                action: {
-                  link: (item: DeviceModel) => ['/system-config', 'devices', item.id, 'history']
-                },
-                visible: (): boolean => {
-                  return DeviceModel.canListHistory(this.authUser);
-                }
-              }
-            ]
-          }
-        ]
       }
     ];
   }

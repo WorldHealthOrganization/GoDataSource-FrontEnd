@@ -58,6 +58,7 @@ import { determineIfSmallScreenMode } from '../../../core/methods/small-screen-m
 import { AppListTableV2DetailRowComponent } from './components/detail/app-list-table-v2-detail-row.component';
 import { AppListTableV2DetailColumnComponent } from './components/detail/app-list-table-v2-detail-column.component';
 import { IV2RowExpandRow, V2RowType } from './models/row.model';
+import { determineIfTouchDevice } from '../../../core/methods/touch-device';
 
 /**
  * Component
@@ -70,12 +71,16 @@ import { IV2RowExpandRow, V2RowType } from './models/row.model';
 })
 export class AppListTableV2Component implements OnInit, OnDestroy {
   // static
+  private static readonly STANDARD_COLUMN_PADDING: number = 8;
+  private static readonly STANDARD_COLUMN_MARGIN: number = 1;
   private static readonly STANDARD_COLUMN_MAX_DEFAULT_WIDTH: number = 400;
+  private static readonly STANDARD_COLUMN_ACTION_WIDTH: number = 24;
+  private static readonly STANDARD_COLUMN_ACTION_GAP: number = 8;
   private static readonly STANDARD_SELECT_COLUMN_WIDTH: number = 42;
   private static readonly STANDARD_OBFUSCATED_COLUMN_WIDTH: number = 400;
-  private static readonly STANDARD_SHAPE_SIZE: number = 12;
-  private static readonly STANDARD_SHAPE_GAP: number = 6;
-  private static readonly STANDARD_SHAPE_PADDING: number = 14;
+  static readonly STANDARD_SHAPE_SIZE: number = 12;
+  static readonly STANDARD_SHAPE_GAP: number = 6;
+  static readonly STANDARD_SHAPE_PADDING: number = 14;
   private static readonly STANDARD_HEADER_HEIGHT: number = 40;
   private static readonly STANDARD_HEADER_WITH_FILTER_HEIGHT: number = 88;
   private static readonly STANDARD_ROW_HEIGHT: number = 40;
@@ -83,6 +88,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   // small screen mode ?
   isSmallScreenMode: boolean = false;
+
+  // check if this is a touch device
+  isTouchDevice: boolean = determineIfTouchDevice();
 
   // records
   recordsSubscription: Subscription;
@@ -113,6 +121,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     return this._processedSelectedResults;
   }
 
+  // table column actions
+  // no need to create setter and call updateColumnDefinitions, because for now columnActions is always initialized before columns, and it shouldn't be changed after that
+  @Input() columnActions: IV2ColumnAction;
+
   // columns
   private _columns: IV2Column[];
   @Input() set columns(columns: IV2Column[]) {
@@ -127,8 +139,14 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       }
     });
 
+    // set header height
+    this.updateHeaderHeight();
+
     // update columns definitions
     this.updateColumnDefinitions();
+
+    // some type of columns should have a fixed width
+    this.adjustFixedSizeColumns();
   }
   get columns(): IV2Column[] {
     return this._columns;
@@ -139,6 +157,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   // has at least one table header filter ?
   hasTableHeaderFilters: boolean = false;
+
+  // allow user to block hiding table filters
+  @Input() canHideTableHeaderFilters: boolean = true;
 
   // ag table api handlers
   private _agTable: {
@@ -227,7 +248,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     this.saveHeaderFilterVisibility();
   }
   get showHeaderFilters(): boolean {
-    return this.hasTableHeaderFilters && this._showHeaderFilters;
+    return this.hasTableHeaderFilters && (
+      !this.canHideTableHeaderFilters ||
+      this._showHeaderFilters
+    );
   }
 
   // grouped data
@@ -746,16 +770,11 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           this._recordsDataMap[record[this.keyField]] = record;
         });
 
-        // no records found ?
-        if (this._recordsData.length < 1) {
-          this._agTable.api.showNoRowsOverlay();
-        }
+        // unselect everything
+        this._agTable.api.deselectAll();
 
         // some type of columns should have a fixed width
         this.adjustFixedSizeColumns();
-
-        // unselect everything
-        this._agTable.api.deselectAll();
 
         // re-render page
         this.detectChanges();
@@ -844,9 +863,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       // make columns visible
       this._columns.forEach((column) => {
         // set not visible
-        const isVisible: boolean = visibleColumnsMap[column.field] !== undefined;
-        column.notVisible = !isVisible &&
-          column.format?.type !== V2ColumnFormat.ACTIONS;
+        const isVisible: boolean = visibleColumnsMap[column.field] !== undefined ||
+          !!column.alwaysVisible;
+        column.notVisible = !isVisible;
 
         // update map if found
         if (isVisible) {
@@ -882,6 +901,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         checkboxSelection: true,
         cellClass: 'gd-cell-no-focus',
         suppressMovable: true,
+        lockPosition: 'left',
         headerComponent: AppListTableV2SelectionHeaderComponent,
         width: AppListTableV2Component.STANDARD_SELECT_COLUMN_WIDTH,
         valueFormatter: () => '',
@@ -890,8 +910,6 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           format: {
             type: V2ColumnFormat.ACTIONS
           },
-          field: this.keyField,
-          label: '',
           actions: [{
             type: V2ActionType.MENU,
             icon: 'expand_more',
@@ -959,33 +977,29 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
       // determine column pinned value
       let pinned: IV2ColumnPinned | boolean;
-      if (column.format?.type !== V2ColumnFormat.ACTIONS) {
+      if (
+        leftPinnedColumns.length > 0 &&
+        leftPinnedColumnsMap[column.field]
+      ) {
+        pinned = IV2ColumnPinned.LEFT;
+      } else if (
+        rightPinnedColumns.length > 0 &&
+        rightPinnedColumnsMap[column.field]
+      ) {
+        pinned = IV2ColumnPinned.RIGHT;
+      } else {
         if (
-          leftPinnedColumns.length > 0 &&
-          leftPinnedColumnsMap[column.field]
+          column.pinned === true ||
+          column.pinned === IV2ColumnPinned.LEFT &&
+          leftPinnedColumns.length < 1
         ) {
           pinned = IV2ColumnPinned.LEFT;
         } else if (
-          rightPinnedColumns.length > 0 &&
-          rightPinnedColumnsMap[column.field]
+          column.pinned === IV2ColumnPinned.RIGHT &&
+          rightPinnedColumns.length < 1
         ) {
           pinned = IV2ColumnPinned.RIGHT;
-        } else {
-          if (
-            column.pinned === true ||
-            column.pinned === IV2ColumnPinned.LEFT &&
-            leftPinnedColumns.length < 1
-          ) {
-            pinned = IV2ColumnPinned.LEFT;
-          } else if (
-            column.pinned === IV2ColumnPinned.RIGHT &&
-            rightPinnedColumns.length < 1
-          ) {
-            pinned = IV2ColumnPinned.RIGHT;
-          }
         }
-      } else {
-        pinned = column.pinned;
       }
 
       // attach column to list of visible columns
@@ -1007,10 +1021,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         cellRenderer: this.handleCellRenderer(column),
         suppressMovable: this.isSmallScreenMode ?
           true :
-          (
-            (column.format && column.format.type === V2ColumnFormat.ACTIONS) ||
-            !!(column as any).notMovable
-          ),
+          !!(column as any).notMovable,
+        lockPosition: column.lockPosition,
         headerComponent: AppListTableV2ColumnHeaderComponent
       });
 
@@ -1058,20 +1070,56 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         renderColumn(visibleColumnsMap[field]);
       });
 
-      // make sure we render the actions columns
+      // render always visible columns too
       this._columns.forEach((column) => {
-        if (
-          column.format?.type === V2ColumnFormat.ACTIONS &&
-          !visibleColumnsMap[column.field]
-        ) {
-          renderColumn(column);
+        // no always visible ?
+        if (!column.alwaysVisible) {
+          return;
         }
+
+        // render column
+        renderColumn(column);
       });
     } else {
       // process columns in default order
       this._columns.forEach((column) => {
         renderColumn(column);
       });
+    }
+
+    // attach actions column to the start or to the end depending on if small or big screen
+    if (this.columnActions) {
+      // create action column
+      const actionColumn: IExtendedColDef = {
+        headerName: '',
+        field: 'actions',
+        pinned: this.isSmallScreenMode ?
+          false :
+          IV2ColumnPinned.RIGHT,
+        resizable: false,
+        columnDefinition: this.columnActions,
+        columnDefinitionData: this,
+        cellClass: 'gd-cell-no-focus',
+        cellRenderer: this.handleCellRenderer(this.columnActions),
+        suppressMovable: true,
+        lockPosition: this.isSmallScreenMode ?
+          'left' :
+          'right',
+        headerComponent: AppListTableV2ColumnHeaderComponent
+      };
+
+      // attach column to list of visible columns depending on screen size
+      if (this.isSmallScreenMode) {
+        // add it to the beginning
+        columnDefs.splice(
+          this.groupActions?.length > 0 || this.groupActionsSingleRecord ? 1 : 0,
+          0,
+          actionColumn
+        );
+      } else {
+        // add it to the end
+        columnDefs.push(actionColumn);
+      }
     }
 
     // add suffix legends
@@ -1204,7 +1252,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   /**
    * Custom renderer
    */
-  private handleCellRenderer(column: IV2Column): any {
+  private handleCellRenderer(column: IV2Column | IV2ColumnAction): any {
     // obfuscate ?
     const basicColumn: IV2ColumnBasic = column as IV2ColumnBasic;
     if (basicColumn.format?.obfuscated) {
@@ -1432,11 +1480,21 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    * Some type of columns should have a fixed width
    */
   private adjustFixedSizeColumns(): void {
+    // nothing to do ?
+    if (!this._agTable?.columnApi) {
+      return;
+    }
+
     // some type of columns should have a fixed width
     this._agTable.columnApi.getColumns().forEach((column) => {
       // retrieve column definition
       const colDef: IExtendedColDef = column.getUserProvidedColDef() as IExtendedColDef;
-      if (colDef.columnDefinition?.format?.type === V2ColumnFormat.STATUS) {
+      if (colDef.columnDefinition?.width) {
+        this._agTable.columnApi.setColumnWidth(
+          column,
+          colDef.columnDefinition.width
+        );
+      } else if (colDef.columnDefinition?.format?.type === V2ColumnFormat.STATUS) {
         // determine maximum number of items
         const statusColumn: IV2ColumnStatus = colDef.columnDefinition as IV2ColumnStatus;
         let maxForms: number = 1;
@@ -1467,6 +1525,26 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           column,
           AppListTableV2Component.STANDARD_OBFUSCATED_COLUMN_WIDTH
         );
+      } else if (colDef.columnDefinition?.format?.type === V2ColumnFormat.ACTIONS) {
+        // number of actions
+        const noActions: number = this.columnActions?.actions?.length ?
+          this.columnActions.actions.length :
+          0;
+
+        // set column width
+        if (noActions > 0) {
+          this._agTable.columnApi.setColumnWidth(
+            column,
+            // width of buttons
+            noActions * AppListTableV2Component.STANDARD_COLUMN_ACTION_WIDTH +
+            // gap between buttons
+            ((noActions - 1) * AppListTableV2Component.STANDARD_COLUMN_ACTION_GAP) +
+            // cell padding (left + right)
+            2 * AppListTableV2Component.STANDARD_COLUMN_PADDING +
+            // cell margin (left + right)
+            2 * AppListTableV2Component.STANDARD_COLUMN_MARGIN
+          );
+        }
       }
     });
   }
@@ -1478,7 +1556,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // construct list of possible columns
     const columns: IV2Column[] = this._columns
       // filter out pinned columns since those are handled by a different button
-      .filter((item) => item.format?.type !== V2ColumnFormat.ACTIONS && (!item.exclude || !item.exclude(item)))
+      .filter((item) => !item.alwaysVisible && (!item.exclude || !item.exclude(item)))
       // sort columns by their label
       .sort((v1, v2) => this.translateService.instant(v1.label).localeCompare(this.translateService.instant(v2.label)));
 
@@ -1552,8 +1630,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           if (
             !colDef ||
             !colDef.columnDefinition ||
-            !visibleMap[colDef.columnDefinition.field] ||
-            colDef.columnDefinition.format?.type === V2ColumnFormat.ACTIONS
+            colDef.columnDefinition.format?.type === V2ColumnFormat.ACTIONS ||
+            !visibleMap[colDef.columnDefinition.field]
           ) {
             return;
           }
@@ -1792,7 +1870,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       }
 
       // visible column ?
-      if (colDef.columnDefinition.field) {
+      if (
+        colDef.columnDefinition.field &&
+        !colDef.columnDefinition.alwaysVisible
+      ) {
         // add to save
         visibleColumns.push(colDef.columnDefinition.field);
 
@@ -1853,6 +1934,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   /**
    * Sort by - used in AppListTableV2ColumnHeaderComponent even if it is marked as not used...
+   * - used externally - do not remove
    */
   columnSortBy(
     component: AppListTableV2ColumnHeaderComponent,
@@ -1966,6 +2048,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   /**
    * Filter by
+   * - used externally - do not remove
    */
   columnFilterBy(
     column: IExtendedColDef,

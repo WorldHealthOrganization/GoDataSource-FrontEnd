@@ -55,6 +55,178 @@ export class LanguagesListComponent
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View Language
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_LIST_LANGUAGES_ACTION_VIEW_LANGUAGE',
+          action: {
+            link: (item: LanguageModel): string[] => {
+              return ['/languages', item.id, 'view'];
+            }
+          },
+          visible: (): boolean => {
+            return LanguageModel.canView(this.authUser);
+          }
+        },
+
+        // Modify Language
+        {
+          type: V2ActionType.ICON,
+          icon: 'edit',
+          iconTooltip: 'LNG_PAGE_LIST_LANGUAGES_ACTION_MODIFY_LANGUAGE',
+          action: {
+            link: (item: LanguageModel): string[] => {
+              return ['/languages', item.id, 'modify'];
+            }
+          },
+          visible: (item: LanguageModel): boolean => {
+            return !item.readOnly &&
+              LanguageModel.canModify(this.authUser);
+          }
+        },
+
+        // Other actions
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          menuOptions: [
+            // Delete
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_LANGUAGES_ACTION_DELETE_LANGUAGE'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: LanguageModel): void => {
+                  // determine what we need to delete
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_DELETE',
+                        data: () => ({
+                          name: item.name
+                        })
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_DELETE_LANGUAGE',
+                        data: () => ({
+                          name: item.name
+                        })
+                      }
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // delete
+                    this.languageDataService
+                      .deleteLanguage(item.id)
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
+
+                          // hide loading
+                          loading.close();
+
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_LIST_LANGUAGES_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                        // hide loading
+                        loading.close();
+
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
+                }
+              },
+              visible: (item: LanguageModel): boolean => {
+                return !item.readOnly &&
+                  LanguageModel.canDelete(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: (item: LanguageModel): boolean => {
+                // visible only if at least one of the previous...
+                return !item.readOnly &&
+                  LanguageModel.canDelete(this.authUser);
+              }
+            },
+
+            // Export Language Tokens
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_LANGUAGES_ACTION_EXPORT_TOKENS'
+              },
+              action: {
+                click: (item: LanguageModel) => {
+                  this.dialogV2Service
+                    .showExportData({
+                      title: {
+                        get: () => 'LNG_PAGE_LIST_LANGUAGES_ACTION_EXPORT_TOKENS_DIALOG_TITLE'
+                      },
+                      export: {
+                        url: `languages/${ item.id }/language-tokens/export`,
+                        async: false,
+                        method: ExportDataMethod.GET,
+                        fileName: item.name,
+                        allow: {
+                          types: [ExportDataExtension.XLSX]
+                        }
+                      }
+                    });
+                }
+              },
+              visible: (): boolean => {
+                return LanguageModel.canExportTokens(this.authUser);
+              }
+            },
+
+            // Import Language Tokens
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_LANGUAGES_ACTION_IMPORT_TOKENS'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                link: (item: LanguageModel) => {
+                  return ['/import-export-data', 'language-data', item.id, 'import-tokens'];
+                }
+              },
+              visible: (): boolean => {
+                return LanguageModel.canImportTokens(this.authUser);
+              }
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  /**
    * Initialize Side Table Columns
    */
   protected initializeTableColumns(): void {
@@ -69,179 +241,6 @@ export class LanguagesListComponent
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH
         }
-      },
-
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // View Language
-          {
-            type: V2ActionType.ICON,
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_LIST_LANGUAGES_ACTION_VIEW_LANGUAGE',
-            action: {
-              link: (item: LanguageModel): string[] => {
-                return ['/languages', item.id, 'view'];
-              }
-            },
-            visible: (): boolean => {
-              return LanguageModel.canView(this.authUser);
-            }
-          },
-
-          // Modify Language
-          {
-            type: V2ActionType.ICON,
-            icon: 'edit',
-            iconTooltip: 'LNG_PAGE_LIST_LANGUAGES_ACTION_MODIFY_LANGUAGE',
-            action: {
-              link: (item: LanguageModel): string[] => {
-                return ['/languages', item.id, 'modify'];
-              }
-            },
-            visible: (item: LanguageModel): boolean => {
-              return !item.readOnly &&
-                LanguageModel.canModify(this.authUser);
-            }
-          },
-
-          // Other actions
-          {
-            type: V2ActionType.MENU,
-            icon: 'more_horiz',
-            menuOptions: [
-              // Delete
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_LANGUAGES_ACTION_DELETE_LANGUAGE'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: LanguageModel): void => {
-                    // determine what we need to delete
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_DELETE',
-                          data: () => ({
-                            name: item.name
-                          })
-                        },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_LANGUAGE',
-                          data: () => ({
-                            name: item.name
-                          })
-                        }
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
-
-                      // delete
-                      this.languageDataService
-                        .deleteLanguage(item.id)
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
-
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_LANGUAGES_ACTION_DELETE_SUCCESS_MESSAGE');
-
-                          // hide loading
-                          loading.close();
-
-                          // reload data
-                          this.needsRefreshList(true);
-                        });
-                    });
-                  }
-                },
-                visible: (item: LanguageModel): boolean => {
-                  return !item.readOnly &&
-                    LanguageModel.canDelete(this.authUser);
-                }
-              },
-
-              // Divider
-              {
-                visible: (item: LanguageModel): boolean => {
-                  // visible only if at least one of the previous...
-                  return !item.readOnly &&
-                    LanguageModel.canDelete(this.authUser);
-                }
-              },
-
-              // Export Language Tokens
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_LANGUAGES_ACTION_EXPORT_TOKENS'
-                },
-                action: {
-                  click: (item: LanguageModel) => {
-                    this.dialogV2Service
-                      .showExportData({
-                        title: {
-                          get: () => 'LNG_PAGE_LIST_LANGUAGES_ACTION_EXPORT_TOKENS_DIALOG_TITLE'
-                        },
-                        export: {
-                          url: `languages/${ item.id }/language-tokens/export`,
-                          async: false,
-                          method: ExportDataMethod.GET,
-                          fileName: item.name,
-                          allow: {
-                            types: [ExportDataExtension.XLSX]
-                          }
-                        }
-                      });
-                  }
-                },
-                visible: (): boolean => {
-                  return LanguageModel.canExportTokens(this.authUser);
-                }
-              },
-
-              // Import Language Tokens
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_LANGUAGES_ACTION_IMPORT_TOKENS'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  link: (item: LanguageModel) => {
-                    return ['/import-export-data', 'language-data', item.id, 'import-tokens'];
-                  }
-                },
-                visible: (): boolean => {
-                  return LanguageModel.canImportTokens(this.authUser);
-                }
-              }
-            ]
-          }
-        ]
       }
     ];
   }

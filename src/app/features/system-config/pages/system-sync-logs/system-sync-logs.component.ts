@@ -20,7 +20,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
@@ -64,6 +64,102 @@ export class SystemSyncLogsComponent
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
+  }
+
+  /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View Error
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_VIEW_ERROR',
+          action: {
+            click: (item: SystemSyncLogModel) => {
+              this.viewError(item);
+            }
+          },
+          visible: (item: SystemSyncLogModel): boolean => {
+            return !_.isEmpty(item.error) &&
+              SystemSyncLogModel.canView(this.authUser);
+          }
+        },
+
+        // Other actions
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          menuOptions: [
+            // Delete log
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_DELETE_LOG'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: SystemSyncLogModel): void => {
+                  // determine what we need to delete
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_DELETE_WITHOUT_NAME'
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_DELETE_SYSTEM_SYNC_LOG'
+                      }
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // delete log
+                    this.systemSyncLogDataService
+                      .deleteSyncLog(item.id)
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
+
+                          // hide loading
+                          loading.close();
+
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                        // hide loading
+                        loading.close();
+
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
+                }
+              },
+              visible: (): boolean => {
+                return SystemSyncLogModel.canDelete(this.authUser);
+              }
+            }
+          ]
+        }
+      ]
+    };
   }
 
   /**
@@ -185,103 +281,6 @@ export class SystemSyncLogsComponent
         filter: {
           type: V2FilterType.DATE_RANGE
         }
-      },
-
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // View Error
-          {
-            type: V2ActionType.ICON,
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_VIEW_ERROR',
-            action: {
-              click: (item: SystemSyncLogModel) => {
-                this.viewError(item);
-              }
-            },
-            visible: (item: SystemSyncLogModel): boolean => {
-              return !_.isEmpty(item.error) &&
-                SystemSyncLogModel.canView(this.authUser);
-            }
-          },
-
-          // Other actions
-          {
-            type: V2ActionType.MENU,
-            icon: 'more_horiz',
-            menuOptions: [
-              // Delete log
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_DELETE_LOG'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: SystemSyncLogModel): void => {
-                    // determine what we need to delete
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_DELETE_WITHOUT_NAME'
-                        },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_SYSTEM_SYNC_LOG'
-                        }
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
-
-                      // delete log
-                      this.systemSyncLogDataService
-                        .deleteSyncLog(item.id)
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
-
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_SYSTEM_SYNC_LOGS_ACTION_DELETE_SUCCESS_MESSAGE');
-
-                          // hide loading
-                          loading.close();
-
-                          // reload data
-                          this.needsRefreshList(true);
-                        });
-                    });
-                  }
-                },
-                visible: (): boolean => {
-                  return SystemSyncLogModel.canDelete(this.authUser);
-                }
-              }
-            ]
-          }
-        ]
       }
     ];
   }

@@ -62,6 +62,169 @@ export class TeamListComponent extends ListComponent<TeamModel> implements OnDes
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_LIST_TEAMS_ACTION_VIEW_TEAM',
+          action: {
+            link: (item: TeamModel): string[] => {
+              return ['/teams', item.id, 'view'];
+            }
+          },
+          visible: (item: TeamModel): boolean => {
+            return item.id !== this.authUser.id &&
+              TeamModel.canView(this.authUser);
+          }
+        },
+
+        // Modify
+        {
+          type: V2ActionType.ICON,
+          icon: 'edit',
+          iconTooltip: 'LNG_PAGE_LIST_TEAMS_ACTION_MODIFY_TEAM',
+          action: {
+            link: (item: TeamModel): string[] => {
+              return ['/teams', item.id, 'modify'];
+            }
+          },
+          visible: (item: TeamModel): boolean => {
+            return item.id !== this.authUser.id &&
+              TeamModel.canModify(this.authUser);
+          }
+        },
+
+        // Other actions
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          menuOptions: [
+            // Delete
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: TeamModel): void => {
+                  // determine what we need to delete
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_DELETE',
+                        data: () => ({
+                          name: item.name
+                        })
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_DELETE_TEAM',
+                        data: () => ({
+                          name: item.name
+                        })
+                      }
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // check if the team is in use
+                    const qb: RequestQueryBuilder = new RequestQueryBuilder();
+                    qb.filter
+                      .where({
+                        teamId: {
+                          'eq': item.id
+                        }
+                      }, true);
+
+                    // no need for more
+                    qb.limit(1);
+
+                    // retrieve follow-ups + contact details
+                    this.followUpsDataService
+                      .getFollowUpsCount(
+                        this.selectedOutbreak.id,
+                        qb
+                      )
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
+
+                          // hide loading
+                          loading.close();
+
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe((followUpsCount) => {
+                        // used ?
+                        if (followUpsCount.count > 0) {
+                          // show error
+                          this.toastV2Service.error('LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_IN_USE_MESSAGE');
+
+                          // hide loading
+                          loading.close();
+
+                          // finished
+                          return;
+                        }
+
+                        // delete
+                        this.teamDataService
+                          .deleteTeam(item.id)
+                          .pipe(
+                            catchError((err) => {
+                              // show error
+                              this.toastV2Service.error(err);
+
+                              // hide loading
+                              loading.close();
+
+                              // send error down the road
+                              return throwError(err);
+                            })
+                          )
+                          .subscribe(() => {
+                            // success
+                            this.toastV2Service.success('LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_SUCCESS_MESSAGE');
+
+                            // hide loading
+                            loading.close();
+
+                            // reload data
+                            this.needsRefreshList(true);
+                          });
+                      });
+                  });
+                }
+              },
+              visible: (item: TeamModel): boolean => {
+                return item.id !== this.authUser.id &&
+                  TeamModel.canDelete(this.authUser);
+              }
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  /**
    * Initialize Side Table Columns
    */
   protected initializeTableColumns() {
@@ -121,169 +284,6 @@ export class TeamListComponent extends ListComponent<TeamModel> implements OnDes
           useOutbreakLocations: false,
           field: 'parentLocationIdFilter'
         }
-      },
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // View
-          {
-            type: V2ActionType.ICON,
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_LIST_TEAMS_ACTION_VIEW_TEAM',
-            action: {
-              link: (item: TeamModel): string[] => {
-                return ['/teams', item.id, 'view'];
-              }
-            },
-            visible: (item: TeamModel): boolean => {
-              return item.id !== this.authUser.id &&
-                TeamModel.canView(this.authUser);
-            }
-          },
-
-          // Modify
-          {
-            type: V2ActionType.ICON,
-            icon: 'edit',
-            iconTooltip: 'LNG_PAGE_LIST_TEAMS_ACTION_MODIFY_TEAM',
-            action: {
-              link: (item: TeamModel): string[] => {
-                return ['/teams', item.id, 'modify'];
-              }
-            },
-            visible: (item: TeamModel): boolean => {
-              return item.id !== this.authUser.id &&
-                TeamModel.canModify(this.authUser);
-            }
-          },
-
-          // Other actions
-          {
-            type: V2ActionType.MENU,
-            icon: 'more_horiz',
-            menuOptions: [
-              // Delete
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: TeamModel): void => {
-                    // determine what we need to delete
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_DELETE',
-                          data: () => ({
-                            name: item.name
-                          })
-                        },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_TEAM',
-                          data: () => ({
-                            name: item.name
-                          })
-                        }
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
-
-                      // check if the team is in use
-                      const qb: RequestQueryBuilder = new RequestQueryBuilder();
-                      qb.filter
-                        .where({
-                          teamId: {
-                            'eq': item.id
-                          }
-                        }, true);
-
-                      // no need for more
-                      qb.limit(1);
-
-                      // retrieve follow-ups + contact details
-                      this.followUpsDataService
-                        .getFollowUpsCount(
-                          this.selectedOutbreak.id,
-                          qb
-                        )
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
-
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe((followUpsCount) => {
-                          // used ?
-                          if (followUpsCount.count > 0) {
-                            // show error
-                            this.toastV2Service.error('LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_IN_USE_MESSAGE');
-
-                            // hide loading
-                            loading.close();
-
-                            // finished
-                            return;
-                          }
-
-                          // delete
-                          this.teamDataService
-                            .deleteTeam(item.id)
-                            .pipe(
-                              catchError((err) => {
-                                // show error
-                                this.toastV2Service.error(err);
-
-                                // hide loading
-                                loading.close();
-
-                                // send error down the road
-                                return throwError(err);
-                              })
-                            )
-                            .subscribe(() => {
-                              // success
-                              this.toastV2Service.success('LNG_PAGE_LIST_TEAMS_ACTION_DELETE_TEAM_SUCCESS_MESSAGE');
-
-                              // hide loading
-                              loading.close();
-
-                              // reload data
-                              this.needsRefreshList(true);
-                            });
-                        });
-                    });
-                  }
-                },
-                visible: (item: TeamModel): boolean => {
-                  return item.id !== this.authUser.id &&
-                    TeamModel.canDelete(this.authUser);
-                }
-              }
-            ]
-          }
-        ]
       }
     ];
   }

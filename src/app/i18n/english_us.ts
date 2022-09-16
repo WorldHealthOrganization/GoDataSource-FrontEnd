@@ -11,28 +11,9 @@ export const EnglishUsLang = {
      */
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
-    'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NUMBER_OF_EVENTS': 'Number of events',
-    'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NO_ENTITIES': 'Number of entities',
-    'LNG_TRANSMISSION_CHAIN_FIELD_LABEL_NO_CASES_DECEASED': 'Number of deceased cases',
-    'LNG_PAGE_DASHBOARD_EPI_CURVE_EXPORT_FORMAT': 'Export format',
-    'LNG_PAGE_DASHBOARD_EPI_CURVE_EXPORT_FORMAT_SINGLE_PAGE': 'Single page',
-    'LNG_PAGE_DASHBOARD_EPI_CURVE_EXPORT_FORMAT_MULTI_PAGE': 'Multiple pages',
-    'LNG_COMMON_LABEL_NO_OUTBREAK_SELECTED': 'There is no outbreak selected',
-    'LNG_PAGE_LIST_AUDIT_LOGS_EXPORT_TITLE': 'Export audit logs',
-    'LNG_PAGE_LIST_AUDIT_LOGS_EXPORT_BUTTON': 'Export audit logs data',
-    'LNG_PAGE_LIST_AUDIT_LOGS_GROUP_ACTION_EXPORT_SELECTED_AUDIT_LOGS': 'Export the selected audit logs',
-    'LNG_LAYOUT_MENU_ITEM_SET_SECURITY_QUESTION_LABEL': 'Security questions',
-    'LNG_PAGE_IMPORT_DATA_ERROR_INVALID_RESPONSE_FROM_SERVER': 'Invalid headers ({{headers}}...)',
-    'LNG_PAGE_MODIFY_CONTACT_ACTION_ADD_CONTACT_OF_CONTACT': 'Add contact of contact',
-    'LNG_COMMON_LABEL_NO_OF_CHANGES': '{{no}} changes',
-    'LNG_COMMON_LABEL_SHOW_HIDE_STATUS': 'Show / Hide status',
-    'LNG_COMMON_LABEL_EXPORT_FIELDS_ALL': 'All fields',
-    'LNG_COMMON_LABEL_EXPORT_FIELDS': 'Fields',
-    'LNG_COMMON_LABEL_TABS_SETTINGS': 'Tab configuration',
-    'LNG_COMMON_LABEL_TABS_ORDER': 'Tabs order',
-    // eslint-disable-next-line @typescript-eslint/quotes
-    'LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG': "Please make sure that '{{fileName}}' dashlet is visible"
-
+    'LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG': 'Please make sure that "{{fileName}}" dashlet is visible',
+    'LNG_PAGE_DASHBOARD_EXPAND_ALL': 'Expand all',
+    'LNG_PAGE_DASHBOARD_COLLAPSE_ALL': 'Collapse all'
 
 
     /**
@@ -67,6 +48,10 @@ export const EnglishUsLang = {
     // LNG_PAGE_GRAPH_SNAPSHOT_FILTER_FIRST_NAME_LABEL
     // LNG_PAGE_GRAPH_SNAPSHOT_FILTER_LAST_NAME_LABEL
     // LNG_PAGE_LIST_USAGE_LOCATIONS_NOT_SELECTED_OUTBREAK
+<<<<<<< HEAD
     // LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL
+=======
+    // LNG_COMMON_LABEL_ACTIONS
+>>>>>>> d9ca421640355cb457d896c298ab31167778ba08
   }
 };

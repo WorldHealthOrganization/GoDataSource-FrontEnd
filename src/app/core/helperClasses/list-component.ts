@@ -243,7 +243,10 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
       // initialize breadcrumbs
       this.initializeBreadcrumbs();
 
-      // initialize side columns
+      // initialize table column actions
+      this.initializeTableColumnActions();
+
+      // initialize table columns
       this.initializeTableColumns();
 
       // initialize process data
@@ -379,6 +382,11 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
    * Initialize table columns
    */
   protected abstract initializeTableColumns(): void;
+
+  /**
+   * Initialize table column - actions
+   */
+  protected abstract initializeTableColumnActions(): void;
 
   /**
    * Initialize process data
@@ -696,6 +704,9 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
     // apply list filters which is mandatory
     this.mergeListFilterToMainFilter();
 
+    // update cached filters
+    this.updateCachedFilters();
+
     // refresh
     this.needsRefreshList(
       true,
@@ -723,6 +734,9 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
 
     // apply list filters which is mandatory
     this.mergeListFilterToMainFilter();
+
+    // update cached filters
+    this.updateCachedFilters();
 
     // refresh list
     this.needsRefreshList(true);
@@ -1049,7 +1063,7 @@ export abstract class ListComponent<T> extends ListAppliedFiltersComponent {
   /**
    * Load cached filters
    */
-  private loadCachedFilters(): void {
+  protected loadCachedFilters(): void {
     // disabled saved filters for current user ?
     const authUser: UserModel = this.listHelperService.authDataService.getAuthenticatedUser();
     if (

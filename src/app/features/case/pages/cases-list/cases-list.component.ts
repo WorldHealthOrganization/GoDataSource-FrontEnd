@@ -164,6 +164,582 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View Case
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CASE',
+          action: {
+            link: (data: CaseModel): string[] => {
+              return ['/cases', data.id, 'view'];
+            }
+          },
+          visible: (item: CaseModel): boolean => {
+            return !item.deleted &&
+              CaseModel.canView(this.authUser);
+          }
+        },
+
+        // Modify Case
+        {
+          type: V2ActionType.ICON,
+          icon: 'edit',
+          iconTooltip: 'LNG_PAGE_LIST_CASES_ACTION_MODIFY_CASE',
+          action: {
+            link: (item: CaseModel): string[] => {
+              return ['/cases', item.id, 'modify'];
+            }
+          },
+          visible: (item: CaseModel): boolean => {
+            return !item.deleted &&
+              this.selectedOutbreakIsActive &&
+              CaseModel.canModify(this.authUser);
+          }
+        },
+
+        // Other actions
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          menuOptions: [
+            // Delete
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: CaseModel): void => {
+                  // data
+                  const message: {
+                    get: string,
+                    data?: {
+                      name: string,
+                      numberOfContacts: string
+                    }
+                  } = {
+                    get: ''
+                  };
+
+                  // determine what we need to delete
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_DELETE',
+                        data: () => ({
+                          name: item.name
+                        })
+                      },
+                      message: {
+                        get: () => message.get,
+                        data: () => message.data
+                      }
+                    },
+                    initialized: (handler) => {
+                      // display loading
+                      handler.loading.show();
+
+                      // determine if case has exposed contacts
+                      this.caseDataService
+                        .getExposedContactsForCase(this.selectedOutbreak.id, item.id)
+                        .pipe(
+                          catchError((err) => {
+                            // show error
+                            this.toastV2Service.error(err);
+
+                            // hide loading
+                            handler.loading.hide();
+
+                            // send error down the road
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe((exposedContacts: { count: number }) => {
+                          // set message data
+                          message.data = {
+                            name: item.name,
+                            numberOfContacts: exposedContacts?.count.toLocaleString('en')
+                          };
+
+                          // determine message label
+                          message.get = !exposedContacts?.count ?
+                            'LNG_DIALOG_CONFIRM_DELETE_CASE' :
+                            'LNG_DIALOG_CONFIRM_DELETE_CASE_WITH_EXPOSED_CONTACTS';
+
+                          // hide loading
+                          handler.loading.hide();
+                        });
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // delete
+                    this.caseDataService
+                      .deleteCase(
+                        this.selectedOutbreak.id,
+                        item.id
+                      )
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
+
+                          // hide loading
+                          loading.close();
+
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                        // hide loading
+                        loading.close();
+
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
+                }
+              },
+              visible: (item: CaseModel): boolean => {
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  CaseModel.canDelete(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: (item: CaseModel): boolean => {
+                // visible only if at least one of the first two items is visible
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  CaseModel.canDelete(this.authUser);
+              }
+            },
+
+            // Convert Case To Contact
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: CaseModel): void => {
+                  // show confirm dialog to confirm the action
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_CONVERT',
+                        data: () => ({
+                          name: item.name,
+                          type: this.translateService.instant(EntityType.CONTACT)
+                        })
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_CONVERT_CASE_TO_CONTACT',
+                        data: () => item as any
+                      }
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // convert
+                    this.caseDataService
+                      .convertToContact(
+                        this.selectedOutbreak.id,
+                        item.id
+                      )
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
+
+                          // hide loading
+                          loading.close();
+
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE');
+
+                        // hide loading
+                        loading.close();
+
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
+                }
+              },
+              visible: (item: CaseModel): boolean => {
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  CaseModel.canConvertToContact(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: (item: CaseModel): boolean => {
+                // visible only if at least one of the first two items is visible
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  CaseModel.canConvertToContact(this.authUser);
+              }
+            },
+
+            // Add Contact to Case
+            {
+              label: {
+                get: () => 'LNG_PAGE_ACTION_ADD_CONTACT'
+              },
+              action: {
+                link: (): string[] => {
+                  return ['/contacts', 'create'];
+                },
+                linkQueryParams: (item: CaseModel): Params => {
+                  return {
+                    entityType: EntityType.CASE,
+                    entityId: item.id
+                  };
+                }
+              },
+              visible: (item: CaseModel): boolean => {
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  ContactModel.canCreate(this.authUser) &&
+                  CaseModel.canCreateContact(this.authUser);
+              }
+            },
+
+            // Bulk add contacts to case
+            {
+              label: {
+                get: () => 'LNG_PAGE_ACTION_BULK_ADD_CONTACTS'
+              },
+              action: {
+                link: (): string[] => {
+                  return ['/contacts', 'create-bulk'];
+                },
+                linkQueryParams: (item: CaseModel): Params => {
+                  return {
+                    entityType: EntityType.CASE,
+                    entityId: item.id
+                  };
+                }
+              },
+              visible: (item: CaseModel): boolean => {
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  ContactModel.canBulkCreate(this.authUser) &&
+                  CaseModel.canBulkCreateContact(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: (item: CaseModel): boolean => {
+                // visible only if at least one of the previous two items is visible
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  (
+                    (
+                      ContactModel.canCreate(this.authUser) &&
+                      CaseModel.canCreateContact(this.authUser)
+                    ) || (
+                      ContactModel.canBulkCreate(this.authUser) &&
+                      CaseModel.canBulkCreateContact(this.authUser)
+                    )
+                  );
+              }
+            },
+
+            // See case contacts..
+            {
+              label: {
+                get: () => 'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM'
+              },
+              action: {
+                link: (item: CaseModel): string[] => {
+                  return ['/relationships', EntityType.CASE, item.id, 'contacts'];
+                }
+              },
+              visible: (item: CaseModel): boolean => {
+                return !item.deleted &&
+                  RelationshipModel.canList(this.authUser) &&
+                  CaseModel.canListRelationshipContacts(this.authUser);
+              }
+            },
+
+            // See case exposures
+            {
+              label: {
+                get: () => 'LNG_PAGE_ACTION_SEE_EXPOSURES_TO'
+              },
+              action: {
+                link: (item: CaseModel): string[] => {
+                  return ['/relationships', EntityType.CASE, item.id, 'exposures'];
+                }
+              },
+              visible: (item: CaseModel): boolean => {
+                return !item.deleted &&
+                  RelationshipModel.canList(this.authUser) &&
+                  CaseModel.canListRelationshipExposures(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: (item: CaseModel): boolean => {
+                // visible only if at least one of the previous two items is visible
+                return !item.deleted &&
+                  RelationshipModel.canList(this.authUser) &&
+                  (
+                    CaseModel.canListRelationshipContacts(this.authUser) ||
+                    CaseModel.canListRelationshipExposures(this.authUser)
+                  );
+              }
+            },
+
+            // See records detected by the system as duplicates but they were marked as not duplicates
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CASES_ACTION_SEE_RECORDS_NOT_DUPLICATES'
+              },
+              action: {
+                link: (item: CaseModel): string[] => {
+                  return ['/duplicated-records/cases', item.id, 'marked-not-duplicates'];
+                }
+              },
+              visible: (item: CaseModel): boolean => {
+                return !item.deleted;
+              }
+            },
+
+            // See case lab results
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS'
+              },
+              action: {
+                link: (item: CaseModel): string[] => {
+                  return ['/lab-results', 'cases', item.id];
+                }
+              },
+              visible: (item: CaseModel): boolean => {
+                return !item.deleted &&
+                  LabResultModel.canList(this.authUser) &&
+                  CaseModel.canListLabResult(this.authUser);
+              }
+            },
+
+            // See contacts follow-us belonging to this case
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS'
+              },
+              action: {
+                link: (item: CaseModel): string[] => {
+                  return ['/contacts', 'case-related-follow-ups', item.id];
+                }
+              },
+              visible: (item: CaseModel): boolean => {
+                return !item.deleted &&
+                  FollowUpModel.canList(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: (item: CaseModel): boolean => {
+                // visible only if at least one of the previous two items is visible
+                return !item.deleted && (
+                  LabResultModel.canList(this.authUser) ||
+                  FollowUpModel.canList(this.authUser)
+                );
+              }
+            },
+
+            // View Case movement map
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CASES_ACTION_VIEW_MOVEMENT'
+              },
+              action: {
+                link: (item: CaseModel): string[] => {
+                  return ['/cases', item.id, 'movement'];
+                }
+              },
+              visible: (item: CaseModel): boolean => {
+                return !item.deleted &&
+                  CaseModel.canViewMovementMap(this.authUser);
+              }
+            },
+
+            // View case chronology timeline
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY'
+              },
+              action: {
+                link: (item: CaseModel): string[] => {
+                  return ['/cases', item.id, 'chronology'];
+                }
+              },
+              visible: (item: CaseModel): boolean => {
+                return !item.deleted &&
+                  CaseModel.canViewChronologyChart(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: (item: CaseModel): boolean => {
+                return !item.deleted && (
+                  CaseModel.canViewMovementMap(this.authUser) ||
+                  CaseModel.canViewChronologyChart(this.authUser)
+                );
+              }
+            },
+
+            // Download case investigation form
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_CASE_INVESTIGATION_FORM'
+              },
+              action: {
+                click: (item: CaseModel) => {
+                  // export
+                  this.dialogV2Service.showExportData({
+                    title: {
+                      get: () => 'LNG_PAGE_LIST_CASES_EXPORT_CASE_INVESTIGATION_FORM_TITLE'
+                    },
+                    initialized: (handler) => {
+                      handler.buttons.click(ExportButtonKey.EXPORT);
+                    },
+                    export: {
+                      url: `outbreaks/${this.selectedOutbreak.id}/cases/${item.id}/export-empty-case-investigation`,
+                      async: false,
+                      method: ExportDataMethod.GET,
+                      fileName: `${this.translateService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
+                      allow: {
+                        types: [
+                          ExportDataExtension.ZIP
+                        ]
+                      }
+                    }
+                  });
+                }
+              },
+              visible: (item: CaseModel): boolean => {
+                return !item.deleted &&
+                  CaseModel.canExportInvestigationForm(this.authUser);
+              }
+            },
+
+            // Restore a deleted case
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_CASES_ACTION_RESTORE_CASE'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: CaseModel) => {
+                  // show confirm dialog to confirm the action
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_RESTORE',
+                        data: () => item as any
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_RESTORE_CASE',
+                        data: () => item as any
+                      }
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // convert
+                    this.caseDataService
+                      .restoreCase(
+                        this.selectedOutbreak.id,
+                        item.id
+                      )
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
+
+                          // hide loading
+                          loading.close();
+
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_RESTORE_SUCCESS_MESSAGE');
+
+                        // hide loading
+                        loading.close();
+
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
+                }
+              },
+              visible: (item: CaseModel): boolean => {
+                return item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  CaseModel.canRestore(this.authUser);
+              }
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  /**
    * Initialize Side Table Columns
    */
   protected initializeTableColumns(): void {
@@ -794,583 +1370,6 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           type: V2FilterType.DATE_RANGE
         },
         sortable: true
-      },
-
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // View Case
-          {
-            type: V2ActionType.ICON,
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CASE',
-            action: {
-              link: (data: CaseModel): string[] => {
-                return ['/cases', data.id, 'view'];
-              }
-            },
-            visible: (item: CaseModel): boolean => {
-              return !item.deleted &&
-                CaseModel.canView(this.authUser);
-            }
-          },
-
-          // Modify Case
-          {
-            type: V2ActionType.ICON,
-            icon: 'edit',
-            iconTooltip: 'LNG_PAGE_LIST_CASES_ACTION_MODIFY_CASE',
-            action: {
-              link: (item: CaseModel): string[] => {
-                return ['/cases', item.id, 'modify'];
-              }
-            },
-            visible: (item: CaseModel): boolean => {
-              return !item.deleted &&
-                this.selectedOutbreakIsActive &&
-                CaseModel.canModify(this.authUser);
-            }
-          },
-
-          // Other actions
-          {
-            type: V2ActionType.MENU,
-            icon: 'more_horiz',
-            menuOptions: [
-              // Delete
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CASES_ACTION_DELETE_CASE'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: CaseModel): void => {
-                    // data
-                    const message: {
-                      get: string,
-                      data?: {
-                        name: string,
-                        numberOfContacts: string
-                      }
-                    } = {
-                      get: ''
-                    };
-
-                    // determine what we need to delete
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_DELETE',
-                          data: () => ({
-                            name: item.name
-                          })
-                        },
-                        message: {
-                          get: () => message.get,
-                          data: () => message.data
-                        }
-                      },
-                      initialized: (handler) => {
-                        // display loading
-                        handler.loading.show();
-
-                        // determine if case has exposed contacts
-                        this.caseDataService
-                          .getExposedContactsForCase(this.selectedOutbreak.id, item.id)
-                          .pipe(
-                            catchError((err) => {
-                              // show error
-                              this.toastV2Service.error(err);
-
-                              // hide loading
-                              handler.loading.hide();
-
-                              // send error down the road
-                              return throwError(err);
-                            })
-                          )
-                          .subscribe((exposedContacts: { count: number }) => {
-                            // set message data
-                            message.data = {
-                              name: item.name,
-                              numberOfContacts: exposedContacts?.count.toLocaleString('en')
-                            };
-
-                            // determine message label
-                            message.get = !exposedContacts?.count ?
-                              'LNG_DIALOG_CONFIRM_DELETE_CASE' :
-                              'LNG_DIALOG_CONFIRM_DELETE_CASE_WITH_EXPOSED_CONTACTS';
-
-                            // hide loading
-                            handler.loading.hide();
-                          });
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
-
-                      // delete
-                      this.caseDataService
-                        .deleteCase(
-                          this.selectedOutbreak.id,
-                          item.id
-                        )
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
-
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_DELETE_SUCCESS_MESSAGE');
-
-                          // hide loading
-                          loading.close();
-
-                          // reload data
-                          this.needsRefreshList(true);
-                        });
-                    });
-                  }
-                },
-                visible: (item: CaseModel): boolean => {
-                  return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    CaseModel.canDelete(this.authUser);
-                }
-              },
-
-              // Divider
-              {
-                visible: (item: CaseModel): boolean => {
-                  // visible only if at least one of the first two items is visible
-                  return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    CaseModel.canDelete(this.authUser);
-                }
-              },
-
-              // Convert Case To Contact
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: CaseModel): void => {
-                    // show confirm dialog to confirm the action
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_CONVERT',
-                          data: () => ({
-                            name: item.name,
-                            type: this.translateService.instant(EntityType.CONTACT)
-                          })
-                        },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_CONVERT_CASE_TO_CONTACT',
-                          data: () => item as any
-                        }
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
-
-                      // convert
-                      this.caseDataService
-                        .convertToContact(
-                          this.selectedOutbreak.id,
-                          item.id
-                        )
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
-
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_CONVERT_TO_CONTACT_SUCCESS_MESSAGE');
-
-                          // hide loading
-                          loading.close();
-
-                          // reload data
-                          this.needsRefreshList(true);
-                        });
-                    });
-                  }
-                },
-                visible: (item: CaseModel): boolean => {
-                  return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    CaseModel.canConvertToContact(this.authUser);
-                }
-              },
-
-              // Divider
-              {
-                visible: (item: CaseModel): boolean => {
-                  // visible only if at least one of the first two items is visible
-                  return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    CaseModel.canConvertToContact(this.authUser);
-                }
-              },
-
-              // Add Contact to Case
-              {
-                label: {
-                  get: () => 'LNG_PAGE_ACTION_ADD_CONTACT'
-                },
-                action: {
-                  link: (): string[] => {
-                    return ['/contacts', 'create'];
-                  },
-                  linkQueryParams: (item: CaseModel): Params => {
-                    return {
-                      entityType: EntityType.CASE,
-                      entityId: item.id
-                    };
-                  }
-                },
-                visible: (item: CaseModel): boolean => {
-                  return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    ContactModel.canCreate(this.authUser) &&
-                    CaseModel.canCreateContact(this.authUser);
-                }
-              },
-
-              // Bulk add contacts to case
-              {
-                label: {
-                  get: () => 'LNG_PAGE_ACTION_BULK_ADD_CONTACTS'
-                },
-                action: {
-                  link: (): string[] => {
-                    return ['/contacts', 'create-bulk'];
-                  },
-                  linkQueryParams: (item: CaseModel): Params => {
-                    return {
-                      entityType: EntityType.CASE,
-                      entityId: item.id
-                    };
-                  }
-                },
-                visible: (item: CaseModel): boolean => {
-                  return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    ContactModel.canBulkCreate(this.authUser) &&
-                    CaseModel.canBulkCreateContact(this.authUser);
-                }
-              },
-
-              // Divider
-              {
-                visible: (item: CaseModel): boolean => {
-                  // visible only if at least one of the previous two items is visible
-                  return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    (
-                      (
-                        ContactModel.canCreate(this.authUser) &&
-                        CaseModel.canCreateContact(this.authUser)
-                      ) || (
-                        ContactModel.canBulkCreate(this.authUser) &&
-                        CaseModel.canBulkCreateContact(this.authUser)
-                      )
-                    );
-                }
-              },
-
-              // See case contacts..
-              {
-                label: {
-                  get: () => 'LNG_PAGE_ACTION_SEE_EXPOSURES_FROM'
-                },
-                action: {
-                  link: (item: CaseModel): string[] => {
-                    return ['/relationships', EntityType.CASE, item.id, 'contacts'];
-                  }
-                },
-                visible: (item: CaseModel): boolean => {
-                  return !item.deleted &&
-                    RelationshipModel.canList(this.authUser) &&
-                    CaseModel.canListRelationshipContacts(this.authUser);
-                }
-              },
-
-              // See case exposures
-              {
-                label: {
-                  get: () => 'LNG_PAGE_ACTION_SEE_EXPOSURES_TO'
-                },
-                action: {
-                  link: (item: CaseModel): string[] => {
-                    return ['/relationships', EntityType.CASE, item.id, 'exposures'];
-                  }
-                },
-                visible: (item: CaseModel): boolean => {
-                  return !item.deleted &&
-                    RelationshipModel.canList(this.authUser) &&
-                    CaseModel.canListRelationshipExposures(this.authUser);
-                }
-              },
-
-              // Divider
-              {
-                visible: (item: CaseModel): boolean => {
-                  // visible only if at least one of the previous two items is visible
-                  return !item.deleted &&
-                    RelationshipModel.canList(this.authUser) &&
-                    (
-                      CaseModel.canListRelationshipContacts(this.authUser) ||
-                      CaseModel.canListRelationshipExposures(this.authUser)
-                    );
-                }
-              },
-
-              // See records detected by the system as duplicates but they were marked as not duplicates
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CASES_ACTION_SEE_RECORDS_NOT_DUPLICATES'
-                },
-                action: {
-                  link: (item: CaseModel): string[] => {
-                    return ['/duplicated-records/cases', item.id, 'marked-not-duplicates'];
-                  }
-                },
-                visible: (item: CaseModel): boolean => {
-                  return !item.deleted;
-                }
-              },
-
-              // See case lab results
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CASES_ACTION_SEE_LAB_RESULTS'
-                },
-                action: {
-                  link: (item: CaseModel): string[] => {
-                    return ['/lab-results', 'cases', item.id];
-                  }
-                },
-                visible: (item: CaseModel): boolean => {
-                  return !item.deleted &&
-                    LabResultModel.canList(this.authUser) &&
-                    CaseModel.canListLabResult(this.authUser);
-                }
-              },
-
-              // See contacts follow-us belonging to this case
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CASES_ACTION_VIEW_FOLLOW_UPS'
-                },
-                action: {
-                  link: (item: CaseModel): string[] => {
-                    return ['/contacts', 'case-related-follow-ups', item.id];
-                  }
-                },
-                visible: (item: CaseModel): boolean => {
-                  return !item.deleted &&
-                    FollowUpModel.canList(this.authUser);
-                }
-              },
-
-              // Divider
-              {
-                visible: (item: CaseModel): boolean => {
-                  // visible only if at least one of the previous two items is visible
-                  return !item.deleted && (
-                    LabResultModel.canList(this.authUser) ||
-                    FollowUpModel.canList(this.authUser)
-                  );
-                }
-              },
-
-              // View Case movement map
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CASES_ACTION_VIEW_MOVEMENT'
-                },
-                action: {
-                  link: (item: CaseModel): string[] => {
-                    return ['/cases', item.id, 'movement'];
-                  }
-                },
-                visible: (item: CaseModel): boolean => {
-                  return !item.deleted &&
-                    CaseModel.canViewMovementMap(this.authUser);
-                }
-              },
-
-              // View case chronology timeline
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CASES_ACTION_VIEW_CHRONOLOGY'
-                },
-                action: {
-                  link: (item: CaseModel): string[] => {
-                    return ['/cases', item.id, 'chronology'];
-                  }
-                },
-                visible: (item: CaseModel): boolean => {
-                  return !item.deleted &&
-                    CaseModel.canViewChronologyChart(this.authUser);
-                }
-              },
-
-              // Divider
-              {
-                visible: (item: CaseModel): boolean => {
-                  return !item.deleted && (
-                    CaseModel.canViewMovementMap(this.authUser) ||
-                    CaseModel.canViewChronologyChart(this.authUser)
-                  );
-                }
-              },
-
-              // Download case investigation form
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CASES_ACTION_EXPORT_CASE_INVESTIGATION_FORM'
-                },
-                action: {
-                  click: (item: CaseModel) => {
-                    // export
-                    this.dialogV2Service.showExportData({
-                      title: {
-                        get: () => 'LNG_PAGE_LIST_CASES_EXPORT_CASE_INVESTIGATION_FORM_TITLE'
-                      },
-                      initialized: (handler) => {
-                        handler.buttons.click(ExportButtonKey.EXPORT);
-                      },
-                      export: {
-                        url: `outbreaks/${this.selectedOutbreak.id}/cases/${item.id}/export-empty-case-investigation`,
-                        async: false,
-                        method: ExportDataMethod.GET,
-                        fileName: `${this.translateService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD')}`,
-                        allow: {
-                          types: [
-                            ExportDataExtension.ZIP
-                          ]
-                        }
-                      }
-                    });
-                  }
-                },
-                visible: (item: CaseModel): boolean => {
-                  return !item.deleted &&
-                    CaseModel.canExportInvestigationForm(this.authUser);
-                }
-              },
-
-              // Restore a deleted case
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_CASES_ACTION_RESTORE_CASE'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: CaseModel) => {
-                    // show confirm dialog to confirm the action
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_RESTORE',
-                          data: () => item as any
-                        },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_RESTORE_CASE',
-                          data: () => item as any
-                        }
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
-
-                      // convert
-                      this.caseDataService
-                        .restoreCase(
-                          this.selectedOutbreak.id,
-                          item.id
-                        )
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
-
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_CASES_ACTION_RESTORE_SUCCESS_MESSAGE');
-
-                          // hide loading
-                          loading.close();
-
-                          // reload data
-                          this.needsRefreshList(true);
-                        });
-                    });
-                  }
-                },
-                visible: (item: CaseModel): boolean => {
-                  return item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    CaseModel.canRestore(this.authUser);
-                }
-              }
-            ]
-          }
-        ]
       }
     );
   }

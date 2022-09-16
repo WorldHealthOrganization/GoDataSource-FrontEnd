@@ -290,13 +290,25 @@
   }
 
   &.gd-form-fill-questionnaire-v2-list-item-markup {
-    background-color: rgba(var(--gd-warning-rgb), 0.2);
+    background-color: rgba(var(--gd-warning-rgb), 0.1);
     color: var(--gd-primary-alt);
     font-weight: 700;
     padding-right: 1.6rem;
 
     &:hover {
-      background-color: rgba(var(--gd-warning-rgb), 0.2);
+      background-color: rgba(var(--gd-warning-rgb), 0.1);
+    }
+  }
+
+  .gd-form-fill-questionnaire-v2-list-item-category {
+    background-color: rgba(var(--gd-warning-rgb), 0.2);
+    height: 100%;
+    padding-left: 3.6rem;
+
+    .gd-form-fill-questionnaire-v2-list-item-category-content {
+      color: var(--gd-primary-alt);
+      font-size: 2rem;
+      font-weight: 700;
     }
   }
 

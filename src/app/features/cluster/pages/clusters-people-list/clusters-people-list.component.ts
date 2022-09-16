@@ -80,6 +80,51 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
   }
 
   /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View Person
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_ACTION_VIEW',
+          action: {
+            link: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): string[] => {
+              return [this.getItemRouterLink(item, 'view')];
+            }
+          },
+          visible: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): boolean => {
+            return !item.deleted &&
+              item.canView(this.authUser);
+          }
+        },
+
+        // Modify Person
+        {
+          type: V2ActionType.ICON,
+          icon: 'edit',
+          iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
+          action: {
+            link: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): string[] => {
+              return [this.getItemRouterLink(item, 'modify')];
+            }
+          },
+          visible: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): boolean => {
+            return !item.deleted &&
+              this.selectedOutbreakIsActive &&
+              item.canModify(this.authUser);
+          }
+        }
+      ]
+    };
+  }
+
+  /**
    * Initialize side table columns
    */
   protected initializeTableColumns(): void {
@@ -245,52 +290,6 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
           // finished
           return forms;
         }
-      },
-
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // View Person
-          {
-            type: V2ActionType.ICON,
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_ACTION_VIEW',
-            action: {
-              link: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): string[] => {
-                return [this.getItemRouterLink(item, 'view')];
-              }
-            },
-            visible: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): boolean => {
-              return !item.deleted &&
-                item.canView(this.authUser);
-            }
-          },
-
-          // Modify Person
-          {
-            type: V2ActionType.ICON,
-            icon: 'edit',
-            iconTooltip: 'LNG_PAGE_ACTION_MODIFY',
-            action: {
-              link: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): string[] => {
-                return [this.getItemRouterLink(item, 'modify')];
-              }
-            },
-            visible: (item: CaseModel | ContactModel | ContactOfContactModel | EventModel): boolean => {
-              return !item.deleted &&
-                this.selectedOutbreakIsActive &&
-                item.canModify(this.authUser);
-            }
-          }
-        ]
       }
     ];
   }

@@ -61,6 +61,10 @@
             }
 
             .gd-create-view-modify-list-top-buttons {
+              @include flex(flex);
+              @include flex_align_items(center);
+              @include flex_justify(center);
+
               button.mat-icon-button {
                 height: 2.4rem;
                 min-width: 2.4rem;
@@ -128,19 +132,16 @@
           }
 
           .cdk-virtual-scroll-viewport {
-            height: 100%;
+            height: calc(100% - 4.8rem);
             overflow-y: overlay;
             overflow-x: hidden;
           }
 
           .gd-create-view-modify-list-data-record {
+            border-bottom: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.15);
             cursor: pointer;
             max-width: var(--gd-side-list-width-expanded);
             width: 100%;
-
-            + .gd-create-view-modify-list-data-record {
-              border-top: 0.1rem solid rgba(var(--gd-secondary-rgb), 0.15);
-            }
 
             &:hover {
               background-color: rgba(var(--gd-secondary-rgb), 0.05);
@@ -150,18 +151,73 @@
               background-color: rgba(var(--gd-primary-alt-rgb), 0.1);
             }
 
-            > a {
+            .gd-create-view-modify-list-data-record-is-text {
               color: var(--gd-text);
               @include flex(flex);
               @include flex_align_items(center);
 
-              > * {
+              > span {
                 line-height: 2.4rem;
                 overflow: hidden;
                 padding: 0.8rem 1.6rem;
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 width: 100%;
+              }
+            }
+
+            .gd-create-view-modify-list-data-record-is-status-and-details {
+              color: var(--gd-text);
+              @include flex(flex);
+              @include flex_align_items(center);
+              height: 100%;
+
+              > span {
+                @include flex(flex);
+                @include flex_align_items(center);
+                @include flex_direction(row);
+                @include flex_justify(flex-start);
+                padding: 0.8rem 1.6rem;
+                width: 100%;
+
+                &.gd-create-view-modify-list-data-record-active-statuses {
+                  padding-left: 0.8rem;
+                }
+              }
+
+              .gd-create-view-modify-list-data-record-is-status-and-details-status {
+                text-align: center;
+
+                svg {
+                  + svg {
+                    margin-left: -0.4rem;
+                  }
+                }
+              }
+
+              .gd-create-view-modify-list-data-record-is-status-and-details-details {
+                @include flex(flex);
+                @include flex_direction(column);
+                @include flex_justify(center);
+                line-height: 2.4rem;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                width: 100%;
+
+                .gd-create-view-modify-list-data-record-is-status-and-details-details-text {
+                  color: var(--gd-text);
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+                }
+
+                .gd-create-view-modify-list-data-record-is-status-and-details-details-details {
+                  color: var(--gd-secondary);
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+                }
               }
             }
           }
@@ -317,12 +373,17 @@
 
     .gd-create-view-modify-top-title-buttons {
       .gd-create-view-modify-top-title-buttons-title {
+        overflow: hidden;
+
         span {
           color: var(--gd-primary);
           font-family: $gd-font-family;
           font-size: 2.4rem;
           font-weight: 500;
           line-height: $gd-line-height;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
 
         .mat-icon-button {
@@ -339,10 +400,6 @@
       }
 
       .gd-create-view-modify-top-title-buttons-buttons {
-        @include breakpoint('xs') {
-          margin-top: 1.6rem;
-        }
-
         .gd-create-view-modify-top-title-buttons-buttons-quick {
           .mat-icon {
             @include transition(all 0.24s ease-in-out 0s);
@@ -359,6 +416,14 @@
   }
 
   .gd-create-view-modify-bottom {
+    position: relative;
+
+    .gd-order-tabs-button {
+      @include border-radius(0.4rem 0.4rem 0 0);
+      position: absolute;
+      z-index: 10;
+    }
+
     .gd-create-view-modify-bottom-content {
       .gd-create-view-modify-bottom-section {
         + .gd-create-view-modify-bottom-section {
@@ -579,6 +644,54 @@
       .gd-create-view-modify-bottom-section-content-input-has-edit-questionnaire,
       .gd-create-view-modify-bottom-section-content-input-has-fill-questionnaire {
         height: 100%;
+      }
+    }
+  }
+}
+
+/* Create */
+.gd-create-view-modify-create {
+  .gd-create-view-modify-top {
+    .gd-create-view-modify-top-title-buttons {
+      .gd-create-view-modify-top-title-buttons-title {
+        padding-right: 4.8rem;
+      }
+    }
+  }
+
+  .gd-create-view-modify-bottom {
+    .gd-order-tabs-button {
+      right: 0;
+      top: -3.6rem;
+
+      + .mat-stepper-horizontal {
+        .mat-horizontal-stepper-header-container {
+          @include border-radius(0.4rem 0 0 0);
+        }
+      }
+    }
+  }
+}
+
+/* Modify & View */
+.gd-create-view-modify-modify,
+.gd-create-view-modify-view {
+  .gd-create-view-modify-bottom {
+    .gd-order-tabs-button {
+      left: 0;
+      top: 0.2rem;
+
+      @include breakpoint('xs') {
+        @include border-radius(0);
+        height: 3.8rem;
+        left: -2rem;
+        top: 0;
+      }
+
+      + .mat-tab-group {
+        .mat-tab-header {
+          padding-left: 8rem;
+        }
       }
     }
   }

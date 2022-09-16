@@ -127,6 +127,9 @@ implements OnDestroy {
 
     // must initialize data ?
     this.refreshNecessary(false);
+
+    // update ui
+    this.detectChanges();
   }
   get expanded(): boolean {
     return this._expanded;

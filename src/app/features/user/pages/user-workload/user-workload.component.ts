@@ -70,8 +70,8 @@ export class UserWorkloadComponent extends ListComponent<any> implements OnDestr
   }
 
   /**
-     * Remove component resources
-     */
+   * Remove component resources
+   */
   ngOnDestroy() {
     // release parent resources
     super.onDestroy();
@@ -112,6 +112,11 @@ export class UserWorkloadComponent extends ListComponent<any> implements OnDestr
     // ...and re-load the list when the Selected Outbreak is changed
     this.needsRefreshList(true);
   }
+
+  /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {}
 
   /**
    * Initialize Side Table Columns

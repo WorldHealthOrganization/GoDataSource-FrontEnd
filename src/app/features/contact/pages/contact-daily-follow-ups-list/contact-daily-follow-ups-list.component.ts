@@ -20,7 +20,6 @@ import { UserModel } from '../../../../core/models/user.model';
 import { FollowUpsDataService } from '../../../../core/services/data/follow-ups.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ExportDataExtension, ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
@@ -28,7 +27,7 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import { IV2Column, IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { IV2FilterDate, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import {
@@ -44,11 +43,11 @@ import {
   V2SideDialogConfigInputType
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
-import { FollowUpPage } from '../../typings/follow-up-page';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { IV2DateRange } from '../../../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
 import { EntityType } from '../../../../core/models/entity-type';
 import { AppFormSelectMultipleV2Component } from '../../../../shared/forms-v2/components/app-form-select-multiple-v2/app-form-select-multiple-v2.component';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-daily-follow-ups-list',
@@ -101,7 +100,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
   constructor(
     protected listHelperService: ListHelperService,
     protected followUpsDataService: FollowUpsDataService,
-    protected i18nService: I18nService,
+    protected translateService: TranslateService,
     protected outbreakDataService: OutbreakDataService,
     private toastV2Service: ToastV2Service,
     private activatedRoute: ActivatedRoute,
@@ -160,6 +159,440 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
 
     // ...and re-load the list when the Selected Outbreak is changed
     this.needsRefreshList(true);
+  }
+
+  /**
+   * Table column - actions
+   */
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View Follow-up
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_VIEW_FOLLOW_UP',
+          action: {
+            link: (item: FollowUpModel): string[] => {
+              return ['/contacts', item.personId, 'follow-ups', item.id, 'view'];
+            }
+          },
+          visible: (item: FollowUpModel): boolean => {
+            return !item.deleted &&
+              FollowUpModel.canView(this.authUser);
+          }
+        },
+
+        // Modify Follow-up
+        {
+          type: V2ActionType.ICON,
+          icon: 'edit',
+          iconTooltip: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MODIFY_FOLLOW_UP',
+          action: {
+            link: (item: FollowUpModel): string[] => {
+              return ['/contacts', item.personId, 'follow-ups', item.id, 'modify'];
+            }
+          },
+          visible: (item: FollowUpModel): boolean => {
+            return !item.deleted &&
+              !item.person?.deleted &&
+              this.selectedOutbreakIsActive &&
+              FollowUpModel.canModify(this.authUser);
+          }
+        },
+
+        // Other actions
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          menuOptions: [
+            // Delete Follow-up
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_FOLLOW_UP'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: FollowUpModel): void => {
+                  // determine what we need to delete
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_DELETE',
+                        data: () => ({
+                          name: item.date ?
+                            moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                            ''
+                        })
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_DELETE_FOLLOW_UP',
+                        data: () => ({
+                          name: item.date ?
+                            moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                            ''
+                        })
+                      }
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // delete follow up
+                    this.followUpsDataService
+                      .deleteFollowUp(this.selectedOutbreak.id, item.personId, item.id)
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
+
+                          // hide loading
+                          loading.close();
+
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                        // hide loading
+                        loading.close();
+
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
+                }
+              },
+              visible: (item: FollowUpModel): boolean => {
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  FollowUpModel.canDelete(this.authUser);
+              }
+            },
+
+            // Restore a deleted Follow-up
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_FOLLOW_UP'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: FollowUpModel) => {
+                  // show confirm dialog to confirm the action
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_RESTORE',
+                        data: () => ({
+                          name: item.date ?
+                            moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                            ''
+                        })
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP',
+                        data: () => ({
+                          name: item.date ?
+                            moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                            ''
+                        })
+                      }
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // delete follow up
+                    this.followUpsDataService
+                      .restoreFollowUp(
+                        this.selectedOutbreak.id,
+                        item.personId,
+                        item.id
+                      )
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
+
+                          // hide loading
+                          loading.close();
+
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SUCCESS_MESSAGE');
+
+                        // hide loading
+                        loading.close();
+
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
+                }
+              },
+              visible: (item: FollowUpModel): boolean => {
+                return item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  FollowUpModel.canRestore(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: (item: FollowUpModel): boolean => {
+                // visible only if at least one of the previous...
+                return !item.deleted &&
+                  item.person?.type !== EntityType.CASE &&
+                  this.selectedOutbreakIsActive &&
+                  FollowUpModel.canModify(this.authUser) &&
+                  !Constants.isDateInTheFuture(item.date);
+              }
+            },
+
+            // Change targeted
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TARGETED_FORM_BUTTON'
+              },
+              action: {
+                click: (item: FollowUpModel) => {
+                  this.dialogV2Service
+                    .showSideDialog({
+                      // title
+                      title: {
+                        get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TARGETED_DIALOG_TITLE'
+                      },
+
+                      // hide search bar
+                      hideInputFilter: true,
+
+                      // inputs
+                      inputs: [
+                        {
+                          type: V2SideDialogConfigInputType.TOGGLE,
+                          value: item.targeted ?
+                            Constants.FILTER_YES_NO_OPTIONS.YES.value :
+                            Constants.FILTER_YES_NO_OPTIONS.NO.value,
+                          name: 'targeted',
+                          options: [
+                            {
+                              label: Constants.FILTER_YES_NO_OPTIONS.YES.label,
+                              value: Constants.FILTER_YES_NO_OPTIONS.YES.value
+                            },
+                            {
+                              label: Constants.FILTER_YES_NO_OPTIONS.NO.label,
+                              value: Constants.FILTER_YES_NO_OPTIONS.NO.value
+                            }
+                          ]
+                        }
+                      ],
+
+                      // buttons
+                      bottomButtons: [
+                        {
+                          label: 'LNG_COMMON_BUTTON_UPDATE',
+                          type: IV2SideDialogConfigButtonType.OTHER,
+                          color: 'primary',
+                          key: 'save',
+                          disabled: (_data, handler): boolean => {
+                            return !handler.form ||
+                              handler.form.invalid ||
+                              item.targeted === ((handler.data.map.targeted as IV2SideDialogConfigInputToggle).value) as boolean;
+                          }
+                        }, {
+                          type: IV2SideDialogConfigButtonType.CANCEL,
+                          label: 'LNG_COMMON_BUTTON_CANCEL',
+                          color: 'text'
+                        }
+                      ]
+                    })
+                    .subscribe((response) => {
+                      // cancelled ?
+                      if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+                        return;
+                      }
+
+                      // change entity targeted
+                      this.followUpsDataService
+                        .modifyFollowUp(
+                          this.selectedOutbreak.id,
+                          item.personId,
+                          item.id,
+                          {
+                            targeted: (response.handler.data.map.targeted as IV2SideDialogConfigInputToggle).value
+                          }
+                        )
+                        .pipe(
+                          catchError((err) => {
+                            this.toastV2Service.error(err);
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          // update our record too
+                          item.targeted = ((response.handler.data.map.targeted as IV2SideDialogConfigInputToggle).value) as boolean;
+
+                          // success message
+                          this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TARGETED_SUCCESS_MESSAGE');
+
+                          // close popup
+                          response.handler.hide();
+
+                          // reload data
+                          this.needsRefreshList(true);
+                        });
+                    });
+                }
+              },
+              visible: (item: FollowUpModel): boolean => {
+                return !item.deleted &&
+                  item.person?.type !== EntityType.CASE &&
+                  this.selectedOutbreakIsActive &&
+                  FollowUpModel.canModify(this.authUser);
+              }
+            },
+
+            // Change team
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TEAM_FORM_BUTTON'
+              },
+              action: {
+                click: (item: FollowUpModel) => {
+                  this.dialogV2Service
+                    .showSideDialog({
+                      // title
+                      title: {
+                        get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TEAM_DIALOG_TITLE'
+                      },
+
+                      // hide search bar
+                      hideInputFilter: true,
+
+                      // inputs
+                      inputs: [
+                        {
+                          type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
+                          name: 'teamId',
+                          placeholder: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
+                          options: this.activatedRoute.snapshot.data.team.options,
+                          value: item.teamId
+                        }
+                      ],
+
+                      // buttons
+                      bottomButtons: [
+                        {
+                          label: 'LNG_COMMON_BUTTON_UPDATE',
+                          type: IV2SideDialogConfigButtonType.OTHER,
+                          color: 'primary',
+                          key: 'save',
+                          disabled: (_data, handler): boolean => {
+                            return !handler.form ||
+                              handler.form.invalid ||
+                              item.teamId === (handler.data.map.teamId as IV2SideDialogConfigInputSingleDropdown).value;
+                          }
+                        }, {
+                          type: IV2SideDialogConfigButtonType.CANCEL,
+                          label: 'LNG_COMMON_BUTTON_CANCEL',
+                          color: 'text'
+                        }
+                      ]
+                    })
+                    .subscribe((response) => {
+                      // cancelled ?
+                      if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+                        return;
+                      }
+
+                      // change entity targeted
+                      this.followUpsDataService
+                        .modifyFollowUp(
+                          this.selectedOutbreak.id,
+                          item.personId,
+                          item.id,
+                          {
+                            teamId: (response.handler.data.map.teamId as IV2SideDialogConfigInputSingleDropdown).value
+                          }
+                        )
+                        .pipe(
+                          catchError((err) => {
+                            this.toastV2Service.error(err);
+                            return throwError(err);
+                          })
+                        )
+                        .subscribe(() => {
+                          // success message
+                          this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TEAM_SUCCESS_MESSAGE');
+
+                          // close popup
+                          response.handler.hide();
+
+                          // reload data
+                          this.needsRefreshList(true);
+                        });
+                    });
+                }
+              },
+              visible: (item: FollowUpModel): boolean => {
+                return !item.deleted &&
+                  item.person?.type !== EntityType.CASE &&
+                  this.selectedOutbreakIsActive &&
+                  FollowUpModel.canModify(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: (item: FollowUpModel) => {
+                return !item.deleted &&
+                  this.selectedOutbreakIsActive &&
+                  FollowUpModel.canModify(this.authUser) &&
+                  FollowUpModel.canList(this.authUser);
+              }
+            },
+
+            // View follow-ups
+            {
+              label: {
+                get: (item: FollowUpModel) => this.translateService.instant('LNG_PAGE_LIST_FOLLOW_UPS_VIEW_PERSON_FOLLOW_UPS_FORM_BUTTON', { name: item.person.name })
+              },
+              action: {
+                link: (item: FollowUpModel): string[] => {
+                  return ['/contacts', 'contact-related-follow-ups', item.personId];
+                }
+              },
+              visible: (item: FollowUpModel): boolean => {
+                return !item.deleted &&
+                  FollowUpModel.canList(this.authUser);
+              }
+            }
+          ]
+        }
+      ]
+    };
   }
 
   /**
@@ -315,6 +748,32 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         }
       },
       {
+        field: 'statuses',
+        label: 'LNG_COMMON_LABEL_STATUSES',
+        format: {
+          type: V2ColumnFormat.STATUS
+        },
+        notResizable: true,
+        pinned: true,
+        legends: [
+          // alerted
+          {
+            title: 'LNG_COMMON_LABEL_STATUSES_ALERTED',
+            items: [{
+              form: {
+                type: IV2ColumnStatusFormType.STAR,
+                color: 'var(--gd-danger)'
+              },
+              label: ' '
+            }]
+          }
+        ],
+        forms: (_column, data: FollowUpModel): V2ColumnStatusForm[] => FollowUpModel.getStatusForms({
+          item: data,
+          translateService: this.translateService
+        })
+      },
+      {
         field: 'teamId',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
         format: {
@@ -462,7 +921,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         notVisible: true,
         format: {
           type: (item) => item.person?.riskLevel && (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.riskLevel] ?
-            this.i18nService.instant((this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.riskLevel].value) :
+            this.translateService.instant((this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.riskLevel].value) :
             '—'
         },
         filter: {
@@ -684,451 +1143,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         filter: {
           type: V2FilterType.DATE_RANGE
         }
-      },
-
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // View Follow-up
-          {
-            type: V2ActionType.ICON,
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_VIEW_FOLLOW_UP',
-            action: {
-              link: (item: FollowUpModel): string[] => {
-                return ['/contacts', item.personId, 'follow-ups', item.id, 'view'];
-              },
-              linkQueryParams: (): Params => {
-                return {
-                  rootPage: this.caseData ? FollowUpPage.CASE_RELATED : FollowUpPage.DAILY,
-                  rootCaseId: this.caseData?.id
-                };
-              }
-            },
-            visible: (item: FollowUpModel): boolean => {
-              return !item.deleted &&
-                FollowUpModel.canView(this.authUser);
-            }
-          },
-
-          // Modify Follow-up
-          {
-            type: V2ActionType.ICON,
-            icon: 'edit',
-            iconTooltip: 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_MODIFY_FOLLOW_UP',
-            action: {
-              link: (item: FollowUpModel): string[] => {
-                return ['/contacts', item.personId, 'follow-ups', item.id, 'modify'];
-              },
-              linkQueryParams: (): Params => {
-                return {
-                  rootPage: this.caseData ? FollowUpPage.CASE_RELATED : FollowUpPage.DAILY,
-                  rootCaseId: this.caseData?.id
-                };
-              }
-            },
-            visible: (item: FollowUpModel): boolean => {
-              return !item.deleted &&
-                !item.person?.deleted &&
-                this.selectedOutbreakIsActive &&
-                FollowUpModel.canModify(this.authUser);
-            }
-          },
-
-          // Other actions
-          {
-            type: V2ActionType.MENU,
-            icon: 'more_horiz',
-            menuOptions: [
-              // Delete Follow-up
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_FOLLOW_UP'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: FollowUpModel): void => {
-                    // determine what we need to delete
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_DELETE',
-                          data: () => ({
-                            name: item.date ?
-                              moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
-                              ''
-                          })
-                        },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_FOLLOW_UP',
-                          data: () => ({
-                            name: item.date ?
-                              moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
-                              ''
-                          })
-                        }
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
-
-                      // delete follow up
-                      this.followUpsDataService
-                        .deleteFollowUp(this.selectedOutbreak.id, item.personId, item.id)
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
-
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SUCCESS_MESSAGE');
-
-                          // hide loading
-                          loading.close();
-
-                          // reload data
-                          this.needsRefreshList(true);
-                        });
-                    });
-                  }
-                },
-                visible: (item: FollowUpModel): boolean => {
-                  return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    FollowUpModel.canDelete(this.authUser);
-                }
-              },
-
-              // Restore a deleted Follow-up
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_FOLLOW_UP'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: FollowUpModel) => {
-                    // show confirm dialog to confirm the action
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_RESTORE',
-                          data: () => ({
-                            name: item.date ?
-                              moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
-                              ''
-                          })
-                        },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_RESTORE_FOLLOW_UP',
-                          data: () => ({
-                            name: item.date ?
-                              moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
-                              ''
-                          })
-                        }
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
-
-                      // delete follow up
-                      this.followUpsDataService
-                        .restoreFollowUp(
-                          this.selectedOutbreak.id,
-                          item.personId,
-                          item.id
-                        )
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
-
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SUCCESS_MESSAGE');
-
-                          // hide loading
-                          loading.close();
-
-                          // reload data
-                          this.needsRefreshList(true);
-                        });
-                    });
-                  }
-                },
-                visible: (item: FollowUpModel): boolean => {
-                  return item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    FollowUpModel.canRestore(this.authUser);
-                }
-              },
-
-              // Divider
-              {
-                visible: (item: FollowUpModel): boolean => {
-                  // visible only if at least one of the previous...
-                  return !item.deleted &&
-                    item.person?.type !== EntityType.CASE &&
-                    this.selectedOutbreakIsActive &&
-                    FollowUpModel.canModify(this.authUser) &&
-                    !Constants.isDateInTheFuture(item.date);
-                }
-              },
-
-              // Change targeted
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TARGETED_FORM_BUTTON'
-                },
-                action: {
-                  click: (item: FollowUpModel) => {
-                    this.dialogV2Service
-                      .showSideDialog({
-                        // title
-                        title: {
-                          get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TARGETED_DIALOG_TITLE'
-                        },
-
-                        // hide search bar
-                        hideInputFilter: true,
-
-                        // inputs
-                        inputs: [
-                          {
-                            type: V2SideDialogConfigInputType.TOGGLE,
-                            value: item.targeted ?
-                              Constants.FILTER_YES_NO_OPTIONS.YES.value :
-                              Constants.FILTER_YES_NO_OPTIONS.NO.value,
-                            name: 'targeted',
-                            options: [
-                              {
-                                label: Constants.FILTER_YES_NO_OPTIONS.YES.label,
-                                value: Constants.FILTER_YES_NO_OPTIONS.YES.value
-                              },
-                              {
-                                label: Constants.FILTER_YES_NO_OPTIONS.NO.label,
-                                value: Constants.FILTER_YES_NO_OPTIONS.NO.value
-                              }
-                            ]
-                          }
-                        ],
-
-                        // buttons
-                        bottomButtons: [
-                          {
-                            label: 'LNG_COMMON_BUTTON_UPDATE',
-                            type: IV2SideDialogConfigButtonType.OTHER,
-                            color: 'primary',
-                            key: 'save',
-                            disabled: (_data, handler): boolean => {
-                              return !handler.form ||
-                                handler.form.invalid ||
-                                item.targeted === ((handler.data.map.targeted as IV2SideDialogConfigInputToggle).value) as boolean;
-                            }
-                          }, {
-                            type: IV2SideDialogConfigButtonType.CANCEL,
-                            label: 'LNG_COMMON_BUTTON_CANCEL',
-                            color: 'text'
-                          }
-                        ]
-                      }).subscribe((response) => {
-                        // cancelled ?
-                        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
-                          return;
-                        }
-
-                        // change entity targeted
-                        this.followUpsDataService
-                          .modifyFollowUp(
-                            this.selectedOutbreak.id,
-                            item.personId,
-                            item.id,
-                            {
-                              targeted: (response.handler.data.map.targeted as IV2SideDialogConfigInputToggle).value
-                            }
-                          )
-                          .pipe(
-                            catchError((err) => {
-                              this.toastV2Service.error(err);
-                              return throwError(err);
-                            })
-                          )
-                          .subscribe(() => {
-                            // update our record too
-                            item.targeted = ((response.handler.data.map.targeted as IV2SideDialogConfigInputToggle).value) as boolean;
-
-                            // success message
-                            this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TARGETED_SUCCESS_MESSAGE');
-
-                            // close popup
-                            response.handler.hide();
-
-                            // reload data
-                            this.needsRefreshList(true);
-                          });
-                      });
-                  }
-                },
-                visible: (item: FollowUpModel): boolean => {
-                  return !item.deleted &&
-                    item.person?.type !== EntityType.CASE &&
-                    this.selectedOutbreakIsActive &&
-                    FollowUpModel.canModify(this.authUser);
-                }
-              },
-
-              // Change team
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TEAM_FORM_BUTTON'
-                },
-                action: {
-                  click: (item: FollowUpModel) => {
-                    this.dialogV2Service
-                      .showSideDialog({
-                        // title
-                        title: {
-                          get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TEAM_DIALOG_TITLE'
-                        },
-
-                        // hide search bar
-                        hideInputFilter: true,
-
-                        // inputs
-                        inputs: [
-                          {
-                            type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
-                            name: 'teamId',
-                            placeholder: 'LNG_FOLLOW_UP_FIELD_LABEL_TEAM',
-                            options: this.activatedRoute.snapshot.data.team.options,
-                            value: item.teamId
-                          }
-                        ],
-
-                        // buttons
-                        bottomButtons: [
-                          {
-                            label: 'LNG_COMMON_BUTTON_UPDATE',
-                            type: IV2SideDialogConfigButtonType.OTHER,
-                            color: 'primary',
-                            key: 'save',
-                            disabled: (_data, handler): boolean => {
-                              return !handler.form ||
-                                handler.form.invalid ||
-                                item.teamId === (handler.data.map.teamId as IV2SideDialogConfigInputSingleDropdown).value;
-                            }
-                          }, {
-                            type: IV2SideDialogConfigButtonType.CANCEL,
-                            label: 'LNG_COMMON_BUTTON_CANCEL',
-                            color: 'text'
-                          }
-                        ]
-                      }).subscribe((response) => {
-                        // cancelled ?
-                        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
-                          return;
-                        }
-
-                        // change entity targeted
-                        this.followUpsDataService
-                          .modifyFollowUp(
-                            this.selectedOutbreak.id,
-                            item.personId,
-                            item.id,
-                            {
-                              teamId: (response.handler.data.map.teamId as IV2SideDialogConfigInputSingleDropdown).value
-                            }
-                          )
-                          .pipe(
-                            catchError((err) => {
-                              this.toastV2Service.error(err);
-                              return throwError(err);
-                            })
-                          )
-                          .subscribe(() => {
-                            // success message
-                            this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_CHANGE_TEAM_SUCCESS_MESSAGE');
-
-                            // close popup
-                            response.handler.hide();
-
-                            // reload data
-                            this.needsRefreshList(true);
-                          });
-                      });
-                  }
-                },
-                visible: (item: FollowUpModel): boolean => {
-                  return !item.deleted &&
-                    item.person?.type !== EntityType.CASE &&
-                    this.selectedOutbreakIsActive &&
-                    FollowUpModel.canModify(this.authUser);
-                }
-              },
-
-              // Divider
-              {
-                visible: (item: FollowUpModel) => {
-                  return !item.deleted &&
-                    this.selectedOutbreakIsActive &&
-                    FollowUpModel.canModify(this.authUser) &&
-                    FollowUpModel.canList(this.authUser);
-                }
-              },
-
-              // View follow-ups
-              {
-                label: {
-                  get: (item: FollowUpModel) => this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_VIEW_PERSON_FOLLOW_UPS_FORM_BUTTON', { name: item.person.name })
-                },
-                action: {
-                  link: (item: FollowUpModel): string[] => {
-                    return ['/contacts', 'contact-related-follow-ups', item.personId];
-                  }
-                },
-                visible: (item: FollowUpModel): boolean => {
-                  return !item.deleted &&
-                    FollowUpModel.canList(this.authUser);
-                }
-              }
-            ]
-          }
-        ]
       }
     ];
   }
@@ -1606,7 +1620,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                     url: `outbreaks/${ this.selectedOutbreak.id }/contacts/daily-followup-form/export`,
                     async: false,
                     method: ExportDataMethod.GET,
-                    fileName: this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME'),
+                    fileName: this.translateService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME'),
                     queryBuilder: this.queryBuilder,
                     allow: {
                       types: [ExportDataExtension.PDF]
@@ -2474,7 +2488,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                   url: `outbreaks/${ this.selectedOutbreak.id }/follow-ups/export`,
                   async: true,
                   method: ExportDataMethod.POST,
-                  fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_FOLLOW_UPS_TITLE') } - ${ moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) }`,
+                  fileName: `${ this.translateService.instant('LNG_PAGE_LIST_FOLLOW_UPS_TITLE') } - ${ moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) }`,
                   queryBuilder: qb,
                   allow: {
                     types: [

@@ -95,14 +95,27 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
   }
 
   /**
-   * Initialize Side Table Columns
+   * Table column - actions
    */
-  protected initializeTableColumns(): void {
-    this.tableColumns = this.entityHelperService.retrieveTableColumns({
+  protected initializeTableColumnActions(): void {
+    this.tableColumnActions = this.entityHelperService.retrieveTableColumnActions({
       selectedOutbreakIsActive: () => this.selectedOutbreakIsActive,
       selectedOutbreak: () => this.selectedOutbreak,
       entity: this._entity,
       relationshipType: this.relationshipType,
+      authUser: this.authUser,
+      refreshList: () => {
+        // reload data
+        this.needsRefreshList(true);
+      }
+    });
+  }
+
+  /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {
+    this.tableColumns = this.entityHelperService.retrieveTableColumns({
       authUser: this.authUser,
       personType: this.activatedRoute.snapshot.data.personType,
       cluster: this.activatedRoute.snapshot.data.cluster,
@@ -113,10 +126,6 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
         exposureDuration: (this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         contextOfTransmission: (this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         user: (this.activatedRoute.snapshot.data.user as IResolverV2ResponseModel<UserModel>).options
-      },
-      refreshList: () => {
-        // reload data
-        this.needsRefreshList(true);
       }
     });
   }

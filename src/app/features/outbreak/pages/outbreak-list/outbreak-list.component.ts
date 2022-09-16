@@ -69,10 +69,9 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
   }
 
   /**
-   * Initialize Side Table Columns
+   * Table column - actions
    */
-  protected initializeTableColumns()
-  {
+  protected initializeTableColumnActions(): void {
     // validate clone outbreak name
     let cloneOutbreakName: string;
     const asyncValidateCloneOutbreakName: Observable<boolean | IGeneralAsyncValidatorResponse> = new Observable((observer) => {
@@ -83,6 +82,500 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
         });
     });
 
+    // init table column actions
+    this.tableColumnActions = {
+      format: {
+        type: V2ColumnFormat.ACTIONS
+      },
+      actions: [
+        // View Outbreak
+        {
+          type: V2ActionType.ICON,
+          icon: 'visibility',
+          iconTooltip: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_OUTBREAK',
+          action: {
+            link: (item: OutbreakModel): string[] => {
+              return ['/outbreaks', item.id, 'view'];
+            }
+          },
+          visible: (item: OutbreakModel): boolean => {
+            return !item.deleted && OutbreakModel.canView(this.authUser);
+          }
+        },
+
+        // Modify Outbreak
+        {
+          type: V2ActionType.ICON,
+          icon: 'edit',
+          iconTooltip: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_MODIFY_OUTBREAK',
+          action: {
+            link: (item: OutbreakModel): string[] => {
+              return ['/outbreaks', item.id, 'modify'];
+            }
+          },
+          visible: (item: OutbreakModel): boolean => {
+            return (
+              !item.deleted &&
+              OutbreakModel.canModify(this.authUser)
+            );
+          }
+        },
+
+        // Make Outbreak active
+        {
+          type: V2ActionType.ICON,
+          icon: 'check',
+          iconTooltip: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE',
+          action: {
+            click: (item: OutbreakModel): void => {
+              // show confirm dialog
+              this.dialogV2Service.showConfirmDialog({
+                config: {
+                  title: {
+                    get: () => 'LNG_COMMON_LABEL_ACTIVE',
+                    data: () => ({
+                      name: item.name
+                    })
+                  },
+                  message: {
+                    get: () => 'LNG_DIALOG_CONFIRM_MAKE_OUTBREAK_ACTIVE',
+                    data: () => ({
+                      name: item.name
+                    })
+                  }
+                }
+              }).subscribe((response) => {
+                // canceled ?
+                if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                  // finished
+                  return;
+                }
+
+                // show loading
+                const loading = this.dialogV2Service.showLoadingDialog();
+
+                // modify outbreak
+                this.userDataService
+                  .modifyUser(
+                    this.authUser.id,
+                    {
+                      activeOutbreakId: item.id
+                    }
+                  )
+                  .pipe(
+                    catchError((err) => {
+                      this.toastV2Service.error(err);
+                      return throwError(err);
+                    })
+                  )
+                  .subscribe(() => {
+                    // reload user data to save the new active outbreak
+                    this.authDataService
+                      .reloadAndPersistAuthUser()
+                      .subscribe((authenticatedUser) => {
+                        this.authUser = authenticatedUser.user;
+                        this.outbreakDataService.checkActiveSelectedOutbreak();
+
+                        // refresh list of top nav outbreaks
+                        TopnavComponent.REFRESH_OUTBREAK_LIST();
+
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE_SUCCESS_MESSAGE');
+
+                        // hide loading
+                        loading.close();
+
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
+              });
+            }
+          },
+          cssClasses: (item: OutbreakModel): string => {
+            return this.authUser &&
+            item.id === this.authUser.activeOutbreakId ?
+              'gd-list-table-actions-action-icon-active' :
+              '';
+          },
+          disable: (item: OutbreakModel): boolean => {
+            return this.authUser &&
+              item.id === this.authUser.activeOutbreakId;
+          }
+        },
+
+        // Other actions
+        {
+          type: V2ActionType.MENU,
+          icon: 'more_horiz',
+          menuOptions: [
+            // Delete Outbreak
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_OUTBREAK'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: OutbreakModel): void => {
+                  // show confirm dialog
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_DELETE',
+                        data: () => ({
+                          name: item.name
+                        })
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_DELETE_OUTBREAK',
+                        data: () => ({
+                          name: item.name
+                        })
+                      }
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // delete outbreak
+                    this.outbreakDataService
+                      .deleteOutbreak(item.id)
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
+
+                          // hide loading
+                          loading.close();
+
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+
+                        // reload user data to get the updated data regarding active outbreak
+                        this.authDataService
+                          .reloadAndPersistAuthUser()
+                          .subscribe((authenticatedUser) => {
+                            this.authUser = authenticatedUser.user;
+
+                            // success
+                            this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_SUCCESS_MESSAGE');
+
+                            // hide loading
+                            loading.close();
+
+                            // reload data
+                            this.needsRefreshList(true);
+                          });
+                      });
+                  });
+                }
+              },
+              visible: (item: OutbreakModel): boolean => {
+                return !item.deleted &&
+                  OutbreakModel.canDelete(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: (item: OutbreakModel): boolean => {
+                // visible only if at least one of the first two items is visible
+                return !item.deleted &&
+                  OutbreakModel.canDelete(this.authUser);
+              }
+            },
+
+            // View Outbreak inconsistencies
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_INCONSISTENCIES'
+              },
+              action: {
+                link: (item: OutbreakModel): string[] => {
+                  return ['/outbreaks', item.id, 'inconsistencies'];
+                }
+              },
+              visible: (item: OutbreakModel): boolean => {
+                return !item.deleted &&
+                  OutbreakModel.canSeeInconsistencies(this.authUser);
+              }
+            },
+
+            // Divider
+            {
+              visible: (item: OutbreakModel): boolean => {
+                return !item.deleted &&
+                  OutbreakModel.canSeeInconsistencies(this.authUser);
+              }
+            },
+
+            // Clone Outbreak
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_OUTBREAK'
+              },
+              action: {
+                click: (item: OutbreakModel): void => {
+                  // determine what we need to clone
+                  this.dialogV2Service
+                    .showSideDialog({
+                      title: {
+                        get: () => 'LNG_COMMON_BUTTON_CLONE',
+                        data: () => ({
+                          name: item.name
+                        })
+                      },
+                      hideInputFilter: true,
+                      inputs: [{
+                        type: V2SideDialogConfigInputType.TEXT,
+                        name: 'cloneData',
+                        data: item,
+                        placeholder: 'LNG_DIALOG_FIELD_PLACEHOLDER_CLONED_OUTBREAK_NAME',
+                        value: this.i18nService.instant('LNG_PAGE_LIST_OUTBREAKS_CLONE_NAME', { name: item.name }),
+                        validators: {
+                          required: () => true,
+                          async: (_data, _handler, input: IV2SideDialogConfigInputText) => {
+                            cloneOutbreakName = input.value;
+                            return asyncValidateCloneOutbreakName;
+                          }
+                        }
+                      }],
+                      bottomButtons: [{
+                        type: IV2SideDialogConfigButtonType.OTHER,
+                        label: 'LNG_COMMON_BUTTON_CLONE',
+                        color: 'primary',
+                        key: 'apply',
+                        disabled: (_data, handler): boolean => {
+                          return !handler.form ||
+                            handler.form.invalid ||
+                            handler.form.pending;
+                        }
+                      }, {
+                        type: IV2SideDialogConfigButtonType.CANCEL,
+                        label: 'LNG_COMMON_BUTTON_CANCEL',
+                        color: 'text'
+                      }],
+                      initialized: (handler) => {
+                        // display loading
+                        handler.loading.show();
+
+                        // get the outbreak to clone
+                        this.outbreakDataService
+                          .getOutbreak(handler.data.map.cloneData.data.id)
+                          .subscribe((outbreak: OutbreakModel) => {
+                            // keep outbreak that will be cloned
+                            handler.data.map.cloneData.data = outbreak;
+
+                            // hide loading
+                            handler.loading.hide();
+                          });
+                      }
+                    })
+                    .subscribe((response) => {
+                      // canceled ?
+                      if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+                        // finished
+                        return;
+                      }
+
+                      // show loading
+                      const loading = this.dialogV2Service.showLoadingDialog();
+
+                      // translate questionnaire questions
+                      const translateQuestionnaire = (questions: QuestionModel[]) => {
+                        _.each(questions, (question: QuestionModel) => {
+                          // translate question
+                          question.text = this.i18nService.instant(question.text);
+
+                          // translate answers & sub questions
+                          _.each(question.answers, (answer: AnswerModel) => {
+                            // translate answer
+                            answer.label = this.i18nService.instant(answer.label);
+
+                            // translate sub-question
+                            if (!_.isEmpty(answer.additionalQuestions)) {
+                              translateQuestionnaire(answer.additionalQuestions);
+                            }
+                          });
+                        });
+                      };
+
+                      // determine data of outbreak that we need to clone
+                      let outbreakToClone = response.handler.data.map.cloneData.data;
+                      const countries: {
+                        id: string
+                      }[] = outbreakToClone.countries;
+
+                      // sanitize
+                      outbreakToClone = JSON.parse(JSON.stringify(outbreakToClone));
+                      delete outbreakToClone.id;
+                      delete outbreakToClone._countryIds;
+                      delete outbreakToClone._countries;
+                      outbreakToClone.countries = countries;
+
+                      // set the name for the cloned outbreak
+                      outbreakToClone.name = (response.handler.data.inputs[0] as any).value;
+
+                      // translate questionnaire questions - Case Form
+                      if (!_.isEmpty(outbreakToClone.caseInvestigationTemplate)) {
+                        translateQuestionnaire(outbreakToClone.caseInvestigationTemplate);
+                      }
+
+                      // translate questionnaire questions - Contact Form
+                      if (!_.isEmpty(outbreakToClone.contactInvestigationTemplate)) {
+                        translateQuestionnaire(outbreakToClone.contactInvestigationTemplate);
+                      }
+
+                      // translate questionnaire questions - Lab Results Form
+                      if (!_.isEmpty(outbreakToClone.labResultsTemplate)) {
+                        translateQuestionnaire(outbreakToClone.labResultsTemplate);
+                      }
+
+                      // translate questionnaire questions - Contact Follow-up
+                      if (!_.isEmpty(outbreakToClone.contactFollowUpTemplate)) {
+                        translateQuestionnaire(outbreakToClone.contactFollowUpTemplate);
+                      }
+
+                      // hide side dialog
+                      response.handler.hide();
+
+                      // create outbreak clone
+                      this.outbreakDataService
+                        .createOutbreak(outbreakToClone)
+                        .pipe(
+                          catchError((err) => {
+                            this.toastV2Service.error(err);
+                            // hide loading
+                            loading.close();
+                            return throwError(err);
+                          }),
+                          switchMap((clonedOutbreak) => {
+                            // update language tokens to get the translation of submitted questions and answers
+                            return this.i18nService.loadUserLanguage()
+                              .pipe(
+                                catchError((err) => {
+                                  this.toastV2Service.error(err);
+                                  // hide loading
+                                  loading.close();
+                                  return throwError(err);
+                                }),
+                                map(() => clonedOutbreak)
+                              );
+                          })
+                        )
+                        .subscribe((clonedOutbreak) => {
+                          // show success message
+                          this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_SUCCESS_MESSAGE');
+
+                          // hide loading
+                          loading.close();
+
+                          // reload data
+                          this.needsRefreshList(true);
+
+                          // navigate to modify page of the new outbreak
+                          if (OutbreakModel.canModify(this.authUser)) {
+                            this.router.navigate([`/outbreaks/${clonedOutbreak.id}/modify`]);
+                          } else if (OutbreakModel.canView(this.authUser)) {
+                            this.router.navigate([`/outbreaks/${clonedOutbreak.id}/view`]);
+                          } else if (OutbreakModel.canList(this.authUser)) {
+                            this.router.navigate(['/outbreaks']);
+                          } else {
+                            // fallback to current page since we already know that we have access to this page
+                            // Don't redirect :)
+                          }
+                        });
+                    });
+                }
+              },
+              visible: (item: OutbreakModel): boolean => {
+                return !item.deleted &&
+                  OutbreakModel.canClone(this.authUser);
+              }
+            },
+
+            // Restore deleted Outbreak
+            {
+              label: {
+                get: () => 'LNG_PAGE_LIST_OUTBREAKS_ACTION_RESTORE_OUTBREAK'
+              },
+              cssClasses: () => 'gd-list-table-actions-action-menu-warning',
+              action: {
+                click: (item: OutbreakModel) => {
+                  // show confirm dialog to confirm the action
+                  this.dialogV2Service.showConfirmDialog({
+                    config: {
+                      title: {
+                        get: () => 'LNG_COMMON_LABEL_RESTORE',
+                        data: () => item as any
+                      },
+                      message: {
+                        get: () => 'LNG_DIALOG_CONFIRM_RESTORE_OUTBREAK',
+                        data: () => item as any
+                      }
+                    }
+                  }).subscribe((response) => {
+                    // canceled ?
+                    if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                      // finished
+                      return;
+                    }
+
+                    // show loading
+                    const loading = this.dialogV2Service.showLoadingDialog();
+
+                    // restore
+                    this.outbreakDataService
+                      .restoreOutbreak(item.id)
+                      .pipe(
+                        catchError((err) => {
+                          // show error
+                          this.toastV2Service.error(err);
+
+                          // hide loading
+                          loading.close();
+
+                          // send error down the road
+                          return throwError(err);
+                        })
+                      )
+                      .subscribe(() => {
+                        // success
+                        this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAKS_RESTORE_SUCCESS_MESSAGE');
+
+                        // hide loading
+                        loading.close();
+
+                        // reload data
+                        this.needsRefreshList(true);
+                      });
+                  });
+                }
+              },
+              visible: (item: OutbreakModel): boolean => {
+                return item.deleted &&
+                  OutbreakModel.canRestore(this.authUser);
+              }
+            }
+          ]
+        }
+      ]
+    };
+  }
+
+  /**
+   * Initialize Side Table Columns
+   */
+  protected initializeTableColumns(): void {
     // default table columns
     this.tableColumns = [
       {
@@ -359,489 +852,6 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
         filter: {
           type: V2FilterType.DATE_RANGE
         }
-      },
-
-      // actions
-      {
-        field: 'actions',
-        label: 'LNG_COMMON_LABEL_ACTIONS',
-        pinned: IV2ColumnPinned.RIGHT,
-        notResizable: true,
-        cssCellClass: 'gd-cell-no-focus',
-        format: {
-          type: V2ColumnFormat.ACTIONS
-        },
-        actions: [
-          // View Outbreak
-          {
-            type: V2ActionType.ICON,
-            icon: 'visibility',
-            iconTooltip: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_OUTBREAK',
-            action: {
-              link: (item: OutbreakModel): string[] => {
-                return ['/outbreaks', item.id, 'view'];
-              }
-            },
-            visible: (item: OutbreakModel): boolean => {
-              return !item.deleted && OutbreakModel.canView(this.authUser);
-            }
-          },
-
-          // Modify Outbreak
-          {
-            type: V2ActionType.ICON,
-            icon: 'edit',
-            iconTooltip: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_MODIFY_OUTBREAK',
-            action: {
-              link: (item: OutbreakModel): string[] => {
-                return ['/outbreaks', item.id, 'modify'];
-              }
-            },
-            visible: (item: OutbreakModel): boolean => {
-              return (
-                !item.deleted &&
-                OutbreakModel.canModify(this.authUser)
-              );
-            }
-          },
-
-          // Make Outbreak active
-          {
-            type: V2ActionType.ICON,
-            icon: 'check',
-            iconTooltip: 'LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE',
-            action: {
-              click: (item: OutbreakModel): void => {
-                // show confirm dialog
-                this.dialogV2Service.showConfirmDialog({
-                  config: {
-                    title: {
-                      get: () => 'LNG_COMMON_LABEL_ACTIVE',
-                      data: () => ({
-                        name: item.name
-                      })
-                    },
-                    message: {
-                      get: () => 'LNG_DIALOG_CONFIRM_MAKE_OUTBREAK_ACTIVE',
-                      data: () => ({
-                        name: item.name
-                      })
-                    }
-                  }
-                }).subscribe((response) => {
-                  // canceled ?
-                  if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                    // finished
-                    return;
-                  }
-
-                  // show loading
-                  const loading = this.dialogV2Service.showLoadingDialog();
-
-                  // modify outbreak
-                  this.userDataService
-                    .modifyUser(
-                      this.authUser.id,
-                      {
-                        activeOutbreakId: item.id
-                      }
-                    )
-                    .pipe(
-                      catchError((err) => {
-                        this.toastV2Service.error(err);
-                        return throwError(err);
-                      })
-                    )
-                    .subscribe(() => {
-                      // reload user data to save the new active outbreak
-                      this.authDataService
-                        .reloadAndPersistAuthUser()
-                        .subscribe((authenticatedUser) => {
-                          this.authUser = authenticatedUser.user;
-                          this.outbreakDataService.checkActiveSelectedOutbreak();
-
-                          // refresh list of top nav outbreaks
-                          TopnavComponent.REFRESH_OUTBREAK_LIST();
-
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAKS_ACTION_SET_ACTIVE_SUCCESS_MESSAGE');
-
-                          // hide loading
-                          loading.close();
-
-                          // reload data
-                          this.needsRefreshList(true);
-                        });
-                    });
-                });
-              }
-            },
-            cssClasses: (item: OutbreakModel): string => {
-              return this.authUser &&
-                item.id === this.authUser.activeOutbreakId ?
-                'gd-list-table-actions-action-icon-active' :
-                '';
-            },
-            disable: (item: OutbreakModel): boolean => {
-              return this.authUser &&
-                item.id === this.authUser.activeOutbreakId;
-            }
-          },
-
-          // Other actions
-          {
-            type: V2ActionType.MENU,
-            icon: 'more_horiz',
-            menuOptions: [
-              // Delete Outbreak
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_OUTBREAK'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: OutbreakModel): void => {
-                    // show confirm dialog
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_DELETE',
-                          data: () => ({
-                            name: item.name
-                          })
-                        },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_DELETE_OUTBREAK',
-                          data: () => ({
-                            name: item.name
-                          })
-                        }
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
-
-                      // delete outbreak
-                      this.outbreakDataService
-                        .deleteOutbreak(item.id)
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
-
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-
-                          // reload user data to get the updated data regarding active outbreak
-                          this.authDataService
-                            .reloadAndPersistAuthUser()
-                            .subscribe((authenticatedUser) => {
-                              this.authUser = authenticatedUser.user;
-
-                              // success
-                              this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAKS_ACTION_DELETE_SUCCESS_MESSAGE');
-
-                              // hide loading
-                              loading.close();
-
-                              // reload data
-                              this.needsRefreshList(true);
-                            });
-                        });
-                    });
-                  }
-                },
-                visible: (item: OutbreakModel): boolean => {
-                  return !item.deleted &&
-                  OutbreakModel.canDelete(this.authUser);
-                }
-              },
-
-              // Divider
-              {
-                visible: (item: OutbreakModel): boolean => {
-                  // visible only if at least one of the first two items is visible
-                  return !item.deleted &&
-                    OutbreakModel.canDelete(this.authUser)
-                  ;
-                }
-              },
-
-              // View Outbreak inconsistencies
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_OUTBREAKS_ACTION_VIEW_INCONSISTENCIES'
-                },
-                action: {
-                  link: (item: OutbreakModel): string[] => {
-                    return ['/outbreaks', item.id, 'inconsistencies'];
-                  }
-                },
-                visible: (item: OutbreakModel): boolean => {
-                  return !item.deleted &&
-                    OutbreakModel.canSeeInconsistencies(this.authUser);
-                }
-              },
-
-              // Divider
-              {
-                visible: (item: OutbreakModel): boolean => {
-                  return !item.deleted &&
-                    OutbreakModel.canSeeInconsistencies(this.authUser);
-                }
-              },
-
-              // Clone Outbreak
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_OUTBREAK'
-                },
-                action: {
-                  click: (item: OutbreakModel): void => {
-                    // determine what we need to clone
-                    this.dialogV2Service
-                      .showSideDialog({
-                        title: {
-                          get: () => 'LNG_COMMON_BUTTON_CLONE',
-                          data: () => ({
-                            name: item.name
-                          })
-                        },
-                        hideInputFilter: true,
-                        inputs: [{
-                          type: V2SideDialogConfigInputType.TEXT,
-                          name: 'cloneData',
-                          data: item,
-                          placeholder: 'LNG_DIALOG_FIELD_PLACEHOLDER_CLONED_OUTBREAK_NAME',
-                          value: this.i18nService.instant('LNG_PAGE_LIST_OUTBREAKS_CLONE_NAME', { name: item.name }),
-                          validators: {
-                            required: () => true,
-                            async: (_data, _handler, input: IV2SideDialogConfigInputText) => {
-                              cloneOutbreakName = input.value;
-                              return asyncValidateCloneOutbreakName;
-                            }
-                          }
-                        }],
-                        bottomButtons: [{
-                          type: IV2SideDialogConfigButtonType.OTHER,
-                          label: 'LNG_COMMON_BUTTON_CLONE',
-                          color: 'primary',
-                          key: 'apply',
-                          disabled: (_data, handler): boolean => {
-                            return !handler.form ||
-                              handler.form.invalid ||
-                              handler.form.pending;
-                          }
-                        }, {
-                          type: IV2SideDialogConfigButtonType.CANCEL,
-                          label: 'LNG_COMMON_BUTTON_CANCEL',
-                          color: 'text'
-                        }],
-                        initialized: (handler) => {
-                          // display loading
-                          handler.loading.show();
-
-                          // get the outbreak to clone
-                          this.outbreakDataService
-                            .getOutbreak(handler.data.map.cloneData.data.id)
-                            .subscribe((outbreak: OutbreakModel) => {
-                              handler.data.map.cloneData.data = outbreak;
-
-                              // hide loading
-                              handler.loading.hide();
-                            });
-                        }
-                      })
-                      .subscribe((response) => {
-                        // canceled ?
-                        if ( response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
-                          // finished
-                          return;
-                        }
-
-                        // show loading
-                        const loading =
-                          this.dialogV2Service.showLoadingDialog();
-
-                        // translate questionnaire questions
-                        const translateQuestionnaire = (questions: QuestionModel[]) => {
-                          _.each(questions, (question: QuestionModel) => {
-                            // translate question
-                            question.text = this.i18nService.instant(question.text);
-
-                            // translate answers & sub questions
-                            _.each(question.answers, (answer: AnswerModel) => {
-                              // translate answer
-                              answer.label = this.i18nService.instant(answer.label);
-
-                              // translate sub-question
-                              if (!_.isEmpty(answer.additionalQuestions)) {
-                                translateQuestionnaire(answer.additionalQuestions);
-                              }
-                            });
-                          });
-                        };
-
-                        const outbreakToClone = response.handler.data.map.cloneData.data;
-
-                        // delete the id from the parent outbreak
-                        delete outbreakToClone.id;
-
-                        // set the name for the cloned outbreak
-                        outbreakToClone.name = (response.handler.data.inputs[0] as any).value;
-
-                        // translate questionnaire questions - Case Form
-                        if (!_.isEmpty(outbreakToClone.caseInvestigationTemplate)) {
-                          translateQuestionnaire(outbreakToClone.caseInvestigationTemplate);
-                        }
-
-                        // translate questionnaire questions - Contact Form
-                        if (!_.isEmpty(outbreakToClone.contactInvestigationTemplate)) {
-                          translateQuestionnaire(outbreakToClone.contactInvestigationTemplate);
-                        }
-
-                        // translate questionnaire questions - Lab Results Form
-                        if (!_.isEmpty(outbreakToClone.labResultsTemplate)) {
-                          translateQuestionnaire(outbreakToClone.labResultsTemplate);
-                        }
-
-                        // translate questionnaire questions - Contact Follow-up
-                        if (!_.isEmpty(outbreakToClone.contactFollowUpTemplate)) {
-                          translateQuestionnaire(outbreakToClone.contactFollowUpTemplate);
-                        }
-
-                        this.outbreakDataService
-                          .createOutbreak(outbreakToClone)
-                          .pipe(
-                            catchError((err) => {
-                              this.toastV2Service.error(err);
-                              // hide loading
-                              loading.close();
-                              return throwError(err);
-                            }),
-                            switchMap((clonedOutbreak) => {
-                              // update language tokens to get the translation of submitted questions and answers
-                              return this.i18nService.loadUserLanguage()
-                                .pipe(
-                                  catchError((err) => {
-                                    this.toastV2Service.error(err);
-                                    // hide loading
-                                    loading.close();
-                                    return throwError(err);
-                                  }),
-                                  map(() => clonedOutbreak)
-                                );
-                            })
-                          )
-                          .subscribe((clonedOutbreak) => {
-
-                            this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAKS_ACTION_CLONE_SUCCESS_MESSAGE');
-
-                            // hide loading
-                            loading.close();
-
-                            // reload data
-                            this.needsRefreshList(true);
-
-                            // navigate to modify page of the new outbreak
-                            if (OutbreakModel.canModify(this.authUser)) {
-                              this.router.navigate([`/outbreaks/${clonedOutbreak.id}/modify`]);
-                            } else if (OutbreakModel.canView(this.authUser)) {
-                              this.router.navigate([`/outbreaks/${clonedOutbreak.id}/view`]);
-                            } else if (OutbreakModel.canList(this.authUser)) {
-                              this.router.navigate(['/outbreaks']);
-                            } else {
-                              // fallback to current page since we already know that we have access to this page
-                              // Don't redirect :)
-                            }
-                          });
-                      });
-                  }
-                },
-                visible: (item: OutbreakModel): boolean => {
-                  return !item.deleted &&
-                    OutbreakModel.canClone(this.authUser);
-                }
-              },
-
-              // Restore deleted Outbreak
-              {
-                label: {
-                  get: () => 'LNG_PAGE_LIST_OUTBREAKS_ACTION_RESTORE_OUTBREAK'
-                },
-                cssClasses: () => 'gd-list-table-actions-action-menu-warning',
-                action: {
-                  click: (item: OutbreakModel) => {
-                    // show confirm dialog to confirm the action
-                    this.dialogV2Service.showConfirmDialog({
-                      config: {
-                        title: {
-                          get: () => 'LNG_COMMON_LABEL_RESTORE',
-                          data: () => item as any
-                        },
-                        message: {
-                          get: () => 'LNG_DIALOG_CONFIRM_RESTORE_OUTBREAK',
-                          data: () => item as any
-                        }
-                      }
-                    }).subscribe((response) => {
-                      // canceled ?
-                      if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                        // finished
-                        return;
-                      }
-
-                      // show loading
-                      const loading = this.dialogV2Service.showLoadingDialog();
-
-                      // restore
-                      this.outbreakDataService
-                        .restoreOutbreak(item.id)
-                        .pipe(
-                          catchError((err) => {
-                            // show error
-                            this.toastV2Service.error(err);
-
-                            // hide loading
-                            loading.close();
-
-                            // send error down the road
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-                          // success
-                          this.toastV2Service.success('LNG_PAGE_LIST_OUTBREAKS_RESTORE_SUCCESS_MESSAGE');
-
-                          // hide loading
-                          loading.close();
-
-                          // reload data
-                          this.needsRefreshList(true);
-                        });
-                    });
-                  }
-                },
-                visible: (item: OutbreakModel): boolean => {
-                  return item.deleted &&
-                  OutbreakModel.canRestore(this.authUser);
-                }
-              }
-            ]
-          }
-        ]
       }
     ];
   }
