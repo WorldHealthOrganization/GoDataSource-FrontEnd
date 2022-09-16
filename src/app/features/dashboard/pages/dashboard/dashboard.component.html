@@ -23,14 +23,40 @@
         fxLayoutAlign="end" fxLayoutGap="0.8rem" flexGrow="0"
         class="gd-basic-top-title-buttons-buttons">
 
+        <!-- Expand / Collapse All -->
+        <button
+          *ngIf="!isSmallScreenMode; else smallScreenExpandCollapseAll"
+          type="button"
+          mat-flat-button
+          color="text"
+          (click)="allExpanded = !allExpanded">
+          {{(allExpanded ? 'LNG_PAGE_DASHBOARD_COLLAPSE_ALL' : 'LNG_PAGE_DASHBOARD_EXPAND_ALL') | translate}}
+        </button>
+        <ng-template
+          #smallScreenExpandCollapseAll>
+          <app-form-toggle-icon-v2
+            class="gd-form-toggle-icon-v2-big"
+            [(ngModel)]="allExpanded"
+            [icon]="allExpanded ? 'expand_less' : 'expand_more'"
+            [matTooltip]="(allExpanded ? 'LNG_PAGE_DASHBOARD_COLLAPSE_ALL' : 'LNG_PAGE_DASHBOARD_EXPAND_ALL') | translate">
+          </app-form-toggle-icon-v2>
+        </ng-template>
+
         <!-- Advanced filters -->
         <button
           type="button"
           mat-flat-button
           color="primary"
           (click)="showAdvancedFilters()">
+
+          <!-- Icon -->
           <mat-icon>filter_alt</mat-icon>
-          {{'LNG_SIDE_FILTERS_TITLE' | translate}}
+
+          <!-- Label -->
+          <span
+            *ngIf="!isSmallScreenMode">
+            {{'LNG_SIDE_FILTERS_TITLE' | translate}}
+          </span>
         </button>
 
         <!-- Quick actions -->
@@ -42,20 +68,33 @@
           <button
             #quickMenuTrigger="matMenuTrigger"
             class="gd-basic-top-title-buttons-buttons-quick"
-            [class.gd-basic-top-title-buttons-buttons-quick-expanded]="quickMenuTrigger.menuOpen"
+            [class.gd-basic-top-title-buttons-buttons-quick-expanded]="quickMenuTrigger.menuOpen && !isSmallScreenMode"
             type="button"
             mat-flat-button color="secondary"
             [disabled]="quickActions.disable && quickActions.disable(null)"
             [matMenuTriggerFor]="quickMenu"
             (menuClosed)="detectChanges()">
 
-            <!-- Label -->
-            <span>
-              {{quickActions.label | translate}}
-            </span>
+            <!-- Big screen TV -->
+            <ng-container
+              *ngIf="!isSmallScreenMode; else smallScreen">
 
-            <!-- Icon -->
-            <mat-icon>expand_more</mat-icon>
+              <!-- Label -->
+              <span>
+                {{quickActions.label | translate}}
+              </span>
+
+              <!-- Icon -->
+              <mat-icon>expand_more</mat-icon>
+            </ng-container>
+
+            <!-- Small screen TV -->
+            <ng-template
+              #smallScreen>
+              <!-- Menu icon -->
+              <mat-icon>apps</mat-icon>
+            </ng-template>
+
           </button>
 
           <!-- Floating menu -->

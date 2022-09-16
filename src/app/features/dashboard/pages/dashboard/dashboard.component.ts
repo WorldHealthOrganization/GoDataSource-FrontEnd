@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { ActivatedRoute } from '@angular/router';
@@ -30,6 +30,7 @@ import { AppContactsKpiDashletComponent } from '../../components/app-contacts-kp
 import { AppCotKpiDashletComponent } from '../../components/app-cot-kpi-dashlet/app-cot-kpi-dashlet.component';
 import * as domtoimage from 'dom-to-image';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputToggle, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { determineIfSmallScreenMode } from '../../../../core/methods/small-screen-mode';
 
 @Component({
   selector: 'app-dashboard',
@@ -43,6 +44,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
   @ViewChild('kpiCases', { static: false }) private _kpiCases: AppCasesKpiDashletComponent;
   @ViewChild('kpiContacts', { static: false }) private _kpiContacts: AppContactsKpiDashletComponent;
   @ViewChild('kpiCOT', { static: false }) private _kpiCOT: AppCotKpiDashletComponent;
+
+  // small screen mode ?
+  isSmallScreenMode: boolean = false;
+
+  // determine if all dashlets are expanded
+  set allExpanded(expanded: boolean) {
+    // expand / collapse
+    this._kpiCases.dashlet.expanded = expanded;
+    this._kpiContacts.dashlet.expanded = expanded;
+    this._kpiCOT.dashlet.expanded = expanded;
+  }
+  get allExpanded(): boolean {
+    return this._kpiCases?.dashlet?.expanded &&
+      this._kpiContacts?.dashlet?.expanded &&
+      this._kpiCOT?.dashlet?.expanded;
+  }
 
   // quick actions
   quickActions: IV2ActionMenuLabel;
@@ -140,6 +157,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private importExportDataService: ImportExportDataService,
     authDataService: AuthDataService
   ) {
+    // update render mode
+    this.updateRenderMode();
+
     // authenticated user
     this._authUser = authDataService.getAuthenticatedUser();
 
@@ -669,5 +689,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
       blob,
       `${fileName}.${extension}`
     );
+  }
+
+  /**
+   * Update website render mode
+   */
+  @HostListener('window:resize')
+  private updateRenderMode(): void {
+    // small screen mode ?
+    this.isSmallScreenMode = determineIfSmallScreenMode();
   }
 }
