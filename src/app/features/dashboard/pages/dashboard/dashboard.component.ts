@@ -521,7 +521,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         // Export EPI - Classification
         {
           label: {
-            get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_CLASSIFICATION_TITLE'
+            get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_CLASSIFICATION_TITLE_SHORT'
           },
           action: {
             click: () => {
@@ -537,7 +537,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         // Export EPI - Outcome
         {
           label: {
-            get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE'
+            get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE_SHORT'
           },
           action: {
             click: () => {
@@ -553,7 +553,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         // Export EPI - Reporting Classification
         {
           label: {
-            get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORTING_TITLE'
+            get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORTING_TITLE_SHORT'
           },
           action: {
             click: () => {

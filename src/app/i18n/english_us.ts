@@ -12,6 +12,9 @@ export const EnglishUsLang = {
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
     'LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG': 'Please make sure that "{{fileName}}" dashlet is visible',
+    'LNG_PAGE_DASHBOARD_EPI_CURVE_CLASSIFICATION_TITLE_SHORT': 'EPI - classification',
+    'LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE_SHORT': 'EPI - outcome',
+    'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORTING_TITLE_SHORT': 'EPI - reporting classification',
     'LNG_PAGE_DASHBOARD_EXPAND_ALL': 'Expand all',
     'LNG_PAGE_DASHBOARD_COLLAPSE_ALL': 'Collapse all'
 
