@@ -11,7 +11,8 @@ export const EnglishUsLang = {
      */
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
-
+    'LNG_PAGE_DASHBOARD_EXPAND_ALL': 'Expand all',
+    'LNG_PAGE_DASHBOARD_COLLAPSE_ALL': 'Collapse all'
 
 
     /**
