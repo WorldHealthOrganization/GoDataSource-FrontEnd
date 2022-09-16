@@ -1864,7 +1864,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
 
               // keep sort order
               if (!this.queryBuilder.sort.isEmpty()) {
-                qb.sort.criterias = {...this.queryBuilder.sort.criterias};
+                qb.sort.criterias = {
+                  ...this.queryBuilder.sort.criterias
+                };
               }
 
               // export

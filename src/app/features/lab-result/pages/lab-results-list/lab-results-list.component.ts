@@ -787,7 +787,9 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
 
               // keep sort order
               if (!this.queryBuilder.sort.isEmpty()) {
-                qb.sort.criterias = {...this.queryBuilder.sort.criterias};
+                qb.sort.criterias = {
+                  ...this.queryBuilder.sort.criterias
+                };
               }
 
               // export

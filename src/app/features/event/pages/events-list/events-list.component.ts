@@ -1001,7 +1001,9 @@ export class EventsListComponent
 
               // keep sort order
               if (!this.queryBuilder.sort.isEmpty()) {
-                qb.sort.criterias = {...this.queryBuilder.sort.criterias};
+                qb.sort.criterias = {
+                  ...this.queryBuilder.sort.criterias
+                };
               }
 
               // export
