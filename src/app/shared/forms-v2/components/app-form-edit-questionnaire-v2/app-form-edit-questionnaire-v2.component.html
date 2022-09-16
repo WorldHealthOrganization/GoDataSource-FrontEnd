@@ -3,26 +3,32 @@
 
   <!-- Top -->
   <div
+    *ngIf="flattenedQuestions?.length > 0 || !viewOnly"
     class="gd-form-edit-questionnaire-v2-top"
     fxLayout="row" fxLayoutAlign="end" fxLayoutGap="0.8rem">
 
-    <!-- Expand All -->
-    <button
-      type="button"
-      mat-flat-button
-      color="text"
-      (click)="collapseExpandAllQuestions(value, false); nonFlatToFlat()">
-      {{'LNG_QUESTIONNAIRE_TEMPLATE_EXPAND_ALL' | translate}}
-    </button>
+    <!-- Expand/Collapse All -->
+    <ng-container 
+      *ngIf="flattenedQuestions?.length > 0">
+      <!-- Expand All -->
+      <button
+        type="button"
+        mat-flat-button
+        color="text"
+        (click)="collapseExpandAllQuestions(value, false); nonFlatToFlat()">
+        {{'LNG_QUESTIONNAIRE_TEMPLATE_EXPAND_ALL' | translate}}
+      </button>
 
-    <!-- Collapse All -->
-    <button
-      type="button"
-      mat-flat-button
-      color="text"
-      (click)="collapseExpandAllQuestions(value, true); nonFlatToFlat()">
-      {{'LNG_QUESTIONNAIRE_TEMPLATE_COLLAPSE_ALL' | translate}}
-    </button>
+      <!-- Collapse All -->
+      <button
+        type="button"
+        mat-flat-button
+        color="text"
+        (click)="collapseExpandAllQuestions(value, true); nonFlatToFlat()">
+        {{'LNG_QUESTIONNAIRE_TEMPLATE_COLLAPSE_ALL' | translate}}
+      </button>
+    </ng-container>
+
 
     <!-- Add question -->
     <button
