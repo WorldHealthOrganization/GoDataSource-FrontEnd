@@ -521,11 +521,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
         // Export EPI - Classification
         {
           label: {
-            get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_CLASSIFICATION_TITLE'
+            get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_CLASSIFICATION_TITLE_SHORT'
           },
           action: {
             click: () => {
-              this.getEpiCurveDashlet('app-epi-curve-dashlet svg');
+              this.getEpiCurveDashlet(
+                'app-epi-curve-dashlet svg',
+                'LNG_PAGE_DASHBOARD_EPI_CURVE_CLASSIFICATION_TITLE'
+              );
             }
           },
           visible: () => DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(this._authUser)
@@ -534,11 +537,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
         // Export EPI - Outcome
         {
           label: {
-            get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE'
+            get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE_SHORT'
           },
           action: {
             click: () => {
-              this.getEpiCurveDashlet('app-epi-curve-outcome-dashlet svg');
+              this.getEpiCurveDashlet(
+                'app-epi-curve-outcome-dashlet svg',
+                'LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE'
+              );
             }
           },
           visible: () => DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(this._authUser)
@@ -547,11 +553,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
         // Export EPI - Reporting Classification
         {
           label: {
-            get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORTING_TITLE'
+            get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORTING_TITLE_SHORT'
           },
           action: {
             click: () => {
-              this.getEpiCurveDashlet('app-epi-curve-reporting-dashlet svg');
+              this.getEpiCurveDashlet(
+                'app-epi-curve-reporting-dashlet svg',
+                'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORTING_TITLE'
+              );
             }
           },
           visible: () => DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(this._authUser)
@@ -690,7 +699,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   /**
    * Get Epi curve dashlet
    */
-  private getEpiCurveDashlet(selector: string) {
+  private getEpiCurveDashlet(
+    selector: string,
+    fileName: string
+  ): void {
     this.dialogV2Service.showSideDialog({
       // title
       title: {
@@ -750,7 +762,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
         .subscribe((pngBase64) => {
           // object not found ?
           if (!pngBase64) {
-            this.toastV2Service.notice('LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG');
+            this.toastV2Service.notice(
+              'LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG',
+              { fileName: this.translateService.instant(fileName) }
+            );
             loading.close();
             return;
           }
@@ -773,7 +788,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
               })
             )
             .subscribe((blob) => {
-              this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL');
+              this.downloadFile(
+                blob,
+                `${this.translateService.instant(fileName)} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`
+              );
               loading.close();
             });
         });
