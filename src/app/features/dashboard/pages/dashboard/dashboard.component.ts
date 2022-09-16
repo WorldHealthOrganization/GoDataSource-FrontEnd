@@ -38,6 +38,7 @@ import { HistogramTransmissionChainsSizeDashletComponent } from '../../component
 import { EpiCurveDashletComponent } from '../../components/epi-curve-dashlet/epi-curve-dashlet.component';
 import { EpiCurveOutcomeDashletComponent } from '../../components/epi-curve-outcome-dashlet/epi-curve-outcome-dashlet.component';
 import { EpiCurveReportingDashletComponent } from '../../components/epi-curve-reporting-dashlet/epi-curve-reporting-dashlet.component';
+import { ContactFollowUpOverviewDashletComponent } from '../../components/contact-follow-up-overview-dashlet/contact-follow-up-overview-dashlet.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -54,6 +55,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   @ViewChild('epiCurveClassification', { static: false }) private _epiCurveClassification: EpiCurveDashletComponent;
   @ViewChild('epiCurveOutcome', { static: false }) private _epiCurveOutcome: EpiCurveOutcomeDashletComponent;
   @ViewChild('epiCurveReporting', { static: false }) private _epiCurveReporting: EpiCurveReportingDashletComponent;
+  @ViewChild('followUpOverview', { static: false }) private _followUpOverview: ContactFollowUpOverviewDashletComponent;
   @ViewChild('kpiSection', { static: false }) private _kpiSection: ElementRef;
   @ViewChild('kpiCases', { static: false }) private _kpiCases: AppCasesKpiDashletComponent;
   @ViewChild('kpiContacts', { static: false }) private _kpiContacts: AppContactsKpiDashletComponent;
@@ -99,6 +101,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this._epiCurveReporting.expanded = expanded;
     }
 
+    // expand / collapse - followUpOverview
+    if (this._followUpOverview) {
+      this._followUpOverview.expanded = expanded;
+    }
+
     // expand / collapse - kpiCases
     if (this._kpiCases?.dashlet) {
       this._kpiCases.dashlet.expanded = expanded;
@@ -136,6 +143,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     ) && (
       !this._epiCurveReporting ||
       this._epiCurveReporting.expanded
+    ) && (
+      !this._followUpOverview ||
+      this._followUpOverview.expanded
     ) && (
       !this._kpiCases?.dashlet ||
       this._kpiCases.dashlet.expanded

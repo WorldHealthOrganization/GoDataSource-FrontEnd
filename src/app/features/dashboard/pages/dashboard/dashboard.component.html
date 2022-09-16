@@ -242,6 +242,7 @@
     <!-- Contact follow-up overview -->
     <app-contact-follow-up-overview-dashlet
       *ngIf="visibleDashlets.FollowUpOverview"
+      #followUpOverview
       [globalFilterDate]="globalFilterDate"
       [globalFilterLocationId]="globalFilterLocationId"
       [globalFilterClassificationId]="globalFilterClassificationId"
