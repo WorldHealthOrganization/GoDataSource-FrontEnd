@@ -50,15 +50,32 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   // determine if all dashlets are expanded
   set allExpanded(expanded: boolean) {
-    // expand / collapse
-    this._kpiCases.dashlet.expanded = expanded;
-    this._kpiContacts.dashlet.expanded = expanded;
-    this._kpiCOT.dashlet.expanded = expanded;
+    // expand / collapse - kpiCases
+    if (this._kpiCases?.dashlet) {
+      this._kpiCases.dashlet.expanded = expanded;
+    }
+
+    // expand / collapse - kpiContacts
+    if (this._kpiContacts?.dashlet) {
+      this._kpiContacts.dashlet.expanded = expanded;
+    }
+
+    // expand / collapse - kpiCOT
+    if (this._kpiCOT?.dashlet) {
+      this._kpiCOT.dashlet.expanded = expanded;
+    }
   }
   get allExpanded(): boolean {
-    return this._kpiCases?.dashlet?.expanded &&
-      this._kpiContacts?.dashlet?.expanded &&
-      this._kpiCOT?.dashlet?.expanded;
+    return (
+      !this._kpiCases?.dashlet ||
+      this._kpiCases.dashlet.expanded
+    ) && (
+      !this._kpiContacts?.dashlet ||
+      this._kpiContacts.dashlet.expanded
+    ) && (
+      !this._kpiCOT?.dashlet ||
+      this._kpiCOT.dashlet.expanded
+    );
   }
 
   // quick actions
