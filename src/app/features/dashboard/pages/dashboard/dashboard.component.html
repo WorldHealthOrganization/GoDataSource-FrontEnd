@@ -222,6 +222,7 @@
     <!-- Epidemiological Curve - OUTCOME -->
     <app-epi-curve-outcome-dashlet
       *ngIf="visibleDashlets.EPICurveOutcome"
+      #epiCurveOutcome
       [globalFilterDate]="globalFilterDate"
       [globalFilterLocationId]="globalFilterLocationId"
       [globalFilterClassificationId]="globalFilterClassificationId"
@@ -231,6 +232,7 @@
     <!-- Epidemiological Curve - REPORTING CLASSIFICATION -->
     <app-epi-curve-reporting-dashlet
       *ngIf="visibleDashlets.EPICurveReporting"
+      #epiCurveReporting
       [globalFilterDate]="globalFilterDate"
       [globalFilterLocationId]="globalFilterLocationId"
       [globalFilterClassificationId]="globalFilterClassificationId"
