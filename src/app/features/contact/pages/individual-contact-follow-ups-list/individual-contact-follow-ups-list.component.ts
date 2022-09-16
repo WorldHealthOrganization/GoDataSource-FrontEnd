@@ -334,210 +334,215 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
    * Initialize table group actions
    */
   protected initializeGroupActions(): void {
-    this.groupActions = [
-      // bulk modify
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_MODIFY_SELECTED_FOLLOW_UPS'
-        },
-        action: {
-          link: () => {
-            return ['/contacts/follow-ups/modify-list'];
+    this.groupActions = {
+      type: V2ActionType.GROUP_ACTIONS,
+      actions: [
+        // bulk modify
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_MODIFY_SELECTED_FOLLOW_UPS'
           },
-          linkQueryParams: (selected: string[]): Params => {
-            return {
-              followUpsIds: JSON.stringify(selected),
-              entityId: this.entityData.id
-            };
-          }
-        },
-        visible: (): boolean => {
-          return FollowUpModel.canBulkModify(this.authUser) &&
-            this.selectedOutbreakIsActive;
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
-        }
-      },
-
-      // bulk export
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_EXPORT_SELECTED_FOLLOW_UPS'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // construct query builder
-            const qb = new RequestQueryBuilder();
-            qb.filter.bySelect(
-              'id',
-              selected,
-              true,
-              null
-            );
-
-            // allow deleted records
-            qb.includeDeleted();
-
-            // keep sort order
-            if (!this.queryBuilder.sort.isEmpty()) {
-              qb.sort.criterias = { ...this.queryBuilder.sort.criterias };
+          action: {
+            link: () => {
+              return ['/contacts/follow-ups/modify-list'];
+            },
+            linkQueryParams: (selected: string[]): Params => {
+              return {
+                followUpsIds: JSON.stringify(selected),
+                entityId: this.entityData.id
+              };
             }
-
-            // export
-            this.exportFollowUps(qb);
+          },
+          visible: (): boolean => {
+            return FollowUpModel.canBulkModify(this.authUser) &&
+              this.selectedOutbreakIsActive;
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
           }
         },
-        visible: (): boolean => {
-          return FollowUpModel.canExport(this.authUser);
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
-        }
-      },
 
-      // bulk delete
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // create query
-            const qb = new RequestQueryBuilder();
-            qb.filter.where({
-              id: {
-                inq: selected
+        // bulk export
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_EXPORT_SELECTED_FOLLOW_UPS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // construct query builder
+              const qb = new RequestQueryBuilder();
+              qb.filter.bySelect(
+                'id',
+                selected,
+                true,
+                null
+              );
+
+              // allow deleted records
+              qb.includeDeleted();
+
+              // keep sort order
+              if (!this.queryBuilder.sort.isEmpty()) {
+                qb.sort.criterias = {
+                  ...this.queryBuilder.sort.criterias
+                };
               }
-            });
 
-            // ask for confirmation
-            this.dialogV2Service
-              .showConfirmDialog({
-                config: {
-                  title: {
-                    get: () => 'LNG_PAGE_ACTION_DELETE'
-                  },
-                  message: {
-                    get: () => 'LNG_DIALOG_CONFIRM_DELETE_MULTIPLE_FOLLOW_UPS'
+              // export
+              this.exportFollowUps(qb);
+            }
+          },
+          visible: (): boolean => {
+            return FollowUpModel.canExport(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
+          }
+        },
+
+        // bulk delete
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_DELETE_SELECTED_FOLLOW_UPS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // create query
+              const qb = new RequestQueryBuilder();
+              qb.filter.where({
+                id: {
+                  inq: selected
+                }
+              });
+
+              // ask for confirmation
+              this.dialogV2Service
+                .showConfirmDialog({
+                  config: {
+                    title: {
+                      get: () => 'LNG_PAGE_ACTION_DELETE'
+                    },
+                    message: {
+                      get: () => 'LNG_DIALOG_CONFIRM_DELETE_MULTIPLE_FOLLOW_UPS'
+                    }
                   }
-                }
-              })
-              .subscribe((response) => {
-                // canceled ?
-                if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                  // finished
-                  return;
-                }
+                })
+                .subscribe((response) => {
+                  // canceled ?
+                  if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                    // finished
+                    return;
+                  }
 
-                // show loading
-                const loading = this.dialogV2Service.showLoadingDialog();
+                  // show loading
+                  const loading = this.dialogV2Service.showLoadingDialog();
 
-                // delete follow-ups
-                this.followUpsDataService
-                  .deleteBulkFollowUps(this.selectedOutbreak.id, qb)
-                  .pipe(
-                    catchError((err) => {
-                      this.toastV2Service.error(err);
+                  // delete follow-ups
+                  this.followUpsDataService
+                    .deleteBulkFollowUps(this.selectedOutbreak.id, qb)
+                    .pipe(
+                      catchError((err) => {
+                        this.toastV2Service.error(err);
+
+                        // hide loading
+                        loading.close();
+
+                        return throwError(err);
+                      })
+                    )
+                    .subscribe(() => {
+                      this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
 
                       // hide loading
                       loading.close();
 
-                      return throwError(err);
-                    })
-                  )
-                  .subscribe(() => {
-                    this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_DELETE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
-
-                    // hide loading
-                    loading.close();
-
-                    this.needsRefreshList(true);
-                  });
-              });
+                      this.needsRefreshList(true);
+                    });
+                });
+            }
+          },
+          visible: (): boolean => {
+            return FollowUpModel.canBulkDelete(this.authUser) &&
+              this.selectedOutbreakIsActive;
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1 ||
+              !this.tableV2Component.processedSelectedResults.allNotDeleted;
           }
         },
-        visible: (): boolean => {
-          return FollowUpModel.canBulkDelete(this.authUser) &&
-            this.selectedOutbreakIsActive;
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1 ||
-            !this.tableV2Component.processedSelectedResults.allNotDeleted;
-        }
-      },
 
-      // bulk restore
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_RESTORE_SELECTED_FOLLOW_UPS'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // create query
-            const qb = new RequestQueryBuilder();
-            qb.filter.where({
-              id: {
-                inq: selected
-              }
-            });
+        // bulk restore
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_FOLLOW_UPS_GROUP_ACTION_RESTORE_SELECTED_FOLLOW_UPS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // create query
+              const qb = new RequestQueryBuilder();
+              qb.filter.where({
+                id: {
+                  inq: selected
+                }
+              });
 
-            // ask for confirmation
-            this.dialogV2Service
-              .showConfirmDialog({
-                config: {
-                  title: {
-                    get: () => 'LNG_PAGE_ACTION_RESTORE'
-                  },
-                  message: {
-                    get: () => 'LNG_DIALOG_CONFIRM_RESTORE_MULTIPLE_FOLLOW_UPS'
+              // ask for confirmation
+              this.dialogV2Service
+                .showConfirmDialog({
+                  config: {
+                    title: {
+                      get: () => 'LNG_PAGE_ACTION_RESTORE'
+                    },
+                    message: {
+                      get: () => 'LNG_DIALOG_CONFIRM_RESTORE_MULTIPLE_FOLLOW_UPS'
+                    }
                   }
-                }
-              })
-              .subscribe((response) => {
-                // canceled ?
-                if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
-                  // finished
-                  return;
-                }
+                })
+                .subscribe((response) => {
+                  // canceled ?
+                  if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+                    // finished
+                    return;
+                  }
 
-                // show loading
-                const loading = this.dialogV2Service.showLoadingDialog();
+                  // show loading
+                  const loading = this.dialogV2Service.showLoadingDialog();
 
-                // restore follow-ups
-                this.followUpsDataService
-                  .restoreBulkFollowUps(this.selectedOutbreak.id, qb)
-                  .pipe(
-                    catchError((err) => {
-                      this.toastV2Service.error(err);
+                  // restore follow-ups
+                  this.followUpsDataService
+                    .restoreBulkFollowUps(this.selectedOutbreak.id, qb)
+                    .pipe(
+                      catchError((err) => {
+                        this.toastV2Service.error(err);
+
+                        // hide loading
+                        loading.close();
+
+                        return throwError(err);
+                      })
+                    )
+                    .subscribe(() => {
+                      this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
 
                       // hide loading
                       loading.close();
 
-                      return throwError(err);
-                    })
-                  )
-                  .subscribe(() => {
-                    this.toastV2Service.success('LNG_PAGE_LIST_FOLLOW_UPS_ACTION_RESTORE_SELECTED_FOLLOW_UPS_SUCCESS_MESSAGE');
-
-                    // hide loading
-                    loading.close();
-
-                    this.needsRefreshList(true);
-                  });
-              });
+                      this.needsRefreshList(true);
+                    });
+                });
+            }
+          },
+          visible: (): boolean => {
+            return FollowUpModel.canBulkDelete(this.authUser) &&
+              this.selectedOutbreakIsActive;
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1 ||
+              !this.tableV2Component.processedSelectedResults.allDeleted;
           }
-        },
-        visible: (): boolean => {
-          return FollowUpModel.canBulkDelete(this.authUser) &&
-            this.selectedOutbreakIsActive;
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1 ||
-            !this.tableV2Component.processedSelectedResults.allDeleted;
         }
-      }
-    ];
+      ]
+    };
   }
 
   /**

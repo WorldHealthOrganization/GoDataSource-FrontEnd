@@ -39,7 +39,7 @@ export class AuditLogsListComponent
     { label: 'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_NAME', value: 'modelName' },
     { label: 'LNG_AUDIT_LOG_FIELD_LABEL_MODEL_ID', value: 'recordId' },
     { label: 'LNG_AUDIT_LOG_FIELD_LABEL_CHANGE_DATA', value: 'changedData' },
-    { label: 'LNG_AUDIT_LOG_FIELD_LABEL_USER', value: 'userId' },
+    { label: 'LNG_AUDIT_LOG_FIELD_LABEL_USER', value: 'user' },
     { label: 'LNG_AUDIT_LOG_FIELD_LABEL_IP_ADDRESS', value: 'userIPAddress' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
@@ -262,42 +262,46 @@ export class AuditLogsListComponent
    * Initialize table group actions
    */
   protected initializeGroupActions(): void {
-    this.groupActions = [
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_AUDIT_LOGS_GROUP_ACTION_EXPORT_SELECTED_AUDIT_LOGS'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // construct query builder
-            const qb = new RequestQueryBuilder();
-            qb.filter.bySelect(
-              'id',
-              selected,
-              true,
-              null
-            );
+    this.groupActions = {
+      type: V2ActionType.GROUP_ACTIONS,
+      visible: () => AuditLogModel.canExport(this.authUser),
+      actions: [
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_AUDIT_LOGS_GROUP_ACTION_EXPORT_SELECTED_AUDIT_LOGS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // construct query builder
+              const qb = new RequestQueryBuilder();
+              qb.filter.bySelect(
+                'id',
+                selected,
+                true,
+                null
+              );
 
-            // allow deleted records
-            qb.includeDeleted();
+              // allow deleted records
+              qb.includeDeleted();
 
-            // keep sort order
-            if (!this.queryBuilder.sort.isEmpty()) {
-              qb.sort.criterias = { ...this.queryBuilder.sort.criterias };
+              // keep sort order
+              if (!this.queryBuilder.sort.isEmpty()) {
+                qb.sort.criterias = { ...this.queryBuilder.sort.criterias };
+              }
+
+              // export
+              this.exportAuditLogs(qb);
             }
-
-            // export
-            this.exportAuditLogs(qb);
+          },
+          visible: (): boolean => {
+            return AuditLogModel.canExport(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
           }
-        },
-        visible: (): boolean => {
-          return AuditLogModel.canExport(this.authUser);
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
         }
-      }
-    ];
+      ]
+    };
   }
 
   /**

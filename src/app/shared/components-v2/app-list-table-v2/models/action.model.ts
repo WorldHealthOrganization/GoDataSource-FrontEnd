@@ -7,7 +7,8 @@ export enum V2ActionType {
   ICON = 'icon',
   MENU = 'menu',
   ICON_LABEL = 'icon_label',
-  LINK = 'link'
+  LINK = 'link',
+  GROUP_ACTIONS = 'group_actions'
 }
 
 /**
@@ -121,6 +122,18 @@ interface IV2ActionMenuDivider {
  * Menu item
  */
 export type V2ActionMenuItem = IV2ActionMenuOption | IV2ActionMenuDivider;
+
+/**
+ * Group Actions
+ */
+export interface IV2GroupActions {
+  // type
+  type: V2ActionType.GROUP_ACTIONS;
+  actions: V2ActionMenuItem[];
+
+  // optional
+  visible?: () => boolean;
+}
 
 /**
  * Action Menu

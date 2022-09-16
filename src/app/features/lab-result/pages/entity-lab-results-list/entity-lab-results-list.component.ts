@@ -282,34 +282,37 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
    * Initialize table grouped data
    */
   protected initializeGroupedData(): void {
-    this.groupActions = [
-      // Export selected lab results
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_LAB_RESULTS_GROUP_ACTION_EXPORT_SELECTED_LAB_RESULTS'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // create query
-            const qb = new RequestQueryBuilder();
-            qb.filter.bySelect(
-              'id',
-              selected,
-              true,
-              null
-            );
+    this.groupActions = {
+      type: V2ActionType.GROUP_ACTIONS,
+      actions: [
+        // Export selected lab results
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_LAB_RESULTS_GROUP_ACTION_EXPORT_SELECTED_LAB_RESULTS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // create query
+              const qb = new RequestQueryBuilder();
+              qb.filter.bySelect(
+                'id',
+                selected,
+                true,
+                null
+              );
 
-            this.exportLabResultsData(qb);
+              this.exportLabResultsData(qb);
+            }
+          },
+          visible: (): boolean => {
+            return LabResultModel.canExport(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
           }
-        },
-        visible: (): boolean => {
-          return LabResultModel.canExport(this.authUser);
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
         }
-      }
-    ];
+      ]
+    };
   }
 
   /**
