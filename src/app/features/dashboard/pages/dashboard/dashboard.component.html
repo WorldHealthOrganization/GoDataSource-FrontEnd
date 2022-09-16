@@ -252,6 +252,7 @@
     <!-- Cases based on contact status -->
     <app-cases-based-on-contact-status-dashlet
       *ngIf="visibleDashlets.ContactStatus"
+      #contactStatus
       [globalFilterDate]="globalFilterDate"
       [globalFilterLocationId]="globalFilterLocationId"
       [globalFilterClassificationId]="globalFilterClassificationId"
