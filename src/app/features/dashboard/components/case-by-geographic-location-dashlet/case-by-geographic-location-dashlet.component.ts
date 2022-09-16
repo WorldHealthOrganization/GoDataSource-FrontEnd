@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
@@ -11,7 +11,7 @@ import { Constants } from '../../../../core/models/constants';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
-import { PieDonutChartData } from '../../../../shared/components/pie-donut-graph/pie-donut-chart.component';
+import { PieDonutChartComponent, PieDonutChartData } from '../../../../shared/components/pie-donut-graph/pie-donut-chart.component';
 import { CaseModel } from '../../../../core/models/case.model';
 import { map } from 'rxjs/operators';
 
@@ -21,6 +21,9 @@ import { map } from 'rxjs/operators';
 })
 export class CasesByGeographicLocationDashletComponent
 implements OnInit, OnDestroy {
+  // kpi dashlet
+  @ViewChild(PieDonutChartComponent, { static: false }) dashlet: PieDonutChartComponent;
+
   // data
   getData$: Observable<PieDonutChartData[]>;
 

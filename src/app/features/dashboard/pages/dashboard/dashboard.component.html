@@ -171,6 +171,7 @@
       <!-- Summary -->
       <app-case-summary-dashlet
         *ngIf="visibleDashlets.CaseSummary"
+        #caseSummary
         [globalFilterDate]="globalFilterDate"
         [globalFilterLocationId]="globalFilterLocationId"
         [globalFilterClassificationId]="globalFilterClassificationId"
@@ -180,6 +181,7 @@
       <!-- Location -->
       <app-case-by-geographic-location-dashlet
         *ngIf="visibleDashlets.CasesPerLocation"
+        #casesPerLocation
         [globalFilterDate]="globalFilterDate"
         [globalFilterLocationId]="globalFilterLocationId"
         [globalFilterClassificationId]="globalFilterClassificationId"
@@ -189,6 +191,7 @@
       <!-- Hospitalized -->
       <app-cases-hospitalized-pie-chart-dashlet
         *ngIf="visibleDashlets.Hospitalized"
+        #hospitalized
         [globalFilterDate]="globalFilterDate"
         [globalFilterLocationId]="globalFilterLocationId"
         [globalFilterClassificationId]="globalFilterClassificationId"

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { CaseDataService } from '../../../../core/services/data/case.data.service';
@@ -12,7 +12,7 @@ import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { CaseModel } from '../../../../core/models/case.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
-import { PieDonutChartData } from '../../../../shared/components/pie-donut-graph/pie-donut-chart.component';
+import { PieDonutChartComponent, PieDonutChartData } from '../../../../shared/components/pie-donut-graph/pie-donut-chart.component';
 import { map } from 'rxjs/operators';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -23,6 +23,9 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 })
 export class CaseSummaryDashletComponent
 implements OnInit, OnDestroy {
+  // kpi dashlet
+  @ViewChild(PieDonutChartComponent, { static: false }) dashlet: PieDonutChartComponent;
+
   // data
   getData$: Observable<PieDonutChartData[]>;
 

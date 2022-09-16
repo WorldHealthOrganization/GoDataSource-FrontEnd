@@ -31,6 +31,9 @@ import { AppCotKpiDashletComponent } from '../../components/app-cot-kpi-dashlet/
 import * as domtoimage from 'dom-to-image';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputToggle, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { determineIfSmallScreenMode } from '../../../../core/methods/small-screen-mode';
+import { CaseSummaryDashletComponent } from '../../components/case-summary-dashlet/case-summary-dashlet.component';
+import { CasesByGeographicLocationDashletComponent } from '../../components/case-by-geographic-location-dashlet/case-by-geographic-location-dashlet.component';
+import { CasesHospitalizedPieChartDashletComponent } from '../../components/cases-hospitalized-pie-chart-dashlet/cases-hospitalized-pie-chart-dashlet.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -40,6 +43,9 @@ import { determineIfSmallScreenMode } from '../../../../core/methods/small-scree
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   // children dashlets
+  @ViewChild('caseSummary', { static: false }) private _caseSummary: CaseSummaryDashletComponent;
+  @ViewChild('casesPerLocation', { static: false }) private _casesPerLocation: CasesByGeographicLocationDashletComponent;
+  @ViewChild('hospitalized', { static: false }) private _hospitalized: CasesHospitalizedPieChartDashletComponent;
   @ViewChild('kpiSection', { static: false }) private _kpiSection: ElementRef;
   @ViewChild('kpiCases', { static: false }) private _kpiCases: AppCasesKpiDashletComponent;
   @ViewChild('kpiContacts', { static: false }) private _kpiContacts: AppContactsKpiDashletComponent;
@@ -50,6 +56,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   // determine if all dashlets are expanded
   set allExpanded(expanded: boolean) {
+    // expand / collapse - caseSummary
+    if (this._caseSummary?.dashlet) {
+      this._caseSummary.dashlet.expanded = expanded;
+    }
+
+    // expand / collapse - casesPerLocation
+    if (this._casesPerLocation?.dashlet) {
+      this._casesPerLocation.dashlet.expanded = expanded;
+    }
+
+    // expand / collapse - hospitalized
+    if (this._hospitalized?.dashlet) {
+      this._hospitalized.dashlet.expanded = expanded;
+    }
+
     // expand / collapse - kpiCases
     if (this._kpiCases?.dashlet) {
       this._kpiCases.dashlet.expanded = expanded;
@@ -67,6 +88,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
   get allExpanded(): boolean {
     return (
+      !this._caseSummary?.dashlet ||
+      this._caseSummary.dashlet.expanded
+    ) && (
+      !this._casesPerLocation?.dashlet ||
+      this._casesPerLocation.dashlet.expanded
+    ) && (
+      !this._hospitalized?.dashlet ||
+      this._hospitalized.dashlet.expanded
+    ) && (
       !this._kpiCases?.dashlet ||
       this._kpiCases.dashlet.expanded
     ) && (
