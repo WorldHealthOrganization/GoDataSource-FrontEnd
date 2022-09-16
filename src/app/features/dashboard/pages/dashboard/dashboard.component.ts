@@ -702,7 +702,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   /**
    * Get Epi curve dashlet
    */
-  private getEpiCurveDashlet(selector: string, fileName: string) {
+  private getEpiCurveDashlet(
+    selector: string,
+    fileName: string
+  ): void {
     this.dialogV2Service.showSideDialog({
       // title
       title: {
