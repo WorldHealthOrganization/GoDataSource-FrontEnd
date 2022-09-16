@@ -1660,127 +1660,130 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
    * Initialize group actions
    */
   protected initializeGroupActions(): void {
-    this.groupActions = [
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // construct query builder
-            const qb = new RequestQueryBuilder();
-            qb.filter.bySelect(
-              'id',
-              selected,
-              true,
-              null
-            );
+    this.groupActions = {
+      type: V2ActionType.GROUP_ACTIONS,
+      actions: [
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // construct query builder
+              const qb = new RequestQueryBuilder();
+              qb.filter.bySelect(
+                'id',
+                selected,
+                true,
+                null
+              );
 
-            // allow deleted records
-            qb.includeDeleted();
+              // allow deleted records
+              qb.includeDeleted();
 
-            // keep sort order
-            if (!this.queryBuilder.sort.isEmpty()) {
-              qb.sort.criterias = { ...this.queryBuilder.sort.criterias };
+              // keep sort order
+              if (!this.queryBuilder.sort.isEmpty()) {
+                qb.sort.criterias = {...this.queryBuilder.sort.criterias};
+              }
+
+              // export
+              this.exportCases(qb);
             }
-
-            // export
-            this.exportCases(qb);
+          },
+          visible: (): boolean => {
+            return CaseModel.canExport(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
           }
-        },
-        visible: (): boolean => {
-          return CaseModel.canExport(this.authUser);
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
-        }
-      }, {
-        label: {
-          get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // remove id from list
-            const anonymizeFields = this.caseFields.filter((item) => {
-              return item.value !== 'id';
-            });
+        }, {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // remove id from list
+              const anonymizeFields = this.caseFields.filter((item) => {
+                return item.value !== 'id';
+              });
 
-            // export dossier
-            this.dialogV2Service.showExportData({
-              title: {
-                get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER_DIALOG_TITLE'
-              },
-              export: {
-                url: `outbreaks/${this.selectedOutbreak.id}/cases/dossier`,
-                async: false,
-                method: ExportDataMethod.POST,
-                fileName: `${this.translateService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
-                extraFormData: {
-                  append: {
-                    cases: selected
-                  }
+              // export dossier
+              this.dialogV2Service.showExportData({
+                title: {
+                  get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_DOSSIER_DIALOG_TITLE'
                 },
-                allow: {
-                  types: [
-                    ExportDataExtension.ZIP
-                  ],
-                  anonymize: {
-                    fields: anonymizeFields,
-                    key: 'data'
+                export: {
+                  url: `outbreaks/${this.selectedOutbreak.id}/cases/dossier`,
+                  async: false,
+                  method: ExportDataMethod.POST,
+                  fileName: `${this.translateService.instant('LNG_PAGE_LIST_CASES_TITLE')} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                  extraFormData: {
+                    append: {
+                      cases: selected
+                    }
+                  },
+                  allow: {
+                    types: [
+                      ExportDataExtension.ZIP
+                    ],
+                    anonymize: {
+                      fields: anonymizeFields,
+                      key: 'data'
+                    }
                   }
                 }
-              }
-            });
+              });
+            }
+          },
+          visible: (): boolean => {
+            return CaseModel.canExportDossier(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
           }
-        },
-        visible: (): boolean => {
-          return CaseModel.canExportDossier(this.authUser);
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
-        }
-      }, {
-        label: {
-          get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_RELATIONSHIPS'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // construct query builder
-            const qb = new RequestQueryBuilder();
-            const personsQb = qb.addChildQueryBuilder('person');
+        }, {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CASES_GROUP_ACTION_EXPORT_SELECTED_CASES_RELATIONSHIPS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // construct query builder
+              const qb = new RequestQueryBuilder();
+              const personsQb = qb.addChildQueryBuilder('person');
 
-            // retrieve only relationships that have at least one persons as desired type
-            qb.filter.byEquality(
-              'persons.type',
-              EntityType.CASE
-            );
+              // retrieve only relationships that have at least one persons as desired type
+              qb.filter.byEquality(
+                'persons.type',
+                EntityType.CASE
+              );
 
-            // id
-            personsQb.filter.bySelect(
-              'id',
-              selected,
-              true,
-              null
-            );
+              // id
+              personsQb.filter.bySelect(
+                'id',
+                selected,
+                true,
+                null
+              );
 
-            // type
-            personsQb.filter.byEquality(
-              'type',
-              EntityType.CASE
-            );
+              // type
+              personsQb.filter.byEquality(
+                'type',
+                EntityType.CASE
+              );
 
-            // export case relationships
-            this.exportCaseRelationships(qb);
+              // export case relationships
+              this.exportCaseRelationships(qb);
+            }
+          },
+          visible: (): boolean => {
+            return CaseModel.canExportRelationships(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
           }
-        },
-        visible: (): boolean => {
-          return CaseModel.canExportRelationships(this.authUser);
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
         }
-      }
-    ];
+      ]
+    };
   }
 
   /**

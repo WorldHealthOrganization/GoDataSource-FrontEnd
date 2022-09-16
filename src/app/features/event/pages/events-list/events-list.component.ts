@@ -983,78 +983,81 @@ export class EventsListComponent
    * Initialize group actions
    */
   protected initializeGroupActions(): void {
-    this.groupActions = [
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_EVENTS_GROUP_ACTION_EXPORT_SELECTED_EVENTS'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // construct query builder
-            const qb = new RequestQueryBuilder();
-            qb.filter.bySelect('id', selected, true, null);
+    this.groupActions = {
+      type: V2ActionType.GROUP_ACTIONS,
+      actions: [
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_EVENTS_GROUP_ACTION_EXPORT_SELECTED_EVENTS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // construct query builder
+              const qb = new RequestQueryBuilder();
+              qb.filter.bySelect('id', selected, true, null);
 
-            // allow deleted records
-            qb.includeDeleted();
+              // allow deleted records
+              qb.includeDeleted();
 
-            // keep sort order
-            if (!this.queryBuilder.sort.isEmpty()) {
-              qb.sort.criterias = { ...this.queryBuilder.sort.criterias };
+              // keep sort order
+              if (!this.queryBuilder.sort.isEmpty()) {
+                qb.sort.criterias = {...this.queryBuilder.sort.criterias};
+              }
+
+              // export
+              this.exportEvents(qb);
             }
-
-            // export
-            this.exportEvents(qb);
+          },
+          visible: (): boolean => {
+            return EventModel.canExport(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
           }
         },
-        visible: (): boolean => {
-          return EventModel.canExport(this.authUser);
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
-        }
-      },
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_EVENTS_GROUP_ACTION_EXPORT_SELECTED_EVENTS_RELATIONSHIPS'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // construct query builder
-            const qb = new RequestQueryBuilder();
-            const personsQb = qb.addChildQueryBuilder('person');
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_EVENTS_GROUP_ACTION_EXPORT_SELECTED_EVENTS_RELATIONSHIPS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // construct query builder
+              const qb = new RequestQueryBuilder();
+              const personsQb = qb.addChildQueryBuilder('person');
 
-            // retrieve only relationships that have at least one persons as desired type
-            qb.filter.byEquality(
-              'persons.type',
-              EntityType.EVENT
-            );
+              // retrieve only relationships that have at least one persons as desired type
+              qb.filter.byEquality(
+                'persons.type',
+                EntityType.EVENT
+              );
 
-            // id
-            personsQb.filter.bySelect(
-              'id',
-              selected,
-              true,
-              null
-            );
+              // id
+              personsQb.filter.bySelect(
+                'id',
+                selected,
+                true,
+                null
+              );
 
-            // type
-            personsQb.filter.byEquality(
-              'type',
-              EntityType.EVENT
-            );
+              // type
+              personsQb.filter.byEquality(
+                'type',
+                EntityType.EVENT
+              );
 
-            // export event relationships
-            this.exportEventRelationships(qb);
+              // export event relationships
+              this.exportEventRelationships(qb);
+            }
+          },
+          visible: (): boolean => {
+            return EventModel.canExportRelationships(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
           }
-        },
-        visible: (): boolean => {
-          return EventModel.canExportRelationships(this.authUser);
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
         }
-      }
-    ];
+      ]
+    };
   }
 
   /**

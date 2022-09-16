@@ -937,136 +937,139 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
    * Initialize group actions
    */
   protected initializeGroupActions(): void {
-    this.groupActions = [
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // construct query builder
-            const qb = new RequestQueryBuilder();
-            qb.filter.bySelect('id', selected, true, null);
+    this.groupActions = {
+      type: V2ActionType.GROUP_ACTIONS,
+      actions: [
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // construct query builder
+              const qb = new RequestQueryBuilder();
+              qb.filter.bySelect('id', selected, true, null);
 
-            // allow deleted records
-            qb.includeDeleted();
+              // allow deleted records
+              qb.includeDeleted();
 
-            // keep sort order
-            if (!this.queryBuilder.sort.isEmpty()) {
-              qb.sort.criterias = { ...this.queryBuilder.sort.criterias };
+              // keep sort order
+              if (!this.queryBuilder.sort.isEmpty()) {
+                qb.sort.criterias = {...this.queryBuilder.sort.criterias};
+              }
+
+              // export
+              this.exportContactsOfContacts(qb);
             }
-
-            // export
-            this.exportContactsOfContacts(qb);
+          },
+          visible: (): boolean => {
+            return ContactOfContactModel.canExport(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
           }
         },
-        visible: (): boolean => {
-          return ContactOfContactModel.canExport(this.authUser);
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
-        }
-      },
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // remove id from list
-            const anonymizeFields =
-              this.contactsOfContactsFields.filter((item) => {
-                return item.value !== 'id';
-              });
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // remove id from list
+              const anonymizeFields =
+                this.contactsOfContactsFields.filter((item) => {
+                  return item.value !== 'id';
+                });
 
-            // export dossier
-            this.dialogV2Service.showExportData({
-              title: {
-                get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER_DIALOG_TITLE'
-              },
-              export: {
-                url: `outbreaks/${this.selectedOutbreak.id}/contacts-of-contacts/dossier`,
-                async: false,
-                method: ExportDataMethod.POST,
-                fileName: `${this.translateService.instant(
-                  'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE'
-                )} - ${moment().format('YYYY-MM-DD HH:mm')}`,
-                extraFormData: {
-                  append: {
-                    contactsOfContacts: selected
-                  }
+              // export dossier
+              this.dialogV2Service.showExportData({
+                title: {
+                  get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_DOSSIER_DIALOG_TITLE'
                 },
-                allow: {
-                  types: [ExportDataExtension.ZIP],
-                  anonymize: {
-                    fields: anonymizeFields,
-                    key: 'data'
+                export: {
+                  url: `outbreaks/${this.selectedOutbreak.id}/contacts-of-contacts/dossier`,
+                  async: false,
+                  method: ExportDataMethod.POST,
+                  fileName: `${this.translateService.instant(
+                    'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_TITLE'
+                  )} - ${moment().format('YYYY-MM-DD HH:mm')}`,
+                  extraFormData: {
+                    append: {
+                      contactsOfContacts: selected
+                    }
+                  },
+                  allow: {
+                    types: [ExportDataExtension.ZIP],
+                    anonymize: {
+                      fields: anonymizeFields,
+                      key: 'data'
+                    }
                   }
                 }
-              }
-            });
-          }
-        },
-        visible: (): boolean => {
-          return ContactOfContactModel.canExportDossier(this.authUser);
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
-        }
-      },
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_RELATIONSHIPS'
-        },
-        action: {
-          click: (selected: string[]) => {
-            // construct query builder
-            const qb = new RequestQueryBuilder();
-            const personsQb = qb.addChildQueryBuilder('person');
-
-            // retrieve only relationships that have at least one persons as desired type
-            qb.filter.byEquality('persons.type', EntityType.CONTACT_OF_CONTACT);
-
-            // id
-            personsQb.filter.bySelect('id', selected, true, null);
-
-            // type
-            personsQb.filter.byEquality('type', EntityType.CONTACT_OF_CONTACT);
-
-            // export Contact of contact relationships
-            this.exportContactsOfContactsRelationships(qb);
-          }
-        },
-        visible: (): boolean => {
-          return ContactOfContactModel.canExportRelationships(this.authUser);
-        },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
-        }
-      },
-      {
-        label: {
-          get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_MODIFY_CONTACTS_OF_CONTACTS'
-        },
-        action: {
-          link: (): string[] => {
-            return ['/contacts-of-contacts', 'modify-bulk'];
+              });
+            }
           },
-          linkQueryParams: (selected: string[]): Params => {
-            return {
-              contactOfContactIds: JSON.stringify(selected)
-            };
+          visible: (): boolean => {
+            return ContactOfContactModel.canExportDossier(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
           }
         },
-        visible: (): boolean => {
-          return ContactOfContactModel.canBulkModify(this.authUser) &&
-            this.selectedOutbreakIsActive;
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_EXPORT_SELECTED_CONTACTS_OF_CONTACTS_RELATIONSHIPS'
+          },
+          action: {
+            click: (selected: string[]) => {
+              // construct query builder
+              const qb = new RequestQueryBuilder();
+              const personsQb = qb.addChildQueryBuilder('person');
+
+              // retrieve only relationships that have at least one persons as desired type
+              qb.filter.byEquality('persons.type', EntityType.CONTACT_OF_CONTACT);
+
+              // id
+              personsQb.filter.bySelect('id', selected, true, null);
+
+              // type
+              personsQb.filter.byEquality('type', EntityType.CONTACT_OF_CONTACT);
+
+              // export Contact of contact relationships
+              this.exportContactsOfContactsRelationships(qb);
+            }
+          },
+          visible: (): boolean => {
+            return ContactOfContactModel.canExportRelationships(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
+          }
         },
-        disable: (selected: string[]): boolean => {
-          return selected.length < 1;
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_GROUP_ACTION_MODIFY_CONTACTS_OF_CONTACTS'
+          },
+          action: {
+            link: (): string[] => {
+              return ['/contacts-of-contacts', 'modify-bulk'];
+            },
+            linkQueryParams: (selected: string[]): Params => {
+              return {
+                contactOfContactIds: JSON.stringify(selected)
+              };
+            }
+          },
+          visible: (): boolean => {
+            return ContactOfContactModel.canBulkModify(this.authUser) &&
+              this.selectedOutbreakIsActive;
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
+          }
         }
-      }
-    ];
+      ]
+    };
   }
 
   /**
