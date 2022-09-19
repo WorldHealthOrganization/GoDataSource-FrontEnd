@@ -682,6 +682,25 @@ export class OutbreakTemplateCreateViewModifyComponent extends CreateViewModifyC
                 );
               }
             }
+          },
+
+          // Divider
+          {
+            type: CreateViewModifyV2MenuType.DIVIDER,
+            visible: () => OutbreakTemplateModel.canGenerateOutbreak(this.authUser)
+          },
+
+          // Generate Outbreak
+          {
+            type: CreateViewModifyV2MenuType.OPTION,
+            label: 'LNG_PAGE_LIST_OUTBREAK_TEMPLATES_ACTION_GENERATE_OUTBREAK',
+            action: {
+              link: () => ['/outbreaks', 'create'],
+              queryParams: () => ({
+                outbreakTemplateId: this.itemData.id
+              })
+            },
+            visible: () => OutbreakTemplateModel.canGenerateOutbreak(this.authUser)
           }
         ]
       }

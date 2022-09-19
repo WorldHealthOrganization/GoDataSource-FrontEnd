@@ -46,9 +46,6 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     [url: string]: Observable<boolean | IGeneralAsyncValidatorResponse>
   } = {};
 
-  // created from a template ?
-  private _outbreakTemplateId: string;
-
   /**
    * Constructor
    */
@@ -110,7 +107,6 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
       const outbreakTemplate: OutbreakTemplateModel = this.activatedRoute.snapshot.data.outbreakTemplate;
       if (outbreakTemplate) {
         // delete the id of the outbreak template
-        this._outbreakTemplateId = outbreakTemplate.id;
         delete outbreakTemplate.id;
 
         // make the new outbreak which is merged with the outbreak template
@@ -1005,17 +1001,6 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
       data,
       finished
     ) => {
-      // are we creating an outbreak from a template ?
-      if (
-        type === CreateViewModifyV2ActionType.CREATE &&
-        this._outbreakTemplateId
-      ) {
-        data = {
-          ...this.itemData,
-          ...data
-        };
-      }
-
       // sanitize questionnaire - case
       // - remove fields used by ui (e.g. collapsed...)
       if (data.caseInvestigationTemplate) {
@@ -1052,10 +1037,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
       // create / modify
       (
         type === CreateViewModifyV2ActionType.CREATE ?
-          this.outbreakDataService.createOutbreak(
-            data,
-            this._outbreakTemplateId
-          ) :
+          this.outbreakDataService.createOutbreak(data) :
           this.outbreakDataService.modifyOutbreak(
             this.itemData.id,
             data
