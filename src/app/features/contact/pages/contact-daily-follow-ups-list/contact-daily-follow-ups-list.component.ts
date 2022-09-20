@@ -1818,6 +1818,20 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
   protected initializeGroupActions(): void {
     this.groupActions = {
       type: V2ActionType.GROUP_ACTIONS,
+      visible: () =>
+        (
+          FollowUpModel.canBulkModify(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ) ||
+        FollowUpModel.canExport(this.authUser) ||
+        (
+          FollowUpModel.canBulkDelete(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ) ||
+        (
+          FollowUpModel.canBulkDelete(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ),
       actions: [
         // bulk modify
         {

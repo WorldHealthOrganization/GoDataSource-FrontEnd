@@ -1473,6 +1473,10 @@ export class ContactsListComponent
   protected initializeGroupActions(): void {
     this.groupActions = {
       type: V2ActionType.GROUP_ACTIONS,
+      visible: () => ContactModel.canExport(this.authUser) ||
+        ContactModel.canExportDossier(this.authUser) ||
+        ContactModel.canExportRelationships(this.authUser) ||
+        ContactModel.canBulkModify(this.authUser),
       actions: [
         {
           label: {

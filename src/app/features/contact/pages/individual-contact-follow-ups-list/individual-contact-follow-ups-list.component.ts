@@ -336,6 +336,16 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
   protected initializeGroupActions(): void {
     this.groupActions = {
       type: V2ActionType.GROUP_ACTIONS,
+      visible: () =>
+        (
+          FollowUpModel.canBulkModify(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ) ||
+        FollowUpModel.canExport(this.authUser) ||
+        (
+          FollowUpModel.canBulkDelete(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ),
       actions: [
         // bulk modify
         {

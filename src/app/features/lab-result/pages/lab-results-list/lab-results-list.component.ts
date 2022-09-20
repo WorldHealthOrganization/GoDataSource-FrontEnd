@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/indent */
 import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
@@ -770,6 +771,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
   protected initializeGroupActions(): void {
     this.groupActions = {
       type: V2ActionType.GROUP_ACTIONS,
+      visible: () => ContactModel.canExport(this.authUser),
       actions: [
         // bulk export
         {

@@ -985,6 +985,8 @@ export class EventsListComponent
   protected initializeGroupActions(): void {
     this.groupActions = {
       type: V2ActionType.GROUP_ACTIONS,
+      visible: () => EventModel.canExport(this.authUser) ||
+        EventModel.canExportRelationships(this.authUser),
       actions: [
         {
           label: {

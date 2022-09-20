@@ -167,6 +167,17 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
   protected initializeGroupActions(): void {
     this.groupActions = {
       type: V2ActionType.GROUP_ACTIONS,
+      visible: () =>
+        (
+          RelationshipModel.canShare(this.authUser) &&
+          this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].share(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ) ||
+        (
+          RelationshipModel.canBulkDelete(this.authUser) &&
+          this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].bulkDelete(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ),
       actions: [
         // Share
         {

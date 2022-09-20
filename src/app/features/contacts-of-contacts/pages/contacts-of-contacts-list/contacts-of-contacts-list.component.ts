@@ -939,6 +939,13 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
   protected initializeGroupActions(): void {
     this.groupActions = {
       type: V2ActionType.GROUP_ACTIONS,
+      visible: () => ContactOfContactModel.canExport(this.authUser) ||
+        ContactOfContactModel.canExportDossier(this.authUser) ||
+        ContactOfContactModel.canExportRelationships(this.authUser) ||
+        (
+          ContactOfContactModel.canBulkModify(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ),
       actions: [
         {
           label: {
