@@ -1445,7 +1445,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           childQueryBuilderKey: 'case'
         },
         {
-          type: V2AdvancedFilterType.RANGE_AGE,
+          type: V2AdvancedFilterType.RANGE_DATE,
           field: 'dob',
           label: 'LNG_CASE_FIELD_LABEL_DOB',
           relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
