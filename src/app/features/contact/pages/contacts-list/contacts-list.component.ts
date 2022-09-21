@@ -54,7 +54,6 @@ export class ContactsListComponent
     { label: 'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME', value: 'middleName' },
     { label: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME', value: 'lastName' },
     { label: 'LNG_CONTACT_FIELD_LABEL_GENDER', value: 'gender' },
-    { label: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER', value: 'phoneNumber' },
     { label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION', value: 'occupation' },
     { label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH', value: 'dob' },
     { label: 'LNG_CONTACT_FIELD_LABEL_AGE', value: 'age' },

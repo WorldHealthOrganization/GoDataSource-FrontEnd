@@ -2141,7 +2141,9 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
     this.expandListColumnRenderer = {
       type: CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS,
       link: (item: ContactModel) => ['/contacts', item.id, 'view'],
-      statusVisible: true,
+      statusVisible: this.expandListColumnRenderer?.statusVisible === undefined ?
+        true :
+        this.expandListColumnRenderer.statusVisible,
       maxNoOfStatusForms: 3,
       get: {
         status: (item: ContactModel) => {
