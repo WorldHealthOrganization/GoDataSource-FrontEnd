@@ -420,7 +420,7 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
       // retrieve the list of lab results
       this.records$ = this.entityLabResultService
         .retrieveRecords(
-          this.selectedOutbreak.id,
+          this.selectedOutbreak,
           EntityModel.getLinkForEntityType(this.personType),
           this.entityData.id,
           this.queryBuilder

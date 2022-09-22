@@ -10,9 +10,11 @@ import { LabResultSequenceModel } from './lab-result-sequence.model';
 import { OutbreakModel } from './outbreak.model';
 import { IPermissionBasic, IPermissionExportable, IPermissionImportable, IPermissionRestorable } from './permission.interface';
 import { PERMISSION } from './permission.model';
-import { IAnswerData } from './question.model';
+import { IAnswerData, QuestionModel } from './question.model';
 import { UserModel } from './user.model';
 import { Moment } from '../helperClasses/x-moment';
+import { TranslateService } from '@ngx-translate/core';
+import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../shared/components-v2/app-list-table-v2/models/column.model';
 
 export class LabResultModel
   extends BaseModel
@@ -42,6 +44,9 @@ export class LabResultModel
   person: CaseModel | ContactModel;
   testedFor: string;
   sequence: LabResultSequenceModel;
+
+  // used by ui
+  alerted: boolean = false;
 
   /**
    * Advanced filters
@@ -124,6 +129,111 @@ export class LabResultModel
 
     // finished
     return advancedFilters;
+  }
+
+  /**
+   * Determine alertness
+   */
+  static determineAlertness(
+    template: QuestionModel[],
+    entities: LabResultModel[]
+  ): LabResultModel[] {
+    // map alert question answers to object for easy find
+    const alertQuestionAnswers: {
+      [question_variable: string]: {
+        [answer_value: string]: true
+      }
+    } = QuestionModel.determineAlertAnswers(template);
+
+    // map alert value to lab results
+    entities.forEach((labResultData: LabResultModel) => {
+      // check if we need to mark lab result as alerted because of questionnaire answers
+      labResultData.alerted = false;
+      if (labResultData.questionnaireAnswers) {
+        const props: string[] = Object.keys(labResultData.questionnaireAnswers);
+        for (let propIndex: number = 0; propIndex < props.length; propIndex++) {
+          // get answer data
+          const questionVariable: string = props[propIndex];
+          const answers: IAnswerData[] = labResultData.questionnaireAnswers[questionVariable];
+
+          // retrieve answer value
+          // only the newest one is of interest, the old ones shouldn't trigger an alert
+          // the first item should be the newest
+          const answerKey = answers?.length > 0 ?
+            answers[0].value :
+            undefined;
+
+          // there is no point in checking the value if there isn't one
+          if (
+            !answerKey &&
+            typeof answerKey !== 'number'
+          ) {
+            continue;
+          }
+
+          // at least one alerted ?
+          if (Array.isArray(answerKey)) {
+            // go through all answers
+            for (let answerKeyIndex: number = 0; answerKeyIndex < answerKey.length; answerKeyIndex++) {
+              if (
+                alertQuestionAnswers[questionVariable] &&
+                alertQuestionAnswers[questionVariable][answerKey[answerKeyIndex]]
+              ) {
+                // alerted
+                labResultData.alerted = true;
+
+                // stop
+                break;
+              }
+            }
+
+            // stop ?
+            if (labResultData.alerted) {
+              // stop
+              break;
+            }
+          } else if (
+            alertQuestionAnswers[questionVariable] &&
+            alertQuestionAnswers[questionVariable][answerKey]
+          ) {
+            // alerted
+            labResultData.alerted = true;
+
+            // stop
+            break;
+          }
+        }
+      }
+    });
+
+    // finished
+    return entities;
+  }
+
+  /**
+   * Retrieve statuses forms
+   */
+  static getStatusForms(
+    info: {
+      // required
+      item: LabResultModel,
+      translateService: TranslateService
+    }
+  ): V2ColumnStatusForm[] {
+    // construct list of forms that we need to display
+    const forms: V2ColumnStatusForm[] = [];
+
+    // alerted
+    if (info.item.alerted) {
+      forms.push({
+        type: IV2ColumnStatusFormType.STAR,
+        color: 'var(--gd-danger)',
+        tooltip: info.translateService.instant('LNG_COMMON_LABEL_STATUSES_ALERTED')
+      });
+    }
+
+    // finished
+    return forms;
   }
 
   /**

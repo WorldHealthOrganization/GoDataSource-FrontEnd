@@ -1453,7 +1453,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           // refresh data
           localTab.records$ = this.entityLabResultService
             .retrieveRecords(
-              this.selectedOutbreak.id,
+              this.selectedOutbreak,
               EntityModel.getLinkForEntityType(this.itemData.type),
               this.itemData.id,
               localTab.queryBuilder
