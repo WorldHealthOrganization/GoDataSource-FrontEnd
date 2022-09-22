@@ -2491,7 +2491,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     if (
       this.itemData.dateOfOnset &&
       this.itemData.dateOfReporting &&
-      moment(this.itemData.dateOfOnset).isAfter(moment(this.itemData.dateofre))
+      moment(this.itemData.dateOfOnset).isAfter(moment(this.itemData.dateOfReporting))
     ) {
       this.toastV2Service.notice(
         this.translateService.instant(
