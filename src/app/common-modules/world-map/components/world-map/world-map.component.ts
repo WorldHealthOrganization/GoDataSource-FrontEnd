@@ -236,8 +236,15 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     return this._displayLoading;
   }
 
+  // selected outbreak
+  selectedOutbreak: OutbreakModel;
+
   // Map Tiles / Layers
   layersLoading: boolean = true;
+  originalLayers: {
+    styleLoaded: boolean,
+    layer: TileLayer<any> | VectorTileLayer | VectorLayer<any>
+  }[] = [];
   layers: {
     styleLoaded: boolean,
     layer: TileLayer<any> | VectorTileLayer | VectorLayer<any>
@@ -409,104 +416,15 @@ export class WorldMapComponent implements OnInit, OnDestroy {
           return;
         }
 
+        // update selected outbreak
+        this.selectedOutbreak = selectedOutbreak;
+
         // construct layer data used by our map
         this.layersLoading = true;
-        this.layers = [];
-        (selectedOutbreak.arcGisServers || []).forEach((mapServer) => {
-          // filter out bad layers
-          if (!mapServer.url) {
-            return;
-          }
-
-          // create layer based on the map type
-          let layerData: {
-            layer: TileLayer<any> | VectorTileLayer | VectorLayer<any>,
-            styleLoaded: boolean
-          };
-          switch (mapServer.type) {
-            case Constants.OUTBREAK_MAP_SERVER_TYPES.TILE_XYZ.value:
-              // add '/tile/{z}/{y}/{x}' to url if not specified
-              layerData = {
-                styleLoaded: true,
-                layer: new TileLayer({
-                  source: new XYZ({
-                    url: mapServer.url + (!/\/tile\/{z}\/{y}\/{x}$/.test(mapServer.url) ? '/tile/{z}/{y}/{x}' : ''),
-                    crossOrigin: 'anonymous'
-                  })
-                })
-              };
-
-              // finished
-              break;
-
-            case Constants.OUTBREAK_MAP_SERVER_TYPES.VECTOR_TILE_VECTOR_TILE_LAYER.value:
-              layerData = {
-                styleLoaded: false,
-                layer: new VectorTileLayer({
-                  // add '/tile/{z}/{y}/{x}.pbf' to url if not specified
-                  source: new VectorTileSource({
-                    url: mapServer.url + (!/\/tile\/{z}\/{y}\/{x}.pbf$/.test(mapServer.url) ? '/tile/{z}/{y}/{x}.pbf' : ''),
-                    format: new MVT()
-                  })
-                })
-              };
-
-              // load styles if necessary
-              if (
-                !mapServer.styleUrl ||
-                !mapServer.styleUrlSource
-              ) {
-                // mark style as being loaded
-                layerData.styleLoaded = true;
-              } else {
-                // make sure that the path style Url ends with /
-                const pathStyleUrl = mapServer.styleUrl + (!/\/$/.test(mapServer.styleUrl) ? '/' : '');
-
-                // get and apply the style
-                fetch(mapServer.styleUrl)
-                  .then(r => r.json())
-                  .then((glStyle) => {
-                    // apply style
-                    applyStyle(
-                      layerData.layer as VectorTileLayer | VectorLayer<any>,
-                      glStyle,
-                      mapServer.styleUrlSource,
-                      pathStyleUrl
-                    ).then(() => {
-                      // mark style as being loaded
-                      layerData.styleLoaded = true;
-
-                      // try again to init map
-                      this.initializeMap();
-                    }).catch(() => {
-                      // display an error
-                      this.toastV2Service.error('LNG_PAGE_WORLD_MAP_OUTBREAK_MAP_SERVER_STYLE_INVALID_URL');
-                    });
-                  });
-              }
-
-              // finished
-              break;
-
-            default:
-              // Constants.OUTBREAK_MAP_SERVER_TYPES.TILE_TILE_ARC_GIS_REST.values:
-              layerData = {
-                styleLoaded: true,
-                layer: new TileLayer({
-                  source: new TileArcGISRest({
-                    url: mapServer.url,
-                    crossOrigin: 'anonymous'
-                  })
-                })
-              };
-
-              // finished
-              break;
-          }
-
-          // add layer to list
-          this.layers.push(layerData);
-        });
+        this.originalLayers = this.initializeLayers();
+        this.layers = this.originalLayers?.length > 0 ?
+          [...this.originalLayers] :
+          [];
 
         // initialize map
         this.initializeMap();
@@ -1127,6 +1045,11 @@ export class WorldMapComponent implements OnInit, OnDestroy {
       // create overlay layer source
       this.mapOverlayLayerSource = new VectorSource();
 
+      // re-initialize layers
+      this.layers = this.originalLayers?.length > 0 ?
+        [...this.originalLayers] :
+        [];
+
       // add overlay - markers & lines layer
       this.layers.push({
         styleLoaded: true,
@@ -1563,11 +1486,128 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Update map size
-     */
+   * Update map size
+   */
   @HostListener('window:resize')
   // @ts-ignore: Ignore value not used
   private updateMapSizeOnWindowResize() {
     this.updateMapSize();
+  }
+
+  /**
+   * Initialize layers
+   */
+  private initializeLayers(): {
+    styleLoaded: boolean,
+    layer: TileLayer<any> | VectorTileLayer | VectorLayer<any>
+  }[] {
+    // no selected outbreak ?
+    if (!this.selectedOutbreak?.id) {
+      return [];
+    }
+
+    // determine layers
+    const layers: {
+      styleLoaded: boolean,
+      layer: TileLayer<any> | VectorTileLayer | VectorLayer<any>
+    }[] = [];
+    (this.selectedOutbreak.arcGisServers || []).forEach((mapServer) => {
+      // filter out bad layers
+      if (!mapServer.url) {
+        return;
+      }
+
+      // create layer based on the map type
+      let layerData: {
+        layer: TileLayer<any> | VectorTileLayer | VectorLayer<any>,
+        styleLoaded: boolean
+      };
+      switch (mapServer.type) {
+        case Constants.OUTBREAK_MAP_SERVER_TYPES.TILE_XYZ.value:
+          // add '/tile/{z}/{y}/{x}' to url if not specified
+          layerData = {
+            styleLoaded: true,
+            layer: new TileLayer({
+              source: new XYZ({
+                url: mapServer.url + (!/\/tile\/{z}\/{y}\/{x}$/.test(mapServer.url) ? '/tile/{z}/{y}/{x}' : ''),
+                crossOrigin: 'anonymous'
+              })
+            })
+          };
+
+          // finished
+          break;
+
+        case Constants.OUTBREAK_MAP_SERVER_TYPES.VECTOR_TILE_VECTOR_TILE_LAYER.value:
+          layerData = {
+            styleLoaded: false,
+            layer: new VectorTileLayer({
+              // add '/tile/{z}/{y}/{x}.pbf' to url if not specified
+              source: new VectorTileSource({
+                url: mapServer.url + (!/\/tile\/{z}\/{y}\/{x}.pbf$/.test(mapServer.url) ? '/tile/{z}/{y}/{x}.pbf' : ''),
+                format: new MVT()
+              })
+            })
+          };
+
+          // load styles if necessary
+          if (
+            !mapServer.styleUrl ||
+            !mapServer.styleUrlSource
+          ) {
+            // mark style as being loaded
+            layerData.styleLoaded = true;
+          } else {
+            // make sure that the path style Url ends with /
+            const pathStyleUrl = mapServer.styleUrl + (!/\/$/.test(mapServer.styleUrl) ? '/' : '');
+
+            // get and apply the style
+            fetch(mapServer.styleUrl)
+              .then(r => r.json())
+              .then((glStyle) => {
+                // apply style
+                applyStyle(
+                  layerData.layer as VectorTileLayer | VectorLayer<any>,
+                  glStyle,
+                  mapServer.styleUrlSource,
+                  pathStyleUrl
+                ).then(() => {
+                  // mark style as being loaded
+                  layerData.styleLoaded = true;
+
+                  // try again to init map
+                  this.initializeMap();
+                }).catch(() => {
+                  // display an error
+                  this.toastV2Service.error('LNG_PAGE_WORLD_MAP_OUTBREAK_MAP_SERVER_STYLE_INVALID_URL');
+                });
+              });
+          }
+
+          // finished
+          break;
+
+        default:
+          // Constants.OUTBREAK_MAP_SERVER_TYPES.TILE_TILE_ARC_GIS_REST.values:
+          layerData = {
+            styleLoaded: true,
+            layer: new TileLayer({
+              source: new TileArcGISRest({
+                url: mapServer.url,
+                crossOrigin: 'anonymous'
+              })
+            })
+          };
+
+          // finished
+          break;
+      }
+
+      // add layer to list
+      layers.push(layerData);
+    });
+
+    // finished
+    return layers;
   }
 }
