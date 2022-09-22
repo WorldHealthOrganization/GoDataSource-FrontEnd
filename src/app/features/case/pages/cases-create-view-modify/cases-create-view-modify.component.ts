@@ -744,6 +744,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             value: {
               get: () => this.itemData.dateOfOnset,
               set: (value) => {
+                if (value > this.itemData.dateOfReporting) {
+                  this.toastV2Service.notice(this.translateService.instant('LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET'));
+                }
                 this.itemData.dateOfOnset = value;
               }
             },
@@ -964,6 +967,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             value: {
               get: () => this.itemData.dateOfReporting,
               set: (value) => {
+                if (value < this.itemData.dateOfOnset) {
+                  this.toastV2Service.notice(this.translateService.instant('LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET'));
+                }
                 this.itemData.dateOfReporting = value;
               }
             },
