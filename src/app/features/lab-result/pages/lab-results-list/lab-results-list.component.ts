@@ -2,7 +2,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import * as _ from 'lodash';
 import { throwError } from 'rxjs';
-import { catchError, takeUntil } from 'rxjs/operators';
+import { catchError, map, takeUntil } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { moment } from '../../../../core/helperClasses/x-moment';
@@ -18,17 +18,17 @@ import { UserModel } from '../../../../core/models/user.model';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { ListHelperService } from '../../../../core/services/helper/list-helper.service';
 import { ExportDataExtension, ExportDataMethod, IV2ExportDataConfigGroupsRequired } from '../../../../core/services/helper/models/dialog-v2.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
-import { IV2ColumnPinned, V2ColumnFormat } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { Constants } from '../../../../core/models/constants';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-lab-results',
@@ -73,7 +73,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
     private toastV2Service: ToastV2Service,
     private outbreakDataService: OutbreakDataService,
     private labResultDataService: LabResultDataService,
-    private i18nService: I18nService,
+    private translateService: TranslateService,
     private activatedRoute: ActivatedRoute,
     private dialogV2Service: DialogV2Service
   ) {
@@ -383,10 +383,36 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
         }
       },
       {
+        field: 'statuses',
+        label: 'LNG_COMMON_LABEL_STATUSES',
+        format: {
+          type: V2ColumnFormat.STATUS
+        },
+        notResizable: true,
+        pinned: true,
+        legends: [
+          // alerted
+          {
+            title: 'LNG_COMMON_LABEL_STATUSES_ALERTED',
+            items: [{
+              form: {
+                type: IV2ColumnStatusFormType.STAR,
+                color: 'var(--gd-danger)'
+              },
+              label: ' '
+            }]
+          }
+        ],
+        forms: (_column, data: LabResultModel): V2ColumnStatusForm[] => LabResultModel.getStatusForms({
+          item: data,
+          translateService: this.translateService
+        })
+      },
+      {
         field: 'classification',
         format: {
           type: (item) => item.person && item.person.classification ?
-            this.i18nService.instant(item.person.classification) :
+            this.translateService.instant(item.person.classification) :
             ''
         },
         label: 'LNG_LAB_RESULT_FIELD_LABEL_CASE_CLASSIFICATION',
@@ -861,14 +887,15 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
       'createdAt',
       'updatedBy',
       'updatedAt',
-      'personType'
+      'personType',
+      'questionnaireAnswers'
     ];
   }
 
   /**
    * Re(load) the Lab Results list
    */
-  refreshList() {
+  refreshList(): void {
     // retrieve only case lab results ?
     if (
       CaseModel.canListLabResult(this.authUser) && (
@@ -908,6 +935,14 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
     this.records$ = this.labResultDataService
       .getOutbreakLabResults(this.selectedOutbreak.id, this.queryBuilder)
       .pipe(
+        // determine alertness
+        map((data: LabResultModel[]) => {
+          return LabResultModel.determineAlertness(
+            this.selectedOutbreak.labResultsTemplate,
+            data
+          );
+        }),
+
         // should be the last pipe
         takeUntil(this.destroyed$)
       );
@@ -999,7 +1034,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                 url: `/outbreaks/${ this.selectedOutbreak.id }/lab-results/export`,
                 async: true,
                 method: ExportDataMethod.POST,
-                fileName: `${ this.i18nService.instant('LNG_PAGE_LIST_LAB_RESULTS_TITLE') } - ${ moment().format('YYYY-MM-DD') }`,
+                fileName: `${ this.translateService.instant('LNG_PAGE_LIST_LAB_RESULTS_TITLE') } - ${ moment().format('YYYY-MM-DD') }`,
                 queryBuilder: qb,
                 allow: {
                   types: [
