@@ -5,7 +5,7 @@
   [advancedFilterType]="Constants.APP_PAGE.CASE_COUNT_MAP.value"
   [advancedFilters]="advancedFilters"
   advancedFiltersHideOperator="true"
-  (advancedFilterBy)="reloadCases()">
+  (advancedFilterBy)="reloadCases($event)">
   <div
     class="gd-case-count-map-distance"
     fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="none center" fxLayoutAlign.lt-md="none start" fxLayoutGap="1.6rem" fxLayoutGap.lt-md="0.8rem">
