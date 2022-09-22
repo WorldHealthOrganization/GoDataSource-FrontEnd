@@ -11,9 +11,7 @@ export const EnglishUsLang = {
      */
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
-    'LNG_USER_FIELD_LABEL_LANGUAGE': 'Language',
-    'LNG_USER_FIELD_LABEL_LANGUAGE_DESCRIPTION': '',
-    'LNG_USER_FIELD_LABEL_CANT_SET_LANGUAGE': 'You need \'Language - list\' permission to set language'
+
 
 
     /**

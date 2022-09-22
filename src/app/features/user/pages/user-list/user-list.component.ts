@@ -345,7 +345,7 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
               '';
           }
         },
-        link: (user: UserModel) => user.languageId && (this.activatedRoute.snapshot.data.language as IResolverV2ResponseModel<LanguageModel>).map[user.languageId] ?
+        link: (user: UserModel) => user.languageId && LanguageModel.canView(this.authUser) && (this.activatedRoute.snapshot.data.language as IResolverV2ResponseModel<LanguageModel>).map[user.languageId] ?
           `languages/${user.languageId}/view` :
           undefined,
         filter: {
@@ -441,7 +441,8 @@ export class UserListComponent extends ListComponent<UserModel> implements OnDes
         institution: (this.activatedRoute.snapshot.data.institution as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         userRole: (this.activatedRoute.snapshot.data.userRole as IResolverV2ResponseModel<UserRoleModel>).options,
         outbreak: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<OutbreakModel>).options,
-        team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options
+        team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).options,
+        language: (this.activatedRoute.snapshot.data.language as IResolverV2ResponseModel<LanguageModel>).options
       }
     });
   }

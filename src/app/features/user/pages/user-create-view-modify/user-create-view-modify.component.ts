@@ -409,14 +409,7 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
                   this.itemData.languageId = value;
                 }
               },
-              options: (this.activatedRoute.snapshot.data.language as IResolverV2ResponseModel<LanguageModel>).options,
-              disabled: (): boolean => {
-                return !LanguageModel.canList(this.authUser);
-              },
-              replace: {
-                condition: () => !LanguageModel.canList(this.authUser),
-                html: this.translateService.instant('LNG_USER_FIELD_LABEL_CANT_SET_LANGUAGE')
-              }
+              options: (this.activatedRoute.snapshot.data.language as IResolverV2ResponseModel<LanguageModel>).options
             }
           ]
         },
@@ -604,7 +597,8 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
         institution: (this.activatedRoute.snapshot.data.institution as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         userRole: (this.activatedRoute.snapshot.data.userRole as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         outbreak: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        language: (this.activatedRoute.snapshot.data.language as IResolverV2ResponseModel<LanguageModel>).options
       }
     });
   }
