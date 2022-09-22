@@ -352,6 +352,18 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH,
           relationshipKey: 'person'
+        },
+        link: (data) => {
+          return data.person.type === EntityType.CASE ?
+            (
+              CaseModel.canView(this.authUser) && !data.person.deleted ?
+                `/cases/${data.person.id}/view` :
+                undefined
+            ) : (
+              data.person.type === EntityType.CONTACT && ContactModel.canView(this.authUser) && !data.person.deleted ?
+                `/contacts/${data.person.id}/view` :
+                undefined
+            );
         }
       },
       {
@@ -366,6 +378,18 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH,
           relationshipKey: 'person'
+        },
+        link: (data) => {
+          return data.person.type === EntityType.CASE ?
+            (
+              CaseModel.canView(this.authUser) && !data.person.deleted ?
+                `/cases/${data.person.id}/view` :
+                undefined
+            ) : (
+              data.person.type === EntityType.CONTACT && ContactModel.canView(this.authUser) && !data.person.deleted ?
+                `/contacts/${data.person.id}/view` :
+                undefined
+            );
         }
       },
       {
@@ -380,6 +404,18 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH,
           relationshipKey: 'person'
+        },
+        link: (data) => {
+          return data.person.type === EntityType.CASE ?
+            (
+              CaseModel.canView(this.authUser) && !data.person.deleted ?
+                `/cases/${data.person.id}/view` :
+                undefined
+            ) : (
+              data.person.type === EntityType.CONTACT && ContactModel.canView(this.authUser) && !data.person.deleted ?
+                `/contacts/${data.person.id}/view` :
+                undefined
+            );
         }
       },
       {
