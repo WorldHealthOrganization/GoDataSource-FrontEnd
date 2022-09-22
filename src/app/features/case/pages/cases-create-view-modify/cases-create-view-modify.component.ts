@@ -148,7 +148,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
     // remove global notifications
     this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_UNRESPONSIVE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
   }
 
   /**
@@ -196,7 +196,6 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     ) {
       // remove global notifications
       this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
-      this.toastV2Service.hide(AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
 
       // show global notifications
       this.checkForPersonExistence();
@@ -2495,12 +2494,12 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       this.toastV2Service.notice(
         this.translateService.instant(
           'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET',
-          AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET
+          AppMessages.APP_MESSAGE_UNRESPONSIVE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET
         )
       );
     } else {
       this.toastV2Service.hide(
-        AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET
+        AppMessages.APP_MESSAGE_UNRESPONSIVE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET
       );
     }
   }
