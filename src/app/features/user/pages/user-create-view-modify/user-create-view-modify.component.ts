@@ -23,6 +23,7 @@ import { RequestFilterGenerator } from '../../../../core/helperClasses/request-q
 import { catchError, takeUntil } from 'rxjs/operators';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { LanguageModel } from '../../../../core/models/language.model';
 
 /**
  * Component
@@ -394,6 +395,27 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
               replace: {
                 condition: () => !OutbreakModel.canList(this.authUser),
                 html: this.translateService.instant('LNG_USER_FIELD_LABEL_CANT_SET_ACTIVE_OUTBREAK')
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'languageId',
+              placeholder: () => 'LNG_USER_FIELD_LABEL_LANGUAGE',
+              description: () => 'LNG_USER_FIELD_LABEL_LANGUAGE_DESCRIPTION',
+              value: {
+                get: () => this.itemData.languageId,
+                set: (value) => {
+                  // set data
+                  this.itemData.languageId = value;
+                }
+              },
+              options: (this.activatedRoute.snapshot.data.language as IResolverV2ResponseModel<LanguageModel>).options,
+              disabled: (): boolean => {
+                return !LanguageModel.canList(this.authUser);
+              },
+              replace: {
+                condition: () => !LanguageModel.canList(this.authUser),
+                html: this.translateService.instant('LNG_USER_FIELD_LABEL_CANT_SET_LANGUAGE')
               }
             }
           ]
