@@ -759,10 +759,10 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     let markerData: WorldMapMarker;
     if (
       size === 1 &&
-            features[0].getProperties &&
-            features[0].getProperties() &&
-            features[0].getProperties().dataForEventListeners &&
-            features[0].getProperties().dataForEventListeners.overlaySingleDisplayLabel
+      features[0].getProperties &&
+      features[0].getProperties() &&
+      features[0].getProperties().dataForEventListeners &&
+      features[0].getProperties().dataForEventListeners.overlaySingleDisplayLabel
     ) {
       markerData = features[0].getProperties().dataForEventListeners;
       cacheKey = markerData.id;
