@@ -747,8 +747,8 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Style Features
-     */
+   * Style Features
+   */
   clusterStyleFeature(feature: Feature<any>): Style {
     // determine number of markers
     const features: Feature<any>[] = feature.get('features');
