@@ -202,7 +202,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     }
 
     // show global notifications
-    if (this.itemData.dateOfOnset > this.itemData.dateOfReporting) {
+    if (this.itemData.dateOfOnset && this.itemData.dateOfReporting && moment(this.itemData.dateOfReporting).isBefore(this.itemData.dateOfOnset)) {
       this.toastV2Service.notice(this.translateService.instant('LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET', AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET));
     }
   }
@@ -750,7 +750,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             value: {
               get: () => this.itemData.dateOfOnset,
               set: (value) => {
-                if (value > this.itemData.dateOfReporting) {
+                if (value && this.itemData.dateOfReporting && moment(value).isAfter(this.itemData.dateOfReporting)) {
                   this.toastV2Service.notice(this.translateService.instant('LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET', AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET));
                 } else {
                   this.toastV2Service.hide(AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
@@ -975,7 +975,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             value: {
               get: () => this.itemData.dateOfReporting,
               set: (value) => {
-                if (value < this.itemData.dateOfOnset) {
+                if (value && this.itemData.dateOfOnset && moment(value).isBefore(this.itemData.dateOfOnset)) {
                   this.toastV2Service.notice(this.translateService.instant('LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET'));
                 } else {
                   this.toastV2Service.hide(AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
