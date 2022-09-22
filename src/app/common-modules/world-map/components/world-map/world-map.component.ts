@@ -1101,8 +1101,8 @@ export class WorldMapComponent implements OnInit, OnDestroy {
     // or map already initialized
     if (
       this.displayLoading ||
-            this.layers.length < 1 ||
-            !_.isEmpty(this.map)
+      this.layers.length < 1 ||
+      !_.isEmpty(this.map)
     ) {
       return;
     }
