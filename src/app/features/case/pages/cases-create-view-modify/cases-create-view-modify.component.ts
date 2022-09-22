@@ -197,12 +197,10 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       // remove global notifications
       this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
 
-      // check
+      // show global notifications
       this.checkForPersonExistence();
+      this.checkForOnsetAfterReporting();
     }
-
-    // show global notifications
-    this.checkForOnsetAfterReporting();
   }
 
   /**
