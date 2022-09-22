@@ -394,8 +394,8 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   ) {}
 
   /**
-     * Init map
-     */
+   * Init map
+   */
   ngOnInit() {
     // fix ol bug in production build: https://github.com/openlayers/openlayers/issues/9019#issuecomment-444441291
     addCommonProjections();
@@ -1094,8 +1094,8 @@ export class WorldMapComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Initialize World Map
-     */
+   * Initialize World Map
+   */
   initializeMap() {
     // no point in initializing map if map is hidden
     // or map already initialized
