@@ -148,6 +148,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
     // remove global notifications
     this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
   }
 
   /**
@@ -196,8 +197,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       // remove global notifications
       this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
 
-      // check
+      // show global notifications
       this.checkForPersonExistence();
+      this.checkForOnsetAfterReporting();
     }
   }
 
@@ -744,7 +746,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             value: {
               get: () => this.itemData.dateOfOnset,
               set: (value) => {
+                // set data
                 this.itemData.dateOfOnset = value;
+
+                // check onset after reporting
+                this.checkForOnsetAfterReporting();
               }
             },
             maxDate: this._today,
@@ -964,7 +970,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             value: {
               get: () => this.itemData.dateOfReporting,
               set: (value) => {
+                // set data
                 this.itemData.dateOfReporting = value;
+
+                // check onset after reporting
+                this.checkForOnsetAfterReporting();
               }
             },
             maxDate: this._today,
@@ -2472,5 +2482,24 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       },
       400
     );
+  }
+
+  /**
+   * Check if "date of onset" is after "date of reporting
+   */
+  private checkForOnsetAfterReporting() {
+    if (
+      this.itemData.dateOfOnset &&
+      this.itemData.dateOfReporting &&
+      moment(this.itemData.dateOfOnset).isAfter(moment(this.itemData.dateOfReporting))
+    ) {
+      this.toastV2Service.notice(
+        'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_IS_AFTER_DATE_OF_REPORTING',
+        undefined,
+        AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET
+      );
+    } else {
+      this.toastV2Service.hide(AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+    }
   }
 }
