@@ -2494,7 +2494,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       moment(this.itemData.dateOfOnset).isAfter(moment(this.itemData.dateOfReporting))
     ) {
       this.toastV2Service.notice(
-        'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_SHOULD_BE_AFTER_DATE_OF_ONSET',
+        'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_IS_AFTER_DATE_OF_REPORTING',
         undefined,
         AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET
       );
