@@ -647,7 +647,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
         text: (item: FollowUpModel) => item.date ?
           moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
           '-',
-        details: () => ''
+        details: undefined
       }
     };
   }
