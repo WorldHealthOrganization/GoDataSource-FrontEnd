@@ -756,6 +756,20 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         notResizable: true,
         pinned: true,
         legends: [
+          // status
+          {
+            title: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
+            items: (this.activatedRoute.snapshot.data.dailyFollowUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).list.map((item) => {
+              return {
+                form: {
+                  type: IV2ColumnStatusFormType.CIRCLE,
+                  color: item.getColorCode()
+                },
+                label: item.id
+              };
+            })
+          },
+
           // alerted
           {
             title: 'LNG_COMMON_LABEL_STATUSES_ALERTED',
@@ -770,7 +784,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         ],
         forms: (_column, data: FollowUpModel): V2ColumnStatusForm[] => FollowUpModel.getStatusForms({
           item: data,
-          translateService: this.translateService
+          translateService: this.translateService,
+          dailyFollowUpStatus: this.activatedRoute.snapshot.data.dailyFollowUpStatus
         })
       },
       {
