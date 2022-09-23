@@ -15,6 +15,7 @@ import { UserModel } from './user.model';
 import { Moment } from '../helperClasses/x-moment';
 import { TranslateService } from '@ngx-translate/core';
 import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../shared/components-v2/app-list-table-v2/models/column.model';
+import { SafeHtml } from '@angular/platform-browser';
 
 export class LabResultModel
   extends BaseModel
@@ -47,6 +48,7 @@ export class LabResultModel
 
   // used by ui
   alerted: boolean = false;
+  uiStatusForms: SafeHtml;
 
   /**
    * Advanced filters

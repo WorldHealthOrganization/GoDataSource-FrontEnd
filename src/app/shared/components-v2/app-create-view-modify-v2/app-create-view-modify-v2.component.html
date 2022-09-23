@@ -181,6 +181,7 @@
 
                         <!-- Details -->
                         <span
+                          *ngIf="expandListColumnRenderer.get.details"
                           class="gd-create-view-modify-list-data-record-is-status-and-details-details-details">
                           {{ expandListColumnRenderer.get.details(record) }}
                         </span>
