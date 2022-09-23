@@ -12,6 +12,7 @@ import { OutbreakDataResolver } from '../../core/services/resolvers/data/outbrea
 import { UserCreateViewModifyComponent } from './pages';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { UserDataResolver } from '../../core/services/resolvers/data/user.resolver';
+import { LanguageDataResolver } from '../../core/services/resolvers/data/language.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -22,7 +23,8 @@ const createViewModifyFoundation: Route = {
     userRole: UserRoleDataResolver,
     outbreak: OutbreakDataResolver,
     team: TeamDataResolver,
-    user: UserDataResolver
+    user: UserDataResolver,
+    language: LanguageDataResolver
   }
 };
 
@@ -43,7 +45,8 @@ const routes: Routes = [
       yesNoAll: YesNoAllDataResolver,
       institution: InstitutionDataResolver,
       userRole: UserRoleDataResolver,
-      outbreak: OutbreakDataResolver
+      outbreak: OutbreakDataResolver,
+      language: LanguageDataResolver
     }
   },
   // Create User

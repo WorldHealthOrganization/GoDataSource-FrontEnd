@@ -9,7 +9,7 @@ import { ToastV2Service } from '../../../../core/services/helper/toast-v2.servic
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { Observable, throwError } from 'rxjs';
 import { EntityModel } from '../../../../core/models/entity-and-relationship.model';
-import { catchError, takeUntil } from 'rxjs/operators';
+import { catchError, map, takeUntil } from 'rxjs/operators';
 import { EntityType } from '../../../../core/models/entity-type';
 import { ContactModel } from '../../../../core/models/contact.model';
 import { CaseModel } from '../../../../core/models/case.model';
@@ -31,6 +31,9 @@ import {
   CreateViewModifyV2ExpandColumnType
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
+import { DomSanitizer } from '@angular/platform-browser';
 
 /**
  * Component
@@ -56,6 +59,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     private activatedRoute: ActivatedRoute,
     private translateService: TranslateService,
     private dialogV2Service: DialogV2Service,
+    private domSanitizer: DomSanitizer,
     authDataService: AuthDataService,
     toastV2Service: ToastV2Service,
     renderer2: Renderer2,
@@ -841,7 +845,7 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
    */
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = this.entityData.deleted ? undefined : {
-      type: CreateViewModifyV2ExpandColumnType.TEXT,
+      type: CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS,
       link: (item: LabResultModel) => {
         if (this._personType === EntityType.CONTACT) {
           return [`/lab-results/contacts/${this.entityData.id}/${item.id}`];
@@ -849,10 +853,40 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
           return [`/lab-results/cases/${this.entityData.id}/${item.id}`];
         }
       },
+      statusVisible: this.expandListColumnRenderer?.statusVisible === undefined ?
+        true :
+        this.expandListColumnRenderer.statusVisible,
+      maxNoOfStatusForms: 1,
       get: {
+        status: (item: LabResultModel) => {
+          // must initialize - optimization to not recreate the list everytime there is an event since data won't change ?
+          if (!item.uiStatusForms) {
+            // determine forms
+            const forms: V2ColumnStatusForm[] = LabResultModel.getStatusForms({
+              item,
+              translateService: this.translateService
+            });
+
+            // create html
+            let html: string = '';
+            forms.forEach((form, formIndex) => {
+              html += AppListTableV2Component.renderStatusForm(
+                form,
+                formIndex < forms.length - 1
+              );
+            });
+
+            // convert to safe html
+            item.uiStatusForms = this.domSanitizer.bypassSecurityTrustHtml(html);
+          }
+
+          // finished
+          return item.uiStatusForms;
+        },
         text: (item: LabResultModel) => item.sampleIdentifier?.trim().length > 0 ?
           item.sampleIdentifier :
-          moment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
+          moment(item.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+        details: undefined
       }
     };
   }
@@ -864,7 +898,8 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     this.expandListQueryFields = [
       'id',
       'sampleIdentifier',
-      'dateSampleTaken'
+      'dateSampleTaken',
+      'questionnaireAnswers'
     ];
   }
 
@@ -908,6 +943,14 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
         data.queryBuilder
       )
       .pipe(
+        // determine alertness
+        map((labResults: LabResultModel[]) => {
+          return LabResultModel.determineAlertness(
+            this.selectedOutbreak.labResultsTemplate,
+            labResults
+          );
+        }),
+
         // should be the last pipe
         takeUntil(this.destroyed$)
       );

@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { IV2BottomDialogConfigButtonType } from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { V2ActionType } from '../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { V2AdvancedFilter, V2AdvancedFilterType } from '../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
-import { IV2Column, IV2ColumnAction, IV2ColumnPinned, V2ColumnFormat } from '../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { IV2Column, IV2ColumnAction, IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { ILabelValuePairModel } from '../../../shared/forms-v2/core/label-value-pair.model';
 import { RequestQueryBuilder } from '../../helperClasses/request-query-builder';
@@ -21,6 +21,7 @@ import { DialogV2Service } from './dialog-v2.service';
 import { ToastV2Service } from './toast-v2.service';
 import { IBasicCount } from '../../models/basic-count.interface';
 import { IResolverV2ResponseModel } from '../resolvers/data/models/resolver-response.model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({
   providedIn: 'root'
@@ -32,7 +33,8 @@ export class EntityLabResultService {
   constructor(
     private dialogV2Service: DialogV2Service,
     private labResultDataService: LabResultDataService,
-    private toastV2Service: ToastV2Service
+    private toastV2Service: ToastV2Service,
+    private translateService: TranslateService
   ) {}
 
   /**
@@ -312,6 +314,32 @@ export class EntityLabResultService {
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH
         }
+      },
+      {
+        field: 'statuses',
+        label: 'LNG_COMMON_LABEL_STATUSES',
+        format: {
+          type: V2ColumnFormat.STATUS
+        },
+        notResizable: true,
+        pinned: true,
+        legends: [
+          // alerted
+          {
+            title: 'LNG_COMMON_LABEL_STATUSES_ALERTED',
+            items: [{
+              form: {
+                type: IV2ColumnStatusFormType.STAR,
+                color: 'var(--gd-danger)'
+              },
+              label: ' '
+            }]
+          }
+        ],
+        forms: (_column, data: LabResultModel): V2ColumnStatusForm[] => LabResultModel.getStatusForms({
+          item: data,
+          translateService: this.translateService
+        })
       },
       {
         field: 'dateSampleTaken',
@@ -719,17 +747,26 @@ export class EntityLabResultService {
    * Retrieve data
    */
   retrieveRecords(
-    outbreakId: string,
+    selectedOutbreak: OutbreakModel,
     entityPath: string,
     entityId: string,
     queryBuilder: RequestQueryBuilder
   ): Observable<LabResultModel[]> {
     return this.labResultDataService
       .getEntityLabResults(
-        outbreakId,
+        selectedOutbreak.id,
         entityPath,
         entityId,
         queryBuilder
+      )
+      .pipe(
+        // determine alertness
+        map((data: LabResultModel[]) => {
+          return LabResultModel.determineAlertness(
+            selectedOutbreak.labResultsTemplate,
+            data
+          );
+        })
       );
   }
 
@@ -782,7 +819,8 @@ export class EntityLabResultService {
       'createdByUser',
       'updatedBy',
       'updatedAt',
-      'updatedByUser'
+      'updatedByUser',
+      'questionnaireAnswers'
     ];
   }
 }
