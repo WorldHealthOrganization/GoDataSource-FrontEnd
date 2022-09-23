@@ -746,10 +746,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             value: {
               get: () => this.itemData.dateOfOnset,
               set: (value) => {
+                // set data
+                this.itemData.dateOfOnset = value;
+
                 // check onset after reporting
                 this.checkForOnsetAfterReporting();
-
-                this.itemData.dateOfOnset = value;
               }
             },
             maxDate: this._today,
@@ -969,10 +970,11 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             value: {
               get: () => this.itemData.dateOfReporting,
               set: (value) => {
+                // set data
+                this.itemData.dateOfReporting = value;
+
                 // check onset after reporting
                 this.checkForOnsetAfterReporting();
-
-                this.itemData.dateOfReporting = value;
               }
             },
             maxDate: this._today,
@@ -2492,15 +2494,12 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       moment(this.itemData.dateOfOnset).isAfter(moment(this.itemData.dateOfReporting))
     ) {
       this.toastV2Service.notice(
-        this.translateService.instant(
-          'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET',
-          AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET
-        )
-      );
-    } else {
-      this.toastV2Service.hide(
+        'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_SHOULD_BE_AFTER_DATE_OF_ONSET',
+        undefined,
         AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET
       );
+    } else {
+      this.toastV2Service.hide(AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
     }
   }
 }

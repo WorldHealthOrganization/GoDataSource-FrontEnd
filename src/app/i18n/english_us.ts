@@ -11,7 +11,7 @@ export const EnglishUsLang = {
      */
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
-    'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET': '\'Date of reporting\' should not be before \'Date of onset\''
+    'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_SHOULD_BE_AFTER_DATE_OF_ONSET': '\'Date of reporting\' should be after \'Date of onset\''
 
 
     /**
