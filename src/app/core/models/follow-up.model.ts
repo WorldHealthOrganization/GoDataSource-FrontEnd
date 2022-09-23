@@ -13,6 +13,9 @@ import { CaseModel } from './case.model';
 import { Moment } from '../helperClasses/x-moment';
 import { TranslateService } from '@ngx-translate/core';
 import { IV2ColumnStatusFormType, V2ColumnStatusForm } from '../../shared/components-v2/app-list-table-v2/models/column.model';
+import { SafeHtml } from '@angular/platform-browser';
+import { IResolverV2ResponseModel } from '../services/resolvers/data/models/resolver-response.model';
+import { ReferenceDataEntryModel } from './reference-data.model';
 
 export class FollowUpModel
   extends BaseModel
@@ -42,6 +45,9 @@ export class FollowUpModel
 
   responsibleUserId: string;
   responsibleUser: UserModel;
+
+  // used by ui
+  uiStatusForms: SafeHtml;
 
   /**
    * Determine alertness
@@ -129,11 +135,24 @@ export class FollowUpModel
     info: {
       // required
       item: FollowUpModel,
-      translateService: TranslateService
+      translateService: TranslateService,
+      dailyFollowUpStatus: IResolverV2ResponseModel<ReferenceDataEntryModel>
     }
   ): V2ColumnStatusForm[] {
     // construct list of forms that we need to display
     const forms: V2ColumnStatusForm[] = [];
+
+    // status
+    if (
+      info.item.statusId &&
+      info.dailyFollowUpStatus.map[info.item.statusId]
+    ) {
+      forms.push({
+        type: IV2ColumnStatusFormType.CIRCLE,
+        color: info.dailyFollowUpStatus.map[info.item.statusId].getColorCode(),
+        tooltip: info.translateService.instant(info.item.statusId)
+      });
+    }
 
     // alerted
     if (info.item.alerted) {

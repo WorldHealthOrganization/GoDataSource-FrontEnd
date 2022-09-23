@@ -29,11 +29,14 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { UserModel } from '../../../../core/models/user.model';
 import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { catchError, takeUntil } from 'rxjs/operators';
+import { catchError, map, takeUntil } from 'rxjs/operators';
 import { TeamModel } from '../../../../core/models/team.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { EntityFollowUpHelperService } from '../../../../core/services/helper/entity-follow-up-helper.service';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
+import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
+import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
+import { DomSanitizer } from '@angular/platform-browser';
 
 /**
  * Component
@@ -60,6 +63,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
     protected dialogV2Service: DialogV2Service,
     protected followUpsDataService: FollowUpsDataService,
     protected entityFollowUpHelperService: EntityFollowUpHelperService,
+    protected domSanitizer: DomSanitizer,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
@@ -607,10 +611,43 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
    */
   protected initializeExpandListColumnRenderer(): void {
     this.expandListColumnRenderer = {
-      type: CreateViewModifyV2ExpandColumnType.TEXT,
+      type: CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS,
       link: (item: FollowUpModel) => ['/contacts', `${this._entityData.id}`, 'follow-ups', item.id, 'view'],
+      statusVisible: this.expandListColumnRenderer?.statusVisible === undefined ?
+        true :
+        this.expandListColumnRenderer.statusVisible,
+      maxNoOfStatusForms: 2,
       get: {
-        text: (item: FollowUpModel) => moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
+        status: (item: FollowUpModel) => {
+          // must initialize - optimization to not recreate the list everytime there is an event since data won't change ?
+          if (!item.uiStatusForms) {
+            // determine forms
+            const forms: V2ColumnStatusForm[] = FollowUpModel.getStatusForms({
+              item,
+              translateService: this.translateService,
+              dailyFollowUpStatus: this.activatedRoute.snapshot.data.dailyFollowUpStatus
+            });
+
+            // create html
+            let html: string = '';
+            forms.forEach((form, formIndex) => {
+              html += AppListTableV2Component.renderStatusForm(
+                form,
+                formIndex < forms.length - 1
+              );
+            });
+
+            // convert to safe html
+            item.uiStatusForms = this.domSanitizer.bypassSecurityTrustHtml(html);
+          }
+
+          // finished
+          return item.uiStatusForms;
+        },
+        text: (item: FollowUpModel) => item.date ?
+          moment(item.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+          '-',
+        details: () => ''
       }
     };
   }
@@ -621,7 +658,9 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
   protected initializeExpandListQueryFields(): void {
     this.expandListQueryFields = [
       'id',
-      'date'
+      'date',
+      'statusId',
+      'questionnaireAnswers'
     ];
   }
 
@@ -657,6 +696,14 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
         data.queryBuilder
       )
       .pipe(
+        // determine alertness
+        map((followUps: FollowUpModel[]) => {
+          return FollowUpModel.determineAlertness(
+            this.selectedOutbreak.contactFollowUpTemplate,
+            followUps
+          );
+        }),
+
         // should be the last pipe
         takeUntil(this.destroyed$)
       );
