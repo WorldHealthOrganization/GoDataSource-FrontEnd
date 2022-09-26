@@ -48,6 +48,7 @@ import { IV2DateRange } from '../../../../shared/forms-v2/components/app-form-da
 import { EntityType } from '../../../../core/models/entity-type';
 import { AppFormSelectMultipleV2Component } from '../../../../shared/forms-v2/components/app-form-select-multiple-v2/app-form-select-multiple-v2.component';
 import { TranslateService } from '@ngx-translate/core';
+import { LocationModel } from '../../../../core/models/location.model';
 
 @Component({
   selector: 'app-daily-follow-ups-list',
@@ -866,7 +867,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           fieldIsArray: false
         },
         link: (data) => {
-          return data.address?.location?.name ?
+          return data.address?.location?.name && LocationModel.canView(this.authUser) ?
             `/locations/${ data.address.location.id }/view` :
             undefined;
         }
@@ -1067,7 +1068,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             )
         },
         link: (data) => {
-          return data.responsibleUserId ?
+          return data.responsibleUserId && UserModel.canView(this.authUser) ?
             `/users/${ data.responsibleUserId }/view` :
             undefined;
         },
@@ -1107,7 +1108,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy ?
+          return data.createdBy && UserModel.canView(this.authUser) ?
             `/users/${ data.createdBy }/view` :
             undefined;
         }
@@ -1142,7 +1143,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.updatedBy ?
+          return data.updatedBy && UserModel.canView(this.authUser) ?
             `/users/${ data.updatedBy }/view` :
             undefined;
         }

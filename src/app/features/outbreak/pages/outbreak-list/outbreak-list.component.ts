@@ -803,7 +803,7 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
           return !OutbreakModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy ?
+          return data.createdBy && UserModel.canView(this.authUser) ?
             `/users/${data.createdBy}/view` :
             undefined;
         }
@@ -836,7 +836,7 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
           return !OutbreakModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.updatedBy ?
+          return data.updatedBy && UserModel.canView(this.authUser) ?
             `/users/${data.updatedBy}/view` :
             undefined;
         }

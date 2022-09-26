@@ -283,7 +283,7 @@ export class HelpItemsListComponent extends ListComponent<HelpItemModel> impleme
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.approvedBy ?
+          return data.approvedBy && UserModel.canView(this.authUser) ?
             `/users/${ data.approvedBy }/view` :
             undefined;
         }

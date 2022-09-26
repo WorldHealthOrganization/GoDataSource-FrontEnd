@@ -236,7 +236,7 @@ export class ClustersPeopleListComponent extends ListComponent<CaseModel | Conta
           }
         },
         link: (data) => {
-          return data.mainAddress?.location?.name ?
+          return data.mainAddress?.location?.name && LocationModel.canView(this.authUser) ?
             `/locations/${ data.mainAddress.location.id }/view` :
             undefined;
         }
