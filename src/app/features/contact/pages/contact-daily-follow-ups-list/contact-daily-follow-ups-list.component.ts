@@ -608,17 +608,17 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     // default table columns
     this.tableColumns = [
       {
-        field: 'lastName',
+        field: 'contact.lastName',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME',
         pinned: IV2ColumnPinned.LEFT,
-        sortable: 'contact.lastName',
+        sortable: true,
         format: {
           type: 'person.lastName'
         },
         filter: {
+          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
           type: V2FilterType.TEXT,
-          textType: V2FilterTextType.STARTS_WITH,
-          relationshipKey: 'contact'
+          textType: V2FilterTextType.STARTS_WITH
         },
         link: (item: FollowUpModel) => {
           return item.person && (
@@ -635,17 +635,17 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         }
       },
       {
-        field: 'firstName',
+        field: 'contact.firstName',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME',
         pinned: IV2ColumnPinned.LEFT,
-        sortable: 'contact.firstName',
+        sortable: true,
         format: {
           type: 'person.firstName'
         },
         filter: {
+          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
           type: V2FilterType.TEXT,
-          textType: V2FilterTextType.STARTS_WITH,
-          relationshipKey: 'contact'
+          textType: V2FilterTextType.STARTS_WITH
         },
         link: (item: FollowUpModel) => {
           return item.person && (
@@ -662,17 +662,17 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         }
       },
       {
-        field: 'visualId',
+        field: 'contact.visualId',
         label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
         pinned: IV2ColumnPinned.LEFT,
-        sortable: 'contact.visualId',
+        sortable: true,
         format: {
           type: 'person.visualId'
         },
         filter: {
+          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
           type: V2FilterType.TEXT,
-          textType: V2FilterTextType.STARTS_WITH,
-          relationshipKey: 'contact'
+          textType: V2FilterTextType.STARTS_WITH
         }
       },
       {
@@ -902,7 +902,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         }
       },
       {
-        field: 'dateOfLastContact',
+        field: 'contact.dateOfLastContact',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
         sortable: true,
         format: {
@@ -911,12 +911,12 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             '—'
         },
         filter: {
-          type: V2FilterType.DATE_RANGE,
-          relationshipKey: 'contact'
+          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+          type: V2FilterType.DATE_RANGE
         }
       },
       {
-        field: 'followUp.endDate',
+        field: 'contact.followUp.endDate',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP',
         sortable: true,
         format: {
@@ -925,12 +925,12 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             '—'
         },
         filter: {
-          type: V2FilterType.DATE_RANGE,
-          relationshipKey: 'contact'
+          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+          type: V2FilterType.DATE_RANGE
         }
       },
       {
-        field: 'riskLevel',
+        field: 'contact.riskLevel',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL',
         sortable: true,
         notVisible: true,
@@ -940,10 +940,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             '—'
         },
         filter: {
+          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
           type: V2FilterType.MULTIPLE_SELECT,
           options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-          includeNoValue: true,
-          relationshipKey: 'contact'
+          includeNoValue: true
         }
       },
       {
