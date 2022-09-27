@@ -629,7 +629,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               item.person.type === EntityType.CONTACT &&
               ContactModel.canView(this.authUser)
             )
-          ) ?
+          ) && !item.person.deleted ?
             `/${item.person.type === EntityType.CASE ? 'cases' : 'contacts'}/${item.person.id}/view` :
             undefined;
         }
@@ -656,7 +656,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               item.person.type === EntityType.CONTACT &&
               ContactModel.canView(this.authUser)
             )
-          ) ?
+          ) && !item.person.deleted ?
             `/${item.person.type === EntityType.CASE ? 'cases' : 'contacts'}/${item.person.id}/view` :
             undefined;
         }
@@ -1303,90 +1303,88 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       );
     }
 
-    // Contact
-    if (ContactModel.canList(this.authUser)) {
-      this.advancedFilters.push(
-        {
-          type: V2AdvancedFilterType.TEXT,
-          field: 'firstName',
-          label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
-          sortable: 'contact.firstName'
-        },
-        {
-          type: V2AdvancedFilterType.TEXT,
-          field: 'lastName',
-          label: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
-          sortable: 'contact.lastName'
-        },
-        {
-          type: V2AdvancedFilterType.ADDRESS,
-          field: 'addresses',
-          label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
-          isArray: false
-        },
-        {
-          type: V2AdvancedFilterType.MULTISELECT,
-          field: 'gender',
-          label: 'LNG_CONTACT_FIELD_LABEL_GENDER',
-          options: this.activatedRoute.snapshot.data.gender.options,
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-        },
-        {
-          type: V2AdvancedFilterType.MULTISELECT,
-          field: 'riskLevel',
-          label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL',
-          options: this.activatedRoute.snapshot.data.risk.options,
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-        },
-        {
-          type: V2AdvancedFilterType.RANGE_AGE,
-          field: 'age',
-          label: 'LNG_CONTACT_FIELD_LABEL_AGE',
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-        },
-        {
-          type: V2AdvancedFilterType.RANGE_DATE,
-          field: 'dob',
-          label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-        },
-        {
-          type: V2AdvancedFilterType.TEXT,
-          field: 'visualId',
-          label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
-          sortable: 'contact.visualId'
-        },
-        {
-          type: V2AdvancedFilterType.TEXT,
-          field: 'addresses.phoneNumber',
-          label: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
-          childQueryBuilderKey: 'contact'
-        },
-        {
-          type: V2AdvancedFilterType.MULTISELECT,
-          field: 'occupation',
-          label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
-          options: this.activatedRoute.snapshot.data.occupation.options,
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-        }
-      );
-    }
+    // Follow-up person
+    this.advancedFilters.push(
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.TEXT,
+        field: 'contact.firstName',
+        label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
+        sortable: 'contact.firstName'
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.TEXT,
+        field: 'contact.lastName',
+        label: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
+        sortable: 'contact.lastName'
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.ADDRESS,
+        field: 'contact.addresses',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
+        isArray: false
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'contact.gender',
+        label: 'LNG_CONTACT_FIELD_LABEL_GENDER',
+        options: this.activatedRoute.snapshot.data.gender.options,
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'contact.riskLevel',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL',
+        options: this.activatedRoute.snapshot.data.risk.options,
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.RANGE_AGE,
+        field: 'contact.age',
+        label: 'LNG_CONTACT_FIELD_LABEL_AGE',
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'contact.dob',
+        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.TEXT,
+        field: 'contact.visualId',
+        label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
+        sortable: 'contact.visualId'
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.TEXT,
+        field: 'contact.addresses.phoneNumber',
+        label: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER',
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'contact.occupation',
+        label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
+        options: this.activatedRoute.snapshot.data.occupation.options,
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+      }
+    );
 
-    // Case
+    // Contacts exposed to cases that match the criteria bellow
     if (CaseModel.canList(this.authUser)) {
       this.advancedFilters.push(
         {
