@@ -1661,6 +1661,9 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
   protected initializeGroupActions(): void {
     this.groupActions = {
       type: V2ActionType.GROUP_ACTIONS,
+      visible: () => CaseModel.canExport(this.authUser) ||
+        CaseModel.canExportDossier(this.authUser) ||
+        CaseModel.canExportRelationships(this.authUser),
       actions: [
         {
           label: {

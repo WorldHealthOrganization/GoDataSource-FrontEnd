@@ -832,6 +832,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
   protected initializeGroupActions(): void {
     this.groupActions = {
       type: V2ActionType.GROUP_ACTIONS,
+      visible: () => LabResultModel.canExport(this.authUser) && (
+        CaseModel.canExportLabResult(this.authUser) ||
+        ContactModel.canExportLabResult(this.authUser)
+      ),
       actions: [
         // bulk export
         {
@@ -859,7 +863,10 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
             }
           },
           visible: (): boolean => {
-            return ContactModel.canExport(this.authUser);
+            return LabResultModel.canExport(this.authUser) && (
+              CaseModel.canExportLabResult(this.authUser) ||
+              ContactModel.canExportLabResult(this.authUser)
+            );
           },
           disable: (selected: string[]): boolean => {
             return selected.length < 1;
