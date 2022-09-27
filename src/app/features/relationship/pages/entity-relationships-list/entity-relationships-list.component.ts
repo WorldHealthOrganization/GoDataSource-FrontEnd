@@ -172,8 +172,11 @@ export class EntityRelationshipsListComponent extends ListComponent<EntityModel>
           RelationshipModel.canShare(this.authUser) &&
           this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].share(this.authUser) &&
           this.selectedOutbreakIsActive
-        ) ||
-        (
+        ) || (
+          this.relationshipType === RelationshipType.CONTACT &&
+          this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].changeSource(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ) || (
           RelationshipModel.canBulkDelete(this.authUser) &&
           this.entityHelperService.entityMap[this._entity.type].can[this.relationshipType === RelationshipType.CONTACT ? 'contacts' : 'exposures'].bulkDelete(this.authUser) &&
           this.selectedOutbreakIsActive

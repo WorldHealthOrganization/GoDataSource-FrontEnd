@@ -1479,7 +1479,10 @@ export class ContactsListComponent
       visible: () => ContactModel.canExport(this.authUser) ||
         ContactModel.canExportDossier(this.authUser) ||
         ContactModel.canExportRelationships(this.authUser) ||
-        ContactModel.canBulkModify(this.authUser),
+        (
+          ContactModel.canBulkModify(this.authUser) &&
+          this.selectedOutbreakIsActive
+        ),
       actions: [
         {
           label: {

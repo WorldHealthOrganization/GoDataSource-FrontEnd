@@ -1843,10 +1843,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         (
           FollowUpModel.canBulkDelete(this.authUser) &&
           this.selectedOutbreakIsActive
-        ) ||
-        (
-          FollowUpModel.canBulkDelete(this.authUser) &&
-          this.selectedOutbreakIsActive
         ),
       actions: [
         // bulk modify
