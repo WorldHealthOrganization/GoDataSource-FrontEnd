@@ -135,7 +135,7 @@
                 <div
                   *cdkVirtualFor="let record of expandListRecords; templateCacheSize: 0;"
                   [ngSwitch]="expandListColumnRenderer?.type"
-                  [ngStyle]="{height: expandListColumnRenderer.type === CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS ? '6.4rem' : '4rem'}"
+                  [style.height]="expandListColumnRenderer.type === CreateViewModifyV2ExpandColumnType.STATUS_AND_DETAILS ? '6.4rem' : '4rem'"
                   class="gd-create-view-modify-list-data-record"
                   [class.gd-create-view-modify-list-data-record-active]="record.id === itemID">
 
@@ -181,6 +181,7 @@
 
                         <!-- Details -->
                         <span
+                          *ngIf="expandListColumnRenderer.get.details"
                           class="gd-create-view-modify-list-data-record-is-status-and-details-details-details">
                           {{ expandListColumnRenderer.get.details(record) }}
                         </span>
@@ -1527,7 +1528,7 @@
                 <ng-template
                   #replaceHtml>
                   <div
-                    class="gd-create-view-modify-bottom-section-content-input-replaced"
+                    class="gd-create-view-modify-bottom-section-content-input gd-create-view-modify-bottom-section-content-input-replaced"
                     [innerHTML]="input.replace.html | safeHtml"></div>
                 </ng-template>
               </ng-template>

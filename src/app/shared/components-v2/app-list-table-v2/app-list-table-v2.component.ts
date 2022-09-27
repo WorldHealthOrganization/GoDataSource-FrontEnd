@@ -30,7 +30,7 @@ import {
 import { AppListTableV2ActionsComponent } from './components/actions/app-list-table-v2-actions.component';
 import { IExtendedColDef } from './models/extended-column.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
-import { IV2ActionIconLabel, IV2ActionMenuLabel, IV2Link, V2ActionMenuItem, V2ActionType } from './models/action.model';
+import { IV2ActionIconLabel, IV2ActionMenuLabel, IV2GroupActions, IV2Link, V2ActionType } from './models/action.model';
 import { IV2GroupedData, IV2GroupedDataValue } from './models/grouped-data.model';
 import { IBasicCount } from '../../../core/models/basic-count.interface';
 import { PageEvent } from '@angular/material/paginator';
@@ -204,7 +204,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   @Input() quickActions: IV2ActionMenuLabel;
 
   // group actions
-  @Input() groupActions: V2ActionMenuItem[];
+  @Input() groupActions: IV2GroupActions;
   @Input() groupActionsSingleRecord: boolean;
 
   // add button
@@ -889,8 +889,13 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // attach items selection column only if we have group actions
     if (
-      this.groupActions?.length > 0 ||
-      this.groupActionsSingleRecord
+      this.groupActionsSingleRecord || (
+        this.groupActions && (
+          !this.groupActions.visible ||
+          this.groupActions.visible()
+        ) &&
+        this.groupActions.actions?.length > 0
+      )
     ) {
       columnDefs.push({
         pinned: this.isSmallScreenMode ?
@@ -915,7 +920,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
             icon: 'expand_more',
             menuOptions: this.groupActionsSingleRecord ?
               [
-                ...(this.groupActions ? this.groupActions : [])
+                ...(this.groupActions?.actions?.length > 0 ? this.groupActions.actions : [])
               ] : [
                 {
                   label: {
@@ -954,7 +959,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
                     );
                   }
                 },
-                ...(this.groupActions ? this.groupActions : [])
+                ...(this.groupActions?.actions?.length > 0 ? this.groupActions.actions : [])
               ]
           }]
         }
@@ -1112,7 +1117,13 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       if (this.isSmallScreenMode) {
         // add it to the beginning
         columnDefs.splice(
-          this.groupActions?.length > 0 || this.groupActionsSingleRecord ? 1 : 0,
+          this.groupActionsSingleRecord || (
+            this.groupActions && (
+              !this.groupActions.visible ||
+              this.groupActions.visible()
+            ) &&
+            this.groupActions.actions?.length > 0
+          ) ? 1 : 0,
           0,
           actionColumn
         );

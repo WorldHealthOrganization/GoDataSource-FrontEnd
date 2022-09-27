@@ -231,7 +231,7 @@ export class ContactRangeFollowUpsListComponent
     },
     {
       field: 'followUpTeamId',
-      label: `${this.translateService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')} / ${this.translateService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')} ${this.translateService.instant('LNG_FOLLOW_UP_FIELD_LABEL_TEAM')}`,
+      label: `${this.translateService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CONTACT')} / ${this.translateService.instant('LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE_CASE')} ${this.translateService.instant('LNG_FOLLOW_UP_FIELD_LABEL_TEAM').toLowerCase()}`,
       format: {
         type: (data) => {
           return data.person.followUpTeamId && (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<TeamModel>).map[data.person.followUpTeamId] ?
@@ -316,7 +316,7 @@ export class ContactRangeFollowUpsListComponent
         return !UserModel.canListForFilters(this.authUser);
       },
       link: (data) => {
-        return data.person?.responsibleUserId ?
+        return data.person?.responsibleUserId && UserModel.canView(this.authUser) ?
           `/users/${ data.person?.responsibleUserId }/view` :
           undefined;
       }

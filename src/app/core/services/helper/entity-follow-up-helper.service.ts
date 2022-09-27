@@ -29,6 +29,7 @@ import * as _ from 'lodash';
 import { LocationModel } from '../../models/location.model';
 import { LocationDataService } from '../data/location.data.service';
 import * as moment from 'moment';
+import { ReferenceDataEntryModel } from '../../models/reference-data.model';
 
 @Injectable({
   providedIn: 'root'
@@ -473,8 +474,8 @@ export class EntityFollowUpHelperService {
     authUser: UserModel,
     team: IResolverV2ResponseModel<TeamModel>,
     user: IResolverV2ResponseModel<UserModel>,
+    dailyFollowUpStatus: IResolverV2ResponseModel<ReferenceDataEntryModel>,
     options: {
-      dailyFollowUpStatus: ILabelValuePairModel[],
       yesNoAll: ILabelValuePairModel[]
     }
   }): IV2Column[] {
@@ -526,7 +527,7 @@ export class EntityFollowUpHelperService {
         sortable: true,
         filter: {
           type: V2FilterType.MULTIPLE_SELECT,
-          options: definitions.options.dailyFollowUpStatus
+          options: definitions.dailyFollowUpStatus.options
         }
       },
       {
@@ -538,6 +539,20 @@ export class EntityFollowUpHelperService {
         notResizable: true,
         pinned: true,
         legends: [
+          // status
+          {
+            title: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUS_ID',
+            items: definitions.dailyFollowUpStatus.list.map((item) => {
+              return {
+                form: {
+                  type: IV2ColumnStatusFormType.CIRCLE,
+                  color: item.getColorCode()
+                },
+                label: item.id
+              };
+            })
+          },
+
           // alerted
           {
             title: 'LNG_COMMON_LABEL_STATUSES_ALERTED',
@@ -552,7 +567,8 @@ export class EntityFollowUpHelperService {
         ],
         forms: (_column, data: FollowUpModel): V2ColumnStatusForm[] => FollowUpModel.getStatusForms({
           item: data,
-          translateService: this.translateService
+          translateService: this.translateService,
+          dailyFollowUpStatus: definitions.dailyFollowUpStatus
         })
       },
       {

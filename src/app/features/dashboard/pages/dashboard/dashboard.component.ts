@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { V2AdvancedFilterComparatorOptions, V2AdvancedFilterComparatorType, V2AdvancedFilterType } from '../../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { ActivatedRoute } from '@angular/router';
@@ -30,6 +30,16 @@ import { AppContactsKpiDashletComponent } from '../../components/app-contacts-kp
 import { AppCotKpiDashletComponent } from '../../components/app-cot-kpi-dashlet/app-cot-kpi-dashlet.component';
 import * as domtoimage from 'dom-to-image';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputToggle, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { determineIfSmallScreenMode } from '../../../../core/methods/small-screen-mode';
+import { CaseSummaryDashletComponent } from '../../components/case-summary-dashlet/case-summary-dashlet.component';
+import { CasesByGeographicLocationDashletComponent } from '../../components/case-by-geographic-location-dashlet/case-by-geographic-location-dashlet.component';
+import { CasesHospitalizedPieChartDashletComponent } from '../../components/cases-hospitalized-pie-chart-dashlet/cases-hospitalized-pie-chart-dashlet.component';
+import { HistogramTransmissionChainsSizeDashletComponent } from '../../components/histogram-transmission-chains-size-dashlet/histogram-transmission-chains-size-dashlet.component';
+import { EpiCurveDashletComponent } from '../../components/epi-curve-dashlet/epi-curve-dashlet.component';
+import { EpiCurveOutcomeDashletComponent } from '../../components/epi-curve-outcome-dashlet/epi-curve-outcome-dashlet.component';
+import { EpiCurveReportingDashletComponent } from '../../components/epi-curve-reporting-dashlet/epi-curve-reporting-dashlet.component';
+import { ContactFollowUpOverviewDashletComponent } from '../../components/contact-follow-up-overview-dashlet/contact-follow-up-overview-dashlet.component';
+import { CasesBasedOnContactStatusDashletComponent } from '../../components/cases-based-on-contact-status-dashlet/cases-based-on-contact-status-dashlet.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -39,10 +49,124 @@ import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputToggle, V2SideDi
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   // children dashlets
+  @ViewChild('caseSummary', { static: false }) private _caseSummary: CaseSummaryDashletComponent;
+  @ViewChild('casesPerLocation', { static: false }) private _casesPerLocation: CasesByGeographicLocationDashletComponent;
+  @ViewChild('hospitalized', { static: false }) private _hospitalized: CasesHospitalizedPieChartDashletComponent;
+  @ViewChild('cotHistogram', { static: false }) private _cotHistogram: HistogramTransmissionChainsSizeDashletComponent;
+  @ViewChild('epiCurveClassification', { static: false }) private _epiCurveClassification: EpiCurveDashletComponent;
+  @ViewChild('epiCurveOutcome', { static: false }) private _epiCurveOutcome: EpiCurveOutcomeDashletComponent;
+  @ViewChild('epiCurveReporting', { static: false }) private _epiCurveReporting: EpiCurveReportingDashletComponent;
+  @ViewChild('followUpOverview', { static: false }) private _followUpOverview: ContactFollowUpOverviewDashletComponent;
+  @ViewChild('contactStatus', { static: false }) private _contactStatus: CasesBasedOnContactStatusDashletComponent;
   @ViewChild('kpiSection', { static: false }) private _kpiSection: ElementRef;
   @ViewChild('kpiCases', { static: false }) private _kpiCases: AppCasesKpiDashletComponent;
   @ViewChild('kpiContacts', { static: false }) private _kpiContacts: AppContactsKpiDashletComponent;
   @ViewChild('kpiCOT', { static: false }) private _kpiCOT: AppCotKpiDashletComponent;
+
+  // small screen mode ?
+  isSmallScreenMode: boolean = false;
+
+  // determine if all dashlets are expanded
+  set allExpanded(expanded: boolean) {
+    // expand / collapse - caseSummary
+    if (this._caseSummary?.dashlet) {
+      this._caseSummary.dashlet.expanded = expanded;
+    }
+
+    // expand / collapse - casesPerLocation
+    if (this._casesPerLocation?.dashlet) {
+      this._casesPerLocation.dashlet.expanded = expanded;
+    }
+
+    // expand / collapse - hospitalized
+    if (this._hospitalized?.dashlet) {
+      this._hospitalized.dashlet.expanded = expanded;
+    }
+
+    // expand / collapse - cotHistogram
+    if (this._cotHistogram) {
+      this._cotHistogram.expanded = expanded;
+    }
+
+    // expand / collapse - epiCurveClassification
+    if (this._epiCurveClassification) {
+      this._epiCurveClassification.expanded = expanded;
+    }
+
+    // expand / collapse - epiCurveOutcome
+    if (this._epiCurveOutcome) {
+      this._epiCurveOutcome.expanded = expanded;
+    }
+
+    // expand / collapse - epiCurveReporting
+    if (this._epiCurveReporting) {
+      this._epiCurveReporting.expanded = expanded;
+    }
+
+    // expand / collapse - followUpOverview
+    if (this._followUpOverview) {
+      this._followUpOverview.expanded = expanded;
+    }
+
+    // expand / collapse - contactStatus
+    if (this._contactStatus) {
+      this._contactStatus.expanded = expanded;
+    }
+
+    // expand / collapse - kpiCases
+    if (this._kpiCases?.dashlet) {
+      this._kpiCases.dashlet.expanded = expanded;
+    }
+
+    // expand / collapse - kpiContacts
+    if (this._kpiContacts?.dashlet) {
+      this._kpiContacts.dashlet.expanded = expanded;
+    }
+
+    // expand / collapse - kpiCOT
+    if (this._kpiCOT?.dashlet) {
+      this._kpiCOT.dashlet.expanded = expanded;
+    }
+  }
+  get allExpanded(): boolean {
+    return (
+      !this._caseSummary?.dashlet ||
+      this._caseSummary.dashlet.expanded
+    ) && (
+      !this._casesPerLocation?.dashlet ||
+      this._casesPerLocation.dashlet.expanded
+    ) && (
+      !this._hospitalized?.dashlet ||
+      this._hospitalized.dashlet.expanded
+    ) && (
+      !this._cotHistogram ||
+      this._cotHistogram.expanded
+    ) && (
+      !this._epiCurveClassification ||
+      this._epiCurveClassification.expanded
+    ) && (
+      !this._epiCurveOutcome ||
+      this._epiCurveOutcome.expanded
+    ) && (
+      !this._epiCurveReporting ||
+      this._epiCurveReporting.expanded
+    ) && (
+      !this._followUpOverview ||
+      this._followUpOverview.expanded
+    ) && (
+      !this._contactStatus ||
+      this._contactStatus.expanded
+    ) && (
+      !this._kpiCases?.dashlet ||
+      this._kpiCases.dashlet.expanded
+    ) && (
+      !this._kpiContacts?.dashlet ||
+      this._kpiContacts.dashlet.expanded
+    ) && (
+      !this._kpiCOT?.dashlet ||
+      this._kpiCOT.dashlet.expanded
+    );
+  }
 
   // quick actions
   quickActions: IV2ActionMenuLabel;
@@ -140,6 +264,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private importExportDataService: ImportExportDataService,
     authDataService: AuthDataService
   ) {
+    // update render mode
+    this.updateRenderMode();
+
     // authenticated user
     this._authUser = authDataService.getAuthenticatedUser();
 
@@ -394,11 +521,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
         // Export EPI - Classification
         {
           label: {
-            get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_CLASSIFICATION_TITLE'
+            get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_CLASSIFICATION_TITLE_SHORT'
           },
           action: {
             click: () => {
-              this.getEpiCurveDashlet('app-epi-curve-dashlet svg');
+              this.getEpiCurveDashlet(
+                'app-epi-curve-dashlet svg',
+                'LNG_PAGE_DASHBOARD_EPI_CURVE_CLASSIFICATION_TITLE'
+              );
             }
           },
           visible: () => DashboardModel.canViewEpiCurveStratifiedByClassificationDashlet(this._authUser)
@@ -407,11 +537,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
         // Export EPI - Outcome
         {
           label: {
-            get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE'
+            get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE_SHORT'
           },
           action: {
             click: () => {
-              this.getEpiCurveDashlet('app-epi-curve-outcome-dashlet svg');
+              this.getEpiCurveDashlet(
+                'app-epi-curve-outcome-dashlet svg',
+                'LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE'
+              );
             }
           },
           visible: () => DashboardModel.canViewEpiCurveStratifiedByOutcomeDashlet(this._authUser)
@@ -420,11 +553,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
         // Export EPI - Reporting Classification
         {
           label: {
-            get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORTING_TITLE'
+            get: () => 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORTING_TITLE_SHORT'
           },
           action: {
             click: () => {
-              this.getEpiCurveDashlet('app-epi-curve-reporting-dashlet svg');
+              this.getEpiCurveDashlet(
+                'app-epi-curve-reporting-dashlet svg',
+                'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORTING_TITLE'
+              );
             }
           },
           visible: () => DashboardModel.canViewEpiCurveStratifiedByClassificationOverReportTimeDashlet(this._authUser)
@@ -563,7 +699,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   /**
    * Get Epi curve dashlet
    */
-  private getEpiCurveDashlet(selector: string) {
+  private getEpiCurveDashlet(
+    selector: string,
+    fileName: string
+  ): void {
     this.dialogV2Service.showSideDialog({
       // title
       title: {
@@ -623,7 +762,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
         .subscribe((pngBase64) => {
           // object not found ?
           if (!pngBase64) {
-            this.toastV2Service.notice('LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG');
+            this.toastV2Service.notice(
+              'LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG',
+              { fileName: this.translateService.instant(fileName) }
+            );
             loading.close();
             return;
           }
@@ -646,7 +788,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
               })
             )
             .subscribe((blob) => {
-              this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORT_LABEL');
+              this.downloadFile(
+                blob,
+                `${this.translateService.instant(fileName)} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`
+              );
               loading.close();
             });
         });
@@ -669,5 +814,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
       blob,
       `${fileName}.${extension}`
     );
+  }
+
+  /**
+   * Update website render mode
+   */
+  @HostListener('window:resize')
+  private updateRenderMode(): void {
+    // small screen mode ?
+    this.isSmallScreenMode = determineIfSmallScreenMode();
   }
 }
