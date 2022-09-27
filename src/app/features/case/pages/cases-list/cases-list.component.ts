@@ -53,7 +53,6 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
     { label: 'LNG_CASE_FIELD_LABEL_MIDDLE_NAME', value: 'middleName' },
     { label: 'LNG_CASE_FIELD_LABEL_LAST_NAME', value: 'lastName' },
     { label: 'LNG_CASE_FIELD_LABEL_GENDER', value: 'gender' },
-    { label: 'LNG_CASE_FIELD_LABEL_PHONE_NUMBER', value: 'phoneNumber' },
     { label: 'LNG_CASE_FIELD_LABEL_OCCUPATION', value: 'occupation' },
     { label: 'LNG_CASE_FIELD_LABEL_DOB', value: 'dob' },
     { label: 'LNG_CASE_FIELD_LABEL_AGE', value: 'age' },
@@ -67,7 +66,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
     { label: 'LNG_CASE_FIELD_LABEL_IS_DATE_OF_ONSET_APPROXIMATE', value: 'isDateOfOnsetApproximate' },
     { label: 'LNG_CASE_FIELD_LABEL_DATE_OF_OUTCOME', value: 'dateOfOutcome' },
     { label: 'LNG_CASE_FIELD_LABEL_DATE_BECOME_CASE', value: 'dateBecomeCase' },
-    { label: 'LNG_CASE_FIELD_LABEL_DATE_RANGES', value: 'dateRanges' },
+    { label: 'LNG_CASE_FIELD_LABEL_HOSPITALIZATION_ISOLATION_DETAILS', value: 'dateRanges' },
     { label: 'LNG_CASE_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value: 'questionnaireAnswers' },
     { label: 'LNG_CASE_FIELD_LABEL_TYPE', value: 'type' },
     { label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING', value: 'dateOfReporting' },
@@ -1002,7 +1001,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           fieldIsArray: true
         },
         link: (data) => {
-          return data.mainAddress?.location?.name ?
+          return data.mainAddress?.location?.name && LocationModel.canView(this.authUser) ?
             `/locations/${data.mainAddress.location.id}/view` :
             undefined;
         }
@@ -1152,7 +1151,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           field: 'burialLocationId.parentLocationIdFilter'
         },
         link: (data) => {
-          return data.burialLocation?.name ?
+          return data.burialLocation?.name && LocationModel.canView(this.authUser) ?
             `/locations/${data.burialLocation.id}/view` :
             undefined;
         }
@@ -1219,7 +1218,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           return !UserModel.canListForFilters(this.authUser);
         },
         link: (data) => {
-          return data.responsibleUserId ?
+          return data.responsibleUserId && UserModel.canView(this.authUser) ?
             `/users/${data.responsibleUserId}/view` :
             undefined;
         }
@@ -1321,7 +1320,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy ?
+          return data.createdBy && UserModel.canView(this.authUser) ?
             `/users/${data.createdBy}/view` :
             undefined;
         }
@@ -1354,7 +1353,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.updatedBy ?
+          return data.updatedBy && UserModel.canView(this.authUser) ?
             `/users/${data.updatedBy}/view` :
             undefined;
         }

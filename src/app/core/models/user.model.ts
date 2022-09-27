@@ -354,6 +354,7 @@ export class UserModel
       userRole: ILabelValuePairModel[],
       outbreak: ILabelValuePairModel[],
       team: ILabelValuePairModel[],
+      language: ILabelValuePairModel[]
     }
   }): V2AdvancedFilter[] {
     // initialize
@@ -405,6 +406,12 @@ export class UserModel
         field: 'outbreakIds',
         label: 'LNG_USER_FIELD_LABEL_AVAILABLE_OUTBREAKS',
         options: data.options.outbreak
+      },
+      {
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'languageId',
+        label: 'LNG_USER_FIELD_LABEL_LANGUAGE',
+        options: data.options.language
       }
     ];
 

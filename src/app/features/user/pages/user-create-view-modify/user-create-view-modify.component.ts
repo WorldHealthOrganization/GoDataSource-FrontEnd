@@ -23,6 +23,7 @@ import { RequestFilterGenerator } from '../../../../core/helperClasses/request-q
 import { catchError, takeUntil } from 'rxjs/operators';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
+import { LanguageModel } from '../../../../core/models/language.model';
 
 /**
  * Component
@@ -395,6 +396,20 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
                 condition: () => !OutbreakModel.canList(this.authUser),
                 html: this.translateService.instant('LNG_USER_FIELD_LABEL_CANT_SET_ACTIVE_OUTBREAK')
               }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'languageId',
+              placeholder: () => 'LNG_USER_FIELD_LABEL_LANGUAGE',
+              description: () => 'LNG_USER_FIELD_LABEL_LANGUAGE_DESCRIPTION',
+              value: {
+                get: () => this.itemData.languageId,
+                set: (value) => {
+                  // set data
+                  this.itemData.languageId = value;
+                }
+              },
+              options: (this.activatedRoute.snapshot.data.language as IResolverV2ResponseModel<LanguageModel>).options
             }
           ]
         },
@@ -582,7 +597,8 @@ export class UserCreateViewModifyComponent extends CreateViewModifyComponent<Use
         institution: (this.activatedRoute.snapshot.data.institution as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         userRole: (this.activatedRoute.snapshot.data.userRole as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
         outbreak: (this.activatedRoute.snapshot.data.outbreak as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-        team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        team: (this.activatedRoute.snapshot.data.team as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        language: (this.activatedRoute.snapshot.data.language as IResolverV2ResponseModel<LanguageModel>).options
       }
     });
   }

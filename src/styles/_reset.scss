@@ -337,6 +337,10 @@ svg:not(:root) {
   -moz-osx-font-smoothing: grayscale;
   /* Support for IE. */
   font-feature-settings: 'liga';
+
+  &.mat-icon {
+    overflow: unset;
+  }
 }
 
 .mat-icon {

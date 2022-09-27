@@ -54,7 +54,6 @@ export class ContactsListComponent
     { label: 'LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME', value: 'middleName' },
     { label: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME', value: 'lastName' },
     { label: 'LNG_CONTACT_FIELD_LABEL_GENDER', value: 'gender' },
-    { label: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER', value: 'phoneNumber' },
     { label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION', value: 'occupation' },
     { label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH', value: 'dob' },
     { label: 'LNG_CONTACT_FIELD_LABEL_AGE', value: 'age' },
@@ -727,7 +726,7 @@ export class ContactsListComponent
           fieldIsArray: true
         },
         link: (data) => {
-          return data.mainAddress?.location?.name ?
+          return data.mainAddress?.location?.name && LocationModel.canView(this.authUser) ?
             `/locations/${data.mainAddress.location.id}/view` :
             undefined;
         }
@@ -921,7 +920,7 @@ export class ContactsListComponent
           return !TeamModel.canList(this.authUser);
         },
         link: (data) => {
-          return data.followUpTeamId ?
+          return data.followUpTeamId && TeamModel.canView(this.authUser) ?
             `/teams/${data.followUpTeamId}/view` :
             undefined;
         }
@@ -1044,7 +1043,7 @@ export class ContactsListComponent
           return !UserModel.canListForFilters(this.authUser);
         },
         link: (data) => {
-          return data.responsibleUserId ?
+          return data.responsibleUserId && UserModel.canView(this.authUser) ?
             `/users/${data.responsibleUserId}/view` :
             undefined;
         }
@@ -1135,7 +1134,9 @@ export class ContactsListComponent
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy ? `/users/${data.createdBy}/view` : undefined;
+          return data.createdBy && UserModel.canView(this.authUser) ?
+            `/users/${data.createdBy}/view` :
+            undefined;
         }
       },
       {
@@ -1166,7 +1167,9 @@ export class ContactsListComponent
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.updatedBy ? `/users/${data.updatedBy}/view` : undefined;
+          return data.updatedBy && UserModel.canView(this.authUser) ?
+            `/users/${data.updatedBy}/view` :
+            undefined;
         }
       },
       {

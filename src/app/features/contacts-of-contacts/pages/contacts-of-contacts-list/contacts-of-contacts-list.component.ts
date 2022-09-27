@@ -508,9 +508,9 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
           fieldIsArray: true
         },
         link: (data) => {
-          return data.mainAddress?.location?.name
-            ? `/locations/${data.mainAddress.location.id}/view`
-            : undefined;
+          return data.mainAddress?.location?.name && LocationModel.canView(this.authUser) ?
+            `/locations/${data.mainAddress.location.id}/view` :
+            undefined;
         }
       },
       {
@@ -683,7 +683,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
           return !UserModel.canListForFilters(this.authUser);
         },
         link: (data) => {
-          return data.responsibleUserId ?
+          return data.responsibleUserId && UserModel.canView(this.authUser) ?
             `/users/${data.responsibleUserId}/view` :
             undefined;
         }
@@ -746,7 +746,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy ?
+          return data.createdBy && UserModel.canView(this.authUser) ?
             `/users/${data.createdBy}/view` :
             undefined;
         }
@@ -779,7 +779,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.updatedBy ?
+          return data.updatedBy && UserModel.canView(this.authUser) ?
             `/users/${data.updatedBy}/view` :
             undefined;
         }

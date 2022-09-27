@@ -23,6 +23,7 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
 import { TransmissionChainFilters } from '../../classes/filter';
 import { IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
+import { IV2SideDialogAdvancedFiltersResponse } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 
 @Component({
   selector: 'app-case-count-map',
@@ -256,8 +257,8 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Export case count map
-     */
+   * Export case count map
+   */
   exportCaseCountMap() {
     if (this.worldMap) {
       const loadingDialog = this.dialogV2Service.showLoadingDialog();
@@ -275,9 +276,62 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Reload case data
-     */
-  reloadCases() {
+   * Reload case data
+   */
+  reloadCases(response?: IV2SideDialogAdvancedFiltersResponse): void {
+    // must reset filters ?
+    if (
+      response !== undefined &&
+      (
+        !response.queryBuilder ||
+        !response.filtersApplied?.appliedFilters?.length
+      )
+    ) {
+      // reset
+      this.filters = new TransmissionChainFilters();
+    } else if (response?.filtersApplied) {
+      // check if some filters were removed
+      const usedFilters: {
+        [uniqueKey: string]: true
+      } = {};
+      (response.filtersApplied.appliedFilters || []).forEach((filter) => {
+        usedFilters[filter.filter.uniqueKey] = true;
+      });
+
+      // check if we need to remove
+      if (!usedFilters['classificationIdLNG_CASE_FIELD_LABEL_CLASSIFICATION']) {
+        this.filters.classificationId = undefined;
+      }
+      if (!usedFilters['occupationLNG_CONTACT_FIELD_LABEL_OCCUPATION']) {
+        this.filters.occupation = undefined;
+      }
+      if (!usedFilters['outcomeIdLNG_CASE_FIELD_LABEL_OUTCOME']) {
+        this.filters.outcomeId = undefined;
+      }
+      if (!usedFilters['firstNameLNG_CONTACT_FIELD_LABEL_FIRST_NAME']) {
+        this.filters.firstName = undefined;
+      }
+      if (!usedFilters['lastNameLNG_CONTACT_FIELD_LABEL_LAST_NAME']) {
+        this.filters.lastName = undefined;
+      }
+      if (!usedFilters['genderLNG_CASE_FIELD_LABEL_GENDER']) {
+        this.filters.gender = undefined;
+      }
+      if (!usedFilters['locationIdsLNG_ADDRESS_FIELD_LABEL_LOCATION']) {
+        this.filters.locationIds = undefined;
+      }
+      if (!usedFilters['clusterIdsLNG_RELATIONSHIP_FIELD_LABEL_CLUSTER']) {
+        this.filters.clusterIds = undefined;
+      }
+      if (!usedFilters['ageLNG_ENTITY_FIELD_LABEL_AGE']) {
+        this.filters.age = undefined;
+      }
+      if (!usedFilters['dateLNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_DATE']) {
+        this.filters.date = undefined;
+      }
+    }
+
+    // retrieve data
     if (this.outbreakId) {
       // display loading
       this.displayLoading = true;
