@@ -1327,7 +1327,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'contact.addresses',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
         relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
-        isArray: false
+        isArray: false,
+        allowedComparators: [
+          _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.ADDRESS], { value: V2AdvancedFilterComparatorType.CONTAINS }),
+          _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.ADDRESS], { value: V2AdvancedFilterComparatorType.LOCATION })
+        ]
       },
       {
         // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
