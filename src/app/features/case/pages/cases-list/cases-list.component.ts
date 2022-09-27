@@ -1001,7 +1001,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           fieldIsArray: true
         },
         link: (data) => {
-          return data.mainAddress?.location?.name ?
+          return data.mainAddress?.location?.name && LocationModel.canView(this.authUser) ?
             `/locations/${data.mainAddress.location.id}/view` :
             undefined;
         }
@@ -1151,7 +1151,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           field: 'burialLocationId.parentLocationIdFilter'
         },
         link: (data) => {
-          return data.burialLocation?.name ?
+          return data.burialLocation?.name && LocationModel.canView(this.authUser) ?
             `/locations/${data.burialLocation.id}/view` :
             undefined;
         }
@@ -1218,7 +1218,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           return !UserModel.canListForFilters(this.authUser);
         },
         link: (data) => {
-          return data.responsibleUserId ?
+          return data.responsibleUserId && UserModel.canView(this.authUser) ?
             `/users/${data.responsibleUserId}/view` :
             undefined;
         }
@@ -1320,7 +1320,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy ?
+          return data.createdBy && UserModel.canView(this.authUser) ?
             `/users/${data.createdBy}/view` :
             undefined;
         }
@@ -1353,7 +1353,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.updatedBy ?
+          return data.updatedBy && UserModel.canView(this.authUser) ?
             `/users/${data.updatedBy}/view` :
             undefined;
         }

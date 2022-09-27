@@ -316,7 +316,7 @@ export class ContactRangeFollowUpsListComponent
         return !UserModel.canListForFilters(this.authUser);
       },
       link: (data) => {
-        return data.person?.responsibleUserId ?
+        return data.person?.responsibleUserId && UserModel.canView(this.authUser) ?
           `/users/${ data.person?.responsibleUserId }/view` :
           undefined;
       }

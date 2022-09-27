@@ -189,7 +189,7 @@ export class AuditLogsListComponent
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.userId ?
+          return data.userId && UserModel.canView(this.authUser) ?
             `/users/${ data.userId }/view` :
             undefined;
         }

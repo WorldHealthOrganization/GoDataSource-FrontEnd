@@ -726,7 +726,7 @@ export class ContactsListComponent
           fieldIsArray: true
         },
         link: (data) => {
-          return data.mainAddress?.location?.name ?
+          return data.mainAddress?.location?.name && LocationModel.canView(this.authUser) ?
             `/locations/${data.mainAddress.location.id}/view` :
             undefined;
         }
@@ -920,7 +920,7 @@ export class ContactsListComponent
           return !TeamModel.canList(this.authUser);
         },
         link: (data) => {
-          return data.followUpTeamId ?
+          return data.followUpTeamId && TeamModel.canView(this.authUser) ?
             `/teams/${data.followUpTeamId}/view` :
             undefined;
         }
@@ -1043,7 +1043,7 @@ export class ContactsListComponent
           return !UserModel.canListForFilters(this.authUser);
         },
         link: (data) => {
-          return data.responsibleUserId ?
+          return data.responsibleUserId && UserModel.canView(this.authUser) ?
             `/users/${data.responsibleUserId}/view` :
             undefined;
         }
@@ -1134,7 +1134,9 @@ export class ContactsListComponent
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy ? `/users/${data.createdBy}/view` : undefined;
+          return data.createdBy && UserModel.canView(this.authUser) ?
+            `/users/${data.createdBy}/view` :
+            undefined;
         }
       },
       {
@@ -1165,7 +1167,9 @@ export class ContactsListComponent
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.updatedBy ? `/users/${data.updatedBy}/view` : undefined;
+          return data.updatedBy && UserModel.canView(this.authUser) ?
+            `/users/${data.updatedBy}/view` :
+            undefined;
         }
       },
       {

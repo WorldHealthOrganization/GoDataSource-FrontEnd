@@ -560,9 +560,9 @@ export class EventsListComponent
           return !UserModel.canListForFilters(this.authUser);
         },
         link: (data) => {
-          return data.responsibleUserId
-            ? `/users/${data.responsibleUserId}/view`
-            : undefined;
+          return data.responsibleUserId && UserModel.canView(this.authUser) ?
+            `/users/${data.responsibleUserId}/view` :
+            undefined;
         }
       }
     ];
@@ -657,7 +657,7 @@ export class EventsListComponent
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.createdBy ?
+          return data.createdBy && UserModel.canView(this.authUser) ?
             `/users/${data.createdBy}/view` :
             undefined;
         }
@@ -690,7 +690,9 @@ export class EventsListComponent
           return !UserModel.canView(this.authUser);
         },
         link: (data) => {
-          return data.updatedBy ? `/users/${data.updatedBy}/view` : undefined;
+          return data.updatedBy && UserModel.canView(this.authUser) ?
+            `/users/${data.updatedBy}/view` :
+            undefined;
         }
       },
       {
@@ -719,9 +721,9 @@ export class EventsListComponent
           fieldIsArray: false
         },
         link: (data) => {
-          return data.mainAddress?.location?.name
-            ? `/locations/${data.mainAddress.location.id}/view`
-            : undefined;
+          return data.mainAddress?.location?.name && LocationModel.canView(this.authUser) ?
+            `/locations/${data.mainAddress.location.id}/view` :
+            undefined;
         }
       },
       {
