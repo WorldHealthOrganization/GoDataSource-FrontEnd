@@ -1972,7 +1972,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // sort
     this.sortBy.emit({
-      field: this._sortBy.column?.columnDefinition.field,
+      field: typeof this._sortBy.column?.columnDefinition.sortable === 'string' ?
+        this._sortBy.column.columnDefinition.sortable :
+        this._sortBy.column?.columnDefinition.field,
       direction: this._sortBy.direction
     });
   }

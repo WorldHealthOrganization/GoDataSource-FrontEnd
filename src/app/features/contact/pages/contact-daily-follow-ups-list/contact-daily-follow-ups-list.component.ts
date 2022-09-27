@@ -611,7 +611,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'lastName',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME',
         pinned: IV2ColumnPinned.LEFT,
-        sortable: true,
+        sortable: 'contact.lastName',
         format: {
           type: 'person.lastName'
         },
@@ -638,7 +638,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'firstName',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME',
         pinned: IV2ColumnPinned.LEFT,
-        sortable: true,
+        sortable: 'contact.firstName',
         format: {
           type: 'person.firstName'
         },
@@ -665,7 +665,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'visualId',
         label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
         pinned: IV2ColumnPinned.LEFT,
-        sortable: true,
+        sortable: 'contact.visualId',
         format: {
           type: 'person.visualId'
         },
@@ -1311,14 +1311,16 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           field: 'firstName',
           label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
           relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
+          sortable: 'contact.firstName'
         },
         {
           type: V2AdvancedFilterType.TEXT,
           field: 'lastName',
           label: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
           relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
+          sortable: 'contact.lastName'
         },
         {
           type: V2AdvancedFilterType.ADDRESS,
@@ -1363,7 +1365,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           field: 'visualId',
           label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
           relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
+          sortable: 'contact.visualId'
         },
         {
           type: V2AdvancedFilterType.TEXT,
