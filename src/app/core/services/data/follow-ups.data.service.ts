@@ -72,12 +72,8 @@ export class FollowUpsDataService {
   }
 
   /**
-     * Retrieve the list of FollowUps from an Outbreak
-     * @param {string} outbreakId
-     * @param queryBuilder
-     * @param needsContactData
-     * @returns {Observable<FollowUpModel[]>}
-     */
+   * Retrieve the list of FollowUps from an Outbreak
+   */
   getFollowUpsList(
     outbreakId: string,
     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
@@ -147,18 +143,11 @@ export class FollowUpsDataService {
             );
         })
       );
-
-
-
   }
 
   /**
-     * Retrieve Follow-up of a Contact
-     * @param {string} outbreakId
-     * @param {string} followUpId
-     * @param {boolean} retrieveCreatedUpdatedBy
-     * @returns {Observable<FollowUpModel>}
-     */
+   * Retrieve Follow-up of a Contact
+   */
   getFollowUp(
     outbreakId: string,
     followUpId: string,

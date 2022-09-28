@@ -261,7 +261,7 @@ interface IV2AdvancedFilterBase {
   extraConditions?: RequestQueryBuilder;
   childQueryBuilderKey?: string;
   relationshipKey?: string;
-  sortable?: boolean;
+  sortable?: true | string;
   havingNotHavingApplyMongo?: boolean;
   filterBy?: (
     query: RequestQueryBuilder,

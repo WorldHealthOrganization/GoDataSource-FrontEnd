@@ -12,6 +12,8 @@ export const EnglishUsLang = {
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
     'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_IS_AFTER_DATE_OF_REPORTING': 'Date of onset is after date of reporting',
+    'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE': 'Exposed to Case',
+    'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT': 'Contact / Case',
     'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_CHANGE_RESULT': 'Change lab result',
     'LNG_PAGE_LIST_LAB_RESULTS_CHANGE_RESULT_DIALOG_TITLE': 'Change result',
     'LNG_PAGE_LIST_LAB_RESULTS_CHANGE_RESULT_SUCCESS_MESSAGE': 'Lab result modified!',

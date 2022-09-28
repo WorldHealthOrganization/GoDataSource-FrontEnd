@@ -596,7 +596,7 @@ export class AppSideDialogV2Component implements OnDestroy {
           input.optionsAsLabelValue.push(option);
 
           // sortable ?
-          if (filterOption.sortable) {
+          if (!!filterOption.sortable) {
             input.sortableOptionsAsLabelValue.push(option);
           }
 
