@@ -218,6 +218,26 @@ const routes: Routes = [
     canDeactivate: [
       PageChangeConfirmationGuard
     ]
+  },
+  // Modify list of Lab Results
+  {
+    path: 'lab-results/modify-list',
+    component: fromPages.LabResultsBulkModifyComponent,
+    canActivate: [AuthGuard],
+    data: {
+      permissions: [
+        // #TODO: Permission should be added to the BE?
+        // PERMISSION.LAB_RESULT_BULK_MODIFY
+      ],
+      action: CreateViewModifyV2Action.MODIFY
+    },
+    resolve: {
+      outbreak: SelectedOutbreakDataResolver,
+      labTestResult: LabTestResultDataResolver
+    },
+    canDeactivate: [
+      PageChangeConfirmationGuard
+    ]
   }
 ];
 

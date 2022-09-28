@@ -140,6 +140,24 @@ export class LabResultDataService {
   }
 
   /**
+     * Modify multiple lab results
+     * @param outbreakId
+     * @param followUpData
+     */
+  bulkModifyLabResults(
+    outbreakId: string,
+    labResultData,
+    queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
+  ) {
+    const whereFilter = queryBuilder.filter.generateCondition(true);
+    return this.http.put(
+      // #TODO: Endpoint needs to be implemented in BE
+      `outbreaks/${outbreakId}/lab-results/bulk?where=${whereFilter}`,
+      labResultData
+    );
+  }
+
+  /**
      * Delete Lab Result
      * @param {string} outbreakId
      * @param {string} labResultId

@@ -11,8 +11,16 @@ export const EnglishUsLang = {
      */
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
-    'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_IS_AFTER_DATE_OF_REPORTING': 'Date of onset is after date of reporting'
-
+    'LNG_CASE_FIELD_LABEL_DATE_OF_ONSET_IS_AFTER_DATE_OF_REPORTING': 'Date of onset is after date of reporting',
+    'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_CHANGE_RESULT': 'Change lab result',
+    'LNG_PAGE_LIST_LAB_RESULTS_CHANGE_RESULT_DIALOG_TITLE': 'Change result',
+    'LNG_PAGE_LIST_LAB_RESULTS_CHANGE_RESULT_SUCCESS_MESSAGE': 'Lab result modified!',
+    'LNG_PAGE_LIST_LAB_RESULTS_GROUP_ACTION_MODIFY_SELECTED_LAB_RESULTS': 'Modify the selected lab results',
+    'LNG_PAGE_MODIFY_LAB_RESULTS_LIST_TITLE': 'Modify lab results',
+    'LNG_PAGE_LAB_RESULTS_LIST_MODIFY_DATA_INFO_LABEL': '*The system will replace only data that is changed. If you don\'t enter any data, then the system won\'t update the data to any of the selected lab results',
+    'LNG_PAGE_MODIFY_LAB_RESULTS_SELECTED_CONTACTS': 'Selected lab results:',
+    'LNG_PAGE_MODIFY_LAB_RESULTS_LIST_ERROR_NO_LAB_RESULTS_SELECTED': 'No lab results were selected',
+    'LNG_PAGE_MODIFY_LAB_RESULTS_LIST_ACTION_MODIFY_MULTIPLE_LAB_RESULTS_SUCCESS_MESSAGE': 'Lab results updated'
 
     /**
      * REMOVE the tokens from below
