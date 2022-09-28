@@ -832,6 +832,11 @@ export class EntityHelperService {
         filter: {
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH
+        },
+        link: (data) => {
+          return data.model && data.model.canView(definitions.authUser) && !data.model.deleted ?
+            `${this.entityMap[data.model.type].link}/${data.model.id}/view` :
+            undefined;
         }
       },
       {
@@ -845,6 +850,11 @@ export class EntityHelperService {
         filter: {
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH
+        },
+        link: (data) => {
+          return data.model && data.model.canView(definitions.authUser) && !data.model.deleted ?
+            `${this.entityMap[data.model.type].link}/${data.model.id}/view` :
+            undefined;
         }
       },
       {
@@ -858,6 +868,11 @@ export class EntityHelperService {
         filter: {
           type: V2FilterType.TEXT,
           textType: V2FilterTextType.STARTS_WITH
+        },
+        link: (data) => {
+          return data.model && data.model.canView(definitions.authUser) && !data.model.deleted ?
+            `${this.entityMap[data.model.type].link}/${data.model.id}/view` :
+            undefined;
         }
       },
       {

@@ -791,6 +791,121 @@ export class RequestFilter {
   }
 
   /**
+   * Search deep if a filter is set on a property an remove it
+   */
+  removeDeep(
+    property: string,
+    triggerChangeListener: boolean = true
+  ): RequestFilter {
+    // deep remove handler
+    const deepRemoveHandler = (objectArray) => {
+      // nothing to do ?
+      if (!objectArray) {
+        return;
+      }
+
+      // object or array ?
+      if (Array.isArray(objectArray)) {
+        // check if we need to remove
+        const indexesToRemove: number[] = [];
+        objectArray.forEach((arrayItem, index) => {
+          // cleanup
+          deepRemoveHandler(arrayItem);
+
+          // empty ?
+          if (
+            arrayItem &&
+            typeof arrayItem === 'object' &&
+            Object.keys(arrayItem).length < 1
+          ) {
+            indexesToRemove.push(index);
+          }
+        });
+
+        // cleanup
+        for (let itemIndex = indexesToRemove.length - 1; itemIndex >= 0; itemIndex--) {
+          objectArray.splice(
+            indexesToRemove[itemIndex],
+            1
+          );
+        }
+      } else if (typeof objectArray === 'object') {
+        // check if we have or and ands - OR
+        if (objectArray.or) {
+          // check if we need to remove
+          deepRemoveHandler(objectArray.or);
+
+          // empty array ?
+          if (
+            !objectArray.or ||
+            objectArray.or.length < 1
+          ) {
+            delete objectArray.or;
+          }
+        }
+
+        // check if we have or and ands - $OR
+        if (objectArray.$or) {
+          // check if we need to remove
+          deepRemoveHandler(objectArray.$or);
+
+          // empty array ?
+          if (
+            !objectArray.$or ||
+            objectArray.$or.length < 1
+          ) {
+            delete objectArray.$or;
+          }
+        }
+
+        // check if we have or and ands - AND
+        if (objectArray.and) {
+          // check if we need to remove
+          deepRemoveHandler(objectArray.and);
+
+          // empty array ?
+          if (
+            !objectArray.and ||
+            objectArray.and.length < 1
+          ) {
+            delete objectArray.and;
+          }
+        }
+
+        // check if we have or and ands - $AND
+        if (objectArray.$and) {
+          // check if we need to remove
+          deepRemoveHandler(objectArray.$and);
+
+          // empty array ?
+          if (
+            !objectArray.$and ||
+            objectArray.$and.length < 1
+          ) {
+            delete objectArray.$and;
+          }
+        }
+
+        // has our property ?
+        if (objectArray[property] !== undefined) {
+          delete objectArray[property];
+        }
+      }
+    };
+
+    // start deep remove
+    deepRemoveHandler(this.conditions);
+
+    // trigger change
+    if (triggerChangeListener) {
+      this.triggerChangeListener();
+    }
+
+    // chain
+    return this;
+  }
+
+  /**
    * Remove condition(s) on a specific property
    */
   remove(

@@ -1829,19 +1829,22 @@ export class DialogV2Service {
       }));
 
       // add sorting criteria
+      const sortField: string = typeof filterDefinition.sortable === 'string' ?
+        filterDefinition.sortable :
+        filterDefinition.field;
       if (
         objectDetailsSort &&
         objectDetailsSort[appliedSort.sortBy.value]
       ) {
         objectDetailsSort[appliedSort.sortBy.value].forEach((childProperty) => {
           queryBuilder.sort.by(
-            `${filterDefinition.field}.${childProperty}`,
+            `${sortField}.${childProperty}`,
             appliedSort.order.value as RequestSortDirection
           );
         });
       } else {
         queryBuilder.sort.by(
-          filterDefinition.field,
+          sortField,
           appliedSort.order.value as RequestSortDirection
         );
       }

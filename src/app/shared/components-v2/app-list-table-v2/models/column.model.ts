@@ -53,7 +53,7 @@ export interface IV2ColumnBasic {
   centerHeader?: boolean;
   link?: (any) => string;
   cssCellClass?: string;
-  sortable?: boolean;
+  sortable?: true | string;
   filter?: V2Filter;
   highlight?: string;
 }
@@ -189,7 +189,7 @@ export interface IV2ColumnButton {
   alwaysVisible?: boolean;
   centerHeader?: boolean;
   cssCellClass?: string;
-  sortable?: boolean;
+  sortable?: true | string;
   filter?: V2Filter;
 }
 
@@ -385,7 +385,7 @@ export interface IV2ColumnExpandRow {
   alwaysVisible?: boolean;
   centerHeader?: boolean;
   cssCellClass?: string;
-  sortable?: boolean;
+  sortable?: true | string;
   filter?: V2Filter;
 }
 

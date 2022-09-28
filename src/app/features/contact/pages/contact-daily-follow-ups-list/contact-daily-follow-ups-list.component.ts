@@ -608,7 +608,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     // default table columns
     this.tableColumns = [
       {
-        field: 'lastName',
+        field: 'contact.lastName',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_LAST_NAME',
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
@@ -616,9 +616,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           type: 'person.lastName'
         },
         filter: {
+          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
           type: V2FilterType.TEXT,
-          textType: V2FilterTextType.STARTS_WITH,
-          relationshipKey: 'contact'
+          textType: V2FilterTextType.STARTS_WITH
         },
         link: (item: FollowUpModel) => {
           return item.person && (
@@ -629,13 +629,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               item.person.type === EntityType.CONTACT &&
               ContactModel.canView(this.authUser)
             )
-          ) ?
+          ) && !item.person.deleted ?
             `/${item.person.type === EntityType.CASE ? 'cases' : 'contacts'}/${item.person.id}/view` :
             undefined;
         }
       },
       {
-        field: 'firstName',
+        field: 'contact.firstName',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_FIRST_NAME',
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
@@ -643,9 +643,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           type: 'person.firstName'
         },
         filter: {
+          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
           type: V2FilterType.TEXT,
-          textType: V2FilterTextType.STARTS_WITH,
-          relationshipKey: 'contact'
+          textType: V2FilterTextType.STARTS_WITH
         },
         link: (item: FollowUpModel) => {
           return item.person && (
@@ -656,13 +656,13 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
               item.person.type === EntityType.CONTACT &&
               ContactModel.canView(this.authUser)
             )
-          ) ?
+          ) && !item.person.deleted ?
             `/${item.person.type === EntityType.CASE ? 'cases' : 'contacts'}/${item.person.id}/view` :
             undefined;
         }
       },
       {
-        field: 'visualId',
+        field: 'contact.visualId',
         label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
@@ -670,9 +670,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           type: 'person.visualId'
         },
         filter: {
+          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
           type: V2FilterType.TEXT,
-          textType: V2FilterTextType.STARTS_WITH,
-          relationshipKey: 'contact'
+          textType: V2FilterTextType.STARTS_WITH
         }
       },
       {
@@ -875,7 +875,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       {
         field: 'phoneNumber',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_PHONE_NUMBER',
-        sortable: true,
         format: {
           type: 'address.phoneNumber'
         },
@@ -903,7 +902,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         }
       },
       {
-        field: 'dateOfLastContact',
+        field: 'contact.dateOfLastContact',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_LAST_CONTACT',
         sortable: true,
         format: {
@@ -912,12 +911,12 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             '—'
         },
         filter: {
-          type: V2FilterType.DATE_RANGE,
-          relationshipKey: 'contact'
+          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+          type: V2FilterType.DATE_RANGE
         }
       },
       {
-        field: 'followUp.endDate',
+        field: 'contact.followUp.endDate',
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_END_OF_FOLLOWUP',
         sortable: true,
         format: {
@@ -926,12 +925,12 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             '—'
         },
         filter: {
-          type: V2FilterType.DATE_RANGE,
-          relationshipKey: 'contact'
+          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+          type: V2FilterType.DATE_RANGE
         }
       },
       {
-        field: 'riskLevel',
+        field: 'contact.riskLevel',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL',
         sortable: true,
         notVisible: true,
@@ -941,10 +940,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             '—'
         },
         filter: {
+          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
           type: V2FilterType.MULTIPLE_SELECT,
           options: (this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-          includeNoValue: true,
-          relationshipKey: 'contact'
+          includeNoValue: true
         }
       },
       {
@@ -991,7 +990,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'address.geoLocation.lat',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
         notVisible: true,
-        sortable: true,
         format: {
           type: 'address.geoLocation.lat'
         }
@@ -1000,7 +998,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'address.geoLocation.lng',
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG',
         notVisible: true,
-        sortable: true,
         format: {
           type: 'address.geoLocation.lng'
         }
@@ -1023,7 +1020,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       },
       {
         field: 'address.geoLocationAccurate',
-        label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_GEO_LOCATION_ACCURATE',
+        label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
         notVisible: true,
         sortable: true,
         format: {
@@ -1306,87 +1303,92 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
       );
     }
 
-    // Contact
-    if (ContactModel.canList(this.authUser)) {
-      this.advancedFilters.push(
-        {
-          type: V2AdvancedFilterType.TEXT,
-          field: 'firstName',
-          label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-        },
-        {
-          type: V2AdvancedFilterType.TEXT,
-          field: 'lastName',
-          label: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-        },
-        {
-          type: V2AdvancedFilterType.ADDRESS,
-          field: 'addresses',
-          label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
-          isArray: false
-        },
-        {
-          type: V2AdvancedFilterType.MULTISELECT,
-          field: 'gender',
-          label: 'LNG_CONTACT_FIELD_LABEL_GENDER',
-          options: this.activatedRoute.snapshot.data.gender.options,
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-        },
-        {
-          type: V2AdvancedFilterType.MULTISELECT,
-          field: 'riskLevel',
-          label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL',
-          options: this.activatedRoute.snapshot.data.risk.options,
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-        },
-        {
-          type: V2AdvancedFilterType.RANGE_AGE,
-          field: 'age',
-          label: 'LNG_CONTACT_FIELD_LABEL_AGE',
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-        },
-        {
-          type: V2AdvancedFilterType.RANGE_DATE,
-          field: 'dob',
-          label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-        },
-        {
-          type: V2AdvancedFilterType.TEXT,
-          field: 'visualId',
-          label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-        },
-        {
-          type: V2AdvancedFilterType.TEXT,
-          field: 'addresses.phoneNumber',
-          label: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
-          childQueryBuilderKey: 'contact'
-        },
-        {
-          type: V2AdvancedFilterType.MULTISELECT,
-          field: 'occupation',
-          label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
-          options: this.activatedRoute.snapshot.data.occupation.options,
-          relationshipKey: 'contact',
-          relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
-        }
-      );
-    }
+    // Follow-up person
+    this.advancedFilters.push(
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.TEXT,
+        field: 'contact.firstName',
+        label: 'LNG_CONTACT_FIELD_LABEL_FIRST_NAME',
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
+        sortable: 'contact.firstName'
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.TEXT,
+        field: 'contact.lastName',
+        label: 'LNG_CONTACT_FIELD_LABEL_LAST_NAME',
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
+        sortable: 'contact.lastName'
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.ADDRESS,
+        field: 'contact.addresses',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_ADDRESS',
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
+        isArray: false,
+        allowedComparators: [
+          _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.ADDRESS], { value: V2AdvancedFilterComparatorType.CONTAINS }),
+          _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.ADDRESS], { value: V2AdvancedFilterComparatorType.LOCATION })
+        ]
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'contact.gender',
+        label: 'LNG_CONTACT_FIELD_LABEL_GENDER',
+        options: this.activatedRoute.snapshot.data.gender.options,
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'contact.riskLevel',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL',
+        options: this.activatedRoute.snapshot.data.risk.options,
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.RANGE_AGE,
+        field: 'contact.age',
+        label: 'LNG_CONTACT_FIELD_LABEL_AGE',
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.RANGE_DATE,
+        field: 'contact.dob',
+        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.TEXT,
+        field: 'contact.visualId',
+        label: 'LNG_CONTACT_FIELD_LABEL_VISUAL_ID',
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT',
+        sortable: 'contact.visualId'
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.TEXT,
+        field: 'contact.addresses.phoneNumber',
+        label: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER',
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+      },
+      {
+        // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+        type: V2AdvancedFilterType.MULTISELECT,
+        field: 'contact.occupation',
+        label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',
+        options: this.activatedRoute.snapshot.data.occupation.options,
+        relationshipLabel: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT'
+      }
+    );
 
-    // Case
+    // Contacts exposed to cases that match the criteria bellow
     if (CaseModel.canList(this.authUser)) {
       this.advancedFilters.push(
         {
@@ -1464,7 +1466,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           childQueryBuilderKey: 'case'
         },
         {
-          type: V2AdvancedFilterType.RANGE_AGE,
+          type: V2AdvancedFilterType.RANGE_DATE,
           field: 'dob',
           label: 'LNG_CASE_FIELD_LABEL_DOB',
           relationshipLabel: 'LNG_PAGE_LIST_FOLLOW_UPS_LABEL_CASE',
@@ -1627,6 +1629,12 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           },
           action: {
             click: () => {
+              // remove date filter since that is applied separately
+              const qb: RequestQueryBuilder = new RequestQueryBuilder();
+              qb.merge(this.queryBuilder);
+              qb.filter.removeDeep('date');
+
+              // print daily follow-up form
               this.dialogV2Service
                 .showExportData({
                   title: {
@@ -1637,7 +1645,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                     async: false,
                     method: ExportDataMethod.GET,
                     fileName: this.translateService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME'),
-                    queryBuilder: this.queryBuilder,
+                    queryBuilder: qb,
                     allow: {
                       types: [ExportDataExtension.PDF]
                     },
@@ -1658,12 +1666,12 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                         },
                         {
                           type: V2SideDialogConfigInputType.DATE,
-                          name: 'printDate',
+                          name: 'date',
                           placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DATE',
                           value: this.printFollowUpsDialogExtraAPIData.startDate,
                           change: (data: IV2SideDialogData) => {
-                            this.printFollowUpsDialogExtraAPIData.startDate = moment((data.map.printDate as IV2SideDialogConfigInputDate).value).startOf('day');
-                            this.printFollowUpsDialogExtraAPIData.endDate = moment((data.map.printDate as IV2SideDialogConfigInputDate).value).endOf('day');
+                            this.printFollowUpsDialogExtraAPIData.startDate = moment((data.map.date as IV2SideDialogConfigInputDate).value).startOf('day');
+                            this.printFollowUpsDialogExtraAPIData.endDate = moment((data.map.date as IV2SideDialogConfigInputDate).value).endOf('day');
                           },
                           validators: {
                             required: () => true
@@ -1772,9 +1780,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                   }
 
                   // cleanup
-                  this.queryBuilder.filter.removePathCondition('date');
-                  this.queryBuilder.filter.removePathCondition('or.date');
-                  this.queryBuilder.filter.removePathCondition('or.statusId');
+                  this.queryBuilder.filter.removeDeep('date');
+                  this.queryBuilder.filter.removeDeep('statusId');
 
                   // get data
                   const date = (response.data.map.date as IV2SideDialogConfigInputDate).value;
@@ -1782,8 +1789,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
 
                   // set date column filter
                   (dateColumn.filter.value as IV2DateRange) = {
-                    startDate: moment(date).startOf('day'),
-                    endDate: moment(date).endOf('day')
+                    startDate: undefined,
+                    endDate: undefined
                   };
 
                   // filter
