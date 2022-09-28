@@ -221,7 +221,7 @@ const routes: Routes = [
   },
   // Modify list of Lab Results
   {
-    path: 'lab-results/modify-list',
+    path: 'modify-list',
     component: fromPages.LabResultsBulkModifyComponent,
     canActivate: [AuthGuard],
     data: {

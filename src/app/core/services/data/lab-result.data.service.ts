@@ -140,10 +140,8 @@ export class LabResultDataService {
   }
 
   /**
-     * Modify multiple lab results
-     * @param outbreakId
-     * @param followUpData
-     */
+   * Modify multiple lab results
+   */
   bulkModifyLabResults(
     outbreakId: string,
     labResultData,
