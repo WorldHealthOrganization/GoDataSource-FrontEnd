@@ -1780,9 +1780,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                   }
 
                   // cleanup
-                  this.queryBuilder.filter.removePathCondition('date');
-                  this.queryBuilder.filter.removePathCondition('or.date');
-                  this.queryBuilder.filter.removePathCondition('or.statusId');
+                  this.queryBuilder.filter.removeDeep('date');
+                  this.queryBuilder.filter.removeDeep('statusId');
 
                   // get data
                   const date = (response.data.map.date as IV2SideDialogConfigInputDate).value;
@@ -1790,8 +1789,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
 
                   // set date column filter
                   (dateColumn.filter.value as IV2DateRange) = {
-                    startDate: moment(date).startOf('day'),
-                    endDate: moment(date).endOf('day')
+                    startDate: undefined,
+                    endDate: undefined
                   };
 
                   // filter
