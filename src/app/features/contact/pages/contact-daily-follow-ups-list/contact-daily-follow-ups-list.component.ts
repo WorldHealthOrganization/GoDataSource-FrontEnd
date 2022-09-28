@@ -1629,6 +1629,12 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           },
           action: {
             click: () => {
+              // remove date filter since that is applied separately
+              const qb: RequestQueryBuilder = new RequestQueryBuilder();
+              qb.merge(this.queryBuilder);
+              qb.filter.removeDeep('date');
+
+              // print daily follow-up form
               this.dialogV2Service
                 .showExportData({
                   title: {
@@ -1639,7 +1645,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                     async: false,
                     method: ExportDataMethod.GET,
                     fileName: this.translateService.instant('LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DAILY_FORM_FILE_NAME'),
-                    queryBuilder: this.queryBuilder,
+                    queryBuilder: qb,
                     allow: {
                       types: [ExportDataExtension.PDF]
                     },
@@ -1660,12 +1666,12 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                         },
                         {
                           type: V2SideDialogConfigInputType.DATE,
-                          name: 'printDate',
+                          name: 'date',
                           placeholder: 'LNG_PAGE_LIST_FOLLOW_UPS_PRINT_DATE',
                           value: this.printFollowUpsDialogExtraAPIData.startDate,
                           change: (data: IV2SideDialogData) => {
-                            this.printFollowUpsDialogExtraAPIData.startDate = moment((data.map.printDate as IV2SideDialogConfigInputDate).value).startOf('day');
-                            this.printFollowUpsDialogExtraAPIData.endDate = moment((data.map.printDate as IV2SideDialogConfigInputDate).value).endOf('day');
+                            this.printFollowUpsDialogExtraAPIData.startDate = moment((data.map.date as IV2SideDialogConfigInputDate).value).startOf('day');
+                            this.printFollowUpsDialogExtraAPIData.endDate = moment((data.map.date as IV2SideDialogConfigInputDate).value).endOf('day');
                           },
                           validators: {
                             required: () => true
