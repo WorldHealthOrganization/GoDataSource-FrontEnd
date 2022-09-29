@@ -15,6 +15,7 @@ import { AuthDataService } from '../../../../core/services/data/auth.data.servic
 import { EntityType } from '../../../../core/models/entity-type';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
   selector: 'app-lab-results-bulk-modify',
@@ -191,22 +192,24 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
             {
               type: CreateViewModifyV2TabInputType.LABEL,
               value: {
-                get: () => 'LNG_PAGE_LAB_RESULTS_LIST_MODIFY_DATA_INFO_LABEL'
+                get: () => 'LNG_PAGE_MODIFY_LAB_RESULTS_LIST_MODIFY_DATA_INFO_LABEL'
               }
             },
 
-            // results
+            // selected results
             {
               type: CreateViewModifyV2TabInputType.LINK_LIST,
               label: {
                 get: () => 'LNG_PAGE_MODIFY_LAB_RESULTS_SELECTED_CONTACTS'
               },
               links: this.selectedLabResults.map((result) => ({
-                label: result.labName,
+                label: result.labName ?
+                  result.labName :
+                  '...',
                 action: {
                   link: () => [
                     '/lab-results',
-                    result.person.type === EntityType.CASE ? '/cases' : '/contacts',
+                    result.person.type === EntityType.CASE ? 'cases' : 'contacts',
                     result.person.id,
                     result.id,
                     'view'
@@ -217,11 +220,104 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
 
             // inputs
             {
+              type: CreateViewModifyV2TabInputType.TEXT,
+              name: 'labName',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME_DESCRIPTION',
+              value: {
+                get: () => null,
+                set: () => null
+              }
+            },
+            {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'result',
-              placeholder: () => 'LNG_PAGE_MODIFY_LAB_RESULTS_SELECTED_CONTACTS',
-              description: () => 'LNG_PAGE_MODIFY_LAB_RESULTS_SELECTED_CONTACTS_DESCRIPTION',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_RESULT_DESCRIPTION',
               options: (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              value: {
+                get: () => null,
+                set: () => null
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.TEXT,
+              name: 'testedFor',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_TESTED_FOR_DESCRIPTION',
+              value: {
+                get: () => null,
+                set: () => null
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'status',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_STATUS',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_STATUS_DESCRIPTION',
+              options: (this.activatedRoute.snapshot.data.labResultProgress as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+              value: {
+                get: () => null,
+                set: () => null
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'sequence.hasSequence',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE_DESCRIPTION',
+              value: {
+                get: () => null,
+                set: () => null
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.DATE,
+              name: 'sequence.dateSampleSent',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT_DESCRIPTION',
+              value: {
+                get: () => null,
+                set: () => null
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'sequence.labId',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB_DESCRIPTION',
+              options: (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              value: {
+                get: () => null,
+                set: () => null
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.DATE,
+              name: 'sequence.dateResult',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT_DESCRIPTION',
+              value: {
+                get: () => null,
+                set: () => null
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'sequence.resultId',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT_DESCRIPTION',
+              options: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              value: {
+                get: () => null,
+                set: () => null
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.TEXT,
+              name: 'sequence.noSequenceReason',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON_DESCRIPTION',
               value: {
                 get: () => null,
                 set: () => null

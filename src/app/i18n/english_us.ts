@@ -19,7 +19,7 @@ export const EnglishUsLang = {
     'LNG_PAGE_LIST_LAB_RESULTS_CHANGE_RESULT_SUCCESS_MESSAGE': 'Lab result modified!',
     'LNG_PAGE_LIST_LAB_RESULTS_GROUP_ACTION_MODIFY_SELECTED_LAB_RESULTS': 'Modify the selected lab results',
     'LNG_PAGE_MODIFY_LAB_RESULTS_LIST_TITLE': 'Modify lab results',
-    'LNG_PAGE_LAB_RESULTS_LIST_MODIFY_DATA_INFO_LABEL': '*The system will replace only data that is changed. If you don\'t enter any data, then the system won\'t update the data to any of the selected lab results',
+    'LNG_PAGE_MODIFY_LAB_RESULTS_LIST_MODIFY_DATA_INFO_LABEL': '*The system will replace only data that is changed. If you don\'t enter any data, then the system won\'t update the data to any of the selected lab results',
     'LNG_PAGE_MODIFY_LAB_RESULTS_SELECTED_CONTACTS': 'Selected lab results:',
     'LNG_PAGE_MODIFY_LAB_RESULTS_LIST_ERROR_NO_LAB_RESULTS_SELECTED': 'No lab results were selected',
     'LNG_PAGE_MODIFY_LAB_RESULTS_LIST_ACTION_MODIFY_MULTIPLE_LAB_RESULTS_SUCCESS_MESSAGE': 'Lab results updated'
