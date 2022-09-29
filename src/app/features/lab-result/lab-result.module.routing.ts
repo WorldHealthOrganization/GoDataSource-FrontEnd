@@ -227,7 +227,7 @@ const routes: Routes = [
     data: {
       permissions: [
         // #TODO: Permission should be added to the BE?
-        // PERMISSION.LAB_RESULT_BULK_MODIFY
+        PERMISSION.LAB_RESULT_BULK_MODIFY
       ],
       action: CreateViewModifyV2Action.MODIFY
     },
