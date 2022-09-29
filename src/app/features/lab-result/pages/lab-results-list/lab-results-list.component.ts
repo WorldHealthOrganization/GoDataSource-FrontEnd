@@ -956,8 +956,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
             }
           },
           visible: (): boolean => {
-            // #TODO: Remove "true ||" used to test the functionality
-            return true || this.selectedOutbreakIsActive &&
+            return this.selectedOutbreakIsActive &&
               LabResultModel.canBulkModify(this.authUser);
           },
           disable: (selected: string[]): boolean => {

@@ -203,6 +203,7 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
                 get: () => 'LNG_PAGE_MODIFY_LAB_RESULTS_SELECTED_CONTACTS'
               },
               links: this.selectedLabResults.map((result) => ({
+                // #TODO: Some lab results do not have 'labName', is this fix with '...' okey ?
                 label: result.labName ?
                   result.labName :
                   '...',
