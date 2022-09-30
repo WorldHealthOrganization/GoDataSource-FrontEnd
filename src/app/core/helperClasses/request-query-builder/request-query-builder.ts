@@ -409,7 +409,7 @@ export class RequestQueryBuilder {
     if (!_.isEmpty(queryBuilder.childrenQueryBuilders)) {
       this.childrenQueryBuilders = {
         ...this.childrenQueryBuilders,
-        ...queryBuilder.childrenQueryBuilders
+        ..._.cloneDeep(queryBuilder.childrenQueryBuilders)
       };
     }
 
