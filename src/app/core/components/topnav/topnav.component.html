@@ -28,16 +28,14 @@
 
     <!-- Search -->
     <app-form-input-v2
-      *ngIf="renderMode !== RenderMode.SMALL"
+      *ngIf="renderMode !== RenderMode.SMALL && selectedOutbreak?.id"
       placeholder="LNG_COMMON_LABEL_SEARCH"
       [(ngModel)]="globalSearchValue"
       [suffixIconButtons]="globalSearchSuffixButtons"
       [neverFloatLabel]="true"
       tooltip="LNG_GLOBAL_ENTITY_SEARCH_ENTITY_ID_LABEL_VALUE_DESCRIPTION"
-      [disabled]="!selectedOutbreak?.id"
       (keyup.enter)="globalSearch()">
     </app-form-input-v2>
-
   </div>
 
   <!-- Middle -->
@@ -95,10 +93,10 @@
 
       <!-- Search -->
       <button
+        *ngIf="selectedOutbreak?.id"
         type="button"
         mat-icon-button
         [matTooltip]="'LNG_COMMON_LABEL_SEARCH' | translate"
-        [disabled]="!selectedOutbreak?.id"
         (click)="mobileGlobalSearch()">
         <mat-icon>search</mat-icon>
       </button>
