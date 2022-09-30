@@ -242,8 +242,18 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
       // create or update
       createOrUpdate: this.initializeProcessData(),
       redirectAfterCreateUpdate: () => {
-        // update - redirect to view
-        this.router.navigate(['/lab-results']);
+        // redirect
+        if (this._parentEntity) {
+          this.router.navigate([
+            '/lab-results',
+            this._parentEntity.type === EntityType.CASE ?
+              'cases' :
+              'contacts',
+            this._parentEntity.id
+          ]);
+        } else {
+          this.router.navigate(['/lab-results']);
+        }
       }
     };
   }

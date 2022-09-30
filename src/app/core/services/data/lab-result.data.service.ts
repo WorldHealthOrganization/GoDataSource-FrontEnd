@@ -149,7 +149,6 @@ export class LabResultDataService {
   ) {
     const whereFilter = queryBuilder.filter.generateCondition(true);
     return this.http.put(
-      // #TODO: Endpoint needs to be implemented in BE
       `outbreaks/${outbreakId}/lab-results/bulk?where=${whereFilter}`,
       labResultData
     );
