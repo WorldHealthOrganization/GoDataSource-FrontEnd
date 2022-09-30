@@ -1914,6 +1914,20 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
           }
         },
 
+        // Divider
+        {
+          visible: () => (
+            (
+              FollowUpModel.canBulkModify(this.authUser) &&
+              this.selectedOutbreakIsActive
+            ) ||
+            FollowUpModel.canExport(this.authUser)
+          ) && (
+            FollowUpModel.canBulkDelete(this.authUser) &&
+            this.selectedOutbreakIsActive
+          )
+        },
+
         // bulk delete
         {
           label: {

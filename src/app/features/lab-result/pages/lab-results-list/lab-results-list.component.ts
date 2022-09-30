@@ -860,6 +860,7 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
             return selected.length < 1;
           }
         },
+
         // bulk export
         {
           label: {
