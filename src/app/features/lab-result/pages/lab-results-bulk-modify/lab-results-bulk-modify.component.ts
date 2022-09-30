@@ -15,6 +15,8 @@ import { EntityType } from '../../../../core/models/entity-type';
 import { LabResultDataService } from '../../../../core/services/data/lab-result.data.service';
 import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { Constants } from '../../../../core/models/constants';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
   selector: 'app-lab-results-bulk-modify',
@@ -202,18 +204,23 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
                 get: () => 'LNG_PAGE_MODIFY_LAB_RESULTS_SELECTED_CONTACTS'
               },
               links: this._selectedLabResults.map((result) => ({
-                // #TODO: Some lab results do not have 'labName', is this fix with '...' okey ?
                 label: result.labName ?
-                  result.labName :
-                  '...',
+                  `${result.labName} (${result.dateSampleTaken ? moment(result.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : '—'})` :
+                  (
+                    result.dateSampleTaken ?
+                      moment(result.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+                      '—'
+                  ),
                 action: {
-                  link: () => [
-                    '/lab-results',
-                    result.person.type === EntityType.CASE ? 'cases' : 'contacts',
-                    result.person.id,
-                    result.id,
-                    'view'
-                  ]
+                  link: () => LabResultModel.canView(this.authUser) ?
+                    [
+                      '/lab-results',
+                      result.person.type === EntityType.CASE ? 'cases' : 'contacts',
+                      result.person.id,
+                      result.id,
+                      'view'
+                    ] :
+                    undefined
                 }
               }))
             },

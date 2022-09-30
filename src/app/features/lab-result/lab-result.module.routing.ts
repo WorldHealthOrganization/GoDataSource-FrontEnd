@@ -226,7 +226,6 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     data: {
       permissions: [
-        // #TODO: Permission should be added to the BE?
         PERMISSION.LAB_RESULT_BULK_MODIFY
       ],
       action: CreateViewModifyV2Action.MODIFY
