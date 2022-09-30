@@ -22,6 +22,7 @@ import { LabPersonTypeDataResolver } from '../../core/services/resolvers/data/la
 import { GanttChartTypeDataResolver } from '../../core/services/resolvers/data/gantt-chart-type.resolver';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { SelectedOutbreakDataResolver } from '../../core/services/resolvers/data/selected-outbreak.resolver';
+import { RelationshipPersonDataResolver } from '../../core/services/resolvers/data/relationship-person.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -235,7 +236,8 @@ const routes: Routes = [
       labTestResult: LabTestResultDataResolver,
       labResultProgress: LabProgressDataResolver,
       labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
-      labSequenceResult: LabSequenceResultDataResolver
+      labSequenceResult: LabSequenceResultDataResolver,
+      entity: RelationshipPersonDataResolver
     },
     canDeactivate: [
       PageChangeConfirmationGuard

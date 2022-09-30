@@ -17,6 +17,8 @@ import { LabResultModel } from '../../../../core/models/lab-result.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { Constants } from '../../../../core/models/constants';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { CaseModel } from '../../../../core/models/case.model';
+import { ContactModel } from '../../../../core/models/contact.model';
 
 @Component({
   selector: 'app-lab-results-bulk-modify',
@@ -25,6 +27,9 @@ import { moment } from '../../../../core/helperClasses/x-moment';
 export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<LabResultModel> implements OnDestroy {
   // data
   private _selectedLabResults: LabResultModel[] = [];
+
+  // parent entity
+  private _parentEntity: CaseModel | ContactModel;
 
   /**
    * Constructor
@@ -46,6 +51,9 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
       activatedRoute,
       authDataService
     );
+
+    // retrieve data
+    this._parentEntity = this.activatedRoute.snapshot.data.entity;
   }
 
   /**
@@ -126,26 +134,92 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
    */
   protected initializeBreadcrumbs() {
     // reset breadcrumbs
-    this.breadcrumbs = [
-      {
-        label: 'LNG_COMMON_LABEL_HOME',
-        action: {
-          link: DashboardModel.canViewDashboard(this.authUser) ?
-            ['/dashboard'] :
-            ['/account/my-profile']
-        }
-      },
-      {
-        label: 'LNG_PAGE_LIST_LAB_RESULTS_TITLE',
-        action: {
-          link: ['/lab-results']
-        }
-      },
-      {
-        label: 'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TITLE',
-        action: null
+    this.breadcrumbs = [{
+      label: 'LNG_COMMON_LABEL_HOME',
+      action: {
+        link: DashboardModel.canViewDashboard(this.authUser) ?
+          ['/dashboard'] :
+          ['/account/my-profile']
       }
-    ];
+    }];
+
+    // do we have parent ?
+    if (this._parentEntity) {
+      // case / event list & view pages
+      if (this._parentEntity.type === EntityType.CASE) {
+        // case list page
+        if (CaseModel.canList(this.authUser)) {
+          this.breadcrumbs.push({
+            label: 'LNG_PAGE_LIST_CASES_TITLE',
+            action: {
+              link: ['/cases']
+            }
+          });
+        }
+
+        // case view page
+        if (CaseModel.canView(this.authUser)) {
+          this.breadcrumbs.push({
+            label: this._parentEntity.name,
+            action: {
+              link: [`/cases/${this._parentEntity.id}/view`]
+            }
+          });
+        }
+      } else {
+        // contact list page
+        if (ContactModel.canList(this.authUser)) {
+          this.breadcrumbs.push({
+            label: 'LNG_PAGE_LIST_CONTACTS_TITLE',
+            action: {
+              link: ['/contacts']
+            }
+          });
+        }
+
+        // contact view page
+        if (ContactModel.canView(this.authUser)) {
+          this.breadcrumbs.push({
+            label: this._parentEntity.name,
+            action: {
+              link: [`/contacts/${this._parentEntity.id}/view`]
+            }
+          });
+        }
+      }
+
+      // entity lab results page
+      this.breadcrumbs.push(
+        {
+          label: 'LNG_PAGE_LIST_LAB_RESULTS_TITLE',
+          action: {
+            link: [
+              '/lab-results',
+              this._parentEntity.type === EntityType.CASE ?
+                'cases' :
+                'contacts',
+              this._parentEntity.id
+            ]
+          }
+        }
+      );
+    } else {
+      // global lab results list page
+      this.breadcrumbs.push(
+        {
+          label: 'LNG_PAGE_LIST_LAB_RESULTS_TITLE',
+          action: {
+            link: ['/lab-results']
+          }
+        }
+      );
+    }
+
+    // main route
+    this.breadcrumbs.push({
+      label: 'LNG_PAGE_MODIFY_FOLLOW_UPS_LIST_TITLE',
+      action: null
+    });
   }
 
   /**

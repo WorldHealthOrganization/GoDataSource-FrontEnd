@@ -275,7 +275,9 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
             },
             linkQueryParams: (selected: string[]): Params => {
               return {
-                labResultsIds: JSON.stringify(selected)
+                labResultsIds: JSON.stringify(selected),
+                entityType: this.entityData.type,
+                entityId: this.entityData.id
               };
             }
           },
