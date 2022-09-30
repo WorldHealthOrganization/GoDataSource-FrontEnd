@@ -832,9 +832,14 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
   protected initializeGroupActions(): void {
     this.groupActions = {
       type: V2ActionType.GROUP_ACTIONS,
-      visible: () => LabResultModel.canExport(this.authUser) && (
-        CaseModel.canExportLabResult(this.authUser) ||
-        ContactModel.canExportLabResult(this.authUser)
+      visible: () => (
+        this.selectedOutbreakIsActive &&
+        LabResultModel.canBulkModify(this.authUser)
+      ) || (
+        LabResultModel.canExport(this.authUser) && (
+          CaseModel.canExportLabResult(this.authUser) ||
+          ContactModel.canExportLabResult(this.authUser)
+        )
       ),
       actions: [
         // bulk modify

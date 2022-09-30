@@ -1,5 +1,5 @@
 import { Component, OnDestroy } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 import * as _ from 'lodash';
 import { throwError } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
@@ -254,7 +254,40 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
   protected initializeGroupActions(): void {
     this.groupActions = {
       type: V2ActionType.GROUP_ACTIONS,
+      visible: () => (
+        this.selectedOutbreakIsActive &&
+        LabResultModel.canBulkModify(this.authUser)
+      ) || (
+        LabResultModel.canExport(this.authUser) && (
+          CaseModel.canExportLabResult(this.authUser) ||
+          ContactModel.canExportLabResult(this.authUser)
+        )
+      ),
       actions: [
+        // bulk modify
+        {
+          label: {
+            get: () => 'LNG_PAGE_LIST_LAB_RESULTS_GROUP_ACTION_MODIFY_SELECTED_LAB_RESULTS'
+          },
+          action: {
+            link: () => {
+              return ['/lab-results/modify-list'];
+            },
+            linkQueryParams: (selected: string[]): Params => {
+              return {
+                labResultsIds: JSON.stringify(selected)
+              };
+            }
+          },
+          visible: (): boolean => {
+            return this.selectedOutbreakIsActive &&
+              LabResultModel.canBulkModify(this.authUser);
+          },
+          disable: (selected: string[]): boolean => {
+            return selected.length < 1;
+          }
+        },
+
         // Export selected lab results
         {
           label: {
@@ -275,7 +308,10 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
             }
           },
           visible: (): boolean => {
-            return LabResultModel.canExport(this.authUser);
+            return LabResultModel.canExport(this.authUser) && (
+              CaseModel.canExportLabResult(this.authUser) ||
+              ContactModel.canExportLabResult(this.authUser)
+            );
           },
           disable: (selected: string[]): boolean => {
             return selected.length < 1;
