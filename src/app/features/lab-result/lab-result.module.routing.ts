@@ -237,7 +237,6 @@ const routes: Routes = [
       labName: LabNameDataResolver,
       labTestResult: LabTestResultDataResolver,
       labResultProgress: LabProgressDataResolver,
-
       labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
       labSequenceResult: LabSequenceResultDataResolver
     },

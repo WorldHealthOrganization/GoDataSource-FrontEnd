@@ -109,7 +109,7 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
           this._selectedLabResults = labResults;
 
           // finished - no item to edit
-          subscriber.next(null);
+          subscriber.next(new LabResultModel());
           subscriber.complete();
         });
     });
@@ -313,8 +313,12 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
                     undefined
                 }
               }))
-            },
-
+            }
+          ]
+        }, {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_DETAILS_TITLE',
+          inputs: [
             // inputs
             {
               type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
@@ -359,69 +363,102 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
                 set: () => null
               }
             }
+          ]
+        },
+        {
+          type: CreateViewModifyV2TabInputType.SECTION,
+          label: 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE',
+          inputs: [
+            {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'sequence[hasSequence]',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE_DESCRIPTION',
+              value: {
+                get: () => this.itemData.sequence.hasSequence,
+                set: (value) => {
+                  // set value
+                  this.itemData.sequence.hasSequence = value;
 
-            // {
-            //   type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-            //   name: 'sequence.hasSequence',
-            //   placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE',
-            //   description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE_DESCRIPTION',
-            //   value: {
-            //     get: () => null,
-            //     set: () => null
-            //   }
-            // },
-            // {
-            //   type: CreateViewModifyV2TabInputType.DATE,
-            //   name: 'sequence.dateSampleSent',
-            //   placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
-            //   description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT_DESCRIPTION',
-            //   value: {
-            //     get: () => null,
-            //     set: () => null
-            //   }
-            // },
-            // {
-            //   type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            //   name: 'sequence.labId',
-            //   placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB',
-            //   description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB_DESCRIPTION',
-            //   options: (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            //   value: {
-            //     get: () => null,
-            //     set: () => null
-            //   }
-            // },
-            // {
-            //   type: CreateViewModifyV2TabInputType.DATE,
-            //   name: 'sequence.dateResult',
-            //   placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT',
-            //   description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT_DESCRIPTION',
-            //   value: {
-            //     get: () => null,
-            //     set: () => null
-            //   }
-            // },
-            // {
-            //   type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-            //   name: 'sequence.resultId',
-            //   placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT',
-            //   description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT_DESCRIPTION',
-            //   options: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-            //   value: {
-            //     get: () => null,
-            //     set: () => null
-            //   }
-            // },
-            // {
-            //   type: CreateViewModifyV2TabInputType.TEXT,
-            //   name: 'sequence.noSequenceReason',
-            //   placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
-            //   description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON_DESCRIPTION',
-            //   value: {
-            //     get: () => null,
-            //     set: () => null
-            //   }
-            // }
+                  // reset data
+                  if (this.itemData.sequence.hasSequence) {
+                    this.itemData.sequence.noSequenceReason = null;
+                  } else {
+                    this.itemData.sequence.dateSampleSent = null;
+                    this.itemData.sequence.labId = null;
+                    this.itemData.sequence.dateResult = null;
+                    this.itemData.sequence.resultId = null;
+                  }
+                }
+              }
+            },
+            {
+              type: CreateViewModifyV2TabInputType.DATE,
+              name: 'sequence[dateSampleSent]',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT_DESCRIPTION',
+              value: {
+                get: () => this.itemData.sequence.dateSampleSent,
+                set: (value) => {
+                  this.itemData.sequence.dateSampleSent = value;
+                }
+              },
+              disabled: () => !this.itemData.sequence.hasSequence
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'sequence[labId]',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB_DESCRIPTION',
+              options: (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              value: {
+                get: () => this.itemData.sequence.labId,
+                set: (value) => {
+                  this.itemData.sequence.labId = value;
+                }
+              },
+              disabled: () => !this.itemData.sequence.hasSequence
+            },
+            {
+              type: CreateViewModifyV2TabInputType.DATE,
+              name: 'sequence[dateResult]',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT_DESCRIPTION',
+              value: {
+                get: () => this.itemData.sequence.dateResult,
+                set: (value) => {
+                  this.itemData.sequence.dateResult = value;
+                }
+              },
+              disabled: () => !this.itemData.sequence.hasSequence
+            },
+            {
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+              name: 'sequence[resultId]',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT_DESCRIPTION',
+              options: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+              value: {
+                get: () => this.itemData.sequence.resultId,
+                set: (value) => {
+                  this.itemData.sequence.resultId = value;
+                }
+              },
+              disabled: () => !this.itemData.sequence.hasSequence
+            },
+            {
+              type: CreateViewModifyV2TabInputType.TEXTAREA,
+              name: 'sequence[noSequenceReason]',
+              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
+              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON_DESCRIPTION',
+              value: {
+                get: () => this.itemData.sequence.noSequenceReason,
+                set: (value) => {
+                  this.itemData.sequence.noSequenceReason = value;
+                }
+              },
+              disabled: () => this.itemData.sequence.hasSequence
+            }
           ]
         }
       ]
