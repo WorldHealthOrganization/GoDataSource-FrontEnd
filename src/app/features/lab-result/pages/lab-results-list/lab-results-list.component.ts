@@ -29,7 +29,6 @@ import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { Constants } from '../../../../core/models/constants';
 import { TranslateService } from '@ngx-translate/core';
-import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 
 @Component({
   selector: 'app-lab-results',
@@ -327,108 +326,6 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                       ContactModel.canRestoreLabResult(this.authUser)
                     )
                   );
-              }
-            },
-
-            // Divider
-            {
-              visible: (): boolean => {
-                // visible only if at least one of the previous...
-                return this.selectedOutbreakIsActive &&
-                  (
-                    LabResultModel.canDelete(this.authUser) &&
-                    LabResultModel.canRestore(this.authUser)
-                  );
-              }
-            },
-
-            // Change result
-            {
-              label: {
-                get: () => 'LNG_PAGE_LIST_ENTITY_LAB_RESULTS_ACTION_CHANGE_RESULT'
-              },
-              action: {
-                click: (item: LabResultModel) => {
-                  this.dialogV2Service
-                    .showSideDialog({
-                      // title
-                      title: {
-                        get: () => 'LNG_PAGE_LIST_LAB_RESULTS_CHANGE_RESULT_DIALOG_TITLE'
-                      },
-
-                      // hide search bar
-                      hideInputFilter: true,
-
-                      // inputs
-                      inputs: [
-                        {
-                          type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
-                          value: item.result,
-                          name: 'result',
-                          placeholder: 'LNG_LAB_RESULT_FIELD_LABEL_RESULT',
-                          options: (this.activatedRoute.snapshot.data.labTestResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
-                        }
-                      ],
-
-                      // buttons
-                      bottomButtons: [
-                        {
-                          label: 'LNG_COMMON_BUTTON_UPDATE',
-                          type: IV2SideDialogConfigButtonType.OTHER,
-                          color: 'primary',
-                          key: 'save',
-                          disabled: (_data, handler): boolean => {
-                            return !handler.form ||
-                              handler.form.invalid ||
-                              item.result === ((handler.data.map.result as IV2SideDialogConfigInputSingleDropdown).value) as string;
-                          }
-                        }, {
-                          type: IV2SideDialogConfigButtonType.CANCEL,
-                          label: 'LNG_COMMON_BUTTON_CANCEL',
-                          color: 'text'
-                        }
-                      ]
-                    })
-                    .subscribe((response) => {
-                      // cancelled ?
-                      if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
-                        return;
-                      }
-
-                      // change entity targeted
-                      this.labResultDataService
-                        .modifyLabResult(
-                          this.selectedOutbreak.id,
-                          item.id,
-                          {
-                            result: (response.handler.data.map.result as IV2SideDialogConfigInputSingleDropdown).value
-                          }
-                        )
-                        .pipe(
-                          catchError((err) => {
-                            this.toastV2Service.error(err);
-                            return throwError(err);
-                          })
-                        )
-                        .subscribe(() => {
-                          // update our record too
-                          item.result = ((response.handler.data.map.result as IV2SideDialogConfigInputSingleDropdown).value) as string;
-
-                          // success message
-                          this.toastV2Service.success('LNG_PAGE_LIST_LAB_RESULTS_CHANGE_RESULT_SUCCESS_MESSAGE');
-
-                          // close popup
-                          response.handler.hide();
-
-                          // reload data
-                          this.needsRefreshList(true);
-                        });
-                    });
-                }
-              },
-              visible: (): boolean => {
-                return this.selectedOutbreakIsActive &&
-                  LabResultModel.canModify(this.authUser);
               }
             }
           ]

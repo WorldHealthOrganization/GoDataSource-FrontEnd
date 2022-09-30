@@ -1,6 +1,5 @@
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { Observable, throwError } from 'rxjs';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
@@ -23,7 +22,7 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 })
 export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<LabResultModel> implements OnDestroy {
   // data
-  selectedLabResults: LabResultModel[] = [];
+  private _selectedLabResults: LabResultModel[] = [];
 
   /**
    * Constructor
@@ -95,7 +94,7 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
         )
         .subscribe((labResults: LabResultModel[]) => {
           // lab results data
-          this.selectedLabResults = labResults;
+          this._selectedLabResults = labResults;
 
           // finished - no item to edit
           subscriber.next(null);
@@ -202,7 +201,7 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
               label: {
                 get: () => 'LNG_PAGE_MODIFY_LAB_RESULTS_SELECTED_CONTACTS'
               },
-              links: this.selectedLabResults.map((result) => ({
+              links: this._selectedLabResults.map((result) => ({
                 // #TODO: Some lab results do not have 'labName', is this fix with '...' okey ?
                 label: result.labName ?
                   result.labName :
@@ -367,7 +366,7 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
       finished
     ) => {
       // get selected lab results ids to pass them to qb
-      const selectedLabResultsIds: string[] = this.selectedLabResults.map((result: LabResultModel) => {
+      const selectedLabResultsIds: string[] = this._selectedLabResults.map((result: LabResultModel) => {
         return result.id;
       });
 
