@@ -1268,14 +1268,14 @@ export class RequestFilter {
       condition = _.transform(this.conditions, (result, conditionData) => {
         // this could overwrite other conditions with the same property, but since API isn't able to process multi level conditions in this case..it won't matter if we overwrite it...
         _.each(conditionData, (data, property) => {
-          result[property] = data;
+          result[property] = _.cloneDeep(data);
         });
       }, {});
     } else {
       condition = this.conditions.length === 0 ?
         {} :
         {
-          [this.operator]: this.conditions
+          [this.operator]: _.cloneDeep(this.conditions)
         };
     }
 

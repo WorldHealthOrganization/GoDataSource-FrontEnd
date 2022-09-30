@@ -1175,12 +1175,22 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       // path or method ?
       const formatType: string = typeof columnDefinition.format.type;
       if (formatType === 'string') {
-        return _.get(
+        // determine value
+        const tmpValue: any = _.get(
           valueFormat.data,
-          columnDefinition.format.type as string,
-          ''
+          columnDefinition.format.type as string
         );
 
+        // empty value ?
+        if (
+          tmpValue === undefined ||
+          tmpValue === null
+        ) {
+          return '';
+        }
+
+        // finished
+        return tmpValue;
       } else if (formatType === 'function') {
         return (columnDefinition.format.type as (any) => string)(valueFormat.data);
 
@@ -1255,9 +1265,16 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     }
 
     // default - try to translate if string
-    return valueFormat.value && typeof valueFormat.value === 'string' ?
-      this.translateService.instant(valueFormat.value) :
-      valueFormat.value;
+    return typeof valueFormat.value === 'string' ?
+      (
+        valueFormat.value ?
+          this.translateService.instant(valueFormat.value) :
+          ''
+      ) : (
+        valueFormat.value === null || valueFormat.value === undefined ?
+          '' :
+          valueFormat.value
+      );
   }
 
   /**
@@ -1286,7 +1303,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         }
 
         // retrieve url link
-        const url: string = basicColumn.link(params.data);
+        const url: string = value ?
+          basicColumn.link(params.data) :
+          undefined;
 
         // create link
         return url ?
