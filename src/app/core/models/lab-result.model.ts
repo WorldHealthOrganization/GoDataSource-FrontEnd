@@ -248,6 +248,11 @@ export class LabResultModel
   static canDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_DELETE) : false); }
 
   /**
+     * Static Permissions - IPermissionBasicBulk
+     */
+  static canBulkModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.LAB_RESULT_BULK_MODIFY) : false); }
+
+  /**
      * Static Permissions - IPermissionRestorable
      */
   static canRestore(user: UserModel): boolean { return user ? user.hasPermissions(PERMISSION.LAB_RESULT_RESTORE) : false; }
@@ -306,6 +311,11 @@ export class LabResultModel
   canCreate(user: UserModel): boolean { return LabResultModel.canCreate(user); }
   canModify(user: UserModel): boolean { return LabResultModel.canModify(user); }
   canDelete(user: UserModel): boolean { return LabResultModel.canDelete(user); }
+
+  /**
+   * Permissions - IPermissionBasicBulk
+   */
+  canBulkModify(user: UserModel): boolean { return LabResultModel.canBulkModify(user); }
 
   /**
      * Permissions - IPermissionRestorable

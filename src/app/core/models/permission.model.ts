@@ -373,6 +373,7 @@ export enum PERMISSION {
   LAB_RESULT_VIEW = 'lab_result_view',
   LAB_RESULT_CREATE = 'lab_result_create',
   LAB_RESULT_MODIFY = 'lab_result_modify',
+  LAB_RESULT_BULK_MODIFY = 'lab_result_bulk_modify',
   LAB_RESULT_DELETE = 'lab_result_delete',
   LAB_RESULT_RESTORE = 'lab_result_restore',
   LAB_RESULT_IMPORT = 'lab_result_import',
