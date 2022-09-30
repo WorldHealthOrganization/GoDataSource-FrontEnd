@@ -233,11 +233,13 @@ const routes: Routes = [
     },
     resolve: {
       outbreak: SelectedOutbreakDataResolver,
+      entity: RelationshipPersonDataResolver,
+      labName: LabNameDataResolver,
       labTestResult: LabTestResultDataResolver,
       labResultProgress: LabProgressDataResolver,
+
       labSequenceLaboratory: LabSequenceLaboratoryDataResolver,
-      labSequenceResult: LabSequenceResultDataResolver,
-      entity: RelationshipPersonDataResolver
+      labSequenceResult: LabSequenceResultDataResolver
     },
     canDeactivate: [
       PageChangeConfirmationGuard

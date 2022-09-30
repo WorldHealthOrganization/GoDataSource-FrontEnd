@@ -19,6 +19,7 @@ import { Constants } from '../../../../core/models/constants';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { CaseModel } from '../../../../core/models/case.model';
 import { ContactModel } from '../../../../core/models/contact.model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-lab-results-bulk-modify',
@@ -35,10 +36,11 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
    * Constructor
    */
   constructor(
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
-    private labResultDataService: LabResultDataService,
+    protected router: Router,
+    protected activatedRoute: ActivatedRoute,
+    protected labResultDataService: LabResultDataService,
     protected toastV2Service: ToastV2Service,
+    protected translateService: TranslateService,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
@@ -289,7 +291,11 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
               },
               links: this._selectedLabResults.map((result) => ({
                 label: result.labName ?
-                  `${result.labName} (${result.dateSampleTaken ? moment(result.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : '—'})` :
+                  `${
+                    (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[result.labName] ?
+                      this.translateService.instant((this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[result.labName].value) :
+                      '—'
+                  } (${result.dateSampleTaken ? moment(result.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) : '—'})` :
                   (
                     result.dateSampleTaken ?
                       moment(result.dateSampleTaken).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
@@ -311,10 +317,11 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
 
             // inputs
             {
-              type: CreateViewModifyV2TabInputType.TEXT,
+              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
               name: 'labName',
               placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME',
               description: () => 'LNG_LAB_RESULT_FIELD_LABEL_LAB_NAME_DESCRIPTION',
+              options: (this.activatedRoute.snapshot.data.labName as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
               value: {
                 get: () => null,
                 set: () => null
@@ -351,69 +358,70 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
                 get: () => null,
                 set: () => null
               }
-            },
-            {
-              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
-              name: 'sequence.hasSequence',
-              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE',
-              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE_DESCRIPTION',
-              value: {
-                get: () => null,
-                set: () => null
-              }
-            },
-            {
-              type: CreateViewModifyV2TabInputType.DATE,
-              name: 'sequence.dateSampleSent',
-              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
-              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT_DESCRIPTION',
-              value: {
-                get: () => null,
-                set: () => null
-              }
-            },
-            {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'sequence.labId',
-              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB',
-              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              value: {
-                get: () => null,
-                set: () => null
-              }
-            },
-            {
-              type: CreateViewModifyV2TabInputType.DATE,
-              name: 'sequence.dateResult',
-              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT',
-              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT_DESCRIPTION',
-              value: {
-                get: () => null,
-                set: () => null
-              }
-            },
-            {
-              type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
-              name: 'sequence.resultId',
-              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT',
-              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT_DESCRIPTION',
-              options: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
-              value: {
-                get: () => null,
-                set: () => null
-              }
-            },
-            {
-              type: CreateViewModifyV2TabInputType.TEXT,
-              name: 'sequence.noSequenceReason',
-              placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
-              description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON_DESCRIPTION',
-              value: {
-                get: () => null,
-                set: () => null
-              }
             }
+
+            // {
+            //   type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+            //   name: 'sequence.hasSequence',
+            //   placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE',
+            //   description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_HAS_SEQUENCE_DESCRIPTION',
+            //   value: {
+            //     get: () => null,
+            //     set: () => null
+            //   }
+            // },
+            // {
+            //   type: CreateViewModifyV2TabInputType.DATE,
+            //   name: 'sequence.dateSampleSent',
+            //   placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT',
+            //   description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_SAMPLE_SENT_DESCRIPTION',
+            //   value: {
+            //     get: () => null,
+            //     set: () => null
+            //   }
+            // },
+            // {
+            //   type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            //   name: 'sequence.labId',
+            //   placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB',
+            //   description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_LAB_DESCRIPTION',
+            //   options: (this.activatedRoute.snapshot.data.labSequenceLaboratory as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            //   value: {
+            //     get: () => null,
+            //     set: () => null
+            //   }
+            // },
+            // {
+            //   type: CreateViewModifyV2TabInputType.DATE,
+            //   name: 'sequence.dateResult',
+            //   placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT',
+            //   description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_DATE_RESULT_DESCRIPTION',
+            //   value: {
+            //     get: () => null,
+            //     set: () => null
+            //   }
+            // },
+            // {
+            //   type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            //   name: 'sequence.resultId',
+            //   placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT',
+            //   description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_RESULT_DESCRIPTION',
+            //   options: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+            //   value: {
+            //     get: () => null,
+            //     set: () => null
+            //   }
+            // },
+            // {
+            //   type: CreateViewModifyV2TabInputType.TEXT,
+            //   name: 'sequence.noSequenceReason',
+            //   placeholder: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON',
+            //   description: () => 'LNG_LAB_RESULT_FIELD_LABEL_SEQUENCE_NO_SEQUENCE_REASON_DESCRIPTION',
+            //   value: {
+            //     get: () => null,
+            //     set: () => null
+            //   }
+            // }
           ]
         }
       ]
