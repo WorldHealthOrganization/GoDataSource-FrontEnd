@@ -150,6 +150,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
 
     // remove global notifications
     this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
   }
 
   /**
@@ -198,8 +199,9 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
       // remove global notifications
       this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
 
-      // check
+      // show global notifications
       this.checkForPersonExistence();
+      this.checkForLastContactBeforeCaseOnSet();
     }
 
     // initialize relationship
@@ -1000,6 +1002,9 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
               get: () => this._relationship.contactDate,
               set: (value) => {
                 this._relationship.contactDate = value;
+
+                // check last contact before date of onset of source case
+                this.checkForLastContactBeforeCaseOnSet();
               }
             },
             maxDate: this._today,
@@ -2453,5 +2458,25 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
       },
       400
     );
+  }
+
+  /**
+   * Check if "Date of Last Contact" is before "Date of Onset" of the source case
+   */
+  private checkForLastContactBeforeCaseOnSet() {
+    if (
+      this._parentEntity instanceof CaseModel &&
+      this._parentEntity.dateOfOnset &&
+      this._relationship.contactDate &&
+      moment(this._relationship.contactDate).isBefore(moment(this._parentEntity.dateOfOnset))
+    ) {
+      this.toastV2Service.notice(
+        'LNG_CONTACT_FIELD_LABEL_LAST_CONTACT_IS_BEFORE_DATE_OF_ONSET',
+        undefined,
+        AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET
+      );
+    } else {
+      this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+    }
   }
 }
