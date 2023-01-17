@@ -719,8 +719,7 @@ export class TransmissionChainDataService {
               if (
                 node.model.type === EntityType.CASE &&
                 node.model instanceof CaseModel &&
-                node.model.classification &&
-                !legendNodeTypesMap.nodeShape[node.model.classification]
+                node.model.classification
               ) {
                 // keep the unique shape type
                 legendNodeTypesMap.nodeShape[node.model.classification] = true;
@@ -1063,29 +1062,27 @@ export class TransmissionChainDataService {
     });
 
     // remove the unrelated categories from the legend
-    const legend: any = { ...colorCriteria };
-    legend.nodeColor = { ..._.pick(legend.nodeColor, Object.keys(legendNodeTypesMap.nodeColor)) };
-    legend.nodeColorKeys = legend.nodeColorKeys.filter((type) => legendNodeTypesMap.nodeColor[type]);
+    graphData.legend = { ...colorCriteria };
+    graphData.legend.nodeColor = { ..._.pick(graphData.legend.nodeColor, Object.keys(legendNodeTypesMap.nodeColor)) };
+    graphData.legend.nodeColorKeys = graphData.legend.nodeColorKeys.filter((type) => legendNodeTypesMap.nodeColor[type]);
 
-    legend.nameColor = { ..._.pick(legend.nameColor, Object.keys(legendNodeTypesMap.nodeNameColor)) };
-    legend.nodeNameColorKeys = legend.nodeNameColorKeys.filter((type) => legendNodeTypesMap.nodeNameColor[type]);
+    graphData.legend.nameColor = { ..._.pick(graphData.legend.nameColor, Object.keys(legendNodeTypesMap.nodeNameColor)) };
+    graphData.legend.nodeNameColorKeys = graphData.legend.nodeNameColorKeys.filter((type) => legendNodeTypesMap.nodeNameColor[type]);
 
-    legend.edgeColor = { ..._.pick(legend.edgeColor, Object.keys(legendNodeTypesMap.edgeColor)) };
-    legend.edgeColorKeys = legend.edgeColorKeys.filter((type) => legendNodeTypesMap.edgeColor[type]);
+    graphData.legend.edgeColor = { ..._.pick(graphData.legend.edgeColor, Object.keys(legendNodeTypesMap.edgeColor)) };
+    graphData.legend.edgeColorKeys = graphData.legend.edgeColorKeys.filter((type) => legendNodeTypesMap.edgeColor[type]);
 
-    legend.labSequenceColor = { ..._.pick(legend.labSequenceColor, Object.keys(legendNodeTypesMap.labSequenceColor)) };
-    legend.labSequenceColorKeys = legend.labSequenceColorKeys.filter((type) => legendNodeTypesMap.labSequenceColor[type]);
+    graphData.legend.labSequenceColor = { ..._.pick(graphData.legend.labSequenceColor, Object.keys(legendNodeTypesMap.labSequenceColor)) };
+    graphData.legend.labSequenceColorKeys = graphData.legend.labSequenceColorKeys.filter((type) => legendNodeTypesMap.labSequenceColor[type]);
 
-    legend.nodeIcon = { ..._.pick(legend.nodeIcon, Object.keys(legendNodeTypesMap.nodeIcon)) };
-    legend.nodeIconKeys = legend.nodeIconKeys.filter((type) => legendNodeTypesMap.nodeIcon[type]);
+    graphData.legend.nodeIcon = { ..._.pick(graphData.legend.nodeIcon, Object.keys(legendNodeTypesMap.nodeIcon)) };
+    graphData.legend.nodeIconKeys = graphData.legend.nodeIconKeys.filter((type) => legendNodeTypesMap.nodeIcon[type]);
 
-    legend.nodeShape = { ..._.pick(legend.nodeShape, Object.keys(legendNodeTypesMap.nodeShape)) };
-    legend.nodeShapeKeys = legend.nodeShapeKeys.filter((type) => legendNodeTypesMap.nodeShape[type]);
+    graphData.legend.nodeShape = { ..._.pick(graphData.legend.nodeShape, Object.keys(legendNodeTypesMap.nodeShape)) };
+    graphData.legend.nodeShapeKeys = graphData.legend.nodeShapeKeys.filter((type) => legendNodeTypesMap.nodeShape[type]);
 
-    legend.edgeIcon = { ..._.pick(legend.edgeIcon, Object.keys(legendNodeTypesMap.edgeIcon)) };
-    legend.edgeIconKeys = legend.edgeIconKeys.filter((type) => legendNodeTypesMap.edgeIcon[type]);
-
-    graphData.legend = legend;
+    graphData.legend.edgeIcon = { ..._.pick(graphData.legend.edgeIcon, Object.keys(legendNodeTypesMap.edgeIcon)) };
+    graphData.legend.edgeIconKeys = graphData.legend.edgeIconKeys.filter((type) => legendNodeTypesMap.edgeIcon[type]);
 
     // finished
     return graphData;
