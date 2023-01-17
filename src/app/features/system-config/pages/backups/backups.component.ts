@@ -40,7 +40,7 @@ import { FormHelperService } from '../../../../core/services/helper/form-helper.
   templateUrl: './backups.component.html'
 })
 export class BackupsComponent extends ListComponent<BackupModel> implements OnDestroy {
-  // used to determine when a backup has finished so we can start the restore process...
+  // used to determine when a backup has finished, so we can start the restore process...
   private _waitForBackupIdToBeReady: string;
 
   /**
@@ -255,7 +255,7 @@ export class BackupsComponent extends ListComponent<BackupModel> implements OnDe
         label: 'LNG_BACKUP_FIELD_LABEL_DATE',
         sortable: true,
         format: {
-          type: V2ColumnFormat.DATE
+          type: V2ColumnFormat.DATETIME
         },
         filter: {
           type: V2FilterType.DATE_RANGE
