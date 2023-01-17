@@ -1610,6 +1610,9 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
         this.initGeospatialMap();
       }
 
+      // update the legend
+      this.legend = { ...this.graphElements.legend };
+
       // render
       this.renderGraph();
     });
