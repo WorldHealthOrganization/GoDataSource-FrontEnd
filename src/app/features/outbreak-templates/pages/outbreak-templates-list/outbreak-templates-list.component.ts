@@ -430,7 +430,7 @@ export class OutbreakTemplatesListComponent
       },
       {
         field: 'checkLastContactDateAgainstDateOnSet',
-        label: 'LNG_OUTBREAK_FIELD_LABEL_CHECK_LAST_CONTACT_DATE_AGAINST_DATE_ON_SET',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_CHECK_LAST_CONTACT_DATE_AGAINST_DATE_OF_ONSET',
         notVisible: true,
         format: {
           type: V2ColumnFormat.BOOLEAN
