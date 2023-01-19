@@ -19,7 +19,10 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { catchError, map, share } from 'rxjs/operators';
 import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 import { moment } from '../../../../core/helperClasses/x-moment';
-import { HotTableWrapperComponent } from '../../../../shared/components/hot-table-wrapper/hot-table-wrapper.component';
+import {
+  HotTableWrapperComponent,
+  IHotTableWrapperEvent
+} from '../../../../shared/components/hot-table-wrapper/hot-table-wrapper.component';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
@@ -34,6 +37,7 @@ import { CellProperties } from 'handsontable/settings';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { AppMessages } from '../../../../core/enums/app-messages.enum';
 
 @Component({
   selector: 'app-bulk-create-contacts',
@@ -82,6 +86,16 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
       err?: string
     }
   }[] = [];
+
+  private _warnings: {
+    dateOfOnset: string | null,
+    rows: {
+      [rowIndex: number]: true
+    }
+  } = {
+      dateOfOnset: null,
+      rows: {}
+    };
 
   contactVisualIdModel: {
     mask: string
@@ -205,6 +219,9 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
       this.outbreakSubscriber.unsubscribe();
       this.outbreakSubscriber = null;
     }
+
+    // remove global notifications
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
   }
 
   /**
@@ -530,6 +547,67 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
   /**
    * After changes
    */
+  afterChange(event: IHotTableWrapperEvent) {
+    // validate if only the feature is enabled or there are changes
+    if (
+      !event.typeSpecificData.changes ||
+      !this.selectedOutbreak.checkLastContactDateAgainstDateOnSet
+    ) {
+      return;
+    }
+
+    // get the contact date column index
+    const lastContactColumnIndex: number = this.hotTableWrapper.sheetColumns.findIndex((column) => column.property === 'relationship.contactDate');
+
+    // check if the date of onset was changed
+    let refreshWarning = false;
+    event.typeSpecificData.changes.forEach((cell) => {
+      // cell[0] - row number, cell[1] - column index, cell[2] - old value, cell[3] - new value
+      if (cell[1] !== lastContactColumnIndex) {
+        return;
+      }
+
+      // check if there is a new value
+      if (
+        cell[3] &&
+        this.relatedEntityData instanceof CaseModel &&
+        this.relatedEntityData.dateOfOnset &&
+        moment(cell[3]).isBefore(moment(this.relatedEntityData.dateOfOnset))
+      ) {
+        this._warnings.dateOfOnset = moment(this.relatedEntityData.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+        this._warnings.rows[cell[0] + 1] = true;
+
+        refreshWarning = true;
+      } else {
+        // remove the row if exists
+        if (this._warnings.rows[cell[0] + 1]) {
+          refreshWarning = true;
+          delete this._warnings.rows[cell[0] + 1];
+        }
+      }
+    });
+
+    // check if current warning the updated message should be re-displayed
+    if (refreshWarning) {
+      this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+    }
+
+    // show the updated message
+    if (Object.keys(this._warnings.rows).length) {
+      this.toastV2Service.notice(
+        'LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_WARNING_LAST_CONTACT_IS_BEFORE_DATE_OF_ONSET',
+        {
+          dateOfOnset: this._warnings.dateOfOnset,
+          rows: Object.keys(this._warnings.rows).join(', ')
+        },
+        AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET
+      );
+    }
+  }
+
+  /**
+   * After changes
+   */
   afterBecameDirty() {
     // no input to make dirty ?
     if (!this.inputForMakingFormDirty) {
@@ -622,6 +700,9 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
    * Create new Contacts
    */
   addContacts() {
+    // remove global notifications
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+
     // make sure we have the component used to validate & retrieve data
     if (!this.hotTableWrapper) {
       return;

@@ -28,12 +28,21 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { catchError, map, takeUntil } from 'rxjs/operators';
-import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
+import {
+  CreateViewModifyV2ExpandColumnType
+} from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import * as _ from 'lodash';
-import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import {
+  IV2BottomDialogConfigButtonType
+} from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { IAppFormIconButtonV2 } from '../../../../shared/forms-v2/core/app-form-icon-button-v2';
+import { AppMessages } from '../../../../core/enums/app-messages.enum';
+import { Constants } from '../../../../core/models/constants';
+import { EntityType } from '../../../../core/models/entity-type';
+import { CaseDataService } from '../../../../core/services/data/case.data.service';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-relationships-create-view-modify',
@@ -59,6 +68,16 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     [id: string]: CaseModel | ContactModel | EventModel | ContactOfContactModel
   } = {};
 
+  private _warnings: {
+    [entityId: string]: {
+      id: string,
+      name: string,
+      type: string,
+      dateOfOnset: string | null,
+    }
+  } = {};
+
+
   /**
    * Constructor
    */
@@ -70,6 +89,8 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     protected entityHelperService: EntityHelperService,
     protected dialogV2Service: DialogV2Service,
     protected router: Router,
+    protected location: Location,
+    private caseDataService: CaseDataService,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
@@ -97,6 +118,20 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
         // initialize new relationship
         this._createRelationships.push(new RelationshipModel());
 
+        // retrieve date of onset for each case
+        if (
+          this.selectedOutbreak.checkLastContactDateAgainstDateOnSet &&
+          this.isCreate &&
+          this.relationshipType === RelationshipType.EXPOSURE &&
+          item.type === EntityType.CASE
+        ) {
+          this.caseDataService
+            .getCase(this.selectedOutbreak.id, item.id)
+            .subscribe((caseDataReturned) => {
+              item['dateOfOnset'] = caseDataReturned.dateOfOnset;
+            });
+        }
+
         // map entity for easy access
         this._createEntitiesMap[item.id] = item;
       });
@@ -117,6 +152,9 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
   ngOnDestroy(): void {
     // parent
     super.onDestroy();
+
+    // remove global notifications
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
   }
 
   /**
@@ -308,6 +346,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     // view / modify ?
     if (!this.isCreate) {
       return [this.initializeTabsDetails(
+        'LNG_COMMON_MODEL_FIELD_LABEL_ID',
         'LNG_COMMON_LABEL_DETAILS',
         (property) => property,
         this.itemData
@@ -319,6 +358,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
       // since merging forms overwrites the array due to spread operator we need unique root properties
       // - fields = { ...fields, ...this.getFields(form) };
       return this.initializeTabsDetails(
+        item.id,
         item.name,
         (property) => `r_${_.camelCase(item.id)}[${item.id}][${property}]`,
         this._createRelationships[index]
@@ -330,6 +370,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
    * Initialize tab details
    */
   private initializeTabsDetails(
+    entityId: string,
     title: string,
     name: (property: string) => string,
     relationshipData: RelationshipModel
@@ -370,6 +411,13 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
               get: () => relationshipData.contactDate,
               set: (value) => {
                 relationshipData.contactDate = value;
+
+                // validate against date of onset
+                this.checkForLastContactBeforeCaseOnSet(
+                  entityId,
+                  title,
+                  relationshipData.contactDate
+                );
               }
             },
             maxDate: this._today,
@@ -827,5 +875,98 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
         }
       }] :
       undefined;
+  }
+
+  /**
+   * Check if "Date of Last Contact" is before "Date of Onset" of the source case
+   */
+  private checkForLastContactBeforeCaseOnSet(
+    entityId: string,
+    entityName: string,
+    contactDate: Moment | string
+  ) {
+    // validate if only the feature is enabled
+    if (!this.selectedOutbreak.checkLastContactDateAgainstDateOnSet) {
+      return;
+    }
+    // get the date of onset of the case
+    let dateOfOnset: Moment | string;
+
+    // get the source entity
+    const sourceEntity = this.relationshipType === RelationshipType.CONTACT ?
+      this._entity :
+      this.isCreate ?
+        this._createEntitiesMap[entityId] :
+        this.itemData.relatedEntity(this._entity.id)?.model;
+
+    // validate contact date
+    if (
+      sourceEntity instanceof CaseModel &&
+      sourceEntity.dateOfOnset &&
+      contactDate &&
+      moment(contactDate).isBefore(moment(sourceEntity.dateOfOnset))
+    ) {
+      this._warnings[this.isCreate ? entityId : sourceEntity.id] = {
+        id: this.isCreate ? entityId : sourceEntity.id,
+        name: this.isCreate ? entityName : sourceEntity.name,
+        type: this.isCreate ? this._createEntitiesMap[entityId]['type'] : sourceEntity.type,
+        dateOfOnset: moment(dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
+      };
+    } else {
+      // remove if exists
+      delete this._warnings[this.isCreate ? entityId : sourceEntity.id];
+    }
+
+    // hide current warning to re-display the updated message
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+
+    // show the updated message
+    if (Object.keys(this._warnings).length) {
+      this.toastV2Service.notice(
+        this.isCreate ?
+          (
+            this.relationshipType === RelationshipType.CONTACT ?
+              'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_WARNING_CONTACT_LAST_CONTACT_IS_BEFORE_DATE_OF_ONSET' :
+              'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_WARNING_EXPOSURE_LAST_CONTACT_IS_BEFORE_DATE_OF_ONSET') :
+          (
+            this.relationshipType === RelationshipType.CONTACT ?
+              'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_WARNING_CONTACT_LAST_CONTACT_IS_BEFORE_DATE_OF_ONSET' :
+              'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_WARNING_EXPOSURE_LAST_CONTACT_IS_BEFORE_DATE_OF_ONSET'
+          ),
+        {
+          // for same case get the first date of onset (modify relatioship and create contacts)
+          dateOfOnset: this._warnings[Object.keys(this._warnings)[0]].dateOfOnset,
+          entities: Object.values(this._warnings).map((item) => {
+            // check rights
+            if (
+              (
+                this.isCreate && this.isCreate &&
+                this.relationshipType === RelationshipType.CONTACT
+              ) || (
+                item.type === EntityType.CONTACT &&
+                !ContactModel.canView(this.authUser)
+              ) || (
+                item.type === EntityType.CASE &&
+                !CaseModel.canView(this.authUser)
+              )
+            ) {
+              return `${item.name} (${this.translateService.instant(item.type)})`;
+            }
+
+            // create url
+            const url: string = `${item.type === EntityType.CONTACT ? '/contacts' : '/cases'}/${item.id}/view`;
+
+            // finished
+            const additionalInfo = this.isCreate && this.relationshipType === RelationshipType.EXPOSURE ?
+              this.translateService.instant('LNG_ENTITY_FIELD_LABEL_DATE_OF_ONSET') + ': ' + item.dateOfOnset :
+              '';
+
+            return `<br><a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.name} (${this.translateService.instant(item.type)}) ${additionalInfo}</span></a>`;
+          })
+            .join(', ')
+        },
+        AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET
+      );
+    }
   }
 }
