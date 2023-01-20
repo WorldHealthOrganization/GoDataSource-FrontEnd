@@ -934,17 +934,14 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
               'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_WARNING_EXPOSURE_LAST_CONTACT_IS_BEFORE_DATE_OF_ONSET'
           ),
         {
-          // for same case get the first date of onset (modify relatioship and create contacts)
+          // for same case get the first date of onset (modify relationship and create contacts)
           dateOfOnset: this._warnings[Object.keys(this._warnings)[0]].dateOfOnset,
           entities: Object.values(this._warnings).map((item) => {
             // check rights
             if (
               (
-                this.isCreate && this.isCreate &&
+                this.isCreate &&
                 this.relationshipType === RelationshipType.CONTACT
-              ) || (
-                item.type === EntityType.CONTACT &&
-                !ContactModel.canView(this.authUser)
               ) || (
                 item.type === EntityType.CASE &&
                 !CaseModel.canView(this.authUser)
@@ -954,7 +951,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
             }
 
             // create url
-            const url: string = `${item.type === EntityType.CONTACT ? '/contacts' : '/cases'}/${item.id}/view`;
+            const url: string = `/cases/${item.id}/view`;
 
             // finished
             const additionalInfo = this.isCreate && this.relationshipType === RelationshipType.EXPOSURE ?
