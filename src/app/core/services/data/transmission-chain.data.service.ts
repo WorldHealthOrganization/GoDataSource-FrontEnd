@@ -34,6 +34,7 @@ export interface IConvertChainToGraphElements {
   caseNodesWithoutDates: any[];
   contactNodesWithoutDates: any[];
   eventNodesWithoutDates: any[];
+  legend: any;
 }
 
 @Injectable()
@@ -459,7 +460,41 @@ export class TransmissionChainDataService {
       edges: [],
       caseNodesWithoutDates: [],
       contactNodesWithoutDates: [],
-      eventNodesWithoutDates: []
+      eventNodesWithoutDates: [],
+      legend: {}
+    };
+
+    // map chain legend node types
+    const legendNodeTypesMap: {
+      nodeColor: {
+        [categoryType: string]: true // ex: Entity Type, Occupation, Gender
+      },
+      nodeNameColor: {
+        [categoryType: string]: true // ex: Age, Gender, Occupation
+      }
+      nodeIcon: {
+        [categoryType: string]: true // ex: Occupation, Outcome, Risk Level
+      },
+      nodeShape: {
+        [categoryType: string]: true // ex: Classification, Entity Type
+      },
+      edgeColor: {
+        [categoryType: string]: true // ex: Cluster, Context of Transmission
+      },
+      edgeIcon: {
+        [categoryType: string]: true // ex: Cluster, Context of Exposure
+      },
+      labSequenceColor: {
+        [categoryType: string]: true
+      },
+    } = {
+      nodeColor: {},
+      nodeNameColor: {},
+      edgeColor: {},
+      labSequenceColor: {},
+      nodeIcon: {},
+      nodeShape: {},
+      edgeIcon: {}
     };
 
     const selectedNodeIds: {
@@ -596,6 +631,9 @@ export class TransmissionChainDataService {
           // set node color
           if (!_.isEmpty(colorCriteria.nodeColor)) {
             if (colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]]) {
+              // keep the unique classification type
+              legendNodeTypesMap.nodeColor[node.model[colorCriteria.nodeColorField]] = true;
+
               // set node color
               nodeData.nodeColor = colorCriteria.nodeColor[node.model[colorCriteria.nodeColorField]];
 
@@ -634,6 +672,9 @@ export class TransmissionChainDataService {
                 colorCriteria.labSequenceColor[nodeLabSequenceResultId] :
                 Constants.DEFAULT_COLOR_CHAINS;
 
+              // keep the unique lab sequence result type
+              legendNodeTypesMap.labSequenceColor[nodeLabSequenceResultId] = true;
+
               // display sequence accordingly
               nodeData.backgroundFill = 'radial-gradient';
 
@@ -651,6 +692,9 @@ export class TransmissionChainDataService {
           // set node label color
           if (!_.isEmpty(colorCriteria.nodeNameColor)) {
             if (colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]]) {
+              // keep the unique classification type
+              legendNodeTypesMap.nodeNameColor[node.model[colorCriteria.nodeNameColorField]] = true;
+
               nodeData.nodeNameColor = colorCriteria.nodeNameColor[node.model[colorCriteria.nodeNameColorField]];
             }
           }
@@ -658,14 +702,29 @@ export class TransmissionChainDataService {
           // set node icon
           if (!_.isEmpty(colorCriteria.nodeIcon)) {
             if (colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]]) {
+              // keep the unique icon type
+              legendNodeTypesMap.nodeIcon[node.model[colorCriteria.nodeIconField]] = true;
+
               nodeData.picture = colorCriteria.nodeIcon[node.model[colorCriteria.nodeIconField]];
             }
           }
           // set node shape
           if (!_.isEmpty(colorCriteria.nodeShape)) {
             if (colorCriteria.nodeShapeField === Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.TYPE.value) {
+              // keep the unique shape type
+              legendNodeTypesMap.nodeShape[node.type] = true;
+
               nodeData.setNodeShapeType(node);
             } else if (colorCriteria.nodeShapeField === Constants.TRANSMISSION_CHAIN_NODE_SHAPE_CRITERIA_OPTIONS.CLASSIFICATION.value) {
+              if (
+                node.model.type === EntityType.CASE &&
+                node.model instanceof CaseModel &&
+                node.model.classification
+              ) {
+                // keep the unique shape type
+                legendNodeTypesMap.nodeShape[node.model.classification] = true;
+              }
+
               nodeData.setNodeShapeClassification(node);
             }
           }
@@ -896,6 +955,9 @@ export class TransmissionChainDataService {
       // set colors
       if (!_.isEmpty(colorCriteria.edgeColor)) {
         if (colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]]) {
+          // keep the unique certainty level type
+          legendNodeTypesMap.edgeColor[relationship[colorCriteria.edgeColorField]] = true;
+
           graphEdge.edgeColor = colorCriteria.edgeColor[relationship[colorCriteria.edgeColorField]];
         }
       }
@@ -971,11 +1033,16 @@ export class TransmissionChainDataService {
       }
 
       // set edge icon
+      // keep also the icon type
       if (colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.SOCIAL_RELATIONSHIP_TYPE.value) {
+        legendNodeTypesMap.edgeIcon[relationship.socialRelationshipTypeId] = true;
+
         graphEdge.setEdgeIconContextOfTransmission(relationship);
         graphEdge.fontFamily = 'Material Icons';
 
       } else if (colorCriteria.edgeIconField === Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.EXPOSURE_TYPE.value) {
+        legendNodeTypesMap.edgeIcon[relationship.exposureTypeId] = true;
+
         graphEdge.setEdgeIconExposureType(relationship);
         graphEdge.fontFamily = 'Material Icons';
       } else if (
@@ -984,6 +1051,8 @@ export class TransmissionChainDataService {
         clusterIconMap &&
         clusterIconMap[relationship.clusterId]
       ) {
+        legendNodeTypesMap.edgeIcon[relationship.clusterId] = true;
+
         graphEdge.label = clusterIconMap[relationship.clusterId];
         graphEdge.fontFamily = 'Material Icons';
       }
@@ -991,6 +1060,29 @@ export class TransmissionChainDataService {
       // add edge
       graphData.edges.push({ data: graphEdge });
     });
+
+    // remove the unrelated categories from the legend
+    graphData.legend = { ...colorCriteria };
+    graphData.legend.nodeColor = { ..._.pick(graphData.legend.nodeColor, Object.keys(legendNodeTypesMap.nodeColor)) };
+    graphData.legend.nodeColorKeys = graphData.legend.nodeColorKeys.filter((type) => legendNodeTypesMap.nodeColor[type]);
+
+    graphData.legend.nameColor = { ..._.pick(graphData.legend.nameColor, Object.keys(legendNodeTypesMap.nodeNameColor)) };
+    graphData.legend.nodeNameColorKeys = graphData.legend.nodeNameColorKeys.filter((type) => legendNodeTypesMap.nodeNameColor[type]);
+
+    graphData.legend.edgeColor = { ..._.pick(graphData.legend.edgeColor, Object.keys(legendNodeTypesMap.edgeColor)) };
+    graphData.legend.edgeColorKeys = graphData.legend.edgeColorKeys.filter((type) => legendNodeTypesMap.edgeColor[type]);
+
+    graphData.legend.labSequenceColor = { ..._.pick(graphData.legend.labSequenceColor, Object.keys(legendNodeTypesMap.labSequenceColor)) };
+    graphData.legend.labSequenceColorKeys = graphData.legend.labSequenceColorKeys.filter((type) => legendNodeTypesMap.labSequenceColor[type]);
+
+    graphData.legend.nodeIcon = { ..._.pick(graphData.legend.nodeIcon, Object.keys(legendNodeTypesMap.nodeIcon)) };
+    graphData.legend.nodeIconKeys = graphData.legend.nodeIconKeys.filter((type) => legendNodeTypesMap.nodeIcon[type]);
+
+    graphData.legend.nodeShape = { ..._.pick(graphData.legend.nodeShape, Object.keys(legendNodeTypesMap.nodeShape)) };
+    graphData.legend.nodeShapeKeys = graphData.legend.nodeShapeKeys.filter((type) => legendNodeTypesMap.nodeShape[type]);
+
+    graphData.legend.edgeIcon = { ..._.pick(graphData.legend.edgeIcon, Object.keys(legendNodeTypesMap.edgeIcon)) };
+    graphData.legend.edgeIconKeys = graphData.legend.edgeIconKeys.filter((type) => legendNodeTypesMap.edgeIcon[type]);
 
     // finished
     return graphData;
