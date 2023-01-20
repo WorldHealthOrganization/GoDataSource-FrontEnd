@@ -574,6 +574,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
       // check if there is a new value
       if (
         cell[3] &&
+        moment(cell[3]).isValid() &&
         this.relatedEntityData instanceof CaseModel &&
         this.relatedEntityData.dateOfOnset &&
         moment(cell[3]).isBefore(moment(this.relatedEntityData.dateOfOnset))

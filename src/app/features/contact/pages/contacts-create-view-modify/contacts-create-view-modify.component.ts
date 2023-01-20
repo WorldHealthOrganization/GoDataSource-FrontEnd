@@ -2473,6 +2473,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
     if (
       (this._parentEntity as CaseModel)?.dateOfOnset &&
       this._relationship.contactDate &&
+      moment(this._relationship.contactDate).isValid() &&
       moment(this._relationship.contactDate).isBefore(moment((this._parentEntity as CaseModel).dateOfOnset))
     ) {
       this.toastV2Service.notice(

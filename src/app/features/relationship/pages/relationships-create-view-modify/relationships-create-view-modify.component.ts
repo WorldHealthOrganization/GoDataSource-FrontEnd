@@ -28,20 +28,15 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { catchError, map, takeUntil } from 'rxjs/operators';
-import {
-  CreateViewModifyV2ExpandColumnType
-} from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
+import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RequestFilterGenerator } from '../../../../core/helperClasses/request-query-builder';
 import { ClusterModel } from '../../../../core/models/cluster.model';
 import * as _ from 'lodash';
-import {
-  IV2BottomDialogConfigButtonType
-} from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { IAppFormIconButtonV2 } from '../../../../shared/forms-v2/core/app-form-icon-button-v2';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { Constants } from '../../../../core/models/constants';
 import { EntityType } from '../../../../core/models/entity-type';
-import { CaseDataService } from '../../../../core/services/data/case.data.service';
 import { Location } from '@angular/common';
 
 @Component({
@@ -68,14 +63,21 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     [id: string]: CaseModel | ContactModel | EventModel | ContactOfContactModel
   } = {};
 
+  // warning messages
   private _warnings: {
-    [entityId: string]: {
-      id: string,
-      name: string,
-      type: string,
-      dateOfOnset: string | null,
+    sourceDateOfOnset: string | null,
+    entities: {
+      [entityId: string]: {
+        id: string,
+        name: string,
+        type: string,
+        dateOfOnset: string | null,
+      }
     }
-  } = {};
+  } = {
+      sourceDateOfOnset: null,
+      entities: {}
+    };
 
 
   /**
@@ -90,7 +92,6 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     protected dialogV2Service: DialogV2Service,
     protected router: Router,
     protected location: Location,
-    private caseDataService: CaseDataService,
     authDataService: AuthDataService,
     renderer2: Renderer2,
     redirectService: RedirectService
@@ -117,20 +118,6 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
       (this._createEntities || []).forEach((item) => {
         // initialize new relationship
         this._createRelationships.push(new RelationshipModel());
-
-        // retrieve date of onset for each case
-        if (
-          this.selectedOutbreak.checkLastContactDateAgainstDateOnSet &&
-          this.isCreate &&
-          this.relationshipType === RelationshipType.EXPOSURE &&
-          item.type === EntityType.CASE
-        ) {
-          this.caseDataService
-            .getCase(this.selectedOutbreak.id, item.id)
-            .subscribe((caseDataReturned) => {
-              item['dateOfOnset'] = caseDataReturned.dateOfOnset;
-            });
-        }
 
         // map entity for easy access
         this._createEntitiesMap[item.id] = item;
@@ -889,8 +876,6 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     if (!this.selectedOutbreak.checkLastContactDateAgainstDateOnSet) {
       return;
     }
-    // get the date of onset of the case
-    let dateOfOnset: Moment | string;
 
     // get the source entity
     const sourceEntity = this.relationshipType === RelationshipType.CONTACT ?
@@ -901,42 +886,47 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
 
     // validate contact date
     if (
-      sourceEntity?.type === EntityType.CASE &&
-      sourceEntity['dateOfOnset'] &&
+      (sourceEntity as CaseModel)?.dateOfOnset &&
       contactDate &&
-      moment(contactDate).isBefore(moment(sourceEntity['dateOfOnset']))
+      moment(contactDate).isValid() &&
+      moment(contactDate).isBefore(moment((sourceEntity as CaseModel).dateOfOnset))
     ) {
-      this._warnings[this.isCreate ? entityId : sourceEntity.id] = {
+      // when new contacts are added keep the source date of onset
+      if (RelationshipType.CONTACT) {
+        this._warnings.sourceDateOfOnset = moment((sourceEntity as CaseModel).dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+      }
+
+      this._warnings.entities[this.isCreate ? entityId : sourceEntity.id] = {
         id: this.isCreate ? entityId : sourceEntity.id,
         name: this.isCreate ? entityName : sourceEntity.name,
-        type: this.isCreate ? this._createEntitiesMap[entityId]['type'] : sourceEntity.type,
-        dateOfOnset: moment(dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
+        type: this.isCreate ? (this._createEntitiesMap[entityId] as CaseModel).type : sourceEntity.type,
+        dateOfOnset: moment((sourceEntity as CaseModel).dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
       };
     } else {
       // remove if exists
-      delete this._warnings[this.isCreate ? entityId : sourceEntity.id];
+      delete this._warnings.entities[this.isCreate ? entityId : sourceEntity.id];
     }
 
     // hide current warning to re-display the updated message
     this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
 
     // show the updated message
-    if (Object.keys(this._warnings).length) {
+    if (Object.keys(this._warnings.entities).length) {
       this.toastV2Service.notice(
         this.isCreate ?
           (
             this.relationshipType === RelationshipType.CONTACT ?
               'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_WARNING_CONTACT_LAST_CONTACT_IS_BEFORE_DATE_OF_ONSET' :
-              'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_WARNING_EXPOSURE_LAST_CONTACT_IS_BEFORE_DATE_OF_ONSET') :
-          (
+              'LNG_PAGE_CREATE_ENTITY_RELATIONSHIP_WARNING_EXPOSURE_LAST_CONTACT_IS_BEFORE_DATE_OF_ONSET'
+          ) : (
             this.relationshipType === RelationshipType.CONTACT ?
               'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_WARNING_CONTACT_LAST_CONTACT_IS_BEFORE_DATE_OF_ONSET' :
               'LNG_PAGE_MODIFY_ENTITY_RELATIONSHIP_WARNING_EXPOSURE_LAST_CONTACT_IS_BEFORE_DATE_OF_ONSET'
           ),
         {
           // for same case get the first date of onset (modify relationship and create contacts)
-          dateOfOnset: this._warnings[Object.keys(this._warnings)[0]].dateOfOnset,
-          entities: Object.values(this._warnings).map((item) => {
+          dateOfOnset: this._warnings.sourceDateOfOnset,
+          entities: Object.values(this._warnings.entities).map((item) => {
             // check rights
             if (
               (
@@ -958,6 +948,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
               this.translateService.instant('LNG_ENTITY_FIELD_LABEL_DATE_OF_ONSET') + ': ' + item.dateOfOnset :
               '';
 
+            // return entity as a link
             return `<br><a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.name} (${this.translateService.instant(item.type)}) ${additionalInfo}</span></a>`;
           })
             .join(', ')
