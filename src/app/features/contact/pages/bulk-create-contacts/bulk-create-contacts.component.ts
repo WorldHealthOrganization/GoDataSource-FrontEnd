@@ -587,12 +587,12 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
       }
     });
 
-    // check if current warning the updated message should be re-displayed
+    // hide previous message if the warning message was updated
     if (refreshWarning) {
       this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
     }
 
-    // show the updated message
+    // show the warning message
     if (Object.keys(this._warnings.rows).length) {
       this.toastV2Service.notice(
         'LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_WARNING_LAST_CONTACT_IS_BEFORE_DATE_OF_ONSET',
