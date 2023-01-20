@@ -901,7 +901,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
 
     // validate contact date
     if (
-      sourceEntity.type === EntityType.CASE &&
+      sourceEntity?.type === EntityType.CASE &&
       sourceEntity['dateOfOnset'] &&
       contactDate &&
       moment(contactDate).isBefore(moment(sourceEntity['dateOfOnset']))

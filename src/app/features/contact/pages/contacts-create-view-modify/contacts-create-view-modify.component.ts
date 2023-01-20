@@ -2465,7 +2465,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
    */
   private checkForLastContactBeforeCaseOnSet() {
     if (
-      this._parentEntity.type === EntityType.CASE &&
+      this._parentEntity?.type === EntityType.CASE &&
       this._parentEntity['dateOfOnset'] &&
       this._relationship.contactDate &&
       moment(this._relationship.contactDate).isBefore(moment(this._parentEntity['dateOfOnset']))
