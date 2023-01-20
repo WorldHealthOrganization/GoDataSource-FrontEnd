@@ -46,6 +46,9 @@ import { AppMessages } from '../../../../core/enums/app-messages.enum';
   styleUrls: ['./bulk-create-contacts.component.scss']
 })
 export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements OnInit, OnDestroy {
+  // constants
+  private static readonly COLUMN_PROPERTY_LAST_CONTACT: string = 'relationship.contactDate';
+
   // breadcrumbs
   breadcrumbs: IV2Breadcrumb[] = [];
 
@@ -474,7 +477,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         null,
         moment())
         .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE')
-        .setProperty(Constants.SHEET_TABLE_COLUMN_PROPERTIES.LAST_CONTACT)
+        .setProperty(BulkCreateContactsComponent.COLUMN_PROPERTY_LAST_CONTACT)
         .setRequired(),
       new DropdownSheetColumn()
         .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL')
@@ -558,7 +561,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     }
 
     // get the contact date column index
-    const lastContactColumnIndex: number = this.hotTableWrapper.sheetColumns.findIndex((column) => column.property === Constants.SHEET_TABLE_COLUMN_PROPERTIES.LAST_CONTACT);
+    const lastContactColumnIndex: number = this.hotTableWrapper.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_LAST_CONTACT);
 
     // check if the date of onset was changed
     let refreshWarning = false;
