@@ -169,7 +169,23 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
   /**
    * Data initialized
    */
-  protected initializedData(): void {}
+  protected initializedData(): void {
+    // validate Last Contact Date against Date of Onset
+    if (
+      this.isView ||
+      this.isModify
+    ) {
+      // remove global notifications
+      this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+
+      // show global notifications
+      this.checkForLastContactBeforeCaseOnSet(
+        this._entity.id,
+        this._entity.name,
+        this.itemData.contactDate
+      );
+    }
+  }
 
   /**
    * Initialize page title

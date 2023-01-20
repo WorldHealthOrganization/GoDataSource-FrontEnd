@@ -201,7 +201,6 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
 
       // show global notifications
       this.checkForPersonExistence();
-      this.checkForLastContactBeforeCaseOnSet();
     }
 
     // initialize relationship
