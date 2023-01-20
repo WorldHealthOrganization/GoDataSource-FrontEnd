@@ -75,6 +75,13 @@ export class OutbreakTemplateModel
         sortable: true
       },
       {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'checkLastContactDateAgainstDateOnSet',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_CHECK_LAST_CONTACT_DATE_AGAINST_DATE_OF_ONSET',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'generateFollowUpsTeamAssignmentAlgorithm',
         label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM',

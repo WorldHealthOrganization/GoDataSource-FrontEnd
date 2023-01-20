@@ -1129,6 +1129,11 @@ export class Constants {
     }
   };
 
+  // hot table wrapper
+  static SHEET_TABLE_COLUMN_PROPERTIES = {
+    'LAST_CONTACT': 'relationship.contactDate'
+  };
+
   /**
      * Today date
      */

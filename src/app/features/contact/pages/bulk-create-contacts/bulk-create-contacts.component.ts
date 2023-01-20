@@ -87,6 +87,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     }
   }[] = [];
 
+  // warning messages
   private _warnings: {
     dateOfOnset: string | null,
     rows: {
@@ -473,7 +474,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         null,
         moment())
         .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE')
-        .setProperty('relationship.contactDate')
+        .setProperty(Constants.SHEET_TABLE_COLUMN_PROPERTIES.LAST_CONTACT)
         .setRequired(),
       new DropdownSheetColumn()
         .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL')
@@ -557,7 +558,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     }
 
     // get the contact date column index
-    const lastContactColumnIndex: number = this.hotTableWrapper.sheetColumns.findIndex((column) => column.property === 'relationship.contactDate');
+    const lastContactColumnIndex: number = this.hotTableWrapper.sheetColumns.findIndex((column) => column.property === Constants.SHEET_TABLE_COLUMN_PROPERTIES.LAST_CONTACT);
 
     // check if the date of onset was changed
     let refreshWarning = false;
@@ -700,9 +701,6 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
    * Create new Contacts
    */
   addContacts() {
-    // remove global notifications
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
-
     // make sure we have the component used to validate & retrieve data
     if (!this.hotTableWrapper) {
       return;

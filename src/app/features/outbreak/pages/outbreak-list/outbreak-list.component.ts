@@ -959,6 +959,7 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
       'id',
       'name',
       'disease',
+      'checkLastContactDateAgainstDateOnSet',
       'countries',
       'reportingGeographicalLevelId',
       'startDate',

@@ -115,6 +115,13 @@ export class OutbreakModel
         sortable: true
       },
       {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'checkLastContactDateAgainstDateOnSet',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_CHECK_LAST_CONTACT_DATE_AGAINST_DATE_OF_ONSET',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
         type: V2AdvancedFilterType.MULTISELECT,
         field: 'countries.id',
         label: 'LNG_OUTBREAK_FIELD_LABEL_COUNTRIES',

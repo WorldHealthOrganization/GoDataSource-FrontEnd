@@ -2464,21 +2464,21 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
    * Check if "Date of Last Contact" is before "Date of Onset" of the source case
    */
   private checkForLastContactBeforeCaseOnSet() {
-    if (
-      this._parentEntity?.type === EntityType.CASE &&
-      this._parentEntity['dateOfOnset'] &&
-      this._relationship.contactDate &&
-      moment(this._relationship.contactDate).isBefore(moment(this._parentEntity['dateOfOnset']))
-    ) {
-      // validate if only the feature is enabled
-      if (!this.selectedOutbreak.checkLastContactDateAgainstDateOnSet) {
-        return;
-      }
+    // return if the feature is disabled
+    if (!this.selectedOutbreak.checkLastContactDateAgainstDateOnSet) {
+      return;
+    }
 
+    // validate contact date
+    if (
+      (this._parentEntity as CaseModel).dateOfOnset &&
+      this._relationship.contactDate &&
+      moment(this._relationship.contactDate).isBefore(moment((this._parentEntity as CaseModel).dateOfOnset))
+    ) {
       this.toastV2Service.notice(
         'LNG_PAGE_CREATE_CONTACT_WARNING_LAST_CONTACT_IS_BEFORE_DATE_OF_ONSET',
         {
-          dateOfOnset: moment(this._parentEntity['dateOfOnset']).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
+          dateOfOnset: moment((this._parentEntity as CaseModel).dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
         },
         AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET
       );
