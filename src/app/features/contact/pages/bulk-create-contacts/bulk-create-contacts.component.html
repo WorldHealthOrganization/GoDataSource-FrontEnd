@@ -53,7 +53,8 @@
           [sheetColumns]="sheetColumns"
           (afterBecameDirty)="afterBecameDirty()"
           [startRows]="20"
-          [minSpareRows]="1">
+          [minSpareRows]="1"
+          (afterChange)="afterChange($event)">
         </app-hot-table-wrapper>
       </div>
 

@@ -150,6 +150,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
 
     // remove global notifications
     this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
   }
 
   /**
@@ -198,7 +199,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
       // remove global notifications
       this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
 
-      // check
+      // show global notifications
       this.checkForPersonExistence();
     }
 
@@ -1000,6 +1001,9 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
               get: () => this._relationship.contactDate,
               set: (value) => {
                 this._relationship.contactDate = value;
+
+                // check last contact before date of onset of source case
+                this.checkForLastContactBeforeCaseOnSet();
               }
             },
             maxDate: this._today,
@@ -2453,5 +2457,33 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
       },
       400
     );
+  }
+
+  /**
+   * Check if "Date of Last Contact" is before "Date of Onset" of the source case
+   */
+  private checkForLastContactBeforeCaseOnSet() {
+    // return if the feature is disabled
+    if (!this.selectedOutbreak.checkLastContactDateAgainstDateOnSet) {
+      return;
+    }
+
+    // validate contact date
+    if (
+      (this._parentEntity as CaseModel)?.dateOfOnset &&
+      this._relationship.contactDate &&
+      moment(this._relationship.contactDate).isValid() &&
+      moment(this._relationship.contactDate).isBefore(moment((this._parentEntity as CaseModel).dateOfOnset))
+    ) {
+      this.toastV2Service.notice(
+        'LNG_PAGE_CREATE_CONTACT_WARNING_LAST_CONTACT_IS_BEFORE_DATE_OF_ONSET',
+        {
+          dateOfOnset: moment((this._parentEntity as CaseModel).dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
+        },
+        AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET
+      );
+    } else {
+      this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+    }
   }
 }
