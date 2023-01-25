@@ -487,14 +487,16 @@ export class TransmissionChainDataService {
       labSequenceColor: {
         [categoryType: string]: true
       },
+      hasMoreVariantsStrains: boolean,
     } = {
       nodeColor: {},
       nodeNameColor: {},
-      edgeColor: {},
-      labSequenceColor: {},
       nodeIcon: {},
       nodeShape: {},
-      edgeIcon: {}
+      edgeColor: {},
+      edgeIcon: {},
+      labSequenceColor: {},
+      hasMoreVariantsStrains: false
     };
 
     const selectedNodeIds: {
@@ -680,6 +682,7 @@ export class TransmissionChainDataService {
 
               // has more ?
               if (node.labResults.length > 1) {
+                colorCriteria.hasMoreVariantsStrains = true;
                 nodeData.backgroundFillStopColors = `${Constants.DEFAULT_GRAPH_NODE_HAS_MORE_LAB_SEQ_COLOR} ${Constants.DEFAULT_GRAPH_NODE_MATCH_FILTER_COLOR} ${nodeLabSequenceColor} ${nodeLabSequenceColor} ${nodeData.nodeColor} ${nodeData.nodeColor}`;
                 nodeData.backgroundFillStopPositions = '0% 10% 12% 28% 30% 100%';
               } else {

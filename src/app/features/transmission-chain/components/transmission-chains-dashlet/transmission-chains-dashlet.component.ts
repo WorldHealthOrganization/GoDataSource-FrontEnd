@@ -239,6 +239,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     nodeColor: {},
     labSequenceColor: {},
     labSequenceColorKeys: [],
+    hasMoreVariantsStrains: false,
     nodeNameColor: {},
     nodeIcon: {},
     nodeNameColorAdditionalInfo: {
@@ -1090,6 +1091,7 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     this.legend.nodeColor = {};
     this.legend.nodeColorKeys = [];
     this.legend.labSequenceColor = {};
+    this.legend.hasMoreVariantsStrains = false;
     this.legend.nodeNameColor = {};
     this.legend.nodeNameColorKeys = [];
     this.legend.edgeColor = {};

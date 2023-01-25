@@ -276,6 +276,7 @@
 
           <!-- Circle -->
           <div
+            *ngIf="advancedFiltersApplied?.appliedFilters?.length"
             fxGrow="0"
             class="matches-filter"
             [style.borderColor]="Constants.DEFAULT_GRAPH_NODE_MATCH_FILTER_COLOR">
@@ -284,12 +285,14 @@
 
           <!-- details -->
           <div
+            *ngIf="advancedFiltersApplied?.appliedFilters?.length"
             fxFlex>
             {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_MATCH_FILTER_TITLE' | translate}}
           </div>
 
           <!-- help -->
           <app-fancy-tooltip
+            *ngIf="advancedFiltersApplied?.appliedFilters?.length"
             fxGrow="0"
             tooltip="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_MATCH_FILTER_TITLE_DESCRIPTION"></app-fancy-tooltip>
         </div>
@@ -406,17 +409,20 @@
             class="legend-item"
             fxLayout="row" fxLayoutAlign="start center">
             <div
+              *ngIf="legend.hasMoreVariantsStrains"
               fxGrow="0"
               class="legend-color"
               [style.background-color]="Constants.DEFAULT_GRAPH_NODE_HAS_MORE_LAB_SEQ_COLOR">
             </div>
             <div
+              *ngIf="legend.hasMoreVariantsStrains"
               fxFlex>
               {{'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_HAS_MORE_COLOR_TITLE' | translate}}
             </div>
 
             <!-- help -->
             <app-fancy-tooltip
+              *ngIf="legend.hasMoreVariantsStrains"
               fxGrow="0"
               tooltip="LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_NODE_LAB_SEQ_HAS_MORE_COLOR_TITLE_DESCRIPTION"></app-fancy-tooltip>
           </div>
