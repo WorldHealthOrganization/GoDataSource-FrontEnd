@@ -139,6 +139,24 @@ export class ImportExportDataService {
       delete data.includeCaseFields;
     }
 
+    // add flag includePersonExposureFields
+    if (!_.isUndefined(data.includePersonExposureFields)) {
+      queryBuilder.filter.flag(
+        'includePersonExposureFields',
+        data.includePersonExposureFields
+      );
+      delete data.includePersonExposureFields;
+    }
+
+    // add flag retrieveOldestExposure
+    if (!_.isUndefined(data.retrieveOldestExposure)) {
+      queryBuilder.filter.flag(
+        'retrieveOldestExposure',
+        data.retrieveOldestExposure
+      );
+      delete data.retrieveOldestExposure;
+    }
+
     // add other custom fields caused by API inconsistencies...
     _.each(data, (value: any, key: string) => {
       completeURL += `&${key}=` + (_.isString(value) || _.isNumber(value) ? value : JSON.stringify(value));
@@ -251,6 +269,24 @@ export class ImportExportDataService {
         data.includeCaseFields
       );
       delete data.includeCaseFields;
+    }
+
+    // add flag includePersonExposureFields
+    if (!_.isUndefined(data.includePersonExposureFields)) {
+      queryBuilder.filter.flag(
+        'includePersonExposureFields',
+        data.includePersonExposureFields
+      );
+      delete data.includePersonExposureFields;
+    }
+
+    // add flag retrieveOldestExposure
+    if (!_.isUndefined(data.retrieveOldestExposure)) {
+      queryBuilder.filter.flag(
+        'retrieveOldestExposure',
+        data.retrieveOldestExposure
+      );
+      delete data.retrieveOldestExposure;
     }
 
     // filter ?

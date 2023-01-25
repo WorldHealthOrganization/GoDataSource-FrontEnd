@@ -33,6 +33,7 @@ import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import * as moment from 'moment';
 import { TranslateService } from '@ngx-translate/core';
+import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 
 @Component({
   selector: 'app-contacts-of-contacts-list',
@@ -65,7 +66,7 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_BURIAL', value: 'dateOfBurial' },
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_VACCINES_RECEIVED', value: 'vaccinesReceived' },
     { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS', value: 'pregnancyStatus' },
-    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUserId' },
+    { label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUser' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
@@ -1279,6 +1280,23 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                   dbColumns: true,
                   dbValues: true,
                   jsonReplaceUndefinedWithNull: true
+                },
+                inputs: {
+                  append: [
+                    {
+                      type: V2SideDialogConfigInputType.CHECKBOX,
+                      placeholder: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_EXPOSURE_INFORMATION',
+                      tooltip: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_EXPOSURE_INFORMATION_DESCRIPTION',
+                      name: 'includePersonExposureFields',
+                      checked: false
+                    }, {
+                      type: V2SideDialogConfigInputType.CHECKBOX,
+                      placeholder: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_RETRIEVE_OLDEST_EXPOSURE',
+                      tooltip: 'LNG_PAGE_LIST_CONTACTS_OF_CONTACTS_EXPORT_RETRIEVE_OLDEST_EXPOSURE_DESCRIPTION',
+                      name: 'retrieveOldestExposure',
+                      checked: false
+                    }
+                  ]
                 }
               }
             });

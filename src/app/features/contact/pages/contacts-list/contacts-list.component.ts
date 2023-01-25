@@ -89,7 +89,7 @@ export class ContactsListComponent
     { label: 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS', value: 'pregnancyStatus' },
     { label: 'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP', value: 'relationship' },
     { label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID', value: 'followUpTeamId' },
-    { label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUserId' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUser' },
     { label: 'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value: 'questionnaireAnswers' }
   ];
 
@@ -1879,10 +1879,21 @@ export class ContactsListComponent
                   append: [
                     {
                       type: V2SideDialogConfigInputType.CHECKBOX,
-                      placeholder:
-                        'LNG_PAGE_LIST_CONTACTS_EXPORT_CASE_INFORMATION',
+                      placeholder: 'LNG_PAGE_LIST_CONTACTS_EXPORT_CASE_INFORMATION',
                       tooltip: 'LNG_PAGE_LIST_CONTACTS_EXPORT_CASE_INFORMATION_DESCRIPTION',
                       name: 'includeCaseFields',
+                      checked: false
+                    }, {
+                      type: V2SideDialogConfigInputType.CHECKBOX,
+                      placeholder: 'LNG_PAGE_LIST_CONTACTS_EXPORT_EXPOSURE_INFORMATION',
+                      tooltip: 'LNG_PAGE_LIST_CONTACTS_EXPORT_EXPOSURE_INFORMATION_DESCRIPTION',
+                      name: 'includePersonExposureFields',
+                      checked: false
+                    }, {
+                      type: V2SideDialogConfigInputType.CHECKBOX,
+                      placeholder: 'LNG_PAGE_LIST_CONTACTS_EXPORT_RETRIEVE_OLDEST_EXPOSURE',
+                      tooltip: 'LNG_PAGE_LIST_CONTACTS_EXPORT_RETRIEVE_OLDEST_EXPOSURE_DESCRIPTION',
+                      name: 'retrieveOldestExposure',
                       checked: false
                     }
                   ]

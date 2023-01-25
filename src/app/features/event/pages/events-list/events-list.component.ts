@@ -64,7 +64,7 @@ export class EventsListComponent
     { label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING', value: 'dateOfReporting' },
     { label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', value: 'isDateOfReportingApproximate' },
     { label: 'LNG_EVENT_FIELD_LABEL_END_DATE', value: 'endDate' },
-    { label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUserId' },
+    { label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUser' },
     { label: 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY', value: 'eventCategory' }
   ];
 
