@@ -1879,10 +1879,21 @@ export class ContactsListComponent
                   append: [
                     {
                       type: V2SideDialogConfigInputType.CHECKBOX,
-                      placeholder:
-                        'LNG_PAGE_LIST_CONTACTS_EXPORT_CASE_INFORMATION',
+                      placeholder: 'LNG_PAGE_LIST_CONTACTS_EXPORT_CASE_INFORMATION',
                       tooltip: 'LNG_PAGE_LIST_CONTACTS_EXPORT_CASE_INFORMATION_DESCRIPTION',
                       name: 'includeCaseFields',
+                      checked: false
+                    }, {
+                      type: V2SideDialogConfigInputType.CHECKBOX,
+                      placeholder: 'LNG_PAGE_LIST_CONTACTS_EXPORT_EXPOSURE_INFORMATION',
+                      tooltip: 'LNG_PAGE_LIST_CONTACTS_EXPORT_EXPOSURE_INFORMATION_DESCRIPTION',
+                      name: 'includePersonExposureFields',
+                      checked: false
+                    }, {
+                      type: V2SideDialogConfigInputType.CHECKBOX,
+                      placeholder: 'LNG_PAGE_LIST_CONTACTS_EXPORT_RETRIEVE_OLDEST_EXPOSURE',
+                      tooltip: 'LNG_PAGE_LIST_CONTACTS_EXPORT_RETRIEVE_OLDEST_EXPOSURE_DESCRIPTION',
+                      name: 'retrieveOldestExposure',
                       checked: false
                     }
                   ]
