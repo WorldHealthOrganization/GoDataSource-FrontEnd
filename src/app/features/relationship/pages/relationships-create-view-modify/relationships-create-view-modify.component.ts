@@ -911,7 +911,8 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
     contactDate: Moment | string
   ) {
     // validate if only the feature is enabled
-    if (!this.selectedOutbreak.checkLastContactDateAgainstDateOnSet ||
+    if (
+      !this.selectedOutbreak.checkLastContactDateAgainstDateOnSet ||
       !Object.keys(entities).length
     ) {
       return;
