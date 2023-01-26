@@ -44,6 +44,9 @@ import { Location } from '@angular/common';
   templateUrl: './relationships-create-view-modify.component.html'
 })
 export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComponent<RelationshipModel> implements OnDestroy {
+  // constants
+  private static readonly PROPERTY_LAST_CONTACT: string = 'contactDate';
+
   // today
   private _today: Moment = moment();
 
@@ -865,7 +868,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
             }
 
             // copy values
-            this._createRelationships.forEach((rel) => {
+            this._createRelationships.forEach((rel, index) => {
               // we already have data, no need to replace
               if (rel[prop]) {
                 return;
@@ -873,6 +876,15 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
 
               // replace with new data
               rel[prop] = _.cloneDeep(item.value);
+
+              // validate against date of onset
+              if (prop === RelationshipsCreateViewModifyComponent.PROPERTY_LAST_CONTACT) {
+                this.checkForLastContactBeforeCaseOnSet(
+                  this._createEntities[index].id,
+                  this._createEntities[index].name,
+                  item.value
+                );
+              }
             });
           });
         }
