@@ -1211,7 +1211,8 @@
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly"
                       [options]="input.typeOptions"
-                      required="true"></app-form-select-single-v2>
+                      required="true"
+                      (ngModelChange)="triggerListInputChanged(input, parentItemIndex)"></app-form-select-single-v2>
 
                     <!-- From & To -->
                     <div
@@ -1227,7 +1228,8 @@
                         [disabled]="parentInput?.readonly"
                         app-date-validator
                         dateSameOrBefore="endDate"
-                        [dateSameOrAfter]="input.startDateValidators?.dateSameOrAfter ? input.startDateValidators?.dateSameOrAfter() : undefined"></app-form-date-v2>
+                        [dateSameOrAfter]="input.startDateValidators?.dateSameOrAfter ? input.startDateValidators?.dateSameOrAfter() : undefined"
+                        (ngModelChange)="triggerListInputChanged(input, parentItemIndex)"></app-form-date-v2>
 
                       <!-- Date range - end -->
                       <app-form-date-v2
@@ -1238,7 +1240,8 @@
                         [viewOnly]="isView"
                         [disabled]="parentInput?.readonly"
                         app-date-validator
-                        dateSameOrAfter="startDate"></app-form-date-v2>
+                        dateSameOrAfter="startDate"
+                        (ngModelChange)="triggerListInputChanged(input, parentItemIndex)"></app-form-date-v2>
 
                     </div>
 
@@ -1249,7 +1252,8 @@
                       placeholder="LNG_CASE_FIELD_LABEL_DATE_RANGE_CENTER_NAME"
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly"
-                      [options]="input.centerOptions"></app-form-select-single-v2>
+                      [options]="input.centerOptions"
+                      (ngModelChange)="triggerListInputChanged(input, parentItemIndex)"></app-form-select-single-v2>
 
                     <!-- Location -->
                     <app-form-select-location-single-v2
@@ -1259,7 +1263,8 @@
                       [viewOnly]="isView"
                       [disabled]="parentInput?.readonly"
                       useOutbreakLocations="true"
-                      clearable="true"></app-form-select-location-single-v2>
+                      clearable="true"
+                      (ngModelChange)="triggerListInputChanged(input, parentItemIndex)"></app-form-select-location-single-v2>
 
                     <!-- Comments -->
                     <app-form-textarea-v2
@@ -1267,7 +1272,8 @@
                       name="comments"
                       placeholder="LNG_CASE_FIELD_LABEL_CENTER_DATES_COMMENTS"
                       [viewOnly]="isView"
-                      [disabled]="parentInput?.readonly"></app-form-textarea-v2>
+                      [disabled]="parentInput?.readonly"
+                      (ngModelChange)="triggerListInputChanged(input, parentItemIndex)"></app-form-textarea-v2>
 
                   </div>
 
