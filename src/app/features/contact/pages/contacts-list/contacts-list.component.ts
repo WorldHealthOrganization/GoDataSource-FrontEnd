@@ -530,6 +530,7 @@ export class ContactsListComponent
               visible: (item: ContactModel): boolean => {
                 return !item.deleted &&
                   this.selectedOutbreakIsActive &&
+                  this.selectedOutbreak.isContactLabResultsActive &&
                   LabResultModel.canList(this.authUser) &&
                   ContactModel.canListLabResult(this.authUser);
               }

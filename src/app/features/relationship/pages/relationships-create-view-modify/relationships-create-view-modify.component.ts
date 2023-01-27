@@ -44,6 +44,9 @@ import { Location } from '@angular/common';
   templateUrl: './relationships-create-view-modify.component.html'
 })
 export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComponent<RelationshipModel> implements OnDestroy {
+  // constants
+  private static readonly PROPERTY_LAST_CONTACT: string = 'contactDate';
+
   // today
   private _today: Moment = moment();
 
@@ -180,8 +183,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
 
       // show global notifications
       this.checkForLastContactBeforeCaseOnSet(
-        this._entity.id,
-        this._entity.name,
+        { [this._entity.id]: this._entity.name },
         this.itemData.contactDate
       );
     }
@@ -417,8 +419,7 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
 
                 // validate against date of onset
                 this.checkForLastContactBeforeCaseOnSet(
-                  entityId,
-                  title,
+                  { [entityId]: title },
                   relationshipData.contactDate
                 );
               }
@@ -865,15 +866,31 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
             }
 
             // copy values
-            this._createRelationships.forEach((rel) => {
+            // keep also the entities for which contact date was copied
+            const updatedEntities: {
+              [id: string]: string
+            } = {};
+            this._createRelationships.forEach((rel, index) => {
               // we already have data, no need to replace
               if (rel[prop]) {
                 return;
               }
 
               // replace with new data
-              rel[prop] = _.cloneDeep(item.value);
+              const propValue = _.cloneDeep(item.value);
+              rel[prop] = propValue;
+
+              // keep entity to validate against date of onset
+              if (prop === RelationshipsCreateViewModifyComponent.PROPERTY_LAST_CONTACT) {
+                updatedEntities[this._createEntities[index].id] = this._createEntities[index].name;
+              }
             });
+
+            // validate against date of onset
+            this.checkForLastContactBeforeCaseOnSet(
+              updatedEntities,
+              item.value
+            );
           });
         }
       }] :
@@ -882,46 +899,57 @@ export class RelationshipsCreateViewModifyComponent extends CreateViewModifyComp
 
   /**
    * Check if "Date of Last Contact" is before "Date of Onset" of the source case
+   *
+   * @param entities A list of pairs: entity id/name
+   * @param contactDate Contact Date
+   * @private
    */
   private checkForLastContactBeforeCaseOnSet(
-    entityId: string,
-    entityName: string,
+    entities: {
+      [id: string]: string
+    },
     contactDate: Moment | string
   ) {
     // validate if only the feature is enabled
-    if (!this.selectedOutbreak.checkLastContactDateAgainstDateOnSet) {
+    if (
+      !this.selectedOutbreak.checkLastContactDateAgainstDateOnSet ||
+      !Object.keys(entities).length
+    ) {
       return;
     }
 
-    // get the source entity
-    const sourceEntity = this.relationshipType === RelationshipType.CONTACT ?
-      this._entity :
-      this.isCreate ?
-        this._createEntitiesMap[entityId] :
-        this.itemData.relatedEntity(this._entity.id)?.model;
+    // check all entities
+    Object.keys(entities).forEach((entityId) => {
+      // get the source entity
+      const sourceEntity = this.relationshipType === RelationshipType.CONTACT ?
+        this._entity :
+        this.isCreate ?
+          this._createEntitiesMap[entityId] :
+          this.itemData.relatedEntity(this._entity.id)?.model;
 
-    // validate contact date
-    if (
-      (sourceEntity as CaseModel)?.dateOfOnset &&
-      contactDate &&
-      moment(contactDate).isValid() &&
-      moment(contactDate).isBefore(moment((sourceEntity as CaseModel).dateOfOnset))
-    ) {
-      // when new contacts are added keep the source date of onset
-      if (RelationshipType.CONTACT) {
-        this._warnings.sourceDateOfOnset = moment((sourceEntity as CaseModel).dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+      // validate contact date
+      if (
+        (sourceEntity as CaseModel)?.dateOfOnset &&
+        contactDate &&
+        moment(contactDate).isValid() &&
+        moment(contactDate).isBefore(moment((sourceEntity as CaseModel).dateOfOnset))
+      ) {
+        // when new contacts are added keep the source date of onset
+        if (RelationshipType.CONTACT) {
+          this._warnings.sourceDateOfOnset = moment((sourceEntity as CaseModel).dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+        }
+
+        this._warnings.entities[this.isCreate ? entityId : sourceEntity.id] = {
+          id: this.isCreate ? entityId : sourceEntity.id,
+          name: this.isCreate ? entities[entityId] : sourceEntity.name,
+          type: this.isCreate ? (this._createEntitiesMap[entityId] as CaseModel).type : sourceEntity.type,
+          dateOfOnset: moment((sourceEntity as CaseModel).dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
+        };
+      } else {
+        // remove if exists
+        delete this._warnings.entities[this.isCreate ? entityId : sourceEntity.id];
       }
-
-      this._warnings.entities[this.isCreate ? entityId : sourceEntity.id] = {
-        id: this.isCreate ? entityId : sourceEntity.id,
-        name: this.isCreate ? entityName : sourceEntity.name,
-        type: this.isCreate ? (this._createEntitiesMap[entityId] as CaseModel).type : sourceEntity.type,
-        dateOfOnset: moment((sourceEntity as CaseModel).dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
-      };
-    } else {
-      // remove if exists
-      delete this._warnings.entities[this.isCreate ? entityId : sourceEntity.id];
-    }
+    });
 
     // hide current warning to re-display the updated message
     this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
