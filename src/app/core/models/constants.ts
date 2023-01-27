@@ -630,6 +630,10 @@ export class Constants {
 
   // used for the criteria radio buttons in the chains of transmission settings
   static TRANSMISSION_CHAIN_EDGE_COLOR_CRITERIA_OPTIONS = {
+    NONE: {
+      label: 'LNG_COMMON_LABEL_NONE',
+      value: 'none'
+    },
     CERTAINITY_LEVEL: {
       label: 'LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL',
       value: 'certaintyLevelId'

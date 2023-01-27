@@ -1078,7 +1078,11 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     // set legend labels
     this.legend.nodeColorLabel = this.referenceDataLabelMap[this.colorCriteria.nodeColorCriteria].label;
     this.legend.nodeNameColorLabel = this.referenceDataLabelMap[this.colorCriteria.nodeNameColorCriteria].label;
-    this.legend.edgeColorLabel = this.colorCriteria.edgeColorCriteria === 'clusterId' ? 'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER' : this.referenceDataLabelMap[this.colorCriteria.edgeColorCriteria].label;
+    this.legend.edgeColorLabel = this.colorCriteria.edgeColorCriteria === 'clusterId' ?
+      'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER' :
+      this.referenceDataLabelMap[this.colorCriteria.edgeColorCriteria] ?
+        this.referenceDataLabelMap[this.colorCriteria.edgeColorCriteria].label :
+        '';
     this.legend.edgeIconLabel = this.colorCriteria.edgeIconCriteria === 'clusterId' ?
       'LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER' : (
         this.referenceDataLabelMap[this.colorCriteria.edgeIconCriteria] ?
@@ -1122,19 +1126,21 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     });
     this.legend.labSequenceColorKeys = Object.keys(this.legend.labSequenceColor);
 
-    if (this.colorCriteria.edgeColorCriteria === 'clusterId') {
-      // we should check if we have this information, if not we must wait for it to be retrieved
-      // must refactor this entire function :)
-      (this.clusterOptions || []).forEach((item) => {
-        this.legend.edgeColor[item.id] = item.colorCode ? item.colorCode : Constants.DEFAULT_COLOR_CHAINS;
-      });
-      this.legend.edgeColorKeys = Object.keys(this.legend.edgeColor);
-    } else {
-      const edgeColorReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.edgeColorCriteria].refDataCateg], 'entries', []);
-      _.forEach(edgeColorReferenceDataEntries, (value) => {
-        this.legend.edgeColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
-      });
-      this.legend.edgeColorKeys = Object.keys(this.legend.edgeColor);
+    if (this.colorCriteria.edgeColorCriteria !== Constants.TRANSMISSION_CHAIN_EDGE_COLOR_CRITERIA_OPTIONS.NONE.value) {
+      if (this.colorCriteria.edgeColorCriteria === 'clusterId') {
+        // we should check if we have this information, if not we must wait for it to be retrieved
+        // must refactor this entire function :)
+        (this.clusterOptions || []).forEach((item) => {
+          this.legend.edgeColor[item.id] = item.colorCode ? item.colorCode : Constants.DEFAULT_COLOR_CHAINS;
+        });
+        this.legend.edgeColorKeys = Object.keys(this.legend.edgeColor);
+      } else {
+        const edgeColorReferenceDataEntries = _.get(this.referenceDataEntries[this.referenceDataLabelMap[this.colorCriteria.edgeColorCriteria].refDataCateg], 'entries', []);
+        _.forEach(edgeColorReferenceDataEntries, (value) => {
+          this.legend.edgeColor[value.value] = value.colorCode ? value.colorCode : Constants.DEFAULT_COLOR_CHAINS;
+        });
+        this.legend.edgeColorKeys = Object.keys(this.legend.edgeColor);
+      }
     }
 
     if (this.colorCriteria.edgeIconCriteria !== Constants.TRANSMISSION_CHAIN_EDGE_ICON_CRITERIA_OPTIONS.NONE.value) {
