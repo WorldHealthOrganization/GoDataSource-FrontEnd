@@ -435,6 +435,10 @@
     .ag-checkbox {
       &.ag-header-select-all {
         margin-right: 0;
+
+        + .ag-header-cell-comp-wrapper {
+          align-items: flex-start;
+        }
       }
 
       .ag-checkbox-input-wrapper {

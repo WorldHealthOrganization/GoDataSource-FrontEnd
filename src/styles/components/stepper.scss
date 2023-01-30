@@ -119,7 +119,8 @@
     padding: 0;
 
     .mat-horizontal-stepper-content {
-      &[aria-expanded="true"] {
+      &[aria-expanded="true"],
+      &:not(.mat-horizontal-stepper-content-inactive) {
         height: 100%;
       }
     }
