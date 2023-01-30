@@ -805,8 +805,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
             (handler.data.map.selectedLanguageId as IV2SideDialogConfigInputSingleDropdown).options = languages.map((item) => {
               return {
                 label: item.name,
-                value: item.id,
-                data: item
+                value: item.id
               };
             });
 
