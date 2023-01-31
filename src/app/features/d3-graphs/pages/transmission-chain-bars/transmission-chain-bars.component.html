@@ -5,6 +5,7 @@
   [advancedFilterType]="Constants.APP_PAGE.COT_BAR_CHART.value"
   [advancedFilters]="advancedFilters"
   advancedFiltersHideOperator="true"
+  selectedOutbreakDisabled="false"
   (advancedFilterBy)="advancedFilterBy($event)">
   <div
     [fxShow]="!loadingData && !noData">
@@ -32,8 +33,7 @@
     <!-- Chart -->
     <div
       #chart
-      id="chart"
-    ></div>
+      id="chart"></div>
   </div>
 
   <div *ngIf="!loadingData && noData">
