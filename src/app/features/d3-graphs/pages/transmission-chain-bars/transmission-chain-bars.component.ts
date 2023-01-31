@@ -91,8 +91,8 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
   ) {}
 
   /**
-     * Component initialized
-     */
+   * Component initialized
+   */
   ngOnInit() {
     // init color rectangles
     this.legendColors = {
@@ -359,8 +359,8 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Component destroyed
-     */
+   * Component destroyed
+   */
   ngOnDestroy() {
     // release graph data
     this.transmissionChainBarsService.destroy();
@@ -394,8 +394,8 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * (Re)Build the graph
-     */
+   * (Re)Build the graph
+   */
   private loadGraph() {
     if (!this.selectedOutbreak) {
       return;
@@ -429,8 +429,8 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Redraw graph
-     */
+   * Redraw graph
+   */
   redrawGraph() {
     // there is no point in drawing graph if we have no data
     if (this.graphData === undefined) {
@@ -448,24 +448,23 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Changed cell width
-     * @param cellWidth
-     */
+   * Changed cell width
+   */
   cellWidthChanged(cellWidth: number) {
     this.cellWidth = cellWidth;
     this.redrawGraph();
   }
 
   /**
-     * Display loading dialog
-     */
+   * Display loading dialog
+   */
   private showLoadingDialog() {
     this.loadingDialog = this.dialogV2Service.showLoadingDialog();
   }
 
   /**
-     * Hide loading dialog
-     */
+   * Hide loading dialog
+   */
   private closeLoadingDialog() {
     if (this.loadingDialog) {
       this.loadingDialog.close();
@@ -474,8 +473,8 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Export visible chain as PDF
-     */
+   * Export visible chain as PDF
+   */
   exportChain() {
     // display loading
     this.showLoadingDialog();
@@ -490,6 +489,14 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
           removeContainer: true,
           ignoreElements: (node): boolean => {
             return node.tagName === 'A';
+          },
+          // #TODO - fix export to include entire chart (vertical + horizontal scroll + dates column) after ticket WGD-4047 is implemented
+          onclone: (_document, element) => {
+            // disable overflow scrolls to render everything, otherwise it won't scroll children, and it won't export everything
+            const container = element.querySelector('.entities-container');
+            if (container) {
+              (container as any).style.overflow = 'visible';
+            }
           }
         }
       )
@@ -514,7 +521,7 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
               this.closeLoadingDialog();
             });
         });
-    });
+    }, 200);
   }
 
   /**
