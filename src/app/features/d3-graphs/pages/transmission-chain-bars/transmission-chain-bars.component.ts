@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { TransmissionChainBarsService } from '../../services/transmission-chain-bars.service';
 import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
-import * as domtoimage from 'dom-to-image';
+import html2canvas from 'html2canvas';
 import * as FileSaver from 'file-saver';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { TransmissionChainBarsDataService } from '../../services/transmission-chain-bars.data.service';
@@ -482,10 +482,20 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
 
     // convert dom container to image
     setTimeout(() => {
-      (domtoimage as any).toPng(this.chartContainer.nativeElement)
-        .then((dataUrl) => {
-          const dataBase64 = dataUrl.replace('data:image/png;base64,', '');
-
+      html2canvas(
+        this.chartContainer.nativeElement, {
+          allowTaint: true,
+          backgroundColor: null,
+          logging: false,
+          removeContainer: true,
+          ignoreElements: (node): boolean => {
+            return node.tagName === 'A';
+          }
+        }
+      )
+        .then((canvas) => {
+          const dataBase64 = canvas.toDataURL('image/png')
+            .replace('data:image/png;base64,', '');
           this.importExportDataService
             .exportImageToPdf({ image: dataBase64, responseType: 'blob', splitFactor: 1 })
             .pipe(

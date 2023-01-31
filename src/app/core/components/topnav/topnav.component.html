@@ -190,6 +190,13 @@
         [ngTemplateOutlet]="menuOption"
         [ngTemplateOutletContext]="{ link: '/saved-import-mapping', label: 'LNG_LAYOUT_MENU_ITEM_SAVED_IMPORT_MAPPING_LABEL' }"></ng-template>
 
+      <!-- Language -->
+      <div
+        mat-menu-item
+        (click)="changeLanguage()">
+        {{'LNG_LAYOUT_LANGUAGE_LABEL' | translate}}
+      </div>
+
       <!-- Almighty divider -->
       <mat-divider></mat-divider>
 

@@ -1,7 +1,7 @@
 import { Component, OnDestroy, Renderer2 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { UserModel, UserRoleModel } from '../../../../core/models/user.model';
-import { Observable, throwError } from 'rxjs';
+import { Observable } from 'rxjs';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
 import { CreateViewModifyComponent } from '../../../../core/helperClasses/create-view-modify-component';
@@ -11,11 +11,8 @@ import { CreateViewModifyV2MenuType, CreateViewModifyV2TabInputType, ICreateView
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
 import { TranslateService } from '@ngx-translate/core';
-import { catchError } from 'rxjs/operators';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { LanguageModel } from '../../../../core/models/language.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 
 @Component({
@@ -266,74 +263,6 @@ export class MyProfileComponent extends CreateViewModifyComponent<UserModel> imp
               link: () => ['/account/set-security-questions']
             },
             visible: () => UserModel.canModifyOwnAccount(this.authUser)
-          },
-
-          // Divider
-          {
-            type: CreateViewModifyV2MenuType.DIVIDER,
-            visible: () => UserModel.canModifyOwnAccount(this.authUser)
-          },
-
-          // Change language
-          {
-            type: CreateViewModifyV2MenuType.OPTION,
-            label: 'LNG_LAYOUT_LANGUAGE_LABEL',
-            action: {
-              click: () => {
-                this.dialogV2Service.showSideDialog({
-                  title: {
-                    get: () => 'LNG_LAYOUT_LANGUAGE_LABEL'
-                  },
-                  hideInputFilter: true,
-                  inputs: [{
-                    type: V2SideDialogConfigInputType.DROPDOWN_SINGLE,
-                    name: 'selectedLanguageId',
-                    placeholder: 'LNG_LAYOUT_LANGUAGE_LABEL',
-                    value: this.i18nService.getSelectedLanguageId(),
-                    options: (this.activatedRoute.snapshot.data.languages as IResolverV2ResponseModel<LanguageModel>).options
-                  }],
-                  bottomButtons: [{
-                    type: IV2SideDialogConfigButtonType.OTHER,
-                    label: 'LNG_COMMON_BUTTON_CHANGE',
-                    color: 'primary'
-                  }, {
-                    type: IV2SideDialogConfigButtonType.CANCEL,
-                    label: 'LNG_COMMON_BUTTON_CANCEL',
-                    color: 'text'
-                  }]
-                }).subscribe((response) => {
-                  // cancelled ?
-                  if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
-                    // finished
-                    return;
-                  }
-
-                  // change language
-                  response.handler.loading.show();
-                  this.i18nService
-                    .changeLanguage((response.data.map.selectedLanguageId as IV2SideDialogConfigInputSingleDropdown).value)
-                    .pipe(
-                      catchError((err) => {
-                        // show error
-                        this.toastV2Service.error(err);
-
-                        // hide
-                        response.handler.hide();
-
-                        // send error down the road
-                        return throwError(err);
-                      })
-                    )
-                    .subscribe(() => {
-                      // hide
-                      response.handler.hide();
-
-                      // finished
-                      this.toastV2Service.success('LNG_LAYOUT_ACTION_CHANGE_LANGUAGE_SUCCESS_MESSAGE');
-                    });
-                });
-              }
-            }
           }
         ]
       }
