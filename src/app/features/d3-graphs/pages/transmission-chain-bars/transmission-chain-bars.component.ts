@@ -486,9 +486,9 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
             // #TODO - fix export to include entire chart (vertical + horizontal scroll + dates column) after ticket WGD-4047 is implemented
             onclone: (_document, element) => {
               // disable overflow scrolls to render everything, otherwise it won't scroll children, and it won't export everything
-              const container = element.querySelector('.entities-container');
+              const container = element.querySelector<HTMLElement>('.entities-container');
               if (container) {
-                (container as any).style.overflow = 'visible';
+                container.style.overflow = 'visible';
               }
             }
           }
