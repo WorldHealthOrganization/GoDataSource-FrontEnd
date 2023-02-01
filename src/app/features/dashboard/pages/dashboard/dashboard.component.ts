@@ -28,7 +28,6 @@ import * as FileSaver from 'file-saver';
 import { AppCasesKpiDashletComponent } from '../../components/app-cases-kpi-dashlet/app-cases-kpi-dashlet.component';
 import { AppContactsKpiDashletComponent } from '../../components/app-contacts-kpi-dashlet/app-contacts-kpi-dashlet.component';
 import { AppCotKpiDashletComponent } from '../../components/app-cot-kpi-dashlet/app-cot-kpi-dashlet.component';
-import html2canvas from 'html2canvas';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputToggle, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { determineIfSmallScreenMode } from '../../../../core/methods/small-screen-mode';
 import { CaseSummaryDashletComponent } from '../../components/case-summary-dashlet/case-summary-dashlet.component';
@@ -589,42 +588,31 @@ export class DashboardComponent implements OnInit, OnDestroy {
               // convert dom container to image
               const loading = this.dialogV2Service.showLoadingDialog();
               setTimeout(() => {
-                html2canvas(
-                  this._kpiSection.nativeElement, {
-                    allowTaint: true,
-                    backgroundColor: null,
-                    logging: false,
-                    removeContainer: true,
-                    ignoreElements: (node): boolean => {
-                      return node.tagName === 'A';
-                    },
-                    onclone: (_document, element) => {
-                      // disable box shadow - otherwise export doesn't look good
-                      (element.querySelectorAll('.gd-dashlet-kpi') || [])
-                        .forEach((node) => {
-                          node.style.boxShadow = 'none';
-                        });
+                this.domService
+                  .convertHTML2PDF(
+                    this._kpiSection.nativeElement,
+                    `${this.translateService.instant('LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL')}.pdf`, {
+                      onclone: (_document, element) => {
+                        // disable box shadow - otherwise export doesn't look good
+                        (element.querySelectorAll('.gd-dashlet-kpi') || [])
+                          .forEach((node) => {
+                            node.style.boxShadow = 'none';
+                          });
+                      }
                     }
-                  }
-                )
-                  .then((canvas) => {
-                    const dataBase64 = canvas.toDataURL('image/png')
-                      .replace('data:image/png;base64,', '');
-                    this.importExportDataService
-                      .exportImageToPdf({ image: dataBase64, responseType: 'blob', splitFactor: 1 })
-                      .pipe(
-                        catchError((err) => {
-                          this.toastV2Service.error(err);
-                          loading.close();
-                          return throwError(err);
-                        })
-                      )
-                      .subscribe((blob) => {
-                        this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL');
-                        loading.close();
-                      });
+                  )
+                  .pipe(
+                    catchError((err) => {
+                      this.toastV2Service.error(err);
+                      loading.close();
+                      return throwError(err);
+                    })
+                  )
+                  .subscribe(() => {
+                    // finished
+                    loading.close();
                   });
-              });
+              }, 200);
             }
           },
           visible: () => DashboardModel.canExportKpi(this._authUser) && (
