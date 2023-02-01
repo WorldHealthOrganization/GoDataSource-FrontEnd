@@ -74,8 +74,6 @@ export class TransmissionChainBarsService {
   private cellHeight = 25;
   // space between cases / events
   private marginBetween = 10;
-  // date cell width (first column)
-  private dateCellWidth = 100;
   // case / event details cell height (first row)
   private entityDetailsCellHeight = 100;
   // relationship X margin - position of relationship vertical lines on X position related to cell left position
@@ -84,7 +82,6 @@ export class TransmissionChainBarsService {
   private cellXPadding = this.relationshipXMargin * 2;
   // extra graph height
   // - 30 for scrollbar (keep extra 30px for horizontal scrollbar)
-  private graphExtraHeight = 30;
   // keep occupied space so we determine intersection
   private relationshipOccupiedSpaces: {
     yLines: {
@@ -136,11 +133,17 @@ export class TransmissionChainBarsService {
   private graphData: TransmissionChainBarsModel;
   // graph container
   private graphContainer: any;
-  // child container for the dates
+  // child section/container for the dates
+  private graphDates: any;
   private graphDatesContainer: any;
-  // child container for the cases / events
-  private graphEntityContainer: any;
-  private graphEntityContainerDiv: any;
+  private graphDatesContainerSVG: any;
+  // child section/container for the cases / events
+  private graphEntity: any;
+  private graphEntitySectionHeader: any;
+  private graphEntitySectionHeaderSVG: any;
+  private graphEntitySectionHeaderHeight: number;
+  private graphEntitySectionDivContainer: any;
+
   // keep hover div to display information
   private graphHoverDiv: any;
   // native container
@@ -166,8 +169,6 @@ export class TransmissionChainBarsService {
   // center name group line height
   private entityDetailsTextLineCellHeight: number = 24;
   private entityDetailsTextLineSpaceBetween: number = 5;
-  private entityDetailsTextLinesHeight: number;
-  private entityDetailsTextLinesHeightMarginBottom: number = 10;
   private entityDetailsTextLinesColorMargin: number = 4;
   private entityDetailsTextLinesColorWidth: number = 10;
   private centerNameCellHeight: number = 5;
@@ -268,6 +269,9 @@ export class TransmissionChainBarsService {
     // create hover div
     this.drawHoverDiv();
 
+    // calculate header height
+    this.graphEntitySectionHeaderHeight = this.determineGraphHeaderHeight();
+
     // draw the dates column
     this.drawDates();
 
@@ -275,10 +279,6 @@ export class TransmissionChainBarsService {
     this.remainingRelationsToDraw = {};
     this.centerOccupiedLines = {};
     this.drawEntities();
-
-    // set graph container height
-    const graphHeight = this.determineGraphHeight();
-    containerNative.style.height = `${graphHeight}px`;
   }
 
   /**
@@ -352,12 +352,6 @@ export class TransmissionChainBarsService {
         }
       }
     });
-
-    // determine mex
-    const centerNameMaxLines: number = _.isEmpty(centerLines) ? 0 : Math.max(...Object.values(centerLines));
-
-    // add center name lines
-    this.entityDetailsTextLinesHeight = centerNameMaxLines * (this.entityDetailsTextLineCellHeight + this.entityDetailsTextLineSpaceBetween) + this.entityDetailsTextLinesHeightMarginBottom;
   }
 
   /**
@@ -409,6 +403,7 @@ export class TransmissionChainBarsService {
     this.graphHoverDiv.style['background-color'] = '#f0f0f5';
     this.graphHoverDiv.style.padding = '2px';
     this.graphHoverDiv.style.border = '1px solid #707075';
+    this.hideHoverDiv();
   }
 
   /**
@@ -425,32 +420,36 @@ export class TransmissionChainBarsService {
      * Draw the first column (with all the dates in the graph)
      */
   private drawDates() {
+    // create dates section
+    this.graphDates = this.graphContainer.append('div')
+      .classed('gd-dates-section', true);
+
+    // create a div to store the dates container
+    // set the same height as entity header container height
+    this.graphDates.append('div')
+      .classed('gd-dates-section-header', true)
+      .style('height', `${this.graphEntitySectionHeaderHeight}px`);
+
     // create dates container
-    this.graphDatesContainer = this.graphContainer.append('div')
-      .classed('dates-container', true);
+    this.graphDatesContainer = this.graphDates.append('div')
+      .classed('gd-dates-section-container', true)
+      .style('height', `calc(100% - ${this.graphEntitySectionHeaderHeight}px)`);
 
     // create SVG container
-    this.graphDatesContainer = this.graphDatesContainer.append('svg')
-      .attr('width', this.dateCellWidth)
-      .attr('height', '100%');
-
-    // draw the first cell (placeholder for visual IDs and full names rows)
-    this.graphDatesContainer.append('rect')
-      .attr('fill', 'transparent')
-      .attr('width', this.dateCellWidth)
-      .attr('height', this.entityDetailsCellHeight + this.entityDetailsTextLinesHeight);
+    this.graphDatesContainerSVG = this.graphDatesContainer.append('svg')
+      .classed('gd-dates-section-container-svg', true);
 
     // draw each date
     Object.keys(this.datesMap).forEach((dayDate, index) => {
       // set position (top-left corner)
-      const dateContainer = this.graphDatesContainer.append('svg')
+      const dateContainer = this.graphDatesContainerSVG.append('svg')
         .attr('x', 0)
-        .attr('y', this.entityDetailsCellHeight + this.entityDetailsTextLinesHeight + index * this.cellHeight);
+        .attr('y', index * this.cellHeight);
 
       const dateGroup = dateContainer.append('g');
       dateGroup.append('rect')
         .attr('fill', 'transparent')
-        .attr('width', this.dateCellWidth)
+        .attr('width', '100%')
         .attr('height', this.cellHeight);
       dateGroup.append('text')
         .text(dayDate)
@@ -465,7 +464,8 @@ export class TransmissionChainBarsService {
      * Mouse move - hover div
      */
   private initSvgMouseMove() {
-    const svg: any = document.querySelector('svg.graph-entities-container-svg');
+    const svg: any = this.graphEntitySectionDivContainer.node();
+    const pt = svg.createSVGPoint();
     svg.addEventListener(
       'mouseleave',
       () => {
@@ -484,13 +484,13 @@ export class TransmissionChainBarsService {
         this.hideHoverDiv();
 
         // is there a point in checking position ?
-        if (evt.layerY <= this.entityDetailsCellHeight + this.entityDetailsTextLinesHeight) {
+        if (evt.layerY <= 0) {
           return;
         }
 
         // determine date
         const date: string = moment(this.graphData.minGraphDate)
-          .add(Math.floor((evt.layerY - (this.entityDetailsCellHeight + this.entityDetailsTextLinesHeight)) / this.cellHeight), 'days')
+          .add(Math.floor(evt.layerY / this.cellHeight), 'days')
           .format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
 
         // if date not mapped, then there is no point in displaying it
@@ -498,8 +498,13 @@ export class TransmissionChainBarsService {
           return;
         }
 
+        // get the cursor point, translated into svg coordinates
+        pt.x = evt.clientX;
+        pt.y = evt.clientY;
+        const cursorPT = pt.matrixTransform(svg.getScreenCTM().inverse());
+
         // determine person name
-        const nameIndex = Math.floor((evt.layerX + this.graphEntityContainerDiv.scrollLeft) / (this.marginBetween + this.cellWidth));
+        const nameIndex = Math.floor((cursorPT.x) / (this.marginBetween + this.cellWidth));
         if (!this.namesMap[nameIndex]) {
           return;
         }
@@ -615,14 +620,28 @@ export class TransmissionChainBarsService {
       }
     };
 
-    // create entities container
-    this.graphEntityContainer = this.graphContainer.append('div')
-      .classed('entities-container', true);
-    this.graphEntityContainerDiv = document.querySelector('div.entities-container');
+    // create a div for entities section
+    this.graphEntity = this.graphContainer.append('div')
+      .classed('gd-entities-section', true);
+
+    // create entities header
+    this.graphEntitySectionHeader = this.graphEntity.append('div')
+      .classed('gd-entities-section-header', true)
+      .style('height', `${this.graphEntitySectionHeaderHeight}px`);
+
+    // create SVG header container
+    this.graphEntitySectionHeaderSVG = this.graphEntitySectionHeader.append('svg')
+      .classed('gd-entities-section-header-svg', true)
+      .attr('width', entitiesGraphWidth);
+
+    // create entities container body
+    const graphEntitySectionDiv = this.graphEntity.append('div')
+      .classed('gd-entities-section-container', true)
+      .style('height', `calc(100% - ${this.graphEntitySectionHeaderHeight}px)`);
 
     // create SVG container
-    this.graphEntityContainer = this.graphEntityContainer.append('svg')
-      .classed('graph-entities-container-svg', true)
+    this.graphEntitySectionDivContainer = graphEntitySectionDiv.append('svg')
+      .classed('gd-entities-section-container-svg', true)
       .attr('width', entitiesGraphWidth);
 
     // listen for hover mouse to show data & person
@@ -640,8 +659,15 @@ export class TransmissionChainBarsService {
     this.drawGraphCenterNames();
 
     // set graph height
-    this.graphEntityContainer
-      .attr('height', this.determineGraphHeight());
+    this.graphDatesContainerSVG.attr('height', this.determineGraphHeight());
+    this.graphEntitySectionDivContainer.attr('height', this.determineGraphHeight());
+
+    // synchronize scroll bars
+    const graphEntitySectionDivDOM = graphEntitySectionDiv.node();
+    graphEntitySectionDivDOM.addEventListener('scroll', () => {
+      this.graphEntitySectionHeader.node().scrollLeft = graphEntitySectionDivDOM.scrollLeft;
+      this.graphDatesContainer.node().scrollTop = graphEntitySectionDivDOM.scrollTop;
+    });
   }
 
   /**
@@ -666,15 +692,20 @@ export class TransmissionChainBarsService {
     // add case / event to the map, so we know it's (already) drawn
     this.entityColumnMap[entityData.id] = entityColumnIdx;
 
+    // draw the case / event column header
+    const entityColumnContainerHeader = this.graphEntitySectionHeaderSVG.append('svg')
+      .attr('x', entityColumnIdx * (this.marginBetween + this.cellWidth))
+      .attr('y', 0);
+
     // draw the case / event column container
-    const entityColumnContainer = this.graphEntityContainer.append('svg')
+    const entityColumnContainer = this.graphEntitySectionDivContainer.append('svg')
       .attr('x', entityColumnIdx * (this.marginBetween + this.cellWidth))
       .attr('y', 0);
 
     // draw the case / event details cell
-    const entityDetailsGroup = entityColumnContainer.append('g')
+    const entityDetailsGroup = entityColumnContainerHeader.append('g')
       .attr('transform', `translate(${this.cellWidth / 2 - 32} 10) rotate(-54, 32, ${this.entityDetailsCellHeight / 2})`)
-      .attr('class', 'entity-info-header');
+      .attr('class', 'gd-entities-section-header-entity-info');
 
     // case full name / / event name
     const name: string = (entityData.firstName ? entityData.firstName + ' ' : '') +
@@ -692,7 +723,7 @@ export class TransmissionChainBarsService {
     if (visualId) {
       entityDetailsGroup.append('text')
         .text(entityData.visualId)
-      // .attr('class', 'entity-info-header')
+      // .attr('class', 'gd-entities-section-header-entity-info')
         .attr('fill', 'black')
         .attr('font-size', '12px')
         .attr('alignment-baseline', 'central')
@@ -887,7 +918,7 @@ export class TransmissionChainBarsService {
 
             // position cell
             const x: number = (cellIndex < 1 ? 0 : this.cellXPadding) + (width * cellIndex);
-            const y: number = this.entityDetailsCellHeight + this.entityDetailsTextLinesHeight + (this.datesMap[drawCell.date] * this.cellHeight);
+            const y: number = this.datesMap[drawCell.date] * this.cellHeight;
             const group = entityColumnContainer.append('g')
               .attr(
                 'transform',
@@ -969,9 +1000,9 @@ export class TransmissionChainBarsService {
 
     // draw the case / event bar container (to show the border)
     const entityBar = entityColumnContainer.append('svg')
-      .attr('class', 'entity-bar')
+      .attr('class', 'gd-entities-section-container-entity-bar')
       .attr('x', 0)
-      .attr('y', this.entityDetailsCellHeight + this.entityDetailsTextLinesHeight + (this.datesMap[date] * this.cellHeight));
+      .attr('y', this.datesMap[date] * this.cellHeight);
     entityBar.append('rect')
       .attr('width', this.cellWidth)
       .attr('height', (moment(entityData.lastGraphDate).startOf('day').diff(dateMoment, 'days') + 1) * this.cellHeight)
@@ -991,21 +1022,21 @@ export class TransmissionChainBarsService {
         entityBar.classed('accent', false);
 
         // remove accent from all relationships
-        this.graphEntityContainer.selectAll('.relationship')
+        this.graphEntitySectionDivContainer.selectAll('.relationship')
           .classed('accent', false);
       } else {
         // selected case / event doesn't have accent;
         // remove accent from all elements
-        this.graphEntityContainer.selectAll('.accent')
+        this.graphEntitySectionDivContainer.selectAll('.accent')
           .classed('accent', false);
 
         // add accent to case / event
         entityBar.classed('accent', true);
 
         // add accent to relationships
-        const sourceEntityRelationships = this.graphEntityContainer
+        const sourceEntityRelationships = this.graphEntitySectionDivContainer
         // find the relationships where current case / event is source
-          .selectAll(`.source-entity-${entityData.id}`)
+          .selectAll(`.gd-entities-section-container-source-entity-${entityData.id}`)
         // show relationships with accent color
           .classed('accent', true)
         // remove them temporarily
@@ -1013,7 +1044,7 @@ export class TransmissionChainBarsService {
 
         // add them back (so they are rendered on top of the others)
         _.get(sourceEntityRelationships, '_groups[0]', []).forEach((relationshipElem) => {
-          this.graphEntityContainer.append(() => relationshipElem);
+          this.graphEntitySectionDivContainer.append(() => relationshipElem);
         });
       }
     });
@@ -1085,7 +1116,7 @@ export class TransmissionChainBarsService {
     // determine line coordinates
     const leftOrRight = (sourceEntityColumnIdx < targetEntityColumnIdx) ? 1 : 0;
     const halfCellHeight = Math.round(this.cellHeight / 2);
-    const lineInitialStartY = this.entityDetailsCellHeight + this.entityDetailsTextLinesHeight + (this.datesMap[sourceEntityFirstGraphDate] * this.cellHeight) + halfCellHeight;
+    const lineInitialStartY = (this.datesMap[sourceEntityFirstGraphDate] * this.cellHeight) + halfCellHeight;
     let lineStartY = lineInitialStartY;
     // stop at the horizontal of the target case's / event's bar
     let lineEndY = lineStartY;
@@ -1117,7 +1148,7 @@ export class TransmissionChainBarsService {
     }
 
     // draw the arrow at the horizontal middle of the target case's / event's bar, but touching the bar
-    const arrowY = this.entityDetailsCellHeight + this.entityDetailsTextLinesHeight + (this.datesMap[targetEntityFirstGraphDate] * this.cellHeight);
+    const arrowY = this.datesMap[targetEntityFirstGraphDate] * this.cellHeight;
 
     // update x position if necessary
     // in some cases we might need to update y position after this one, but this case has few chances and until we encounter it there is no point to put more stress on performance
@@ -1161,8 +1192,8 @@ export class TransmissionChainBarsService {
       }
 
       // draw connection line
-      this.graphEntityContainer.append('line')
-        .attr('class', `relationship source-entity-${sourceEntityId}`)
+      this.graphEntitySectionDivContainer.append('line')
+        .attr('class', `gd-entities-section-container-relationship gd-entities-section-container-source-entity-${sourceEntityId}`)
         .attr('stroke', this.graphConfig.relationshipStrokeColor)
         .attr('stroke-width', `${this.relationshipStrokeWidth}px`)
         .attr('x1', lineStartX)
@@ -1172,8 +1203,8 @@ export class TransmissionChainBarsService {
     }
 
     // draw the horizontal line from the source case / event to the target case / event
-    this.graphEntityContainer.append('line')
-      .attr('class', `relationship source-entity-${sourceEntityId}`)
+    this.graphEntitySectionDivContainer.append('line')
+      .attr('class', `gd-entities-section-container-relationship gd-entities-section-container-source-entity-${sourceEntityId}`)
       .attr('stroke', this.graphConfig.relationshipStrokeColor)
       .attr('stroke-width', `${this.relationshipStrokeWidth}px`)
       .attr('x1', lineStartX)
@@ -1212,8 +1243,8 @@ export class TransmissionChainBarsService {
       lineEndX;
 
     // draw the vertical line (arrow's base)
-    this.graphEntityContainer.append('line')
-      .attr('class', `relationship source-entity-${sourceEntityId}`)
+    this.graphEntitySectionDivContainer.append('line')
+      .attr('class', `gd-entities-section-container-relationship gd-entities-section-container-source-entity-${sourceEntityId}`)
       .attr('stroke', this.graphConfig.relationshipStrokeColor)
       .attr('stroke-width', `${this.relationshipStrokeWidth}px`)
       .attr('x1', lineEndX)
@@ -1222,8 +1253,8 @@ export class TransmissionChainBarsService {
       .attr('y2', arrowY);
 
     // draw the top of the arrow
-    this.graphEntityContainer.append('polygon')
-      .attr('class', `relationship source-entity-${sourceEntityId}`)
+    this.graphEntitySectionDivContainer.append('polygon')
+      .attr('class', `gd-entities-section-container-relationship gd-entities-section-container-source-entity-${sourceEntityId}`)
       .attr('fill', this.graphConfig.relationshipStrokeColor)
       .attr('points', `${lineEndX},${arrowY} ${lineEndX - 5},${(arrowY - 8)} ${lineEndX + 5},${arrowY - 8}`);
   }
@@ -1233,7 +1264,7 @@ export class TransmissionChainBarsService {
      */
   private drawGraphCenterNames() {
     // position svg
-    const groupContainer = this.graphEntityContainer.append('svg')
+    const groupContainer = this.graphEntitySectionHeaderSVG.append('svg')
       .attr('x', 0)
       .attr('y', this.entityDetailsCellHeight);
 
@@ -1317,18 +1348,28 @@ export class TransmissionChainBarsService {
   }
 
   /**
-     * Determine graph height based on the data
-     */
+   * Determine graph header height based on the maximum center names per entity
+   */
+  private determineGraphHeaderHeight(): number {
+    // determine max of number of center name
+    const maxCenterNames = Math.max(...Object.values(this.entityToCenterNameCell).map(t => Object.keys(t).length));
+
+    // add entity name cell height and each center name cell height
+    return this.entityDetailsCellHeight + maxCenterNames * (this.entityDetailsTextLineCellHeight + this.entityDetailsTextLineSpaceBetween);
+  }
+
+  /**
+   * Determine graph height based on the data
+   */
   private determineGraphHeight(): number {
     // determine number of dates displayed
     const daysNo = Object.keys(this.datesMap).length;
 
     // determine container height accordingly to max number of cells
-    const datesHeight: number = this.entityDetailsCellHeight + this.entityDetailsTextLinesHeight + daysNo * this.cellHeight;
+    const datesHeight: number = daysNo * this.cellHeight;
 
     // visual-id-column-height + days-no * cell-height
-    return Math.max(datesHeight, this.relationshipOccupiedSpaces.yLines.max)
-            + this.graphExtraHeight;
+    return Math.max(datesHeight, this.relationshipOccupiedSpaces.yLines.max);
   }
 
   /**
