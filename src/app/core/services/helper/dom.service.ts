@@ -126,7 +126,9 @@ export class DomService {
           logging: false,
           removeContainer: true,
           ignoreElements: (node): boolean => {
-            return node.tagName === 'A';
+            return node.tagName === 'A' ||
+              node.tagName === 'BUTTON' ||
+              node.tagName === 'APP-FORM-SELECT-SINGLE-V2';
           },
           onclone: options?.onclone
         }
@@ -152,19 +154,22 @@ export class DomService {
     htmlElement: HTMLElement,
     fileName: string,
     options?: {
-      onclone?: (document: Document, element: HTMLElement) => void
+      onclone?: (document: Document, element: HTMLElement) => void,
+      splitType?: 'grid' | 'auto'
     }
   ): Observable<void> {
     return this.convertHTML2DataUriPNG(
-      htmlElement,
-      options
+      htmlElement, {
+        onclone: options?.onclone
+      }
     ).pipe(
       switchMap((dataBase64) => {
         return this.importExportDataService
           .exportImageToPdf({
             image: dataBase64,
             responseType: 'blob',
-            splitFactor: 1
+            splitFactor: 1,
+            splitType: options?.splitType
           });
       }),
       map((blob) => {
