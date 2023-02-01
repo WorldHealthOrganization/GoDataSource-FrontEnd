@@ -23,12 +23,9 @@ import { DomService } from '../../../../core/services/helper/dom.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
-import * as FileSaver from 'file-saver';
 import { AppCasesKpiDashletComponent } from '../../components/app-cases-kpi-dashlet/app-cases-kpi-dashlet.component';
 import { AppContactsKpiDashletComponent } from '../../components/app-contacts-kpi-dashlet/app-contacts-kpi-dashlet.component';
 import { AppCotKpiDashletComponent } from '../../components/app-cot-kpi-dashlet/app-cot-kpi-dashlet.component';
-import html2canvas from 'html2canvas';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputToggle, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { determineIfSmallScreenMode } from '../../../../core/methods/small-screen-mode';
 import { CaseSummaryDashletComponent } from '../../components/case-summary-dashlet/case-summary-dashlet.component';
@@ -261,7 +258,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private translateService: TranslateService,
     private domService: DomService,
     private toastV2Service: ToastV2Service,
-    private importExportDataService: ImportExportDataService,
     authDataService: AuthDataService
   ) {
     // update render mode
@@ -526,7 +522,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
           action: {
             click: () => {
               this.getEpiCurveDashlet(
-                'app-epi-curve-dashlet svg',
+                'app-epi-curve-dashlet',
+                '.gd-dashlet-epi-curve',
                 'LNG_PAGE_DASHBOARD_EPI_CURVE_CLASSIFICATION_TITLE'
               );
             }
@@ -542,7 +539,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
           action: {
             click: () => {
               this.getEpiCurveDashlet(
-                'app-epi-curve-outcome-dashlet svg',
+                'app-epi-curve-outcome-dashlet',
+                '.gd-dashlet-epi-curve-outcome',
                 'LNG_PAGE_DASHBOARD_EPI_CURVE_OUTCOME_TITLE'
               );
             }
@@ -558,7 +556,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
           action: {
             click: () => {
               this.getEpiCurveDashlet(
-                'app-epi-curve-reporting-dashlet svg',
+                'app-epi-curve-reporting-dashlet',
+                '.gd-dashlet-epi-curve-reporting',
                 'LNG_PAGE_DASHBOARD_EPI_CURVE_REPORTING_TITLE'
               );
             }
@@ -589,42 +588,31 @@ export class DashboardComponent implements OnInit, OnDestroy {
               // convert dom container to image
               const loading = this.dialogV2Service.showLoadingDialog();
               setTimeout(() => {
-                html2canvas(
-                  this._kpiSection.nativeElement, {
-                    allowTaint: true,
-                    backgroundColor: null,
-                    logging: false,
-                    removeContainer: true,
-                    ignoreElements: (node): boolean => {
-                      return node.tagName === 'A';
-                    },
-                    onclone: (_document, element) => {
-                      // disable box shadow - otherwise export doesn't look good
-                      (element.querySelectorAll('.gd-dashlet-kpi') || [])
-                        .forEach((node) => {
-                          node.style.boxShadow = 'none';
-                        });
+                this.domService
+                  .convertHTML2PDF(
+                    this._kpiSection.nativeElement,
+                    `${this.translateService.instant('LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL')}.pdf`, {
+                      onclone: (_document, element) => {
+                        // disable box shadow - otherwise export doesn't look good
+                        (element.querySelectorAll('.gd-dashlet-kpi') || [])
+                          .forEach((node) => {
+                            node.style.boxShadow = 'none';
+                          });
+                      }
                     }
-                  }
-                )
-                  .then((canvas) => {
-                    const dataBase64 = canvas.toDataURL('image/png')
-                      .replace('data:image/png;base64,', '');
-                    this.importExportDataService
-                      .exportImageToPdf({ image: dataBase64, responseType: 'blob', splitFactor: 1 })
-                      .pipe(
-                        catchError((err) => {
-                          this.toastV2Service.error(err);
-                          loading.close();
-                          return throwError(err);
-                        })
-                      )
-                      .subscribe((blob) => {
-                        this.downloadFile(blob, 'LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL');
-                        loading.close();
-                      });
+                  )
+                  .pipe(
+                    catchError((err) => {
+                      this.toastV2Service.error(err);
+                      loading.close();
+                      return throwError(err);
+                    })
+                  )
+                  .subscribe(() => {
+                    // finished
+                    loading.close();
                   });
-              });
+              }, 200);
             }
           },
           visible: () => DashboardModel.canExportKpi(this._authUser) && (
@@ -711,9 +699,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
    * Get Epi curve dashlet
    */
   private getEpiCurveDashlet(
-    selector: string,
+    elementSelector: string,
+    boxShadowSelector: string,
     fileName: string
   ): void {
+    // check that graph is rendered
+    if (!document.querySelector(`${elementSelector} svg`)) {
+      // display warning
+      this.toastV2Service.notice(
+        'LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG',
+        { fileName: this.translateService.instant(fileName) }
+      );
+
+      // finished
+      return;
+    }
+
+    // show configuration dialog
     this.dialogV2Service.showSideDialog({
       // title
       title: {
@@ -762,69 +764,42 @@ export class DashboardComponent implements OnInit, OnDestroy {
       // determine export format
       const exportAsSinglePage: boolean = (response.data.map.exportFormat as IV2SideDialogConfigInputToggle).value as boolean;
 
-      // export
-      const loading = this.dialogV2Service.showLoadingDialog();
-      this.domService
-        .getPNGBase64(
-          selector,
-          '#tempCanvas',
-          1
-        )
-        .subscribe((pngBase64) => {
-          // object not found ?
-          if (!pngBase64) {
-            this.toastV2Service.notice(
-              'LNG_PAGE_DASHBOARD_EPI_ELEMENT_NOT_VISIBLE_ERROR_MSG',
-              { fileName: this.translateService.instant(fileName) }
-            );
-            loading.close();
-            return;
-          }
-
-          // export
-          this.importExportDataService
-            .exportImageToPdf({
-              image: pngBase64,
-              responseType: 'blob',
-              splitFactor: 1,
-              splitType: exportAsSinglePage ?
-                'grid' :
-                'auto'
-            })
-            .pipe(
-              catchError((err) => {
-                this.toastV2Service.error(err);
-                loading.close();
-                return throwError(err);
-              })
-            )
-            .subscribe((blob) => {
-              this.downloadFile(
-                blob,
-                `${this.translateService.instant(fileName)} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}`
-              );
-              loading.close();
-            });
-        });
-
       // close popup
       response.handler.hide();
-    });
-  }
 
-  /**
-   * Download File
-   */
-  private downloadFile(
-    blob,
-    fileNameToken,
-    extension: string = 'pdf'
-  ) {
-    const fileName = this.translateService.instant(fileNameToken);
-    FileSaver.saveAs(
-      blob,
-      `${fileName}.${extension}`
-    );
+      // export
+      const loading = this.dialogV2Service.showLoadingDialog();
+      setTimeout(() => {
+        this.domService
+          .convertHTML2PDF(
+            document.querySelector(elementSelector),
+            `${this.translateService.instant(fileName)} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}.pdf`, {
+              splitType: exportAsSinglePage ?
+                'grid' :
+                'auto',
+              onclone: (_document, element) => {
+                // disable box shadow - otherwise export doesn't look good
+                const container = element.querySelector<HTMLElement>(boxShadowSelector);
+                if (container) {
+                  container.style.boxShadow = 'none';
+                }
+              }
+            }
+          )
+          .pipe(
+            catchError((err) => {
+              this.toastV2Service.error(err);
+              loading.close();
+              return throwError(err);
+            })
+          )
+          .subscribe(() => {
+            // finished
+            loading.close();
+          });
+
+      }, 200);
+    });
   }
 
   /**

@@ -1,8 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { TransmissionChainBarsService } from '../../services/transmission-chain-bars.service';
-import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
-import html2canvas from 'html2canvas';
-import * as FileSaver from 'file-saver';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { TransmissionChainBarsDataService } from '../../services/transmission-chain-bars.data.service';
 import { OutbreakModel } from '../../../../core/models/outbreak.model';
@@ -28,6 +25,7 @@ import * as _ from 'lodash';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { EntityType } from '../../../../core/models/entity-type';
 import { IV2SideDialogAdvancedFiltersResponse } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { DomService } from '../../../../core/services/helper/dom.service';
 
 @Component({
   selector: 'app-transmission-chain-bars',
@@ -76,23 +74,23 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
   advancedFilters: V2AdvancedFilter[];
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     private authDataService: AuthDataService,
     private transmissionChainBarsService: TransmissionChainBarsService,
     private transmissionChainBarsDataService: TransmissionChainBarsDataService,
     private outbreakDataService: OutbreakDataService,
     private dialogV2Service: DialogV2Service,
-    private importExportDataService: ImportExportDataService,
     private i18nService: I18nService,
     protected toastV2Service: ToastV2Service,
-    protected activatedRoute: ActivatedRoute
+    protected activatedRoute: ActivatedRoute,
+    private domService: DomService
   ) {}
 
   /**
-     * Component initialized
-     */
+   * Component initialized
+   */
   ngOnInit() {
     // init color rectangles
     this.legendColors = {
@@ -359,8 +357,8 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Component destroyed
-     */
+   * Component destroyed
+   */
   ngOnDestroy() {
     // release graph data
     this.transmissionChainBarsService.destroy();
@@ -394,8 +392,8 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * (Re)Build the graph
-     */
+   * (Re)Build the graph
+   */
   private loadGraph() {
     if (!this.selectedOutbreak) {
       return;
@@ -429,8 +427,8 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Redraw graph
-     */
+   * Redraw graph
+   */
   redrawGraph() {
     // there is no point in drawing graph if we have no data
     if (this.graphData === undefined) {
@@ -448,24 +446,23 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Changed cell width
-     * @param cellWidth
-     */
+   * Changed cell width
+   */
   cellWidthChanged(cellWidth: number) {
     this.cellWidth = cellWidth;
     this.redrawGraph();
   }
 
   /**
-     * Display loading dialog
-     */
+   * Display loading dialog
+   */
   private showLoadingDialog() {
     this.loadingDialog = this.dialogV2Service.showLoadingDialog();
   }
 
   /**
-     * Hide loading dialog
-     */
+   * Hide loading dialog
+   */
   private closeLoadingDialog() {
     if (this.loadingDialog) {
       this.loadingDialog.close();
@@ -474,47 +471,40 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
   }
 
   /**
-     * Export visible chain as PDF
-     */
+   * Export visible chain as PDF
+   */
   exportChain() {
     // display loading
     this.showLoadingDialog();
 
     // convert dom container to image
     setTimeout(() => {
-      html2canvas(
-        this.chartContainer.nativeElement, {
-          allowTaint: true,
-          backgroundColor: null,
-          logging: false,
-          removeContainer: true,
-          ignoreElements: (node): boolean => {
-            return node.tagName === 'A';
+      this.domService
+        .convertHTML2PDF(
+          this.chartContainer.nativeElement,
+          `${this.i18nService.instant('LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE')}.pdf`, {
+            // #TODO - fix export to include entire chart (vertical + horizontal scroll + dates column) after ticket WGD-4047 is implemented
+            onclone: (_document, element) => {
+              // disable overflow scrolls to render everything, otherwise it won't scroll children, and it won't export everything
+              const container = element.querySelector<HTMLElement>('.entities-container');
+              if (container) {
+                container.style.overflow = 'visible';
+              }
+            }
           }
-        }
-      )
-        .then((canvas) => {
-          const dataBase64 = canvas.toDataURL('image/png')
-            .replace('data:image/png;base64,', '');
-          this.importExportDataService
-            .exportImageToPdf({ image: dataBase64, responseType: 'blob', splitFactor: 1 })
-            .pipe(
-              catchError((err) => {
-                this.toastV2Service.error(err);
-                this.closeLoadingDialog();
-                return throwError(err);
-              })
-            )
-            .subscribe((blob) => {
-              const fileName = this.i18nService.instant('LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE');
-              FileSaver.saveAs(
-                blob,
-                `${fileName}.pdf`
-              );
-              this.closeLoadingDialog();
-            });
+        )
+        .pipe(
+          catchError((err) => {
+            this.toastV2Service.error(err);
+            this.closeLoadingDialog();
+            return throwError(err);
+          })
+        )
+        .subscribe(() => {
+          // finished
+          this.closeLoadingDialog();
         });
-    });
+    }, 200);
   }
 
   /**

@@ -1,9 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { DomService } from '../../../../core/services/helper/dom.service';
-import { ImportExportDataService } from '../../../../core/services/data/import-export.data.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
-import * as FileSaver from 'file-saver';
 import { GanttChartDelayOnsetDashletComponent } from '../../components/gantt-chart-delay-onset-dashlet/gantt-chart-delay-onset-dashlet.component';
 import { throwError } from 'rxjs';
 import { Constants } from '../../../../core/models/constants';
@@ -22,7 +20,7 @@ import { IV2LoadingDialogHandler } from '../../../../shared/components-v2/app-lo
 import { ActivatedRoute } from '@angular/router';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { IV2SideDialogAdvancedFiltersResponse } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { IV2SideDialogAdvancedFiltersResponse, IV2SideDialogConfigButtonType, IV2SideDialogConfigInputToggle, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 
 @Component({
   selector: 'app-gantt-chart',
@@ -61,7 +59,6 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
      */
   constructor(
     private domService: DomService,
-    private importExportDataService: ImportExportDataService,
     private i18nService: I18nService,
     private toastV2Service: ToastV2Service,
     private dialogV2Service: DialogV2Service,
@@ -170,58 +167,109 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
   }
 
   /**
-     * generate Gantt chart report - image will be exported as pdf
-     */
+   * Generate Gantt chart report - image will be exported as pdf
+   */
   generateGanttChartReport() {
     // check if we have data to export
     if (
       !this.ganttChart ||
-            !this.ganttChart.hasData()
+      !this.ganttChart.hasData()
     ) {
       this.toastV2Service.error('LNG_PAGE_DASHLET_GANTT_CHART_NO_DATA_LABEL');
-    } else {
-      this.showLoadingDialog();
-      let ganttChartName = 'app-gantt-chart-delay-onset-dashlet svg';
-      if (this.ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value) {
-        ganttChartName = 'app-gantt-chart-delay-onset-hospitalization-dashlet svg';
+      return;
+    }
+
+    // show configuration dialog
+    this.dialogV2Service.showSideDialog({
+      // title
+      title: {
+        get: () => 'LNG_PAGE_GANTT_CHART_REPORT_FORMAT'
+      },
+
+      // inputs
+      hideInputFilter: true,
+      inputs: [
+        {
+          type: V2SideDialogConfigInputType.TOGGLE,
+          value: false,
+          name: 'exportFormat',
+          options: [
+            {
+              label: 'LNG_PAGE_GANTT_CHART_REPORT_FORMAT_MULTI_PAGE',
+              value: false
+            },
+            {
+              label: 'LNG_PAGE_GANTT_CHART_REPORT_FORMAT_SINGLE_PAGE',
+              value: true
+            }
+          ]
+        }
+      ],
+
+      // buttons
+      bottomButtons: [
+        {
+          label: 'LNG_COMMON_BUTTON_EXPORT',
+          type: IV2SideDialogConfigButtonType.OTHER,
+          color: 'primary',
+          key: 'save'
+        }, {
+          type: IV2SideDialogConfigButtonType.CANCEL,
+          label: 'LNG_COMMON_BUTTON_CANCEL',
+          color: 'text'
+        }
+      ]
+    }).subscribe((response) => {
+      // cancelled ?
+      if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+        return;
       }
 
-      // export graph as png image
-      this.domService
-        .getPNGBase64(ganttChartName, '#tempCanvas')
-        .subscribe((pngBase64) => {
-          this.importExportDataService
-            .exportImageToPdf({ image: pngBase64, responseType: 'blob', splitFactor: 1 })
-            .pipe(
-              catchError((err) => {
-                this.toastV2Service.error(err);
-                this.closeLoadingDialog();
-                return throwError(err);
-              })
-            )
-            .subscribe((blob) => {
-              this.downloadFile(blob, 'LNG_PAGE_GANTT_CHART_REPORT_LABEL');
-              this.closeLoadingDialog();
-            });
-        });
-    }
-  }
+      // determine export format
+      const exportAsSinglePage: boolean = (response.data.map.exportFormat as IV2SideDialogConfigInputToggle).value as boolean;
 
-  /**
-     * Download File
-     * @param blob
-     * @param fileNameToken
-     */
-  private downloadFile(
-    blob,
-    fileNameToken,
-    extension: string = 'pdf'
-  ) {
-    const fileName = this.i18nService.instant(fileNameToken);
-    FileSaver.saveAs(
-      blob,
-      `${fileName}.${extension}`
-    );
+      // close popup
+      response.handler.hide();
+
+      // show loading
+      this.showLoadingDialog();
+
+      // export
+      setTimeout(() => {
+        this.domService
+          .convertHTML2PDF(
+            document.querySelector(
+              this.ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value ?
+                'app-gantt-chart-delay-onset-hospitalization-dashlet' :
+                'app-gantt-chart-delay-onset-dashlet'
+            ),
+            `${this.i18nService.instant('LNG_PAGE_GANTT_CHART_REPORT_LABEL')}.pdf`, {
+              splitType: exportAsSinglePage ?
+                'grid' :
+                'auto',
+              onclone: (_document, element) => {
+                // disable overflow scrolls to render everything, otherwise it won't scroll children, and it won't export everything
+                const container = element.querySelector<HTMLElement>('#gantt-svg-root');
+                if (container) {
+                  container.style.overflow = 'visible';
+                }
+              }
+            }
+          )
+          .pipe(
+            catchError((err) => {
+              this.toastV2Service.error(err);
+              this.closeLoadingDialog();
+              return throwError(err);
+            })
+          )
+          .subscribe(() => {
+            // finished
+            this.closeLoadingDialog();
+          });
+
+      }, 200);
+    });
   }
 
   /**
