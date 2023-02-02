@@ -18,6 +18,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import { LocationDataService } from '../../../../core/services/data/location.data.service';
 
 @Component({
   selector: 'app-event-merge-duplicate-records',
@@ -46,6 +47,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
     private activatedRoute: ActivatedRoute,
     private outbreakDataService: OutbreakDataService,
     private translateService: TranslateService,
+    private locationDataService: LocationDataService,
     protected toastV2Service: ToastV2Service,
     authDataService: AuthDataService,
     renderer2: Renderer2,
@@ -102,97 +104,155 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
           })
         )
         .subscribe((mergeRecords) => {
-          // determine data
-          this._uniqueOptions = {
-            name: this.getFieldOptions(
-              mergeRecords,
-              'name'
-            ).options,
-            date: this.getFieldOptions(
-              mergeRecords,
-              'date'
-            ).options,
-            dateOfReporting: this.getFieldOptions(
-              mergeRecords,
-              'dateOfReporting'
-            ).options,
-            isDateOfReportingApproximate: this.getFieldOptions(
-              mergeRecords,
-              'isDateOfReportingApproximate'
-            ).options,
-            responsibleUserId: this.getFieldOptions(
-              mergeRecords,
-              'responsibleUserId'
-            ).options,
-            eventCategory: this.getFieldOptions(
-              mergeRecords,
-              'eventCategory'
-            ).options,
-            endDate: this.getFieldOptions(
-              mergeRecords,
-              'endDate'
-            ).options,
-            description: this.getFieldOptions(
-              mergeRecords,
-              'description'
-            ).options,
-            addresses: []
+          // map locations
+          const locationsMap: {
+            [id: string]: string
+          } = {};
+
+          // determine and format data for each item
+          const finish = () => {
+            // determine data
+            this._uniqueOptions = {
+              name: this.getFieldOptions(
+                mergeRecords,
+                'name'
+              ).options,
+              date: this.getFieldOptions(
+                mergeRecords,
+                'date'
+              ).options,
+              dateOfReporting: this.getFieldOptions(
+                mergeRecords,
+                'dateOfReporting'
+              ).options,
+              isDateOfReportingApproximate: this.getFieldOptions(
+                mergeRecords,
+                'isDateOfReportingApproximate'
+              ).options,
+              responsibleUserId: this.getFieldOptions(
+                mergeRecords,
+                'responsibleUserId'
+              ).options,
+              eventCategory: this.getFieldOptions(
+                mergeRecords,
+                'eventCategory'
+              ).options,
+              endDate: this.getFieldOptions(
+                mergeRecords,
+                'endDate'
+              ).options,
+              description: this.getFieldOptions(
+                mergeRecords,
+                'description'
+              ).options,
+              addresses: []
+            };
+
+            // go through records and determine data
+            mergeRecords.forEach((item) => {
+              // determine addresses
+              const event = item.model as EventModel;
+
+              // add to list ?
+              if (
+                (
+                  event.address.locationId &&
+                  locationsMap[event.address.locationId]
+                ) ||
+                event.address.fullAddress
+              ) {
+                this._uniqueOptions.addresses.push({
+                  label:
+                    (
+                      event.address.fullAddress ? event.address.fullAddress : ''
+                    ) +
+                    (
+                      event.address.fullAddress && locationsMap[event.address.locationId] ? ', ' : ''
+                    ) +
+                    (
+                      locationsMap[event.address.locationId] ? locationsMap[event.address.locationId] : ''
+                    ),
+                  value: event.id,
+                  data: event.address
+                });
+              }
+            });
+
+            // auto-select if only one value
+            const data: EventModel = new EventModel();
+            data.name = this._uniqueOptions.name.length === 1 ?
+              this._uniqueOptions.name[0].value :
+              data.name;
+            data.date = this._uniqueOptions.date.length === 1 ?
+              this._uniqueOptions.date[0].value :
+              data.date;
+            data.dateOfReporting = this._uniqueOptions.dateOfReporting.length === 1 ?
+              this._uniqueOptions.dateOfReporting[0].value :
+              data.dateOfReporting;
+            data.isDateOfReportingApproximate = this._uniqueOptions.isDateOfReportingApproximate.length === 1 ?
+              this._uniqueOptions.isDateOfReportingApproximate[0].value :
+              data.isDateOfReportingApproximate;
+            data.responsibleUserId = this._uniqueOptions.responsibleUserId.length === 1 ?
+              this._uniqueOptions.responsibleUserId[0].value :
+              data.responsibleUserId;
+            data.eventCategory = this._uniqueOptions.eventCategory.length === 1 ?
+              this._uniqueOptions.eventCategory[0].value :
+              data.eventCategory;
+            data.endDate = this._uniqueOptions.endDate.length === 1 ?
+              this._uniqueOptions.endDate[0].value :
+              data.endDate;
+            data.description = this._uniqueOptions.description.length === 1 ?
+              this._uniqueOptions.description[0].value :
+              data.description;
+            this._addressID = this._uniqueOptions.addresses.length === 1 ?
+              this._uniqueOptions.addresses[0].value :
+              undefined;
+            data.address = this._addressID !== undefined ?
+              this._uniqueOptions.addresses.find((addressItem) => addressItem.value === this._addressID).data :
+              undefined;
+
+            // finish
+            subscriber.next(data);
+            subscriber.complete();
           };
 
-          // go through records and determine data
-          mergeRecords.forEach((item) => {
-            // determine addresses
-            const event = item.model as EventModel;
-
-            // add to list ?
-            if (
-              event.address.locationId ||
-              event.address.fullAddress
-            ) {
-              this._uniqueOptions.addresses.push({
-                label: event.address.fullAddress,
-                value: event.id,
-                data: event.address
-              });
-            }
+          // get locations
+          const locationIds: string[] = mergeRecords.map((event) => {
+            return (event.model as EventModel).address.locationId;
           });
 
-          // auto-select if only one value
-          const data: EventModel = new EventModel();
-          data.name = this._uniqueOptions.name.length === 1 ?
-            this._uniqueOptions.name[0].value :
-            data.name;
-          data.date = this._uniqueOptions.date.length === 1 ?
-            this._uniqueOptions.date[0].value :
-            data.date;
-          data.dateOfReporting = this._uniqueOptions.dateOfReporting.length === 1 ?
-            this._uniqueOptions.dateOfReporting[0].value :
-            data.dateOfReporting;
-          data.isDateOfReportingApproximate = this._uniqueOptions.isDateOfReportingApproximate.length === 1 ?
-            this._uniqueOptions.isDateOfReportingApproximate[0].value :
-            data.isDateOfReportingApproximate;
-          data.responsibleUserId = this._uniqueOptions.responsibleUserId.length === 1 ?
-            this._uniqueOptions.responsibleUserId[0].value :
-            data.responsibleUserId;
-          data.eventCategory = this._uniqueOptions.eventCategory.length === 1 ?
-            this._uniqueOptions.eventCategory[0].value :
-            data.eventCategory;
-          data.endDate = this._uniqueOptions.endDate.length === 1 ?
-            this._uniqueOptions.endDate[0].value :
-            data.endDate;
-          data.description = this._uniqueOptions.description.length === 1 ?
-            this._uniqueOptions.description[0].value :
-            data.description;
-          this._addressID = this._uniqueOptions.addresses.length === 1 ?
-            this._uniqueOptions.addresses[0].value :
-            undefined;
-          data.address = this._addressID !== undefined ?
-            this._uniqueOptions.addresses.find((addressItem) => addressItem.value === this._addressID).data :
-            undefined;
+          if (locationIds.length) {
+            // construct query builder
+            const qbLocations: RequestQueryBuilder = new RequestQueryBuilder();
+            qbLocations.filter.bySelect(
+              'id',
+              locationIds,
+              false,
+              null
+            );
 
-          // finish
-          subscriber.next(data);
-          subscriber.complete();
+            this.locationDataService
+              .getLocationsList(qbLocations)
+              .pipe(
+                catchError((err) => {
+                  // finished
+                  subscriber.error(err);
+                  return throwError(err);
+                })
+              )
+              .subscribe((locations) => {
+                // map the new locations
+                locations.forEach((location) => {
+                  locationsMap[location.id] = location.name;
+                });
+
+                // format data
+                finish();
+              });
+          } else {
+            // format data
+            finish();
+          }
         });
     });
   }
