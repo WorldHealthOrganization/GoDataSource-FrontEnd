@@ -950,11 +950,13 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
         questionnaire: this.selectedOutbreak.caseInvestigationTemplate,
         value: {
           get: () => this.itemData.questionnaireAnswersCase,
-          set: () => {}
+          set: (value) => {
+            this.itemData.questionnaireAnswersCase = value;
+          }
         },
         updateErrors: () => {}
       },
-      visible: () => this.isView &&
+      visible: () =>
         this.selectedOutbreak.caseInvestigationTemplate?.length > 0 &&
         this.itemData.wasCase &&
         this.itemData.hasQuestionnaireAnswersCase
