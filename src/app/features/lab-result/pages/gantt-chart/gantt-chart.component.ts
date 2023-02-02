@@ -188,15 +188,16 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
         .convertHTML2PDF(
           document.querySelector(
             this.ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value ?
-              'app-gantt-chart-delay-onset-hospitalization-dashlet' :
-              'app-gantt-chart-delay-onset-dashlet'
+              'app-gantt-chart-delay-onset-hospitalization-dashlet #gantt-svg-root' :
+              'app-gantt-chart-delay-onset-dashlet #gantt-svg-root'
           ),
           `${this.i18nService.instant('LNG_PAGE_GANTT_CHART_REPORT_LABEL')}.pdf`, {
             onclone: (_document, element) => {
               // disable overflow scrolls to render everything, otherwise it won't scroll children, and it won't export everything
-              const container = element.querySelector<HTMLElement>('#gantt-svg-root');
-              if (container) {
-                container.style.overflow = 'visible';
+              if (element) {
+                element.style.overflow = 'visible';
+                element.style.width = 'fit-content';
+                element.style.height = 'fit-content';
               }
             }
           }
