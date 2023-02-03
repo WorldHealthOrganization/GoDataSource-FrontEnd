@@ -774,6 +774,20 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
         }
       },
       {
+        field: 'disableModifyingLegacyQuestionnaire',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DISABLE_MODIFYING_LEGACY_QUESTIONNAIRE',
+        sortable: true,
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      },
+      {
         field: 'generateFollowUpsDateOfLastContact',
         label: 'LNG_OUTBREAK_FIELD_LABEL_FOLLOWUP_GENERATION_DATE_OF_LAST_CONTACT',
         notVisible: true,
@@ -960,6 +974,7 @@ export class OutbreakListComponent extends ListComponent<OutbreakModel> implemen
       'name',
       'disease',
       'checkLastContactDateAgainstDateOnSet',
+      'disableModifyingLegacyQuestionnaire',
       'countries',
       'reportingGeographicalLevelId',
       'startDate',
