@@ -19,7 +19,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { TranslateService } from '@ngx-translate/core';
 import * as momentOriginal from 'moment';
-import { DomService } from '../../../../core/services/helper/dom.service';
+import { ConvertHtmlToPDFStep, DomService } from '../../../../core/services/helper/dom.service';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -587,32 +587,50 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
               // convert dom container to image
               const loading = this.dialogV2Service.showLoadingDialog();
-              setTimeout(() => {
-                this.domService
-                  .convertHTML2PDF(
-                    this._kpiSection.nativeElement,
-                    `${this.translateService.instant('LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL')}.pdf`, {
-                      onclone: (_document, element) => {
-                        // disable box shadow - otherwise export doesn't look good
-                        (element.querySelectorAll('.gd-dashlet-kpi') || [])
-                          .forEach((node) => {
-                            node.style.boxShadow = 'none';
-                          });
-                      }
+              this.domService
+                .convertHTML2PDF(
+                  this._kpiSection.nativeElement,
+                  `${this.translateService.instant('LNG_PAGE_DASHBOARD_KPIS_REPORT_LABEL')}.pdf`, {
+                    onclone: (_document, element) => {
+                      // disable box shadow - otherwise export doesn't look good
+                      (element.querySelectorAll('.gd-dashlet-kpi') || [])
+                        .forEach((node) => {
+                          node.style.boxShadow = 'none';
+                        });
                     }
-                  )
-                  .pipe(
-                    catchError((err) => {
-                      this.toastV2Service.error(err);
-                      loading.close();
-                      return throwError(err);
-                    })
-                  )
-                  .subscribe(() => {
-                    // finished
+                  },
+                  (step) => {
+                    // determine percent
+                    let percent: number;
+                    switch (step) {
+                      case ConvertHtmlToPDFStep.INITIALIZED:
+                        percent = 5;
+                        break;
+                      case ConvertHtmlToPDFStep.CONVERTING_HTML_TO_PDF:
+                        percent = 50;
+                        break;
+                      case ConvertHtmlToPDFStep.EXPORTING_PDF:
+                        percent = 99;
+                        break;
+                    }
+
+                    // update dialog percent
+                    loading.message({
+                      message: `${percent}%`
+                    });
+                  }
+                )
+                .pipe(
+                  catchError((err) => {
+                    this.toastV2Service.error(err);
                     loading.close();
-                  });
-              }, 200);
+                    return throwError(err);
+                  })
+                )
+                .subscribe(() => {
+                  // finished
+                  loading.close();
+                });
             }
           },
           visible: () => DashboardModel.canExportKpi(this._authUser) && (
@@ -769,36 +787,53 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
       // export
       const loading = this.dialogV2Service.showLoadingDialog();
-      setTimeout(() => {
-        this.domService
-          .convertHTML2PDF(
-            document.querySelector(elementSelector),
-            `${this.translateService.instant(fileName)} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}.pdf`, {
-              splitType: exportAsSinglePage ?
-                'grid' :
-                'auto',
-              onclone: (_document, element) => {
-                // disable box shadow - otherwise export doesn't look good
-                const container = element.querySelector<HTMLElement>(boxShadowSelector);
-                if (container) {
-                  container.style.boxShadow = 'none';
-                }
+      this.domService
+        .convertHTML2PDF(
+          document.querySelector(elementSelector),
+          `${this.translateService.instant(fileName)} - ${momentOriginal().format('YYYY-MM-DD HH:mm')}.pdf`, {
+            splitType: exportAsSinglePage ?
+              'grid' :
+              'auto',
+            onclone: (_document, element) => {
+              // disable box shadow - otherwise export doesn't look good
+              const container = element.querySelector<HTMLElement>(boxShadowSelector);
+              if (container) {
+                container.style.boxShadow = 'none';
               }
             }
-          )
-          .pipe(
-            catchError((err) => {
-              this.toastV2Service.error(err);
-              loading.close();
-              return throwError(err);
-            })
-          )
-          .subscribe(() => {
-            // finished
-            loading.close();
-          });
+          },
+          (step) => {
+            // determine percent
+            let percent: number;
+            switch (step) {
+              case ConvertHtmlToPDFStep.INITIALIZED:
+                percent = 5;
+                break;
+              case ConvertHtmlToPDFStep.CONVERTING_HTML_TO_PDF:
+                percent = 50;
+                break;
+              case ConvertHtmlToPDFStep.EXPORTING_PDF:
+                percent = 99;
+                break;
+            }
 
-      }, 200);
+            // update dialog percent
+            loading.message({
+              message: `${percent}%`
+            });
+          }
+        )
+        .pipe(
+          catchError((err) => {
+            this.toastV2Service.error(err);
+            loading.close();
+            return throwError(err);
+          })
+        )
+        .subscribe(() => {
+          // finished
+          loading.close();
+        });
     });
   }
 

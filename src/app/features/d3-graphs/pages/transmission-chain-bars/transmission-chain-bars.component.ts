@@ -25,7 +25,7 @@ import * as _ from 'lodash';
 import { moment } from '../../../../core/helperClasses/x-moment';
 import { EntityType } from '../../../../core/models/entity-type';
 import { IV2SideDialogAdvancedFiltersResponse } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
-import { DomService } from '../../../../core/services/helper/dom.service';
+import { ConvertHtmlToPDFStep, DomService } from '../../../../core/services/helper/dom.service';
 
 @Component({
   selector: 'app-transmission-chain-bars',
@@ -457,6 +457,12 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
    * Display loading dialog
    */
   private showLoadingDialog() {
+    // loading dialog already visible ?
+    if (this.loadingDialog) {
+      return;
+    }
+
+    // show
     this.loadingDialog = this.dialogV2Service.showLoadingDialog();
   }
 
@@ -478,33 +484,52 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
     this.showLoadingDialog();
 
     // convert dom container to image
-    setTimeout(() => {
-      this.domService
-        .convertHTML2PDF(
-          this.chartContainer.nativeElement,
-          `${this.i18nService.instant('LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE')}.pdf`, {
-            // #TODO - fix export to include entire chart (vertical + horizontal scroll + dates column) after ticket WGD-4047 is implemented
-            onclone: (_document, element) => {
-              // disable overflow scrolls to render everything, otherwise it won't scroll children, and it won't export everything
-              const container = element.querySelector<HTMLElement>('.entities-container');
-              if (container) {
-                container.style.overflow = 'visible';
-              }
+    this.domService
+      .convertHTML2PDF(
+        this.chartContainer.nativeElement,
+        `${this.i18nService.instant('LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE')}.pdf`, {
+          onclone: (_document, element) => {
+            // disable overflow scrolls to render everything, otherwise it won't scroll children, and it won't export everything
+            const container = element.querySelector<HTMLElement>('.gd-entities-section-container');
+            if (container) {
+              container.style.overflow = 'visible';
+              container.style.width = 'fit-content';
+              container.style.height = 'fit-content';
             }
           }
-        )
-        .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            this.closeLoadingDialog();
-            return throwError(err);
-          })
-        )
-        .subscribe(() => {
-          // finished
+        },
+        (step) => {
+          // determine percent
+          let percent: number;
+          switch (step) {
+            case ConvertHtmlToPDFStep.INITIALIZED:
+              percent = 5;
+              break;
+            case ConvertHtmlToPDFStep.CONVERTING_HTML_TO_PDF:
+              percent = 50;
+              break;
+            case ConvertHtmlToPDFStep.EXPORTING_PDF:
+              percent = 99;
+              break;
+          }
+
+          // update dialog percent
+          this.loadingDialog.message({
+            message: `${percent}%`
+          });
+        }
+      )
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
           this.closeLoadingDialog();
-        });
-    }, 200);
+          return throwError(err);
+        })
+      )
+      .subscribe(() => {
+        // finished
+        this.closeLoadingDialog();
+      });
   }
 
   /**

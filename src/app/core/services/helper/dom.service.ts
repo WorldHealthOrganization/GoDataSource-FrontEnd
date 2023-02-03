@@ -1,9 +1,18 @@
 import { Injectable } from '@angular/core';
-import { Observable, switchMap } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import html2canvas from 'html2canvas';
 import { ImportExportDataService } from '../data/import-export.data.service';
-import { map } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import * as FileSaver from 'file-saver';
+
+/**
+ * Convert html to pdf step
+ */
+export enum ConvertHtmlToPDFStep {
+  INITIALIZED,
+  CONVERTING_HTML_TO_PDF,
+  EXPORTING_PDF
+}
 
 @Injectable()
 export class DomService {
@@ -15,10 +24,8 @@ export class DomService {
   ) {}
 
   /**
-     * Scroll to the end of the list of elements with the given css selector
-     * @param selector
-     * @param block
-     */
+   * Scroll to the end of the list of elements with the given css selector
+   */
   scrollItemIntoView(
     selector,
     block: string = 'end'
@@ -27,7 +34,7 @@ export class DomService {
       const item = document.querySelector(selector);
       if (
         item &&
-                item.scrollIntoView
+        item.scrollIntoView
       ) {
         item.scrollIntoView({
           behavior: 'smooth',
@@ -84,29 +91,74 @@ export class DomService {
     options?: {
       onclone?: (document: Document, element: HTMLElement) => void,
       splitType?: 'grid' | 'auto'
-    }
+    },
+    stateChanged?: (step: ConvertHtmlToPDFStep) => void
   ): Observable<void> {
-    return this.convertHTML2DataUriPNG(
-      htmlElement, {
-        onclone: options?.onclone
-      }
-    ).pipe(
-      switchMap((dataBase64) => {
-        return this.importExportDataService
-          .exportImageToPdf({
-            image: dataBase64,
-            responseType: 'blob',
-            splitFactor: 1,
-            splitType: options?.splitType
-          });
-      }),
-      map((blob) => {
-        // export file
-        FileSaver.saveAs(
-          blob,
-          fileName
-        );
-      })
-    );
+    // step
+    if (stateChanged) {
+      stateChanged(ConvertHtmlToPDFStep.INITIALIZED);
+    }
+
+    // execute
+    return new Observable((subscriber) => {
+      setTimeout(() => {
+        this.convertHTML2DataUriPNG(
+          htmlElement, {
+            onclone: options?.onclone
+          }
+        ).pipe(
+          // handle error
+          catchError((err) => {
+            // send further
+            subscriber.error(err);
+            subscriber.complete();
+
+            // finished
+            return throwError(err);
+          })
+        ).subscribe((dataBase64) => {
+          // step
+          if (stateChanged) {
+            stateChanged(ConvertHtmlToPDFStep.CONVERTING_HTML_TO_PDF);
+          }
+
+          // convert html to pdf
+          return this.importExportDataService
+            .exportImageToPdf({
+              image: dataBase64,
+              responseType: 'blob',
+              splitFactor: 1,
+              splitType: options?.splitType
+            })
+            .pipe(
+              // handle error
+              catchError((err) => {
+                // send further
+                subscriber.error(err);
+                subscriber.complete();
+
+                // finished
+                return throwError(err);
+              })
+            )
+            .subscribe((blob) => {
+              // step
+              if (stateChanged) {
+                stateChanged(ConvertHtmlToPDFStep.EXPORTING_PDF);
+              }
+
+              // export file
+              FileSaver.saveAs(
+                blob,
+                fileName
+              );
+
+              // finished
+              subscriber.next();
+              subscriber.complete();
+            });
+        });
+      }, 200);
+    });
   }
 }
