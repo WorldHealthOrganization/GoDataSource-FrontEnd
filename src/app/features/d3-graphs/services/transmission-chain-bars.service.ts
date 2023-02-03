@@ -1285,7 +1285,7 @@ export class TransmissionChainBarsService {
       let y: number = 0;
       while (
         this.centerOccupiedLines[y] &&
-                x >= this.centerOccupiedLines[y].x1 && x <= this.centerOccupiedLines[y].x2
+        x >= this.centerOccupiedLines[y].x1 && x <= this.centerOccupiedLines[y].x2
       ) {
         // next line
         y += this.entityDetailsTextLineCellHeight + this.entityDetailsTextLineSpaceBetween;
@@ -1305,10 +1305,19 @@ export class TransmissionChainBarsService {
         x2: x + width
       };
 
+      // determine center name
+      const renderName = cell.name ?
+        this.centerTokenToNameMap[cell.name] || cell.name :
+        cell.name;
+
       // group handler
       const group = groupContainer.append('svg')
         .attr('x', x)
         .attr('y', y);
+
+      // draw cell rectangle
+      group.append('title')
+        .text(renderName);
 
       // draw cell rectangle
       group.append('rect')
@@ -1336,11 +1345,6 @@ export class TransmissionChainBarsService {
         .attr('x', textX)
         .attr('width', width - (textX + this.entityDetailsTextLinesColorMargin))
         .attr('height', height);
-
-      // determine center name
-      const renderName = cell.name ?
-        this.centerTokenToNameMap[cell.name] || cell.name :
-        cell.name;
 
       // draw cell text
       group.append('text')
