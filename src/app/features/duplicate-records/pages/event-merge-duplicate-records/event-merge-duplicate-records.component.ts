@@ -152,24 +152,23 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
             mergeRecords.forEach((item) => {
               // determine addresses
               const event = item.model as EventModel;
+              const eventFullAddress = event.address?.fullAddress;
 
               // add to list ?
               if (
                 (
-                  event.address.locationId &&
+                  event.address?.locationId &&
                   locationsMap[event.address.locationId]
                 ) ||
-                event.address.fullAddress
+                eventFullAddress
               ) {
                 this._uniqueOptions.addresses.push({
                   label:
                     (
-                      event.address.fullAddress ? event.address.fullAddress : ''
-                    ) +
-                    (
-                      event.address.fullAddress && locationsMap[event.address.locationId] ? ', ' : ''
-                    ) +
-                    (
+                      eventFullAddress ? eventFullAddress : ''
+                    ) + (
+                      eventFullAddress && locationsMap[event.address.locationId] ? ', ' : ''
+                    ) + (
                       locationsMap[event.address.locationId] ? locationsMap[event.address.locationId] : ''
                     ),
                   value: event.id,
@@ -216,14 +215,25 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
             subscriber.complete();
           };
 
-          // get locations
-          const locationIds: string[] = mergeRecords.map((event) => {
-            return (event.model as EventModel).address.locationId;
+          // map list of location Ids
+          const locationIdsMap: {
+            [locationId: string]: true
+          } = {};
+          mergeRecords.forEach((item) => {
+            if ((item.model as EventModel)?.address?.locationId) {
+              locationIdsMap[(item.model as EventModel).address.locationId] = true;
+            }
           });
 
+          // check if there are location to retrieve
+          const locationIds: string[] = Object.keys(locationIdsMap);
           if (locationIds.length) {
             // construct query builder
             const qbLocations: RequestQueryBuilder = new RequestQueryBuilder();
+            qb.fields(
+              'id',
+              'name'
+            );
             qbLocations.filter.bySelect(
               'id',
               locationIds,
@@ -231,6 +241,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
               null
             );
 
+            // retrieve locations
             this.locationDataService
               .getLocationsList(qbLocations)
               .pipe(
