@@ -490,11 +490,20 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
         `${this.i18nService.instant('LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE')}.pdf`, {
           onclone: (_document, element) => {
             // disable overflow scrolls to render everything, otherwise it won't scroll children, and it won't export everything
-            const container = element.querySelector<HTMLElement>('.gd-entities-section-container');
-            if (container) {
-              container.style.overflow = 'visible';
-              container.style.width = 'fit-content';
-              container.style.height = 'fit-content';
+            const chartSection = element.querySelector<HTMLElement>('.gd-entities-section');
+            const chartSectionContainer = chartSection.querySelector<HTMLElement>('.gd-entities-section-container');
+            if (
+              chartSection &&
+              chartSectionContainer
+            ) {
+              element.style.whiteSpace = 'nowrap';
+              element.style.width = 'fit-content';
+              element.style.height = 'fit-content';
+              chartSection.style.width = 'fit-content';
+              chartSection.style.height = 'fit-content';
+              chartSectionContainer.style.overflow = 'visible';
+              chartSectionContainer.style.width = 'fit-content';
+              chartSectionContainer.style.height = 'fit-content';
             }
           }
         },

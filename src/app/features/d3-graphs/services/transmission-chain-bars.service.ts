@@ -678,14 +678,14 @@ export class TransmissionChainBarsService {
   }
 
   /**
-     * Draw a case / event block
-     */
+   * Draw a case / event block
+   */
   private drawEntity(entityId: string) {
     // keep case / event data for later use
     const entityData = this.graphData.personsMap[entityId] as EntityBarModel;
     if (
       !entityData ||
-            !entityData.date
+      !entityData.date
     ) {
       return;
     }
@@ -774,7 +774,7 @@ export class TransmissionChainBarsService {
     // date of outcome
     if (
       entityData.dateOfOutcome &&
-            entityData.outcomeId
+      entityData.outcomeId
     ) {
       // determine cell label
       let dateOfOutcomeLabel: string = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_OUTCOME_OTHER_LABEL');
