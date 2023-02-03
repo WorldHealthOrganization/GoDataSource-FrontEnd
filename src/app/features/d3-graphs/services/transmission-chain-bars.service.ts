@@ -595,12 +595,19 @@ export class TransmissionChainBarsService {
   }
 
   /**
-     * Draw the cases & events (one column for each case / event)
-     */
+   * Check if we should draw entity
+   */
+  private shouldDrawEntity(entityId: string): boolean {
+    return !!this.graphData.personsMap[entityId]?.date;
+  }
+
+  /**
+   * Draw the cases & events (one column for each case / event)
+   */
   private drawEntities() {
     // determine graph width based on the number of cases & events
     // entities-no * (margin-between-entities + entity-cell-width) + placeholder-for-overflowing-name-or-visual-id
-    const entitiesGraphWidth = this.graphData.personsOrder.length * (this.marginBetween + this.cellWidth) + 20;
+    const entitiesGraphWidth = this.graphData.personsOrder.filter((entityId) => this.shouldDrawEntity(entityId)).length * (this.marginBetween + this.cellWidth) + 20;
 
     // reset occupied spaces
     this.relationshipOccupiedSpaces = {
@@ -670,15 +677,12 @@ export class TransmissionChainBarsService {
    */
   private drawEntity(entityId: string) {
     // keep case / event data for later use
-    const entityData = this.graphData.personsMap[entityId] as EntityBarModel;
-    if (
-      !entityData ||
-      !entityData.date
-    ) {
+    if (!this.shouldDrawEntity(entityId)) {
       return;
     }
 
     // the column where we draw the case / event
+    const entityData = this.graphData.personsMap[entityId] as EntityBarModel;
     const entityColumnIdx = this.currentColumnIdx;
 
     // increment the current column index for when drawing a new case / event
