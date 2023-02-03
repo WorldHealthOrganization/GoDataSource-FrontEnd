@@ -88,6 +88,17 @@ interface ICreateViewModifyV2TabInputActionButton {
 }
 
 /**
+ * Handle changed event for inputs that support it
+ */
+export interface ICreateViewModifyV2TabInputChanged {
+  // optional
+  changed?: (
+    input: ICreateViewModifyV2TabInputChanged,
+    index?: number
+  ) => void;
+}
+
+/**
  * Input - base value
  */
 interface ICreateViewModifyV2TabInputValue<T> {
@@ -518,7 +529,7 @@ interface ICreateViewModifyV2TabInputVaccine {
 /**
  * Input - center date range
  */
-interface ICreateViewModifyV2TabInputCenterDateRange {
+interface ICreateViewModifyV2TabInputCenterDateRange extends ICreateViewModifyV2TabInputChanged {
   // required
   type: CreateViewModifyV2TabInputType.CENTER_DATE_RANGE;
   typeOptions: ILabelValuePairModel[];
@@ -530,7 +541,7 @@ interface ICreateViewModifyV2TabInputCenterDateRange {
   // optional
   startDateValidators?: {
     dateSameOrAfter?: () => (Moment | string)[]
-  }
+  };
 }
 
 /**

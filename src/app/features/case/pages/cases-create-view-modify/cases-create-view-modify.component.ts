@@ -149,6 +149,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     // remove global notifications
     this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
     this.toastV2Service.hide(AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
   }
 
   /**
@@ -200,6 +201,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       // show global notifications
       this.checkForPersonExistence();
       this.checkForOnsetAfterReporting();
+      this.checkForOnsetAfterHospitalizationStartDate();
     }
   }
 
@@ -1067,6 +1069,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             itemsChanged: (list) => {
               // update documents
               this.itemData.dateRanges = list.items;
+
+              // validate hospitalization start date against date of onset
+              this.checkForOnsetAfterHospitalizationStartDate();
             },
             definition: {
               add: {
@@ -1086,10 +1091,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                     return this.itemData.dateRanges[index];
                   }
                 },
-                startDateValidators: {
-                  dateSameOrAfter: () => [
-                    'dateOfOnset'
-                  ]
+                changed: () => {
+                  // validate hospitalization start date against date of onset
+                  this.checkForOnsetAfterHospitalizationStartDate();
                 }
               }
             }
@@ -2501,5 +2505,43 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     } else {
       this.toastV2Service.hide(AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
     }
+  }
+
+  /**
+   * Check if hospitalization start date is before date of onset
+   */
+  private checkForOnsetAfterHospitalizationStartDate() {
+    // return if there is no valid date of onset or no hospitalization
+    if (
+      !this.itemData.dateOfOnset ||
+      !moment(this.itemData.dateOfOnset).isValid() ||
+      !this.itemData.dateRanges?.length
+    ) {
+      // make sure that there is no warning
+      this.toastV2Service.hide(AppMessages.APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+
+      return;
+    }
+
+    // parse hospitalization items
+    for (const item of this.itemData.dateRanges) {
+      if (
+        item.startDate &&
+        moment(item.startDate).isValid() &&
+        moment(item.startDate).isBefore(moment(this.itemData.dateOfOnset))
+      ) {
+        this.toastV2Service.notice(
+          'LNG_HOSPITALISATION_ISOLATION_DATE_RANGE_WARNING_CASE_DATEOFONSET_AFTER_START_DATE',
+          undefined,
+          AppMessages.APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET
+        );
+
+        // return if at least one mismatch found
+        return;
+      }
+    }
+
+    // hide warning if no mismatch found
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
   }
 }
