@@ -442,20 +442,17 @@ export class TransmissionChainBarsService {
     // draw each date
     Object.keys(this.datesMap).forEach((dayDate, index) => {
       // set position (top-left corner)
-      const dateContainer = this.graphDatesContainerSVG.append('svg')
-        .attr('x', 0)
-        .attr('y', index * this.cellHeight);
-
-      const dateGroup = dateContainer.append('g');
-      dateGroup.append('rect')
+      const dateContainer = this.graphDatesContainerSVG.append('g')
+        .attr('transform', `translate(0, ${index * this.cellHeight})`);
+      dateContainer.append('rect')
         .attr('fill', 'transparent')
         .attr('width', '100%')
         .attr('height', this.cellHeight);
-      dateGroup.append('text')
+      dateContainer.append('text')
         .text(dayDate)
         .attr('fill', 'black')
         .attr('alignment-baseline', 'central')
-      // center the text vertically
+        .attr('x', 0)
         .attr('y', this.cellHeight / 2);
     });
   }
@@ -580,15 +577,6 @@ export class TransmissionChainBarsService {
           totalOffsetLeft += parent.offsetLeft;
           scrollOffsetY += parent.scrollTop;
           parent = parent.parentElement;
-        }
-
-        // add filters height if necessary
-        const filtersDiv: any = document.querySelector('div.filters');
-        if (
-          filtersDiv &&
-                    filtersDiv.offsetHeight
-        ) {
-          scrollOffsetY += filtersDiv.offsetHeight - 30;
         }
 
         // set floating div position
