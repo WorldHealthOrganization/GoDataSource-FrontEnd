@@ -2526,6 +2526,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     // parse hospitalization items
     for (const item of this.itemData.dateRanges) {
       if (
+        item.startDate &&
         moment(item.startDate).isValid() &&
         moment(item.startDate).isBefore(moment(this.itemData.dateOfOnset))
       ) {
