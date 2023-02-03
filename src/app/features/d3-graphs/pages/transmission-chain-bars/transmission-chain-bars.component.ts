@@ -490,17 +490,28 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
         `${this.i18nService.instant('LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE')}.pdf`, {
           onclone: (_document, element) => {
             // disable overflow scrolls to render everything, otherwise it won't scroll children, and it won't export everything
+            const dateSection = element.querySelector<HTMLElement>('.gd-dates-section');
+            const dateSectionContainer = element.querySelector<HTMLElement>('.gd-dates-section-container');
             const chartSection = element.querySelector<HTMLElement>('.gd-entities-section');
+            const chartSectionHeader = element.querySelector<HTMLElement>('.gd-entities-section-header');
             const chartSectionContainer = chartSection.querySelector<HTMLElement>('.gd-entities-section-container');
             if (
+              dateSection &&
+              dateSectionContainer &&
               chartSection &&
+              chartSectionHeader &&
               chartSectionContainer
             ) {
               element.style.whiteSpace = 'nowrap';
               element.style.width = 'fit-content';
               element.style.height = 'fit-content';
+              dateSection.style.height = 'fit-content';
+              dateSectionContainer.style.overflow = 'visible';
+              dateSectionContainer.style.height = 'fit-content';
               chartSection.style.width = 'fit-content';
               chartSection.style.height = 'fit-content';
+              chartSectionHeader.style.overflow = 'visible';
+              chartSectionHeader.style.width = 'fit-content';
               chartSectionContainer.style.overflow = 'visible';
               chartSectionContainer.style.width = 'fit-content';
               chartSectionContainer.style.height = 'fit-content';
