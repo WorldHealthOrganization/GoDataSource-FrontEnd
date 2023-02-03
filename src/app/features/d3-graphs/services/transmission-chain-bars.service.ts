@@ -464,7 +464,7 @@ export class TransmissionChainBarsService {
      * Mouse move - hover div
      */
   private initSvgMouseMove() {
-    const svg: any = this.graphEntitySectionDivContainer.node();
+    const svg: SVGSVGElement = this.graphEntitySectionDivContainer.node();
     const pt = svg.createSVGPoint();
     svg.addEventListener(
       'mouseleave',
@@ -474,7 +474,13 @@ export class TransmissionChainBarsService {
     );
     svg.addEventListener(
       'mousemove',
-      (evt) => {
+      (evt: {
+        clientX: number,
+        clientY: number,
+        screenX: number,
+        screenY: number,
+        layerY?: number
+      }) => {
         // retrieve hover div
         if (!this.graphHoverDiv) {
           return;
@@ -484,7 +490,7 @@ export class TransmissionChainBarsService {
         this.hideHoverDiv();
 
         // is there a point in checking position ?
-        if (evt.layerY <= 0) {
+        if (evt.layerY <= this.graphEntitySectionHeaderHeight) {
           return;
         }
 
@@ -504,7 +510,7 @@ export class TransmissionChainBarsService {
         const cursorPT = pt.matrixTransform(svg.getScreenCTM().inverse());
 
         // determine person name
-        const nameIndex = Math.floor((cursorPT.x) / (this.marginBetween + this.cellWidth));
+        const nameIndex = Math.floor(cursorPT.x / (this.marginBetween + this.cellWidth));
         if (!this.namesMap[nameIndex]) {
           return;
         }
@@ -659,8 +665,9 @@ export class TransmissionChainBarsService {
     this.drawGraphCenterNames();
 
     // set graph height
-    this.graphDatesContainerSVG.attr('height', this.determineGraphHeight());
-    this.graphEntitySectionDivContainer.attr('height', this.determineGraphHeight());
+    const graphHeight: number = this.determineGraphHeight();
+    this.graphDatesContainerSVG.attr('height', graphHeight);
+    this.graphEntitySectionDivContainer.attr('height', graphHeight);
 
     // synchronize scroll bars
     const graphEntitySectionDivDOM = graphEntitySectionDiv.node();
@@ -723,7 +730,6 @@ export class TransmissionChainBarsService {
     if (visualId) {
       entityDetailsGroup.append('text')
         .text(entityData.visualId)
-      // .attr('class', 'gd-entities-section-header-entity-info')
         .attr('fill', 'black')
         .attr('font-size', '12px')
         .attr('alignment-baseline', 'central')

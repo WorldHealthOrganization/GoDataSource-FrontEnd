@@ -1069,6 +1069,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             itemsChanged: (list) => {
               // update documents
               this.itemData.dateRanges = list.items;
+
+              // validate hospitalization start date against date of onset
+              this.checkForOnsetAfterHospitalizationStartDate();
             },
             definition: {
               add: {
@@ -2508,16 +2511,21 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Check if hospitalization start date is before date of onset
    */
   private checkForOnsetAfterHospitalizationStartDate() {
-    // return if there is no hospitalization
-    if (!this.itemData.dateRanges.length) {
+    // return if there is no valid date of onset or no hospitalization
+    if (
+      !this.itemData.dateOfOnset ||
+      !moment(this.itemData.dateOfOnset).isValid() ||
+      !this.itemData.dateRanges?.length
+    ) {
+      // make sure that there is no warning
+      this.toastV2Service.hide(AppMessages.APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+
       return;
     }
 
     // parse hospitalization items
     for (const item of this.itemData.dateRanges) {
       if (
-        this.itemData.dateOfOnset &&
-        item.startDate &&
         moment(item.startDate).isValid() &&
         moment(item.startDate).isBefore(moment(this.itemData.dateOfOnset))
       ) {
