@@ -90,7 +90,7 @@ export class DomService {
     fileName: string,
     options?: {
       onclone?: (document: Document, element: HTMLElement) => void,
-      splitType?: 'grid' | 'auto'
+      splitType?: 'auto' | 'grid' | 'horizontal' | 'vertical'
     },
     stateChanged?: (step: ConvertHtmlToPDFStep) => void
   ): Observable<void> {

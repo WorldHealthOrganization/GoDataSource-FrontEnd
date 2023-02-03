@@ -549,10 +549,10 @@ export class TransmissionChainBarsService {
                   null;
                 if (
                   centerName &&
-                                    dateRange.startDate &&
-                                    moment(dateRange.startDate).isSameOrBefore(dateMoment) && (
+                  dateRange.startDate &&
+                  moment(dateRange.startDate).isSameOrBefore(dateMoment) && (
                     !dateRange.endDate ||
-                                        moment(dateRange.endDate).isSameOrAfter(dateMoment)
+                    moment(dateRange.endDate).isSameOrAfter(dateMoment)
                   )
                 ) {
                   text += `<br />${this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_CENTER_NAME_LABEL', { name: centerName })}`;
