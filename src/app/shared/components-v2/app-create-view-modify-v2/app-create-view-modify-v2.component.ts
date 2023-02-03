@@ -1,6 +1,14 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { CreateViewModifyV2Action } from './models/action.model';
-import { CreateViewModifyV2ActionType, CreateViewModifyV2MenuType, CreateViewModifyV2TabInputType, ICreateViewModifyV2, ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputList, ICreateViewModifyV2TabTable } from './models/tab.model';
+import {
+  CreateViewModifyV2ActionType,
+  CreateViewModifyV2MenuType,
+  CreateViewModifyV2TabInputType,
+  ICreateViewModifyV2,
+  ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputChanged,
+  ICreateViewModifyV2TabInputList,
+  ICreateViewModifyV2TabTable
+} from './models/tab.model';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
 import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/bottom-dialog-config.model';
@@ -571,6 +579,25 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
       // remove item
       deleteItem();
     });
+  }
+
+  /**
+   * Trigger changed method if we have one assigned
+   */
+  triggerListInputChanged(
+    input: ICreateViewModifyV2TabInputChanged,
+    itemIndex?: number
+  ): void {
+    // nothing to do ?
+    if (!input.changed) {
+      return;
+    }
+
+    // trigger change
+    input.changed(
+      input,
+      itemIndex
+    );
   }
 
   /**

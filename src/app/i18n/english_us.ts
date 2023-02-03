@@ -19,10 +19,7 @@ export const EnglishUsLang = {
     'LNG_PAGE_MODIFY_LAB_RESULTS_LIST_MODIFY_DATA_INFO_LABEL': '*The system will replace only data that is changed. If you don\'t enter any data, then the system won\'t update the data to any of the selected lab results',
     'LNG_PAGE_MODIFY_LAB_RESULTS_SELECTED_CONTACTS': 'Selected lab results:',
     'LNG_PAGE_MODIFY_LAB_RESULTS_LIST_ERROR_NO_LAB_RESULTS_SELECTED': 'No lab results were selected',
-    'LNG_PAGE_MODIFY_LAB_RESULTS_LIST_ACTION_MODIFY_MULTIPLE_LAB_RESULTS_SUCCESS_MESSAGE': 'Lab results updated',
-    'LNG_PAGE_GANTT_CHART_REPORT_FORMAT': 'Export format',
-    'LNG_PAGE_GANTT_CHART_REPORT_FORMAT_MULTI_PAGE': 'Multiple pages',
-    'LNG_PAGE_GANTT_CHART_REPORT_FORMAT_SINGLE_PAGE': 'Single page'
+    'LNG_PAGE_MODIFY_LAB_RESULTS_LIST_ACTION_MODIFY_MULTIPLE_LAB_RESULTS_SUCCESS_MESSAGE': 'Lab results updated'
 
     /**
      * REMOVE the tokens from below
@@ -38,7 +35,6 @@ export const EnglishUsLang = {
     // ageButtonLabel="LNG_CASE_FIELD_LABEL_AGE_BUTTON"
     // dobButtonLabel="LNG_CASE_FIELD_LABEL_DATE_OF_BIRTH_BUTTON"
     // dobPlaceholder="LNG_CASE_FIELD_LABEL_DOB"
-    // LNG_HOSPITALISATION_ISOLATION_DATE_RANGE_WARNING_CASE_DATEOFONSET_AFTER_START_DATE
     // LNG_DIALOG_CONFIRM_CHANGE_CASE_EPI_CLASSIFICATION
     // LNG_PAGE_TERMS_OF_USE_TITLE
     // LNG_PAGE_TERMS_OF_USE_HEADER_TITLE

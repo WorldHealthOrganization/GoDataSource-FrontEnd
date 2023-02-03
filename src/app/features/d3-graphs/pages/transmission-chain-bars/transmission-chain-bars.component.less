@@ -1,4 +1,5 @@
 @relationship-accent-color: #da0000;
+@gd-chart-left-width: 100px;
 
 app-transmission-chain-bars {
     .filters {
@@ -28,42 +29,70 @@ app-transmission-chain-bars {
         }
     }
 
-    #chart {
-        display: flex;
-        width: 100%;
-        // keep some padding for scrollbars when exporting the graph
-        padding-right: 18px;
-        box-sizing: border-box;
+  #chart {
+    width: 100%;
+    height: 100%;
+    // #TODO keep some padding for scrollbars when exporting the graph
+    box-sizing: border-box;
 
-        .entities-container {
-            flex: 1 1;
-            overflow-x: scroll;
-            overflow-y: hidden;
+    .gd-dates-section {
+      display: inline-block;
+      width: @gd-chart-left-width;
+      height: 100%;
+      vertical-align: top;
 
-            .relationship {
-                &.accent {
-                    stroke: @relationship-accent-color;
-                    fill: @relationship-accent-color;
-                }
-            }
+      .gd-dates-section-container {
+        overflow: hidden;
 
-            .entity-info-header {
-                cursor: pointer;
-
-                &:hover {
-                    text-decoration: underline;
-                }
-            }
-
-            .entity-bar {
-                cursor: pointer;
-
-                &.accent {
-                    rect {
-                        stroke: @relationship-accent-color;
-                    }
-                }
-            }
+        .gd-dates-section-container-svg {
+          width: 100%;
         }
+      }
     }
+
+    .gd-entities-section {
+      display: inline-block;
+      width: calc(100% - @gd-chart-left-width);
+      height: 100%;
+
+      .gd-entities-section-header {
+        overflow: hidden;
+
+        .gd-entities-section-header-svg {
+          height: 100%;
+        }
+
+        .gd-entities-section-header-entity-info {
+          cursor: pointer;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+
+      .gd-entities-section-container {
+        display: inline-block;
+        width: 100%;
+        overflow: auto;
+
+        .gd-entities-section-container-relationship {
+          &.accent {
+            stroke: @relationship-accent-color;
+            fill: @relationship-accent-color;
+          }
+        }
+
+        .gd-entities-section-container-entity-bar {
+          cursor: pointer;
+
+          &.accent {
+            rect {
+              stroke: @relationship-accent-color;
+            }
+          }
+        }
+      }
+    }
+  }
 }
