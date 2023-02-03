@@ -47,7 +47,7 @@ export class DomService {
   /**
    * Convert html to base 64 png
    */
-  convertHTML2DataUriPNG(
+  private convertHTML2DataUriPNG(
     htmlElement: HTMLElement,
     options?: {
       onclone?: (document: Document, element: HTMLElement) => void
