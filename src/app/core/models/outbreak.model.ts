@@ -71,6 +71,7 @@ export class OutbreakModel
   isDateOfOnsetRequired: boolean;
   applyGeographicRestrictions: boolean;
   checkLastContactDateAgainstDateOnSet: boolean;
+  disableModifyingLegacyQuestionnaire: boolean;
 
   generateFollowUpsOverwriteExisting: boolean;
   generateFollowUpsKeepTeamAssignment: boolean;
@@ -118,6 +119,13 @@ export class OutbreakModel
         type: V2AdvancedFilterType.SELECT,
         field: 'checkLastContactDateAgainstDateOnSet',
         label: 'LNG_OUTBREAK_FIELD_LABEL_CHECK_LAST_CONTACT_DATE_AGAINST_DATE_OF_ONSET',
+        options: data.options.yesNo,
+        sortable: true
+      },
+      {
+        type: V2AdvancedFilterType.SELECT,
+        field: 'disableModifyingLegacyQuestionnaire',
+        label: 'LNG_OUTBREAK_FIELD_LABEL_DISABLE_MODIFYING_LEGACY_QUESTIONNAIRE',
         options: data.options.yesNo,
         sortable: true
       },
@@ -264,6 +272,7 @@ export class OutbreakModel
     this.isDateOfOnsetRequired = _.get(data, 'isDateOfOnsetRequired', true);
     this.applyGeographicRestrictions = _.get(data, 'applyGeographicRestrictions', false);
     this.checkLastContactDateAgainstDateOnSet = _.get(data, 'checkLastContactDateAgainstDateOnSet', false);
+    this.disableModifyingLegacyQuestionnaire = _.get(data, 'disableModifyingLegacyQuestionnaire', false);
     this.generateFollowUpsOverwriteExisting = _.get(data, 'generateFollowUpsOverwriteExisting', false);
     this.generateFollowUpsKeepTeamAssignment = _.get(data, 'generateFollowUpsKeepTeamAssignment', true);
     this.generateFollowUpsTeamAssignmentAlgorithm = _.get(data, 'generateFollowUpsTeamAssignmentAlgorithm', Constants.FOLLOWUP_GENERATION_TEAM_ASSIGNMENT_ALGORITHM.ROUND_ROBIN_ALL_TEAMS.value);
