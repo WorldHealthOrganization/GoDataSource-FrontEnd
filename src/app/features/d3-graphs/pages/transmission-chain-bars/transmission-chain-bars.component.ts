@@ -488,8 +488,6 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
       .convertHTML2PDF(
         this.chartContainer.nativeElement,
         `${this.i18nService.instant('LNG_PAGE_TRANSMISSION_CHAIN_BARS_TITLE')}.pdf`, {
-          splitFactor: 1,
-          splitType: 'grid',
           onclone: (_document, element) => {
             // disable overflow scrolls to render everything, otherwise it won't scroll children, and it won't export everything
             const dateSection = element.querySelector<HTMLElement>('.gd-dates-section');
