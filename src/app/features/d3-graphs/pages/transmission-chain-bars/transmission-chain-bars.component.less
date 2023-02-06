@@ -41,6 +41,11 @@ app-transmission-chain-bars {
       height: 100%;
       vertical-align: top;
 
+      // IMPORTANT: needed, otherwise header date rows and header case names aren't exported :)
+      .gd-dates-section-header {
+        background-color: white;
+      }
+
       .gd-dates-section-container {
         overflow: hidden;
 

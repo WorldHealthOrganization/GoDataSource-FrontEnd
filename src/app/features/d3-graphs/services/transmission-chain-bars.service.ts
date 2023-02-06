@@ -458,9 +458,10 @@ export class TransmissionChainBarsService {
   }
 
   /**
-     * Mouse move - hover div
-     */
+   * Mouse move - hover div
+   */
   private initSvgMouseMove() {
+    // #TODO - remove tooltip dif once we have a way implemented by Laur to detect headers (case, center & date - intersection screenshot sent to Laur a few days ago)
     const svg: SVGSVGElement = this.graphEntitySectionDivContainer.node();
     const pt = svg.createSVGPoint();
     svg.addEventListener(

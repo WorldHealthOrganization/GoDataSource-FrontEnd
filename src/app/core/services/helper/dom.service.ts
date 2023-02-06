@@ -90,6 +90,7 @@ export class DomService {
     fileName: string,
     options?: {
       onclone?: (document: Document, element: HTMLElement) => void,
+      splitFactor?: number,
       splitType?: 'auto' | 'grid' | 'horizontal' | 'vertical'
     },
     stateChanged?: (step: ConvertHtmlToPDFStep) => void
@@ -127,7 +128,9 @@ export class DomService {
             .exportImageToPdf({
               image: dataBase64,
               responseType: 'blob',
-              splitFactor: 1,
+              splitFactor: options?.splitFactor ?
+                options?.splitFactor :
+                1,
               splitType: options?.splitType
             })
             .pipe(
