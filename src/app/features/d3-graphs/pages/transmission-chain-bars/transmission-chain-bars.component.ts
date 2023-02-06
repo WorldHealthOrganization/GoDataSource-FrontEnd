@@ -26,6 +26,7 @@ import { moment } from '../../../../core/helperClasses/x-moment';
 import { EntityType } from '../../../../core/models/entity-type';
 import { IV2SideDialogAdvancedFiltersResponse } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ConvertHtmlToPDFStep, DomService } from '../../../../core/services/helper/dom.service';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
   selector: 'app-transmission-chain-bars',
@@ -58,7 +59,21 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
   legendColors: any;
 
   graphData: any;
-  cellWidth: number = 91;
+
+  // cell width column
+  selectedCellWidthValue: string = '91';
+  cellWidthOptions: ILabelValuePairModel[] = [
+    {
+      label: '91',
+      value: '91'
+    }, {
+      label: '110',
+      value: '110'
+    }, {
+      label: '150',
+      value: '150'
+    }
+  ];
 
   @ViewChild('chart', { static: true }) chartContainer: ElementRef;
 
@@ -440,7 +455,7 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
       this.chartContainer.nativeElement,
       this.graphData,
       this.centerTokenToNameMap, {
-        cellWidth: this.cellWidth
+        cellWidth: parseInt(this.selectedCellWidthValue, 10)
       }
     );
   }
@@ -448,8 +463,7 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
   /**
    * Changed cell width
    */
-  cellWidthChanged(cellWidth: number) {
-    this.cellWidth = cellWidth;
+  cellWidthChanged(): void {
     this.redrawGraph();
   }
 
