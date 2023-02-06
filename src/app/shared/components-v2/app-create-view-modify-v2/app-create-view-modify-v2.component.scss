@@ -418,7 +418,7 @@
   .gd-create-view-modify-bottom {
     position: relative;
 
-    .gd-order-tabs-button {
+    .gd-conf-tabs-button {
       @include border-radius(0.4rem 0.4rem 0 0);
       position: absolute;
       z-index: 10;
@@ -660,7 +660,7 @@
   }
 
   .gd-create-view-modify-bottom {
-    .gd-order-tabs-button {
+    .gd-conf-tabs-button {
       right: 0;
       top: -3.6rem;
 
@@ -677,7 +677,7 @@
 .gd-create-view-modify-modify,
 .gd-create-view-modify-view {
   .gd-create-view-modify-bottom {
-    .gd-order-tabs-button {
+    .gd-conf-tabs-button {
       left: 0;
       top: 0.2rem;
 

@@ -20,6 +20,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
 import { IGroupEventData, IGroupOptionEventData, ISelectGroupOptionFormatResponse, ISelectGroupOptionMap } from '../../../forms-v2/components/app-form-select-groups-v2/models/select-group.model';
 import { LocationIdentifierModel } from '../../../../core/models/location-identifier.model';
+import { IV2SideDialogData, V2SideDialogConfigInput } from '../../app-side-dialog-v2/models/side-dialog-config.model';
 
 /**
  * Input type
@@ -868,4 +869,15 @@ export interface ICreateViewModifyV2 {
 
   // optional
   modifyGetAllNotOnlyDirtyFields?: boolean;
+}
+
+/**
+ * Create / View / Modify tab configuration
+ */
+export interface ICreateViewModifyV2Conf {
+  inputs: V2SideDialogConfigInput[];
+  apply: (
+    data: IV2SideDialogData,
+    finish: () => void
+  ) => void;
 }
