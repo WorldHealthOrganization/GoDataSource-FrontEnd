@@ -5,10 +5,11 @@ import { Constants } from '../../../core/models/constants';
 import { TransmissionChainBarsModel } from '../typings/transmission-chain-bars.model';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { EntityBarModel } from '../typings/entity-bar.model';
-import { Router } from '@angular/router';
 import { EntityType } from '../../../core/models/entity-type';
 import { Moment, moment } from '../../../core/helperClasses/x-moment';
 import { v4 as uuid } from 'uuid';
+import { Location } from '@angular/common';
+import { Router } from '@angular/router';
 
 // define cell types that we need to draw
 enum drawCellType {
@@ -215,7 +216,8 @@ export class TransmissionChainBarsService {
      */
   constructor(
     private i18nService: I18nService,
-    private router: Router
+    private router: Router,
+    private location: Location
   ) {}
 
   /**
@@ -702,15 +704,36 @@ export class TransmissionChainBarsService {
       .attr('x', entityColumnIdx * (this.marginBetween + this.cellWidth))
       .attr('y', 0);
 
+    // entity link
+    const url: string = entityData.type === EntityType.EVENT ?
+      `/events/${entityData.id}/view` :
+      `/cases/${entityData.id}/view`;
+    const externURL: string = this.location.prepareExternalUrl(url);
+    const entityDetailsGroupSVG = entityColumnContainerHeader
+      .append('a')
+      .attr('href', externURL)
+      .append('svg');
+
+    // handle single page application link, so we don't reload modules
+    entityDetailsGroupSVG.on('click', (event) => {
+      // stop propagation
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+
+      // redirect
+      this.router.navigate([url]);
+    });
+
     // draw the case / event details cell
-    const entityDetailsGroup = entityColumnContainerHeader.append('g')
+    const entityDetailsGroupG = entityDetailsGroupSVG.append('g')
       .attr('transform', `translate(${this.cellWidth / 2 - 32} 10) rotate(-54, 32, ${this.entityDetailsCellHeight / 2})`)
       .attr('class', 'gd-entities-section-header-entity-info');
 
     // case full name / / event name
     const name: string = (entityData.firstName ? entityData.firstName + ' ' : '') +
             (entityData.lastName ? entityData.lastName : '');
-    entityDetailsGroup.append('text')
+    entityDetailsGroupG.append('text')
       .text(name)
       .attr('fill', 'black')
       .attr('font-size', '12px')
@@ -721,7 +744,7 @@ export class TransmissionChainBarsService {
     // case visual ID
     const visualId: string = entityData.visualId ? entityData.visualId.trim() : null;
     if (visualId) {
-      entityDetailsGroup.append('text')
+      entityDetailsGroupG.append('text')
         .text(entityData.visualId)
         .attr('fill', 'black')
         .attr('font-size', '12px')
@@ -736,17 +759,6 @@ export class TransmissionChainBarsService {
         `${name} (${visualId})` :
         name
     );
-
-    // register onclick event to navigate to case page when user clicks on Visual ID or Full Name
-    const redirectToEntityPage = (targetEntityId: string, entityType: EntityType) => {
-      if (entityType === EntityType.EVENT) {
-        this.router.navigate(['events', targetEntityId, 'view']);
-      } else {
-        this.router.navigate(['cases', targetEntityId, 'view']);
-      }
-    };
-    entityDetailsGroup.on('click', () => { redirectToEntityPage(entityData.id, entityData.type); });
-
 
 
     // keep case date of onset / event date for later use
