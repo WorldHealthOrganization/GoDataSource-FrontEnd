@@ -1006,8 +1006,8 @@ export class TransmissionChainBarsService {
       .attr('width', this.cellWidth)
       .attr('height', (moment(entityData.lastGraphDate).startOf('day').diff(dateMoment, 'days') + 1) * this.cellHeight)
       .attr('fill', 'transparent')
-      .attr('stroke', 'black')
-      .attr('stroke-width', '2')
+      .attr('stroke', 'var(--gd-secondary)')
+      .attr('stroke-width', '1')
       .attr('shape-rendering', 'optimizeSpeed');
 
     /**
@@ -1316,8 +1316,8 @@ export class TransmissionChainBarsService {
       group.append('rect')
         .attr('width', width)
         .attr('height', height)
-        .attr('fill', 'transparent')
-        .attr('stroke', 'black')
+        .attr('fill', 'white')
+        .attr('stroke', 'var(--gd-secondary)')
         .attr('stroke-width', '1')
         .attr('shape-rendering', 'optimizeSpeed');
 
@@ -1343,7 +1343,7 @@ export class TransmissionChainBarsService {
       group.append('text')
         .text(renderName)
         .attr('clip-path', `url(#${pathId})`)
-        .attr('fill', 'black')
+        .attr('fill', 'var(--gd-text)')
         .attr('alignment-baseline', 'central')
         .attr('x', textX)
         .attr('y', height / 2);

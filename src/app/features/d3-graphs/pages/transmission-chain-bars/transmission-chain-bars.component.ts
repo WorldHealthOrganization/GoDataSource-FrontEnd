@@ -31,7 +31,7 @@ import { ConvertHtmlToPDFStep, DomService } from '../../../../core/services/help
   selector: 'app-transmission-chain-bars',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './transmission-chain-bars.component.html',
-  styleUrls: ['./transmission-chain-bars.component.less']
+  styleUrls: ['./transmission-chain-bars.component.scss']
 })
 export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
   // breadcrumbs
