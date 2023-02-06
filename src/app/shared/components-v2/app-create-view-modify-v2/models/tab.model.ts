@@ -874,7 +874,7 @@ export interface ICreateViewModifyV2 {
 /**
  * Create / View / Modify tab configuration
  */
-export interface ICreateViewModifyV2Conf {
+export interface ICreateViewModifyV2Config {
   inputs: V2SideDialogConfigInput[];
   apply: (
     data: IV2SideDialogData,

@@ -5,7 +5,7 @@ import {
   CreateViewModifyV2MenuType,
   CreateViewModifyV2TabInputType,
   ICreateViewModifyV2,
-  ICreateViewModifyV2Conf,
+  ICreateViewModifyV2Config,
   ICreateViewModifyV2Tab,
   ICreateViewModifyV2TabInputChanged,
   ICreateViewModifyV2TabInputList,
@@ -394,7 +394,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   }
 
   // custom tab configuration settings
-  @Input() tabConfiguration: ICreateViewModifyV2Conf;
+  @Input() tabConfiguration: ICreateViewModifyV2Config;
 
   // user settings key
   private _pageSettingsKey: string;

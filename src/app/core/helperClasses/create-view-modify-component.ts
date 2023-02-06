@@ -2,7 +2,7 @@ import { Observable, ReplaySubject, throwError } from 'rxjs';
 import { IV2Breadcrumb } from '../../shared/components-v2/app-breadcrumb-v2/models/breadcrumb.model';
 import { OutbreakModel } from '../models/outbreak.model';
 import { UserModel, UserSettings } from '../models/user.model';
-import { ICreateViewModifyV2, ICreateViewModifyV2Conf } from '../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
+import { ICreateViewModifyV2, ICreateViewModifyV2Config } from '../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { ActivatedRoute } from '@angular/router';
 import { Directive, Renderer2, ViewChild } from '@angular/core';
 import { TopnavComponent } from '../components/topnav/topnav.component';
@@ -74,7 +74,7 @@ export abstract class CreateViewModifyComponent<T>
   tabData: ICreateViewModifyV2;
 
   // tab configuration
-  tabConfiguration: ICreateViewModifyV2Conf;
+  tabConfiguration: ICreateViewModifyV2Config;
 
   // expanded list records observable
   expandListRecords$: Observable<T[]>;
