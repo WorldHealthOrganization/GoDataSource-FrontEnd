@@ -1028,12 +1028,9 @@ export class TransmissionChainBarsService {
     entityBar.on('click', () => {
       // selected case / event does already have accent?
       if (entityBar.classed('accent')) {
-        // selected case / event has accent;
-        // remove accent from case / event
-        entityBar.classed('accent', false);
-
-        // remove accent from all relationships
-        this.graphEntitySectionDivContainer.selectAll('.relationship')
+        // selected case / event doesn't have accent;
+        // remove accent from all elements
+        this.graphEntitySectionDivContainer.selectAll('.accent')
           .classed('accent', false);
       } else {
         // selected case / event doesn't have accent;
