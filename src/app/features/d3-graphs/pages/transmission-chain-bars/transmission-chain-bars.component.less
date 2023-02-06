@@ -1,5 +1,5 @@
 @relationship-accent-color: #da0000;
-@gd-chart-left-width: 100px;
+@gd-chart-left-width: 80px;
 
 app-transmission-chain-bars {
     .filters {
@@ -40,6 +40,11 @@ app-transmission-chain-bars {
       width: @gd-chart-left-width;
       height: 100%;
       vertical-align: top;
+
+      // IMPORTANT: needed, otherwise header date rows and header case names aren't exported :)
+      .gd-dates-section-header {
+        background-color: white;
+      }
 
       .gd-dates-section-container {
         overflow: hidden;

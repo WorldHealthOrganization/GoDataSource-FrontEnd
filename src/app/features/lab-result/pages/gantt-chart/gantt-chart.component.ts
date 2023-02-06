@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
-import { DomService } from '../../../../core/services/helper/dom.service';
+import { ConvertHtmlToPDFStep, DomService } from '../../../../core/services/helper/dom.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { GanttChartDelayOnsetDashletComponent } from '../../components/gantt-chart-delay-onset-dashlet/gantt-chart-delay-onset-dashlet.component';
 import { throwError } from 'rxjs';
@@ -183,44 +183,67 @@ export class GanttChartComponent extends ConfirmOnFormChanges implements OnInit 
     this.showLoadingDialog();
 
     // export
-    setTimeout(() => {
-      this.domService
-        .convertHTML2PDF(
-          document.querySelector(
-            this.ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value ?
-              'app-gantt-chart-delay-onset-hospitalization-dashlet #gantt-svg-root' :
-              'app-gantt-chart-delay-onset-dashlet #gantt-svg-root'
-          ),
-          `${this.i18nService.instant('LNG_PAGE_GANTT_CHART_REPORT_LABEL')}.pdf`, {
-            onclone: (_document, element) => {
-              // disable overflow scrolls to render everything, otherwise it won't scroll children, and it won't export everything
-              if (element) {
-                element.style.overflow = 'visible';
-                element.style.width = 'fit-content';
-                element.style.height = 'fit-content';
-              }
+    this.domService
+      .convertHTML2PDF(
+        document.querySelector(
+          this.ganttChartType === Constants.GANTT_CHART_TYPES.GANTT_CHART_HOSPITALIZATION_ISOLATION.value ?
+            'app-gantt-chart-delay-onset-hospitalization-dashlet #gantt-svg-root' :
+            'app-gantt-chart-delay-onset-dashlet #gantt-svg-root'
+        ),
+        `${this.i18nService.instant('LNG_PAGE_GANTT_CHART_REPORT_LABEL')}.pdf`, {
+          onclone: (_document, element) => {
+            // disable overflow scrolls to render everything, otherwise it won't scroll children, and it won't export everything
+            if (element) {
+              element.style.overflow = 'visible';
+              element.style.width = 'fit-content';
+              element.style.height = 'fit-content';
             }
           }
-        )
-        .pipe(
-          catchError((err) => {
-            this.toastV2Service.error(err);
-            this.closeLoadingDialog();
-            return throwError(err);
-          })
-        )
-        .subscribe(() => {
-          // finished
-          this.closeLoadingDialog();
-        });
+        },
+        (step) => {
+          // determine percent
+          let percent: number;
+          switch (step) {
+            case ConvertHtmlToPDFStep.INITIALIZED:
+              percent = 5;
+              break;
+            case ConvertHtmlToPDFStep.CONVERTING_HTML_TO_PDF:
+              percent = 50;
+              break;
+            case ConvertHtmlToPDFStep.EXPORTING_PDF:
+              percent = 99;
+              break;
+          }
 
-    }, 200);
+          // update dialog percent
+          this.loadingDialog.message({
+            message: `${percent}%`
+          });
+        }
+      )
+      .pipe(
+        catchError((err) => {
+          this.toastV2Service.error(err);
+          this.closeLoadingDialog();
+          return throwError(err);
+        })
+      )
+      .subscribe(() => {
+        // finished
+        this.closeLoadingDialog();
+      });
   }
 
   /**
      * Display loading dialog
      */
   showLoadingDialog() {
+    // loading dialog already visible ?
+    if (this.loadingDialog) {
+      return;
+    }
+
+    // show
     this.loadingDialog = this.dialogV2Service.showLoadingDialog();
   }
 

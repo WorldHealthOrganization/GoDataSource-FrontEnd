@@ -442,28 +442,26 @@ export class TransmissionChainBarsService {
     // draw each date
     Object.keys(this.datesMap).forEach((dayDate, index) => {
       // set position (top-left corner)
-      const dateContainer = this.graphDatesContainerSVG.append('svg')
-        .attr('x', 0)
-        .attr('y', index * this.cellHeight);
-
-      const dateGroup = dateContainer.append('g');
-      dateGroup.append('rect')
+      const dateContainer = this.graphDatesContainerSVG.append('g')
+        .attr('transform', `translate(0, ${index * this.cellHeight})`);
+      dateContainer.append('rect')
         .attr('fill', 'transparent')
         .attr('width', '100%')
         .attr('height', this.cellHeight);
-      dateGroup.append('text')
+      dateContainer.append('text')
         .text(dayDate)
         .attr('fill', 'black')
         .attr('alignment-baseline', 'central')
-      // center the text vertically
+        .attr('x', 0)
         .attr('y', this.cellHeight / 2);
     });
   }
 
   /**
-     * Mouse move - hover div
-     */
+   * Mouse move - hover div
+   */
   private initSvgMouseMove() {
+    // #TODO - remove tooltip dif once we have a way implemented by Laur to detect headers (case, center & date - intersection screenshot sent to Laur a few days ago)
     const svg: SVGSVGElement = this.graphEntitySectionDivContainer.node();
     const pt = svg.createSVGPoint();
     svg.addEventListener(
@@ -552,10 +550,10 @@ export class TransmissionChainBarsService {
                   null;
                 if (
                   centerName &&
-                                    dateRange.startDate &&
-                                    moment(dateRange.startDate).isSameOrBefore(dateMoment) && (
+                  dateRange.startDate &&
+                  moment(dateRange.startDate).isSameOrBefore(dateMoment) && (
                     !dateRange.endDate ||
-                                        moment(dateRange.endDate).isSameOrAfter(dateMoment)
+                    moment(dateRange.endDate).isSameOrAfter(dateMoment)
                   )
                 ) {
                   text += `<br />${this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_CENTER_NAME_LABEL', { name: centerName })}`;
@@ -582,15 +580,6 @@ export class TransmissionChainBarsService {
           parent = parent.parentElement;
         }
 
-        // add filters height if necessary
-        const filtersDiv: any = document.querySelector('div.filters');
-        if (
-          filtersDiv &&
-                    filtersDiv.offsetHeight
-        ) {
-          scrollOffsetY += filtersDiv.offsetHeight - 30;
-        }
-
         // set floating div position
         this.graphHoverDiv.innerHTML = text;
         this.graphHoverDiv.style.left = `${evt.screenX - totalOffsetLeft}px`;
@@ -607,12 +596,19 @@ export class TransmissionChainBarsService {
   }
 
   /**
-     * Draw the cases & events (one column for each case / event)
-     */
+   * Check if we should draw entity
+   */
+  private shouldDrawEntity(entityId: string): boolean {
+    return !!this.graphData.personsMap[entityId]?.date;
+  }
+
+  /**
+   * Draw the cases & events (one column for each case / event)
+   */
   private drawEntities() {
     // determine graph width based on the number of cases & events
     // entities-no * (margin-between-entities + entity-cell-width) + placeholder-for-overflowing-name-or-visual-id
-    const entitiesGraphWidth = this.graphData.personsOrder.length * (this.marginBetween + this.cellWidth) + 20;
+    const entitiesGraphWidth = this.graphData.personsOrder.filter((entityId) => this.shouldDrawEntity(entityId)).length * (this.marginBetween + this.cellWidth) + 20;
 
     // reset occupied spaces
     this.relationshipOccupiedSpaces = {
@@ -678,19 +674,16 @@ export class TransmissionChainBarsService {
   }
 
   /**
-     * Draw a case / event block
-     */
+   * Draw a case / event block
+   */
   private drawEntity(entityId: string) {
     // keep case / event data for later use
-    const entityData = this.graphData.personsMap[entityId] as EntityBarModel;
-    if (
-      !entityData ||
-            !entityData.date
-    ) {
+    if (!this.shouldDrawEntity(entityId)) {
       return;
     }
 
     // the column where we draw the case / event
+    const entityData = this.graphData.personsMap[entityId] as EntityBarModel;
     const entityColumnIdx = this.currentColumnIdx;
 
     // increment the current column index for when drawing a new case / event
@@ -774,7 +767,7 @@ export class TransmissionChainBarsService {
     // date of outcome
     if (
       entityData.dateOfOutcome &&
-            entityData.outcomeId
+      entityData.outcomeId
     ) {
       // determine cell label
       let dateOfOutcomeLabel: string = this.translate('LNG_PAGE_TRANSMISSION_CHAIN_BARS_OUTCOME_OTHER_LABEL');
@@ -1285,7 +1278,7 @@ export class TransmissionChainBarsService {
       let y: number = 0;
       while (
         this.centerOccupiedLines[y] &&
-                x >= this.centerOccupiedLines[y].x1 && x <= this.centerOccupiedLines[y].x2
+        x >= this.centerOccupiedLines[y].x1 && x <= this.centerOccupiedLines[y].x2
       ) {
         // next line
         y += this.entityDetailsTextLineCellHeight + this.entityDetailsTextLineSpaceBetween;
@@ -1305,10 +1298,19 @@ export class TransmissionChainBarsService {
         x2: x + width
       };
 
+      // determine center name
+      const renderName = cell.name ?
+        this.centerTokenToNameMap[cell.name] || cell.name :
+        cell.name;
+
       // group handler
       const group = groupContainer.append('svg')
         .attr('x', x)
         .attr('y', y);
+
+      // draw cell rectangle
+      group.append('title')
+        .text(renderName);
 
       // draw cell rectangle
       group.append('rect')
@@ -1337,11 +1339,6 @@ export class TransmissionChainBarsService {
         .attr('width', width - (textX + this.entityDetailsTextLinesColorMargin))
         .attr('height', height);
 
-      // determine center name
-      const renderName = cell.name ?
-        this.centerTokenToNameMap[cell.name] || cell.name :
-        cell.name;
-
       // draw cell text
       group.append('text')
         .text(renderName)
@@ -1358,7 +1355,7 @@ export class TransmissionChainBarsService {
    */
   private determineGraphHeaderHeight(): number {
     // determine max of number of center name
-    const maxCenterNames = Math.max(...Object.values(this.entityToCenterNameCell).map(t => Object.keys(t).length));
+    const maxCenterNames = Math.max(0, ...Object.values(this.entityToCenterNameCell).map(t => Object.keys(t).length));
 
     // add entity name cell height and each center name cell height
     return this.entityDetailsCellHeight + maxCenterNames * (this.entityDetailsTextLineCellHeight + this.entityDetailsTextLineSpaceBetween);
