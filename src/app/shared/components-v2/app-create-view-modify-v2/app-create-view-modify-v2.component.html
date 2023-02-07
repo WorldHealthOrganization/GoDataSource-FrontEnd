@@ -1635,10 +1635,10 @@
             </ng-container>
           </ng-template>
 
-          <!-- Order tabs -->
+          <!-- Configure tabs -->
           <button
-            *ngIf="enableTabReorder && !!tabData?.tabs?.length"
-            class="gd-order-tabs-button"
+            *ngIf="!!tabData?.tabs?.length && (enableTabReorder || !!tabConfiguration?.inputs?.length)"
+            class="gd-conf-tabs-button"
             type="button"
             mat-icon-button
             color="primary"

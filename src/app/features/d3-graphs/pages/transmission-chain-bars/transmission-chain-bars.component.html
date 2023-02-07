@@ -41,13 +41,10 @@
             <div>
               {{ 'LNG_PAGE_TRANSMISSION_CHAIN_BARS_CELL_WIDTH_LABEL' | translate }}
             </div>
-            <mat-slider
-              [min]="91"
-              [max]="150"
-              [ngModel]="cellWidth"
-              [tickInterval]="10"
-              (valueChange)="cellWidthChanged($event)">
-            </mat-slider>
+            <app-form-toggle-v2
+              [(ngModel)]="selectedCellWidthValue"
+              [options]="cellWidthOptions"
+              (ngModelChange)="cellWidthChanged()"></app-form-toggle-v2>
           </div>
       </mat-menu>
     </div>

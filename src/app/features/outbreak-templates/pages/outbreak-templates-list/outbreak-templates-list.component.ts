@@ -442,6 +442,19 @@ export class OutbreakTemplatesListComponent
         }
       },
       {
+        field: 'disableModifyingLegacyQuestionnaire',
+        label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_DISABLE_MODIFYING_LEGACY_QUESTIONNAIRE',
+        notVisible: true,
+        format: {
+          type: V2ColumnFormat.BOOLEAN
+        },
+        filter: {
+          type: V2FilterType.BOOLEAN,
+          value: '',
+          defaultValue: ''
+        }
+      },
+      {
         field: 'generateFollowUpsKeepTeamAssignment',
         label: 'LNG_OUTBREAK_TEMPLATE_FIELD_LABEL_FOLLOWUP_GENERATION_KEEP_TEAM_ASSIGNMENT',
         notVisible: true,
@@ -554,6 +567,7 @@ export class OutbreakTemplatesListComponent
       'id',
       'name',
       'checkLastContactDateAgainstDateOnSet',
+      'disableModifyingLegacyQuestionnaire',
       'description',
       'disease',
       'generateFollowUpsTeamAssignmentAlgorithm',

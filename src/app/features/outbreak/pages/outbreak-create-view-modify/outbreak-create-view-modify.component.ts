@@ -501,6 +501,17 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
                   this.itemData.checkLastContactDateAgainstDateOnSet = value;
                 }
               }
+            }, {
+              type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,
+              name: 'disableModifyingLegacyQuestionnaire',
+              placeholder: () => 'LNG_OUTBREAK_FIELD_LABEL_DISABLE_MODIFYING_LEGACY_QUESTIONNAIRE',
+              description: () => 'LNG_OUTBREAK_FIELD_LABEL_DISABLE_MODIFYING_LEGACY_QUESTIONNAIRE_DESCRIPTION',
+              value: {
+                get: () => this.itemData.disableModifyingLegacyQuestionnaire,
+                set: (value) => {
+                  this.itemData.disableModifyingLegacyQuestionnaire = value;
+                }
+              }
             }
           ]
         },
