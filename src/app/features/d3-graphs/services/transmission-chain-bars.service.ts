@@ -70,7 +70,7 @@ interface GroupCell {
 export class TransmissionChainBarsService {
   // default header color
   private static DEFAULT_HEADER_COLUMN = 'transparent';
-  private static DEFAULT_HEADER_COLUMN_HIGHLIGHTED = 'red';
+  private static DEFAULT_HEADER_COLUMN_HIGHLIGHTED = 'rgba(var(--gd-primary-rgb), 0.25)';
 
   // regular cell width
   private readonly cellWidthDefault = 91;
@@ -421,13 +421,13 @@ export class TransmissionChainBarsService {
         .attr('transform', `translate(0, ${index * this.cellHeight})`);
       this.hover.rects.dates[dayDate] = dateContainer.append('rect')
         .attr('fill', TransmissionChainBarsService.DEFAULT_HEADER_COLUMN)
-        .attr('width', '100%')
+        .attr('width', 'calc(100% + 14px)')
         .attr('height', this.cellHeight);
       dateContainer.append('text')
         .text(dayDate)
         .attr('fill', 'black')
         .attr('alignment-baseline', 'central')
-        .attr('x', 0)
+        .attr('x', 14)
         .attr('y', this.cellHeight / 2);
     });
   }

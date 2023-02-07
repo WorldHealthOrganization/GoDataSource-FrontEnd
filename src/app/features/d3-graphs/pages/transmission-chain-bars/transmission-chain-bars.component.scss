@@ -47,7 +47,6 @@ app-transmission-chain-bars {
       .gd-dates-section-container {
         background-color: rgba(var(--gd-primary-rgb), 0.05);
         overflow: hidden;
-        padding-left: 1.4rem;
 
         .gd-dates-section-container-svg {
           width: 100%;
@@ -118,7 +117,7 @@ app-transmission-chain-bars {
 .gd-cot-bars-legend-content {
   max-width: 100%;
   min-width: 0;
-  padding: 1.6rem 1.6rem 5rem;
+  padding: 1.6rem;
 
   .gd-cot-bars-legend-colors {
     .legend-rect {
@@ -131,16 +130,6 @@ app-transmission-chain-bars {
   }
 
   .gd-cot-bars-legend-cell-width {
-    bottom: 0;
     margin-top: 1.6rem;
-    position: absolute;
-    width: 20rem;
-
-    mat-slider {
-      height: auto;
-      min-width: 0;
-      position: static;
-      width: 100%;
-    }
   }
 }
