@@ -375,9 +375,6 @@ export class TransmissionChainBarsComponent implements OnInit, OnDestroy {
    * Component destroyed
    */
   ngOnDestroy() {
-    // release graph data
-    this.transmissionChainBarsService.destroy();
-
     // release subscriber
     if (this.outbreakSubscriber) {
       this.outbreakSubscriber.unsubscribe();
