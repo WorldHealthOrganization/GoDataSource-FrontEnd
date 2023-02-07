@@ -57,12 +57,16 @@
 
   <div
     *ngIf="!loadingData && noData"
-    class="cot-bars-no-data"
-    fxFlex fxLayoutAlign="center center">
-    <span
-      fxGrow="0">
-      {{'LNG_PAGE_TRANSMISSION_CHAIN_BARS_NO_DATA' | translate}}
-    </span>
+    fxLayout="column" fxLayoutAlign="center center"
+    class="gd-cot-bars-no-data">
+
+    <!-- Image -->
+    <div
+      class="gd-cot-bars-no-data-image"></div>
+
+    <!-- Message -->
+    <div
+      class="gd-cot-bars-no-data-text">{{'LNG_PAGE_TRANSMISSION_CHAIN_BARS_NO_DATA' | translate}}</div>
   </div>
 
   <div

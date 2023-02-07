@@ -119,19 +119,19 @@ export class TransmissionChainBarsService {
 
   // keeping this config centralized in case / event we need to make the graph configurable by the user
   public graphConfig = {
-    isolationColor: 'steelblue',
-    isolationTextColor: 'black',
-    labResultColor: 'darkred',
-    labResultTextColor: 'white',
-    dateOnsetColor: 'white',
-    dateOnsetTextColor: 'black',
-    dateOutcomeColor: '#003d4d',
-    dateOutcomeTextColor: 'white',
-    dateOutcomeBurialColor: '#990000',
-    dateOutcomeBurialTextColor: 'black',
+    isolationColor: 'var(--gd-primary)',
+    isolationTextColor: 'var(--gd-background)',
+    labResultColor: 'var(--gd-warning)',
+    labResultTextColor: 'var(--gd-text)',
+    dateOnsetColor: 'var(--gd-background)',
+    dateOnsetTextColor: 'var(--gd-text)',
+    dateOutcomeColor: 'var(--gd-primary-alt)',
+    dateOutcomeTextColor: 'var(--gd-background)',
+    dateOutcomeBurialColor: 'var(--gd-danger)',
+    dateOutcomeBurialTextColor: 'var(--gd-background)',
     // opacity for cells that are before date of onset
     beforeDateOfOnsetOpacity: 0.35,
-    relationshipStrokeColor: '#555555'
+    relationshipStrokeColor: 'var(--gd-secondary)'
   };
 
   // data used to draw the graph

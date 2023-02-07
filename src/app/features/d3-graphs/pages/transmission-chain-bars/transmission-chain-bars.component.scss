@@ -112,6 +112,26 @@ app-transmission-chain-bars {
       }
     }
   }
+
+  .gd-cot-bars-no-data {
+    height: 100%;
+    width: 100%;
+
+    .gd-cot-bars-no-data-image {
+      background-image: url(../../../../../assets/images/nothing-found.svg);
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 25rem;
+      width: 25rem;
+    }
+
+    .gd-cot-bars-no-data-text {
+      color: var(--gd-secondary);
+      font-size: 1.6rem;
+      margin-top: 2rem;
+    }
+  }
 }
 
 .gd-cot-bars-legend-content {
