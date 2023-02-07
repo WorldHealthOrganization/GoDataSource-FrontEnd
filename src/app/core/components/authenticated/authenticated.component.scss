@@ -180,7 +180,7 @@ mat-sidenav-container {
         overflow-y: overlay;
 
         @include breakpoint('lt-md') {
-          padding: 1.2rem 2rem 2rem;
+          padding: 1.2rem 2.4rem 2.4rem;
         }
       }
 

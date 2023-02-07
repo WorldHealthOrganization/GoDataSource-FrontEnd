@@ -434,7 +434,7 @@
         (click)="expandCollapseBottomSection()"
         class="gd-list-table-bottom-collapse-expand-button">
         <mat-icon
-          *ngIf="!bottomSectionSavingConfig; else savingBottomSectionConfig">{{bottomSectionIsCollapsed ? 'chevron_left' : 'chevron_right'}}</mat-icon>
+          *ngIf="!bottomSectionSavingConfig; else savingBottomSectionConfig">{{bottomSectionIsCollapsed ? 'expand' : 'compress'}}</mat-icon>
         <ng-template
           #savingBottomSectionConfig>
           <mat-progress-spinner
