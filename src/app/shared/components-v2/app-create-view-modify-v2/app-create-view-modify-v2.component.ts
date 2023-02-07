@@ -5,7 +5,9 @@ import {
   CreateViewModifyV2MenuType,
   CreateViewModifyV2TabInputType,
   ICreateViewModifyV2,
-  ICreateViewModifyV2Tab, ICreateViewModifyV2TabInputChanged,
+  ICreateViewModifyV2Config,
+  ICreateViewModifyV2Tab,
+  ICreateViewModifyV2TabInputChanged,
   ICreateViewModifyV2TabInputList,
   ICreateViewModifyV2TabTable
 } from './models/tab.model';
@@ -41,7 +43,15 @@ import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ActivatedRoute, Params } from '@angular/router';
 import { MatTabGroup } from '@angular/material/tabs';
-import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSortList, V2SideDialogConfigInput, V2SideDialogConfigInputType } from '../app-side-dialog-v2/models/side-dialog-config.model';
+import {
+  IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigInputGroup,
+  IV2SideDialogConfigInputMap,
+  IV2SideDialogConfigInputSortList,
+  IV2SideDialogData,
+  V2SideDialogConfigInput,
+  V2SideDialogConfigInputType
+} from '../app-side-dialog-v2/models/side-dialog-config.model';
 import { determineIfSmallScreenMode } from '../../../core/methods/small-screen-mode';
 
 /**
@@ -382,6 +392,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   get enableTabReorder(): boolean {
     return this._enableTabReorder;
   }
+
+  // custom tab configuration settings
+  @Input() tabConfiguration: ICreateViewModifyV2Config;
 
   // user settings key
   private _pageSettingsKey: string;
@@ -1473,21 +1486,34 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     // construct list of configurable inputs
     const inputs: V2SideDialogConfigInput[] = [];
 
-    // order tabs
-    inputs.push(
-      {
-        type: V2SideDialogConfigInputType.DIVIDER,
-        placeholder: 'LNG_COMMON_LABEL_TABS_ORDER'
-      },
-      {
-        type: V2SideDialogConfigInputType.SORT_LIST,
-        name: 'sortedItems',
-        items: this.tabData.tabs.map((tab) => ({
-          label: tab.label,
-          value: tab.name || tab.label
-        }))
-      }
-    );
+    // do we have custom tab configuration ?
+    if (this.tabConfiguration?.inputs?.length) {
+      inputs.push(
+        {
+          type: V2SideDialogConfigInputType.GROUP,
+          name: 'tabConfig',
+          inputs: this.tabConfiguration.inputs
+        }
+      );
+    }
+
+    // is tab ordering enabled ?
+    if (this.enableTabReorder) {
+      inputs.push(
+        {
+          type: V2SideDialogConfigInputType.DIVIDER,
+          placeholder: 'LNG_COMMON_LABEL_TABS_ORDER'
+        },
+        {
+          type: V2SideDialogConfigInputType.SORT_LIST,
+          name: 'sortedItems',
+          items: this.tabData.tabs.map((tab) => ({
+            label: tab.label,
+            value: tab.name || tab.label
+          }))
+        }
+      );
+    }
 
     // display dialog
     this.dialogV2Service
@@ -1517,38 +1543,79 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
         // show loading while saving the new order
         response.handler.loading.show();
 
-        // determine tabs order
-        const tabsOrder: string[] = (response.data.map.sortedItems as IV2SideDialogConfigInputSortList).items
-          .map((item) => item.value);
+        // finish handler
+        const finished = () => {
+          // close dialog
+          response.handler.hide();
+        };
 
-        // update settings
-        this.authDataService
-          .updateSettingsForCurrentUser({
-            [`${this.pageSettingsKey}.${AppCreateViewModifyV2Component.GENERAL_SETTINGS_TAB_ORDER}`]: tabsOrder
-          })
-          .pipe(
-            catchError((err) => {
-              // error
-              this.toastV2Service.error(err);
+        // handle tab custom configuration
+        const handleConfSettings = () => {
+          // there is no point in continuing if we don't have custom tab configuration ?
+          if (!this.tabConfiguration?.inputs?.length) {
+            finished();
+            return;
+          }
 
-              // send error down the road
-              return throwError(err);
-            })
-          )
-          .subscribe(() => {
-            // update settings
-            this.loadPageSettings();
-
-            // hack to fix tab drawing issue when you move a tab before teh selected tab
-            this.loadingPage = true;
-            setTimeout(() => {
-              this.loadingPage = false;
-              this.detectChanges();
-            });
-
-            // close
-            response.handler.hide();
+          // map inputs
+          const confInputs = (response.data.map.tabConfig as IV2SideDialogConfigInputGroup).inputs;
+          const confDataMap: IV2SideDialogConfigInputMap = {};
+          confInputs.forEach((item) => {
+            confDataMap[item.name] = item;
           });
+          const confData: IV2SideDialogData = {
+            inputs: confInputs,
+            map: confDataMap,
+            echo: null
+          };
+
+          // handle tab custom configuration
+          this.tabConfiguration.apply(
+            confData,
+            () => {
+              finished();
+            }
+          );
+        };
+
+        // is tab ordering enabled ?
+        if (this.enableTabReorder) {
+          // determine tabs order
+          const tabsOrder: string[] = (response.data.map.sortedItems as IV2SideDialogConfigInputSortList).items
+            .map((item) => item.value);
+
+          // update settings
+          this.authDataService
+            .updateSettingsForCurrentUser({
+              [`${this.pageSettingsKey}.${AppCreateViewModifyV2Component.GENERAL_SETTINGS_TAB_ORDER}`]: tabsOrder
+            })
+            .pipe(
+              catchError((err) => {
+                // error
+                this.toastV2Service.error(err);
+
+                // send error down the road
+                return throwError(err);
+              })
+            )
+            .subscribe(() => {
+              // update settings
+              this.loadPageSettings();
+
+              // hack to fix tab drawing issue when you move a tab before the selected tab
+              this.loadingPage = true;
+              setTimeout(() => {
+                this.loadingPage = false;
+                this.detectChanges();
+              });
+
+              // handle custom tab configuration inputs
+              handleConfSettings();
+            });
+        } else {
+          // handle custom tab configuration inputs
+          handleConfSettings();
+        }
       });
   }
 }
