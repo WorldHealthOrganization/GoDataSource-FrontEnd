@@ -511,6 +511,7 @@
 /* List table legend */
 .gd-list-table-bottom-left {
   padding: 0.4rem 0;
+  width: 100%;
 
   .gd-list-table-bottom-left-legend {
     .gd-list-table-bottom-left-legend-title {
@@ -532,5 +533,14 @@
         margin-right: 0.4rem;
       }
     }
+  }
+}
+
+/* List table pagination */
+.gd-list-table-bottom-right {
+  min-width: 41rem;
+
+  @include breakpoint('xs') {
+    width: 100%;
   }
 }

@@ -6,6 +6,10 @@
   .gd-list-top-tile-buttons {
     padding-bottom: 2.4rem;
 
+    @include breakpoint('lt-lg') {
+      padding-bottom: 0.8rem;
+    }
+
     /* Page title & view button */
     .gd-list-top-tile-buttons-title {
       overflow: hidden;
@@ -182,6 +186,10 @@
   .gd-list-table {
     .gd-list-table-header {
       padding: 1.6rem;
+
+      @include breakpoint('lt-lg') {
+        padding: 0.8rem;
+      }
 
       .gd-list-table-header-left {
         .gd-list-table-header-left-text {
