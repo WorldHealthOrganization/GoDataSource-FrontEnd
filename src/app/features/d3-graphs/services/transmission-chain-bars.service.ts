@@ -87,7 +87,7 @@ export class TransmissionChainBarsService {
   private cellXPadding = this.relationshipXMargin * 2;
   // extra graph height
   // - 30 for scrollbar (keep extra 30px for horizontal scrollbar)
-  // keep occupied space so we determine intersection
+  // keep occupied space to determine intersection
   private relationshipOccupiedSpaces: {
     yLines: {
       values: {
@@ -185,9 +185,6 @@ export class TransmissionChainBarsService {
   // cache some translations
   private translationsMap = {};
 
-  // window scroll listener
-  private onWindowScrollArrow: any;
-
   // center name group line height
   private entityDetailsTextLineCellHeight: number = 24;
   private entityDetailsTextLineSpaceBetween: number = 5;
@@ -242,11 +239,8 @@ export class TransmissionChainBarsService {
   ) {}
 
   /**
-     * Draw graph
-     * @param containerNative
-     * @param data
-     * @param options
-     */
+   * Draw graph
+   */
   drawGraph(
     containerNative: any,
     data: TransmissionChainBarsModel,
@@ -368,16 +362,6 @@ export class TransmissionChainBarsService {
         }
       }
     });
-  }
-
-  /**
-   * Cleanup for Window scroll
-   */
-  private removeWindowScrollListener() {
-    if (this.onWindowScrollArrow) {
-      window.removeEventListener('scroll', this.onWindowScrollArrow, true);
-      this.onWindowScrollArrow = null;
-    }
   }
 
   /**
@@ -1092,9 +1076,9 @@ export class TransmissionChainBarsService {
       // try next one
       lineEndX += this.relationshipStrokeWidth + this.relationshipSpaceBetweenStrokesX;
 
-      // if bigger then parent cell width, then we need to draw it on top...we can't draw it somewhere else...
+      // if bigger than parent cell width, then we need to draw it on top...we can't draw it somewhere else...
       if (lineEndX > initialLineStartY + this.cellWidth - this.relationshipXMargin) {
-        // reset position to the beg of the cell
+        // reset position to the beginning of the cell
         lineEndX = initialLineStartY;
 
         // force break so we don't do an infinite while
@@ -1341,14 +1325,6 @@ export class TransmissionChainBarsService {
     }
 
     return this.translationsMap[token];
-  }
-
-  /**
-   * Clear
-   */
-  public destroy() {
-    // remove window listener
-    this.removeWindowScrollListener();
   }
 
   /**
