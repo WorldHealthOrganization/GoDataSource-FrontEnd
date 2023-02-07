@@ -383,6 +383,11 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     return !!this._pageSettingsKey;
   }
 
+  // collapse / expand bottom section
+  bottomSectionIsCollapsed: boolean = false;
+  bottomSectionSavingConfig: boolean = false;
+  private _pageSettingsKeyBottomSectionCollapsed: string = 'bottomSectionCollapsed';
+
   // info values - used to display additional information relevant for this page
   private _infos: string[];
   infosJoined: string;
@@ -609,6 +614,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   ) {
     // update small screen mode
     this.updateRenderMode(true);
+
+    // update bottom section collapse / expand
+    this.loadBottomSectionConfig();
   }
 
   /**
@@ -2251,5 +2259,51 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // finished
     return newData;
+  }
+
+  /**
+   * Retrieve bottom section setting
+   */
+  private loadBottomSectionConfig(): void {
+    // retrieve collapse / expand value
+    const authUser: UserModel = this.authDataService.getAuthenticatedUser();
+    this.bottomSectionIsCollapsed = !!authUser.getSettings(this._pageSettingsKeyBottomSectionCollapsed);
+  }
+
+  /**
+   * Expand / collapse bottom section (legend & pagination)
+   */
+  expandCollapseBottomSection(): void {
+    // disable while saving user settings
+    this.bottomSectionSavingConfig = true;
+
+    // attach / detach collapsed class
+    this.bottomSectionIsCollapsed = !this.bottomSectionIsCollapsed;
+
+    // refresh html
+    this.detectChanges();
+    this.resizeTable();
+
+    // update settings
+    this.authDataService
+      .updateSettingsForCurrentUser({
+        [this._pageSettingsKeyBottomSectionCollapsed]: this.bottomSectionIsCollapsed
+      })
+      .pipe(
+        catchError((err) => {
+          // error
+          this.toastV2Service.error(err);
+
+          // send error down the road
+          return throwError(err);
+        })
+      )
+      .subscribe(() => {
+        // finished saving
+        this.bottomSectionSavingConfig = false;
+
+        // update layout
+        this.detectChanges();
+      });
   }
 }
