@@ -286,12 +286,16 @@ export abstract class CreateViewModifyComponent<T>
   ) {
 
     // update settings
+    this.loadingPage = true;
     this.authDataService
       .updateSettingsForCurrentUser({
         [`${pageSettingsKey}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTION_HIDE_QUESTION_NUMBERS}`]: Object.keys(tabOptions).length ? tabOptions : undefined
       })
       .pipe(
         catchError((err) => {
+          // hide loading
+          this.loadingPage = false;
+
           // error
           this.toastV2Service.error(err);
 
@@ -300,11 +304,8 @@ export abstract class CreateViewModifyComponent<T>
         })
       )
       .subscribe(() => {
-        // hack to fix tab drawing issue when you move a tab before the selected tab
-        this.loadingPage = true;
-        setTimeout(() => {
-          this.loadingPage = false;
-        });
+        // hide loading
+        this.loadingPage = false;
 
         // finish
         finish();
