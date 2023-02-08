@@ -47,7 +47,12 @@ import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { Location } from '@angular/common';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
-import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputLinkWithAction, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import {
+  IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigInputLinkWithAction,
+  IV2SideDialogConfigInputToggleCheckbox,
+  V2SideDialogConfigInputType
+} from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { EntityDataService } from '../../../../core/services/data/entity.data.service';
 import { RelationshipType } from '../../../../core/enums/relationship-type.enum';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
@@ -68,6 +73,10 @@ import { DomSanitizer } from '@angular/platform-browser';
   templateUrl: './cases-create-view-modify.component.html'
 })
 export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<CaseModel> implements OnDestroy {
+  // constants
+  private static readonly TAB_NAMES_QUESTIONNAIRE: string = 'questionnaire';
+  private static readonly TAB_NAMES_QUESTIONNAIRE_AS_CONTACT: string = 'questionnaire_as_contact';
+
   // case visual id mask
   private _caseVisualIDMask: {
     mask: string
@@ -92,6 +101,10 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
   // custom uuid creation ?
   customCaseUUID: string;
+
+  // hide/show question numbers
+  hideCaseQuestionNumbers: boolean = false;
+  hideContactQuestionNumbers: boolean = false;
 
   /**
    * Constructor
@@ -130,6 +143,20 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         this.customCaseUUID = uid;
       }
     }
+
+    // do we have tabs options already saved ?
+    const generalSettings: {
+      [key: string]: any
+    } = this.authDataService
+      .getAuthenticatedUser()
+      .getSettings(UserSettings.CASE_GENERAL);
+    const hideQuestionNumbers: string[] = generalSettings && generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS] ?
+      generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS][CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTION_HIDE_QUESTION_NUMBERS] :
+      undefined;
+
+    // use the saved options
+    this.hideCaseQuestionNumbers = hideQuestionNumbers ? hideQuestionNumbers[CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE] : false;
+    this.hideContactQuestionNumbers = hideQuestionNumbers ? hideQuestionNumbers[CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CONTACT] : false;
   }
 
   /**
@@ -322,6 +349,46 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
    * Initialize tabs
    */
   protected initializeTabs(): void {
+    // tab custom configuration
+    this.tabConfiguration = {
+      inputs: [
+        {
+          type: V2SideDialogConfigInputType.DIVIDER,
+          placeholder: 'LNG_COMMON_LABEL_TAB_OPTIONS'
+        },
+        {
+          type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+          name: CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE,
+          placeholder: this.isCreate ? 'LNG_PAGE_CREATE_CASE_TAB_OPTION_SHOW_CASE_QUESTION_NUMBERS' : 'LNG_PAGE_MODIFY_CASE_TAB_OPTION_SHOW_CASE_QUESTION_NUMBERS',
+          value: !this.hideCaseQuestionNumbers
+        },
+        {
+          type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+          name: CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CONTACT,
+          placeholder: this.isCreate ? 'LNG_PAGE_CREATE_CASE_TAB_OPTION_SHOW_CONTACT_QUESTION_NUMBERS' : 'LNG_PAGE_MODIFY_CASE_TAB_OPTION_SHOW_CONTACT_QUESTION_NUMBERS',
+          value: !this.hideContactQuestionNumbers
+        }
+      ],
+      apply: (data, finish) => {
+        // save settings
+        const hideCaseQuestionNumbers: boolean = !(data.map[CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE] as IV2SideDialogConfigInputToggleCheckbox).value;
+        const hideContactQuestionNumbers: boolean = !(data.map[CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CONTACT] as IV2SideDialogConfigInputToggleCheckbox).value;
+        this.updateGeneralSettings(UserSettings.CASE_GENERAL, {
+          [CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE]: hideCaseQuestionNumbers,
+          [CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CONTACT]: hideContactQuestionNumbers
+        }, () => {
+          // update ui
+          this.hideCaseQuestionNumbers = hideCaseQuestionNumbers;
+          this.hideContactQuestionNumbers = hideContactQuestionNumbers;
+          this.tabsV2Component.detectChanges();
+
+          // finish
+          finish();
+        });
+      }
+    };
+
+    // tabs
     this.tabData = {
       // tabs
       tabs: [
@@ -1110,7 +1177,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     let errors: string = '';
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
-      name: 'questionnaire',
+      name: CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE,
       label: 'LNG_PAGE_MODIFY_CASE_TAB_QUESTIONNAIRE_TITLE',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
@@ -1121,6 +1188,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           set: (value) => {
             this.itemData.questionnaireAnswers = value;
           }
+        },
+        hideQuestionNumbers: () => {
+          return this.hideCaseQuestionNumbers;
         },
         updateErrors: (errorsHTML) => {
           errors = errorsHTML;
@@ -1139,7 +1209,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   private initializeTabsQuestionnaireAsContact(): ICreateViewModifyV2TabTable {
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
-      name: 'questionnaire_as_contact',
+      name: CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CONTACT,
       label: `${this.translateService.instant(EntityType.CONTACT)} ${this.translateService.instant('LNG_PAGE_MODIFY_CASE_TAB_CONTACT_QUESTIONNAIRE_TITLE')}`,
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
@@ -1150,6 +1220,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           set: (value) => {
             this.itemData.questionnaireAnswersContact = value;
           }
+        },
+        hideQuestionNumbers: () => {
+          return this.hideContactQuestionNumbers;
         },
         updateErrors: () => {}
       },

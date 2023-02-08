@@ -203,6 +203,9 @@ export class AppFormFillQuestionnaireV2Component
   // view only
   @Input() viewOnly: boolean;
 
+  // hide question numbers
+  @Input() hideQuestionNumbers: () => boolean;
+
   // questionnaire
   private _questionnaire: QuestionModel[];
   @Input() set questionnaire(questionnaire: QuestionModel[]) {

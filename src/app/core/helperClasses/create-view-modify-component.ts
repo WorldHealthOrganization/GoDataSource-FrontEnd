@@ -21,6 +21,10 @@ import { AppCreateViewModifyV2Component } from '../../shared/components-v2/app-c
 @Directive()
 export abstract class CreateViewModifyComponent<T>
   extends ConfirmOnFormChanges {
+  // constants
+  protected static readonly GENERAL_SETTINGS_TAB_OPTIONS: string = 'tabsOptions';
+  protected static readonly GENERAL_SETTINGS_TAB_OPTION_HIDE_QUESTION_NUMBERS: string = 'hideQuestionNumbers';
+
   // handler for stopping take until
   protected destroyed$: ReplaySubject<boolean> = new ReplaySubject<boolean>();
 
@@ -103,7 +107,7 @@ export abstract class CreateViewModifyComponent<T>
     protected renderer2: Renderer2,
     protected redirectService: RedirectService,
     activatedRoute: ActivatedRoute,
-    authDataService: AuthDataService,
+    protected authDataService: AuthDataService,
     dontDisableOutbreakSelect?: boolean
   ) {
     // initialize parent
@@ -268,6 +272,43 @@ export abstract class CreateViewModifyComponent<T>
         this.redirectService.to([event.target.parentElement.getAttribute('href')]);
       }
     );
+  }
+
+  /**
+   * Updates user general settings
+   */
+  updateGeneralSettings(
+    pageSettingsKey: string,
+    tabOptions: {
+      [setting: string]: boolean
+    },
+    finish: () => void
+  ) {
+
+    // update settings
+    this.authDataService
+      .updateSettingsForCurrentUser({
+        [`${pageSettingsKey}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTION_HIDE_QUESTION_NUMBERS}`]: Object.keys(tabOptions).length ? tabOptions : undefined
+      })
+      .pipe(
+        catchError((err) => {
+          // error
+          this.toastV2Service.error(err);
+
+          // send error down the road
+          return throwError(err);
+        })
+      )
+      .subscribe(() => {
+        // hack to fix tab drawing issue when you move a tab before the selected tab
+        this.loadingPage = true;
+        setTimeout(() => {
+          this.loadingPage = false;
+        });
+
+        // finish
+        finish();
+      });
   }
 
   /**

@@ -523,6 +523,7 @@
                     [name]="parentName ? parentName + '[' + input.name + ']' : input.name"
                     [viewOnly]="isView || !input.value.set"
                     [questionnaire]="input.questionnaire"
+                    [hideQuestionNumbers]="input.hideQuestionNumbers"
                     [selectedTab]="selectedTab === tab"
                     [disableValidation]="input.disableValidation"
                     app-questionnaire-answers-validator
