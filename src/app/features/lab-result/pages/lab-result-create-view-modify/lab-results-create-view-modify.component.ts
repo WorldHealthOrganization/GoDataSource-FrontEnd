@@ -95,8 +95,10 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
     } = this.authDataService
       .getAuthenticatedUser()
       .getSettings(UserSettings.LAB_RESULT_GENERAL);
-    const hideQuestionNumbers: string[] = generalSettings && generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS] ?
-      generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS][CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTION_HIDE_QUESTION_NUMBERS] :
+    const hideQuestionNumbers: {
+      [key: string]: any
+    } = generalSettings && generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS] ?
+      generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS][CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS] :
       undefined;
 
     // use the saved options
@@ -328,23 +330,26 @@ export class LabResultsCreateViewModifyComponent extends CreateViewModifyCompone
         {
           type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
           name: LabResultsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE,
-          placeholder: this.isCreate ? 'LNG_PAGE_CREATE_LAB_RESULT_TAB_OPTION_SHOW_QUESTION_NUMBERS' : 'LNG_PAGE_MODIFY_LAB_RESULT_TAB_OPTION_SHOW_QUESTION_NUMBERS',
+          placeholder: this.isCreate ?
+            'LNG_PAGE_CREATE_LAB_RESULT_TAB_OPTION_SHOW_QUESTION_NUMBERS' :
+            'LNG_PAGE_MODIFY_LAB_RESULT_TAB_OPTION_SHOW_QUESTION_NUMBERS',
           value: !this.hideQuestionNumbers
         }
       ],
       apply: (data, finish) => {
         // save settings
         const hideQuestionNumbers: boolean = !(data.map[LabResultsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE] as IV2SideDialogConfigInputToggleCheckbox).value;
-        this.updateGeneralSettings(UserSettings.LAB_RESULT_GENERAL, {
-          [LabResultsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE]: hideQuestionNumbers
-        }, () => {
-          // update ui
-          this.hideQuestionNumbers = hideQuestionNumbers;
-          this.tabsV2Component.detectChanges();
+        this.updateGeneralSettings(
+          `${UserSettings.LAB_RESULT_GENERAL}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS}`, {
+            [LabResultsCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE]: hideQuestionNumbers
+          }, () => {
+            // update ui
+            this.hideQuestionNumbers = hideQuestionNumbers;
+            this.tabsV2Component.detectChanges();
 
-          // finish
-          finish();
-        });
+            // finish
+            finish();
+          });
       }
     };
 

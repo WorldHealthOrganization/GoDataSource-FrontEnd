@@ -23,7 +23,7 @@ export abstract class CreateViewModifyComponent<T>
   extends ConfirmOnFormChanges {
   // constants
   protected static readonly GENERAL_SETTINGS_TAB_OPTIONS: string = 'tabsOptions';
-  protected static readonly GENERAL_SETTINGS_TAB_OPTION_HIDE_QUESTION_NUMBERS: string = 'hideQuestionNumbers';
+  protected static readonly GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS: string = 'hideQuestionNumbers';
 
   // handler for stopping take until
   protected destroyed$: ReplaySubject<boolean> = new ReplaySubject<boolean>();
@@ -278,24 +278,18 @@ export abstract class CreateViewModifyComponent<T>
    * Updates user general settings
    */
   updateGeneralSettings(
-    pageSettingsKey: string,
-    tabOptions: {
+    settingsPath: string,
+    options: {
       [setting: string]: boolean
     },
     finish: () => void
   ) {
-
-    // update settings
-    this.loadingPage = true;
     this.authDataService
       .updateSettingsForCurrentUser({
-        [`${pageSettingsKey}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTION_HIDE_QUESTION_NUMBERS}`]: Object.keys(tabOptions).length ? tabOptions : undefined
+        [settingsPath]: Object.keys(options).length ? options : undefined
       })
       .pipe(
         catchError((err) => {
-          // hide loading
-          this.loadingPage = false;
-
           // error
           this.toastV2Service.error(err);
 
@@ -304,9 +298,6 @@ export abstract class CreateViewModifyComponent<T>
         })
       )
       .subscribe(() => {
-        // hide loading
-        this.loadingPage = false;
-
         // finish
         finish();
       });

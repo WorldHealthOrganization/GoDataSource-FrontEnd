@@ -150,8 +150,10 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     } = this.authDataService
       .getAuthenticatedUser()
       .getSettings(UserSettings.CASE_GENERAL);
-    const hideQuestionNumbers: string[] = generalSettings && generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS] ?
-      generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS][CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTION_HIDE_QUESTION_NUMBERS] :
+    const hideQuestionNumbers: {
+      [key: string]: any
+    } = generalSettings && generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS] ?
+      generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS][CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS] :
       undefined;
 
     // use the saved options
@@ -359,13 +361,17 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         {
           type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
           name: CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE,
-          placeholder: this.isCreate ? 'LNG_PAGE_CREATE_CASE_TAB_OPTION_SHOW_CASE_QUESTION_NUMBERS' : 'LNG_PAGE_MODIFY_CASE_TAB_OPTION_SHOW_CASE_QUESTION_NUMBERS',
+          placeholder: this.isCreate ?
+            'LNG_PAGE_CREATE_CASE_TAB_OPTION_SHOW_CASE_QUESTION_NUMBERS' :
+            'LNG_PAGE_MODIFY_CASE_TAB_OPTION_SHOW_CASE_QUESTION_NUMBERS',
           value: !this.hideCaseQuestionNumbers
         },
         {
           type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
           name: CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CONTACT,
-          placeholder: this.isCreate ? 'LNG_PAGE_CREATE_CASE_TAB_OPTION_SHOW_CONTACT_QUESTION_NUMBERS' : 'LNG_PAGE_MODIFY_CASE_TAB_OPTION_SHOW_CONTACT_QUESTION_NUMBERS',
+          placeholder: this.isCreate ?
+            'LNG_PAGE_CREATE_CASE_TAB_OPTION_SHOW_CONTACT_QUESTION_NUMBERS' :
+            'LNG_PAGE_MODIFY_CASE_TAB_OPTION_SHOW_CONTACT_QUESTION_NUMBERS',
           value: !this.hideContactQuestionNumbers
         }
       ],
@@ -373,18 +379,19 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         // save settings
         const hideCaseQuestionNumbers: boolean = !(data.map[CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE] as IV2SideDialogConfigInputToggleCheckbox).value;
         const hideContactQuestionNumbers: boolean = !(data.map[CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CONTACT] as IV2SideDialogConfigInputToggleCheckbox).value;
-        this.updateGeneralSettings(UserSettings.CASE_GENERAL, {
-          [CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE]: hideCaseQuestionNumbers,
-          [CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CONTACT]: hideContactQuestionNumbers
-        }, () => {
-          // update ui
-          this.hideCaseQuestionNumbers = hideCaseQuestionNumbers;
-          this.hideContactQuestionNumbers = hideContactQuestionNumbers;
-          this.tabsV2Component.detectChanges();
+        this.updateGeneralSettings(
+          `${UserSettings.CASE_GENERAL}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS}`, {
+            [CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE]: hideCaseQuestionNumbers,
+            [CasesCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE_AS_CONTACT]: hideContactQuestionNumbers
+          }, () => {
+            // update ui
+            this.hideCaseQuestionNumbers = hideCaseQuestionNumbers;
+            this.hideContactQuestionNumbers = hideContactQuestionNumbers;
+            this.tabsV2Component.detectChanges();
 
-          // finish
-          finish();
-        });
+            // finish
+            finish();
+          });
       }
     };
 

@@ -111,8 +111,10 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
     } = this.authDataService
       .getAuthenticatedUser()
       .getSettings(UserSettings.FOLLOW_UP_GENERAL);
-    const hideQuestionNumbers: string[] = generalSettings && generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS] ?
-      generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS][CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTION_HIDE_QUESTION_NUMBERS] :
+    const hideQuestionNumbers: {
+      [key: string]: any
+    } = generalSettings && generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS] ?
+      generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS][CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS] :
       undefined;
 
     // use the saved options
@@ -328,23 +330,26 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
         {
           type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
           name: FollowUpCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE,
-          placeholder: this.isCreate ? 'LNG_PAGE_CREATE_FOLLOW_UP_TAB_OPTION_SHOW_QUESTION_NUMBERS' : 'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_OPTION_SHOW_QUESTION_NUMBERS',
+          placeholder: this.isCreate ?
+            'LNG_PAGE_CREATE_FOLLOW_UP_TAB_OPTION_SHOW_QUESTION_NUMBERS' :
+            'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_OPTION_SHOW_QUESTION_NUMBERS',
           value: !this.hideQuestionNumbers
         }
       ],
       apply: (data, finish) => {
         // save settings
         const hideQuestionNumbers: boolean = !(data.map[FollowUpCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE] as IV2SideDialogConfigInputToggleCheckbox).value;
-        this.updateGeneralSettings(UserSettings.FOLLOW_UP_GENERAL, {
-          [FollowUpCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE]: hideQuestionNumbers
-        }, () => {
-          // update ui
-          this.hideQuestionNumbers = hideQuestionNumbers;
-          this.tabsV2Component.detectChanges();
+        this.updateGeneralSettings(
+          `${UserSettings.FOLLOW_UP_GENERAL}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS}`, {
+            [FollowUpCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE]: hideQuestionNumbers
+          }, () => {
+            // update ui
+            this.hideQuestionNumbers = hideQuestionNumbers;
+            this.tabsV2Component.detectChanges();
 
-          // finish
-          finish();
-        });
+            // finish
+            finish();
+          });
       }
     };
 
