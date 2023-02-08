@@ -154,6 +154,9 @@ export class AppFormSelectSingleV2Component
     return this.allOptions;
   }
 
+  // search value
+  private _searchValue: string;
+
   // allow disabled options to be selected ?
   @Input() allowDisabledToBeSelected: boolean = false;
 
@@ -183,30 +186,64 @@ export class AppFormSelectSingleV2Component
   }
 
   /**
+   * Update visible options depending on if they were disabled or not
+   */
+  writeValue(value: string) {
+    // parent
+    super.writeValue(value);
+
+    // do we need to update options ?
+    if (
+      !this.allowDisabledToBeSelected &&
+      this.value
+    ) {
+      this.filterOptions();
+    }
+  }
+
+  /**
    * Filter options
    */
-  filterOptions(byValue?: string): void {
+  filterOptions(searchValue?: string): void {
+    // update search value
+    if (searchValue !== undefined) {
+      this._searchValue = searchValue;
+    }
+
     // nothing to filter ?
-    if (!this.options) {
+    if (!this.options?.length) {
       this.filteredOptions = [];
       return;
     }
 
     // filter options
-    if (!byValue) {
+    if (!this._searchValue) {
       // all visible options
-      this.filteredOptions = this.options;
+      this.filteredOptions = this.allowDisabledToBeSelected ?
+        this.options :
+        this.options.filter((item: ILabelValuePairModel): boolean => {
+          return !item.disabled || (
+            this.value &&
+            item.value === this.value
+          );
+        });
 
       // finished
       return;
     }
 
     // case insensitive
-    byValue = byValue.toLowerCase();
+    const byValue: string = this._searchValue.toLowerCase();
 
     // filter
     this.filteredOptions = this.options.filter((item: ILabelValuePairModel): boolean => {
-      return item.label.toLowerCase().indexOf(byValue) > -1;
+      return (
+        this.allowDisabledToBeSelected ||
+        !item.disabled || (
+          this.value &&
+          item.value === this.value
+        )
+      ) && item.label.toLowerCase().indexOf(byValue) > -1;
     });
   }
 
