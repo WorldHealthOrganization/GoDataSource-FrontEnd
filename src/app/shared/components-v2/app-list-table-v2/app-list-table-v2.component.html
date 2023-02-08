@@ -434,7 +434,7 @@
         (click)="expandCollapseBottomSection()"
         class="gd-list-table-bottom-collapse-expand-button">
         <mat-icon
-          *ngIf="!bottomSectionSavingConfig; else savingBottomSectionConfig">{{bottomSectionIsCollapsed ? 'chevron_left' : 'chevron_right'}}</mat-icon>
+          *ngIf="!bottomSectionSavingConfig; else savingBottomSectionConfig">{{bottomSectionIsCollapsed ? 'expand' : 'compress'}}</mat-icon>
         <ng-template
           #savingBottomSectionConfig>
           <mat-progress-spinner
@@ -446,7 +446,7 @@
 
     <!-- Table paginator -->
     <div
-      fxLayout="row" fxLayoutAlign="space-between center"
+      fxLayout="row" fxLayout.sm="column" fxLayoutAlign="space-between center"
       class="gd-list-table-bottom"
       [class.gd-list-table-bottom-collapsed]="bottomSectionIsCollapsed">
 
@@ -459,7 +459,7 @@
         <!-- Legends & Messages -->
         <div
           *ngFor="let legend of legends"
-          fxLayout="row wrap" fxLayoutAlign="start center"
+          fxLayout="row nowrap" fxLayoutAlign="start start"
           class="gd-list-table-bottom-left-legend"
           [innerHTML]="legend.html | safeHtml"></div>
 

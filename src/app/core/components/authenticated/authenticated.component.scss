@@ -5,6 +5,7 @@ mat-sidenav-container {
   --gd-menu-width-expanded: 33rem;
   --gd-menu-width-collapsed: 7rem;
   --gd-top-bar-height: 7rem;
+  --gd-top-bar-height-mobile: 5.4rem;
 
   /* Authenticated body layout */
   &.gd-body-content {
@@ -63,6 +64,12 @@ mat-sidenav-container {
             width: 100%;
           }
 
+          @include breakpoint('lt-lg') {
+            height: var(--gd-top-bar-height-mobile);
+            padding-top: 0.8rem;
+            padding-bottom: 0.8rem;
+          }
+
           img {
             height: 3.8rem;
             max-width: 18.05rem;
@@ -74,6 +81,10 @@ mat-sidenav-container {
         .gd-body-content-left-content-menu {
           height: calc(100% - var(--gd-top-bar-height));
           position: relative;
+
+          @include breakpoint('lt-lg') {
+            height: calc(100% - var(--gd-top-bar-height-mobile));
+          }
 
           /* Top gradient which appears only when collapsed menu has scrollbar */
           &:before {
@@ -132,6 +143,10 @@ mat-sidenav-container {
         width: 2rem;
         z-index: 1000;
 
+        @include breakpoint('lt-lg') {
+          top: calc(var(--gd-top-bar-height-mobile) + 1.6rem);
+        }
+
         .material-icons {
           font-size: 2rem;
           @include flex(flex);
@@ -167,6 +182,10 @@ mat-sidenav-container {
         height: var(--gd-top-bar-height);
         position: relative;
         z-index: 1000;
+
+        @include breakpoint('lt-lg') {
+          height: var(--gd-top-bar-height-mobile);
+        }
       }
 
       /* Page content */
@@ -179,8 +198,17 @@ mat-sidenav-container {
         overflow-x: hidden;
         overflow-y: overlay;
 
+        @include breakpoint('lt-lg') {
+          height: calc(100vh - var(--gd-top-bar-height-mobile)); /* Fallback for browsers which cannot support Custom Properties */
+          height: calc((var(--vh, 1vh) * 100) - var(--gd-top-bar-height-mobile));
+        }
+
+        @include breakpoint('lg') {
+          padding: 0.8rem 1.6rem 1.6rem 3.2rem;
+        }
+
         @include breakpoint('lt-md') {
-          padding: 1.2rem 2rem 2rem;
+          padding: 0.8rem 1.6rem 1.6rem 2.4rem;
         }
       }
 
