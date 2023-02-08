@@ -210,6 +210,14 @@ export class AppFormSelectMultipleV2Component
   // toggle all
   toggleAllCheckboxChecked: boolean = false;
 
+  // search value
+  private _searchValue: string;
+
+  // selected values
+  selectedValues: {
+    [value: string]: true
+  } = {};
+
   // vscroll handler
   @ViewChild('cdkVirtualScrollViewport') cdkVirtualScrollViewport: CdkVirtualScrollViewport;
 
@@ -240,30 +248,68 @@ export class AppFormSelectMultipleV2Component
   }
 
   /**
+   * Update visible options depending on if they were disabled or not
+   */
+  writeValue(value: string[]) {
+    // parent
+    super.writeValue(value);
+
+    // do we need to update options ?
+    if (
+      !this.allowDisabledToBeSelected &&
+      this.value?.length
+    ) {
+      this.filterOptions();
+    }
+  }
+
+  /**
    * Filter options
    */
-  filterOptions(byValue?: string): void {
+  filterOptions(searchValue?: string): void {
+    // update search value
+    if (searchValue !== undefined) {
+      this._searchValue = searchValue;
+    }
+
     // nothing to filter ?
     if (!this.options) {
       this.filteredOptions = [];
       return;
     }
 
+    // map selected values for easy find
+    this.selectedValues = {};
+    if (this.value?.length) {
+      this.value.forEach((value) => {
+        this.selectedValues[value] = true;
+      });
+    }
+
     // filter options
-    if (!byValue) {
+    if (!this._searchValue) {
       // all visible options
-      this.filteredOptions = this.options;
+      this.filteredOptions = this.allowDisabledToBeSelected ?
+        this.options :
+        this.options.filter((item: ILabelValuePairModel): boolean => {
+          return !item.disabled ||
+            this.selectedValues[item.value];
+        });
 
       // finished
       return;
     }
 
     // case insensitive
-    byValue = byValue.toLowerCase();
+    const byValue: string = this._searchValue.toLowerCase();
 
     // filter
     this.filteredOptions = this.options.filter((item: ILabelValuePairModel): boolean => {
-      return item.label.toLowerCase().indexOf(byValue) > -1;
+      return (
+        this.allowDisabledToBeSelected ||
+        !item.disabled ||
+        this.selectedValues[item.value]
+      ) && item.label.toLowerCase().indexOf(byValue) > -1;
     });
   }
 
