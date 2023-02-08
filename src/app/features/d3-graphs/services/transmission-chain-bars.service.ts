@@ -70,7 +70,7 @@ interface GroupCell {
 export class TransmissionChainBarsService {
   // default header color
   private static DEFAULT_HEADER_COLUMN = 'transparent';
-  private static DEFAULT_HEADER_COLUMN_HIGHLIGHTED = 'red';
+  private static DEFAULT_HEADER_COLUMN_HIGHLIGHTED = 'rgba(var(--gd-primary-rgb), 0.25)';
 
   // regular cell width
   private readonly cellWidthDefault = 91;
@@ -119,19 +119,19 @@ export class TransmissionChainBarsService {
 
   // keeping this config centralized in case / event we need to make the graph configurable by the user
   public graphConfig = {
-    isolationColor: 'steelblue',
-    isolationTextColor: 'black',
-    labResultColor: 'darkred',
-    labResultTextColor: 'white',
-    dateOnsetColor: 'white',
-    dateOnsetTextColor: 'black',
-    dateOutcomeColor: '#003d4d',
-    dateOutcomeTextColor: 'white',
-    dateOutcomeBurialColor: '#990000',
-    dateOutcomeBurialTextColor: 'black',
+    isolationColor: 'var(--gd-primary)',
+    isolationTextColor: 'var(--gd-background)',
+    labResultColor: 'var(--gd-warning)',
+    labResultTextColor: 'var(--gd-text)',
+    dateOnsetColor: 'var(--gd-background)',
+    dateOnsetTextColor: 'var(--gd-text)',
+    dateOutcomeColor: 'var(--gd-primary-alt)',
+    dateOutcomeTextColor: 'var(--gd-background)',
+    dateOutcomeBurialColor: 'var(--gd-danger)',
+    dateOutcomeBurialTextColor: 'var(--gd-background)',
     // opacity for cells that are before date of onset
     beforeDateOfOnsetOpacity: 0.35,
-    relationshipStrokeColor: '#555555'
+    relationshipStrokeColor: 'var(--gd-secondary)'
   };
 
   // data used to draw the graph
@@ -405,13 +405,13 @@ export class TransmissionChainBarsService {
         .attr('transform', `translate(0, ${index * this.cellHeight})`);
       this.hover.rects.dates[dayDate] = dateContainer.append('rect')
         .attr('fill', TransmissionChainBarsService.DEFAULT_HEADER_COLUMN)
-        .attr('width', '100%')
+        .attr('width', 'calc(100% + 14px)')
         .attr('height', this.cellHeight);
       dateContainer.append('text')
         .text(dayDate)
         .attr('fill', 'black')
         .attr('alignment-baseline', 'central')
-        .attr('x', 0)
+        .attr('x', 14)
         .attr('y', this.cellHeight / 2);
     });
   }
@@ -919,8 +919,8 @@ export class TransmissionChainBarsService {
       .attr('width', this.cellWidth)
       .attr('height', (moment(entityData.lastGraphDate).startOf('day').diff(dateMoment, 'days') + 1) * this.cellHeight)
       .attr('fill', 'transparent')
-      .attr('stroke', 'black')
-      .attr('stroke-width', '2')
+      .attr('stroke', 'var(--gd-secondary)')
+      .attr('stroke-width', '1')
       .attr('shape-rendering', 'optimizeSpeed');
 
     // show relationships with different color when hover on a Case / Event
@@ -1224,8 +1224,8 @@ export class TransmissionChainBarsService {
       group.append('rect')
         .attr('width', width)
         .attr('height', height)
-        .attr('fill', 'transparent')
-        .attr('stroke', 'black')
+        .attr('fill', 'white')
+        .attr('stroke', 'var(--gd-secondary)')
         .attr('stroke-width', '1')
         .attr('shape-rendering', 'optimizeSpeed');
 
@@ -1251,7 +1251,7 @@ export class TransmissionChainBarsService {
       group.append('text')
         .text(renderName)
         .attr('clip-path', `url(#${pathId})`)
-        .attr('fill', 'black')
+        .attr('fill', 'var(--gd-text)')
         .attr('alignment-baseline', 'central')
         .attr('x', textX)
         .attr('y', height / 2);

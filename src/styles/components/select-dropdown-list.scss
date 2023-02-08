@@ -204,13 +204,16 @@
         }
 
         &:not(.mat-option-disabled) {
-          color: var(--gd-primary);
+          color: var(--gd-text);
         }
       }
 
       &.mat-active {
         background: transparent;
-        color: var(--gd-text);
+        
+        &:not(.mat-option-disabled) {
+          color: var(--gd-text);
+        }
       }
 
       .mat-pseudo-checkbox {
@@ -223,34 +226,15 @@
         }
 
         &.mat-pseudo-checkbox-checked {
-          background: var(--gd-primary);
+          &:not(.mat-pseudo-checkbox-disabled) {
+            background: var(--gd-primary);
+          }
 
           &:after {
             height: 0.4rem;
             left: 0.1rem;
             top: 0.3rem;
             width: 1rem;
-          }
-
-          /* Checkbox checked and disabled */
-          &.mat-pseudo-checkbox-disabled {
-            background-color: var(--gd-primary);
-            color: var(--gd-background);
-          }
-        }
-
-        /* Checkbox not checked and disabled */
-        &:not(.mat-pseudo-checkbox-checked) {
-          &.mat-pseudo-checkbox-disabled {
-            color: rgba(var(--gd-secondary-rgb), 0.5);
-          }
-        }
-
-        &.mat-pseudo-checkbox-disabled {
-          color: rgba(var(--gd-secondary-rgb), 0.5);
-
-          + .mat-option-text {
-            color: var(--gd-text);
           }
         }
       }
