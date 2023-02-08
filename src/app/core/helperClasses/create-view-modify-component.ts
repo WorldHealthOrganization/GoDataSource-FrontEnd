@@ -21,6 +21,10 @@ import { AppCreateViewModifyV2Component } from '../../shared/components-v2/app-c
 @Directive()
 export abstract class CreateViewModifyComponent<T>
   extends ConfirmOnFormChanges {
+  // constants
+  protected static readonly GENERAL_SETTINGS_TAB_OPTIONS: string = 'tabsOptions';
+  protected static readonly GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS: string = 'hideQuestionNumbers';
+
   // handler for stopping take until
   protected destroyed$: ReplaySubject<boolean> = new ReplaySubject<boolean>();
 
@@ -103,7 +107,7 @@ export abstract class CreateViewModifyComponent<T>
     protected renderer2: Renderer2,
     protected redirectService: RedirectService,
     activatedRoute: ActivatedRoute,
-    authDataService: AuthDataService,
+    protected authDataService: AuthDataService,
     dontDisableOutbreakSelect?: boolean
   ) {
     // initialize parent
@@ -268,6 +272,35 @@ export abstract class CreateViewModifyComponent<T>
         this.redirectService.to([event.target.parentElement.getAttribute('href')]);
       }
     );
+  }
+
+  /**
+   * Updates user general settings
+   */
+  updateGeneralSettings(
+    settingsPath: string,
+    options: {
+      [setting: string]: boolean
+    },
+    finish: () => void
+  ) {
+    this.authDataService
+      .updateSettingsForCurrentUser({
+        [settingsPath]: Object.keys(options).length ? options : undefined
+      })
+      .pipe(
+        catchError((err) => {
+          // error
+          this.toastV2Service.error(err);
+
+          // send error down the road
+          return throwError(err);
+        })
+      )
+      .subscribe(() => {
+        // finish
+        finish();
+      });
   }
 
   /**
