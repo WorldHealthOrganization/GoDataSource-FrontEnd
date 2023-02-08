@@ -514,18 +514,30 @@
   width: 100%;
 
   .gd-list-table-bottom-left-legend {
+    width: 100%;
+
     .gd-list-table-bottom-left-legend-title {
       color: var(--gd-secondary);
       font-size: 1.2rem;
       margin-left: 0.8rem;
-      min-width: 13.5rem;
+      min-width: 13.6rem;
       text-transform: uppercase;
     }
+
+    .gd-list-table-bottom-left-legend-items {
+      @include flex_align_items(flex-start);
+      @include flex(flex);
+      @include flex_direction(row);
+      @include flex_wrap(wrap);
+      @include flex_justify(flex-start);
+      width: 100%;
+    }
   
-    .gd-list-table-bottom-left-legend-item {
+    .gd-list-table-bottom-left-legend-items-item {
       @include flex_align_items(center);
       @include flex(flex);
       @include flex_direction(row);
+      @include flex_wrap(nowrap);
       font-size: 1.2rem;
       margin-left: 0.8rem;
   

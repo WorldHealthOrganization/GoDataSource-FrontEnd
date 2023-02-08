@@ -459,7 +459,7 @@
         <!-- Legends & Messages -->
         <div
           *ngFor="let legend of legends"
-          fxLayout="row wrap" fxLayoutAlign="start center"
+          fxLayout="row nowrap" fxLayoutAlign="start start"
           class="gd-list-table-bottom-left-legend"
           [innerHTML]="legend.html | safeHtml"></div>
 
