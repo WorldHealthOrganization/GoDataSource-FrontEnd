@@ -27,8 +27,13 @@ import { ContactModel } from '../../../../core/models/contact.model';
 import { CaseModel } from '../../../../core/models/case.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
-import { UserModel } from '../../../../core/models/user.model';
-import { V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import {
+  UserModel, UserSettings
+} from '../../../../core/models/user.model';
+import {
+  V2SideDialogConfigInputType,
+  IV2SideDialogConfigInputToggleCheckbox
+} from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { catchError, map, takeUntil } from 'rxjs/operators';
 import { TeamModel } from '../../../../core/models/team.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
@@ -46,11 +51,17 @@ import { DomSanitizer } from '@angular/platform-browser';
   templateUrl: './follow-up-create-view-modify.component.html'
 })
 export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent<FollowUpModel> implements OnDestroy {
+  // constants
+  private static readonly TAB_NAMES_QUESTIONNAIRE: string = 'questionnaire';
+
   // entity
   private _entityData: ContactModel | CaseModel;
 
   // history ?
   isHistory: boolean;
+
+  // hide/show question numbers
+  hideQuestionNumbers: boolean = false;
 
   /**
    * Constructor
@@ -93,6 +104,21 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
         AppMessages.APP_MESSAGE_HISTORY_FOLLOW_UPS
       );
     }
+
+    // do we have tabs options already saved ?
+    const generalSettings: {
+      [key: string]: any
+    } = this.authDataService
+      .getAuthenticatedUser()
+      .getSettings(UserSettings.FOLLOW_UP_GENERAL);
+    const hideQuestionNumbers: {
+      [key: string]: any
+    } = generalSettings && generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS] ?
+      generalSettings[CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS][CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS] :
+      undefined;
+
+    // use the saved options
+    this.hideQuestionNumbers = hideQuestionNumbers ? hideQuestionNumbers[FollowUpCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE] : false;
   }
 
   /**
@@ -294,6 +320,40 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
    * Initialize tabs
    */
   protected initializeTabs(): void {
+    // tab custom configuration
+    this.tabConfiguration = {
+      inputs: [
+        {
+          type: V2SideDialogConfigInputType.DIVIDER,
+          placeholder: 'LNG_COMMON_LABEL_TAB_OPTIONS'
+        },
+        {
+          type: V2SideDialogConfigInputType.TOGGLE_CHECKBOX,
+          name: FollowUpCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE,
+          placeholder: this.isCreate ?
+            'LNG_PAGE_CREATE_FOLLOW_UP_TAB_OPTION_SHOW_QUESTION_NUMBERS' :
+            'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_OPTION_SHOW_QUESTION_NUMBERS',
+          value: !this.hideQuestionNumbers
+        }
+      ],
+      apply: (data, finish) => {
+        // save settings
+        const hideQuestionNumbers: boolean = !(data.map[FollowUpCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE] as IV2SideDialogConfigInputToggleCheckbox).value;
+        this.updateGeneralSettings(
+          `${UserSettings.FOLLOW_UP_GENERAL}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS}.${CreateViewModifyComponent.GENERAL_SETTINGS_TAB_OPTIONS_HIDE_QUESTION_NUMBERS}`, {
+            [FollowUpCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE]: hideQuestionNumbers
+          }, () => {
+            // update ui
+            this.hideQuestionNumbers = hideQuestionNumbers;
+            this.tabsV2Component.detectChanges();
+
+            // finish
+            finish();
+          });
+      }
+    };
+
+    // tabs
     this.tabData = {
       // tabs
       tabs: [
@@ -457,7 +517,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
     let errors: string = '';
     return {
       type: CreateViewModifyV2TabInputType.TAB_TABLE,
-      name: 'questionnaire',
+      name: FollowUpCreateViewModifyComponent.TAB_NAMES_QUESTIONNAIRE,
       label: 'LNG_PAGE_MODIFY_FOLLOW_UP_TAB_QUESTIONNAIRE_TITLE',
       definition: {
         type: CreateViewModifyV2TabInputType.TAB_TABLE_FILL_QUESTIONNAIRE,
@@ -468,6 +528,9 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
           set: (value) => {
             this.itemData.questionnaireAnswers = value;
           }
+        },
+        hideQuestionNumbers: () => {
+          return this.hideQuestionNumbers;
         },
         updateErrors: (errorsHTML) => {
           errors = errorsHTML;

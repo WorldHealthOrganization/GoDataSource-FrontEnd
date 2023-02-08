@@ -699,6 +699,7 @@ interface ICreateViewModifyV2TabTableFillQuestionnaire {
 
   // optional
   disableValidation?: boolean;
+  hideQuestionNumbers?: () => boolean;
 }
 
 /**

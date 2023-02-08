@@ -383,6 +383,11 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     return !!this._pageSettingsKey;
   }
 
+  // collapse / expand bottom section
+  bottomSectionIsCollapsed: boolean = false;
+  bottomSectionSavingConfig: boolean = false;
+  private _pageSettingsKeyBottomSectionCollapsed: string = 'bottomSectionCollapsed';
+
   // info values - used to display additional information relevant for this page
   private _infos: string[];
   infosJoined: string;
@@ -428,10 +433,13 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         // simple item ?
         if (Array.isArray(item.value)) {
           // create html
-          let html: string = `<span class="gd-list-table-bottom-left-legend-title">${this.translateService.instant(item.label)}</span>`;
+          let html: string = `<span class="gd-list-table-bottom-left-legend-title">${this.translateService.instant(item.label)}</span><span class="gd-list-table-bottom-left-legend-items">`;
           (item.value as ILabelValuePairModel[]).forEach((subItem) => {
-            html += `<span class="gd-list-table-bottom-left-legend-item">${AppListTableV2Component.renderStatusForm({ type: IV2ColumnStatusFormType.SQUARE, color: subItem.color }, false)} ${this.translateService.instant(subItem.label)}</span>`;
+            html += `<span class="gd-list-table-bottom-left-legend-items-item">${AppListTableV2Component.renderStatusForm({ type: IV2ColumnStatusFormType.SQUARE, color: subItem.color }, false)} ${this.translateService.instant(subItem.label)}</span>`;
           });
+
+          // close items list
+          html += '</span>';
 
           // add legend
           this._suffixLegendsHTML.push({
@@ -439,7 +447,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           });
         } else {
           this._suffixLegendsHTML.push({
-            html: `<span class="gd-list-table-bottom-left-legend-title">${this.translateService.instant(item.label)}</span><span class="gd-list-table-bottom-left-legend-item">${item.value}</span>`
+            html: `<span class="gd-list-table-bottom-left-legend-title">${this.translateService.instant(item.label)}</span><span class="gd-list-table-bottom-left-legend-items"><span class="gd-list-table-bottom-left-legend-items-item">${item.value}</span></span>`
           });
         }
       });
@@ -609,6 +617,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   ) {
     // update small screen mode
     this.updateRenderMode(true);
+
+    // update bottom section collapse / expand
+    this.loadBottomSectionConfig();
   }
 
   /**
@@ -1039,14 +1050,17 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         // go through legends
         statusColumn.legends.forEach((legend) => {
           // render legends
-          let html: string = `<span class="gd-list-table-bottom-left-legend-title">${this.translateService.instant(legend.title)}</span> `;
+          let html: string = `<span class="gd-list-table-bottom-left-legend-title">${this.translateService.instant(legend.title)}</span><span class="gd-list-table-bottom-left-legend-items">`;
 
           // render legend
           legend.items.forEach((legendItem) => {
-            html += `<span class="gd-list-table-bottom-left-legend-item">
+            html += `<span class="gd-list-table-bottom-left-legend-items-item">
               ${AppListTableV2Component.renderStatusForm(legendItem.form, false)} ${this.translateService.instant(legendItem.label)}
             </span>`;
           });
+
+          // close items list
+          html += '</span>';
 
           // add to legends to render
           this.legends.push({
@@ -2251,5 +2265,51 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // finished
     return newData;
+  }
+
+  /**
+   * Retrieve bottom section setting
+   */
+  private loadBottomSectionConfig(): void {
+    // retrieve collapse / expand value
+    const authUser: UserModel = this.authDataService.getAuthenticatedUser();
+    this.bottomSectionIsCollapsed = !!authUser.getSettings(this._pageSettingsKeyBottomSectionCollapsed);
+  }
+
+  /**
+   * Expand / collapse bottom section (legend & pagination)
+   */
+  expandCollapseBottomSection(): void {
+    // disable while saving user settings
+    this.bottomSectionSavingConfig = true;
+
+    // attach / detach collapsed class
+    this.bottomSectionIsCollapsed = !this.bottomSectionIsCollapsed;
+
+    // refresh html
+    this.detectChanges();
+    this.resizeTable();
+
+    // update settings
+    this.authDataService
+      .updateSettingsForCurrentUser({
+        [this._pageSettingsKeyBottomSectionCollapsed]: this.bottomSectionIsCollapsed
+      })
+      .pipe(
+        catchError((err) => {
+          // error
+          this.toastV2Service.error(err);
+
+          // send error down the road
+          return throwError(err);
+        })
+      )
+      .subscribe(() => {
+        // finished saving
+        this.bottomSectionSavingConfig = false;
+
+        // update layout
+        this.detectChanges();
+      });
   }
 }
