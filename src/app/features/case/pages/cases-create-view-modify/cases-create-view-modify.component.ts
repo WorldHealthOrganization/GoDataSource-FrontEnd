@@ -922,8 +922,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                 // set data
                 this.itemData.outcomeId = value;
 
-                // reset data if not decease
+                // reset data if not deceased
                 if (this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED) {
+                  this.itemData.deathLocationId = null;
                   this.itemData.safeBurial = null;
                   this.itemData.dateOfBurial = null;
                   this.itemData.burialLocationId = null;
@@ -963,6 +964,23 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
               set: (value) => {
                 this.itemData.transferRefused = value;
               }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.LOCATION_SINGLE,
+            name: 'deathLocationId',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID',
+            description: () => 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID_DESCRIPTION',
+            useOutbreakLocations: true,
+            value: {
+              get: () => this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED ?
+                undefined :
+                this.itemData.deathLocationId,
+              set: (value) => {
+                this.itemData.deathLocationId = value;
+              }
+            },
+            disabled: () => {
+              return this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
             }
           }, {
             type: CreateViewModifyV2TabInputType.TOGGLE_CHECKBOX,

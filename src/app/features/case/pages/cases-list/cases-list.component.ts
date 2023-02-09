@@ -72,6 +72,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
     { label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING', value: 'dateOfReporting' },
     { label: 'LNG_CASE_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', value: 'isDateOfReportingApproximate' },
     { label: 'LNG_CASE_FIELD_LABEL_TRANSFER_REFUSED', value: 'transferRefused' },
+    { label: 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID', value: 'deathLocationId' },
     { label: 'LNG_CASE_FIELD_LABEL_VISUAL_ID', value: 'visualId' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
@@ -923,6 +924,23 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
         sortable: true,
         filter: {
           type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
+        field: 'deathLocationId',
+        label: 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID',
+        format: {
+          type: 'deathLocation.name'
+        },
+        filter: {
+          type: V2FilterType.MULTIPLE_LOCATION,
+          useOutbreakLocations: true,
+          field: 'deathLocationId.parentLocationIdFilter'
+        },
+        link: (data) => {
+          return data.deathLocation?.name && LocationModel.canView(this.authUser) ?
+            `/locations/${data.deathLocation.id}/view` :
+            undefined;
         }
       },
       {
@@ -2191,6 +2209,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
       'dateInvestigationCompleted',
       'outcomeId',
       'dateOfOutcome',
+      'deathLocationId',
       'age',
       'gender',
       'addresses',
@@ -2252,6 +2271,11 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
               locationsIdsMap[address.locationId] = true;
             });
 
+            // death location
+            if (item.deathLocationId) {
+              locationsIdsMap[item.deathLocationId] = true;
+            }
+
             // burial location
             if (item.burialLocationId) {
               locationsIdsMap[item.burialLocationId] = true;
@@ -2296,6 +2320,11 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                       locationsMap[address.locationId] :
                       address.location;
                   });
+
+                  // death location
+                  item.deathLocation = item.deathLocationId && locationsMap[item.deathLocationId] ?
+                    locationsMap[item.deathLocationId] :
+                    item.deathLocation;
 
                   // burial location
                   item.burialLocation = item.burialLocationId && locationsMap[item.burialLocationId] ?

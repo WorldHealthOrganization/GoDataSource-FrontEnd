@@ -82,6 +82,8 @@ export class CaseModel
   dateOfLastContact: string;
   isDateOfReportingApproximate: boolean;
   transferRefused: boolean;
+  deathLocationId: string;
+  deathLocation: LocationModel;
   outbreakId: string;
   investigationStatus: string;
   dateInvestigationCompleted: string | Moment;
@@ -611,6 +613,7 @@ export class CaseModel
     this.dateOfLastContact = _.get(data, 'dateOfLastContact');
     this.isDateOfReportingApproximate = _.get(data, 'isDateOfReportingApproximate');
     this.transferRefused = _.get(data, 'transferRefused');
+    this.deathLocationId = _.get(data, 'deathLocationId');
     this.outbreakId = _.get(data, 'outbreakId');
     this.investigationStatus = _.get(data, 'investigationStatus');
     this.dateInvestigationCompleted = _.get(data, 'dateInvestigationCompleted');
