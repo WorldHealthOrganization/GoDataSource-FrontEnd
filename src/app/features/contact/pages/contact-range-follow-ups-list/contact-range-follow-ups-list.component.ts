@@ -859,7 +859,7 @@ export class ContactRangeFollowUpsListComponent
                         Constants.DEFAULT_COLOR_REF_DATA;
 
                       // construct url
-                      const url: string = `/contacts/${data.person.id}/follow-ups/${followUp.id}/${FollowUpModel.canModify(this.authUser) ? 'modify' : 'view'}`;
+                      const url: string = `/contacts/${data.person.id}/follow-ups/${followUp.id}/${FollowUpModel.canModify(this.authUser) ? 'modify' : 'view'}?origin=${Constants.ORIGIN_FOLLOWUP_DASHBOARD}`;
 
                       // render html
                       html += `<a class="gd-list-table-link" href="${this.location.prepareExternalUrl(url)}">

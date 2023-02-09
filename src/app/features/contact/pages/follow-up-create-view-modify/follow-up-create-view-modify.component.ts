@@ -60,6 +60,9 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
   // history ?
   isHistory: boolean;
 
+  // origin link
+  origin: string;
+
   // hide/show question numbers
   hideQuestionNumbers: boolean = false;
 
@@ -91,6 +94,7 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
     // retrieve data
     this._entityData = activatedRoute.snapshot.data.entityData;
     this.isHistory = !!activatedRoute.snapshot.data.isHistory;
+    this.origin = activatedRoute.snapshot.queryParams.origin;
 
     // display history follow-ups ?
     if (this._entityData?.type === EntityType.CASE) {
@@ -183,6 +187,14 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
    * Initialize breadcrumbs
    */
   protected initializeBreadcrumbs() {
+    // origin link
+    const originLabel = this.origin === Constants.ORIGIN_FOLLOWUP_DASHBOARD ?
+      'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL' :
+      'LNG_LAYOUT_MENU_ITEM_CONTACTS_FOLLOW_UPS_LABEL';
+    const originLink = this.origin === Constants.ORIGIN_FOLLOWUP_DASHBOARD ?
+      '/contacts/range-follow-ups' :
+      '/contacts/follow-ups';
+
     // reset breadcrumbs
     this.breadcrumbs = [
       {
@@ -207,12 +219,12 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
         });
       }
 
-      // follow-up dashboard
+      // origin
       if (FollowUpModel.canListDashboard(this.authUser)) {
         this.breadcrumbs.push({
-          label: 'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL',
+          label: originLabel,
           action: {
-            link: ['/contacts/range-follow-ups']
+            link: [originLink]
           }
         });
       }
@@ -247,12 +259,12 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
         });
       }
 
-      // follow-up dashboard
+      // origin
       if (FollowUpModel.canListDashboard(this.authUser)) {
         this.breadcrumbs.push({
-          label: 'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL',
+          label: originLabel,
           action: {
-            link: ['/contacts/range-follow-ups']
+            link: [originLink]
           }
         });
       }
