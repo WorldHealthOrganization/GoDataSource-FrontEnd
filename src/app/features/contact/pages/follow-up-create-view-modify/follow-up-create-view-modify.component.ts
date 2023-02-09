@@ -52,6 +52,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 })
 export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent<FollowUpModel> implements OnDestroy {
   // constants
+  public static readonly ORIGIN_FOLLOWUP_DASHBOARD: string = 'followup_dashboard';
   private static readonly TAB_NAMES_QUESTIONNAIRE: string = 'questionnaire';
 
   // entity
@@ -187,13 +188,13 @@ export class FollowUpCreateViewModifyComponent extends CreateViewModifyComponent
    * Initialize breadcrumbs
    */
   protected initializeBreadcrumbs() {
-    // origin link
-    const originLabel = this.origin === Constants.ORIGIN_FOLLOWUP_DASHBOARD ?
-      'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL' :
-      'LNG_LAYOUT_MENU_ITEM_CONTACTS_FOLLOW_UPS_LABEL';
-    const originLink = this.origin === Constants.ORIGIN_FOLLOWUP_DASHBOARD ?
-      '/contacts/range-follow-ups' :
-      '/contacts/follow-ups';
+    // determine origin link and label
+    let originLabel: string = 'LNG_LAYOUT_MENU_ITEM_CONTACTS_FOLLOW_UPS_LABEL';
+    let originLink: string = '/contacts/follow-ups';
+    if (this.origin === FollowUpCreateViewModifyComponent.ORIGIN_FOLLOWUP_DASHBOARD) {
+      originLabel = 'LNG_LAYOUT_MENU_ITEM_CONTACTS_RANGE_FOLLOW_UPS_LABEL';
+      originLink = '/contacts/range-follow-ups';
+    }
 
     // reset breadcrumbs
     this.breadcrumbs = [

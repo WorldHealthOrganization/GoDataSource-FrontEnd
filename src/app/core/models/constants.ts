@@ -138,9 +138,6 @@ export class Constants {
   // default color to be used in dashboard - cases based on contact status
   static DEFAULT_COLOR_CHART_CASE_FROM_CONTACT_PERCENTAGE = '#FFC000';
 
-  // origin links
-  static ORIGIN_FOLLOWUP_DASHBOARD: string = 'followup_dashboard';
-
   // these need to be hardcoded, this is why we don't pull them from reference data
   // they are in reference data only to disable some options or translate labels ( since answer type category is readonly )
   static ANSWER_TYPES = {
