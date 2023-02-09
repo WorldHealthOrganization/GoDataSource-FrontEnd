@@ -32,6 +32,9 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import { IV2FilterText, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { AddressModel } from '../../../../core/models/address.model';
 import { UserModel } from '../../../../core/models/user.model';
+import {
+  FollowUpCreateViewModifyComponent
+} from '../follow-up-create-view-modify/follow-up-create-view-modify.component';
 
 @Component({
   selector: 'app-contact-range-follow-ups-list',
@@ -859,7 +862,7 @@ export class ContactRangeFollowUpsListComponent
                         Constants.DEFAULT_COLOR_REF_DATA;
 
                       // construct url
-                      const url: string = `/contacts/${data.person.id}/follow-ups/${followUp.id}/${FollowUpModel.canModify(this.authUser) ? 'modify' : 'view'}`;
+                      const url: string = `/contacts/${data.person.id}/follow-ups/${followUp.id}/${FollowUpModel.canModify(this.authUser) ? 'modify' : 'view'}?origin=${FollowUpCreateViewModifyComponent.ORIGIN_FOLLOWUP_DASHBOARD}`;
 
                       // render html
                       html += `<a class="gd-list-table-link" href="${this.location.prepareExternalUrl(url)}">
