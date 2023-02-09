@@ -62,6 +62,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
     outcomeId: ILabelValuePairModel[],
     dateOfOutcome: ILabelValuePairModel[],
     transferRefused: ILabelValuePairModel[],
+    deathLocationId: ILabelValuePairModel[],
     safeBurial: ILabelValuePairModel[],
     dateOfBurial: ILabelValuePairModel[],
     burialLocationId: ILabelValuePairModel[],
@@ -225,6 +226,10 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
               mergeRecords,
               'transferRefused'
             ).options,
+            deathLocationId: this.getFieldOptions(
+              mergeRecords,
+              'deathLocationId'
+            ).options,
             safeBurial: this.getFieldOptions(
               mergeRecords,
               'safeBurial'
@@ -343,6 +348,9 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
           data.transferRefused = this._uniqueOptions.transferRefused.length === 1 ?
             this._uniqueOptions.transferRefused[0].value :
             data.transferRefused;
+          data.deathLocationId = this._uniqueOptions.deathLocationId.length === 1 ?
+            this._uniqueOptions.deathLocationId[0].value :
+            data.deathLocationId;
           data.safeBurial = this._uniqueOptions.safeBurial.length === 1 ?
             this._uniqueOptions.safeBurial[0].value :
             data.safeBurial;
@@ -376,6 +384,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
 
           // reset data if not decease
           if (data.outcomeId !== Constants.OUTCOME_STATUS.DECEASED) {
+            data.deathLocationId = null;
             data.safeBurial = null;
             data.dateOfBurial = null;
             data.burialLocationId = null;
@@ -505,7 +514,10 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
           }
 
           // must retrieve locations ?
-          if (this._uniqueOptions.burialLocationId.length < 1) {
+          if (
+            this._uniqueOptions.deathLocationId.length < 1 &&
+            this._uniqueOptions.burialLocationId.length < 1
+          ) {
             // nope, we have everything
             subscriber.next(data);
             subscriber.complete();
@@ -514,6 +526,13 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
             const locationIdsMap: {
               [locationId: string]: true
             } = {};
+
+            // death location
+            this._uniqueOptions.deathLocationId.forEach((item) => {
+              locationIdsMap[item.value] = true;
+            });
+
+            // burial location
             this._uniqueOptions.burialLocationId.forEach((item) => {
               locationIdsMap[item.value] = true;
             });
@@ -547,6 +566,13 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
                 } = {};
                 locations.forEach((location) => {
                   locationsMap[location.id] = location;
+                });
+
+                // replace death location labels
+                this._uniqueOptions.deathLocationId.forEach((item) => {
+                  item.label = locationsMap[item.value] ?
+                    locationsMap[item.value].name :
+                    item.label;
                 });
 
                 // replace burial location labels
@@ -976,6 +1002,7 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
 
                 // reset data if not decease
                 if (this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED) {
+                  this.itemData.deathLocationId = null;
                   this.itemData.safeBurial = null;
                   this.itemData.dateOfBurial = null;
                   this.itemData.burialLocationId = null;
@@ -1006,6 +1033,21 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
               set: (value) => {
                 this.itemData.transferRefused = value as any;
               }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'deathLocationId',
+            placeholder: () => 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID',
+            description: () => 'LNG_CASE_FIELD_LABEL_DEATH_LOCATION_ID_DESCRIPTION',
+            options: this._uniqueOptions.deathLocationId,
+            value: {
+              get: () => this.itemData.deathLocationId,
+              set: (value) => {
+                this.itemData.deathLocationId = value;
+              }
+            },
+            disabled: () => {
+              return this.itemData.outcomeId !== Constants.OUTCOME_STATUS.DECEASED;
             }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
