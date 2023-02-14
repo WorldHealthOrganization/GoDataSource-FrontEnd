@@ -200,7 +200,11 @@ export class SearchResultListComponent extends ListComponent<CaseModel | Contact
           }
 
           // display dialog
-          this.entityHelperService.contacts(this.selectedOutbreak, item);
+          this.entityHelperService.contacts(
+            this.selectedOutbreak,
+            this.authUser,
+            item
+          );
         },
         disabled: (data) => !RelationshipModel.canList(this.authUser) || !data.canListRelationshipContacts(this.authUser)
       },
@@ -221,7 +225,11 @@ export class SearchResultListComponent extends ListComponent<CaseModel | Contact
           }
 
           // display dialog
-          this.entityHelperService.exposures(this.selectedOutbreak, item);
+          this.entityHelperService.exposures(
+            this.selectedOutbreak,
+            this.authUser,
+            item
+          );
         },
         disabled: (data) => !RelationshipModel.canList(this.authUser) || !data.canListRelationshipExposures(this.authUser)
       }

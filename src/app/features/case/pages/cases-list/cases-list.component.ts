@@ -1270,6 +1270,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
             // display dialog
             this.entityHelperService.contacts(
               this.selectedOutbreak,
+              this.authUser,
               item
             );
           },
@@ -1298,6 +1299,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
             // display dialog
             this.entityHelperService.exposures(
               this.selectedOutbreak,
+              this.authUser,
               item
             );
           },
