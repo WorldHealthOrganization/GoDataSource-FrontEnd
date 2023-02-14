@@ -32,6 +32,7 @@ import { I18nService } from '../../../../core/services/helper/i18n.service';
 import { TopnavComponent } from '../../../../core/components/topnav/topnav.component';
 import { QuestionModel } from '../../../../core/models/question.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { AppMessages } from '../../../../core/enums/app-messages.enum';
 
 /**
  * Component
@@ -77,6 +78,9 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
   ngOnDestroy(): void {
     // parent
     super.onDestroy();
+
+    // remove global notifications
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_ENTITY_MASK);
   }
 
   /**
@@ -112,6 +116,13 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
         // make the new outbreak which is merged with the outbreak template
         this.itemData = new OutbreakModel(outbreakTemplate);
       }
+    }
+    else {
+      // remove global notifications
+      this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_ENTITY_MASK);
+
+      // show global notifications
+      this.checkDuplicateEntityMasks();
     }
   }
 
@@ -389,6 +400,9 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
                 get: () => this.itemData.caseIdMask,
                 set: (value) => {
                   this.itemData.caseIdMask = value;
+
+                  // check duplicate mask
+                  this.checkDuplicateEntityMasks();
                 }
               },
               validators: {
@@ -406,6 +420,9 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
                 get: () => this.itemData.contactIdMask,
                 set: (value) => {
                   this.itemData.contactIdMask = value;
+
+                  // check duplicate mask
+                  this.checkDuplicateEntityMasks();
                 }
               },
               validators: {
@@ -423,6 +440,9 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
                 get: () => this.itemData.contactOfContactIdMask,
                 set: (value) => {
                   this.itemData.contactOfContactIdMask = value;
+
+                  // check duplicate mask
+                  this.checkDuplicateEntityMasks();
                 }
               },
               validators: {
@@ -1184,5 +1204,29 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
         // should be the last pipe
         takeUntil(this.destroyed$)
       );
+  }
+
+  /**
+   * Check if there are duplicate masks for case/contact/contact of contact
+   */
+  private checkDuplicateEntityMasks() {
+    // create an array with all masks
+    const entityMask = [this.itemData.caseIdMask, this.itemData.contactIdMask, this.itemData.contactOfContactIdMask];
+
+    // remove duplicates from the initial array and check new length
+    if (
+      [...new Set(entityMask)].length < entityMask.length
+    ) {
+      this.toastV2Service.notice(
+        'LNG_OUTBREAK_FIELD_CHECK_DUPLICATE_ENTITY_MASK',
+        undefined,
+        AppMessages.APP_MESSAGE_DUPLICATE_ENTITY_MASK
+      );
+
+      return;
+    }
+
+    // hide warning if no mismatch found
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_ENTITY_MASK);
   }
 }
