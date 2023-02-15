@@ -116,11 +116,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
         // make the new outbreak which is merged with the outbreak template
         this.itemData = new OutbreakModel(outbreakTemplate);
       }
-    }
-    else {
-      // remove global notifications
-      this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_ENTITY_MASK);
-
+    } else {
       // show global notifications
       this.checkDuplicateEntityMasks();
     }
