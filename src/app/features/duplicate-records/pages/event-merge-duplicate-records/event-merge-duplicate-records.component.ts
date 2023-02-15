@@ -154,20 +154,21 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
               const event = item.model as EventModel;
               const eventFullAddress = event.address?.fullAddress;
 
+              // create a full address with email and phone number (filter is used to remove empty strings or undefined values)
+              const addressLabelFields = [
+                eventFullAddress,
+                event.address?.locationId ? locationsMap[event.address.locationId] : undefined,
+                event.address?.postalCode,
+                event.address?.emailAddress,
+                event.address?.phoneNumber,
+                event.address?.geoLocation?.lat,
+                event.address?.geoLocation?.lng
+              ].filter(e => e);
+
               // add to list ?
-              if (
-                (
-                  event.address?.locationId &&
-                  locationsMap[event.address.locationId]
-                ) ||
-                eventFullAddress ||
-                event.address?.emailAddress ||
-                event.address?.phoneNumber
-              ) {
-                // create a full address with email and phone number (filter is used to remove empty strings or undefined values)
-                const addressLabel = [eventFullAddress, locationsMap[event.address.locationId], event.address?.emailAddress, event.address?.phoneNumber].filter(e => e).join(', ');
+              if (addressLabelFields.length) {
                 this._uniqueOptions.addresses.push({
-                  label: addressLabel,
+                  label: addressLabelFields.join(', '),
                   value: event.id,
                   data: event.address
                 });
