@@ -17,6 +17,12 @@
     @include flex_align_items(center);
     margin-right: 0;
 
+    .mat-paginator-page-size-label {
+      @include breakpoint('xxs') {
+        display: none;
+      }
+    }
+
     .mat-paginator-page-size-select {
       height: auto;
       margin: 0;
@@ -59,6 +65,10 @@
 
   .mat-paginator-range-label {
     margin: 0 2.4rem;
+
+    @include breakpoint('xxs') {
+      margin: 0 0.8rem;
+    }
   }
 
   /* Pagination nav buttons */
