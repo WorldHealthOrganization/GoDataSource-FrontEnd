@@ -281,14 +281,13 @@ export class EntityHelperService {
                   link: () => [
                     `/relationships/${sourcePerson.type}/${sourcePerson.id}/contacts/${relationshipData.relationship.id}/view`
                   ],
-                  visible: () => RelationshipModel.canView(authUser) && (
+                  visible: () => RelationshipModel.canView(authUser) &&
                     (
                       relationshipData.model.type !== EntityType.CONTACT_OF_CONTACT ||
                       selectedOutbreak?.isContactsOfContactsActive
                     ) &&
                     relationshipData.model.canView(authUser) &&
                     !relationshipData.model.deleted
-                  )
                 }, {
                   type: V2SideDialogConfigInputType.DIVIDER
                 });
