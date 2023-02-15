@@ -155,7 +155,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
               const eventFullAddress = event.address?.fullAddress;
 
               // create a full address with all fields (filter is used to remove empty strings or undefined values)
-              const addressLabelFields = [
+              const addressLabelFields: string = [
                 eventFullAddress,
                 event.address?.locationId ? locationsMap[event.address.locationId] : undefined,
                 event.address?.postalCode,

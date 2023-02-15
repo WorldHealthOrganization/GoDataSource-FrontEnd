@@ -339,11 +339,10 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
                 address.geoLocation?.lat,
                 address.geoLocation?.lng
               ].map(e => e ? e.toString().trim() : e)
-                .filter(e => e)
-                .join(', ');
+                .filter(e => e);
 
               // add to list ?
-              if (addressFields) {
+              if (addressFields.length) {
                 // current address ?
                 // if we have multiple current addresses then we change them to previously addresses and keep the freshest one by address.date
                 if (address.typeId === AddressType.CURRENT_ADDRESS) {
