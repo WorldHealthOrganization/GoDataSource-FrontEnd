@@ -53,6 +53,9 @@ export class ContactsListComponent
   extends ListComponent<ContactModel>
   implements OnDestroy
 {
+  // constants
+  private static readonly RELATIONSHIP_DATA: string = 'relationship';
+
   // contact fields
   contactFields: ILabelValuePairModel[] = [
     { label: 'LNG_CONTACT_FIELD_LABEL_ID', value: 'id' },
@@ -93,7 +96,7 @@ export class ContactsListComponent
     { label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS', value: 'numberOfContacts' },
     { label: 'LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED', value: 'vaccinesReceived' },
     { label: 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS', value: 'pregnancyStatus' },
-    { label: 'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP', value: 'relationship' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP', value: ContactsListComponent.RELATIONSHIP_DATA },
     { label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID', value: 'followUpTeamId' },
     { label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUser' },
     { label: 'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value: 'questionnaireAnswers' }
@@ -1894,7 +1897,24 @@ export class ContactsListComponent
                     }
                   },
                   fields: {
-                    options: this.contactFields
+                    options: this.contactFields,
+                    change: (data, handler) => {
+                      // do we need to de-select exposure person data ?
+                      const includeExposurePersonDataCheckbox: IV2SideDialogConfigInputCheckbox = data.map.includePersonExposureFields as IV2SideDialogConfigInputCheckbox;
+                      const allFields: boolean = (data.map.fieldsAll as IV2SideDialogConfigInputCheckbox)?.checked;
+                      const fieldsListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsList as IV2SideDialogConfigInputMultiDropdown;
+                      if (
+                        includeExposurePersonDataCheckbox?.checked &&
+                        !allFields && (
+                          !fieldsListDropdown.values?.length ||
+                          fieldsListDropdown.values.indexOf(ContactsListComponent.RELATIONSHIP_DATA) < 0
+                        )
+                      ) {
+                        // de-select exposure person data
+                        includeExposurePersonDataCheckbox.checked = false;
+                        handler.detectChanges();
+                      }
+                    }
                   },
                   dbColumns: true,
                   dbValues: true,
@@ -1916,24 +1936,42 @@ export class ContactsListComponent
                       name: 'includePersonExposureFields',
                       checked: false,
                       change: (data, handler) => {
-                        // do we need to select relationship data ?
-                        const fieldsGroupListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsGroupList as IV2SideDialogConfigInputMultiDropdown;
-                        const allGroups: boolean = (data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox)?.checked;
+                        // check if we need to make adjustments
                         const includeExposurePersonData: boolean = (data.map.includePersonExposureFields as IV2SideDialogConfigInputCheckbox)?.checked;
-                        if (
-                          fieldsGroupListDropdown &&
-                          includeExposurePersonData &&
-                          !allGroups
-                        ) {
-                          // initialize if necessary
-                          fieldsGroupListDropdown.values = fieldsGroupListDropdown.values || [];
+                        if (includeExposurePersonData) {
+                          // check groups & fields
+                          const allGroups: boolean = (data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox)?.checked;
+                          const allFields: boolean = (data.map.fieldsAll as IV2SideDialogConfigInputCheckbox)?.checked;
+                          if (!allGroups) {
+                            // do we need to select relationship data ?
+                            const fieldsGroupListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsGroupList as IV2SideDialogConfigInputMultiDropdown;
+                            if (fieldsGroupListDropdown) {
+                              // initialize if necessary
+                              fieldsGroupListDropdown.values = fieldsGroupListDropdown.values || [];
 
-                          // select relationship data since this is necessary
-                          if (fieldsGroupListDropdown.values.indexOf(Constants.EXPORT_GROUP.RELATIONSHIPS_DATA) < 0) {
-                            // select relationship data
-                            fieldsGroupListDropdown.values.push(Constants.EXPORT_GROUP.RELATIONSHIPS_DATA);
-                            fieldsGroupListDropdown.values = [...fieldsGroupListDropdown.values];
-                            handler.detectChanges();
+                              // select relationship data since this is necessary
+                              if (fieldsGroupListDropdown.values.indexOf(Constants.EXPORT_GROUP.RELATIONSHIPS_DATA) < 0) {
+                                // select relationship data
+                                fieldsGroupListDropdown.values.push(Constants.EXPORT_GROUP.RELATIONSHIPS_DATA);
+                                fieldsGroupListDropdown.values = [...fieldsGroupListDropdown.values];
+                                handler.detectChanges();
+                              }
+                            }
+                          } else if (!allFields) {
+                            // do we need to select relationship data ?
+                            const fieldsListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsList as IV2SideDialogConfigInputMultiDropdown;
+                            if (fieldsListDropdown) {
+                              // initialize if necessary
+                              fieldsListDropdown.values = fieldsListDropdown.values || [];
+
+                              // select relationship data since this is necessary
+                              if (fieldsListDropdown.values.indexOf(ContactsListComponent.RELATIONSHIP_DATA) < 0) {
+                                // select relationship data
+                                fieldsListDropdown.values.push(ContactsListComponent.RELATIONSHIP_DATA);
+                                fieldsListDropdown.values = [...fieldsListDropdown.values];
+                                handler.detectChanges();
+                              }
+                            }
                           }
                         }
                       }

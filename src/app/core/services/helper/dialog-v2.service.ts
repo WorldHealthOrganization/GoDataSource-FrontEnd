@@ -398,7 +398,18 @@ export class DialogV2Service {
               false :
               !(data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked;
           },
-          change: (data): void => {
+          change: (data, handler): void => {
+            // trigger callback ?
+            if (
+              config.export.allow.fields &&
+              config.export.allow.fields.change
+            ) {
+              config.export.allow.fields.change(
+                data,
+                handler
+              );
+            }
+
             // all fields ?
             if ((data.map.fieldsAll as IV2SideDialogConfigInputCheckbox).checked) {
               (data.map.fieldsList as IV2SideDialogConfigInputMultiDropdown).values = [];
@@ -426,6 +437,18 @@ export class DialogV2Service {
               return !(data.map.fieldsAll as IV2SideDialogConfigInputCheckbox).checked && (
                 !data.map.fieldsGroupAll ||
                 (data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked
+              );
+            }
+          },
+          change: (data, handler) => {
+            // trigger callback ?
+            if (
+              config.export.allow.fields &&
+              config.export.allow.fields.change
+            ) {
+              config.export.allow.fields.change(
+                data,
+                handler
               );
             }
           }
