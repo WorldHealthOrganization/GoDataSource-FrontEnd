@@ -791,7 +791,9 @@ export class IndividualContactFollowUpsListComponent extends ListComponent<Follo
                       fields: followUpFieldGroups,
                       required: followUpFieldGroupsRequires
                     },
-                    fields: this.followUpFields,
+                    fields: {
+                      options: this.followUpFields
+                    },
                     dbColumns: true,
                     dbValues: true,
                     jsonReplaceUndefinedWithNull: true,

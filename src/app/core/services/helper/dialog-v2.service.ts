@@ -260,7 +260,7 @@ export class DialogV2Service {
     // add divider for groups and fields
     if (
       config.export.allow.groups ||
-      config.export.allow.fields
+      config.export.allow.fields?.options?.length > 0
     ) {
       inputs.push({
         type: V2SideDialogConfigInputType.DIVIDER
@@ -276,7 +276,18 @@ export class DialogV2Service {
           placeholder: 'LNG_COMMON_LABEL_EXPORT_FIELDS_GROUPS_ALL',
           name: 'fieldsGroupAll',
           checked: true,
-          change: (data): void => {
+          change: (data, handler): void => {
+            // trigger callback ?
+            if (
+              config.export.allow.groups &&
+              config.export.allow.groups.change
+            ) {
+              config.export.allow.groups.change(
+                data,
+                handler
+              );
+            }
+
             // all fields groups checked ?
             if ((data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked) {
               // clear specific groups
@@ -314,12 +325,23 @@ export class DialogV2Service {
               return !(data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked;
             }
           },
-          change: (data): void => {
+          change: (data, handler): void => {
             // nothing to do ?
-            if (
-              !config.export.allow.groups ||
-              !config.export.allow.groups.required
-            ) {
+            if (!config.export.allow.groups) {
+              // finished
+              return;
+            }
+
+            // trigger callback ?
+            if (config.export.allow.groups.change) {
+              config.export.allow.groups.change(
+                data,
+                handler
+              );
+            }
+
+            // if there are no required fields then we don't need to proceed further
+            if (!config.export.allow.groups.required) {
               // finished
               return;
             }
@@ -363,7 +385,7 @@ export class DialogV2Service {
     }
 
     // specific fields
-    if (config.export.allow.fields) {
+    if (config.export.allow.fields?.options?.length > 0) {
       // all
       inputs.push(
         {
@@ -376,7 +398,18 @@ export class DialogV2Service {
               false :
               !(data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked;
           },
-          change: (data): void => {
+          change: (data, handler): void => {
+            // trigger callback ?
+            if (
+              config.export.allow.fields &&
+              config.export.allow.fields.change
+            ) {
+              config.export.allow.fields.change(
+                data,
+                handler
+              );
+            }
+
             // all fields ?
             if ((data.map.fieldsAll as IV2SideDialogConfigInputCheckbox).checked) {
               (data.map.fieldsList as IV2SideDialogConfigInputMultiDropdown).values = [];
@@ -392,7 +425,7 @@ export class DialogV2Service {
           placeholder: 'LNG_COMMON_LABEL_EXPORT_FIELDS',
           name: 'fieldsList',
           values: [],
-          options: config.export.allow.fields,
+          options: config.export.allow.fields.options,
           disabled: (data): boolean => {
             return (data.map.fieldsAll as IV2SideDialogConfigInputCheckbox).checked || (
               data.map.fieldsGroupAll &&
@@ -406,6 +439,18 @@ export class DialogV2Service {
                 (data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked
               );
             }
+          },
+          change: (data, handler) => {
+            // trigger callback ?
+            if (
+              config.export.allow.fields &&
+              config.export.allow.fields.change
+            ) {
+              config.export.allow.fields.change(
+                data,
+                handler
+              );
+            }
           }
         }
       );
@@ -414,7 +459,7 @@ export class DialogV2Service {
     // add divider for groups and fields
     if (
       config.export.allow.groups ||
-      config.export.allow.fields
+      config.export.allow.fields?.options?.length > 0
     ) {
       inputs.push({
         type: V2SideDialogConfigInputType.DIVIDER

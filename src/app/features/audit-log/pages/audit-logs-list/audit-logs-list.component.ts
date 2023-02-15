@@ -435,7 +435,9 @@ export class AuditLogsListComponent
             anonymize: {
               fields: this.auditLogFields
             },
-            fields: this.auditLogFields,
+            fields: {
+              options: this.auditLogFields
+            },
             dbColumns: true,
             dbValues: true,
             jsonReplaceUndefinedWithNull: true

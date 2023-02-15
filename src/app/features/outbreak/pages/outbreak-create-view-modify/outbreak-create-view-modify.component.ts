@@ -1210,15 +1210,15 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     const entityMask = [this.itemData.caseIdMask, this.itemData.contactIdMask, this.itemData.contactOfContactIdMask];
 
     // remove duplicates from the initial array and check new length
-    if (
-      [...new Set(entityMask)].length < entityMask.length
-    ) {
+    if ([...new Set(entityMask)].length < entityMask.length) {
+      // show warning
       this.toastV2Service.notice(
         'LNG_OUTBREAK_FIELD_CHECK_DUPLICATE_ENTITY_MASK',
         undefined,
         AppMessages.APP_MESSAGE_DUPLICATE_ENTITY_MASK
       );
 
+      // no need to continue since it will hide warning
       return;
     }
 
