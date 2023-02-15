@@ -1071,11 +1071,7 @@ export class ContactsListComponent
           }
 
           // display dialog
-          this.entityHelperService.contacts(
-            this.selectedOutbreak,
-            this.authUser,
-            item
-          );
+          this.entityHelperService.contacts(this.selectedOutbreak, item);
         },
         disabled: (data) =>
           !RelationshipModel.canList(this.authUser) ||
@@ -1103,11 +1099,7 @@ export class ContactsListComponent
           }
 
           // display dialog
-          this.entityHelperService.exposures(
-            this.selectedOutbreak,
-            this.authUser,
-            item
-          );
+          this.entityHelperService.exposures(this.selectedOutbreak, item);
         },
         disabled: (data) =>
           !RelationshipModel.canList(this.authUser) ||

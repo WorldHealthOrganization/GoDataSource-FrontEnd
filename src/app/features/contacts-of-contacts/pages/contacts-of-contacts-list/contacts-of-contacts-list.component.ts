@@ -712,7 +712,6 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
           // display dialog
           this.entityHelperService.exposures(
             this.selectedOutbreak,
-            this.authUser,
             item
           );
         },

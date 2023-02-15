@@ -31,6 +31,7 @@ import { IBasicCount } from '../../models/basic-count.interface';
 import { V2AdvancedFilter, V2AdvancedFilterType } from '../../../shared/components-v2/app-list-table-v2/models/advanced-filter.model';
 import { v4 as uuid } from 'uuid';
 import { catchError } from 'rxjs/operators';
+import { AuthDataService } from '../data/auth.data.service';
 
 /**
  * From ?
@@ -157,7 +158,8 @@ export class EntityHelperService {
     private relationshipDataService: RelationshipDataService,
     private i18nService: I18nService,
     private toastV2Service: ToastV2Service,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private authDataService: AuthDataService
   ) {}
 
   /**
@@ -165,7 +167,6 @@ export class EntityHelperService {
    */
   private showEntityDialog(
     selectedOutbreak: OutbreakModel,
-    authUser: UserModel,
     from: SentFromColumn,
     endpoint$: Observable<EntityModel[]>,
     entity: CaseModel | ContactModel | EventModel | ContactOfContactModel
@@ -203,6 +204,9 @@ export class EntityHelperService {
               })
             )
             .subscribe((data) => {
+              // get the authenticated user
+              const authUser = this.authDataService.getAuthenticatedUser();
+
               // construct list of inputs to display
               const entitiesList: IV2SideDialogConfigInputAccordion = {
                 type: V2SideDialogConfigInputType.ACCORDION,
@@ -234,14 +238,11 @@ export class EntityHelperService {
                     'view'
                   ],
                   visible: () => (
-                    (
-                      relationshipData.model.type !== EntityType.CONTACT_OF_CONTACT ||
-                      selectedOutbreak?.isContactsOfContactsActive
-                    ) &&
-                    relationshipData.model &&
+                    relationshipData.model.type !== EntityType.CONTACT_OF_CONTACT ||
+                    selectedOutbreak?.isContactsOfContactsActive
+                  ) &&
                     relationshipData.model.canView(authUser) &&
                     !relationshipData.model.deleted
-                  )
                 }, {
                   type: V2SideDialogConfigInputType.DIVIDER
                 });
@@ -280,16 +281,13 @@ export class EntityHelperService {
                   link: () => [
                     `/relationships/${sourcePerson.type}/${sourcePerson.id}/contacts/${relationshipData.relationship.id}/view`
                   ],
-                  visible: () => (
-                    RelationshipModel.canView(authUser) && (
-                      (
-                        relationshipData.model.type !== EntityType.CONTACT_OF_CONTACT ||
-                        selectedOutbreak?.isContactsOfContactsActive
-                      ) &&
-                      relationshipData.model &&
-                      relationshipData.model.canView(authUser) &&
-                      !relationshipData.model.deleted
-                    )
+                  visible: () => RelationshipModel.canView(authUser) && (
+                    (
+                      relationshipData.model.type !== EntityType.CONTACT_OF_CONTACT ||
+                      selectedOutbreak?.isContactsOfContactsActive
+                    ) &&
+                    relationshipData.model.canView(authUser) &&
+                    !relationshipData.model.deleted
                   )
                 }, {
                   type: V2SideDialogConfigInputType.DIVIDER
@@ -655,12 +653,10 @@ export class EntityHelperService {
    */
   contacts(
     selectedOutbreak: OutbreakModel,
-    authUser: UserModel,
     entity: CaseModel | ContactModel | EventModel | ContactOfContactModel
   ): void {
     this.showEntityDialog(
       selectedOutbreak,
-      authUser,
       SentFromColumn.CONTACTS,
       this.relationshipDataService.getEntityContacts(
         selectedOutbreak.id,
@@ -676,12 +672,10 @@ export class EntityHelperService {
    */
   exposures(
     selectedOutbreak: OutbreakModel,
-    authUser: UserModel,
     entity: CaseModel | ContactModel | EventModel | ContactOfContactModel
   ): void {
     this.showEntityDialog(
       selectedOutbreak,
-      authUser,
       SentFromColumn.EXPOSURES,
       this.relationshipDataService.getEntityExposures(
         selectedOutbreak.id,
