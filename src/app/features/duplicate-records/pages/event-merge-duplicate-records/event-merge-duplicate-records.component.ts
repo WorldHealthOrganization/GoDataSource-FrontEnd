@@ -160,17 +160,14 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
                   event.address?.locationId &&
                   locationsMap[event.address.locationId]
                 ) ||
-                eventFullAddress
+                eventFullAddress ||
+                event.address?.emailAddress ||
+                event.address?.phoneNumber
               ) {
+                // create a full address with email and phone number (filter is used to remove empty strings or undefined values)
+                const addressLabel = [eventFullAddress, locationsMap[event.address.locationId], event.address?.emailAddress, event.address?.phoneNumber].filter(e => e).join(', ');
                 this._uniqueOptions.addresses.push({
-                  label:
-                    (
-                      eventFullAddress ? eventFullAddress : ''
-                    ) + (
-                      eventFullAddress && locationsMap[event.address.locationId] ? ', ' : ''
-                    ) + (
-                      locationsMap[event.address.locationId] ? locationsMap[event.address.locationId] : ''
-                    ),
+                  label: addressLabel,
                   value: event.id,
                   data: event.address
                 });
