@@ -2559,7 +2559,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                       fields: followUpFieldGroups,
                       required: followUpFieldGroupsRequires
                     },
-                    fields: this.followUpFields,
+                    fields: {
+                      options: this.followUpFields
+                    },
                     dbColumns: true,
                     dbValues: true,
                     jsonReplaceUndefinedWithNull: true,

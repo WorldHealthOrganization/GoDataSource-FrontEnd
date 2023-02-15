@@ -260,7 +260,7 @@ export class DialogV2Service {
     // add divider for groups and fields
     if (
       config.export.allow.groups ||
-      config.export.allow.fields
+      config.export.allow.fields?.options?.length > 0
     ) {
       inputs.push({
         type: V2SideDialogConfigInputType.DIVIDER
@@ -385,7 +385,7 @@ export class DialogV2Service {
     }
 
     // specific fields
-    if (config.export.allow.fields) {
+    if (config.export.allow.fields?.options?.length > 0) {
       // all
       inputs.push(
         {
@@ -414,7 +414,7 @@ export class DialogV2Service {
           placeholder: 'LNG_COMMON_LABEL_EXPORT_FIELDS',
           name: 'fieldsList',
           values: [],
-          options: config.export.allow.fields,
+          options: config.export.allow.fields.options,
           disabled: (data): boolean => {
             return (data.map.fieldsAll as IV2SideDialogConfigInputCheckbox).checked || (
               data.map.fieldsGroupAll &&
@@ -436,7 +436,7 @@ export class DialogV2Service {
     // add divider for groups and fields
     if (
       config.export.allow.groups ||
-      config.export.allow.fields
+      config.export.allow.fields?.options?.length > 0
     ) {
       inputs.push({
         type: V2SideDialogConfigInputType.DIVIDER

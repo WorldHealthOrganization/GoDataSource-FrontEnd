@@ -1893,7 +1893,9 @@ export class ContactsListComponent
                       }
                     }
                   },
-                  fields: this.contactFields,
+                  fields: {
+                    options: this.contactFields
+                  },
                   dbColumns: true,
                   dbValues: true,
                   jsonReplaceUndefinedWithNull: true,
@@ -2016,7 +2018,9 @@ export class ContactsListComponent
                     fields: relationshipFieldGroups,
                     required: relationshipFieldGroupsRequires
                   },
-                  fields: this.relationshipFields,
+                  fields: {
+                    options: this.relationshipFields
+                  },
                   dbColumns: true,
                   dbValues: true,
                   jsonReplaceUndefinedWithNull: true

@@ -2015,7 +2015,9 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                       fields: caseFieldGroups,
                       required: caseFieldGroupsRequires
                     },
-                    fields: this.caseFields,
+                    fields: {
+                      options: this.caseFields
+                    },
                     dbColumns: true,
                     dbValues: true,
                     jsonReplaceUndefinedWithNull: true,
@@ -2103,7 +2105,9 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                       fields: relationshipFieldGroups,
                       required: relationshipFieldGroupsRequires
                     },
-                    fields: this.relationshipFields,
+                    fields: {
+                      options: this.relationshipFields
+                    },
                     dbColumns: true,
                     dbValues: true,
                     jsonReplaceUndefinedWithNull: true

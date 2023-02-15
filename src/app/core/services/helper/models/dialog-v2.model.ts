@@ -96,7 +96,13 @@ export interface IV2ExportDataConfig {
         required?: IV2ExportDataConfigGroupsRequired,
         change?: (data: IV2SideDialogData, handler: IV2SideDialogHandler) => void
       },
-      fields?: ILabelValuePairModel[],
+      fields?: {
+        // required
+        options: ILabelValuePairModel[],
+
+        // optional
+        change?: (data: IV2SideDialogData, handler: IV2SideDialogHandler) => void
+      },
       dbColumns?: boolean,
       dbValues?: boolean,
       jsonReplaceUndefinedWithNull?: boolean,

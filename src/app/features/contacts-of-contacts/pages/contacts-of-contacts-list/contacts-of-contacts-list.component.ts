@@ -1293,7 +1293,9 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                       }
                     }
                   },
-                  fields: this.contactsOfContactsFields,
+                  fields: {
+                    options: this.contactsOfContactsFields
+                  },
                   dbColumns: true,
                   dbValues: true,
                   jsonReplaceUndefinedWithNull: true
@@ -1408,7 +1410,9 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                       fields: relationshipFieldGroups,
                       required: relationshipFieldGroupsRequires
                     },
-                    fields: this.relationshipFields,
+                    fields: {
+                      options: this.relationshipFields
+                    },
                     dbColumns: true,
                     dbValues: true,
                     jsonReplaceUndefinedWithNull: true
