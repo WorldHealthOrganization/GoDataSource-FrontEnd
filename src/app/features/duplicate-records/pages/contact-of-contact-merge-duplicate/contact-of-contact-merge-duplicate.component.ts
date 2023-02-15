@@ -259,10 +259,12 @@ export class ContactOfContactMergeDuplicateComponent extends CreateViewModifyCom
                 address.phoneNumber,
                 address.geoLocation?.lat,
                 address.geoLocation?.lng
-              ].filter(e => e);
+              ].map(e => e ? e.toString().trim() : e)
+                .filter(e => e)
+                .join(', ');
 
               // add to list ?
-              if (addressFields.length) {
+              if (addressFields) {
                 // current address ?
                 // if we have multiple current addresses then we change them to previously addresses and keep the freshest one by address.date
                 if (address.typeId === AddressType.CURRENT_ADDRESS) {

@@ -163,12 +163,14 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
                 event.address?.phoneNumber,
                 event.address?.geoLocation?.lat,
                 event.address?.geoLocation?.lng
-              ].filter(e => e);
+              ].map(e => e ? e.toString().trim() : e)
+                .filter(e => e)
+                .join(', ');
 
               // add to list ?
-              if (addressLabelFields.length) {
+              if (addressLabelFields) {
                 this._uniqueOptions.addresses.push({
-                  label: addressLabelFields.join(', '),
+                  label: addressLabelFields,
                   value: event.id,
                   data: event.address
                 });
