@@ -276,7 +276,18 @@ export class DialogV2Service {
           placeholder: 'LNG_COMMON_LABEL_EXPORT_FIELDS_GROUPS_ALL',
           name: 'fieldsGroupAll',
           checked: true,
-          change: (data): void => {
+          change: (data, handler): void => {
+            // trigger callback ?
+            if (
+              config.export.allow.groups &&
+              config.export.allow.groups.change
+            ) {
+              config.export.allow.groups.change(
+                data,
+                handler
+              );
+            }
+
             // all fields groups checked ?
             if ((data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked) {
               // clear specific groups
@@ -314,12 +325,23 @@ export class DialogV2Service {
               return !(data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox).checked;
             }
           },
-          change: (data): void => {
+          change: (data, handler): void => {
             // nothing to do ?
-            if (
-              !config.export.allow.groups ||
-              !config.export.allow.groups.required
-            ) {
+            if (!config.export.allow.groups) {
+              // finished
+              return;
+            }
+
+            // trigger callback ?
+            if (config.export.allow.groups.change) {
+              config.export.allow.groups.change(
+                data,
+                handler
+              );
+            }
+
+            // if there are no required fields then we don't need to proceed further
+            if (!config.export.allow.groups.required) {
               // finished
               return;
             }

@@ -2,7 +2,7 @@ import { ExportStatusStep } from '../../../models/constants';
 import { Moment } from 'moment';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { RequestQueryBuilder } from '../../../helperClasses/request-query-builder';
-import { IV2SideDialogHandler, V2SideDialogConfigInput } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { IV2SideDialogData, IV2SideDialogHandler, V2SideDialogConfigInput } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 
 /**
  * Export data config progress answer
@@ -93,7 +93,8 @@ export interface IV2ExportDataConfig {
         fields: ILabelValuePairModel[],
 
         // optional
-        required?: IV2ExportDataConfigGroupsRequired
+        required?: IV2ExportDataConfigGroupsRequired,
+        change?: (data: IV2SideDialogData, handler: IV2SideDialogHandler) => void
       },
       fields?: ILabelValuePairModel[],
       dbColumns?: boolean,
