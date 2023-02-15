@@ -1570,9 +1570,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
           };
 
           // update tab configuration values to those that were applied
-          if (this.tabConfiguration?.inputs?.length) {
-            this.tabConfiguration.inputs = confInputs;
-          }
+          this.tabConfiguration.inputs = confInputs;
 
           // handle tab custom configuration
           this.tabConfiguration.apply(
