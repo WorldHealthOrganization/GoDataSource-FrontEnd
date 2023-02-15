@@ -553,6 +553,7 @@
   min-width: 42rem;
 
   @include breakpoint('xs') {
+    min-width: 100%;
     width: 100%;
   }
 }

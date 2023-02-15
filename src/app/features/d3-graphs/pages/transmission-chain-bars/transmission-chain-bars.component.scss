@@ -1,3 +1,5 @@
+@import 'mixins';
+
 /* COT Bars */
 app-transmission-chain-bars {
   --relationship-accent-color: var(--gd-danger);
@@ -140,12 +142,31 @@ app-transmission-chain-bars {
   padding: 1.6rem;
 
   .gd-cot-bars-legend-colors {
+    @include flex(flex);
+    @include flex_direction(column);
+    width: 100%;
+
+    > div {
+      @include flex(flex);
+      @include flex_align_items(stretch);
+      @include flex_direction(row);
+      width: 100%;
+
+      + div {
+        margin-top: 0.4rem;
+      }
+    }
+
     .legend-rect {
       border-radius: 0.2rem;
-      display: inline-block;
-      height: 1.6rem;
-      vertical-align: text-bottom;
+      display: block;
+      margin-right: 0.4rem;
+      min-width: 1.6rem;
       width: 1.6rem;
+
+      + span {
+        line-height: 1.6rem;
+      }
     }
   }
 
