@@ -281,7 +281,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
         this.changeDetectorRef.detectChanges();
       });
 
-    // subscribe to language changes
+    // subscribe to language change
     this.refreshLanguageTokens();
   }
 
@@ -324,7 +324,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
   }
 
   /**
-   *  Subscribe to language changes
+   *  Subscribe to language change
    */
   private refreshLanguageTokens() {
     // attach event

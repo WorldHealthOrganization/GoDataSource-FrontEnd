@@ -497,7 +497,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
     // update menu visibility
     this.updateMenuVisibility();
 
-    // subscribe to language changes
+    // subscribe to language change
     this.refreshLanguageTokens();
   }
 
@@ -519,7 +519,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
   }
 
   /**
-   *  Subscribe to language changes
+   *  Subscribe to language change
    */
   private refreshLanguageTokens() {
     // attach event

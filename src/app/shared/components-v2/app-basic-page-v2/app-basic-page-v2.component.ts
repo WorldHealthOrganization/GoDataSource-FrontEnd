@@ -75,7 +75,7 @@ export class AppBasicPageV2Component implements OnInit, OnDestroy {
     // update table size
     this.resizeTable();
 
-    // subscribe to language changes
+    // subscribe to language change
     this.refreshLanguageTokens();
   }
 
@@ -138,7 +138,7 @@ export class AppBasicPageV2Component implements OnInit, OnDestroy {
   }
 
   /**
-   *  Subscribe to language changes
+   *  Subscribe to language change
    */
   private refreshLanguageTokens() {
     // attach event
