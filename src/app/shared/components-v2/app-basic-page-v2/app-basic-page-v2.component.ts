@@ -6,6 +6,8 @@ import { V2AdvancedFilter } from '../app-list-table-v2/models/advanced-filter.mo
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
 import { SavedFilterData } from '../../../core/models/saved-filters.model';
 import { IV2SideDialogAdvancedFiltersResponse } from '../app-side-dialog-v2/models/side-dialog-config.model';
+import { Subscription } from 'rxjs/internal/Subscription';
+import { I18nService } from '../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -18,6 +20,9 @@ import { IV2SideDialogAdvancedFiltersResponse } from '../app-side-dialog-v2/mode
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppBasicPageV2Component implements OnInit, OnDestroy {
+  // language handler
+  languageSubscription: Subscription;
+
   // breadcrumbs
   @Input() breadcrumbs: IV2Breadcrumb[];
 
@@ -56,7 +61,8 @@ export class AppBasicPageV2Component implements OnInit, OnDestroy {
   constructor(
     protected elementRef: ElementRef,
     protected dialogV2Service: DialogV2Service,
-    protected changeDetectorRef: ChangeDetectorRef
+    protected changeDetectorRef: ChangeDetectorRef,
+    protected i18nService: I18nService
   ) {
     // disable select outbreak
     TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = true;
@@ -68,6 +74,9 @@ export class AppBasicPageV2Component implements OnInit, OnDestroy {
   ngOnInit(): void {
     // update table size
     this.resizeTable();
+
+    // subscribe to language change
+    this.refreshLanguageTokens();
   }
 
   /**
@@ -76,6 +85,9 @@ export class AppBasicPageV2Component implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     // enable select outbreak
     TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = false;
+
+    // stop refresh language tokens
+    this.releaseLanguageListener();
   }
 
   /**
@@ -119,6 +131,32 @@ export class AppBasicPageV2Component implements OnInit, OnDestroy {
     if (table) {
       // set main table height - mat card
       table.style.height = `calc(100% - ${topHeight}px)`;
+    }
+  }
+
+  /**
+   *  Subscribe to language change
+   */
+  private refreshLanguageTokens() {
+    // stop refresh language tokens
+    this.releaseLanguageListener();
+
+    // attach event
+    this.languageSubscription = this.i18nService.languageChangedEvent
+      .subscribe(() => {
+        // update ui
+        this.detectChanges();
+      });
+  }
+
+  /**
+   * Release language listener
+   */
+  private releaseLanguageListener() {
+    // release language listener
+    if (this.languageSubscription) {
+      this.languageSubscription.unsubscribe();
+      this.languageSubscription = null;
     }
   }
 

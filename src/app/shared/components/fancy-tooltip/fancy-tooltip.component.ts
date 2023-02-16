@@ -40,7 +40,26 @@ export class FancyTooltipComponent implements OnDestroy {
     protected i18nService: I18nService,
     private sanitized: DomSanitizer
   ) {
-    // on language change..we need to translate again the token
+    // subscribe to language change
+    this.refreshLanguageTokens();
+  }
+
+  /**
+     * Component destroyed
+     */
+  ngOnDestroy() {
+    // stop refresh language tokens
+    this.releaseLanguageListener();
+  }
+
+  /**
+   *  Subscribe to language change
+   */
+  private refreshLanguageTokens() {
+    // stop refresh language tokens
+    this.releaseLanguageListener();
+
+    // attach event
     this.languageSubscription = this.i18nService.languageChangedEvent
       .subscribe(() => {
         this.tooltip = this._tooltipToken;
@@ -48,9 +67,10 @@ export class FancyTooltipComponent implements OnDestroy {
   }
 
   /**
-     * Component destroyed
-     */
-  ngOnDestroy() {
+   * Release language listener
+   */
+  private releaseLanguageListener() {
+    // release language listener
     if (this.languageSubscription) {
       this.languageSubscription.unsubscribe();
       this.languageSubscription = null;
