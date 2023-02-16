@@ -1125,7 +1125,9 @@ export class LabResultsListComponent extends ListComponent<LabResultModel> imple
                     fields: labResultsFieldGroups,
                     required: labResultsFieldGroupsRequires
                   },
-                  fields: this.labFields,
+                  fields: {
+                    options: this.labFields
+                  },
                   dbColumns: true,
                   dbValues: true,
                   questionnaireVariables: true,

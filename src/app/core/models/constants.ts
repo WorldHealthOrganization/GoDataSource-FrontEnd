@@ -1133,6 +1133,11 @@ export class Constants {
     }
   };
 
+  // export groups
+  static EXPORT_GROUP = {
+    RELATIONSHIPS_DATA: 'LNG_COMMON_LABEL_EXPORT_GROUP_RELATIONSHIPS_DATA'
+  };
+
   /**
      * Today date
      */

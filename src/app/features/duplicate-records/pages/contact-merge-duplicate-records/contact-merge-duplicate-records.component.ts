@@ -329,11 +329,20 @@ export class ContactMergeDuplicateRecordsComponent extends CreateViewModifyCompo
 
             // determine addresses
             ((item.model as ContactModel).addresses || []).forEach((address) => {
+              // create a full address with all fields (filter is used to remove empty strings or undefined values)
+              const addressFields = [
+                address.fullAddress,
+                address.locationId,
+                address.postalCode,
+                address.emailAddress,
+                address.phoneNumber,
+                address.geoLocation?.lat,
+                address.geoLocation?.lng
+              ].map(e => e ? e.toString().trim() : e)
+                .filter(e => e);
+
               // add to list ?
-              if (
-                address.locationId ||
-                address.fullAddress
-              ) {
+              if (addressFields.length) {
                 // current address ?
                 // if we have multiple current addresses then we change them to previously addresses and keep the freshest one by address.date
                 if (address.typeId === AddressType.CURRENT_ADDRESS) {

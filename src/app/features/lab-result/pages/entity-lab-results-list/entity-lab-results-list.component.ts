@@ -659,7 +659,9 @@ export class EntityLabResultsListComponent extends ListComponent<LabResultModel>
                     fields: labResultsFieldGroups,
                     required: labResultsFieldGroupsRequires
                   },
-                  fields: this.labFields,
+                  fields: {
+                    options: this.labFields
+                  },
                   dbColumns: true,
                   dbValues: true,
                   questionnaireVariables: true,
