@@ -313,11 +313,8 @@ export class TopnavComponent implements OnInit, OnDestroy {
       this._contextSearchHelpSubscription = null;
     }
 
-    // release language listener
-    if (this.languageSubscription) {
-      this.languageSubscription.unsubscribe();
-      this.languageSubscription = null;
-    }
+    // stop refresh language tokens
+    this.releaseLanguageListener();
 
     // close loading handler
     this.hideLoading();
@@ -333,6 +330,17 @@ export class TopnavComponent implements OnInit, OnDestroy {
         // update ui
         this.changeDetectorRef.detectChanges();
       });
+  }
+
+  /**
+   * Release language listener
+   */
+  private releaseLanguageListener() {
+    // release language listener
+    if (this.languageSubscription) {
+      this.languageSubscription.unsubscribe();
+      this.languageSubscription = null;
+    }
   }
 
   /**

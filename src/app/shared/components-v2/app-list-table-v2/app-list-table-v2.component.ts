@@ -705,11 +705,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       this.clickListener = undefined;
     }
 
-    // release language listener
-    if (this.languageSubscription) {
-      this.languageSubscription.unsubscribe();
-      this.languageSubscription = null;
-    }
+    // stop refresh language tokens
+    this.releaseLanguageListener();
   }
 
   /**
@@ -721,6 +718,17 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       .subscribe(() => {
         this.updateColumnDefinitions();
       });
+  }
+
+  /**
+   * Release language listener
+   */
+  private releaseLanguageListener() {
+    // release language listener
+    if (this.languageSubscription) {
+      this.languageSubscription.unsubscribe();
+      this.languageSubscription = null;
+    }
   }
 
   /**

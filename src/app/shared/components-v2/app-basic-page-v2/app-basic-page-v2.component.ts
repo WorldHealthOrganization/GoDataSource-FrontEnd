@@ -86,11 +86,8 @@ export class AppBasicPageV2Component implements OnInit, OnDestroy {
     // enable select outbreak
     TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = false;
 
-    // release language listener
-    if (this.languageSubscription) {
-      this.languageSubscription.unsubscribe();
-      this.languageSubscription = null;
-    }
+    // stop refresh language tokens
+    this.releaseLanguageListener();
   }
 
   /**
@@ -147,6 +144,17 @@ export class AppBasicPageV2Component implements OnInit, OnDestroy {
         // update ui
         this.detectChanges();
       });
+  }
+
+  /**
+   * Release language listener
+   */
+  private releaseLanguageListener() {
+    // release language listener
+    if (this.languageSubscription) {
+      this.languageSubscription.unsubscribe();
+      this.languageSubscription = null;
+    }
   }
 
   /**

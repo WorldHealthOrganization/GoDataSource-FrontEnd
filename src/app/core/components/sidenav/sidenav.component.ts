@@ -511,11 +511,8 @@ export class SidenavComponent implements OnInit, OnDestroy {
       this.outbreakSubscriber = null;
     }
 
-    // release language listener
-    if (this.languageSubscription) {
-      this.languageSubscription.unsubscribe();
-      this.languageSubscription = null;
-    }
+    // stop refresh language tokens
+    this.releaseLanguageListener();
   }
 
   /**
@@ -528,6 +525,17 @@ export class SidenavComponent implements OnInit, OnDestroy {
         // update ui
         this.changeDetectorRef.detectChanges();
       });
+  }
+
+  /**
+   * Release language listener
+   */
+  private releaseLanguageListener() {
+    // release language listener
+    if (this.languageSubscription) {
+      this.languageSubscription.unsubscribe();
+      this.languageSubscription = null;
+    }
   }
 
   /**
