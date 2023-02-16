@@ -512,7 +512,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
     }
 
     // stop refresh language tokens
-    this.releaseLanguageListener();
+    this.releaseLanguageChangeListener();
   }
 
   /**
@@ -520,7 +520,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
    */
   private initializeLanguageChangeListener(): void {
     // stop refresh language tokens
-    this.releaseLanguageListener();
+    this.releaseLanguageChangeListener();
 
     // attach event
     this.languageSubscription = this.i18nService.languageChangedEvent
@@ -533,7 +533,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
   /**
    * Release language listener
    */
-  private releaseLanguageListener(): void {
+  private releaseLanguageChangeListener(): void {
     // release language listener
     if (this.languageSubscription) {
       this.languageSubscription.unsubscribe();

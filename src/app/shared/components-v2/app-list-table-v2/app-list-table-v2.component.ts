@@ -706,7 +706,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     }
 
     // stop refresh language tokens
-    this.releaseLanguageListener();
+    this.releaseLanguageChangeListener();
   }
 
   /**
@@ -714,7 +714,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    */
   private initializeLanguageChangeListener(): void {
     // stop refresh language tokens
-    this.releaseLanguageListener();
+    this.releaseLanguageChangeListener();
 
     // attach event
     this.languageSubscription = this.i18nService.languageChangedEvent
@@ -726,7 +726,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   /**
    * Release language listener
    */
-  private releaseLanguageListener() {
+  private releaseLanguageChangeListener(): void {
     // release language listener
     if (this.languageSubscription) {
       this.languageSubscription.unsubscribe();

@@ -314,7 +314,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
     }
 
     // stop refresh language tokens
-    this.releaseLanguageListener();
+    this.releaseLanguageChangeListener();
 
     // close loading handler
     this.hideLoading();
@@ -325,7 +325,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
    */
   private initializeLanguageChangeListener(): void {
     // stop refresh language tokens
-    this.releaseLanguageListener();
+    this.releaseLanguageChangeListener();
 
     // attach event
     this.languageSubscription = this.i18nService.languageChangedEvent
@@ -338,7 +338,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
   /**
    * Release language listener
    */
-  private releaseLanguageListener() {
+  private releaseLanguageChangeListener(): void {
     // release language listener
     if (this.languageSubscription) {
       this.languageSubscription.unsubscribe();
