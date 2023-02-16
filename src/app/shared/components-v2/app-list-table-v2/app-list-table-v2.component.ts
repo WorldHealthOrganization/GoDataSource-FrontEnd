@@ -3,7 +3,6 @@ import { Observable, throwError } from 'rxjs';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { GridReadyEvent, IsFullWidthRowParams, RowHeightParams, RowNode, ValueFormatterParams } from '@ag-grid-community/core';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-import { TranslateService } from '@ngx-translate/core';
 import * as _ from 'lodash';
 import { moment } from '../../../core/helperClasses/x-moment';
 import { Constants } from '../../../core/models/constants';
@@ -59,6 +58,7 @@ import { AppListTableV2DetailRowComponent } from './components/detail/app-list-t
 import { AppListTableV2DetailColumnComponent } from './components/detail/app-list-table-v2-detail-column.component';
 import { IV2RowExpandRow, V2RowType } from './models/row.model';
 import { determineIfTouchDevice } from '../../../core/methods/touch-device';
+import { I18nService } from '../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -91,6 +91,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
   // check if this is a touch device
   isTouchDevice: boolean = determineIfTouchDevice();
+
+  // language handler
+  languageSubscription: Subscription;
 
   // records
   recordsSubscription: Subscription;
@@ -402,7 +405,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       this._infos.length > 0
     ) {
       this._infos.forEach((info) => {
-        this.infosJoined += `<div>${this.translateService.instant(info)}</div>`;
+        this.infosJoined += `<div>${this.i18nService.instant(info)}</div>`;
       });
     }
   }
@@ -433,9 +436,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         // simple item ?
         if (Array.isArray(item.value)) {
           // create html
-          let html: string = `<span class="gd-list-table-bottom-left-legend-title">${this.translateService.instant(item.label)}</span><span class="gd-list-table-bottom-left-legend-items">`;
+          let html: string = `<span class="gd-list-table-bottom-left-legend-title">${this.i18nService.instant(item.label)}</span><span class="gd-list-table-bottom-left-legend-items">`;
           (item.value as ILabelValuePairModel[]).forEach((subItem) => {
-            html += `<span class="gd-list-table-bottom-left-legend-items-item">${AppListTableV2Component.renderStatusForm({ type: IV2ColumnStatusFormType.SQUARE, color: subItem.color }, false)} ${this.translateService.instant(subItem.label)}</span>`;
+            html += `<span class="gd-list-table-bottom-left-legend-items-item">${AppListTableV2Component.renderStatusForm({ type: IV2ColumnStatusFormType.SQUARE, color: subItem.color }, false)} ${this.i18nService.instant(subItem.label)}</span>`;
           });
 
           // close items list
@@ -447,7 +450,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           });
         } else {
           this._suffixLegendsHTML.push({
-            html: `<span class="gd-list-table-bottom-left-legend-title">${this.translateService.instant(item.label)}</span><span class="gd-list-table-bottom-left-legend-items"><span class="gd-list-table-bottom-left-legend-items-item">${item.value}</span></span>`
+            html: `<span class="gd-list-table-bottom-left-legend-title">${this.i18nService.instant(item.label)}</span><span class="gd-list-table-bottom-left-legend-items"><span class="gd-list-table-bottom-left-legend-items-item">${item.value}</span></span>`
           });
         }
       });
@@ -606,7 +609,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    */
   constructor(
     protected changeDetectorRef: ChangeDetectorRef,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected location: Location,
     protected renderer2: Renderer2,
     protected elementRef: ElementRef,
@@ -684,6 +687,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     setTimeout(() => {
       this.resizeTable();
     });
+
+    // subscribe to language change
+    this.refreshLanguageTokens();
   }
 
   /**
@@ -697,6 +703,34 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     if (this.clickListener) {
       this.clickListener();
       this.clickListener = undefined;
+    }
+
+    // stop refresh language tokens
+    this.releaseLanguageListener();
+  }
+
+  /**
+   *  Subscribe to language change
+   */
+  private refreshLanguageTokens() {
+    // stop refresh language tokens
+    this.releaseLanguageListener();
+
+    // attach event
+    this.languageSubscription = this.i18nService.languageChangedEvent
+      .subscribe(() => {
+        this.updateColumnDefinitions();
+      });
+  }
+
+  /**
+   * Release language listener
+   */
+  private releaseLanguageListener() {
+    // release language listener
+    if (this.languageSubscription) {
+      this.languageSubscription.unsubscribe();
+      this.languageSubscription = null;
     }
   }
 
@@ -1021,7 +1055,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       // attach column to list of visible columns
       columnDefs.push({
         headerName: column.label && column.format?.type !== V2ColumnFormat.STATUS ?
-          this.translateService.instant(column.label) :
+          this.i18nService.instant(column.label) :
           '',
         field: column.field,
         pinned: this.isSmallScreenMode ?
@@ -1050,12 +1084,12 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
         // go through legends
         statusColumn.legends.forEach((legend) => {
           // render legends
-          let html: string = `<span class="gd-list-table-bottom-left-legend-title">${this.translateService.instant(legend.title)}</span><span class="gd-list-table-bottom-left-legend-items">`;
+          let html: string = `<span class="gd-list-table-bottom-left-legend-title">${this.i18nService.instant(legend.title)}</span><span class="gd-list-table-bottom-left-legend-items">`;
 
           // render legend
           legend.items.forEach((legendItem) => {
             html += `<span class="gd-list-table-bottom-left-legend-items-item">
-              ${AppListTableV2Component.renderStatusForm(legendItem.form, false)} ${this.translateService.instant(legendItem.label)}
+              ${AppListTableV2Component.renderStatusForm(legendItem.form, false)} ${this.i18nService.instant(legendItem.label)}
             </span>`;
           });
 
@@ -1228,10 +1262,10 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           // AGE
           case V2ColumnFormat.AGE:
             return fieldValue?.months > 0 ?
-              fieldValue?.months + ' ' + this.translateService.instant('LNG_AGE_FIELD_LABEL_MONTHS') :
+              fieldValue?.months + ' ' + this.i18nService.instant('LNG_AGE_FIELD_LABEL_MONTHS') :
               (
                 fieldValue?.years > 0 ?
-                  (fieldValue?.years + ' ' + this.translateService.instant('LNG_AGE_FIELD_LABEL_YEARS')) :
+                  (fieldValue?.years + ' ' + this.i18nService.instant('LNG_AGE_FIELD_LABEL_YEARS')) :
                   ''
               );
 
@@ -1250,8 +1284,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           // BOOLEAN
           case V2ColumnFormat.BOOLEAN:
             return fieldValue ?
-              this.translateService.instant('LNG_COMMON_LABEL_YES') :
-              this.translateService.instant('LNG_COMMON_LABEL_NO');
+              this.i18nService.instant('LNG_COMMON_LABEL_YES') :
+              this.i18nService.instant('LNG_COMMON_LABEL_NO');
 
           // COLOR & ICON
           case V2ColumnFormat.COLOR:
@@ -1282,7 +1316,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     return typeof valueFormat.value === 'string' ?
       (
         valueFormat.value ?
-          this.translateService.instant(valueFormat.value) :
+          this.i18nService.instant(valueFormat.value) :
           ''
       ) : (
         valueFormat.value === null || valueFormat.value === undefined ?
@@ -1340,7 +1374,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           // create color display
           return value ?
             `<div class="gd-list-table-color"><span style="background-color: ${value};"></span> ${value}</div>` :
-            this.translateService.instant(colorColumn.noColorLabel);
+            this.i18nService.instant(colorColumn.noColorLabel);
         };
       }
 
@@ -1357,7 +1391,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           // create color display
           return value ?
             `<img class="gd-list-table-icon-url" src="${value}" alt="${URLIconColumn.noIconLabel}" />` :
-            this.translateService.instant(URLIconColumn.noIconLabel);
+            this.i18nService.instant(URLIconColumn.noIconLabel);
         };
       }
 
@@ -1374,7 +1408,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
           // create color display
           return value ?
             `<span class="gd-list-table-icon-material"><span class="material-icons">${value}</span></span>` :
-            this.translateService.instant(materialIconColumn.noIconLabel);
+            this.i18nService.instant(materialIconColumn.noIconLabel);
         };
       }
 
@@ -1602,7 +1636,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       // filter out pinned columns since those are handled by a different button
       .filter((item) => !item.alwaysVisible && (!item.exclude || !item.exclude(item)))
       // sort columns by their label
-      .sort((v1, v2) => this.translateService.instant(v1.label).localeCompare(this.translateService.instant(v2.label)));
+      .sort((v1, v2) => this.i18nService.instant(v1.label).localeCompare(this.i18nService.instant(v2.label)));
 
     // construct list of checkboxes
     const checkboxInputs: V2SideDialogConfigInput[] = [];
