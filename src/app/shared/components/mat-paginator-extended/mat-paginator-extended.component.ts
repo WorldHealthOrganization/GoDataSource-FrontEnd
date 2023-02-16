@@ -38,7 +38,7 @@ class CustomMatPaginatorIntl
    * Destroyed
    */
   ngOnDestroy() {
-    /// release language listener
+    // release language listener
     if (this.languageSubscription) {
       this.languageSubscription.unsubscribe();
       this.languageSubscription = null;

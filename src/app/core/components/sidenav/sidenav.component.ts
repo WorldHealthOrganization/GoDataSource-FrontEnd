@@ -21,6 +21,7 @@ import { IsActiveMatchOptions } from '@angular/router';
 import { ToastV2Service } from '../../services/helper/toast-v2.service';
 import { MAT_MENU_DEFAULT_OPTIONS } from '@angular/material/menu';
 import { determineIfTouchDevice } from '../../methods/touch-device';
+import { I18nService } from '../../services/helper/i18n.service';
 
 @Component({
   selector: 'app-sidenav',
@@ -49,6 +50,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
 
   // subscriptions
   outbreakSubscriber: Subscription;
+
+  // language handler
+  languageSubscription: Subscription;
 
   // authenticated user
   authUser: UserModel;
@@ -443,7 +447,8 @@ export class SidenavComponent implements OnInit, OnDestroy {
     private outbreakDataService: OutbreakDataService,
     private toastV2Service: ToastV2Service,
     private systemSettingsDataService: SystemSettingsDataService,
-    private changeDetectorRef: ChangeDetectorRef
+    private changeDetectorRef: ChangeDetectorRef,
+    private i18nService: I18nService
   ) {
     // get the authenticated user
     this.authUser = this.authDataService.getAuthenticatedUser();
@@ -491,6 +496,9 @@ export class SidenavComponent implements OnInit, OnDestroy {
 
     // update menu visibility
     this.updateMenuVisibility();
+
+    // subscribe to language changes
+    this.refreshLanguageTokens();
   }
 
   /**
@@ -502,6 +510,24 @@ export class SidenavComponent implements OnInit, OnDestroy {
       this.outbreakSubscriber.unsubscribe();
       this.outbreakSubscriber = null;
     }
+
+    // release language listener
+    if (this.languageSubscription) {
+      this.languageSubscription.unsubscribe();
+      this.languageSubscription = null;
+    }
+  }
+
+  /**
+   *  Subscribe to language changes
+   */
+  private refreshLanguageTokens() {
+    // attach event
+    this.languageSubscription = this.i18nService.languageChangedEvent
+      .subscribe(() => {
+        // update ui
+        this.changeDetectorRef.detectChanges();
+      });
   }
 
   /**

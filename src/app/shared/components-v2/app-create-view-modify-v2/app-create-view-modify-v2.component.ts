@@ -53,6 +53,7 @@ import {
   V2SideDialogConfigInputType
 } from '../app-side-dialog-v2/models/side-dialog-config.model';
 import { determineIfSmallScreenMode } from '../../../core/methods/small-screen-mode';
+import { I18nService } from '../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -67,6 +68,9 @@ import { determineIfSmallScreenMode } from '../../../core/methods/small-screen-m
 export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   // constants
   private static readonly GENERAL_SETTINGS_TAB_ORDER: string = 'tabsOrder';
+
+  // language handler
+  languageSubscription: Subscription;
 
   // page type
   // - determined from route data
@@ -441,7 +445,8 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     protected toastV2Service: ToastV2Service,
     protected authDataService: AuthDataService,
     protected storageService: StorageService,
-    protected activatedRoute: ActivatedRoute
+    protected activatedRoute: ActivatedRoute,
+    protected i18nService: I18nService
   ) {
     // update render mode
     this.updateRenderMode();
@@ -451,6 +456,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    * Initialize resources
    */
   ngOnInit(): void {
+    // subscribe to language changes
+    this.refreshLanguageTokens();
+
     // update table size
     this.resizeTable();
   }
@@ -464,6 +472,32 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
     // stop refresh list from search typing
     this.expandListStopSearchApply();
+
+    // stop refresh language tokens
+    this.releaseLanguageListener();
+  }
+
+  /**
+   *  Subscribe to language changes
+   */
+  private refreshLanguageTokens() {
+    // attach event
+    this.languageSubscription = this.i18nService.languageChangedEvent
+      .subscribe(() => {
+        // update ui
+        this.detectChanges();
+      });
+  }
+
+  /**
+   * Release language listener
+   */
+  private releaseLanguageListener() {
+    // release language listener
+    if (this.languageSubscription) {
+      this.languageSubscription.unsubscribe();
+      this.languageSubscription = null;
+    }
   }
 
   /**

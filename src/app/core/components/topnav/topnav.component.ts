@@ -59,6 +59,9 @@ export class TopnavComponent implements OnInit, OnDestroy {
     }
   }
 
+  // language handler
+  languageSubscription: Subscription;
+
   // global search
   globalSearchValue: string;
   globalSearchSuffixButtons: IAppFormIconButtonV2[] = [
@@ -277,6 +280,9 @@ export class TopnavComponent implements OnInit, OnDestroy {
         // update ui
         this.changeDetectorRef.detectChanges();
       });
+
+    // subscribe to language changes
+    this.refreshLanguageTokens();
   }
 
   /**
@@ -307,8 +313,26 @@ export class TopnavComponent implements OnInit, OnDestroy {
       this._contextSearchHelpSubscription = null;
     }
 
+    // release language listener
+    if (this.languageSubscription) {
+      this.languageSubscription.unsubscribe();
+      this.languageSubscription = null;
+    }
+
     // close loading handler
     this.hideLoading();
+  }
+
+  /**
+   *  Subscribe to language changes
+   */
+  private refreshLanguageTokens() {
+    // attach event
+    this.languageSubscription = this.i18nService.languageChangedEvent
+      .subscribe(() => {
+        // update ui
+        this.changeDetectorRef.detectChanges();
+      });
   }
 
   /**
