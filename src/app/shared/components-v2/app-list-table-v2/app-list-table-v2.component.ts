@@ -689,7 +689,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     });
 
     // subscribe to language change
-    this.refreshLanguageTokens();
+    this.initializeLanguageChangeListener();
   }
 
   /**
@@ -712,7 +712,7 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
   /**
    *  Subscribe to language change
    */
-  private refreshLanguageTokens() {
+  private initializeLanguageChangeListener(): void {
     // stop refresh language tokens
     this.releaseLanguageListener();
 

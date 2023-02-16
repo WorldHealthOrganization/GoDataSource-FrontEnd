@@ -282,7 +282,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
       });
 
     // subscribe to language change
-    this.refreshLanguageTokens();
+    this.initializeLanguageChangeListener();
   }
 
   /**
@@ -323,7 +323,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
   /**
    *  Subscribe to language change
    */
-  private refreshLanguageTokens() {
+  private initializeLanguageChangeListener(): void {
     // stop refresh language tokens
     this.releaseLanguageListener();
 

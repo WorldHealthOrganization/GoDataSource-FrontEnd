@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -8,7 +8,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
   templateUrl: './fancy-tooltip.component.html',
   styleUrls: ['./fancy-tooltip.component.scss']
 })
-export class FancyTooltipComponent implements OnDestroy {
+export class FancyTooltipComponent implements OnInit, OnDestroy {
   // tooltip
   private _tooltipToken: string;
   private _tooltip: string | SafeHtml;
@@ -34,20 +34,25 @@ export class FancyTooltipComponent implements OnDestroy {
   private languageSubscription: Subscription;
 
   /**
-     * Constructor
-     */
+   * Constructor
+   */
   constructor(
     protected i18nService: I18nService,
     private sanitized: DomSanitizer
-  ) {
+  ) {}
+
+  /**
+   * Component initialized
+   */
+  ngOnInit(): void {
     // subscribe to language change
-    this.refreshLanguageTokens();
+    this.initializeLanguageChangeListener();
   }
 
   /**
-     * Component destroyed
-     */
-  ngOnDestroy() {
+   * Component destroyed
+   */
+  ngOnDestroy(): void {
     // stop refresh language tokens
     this.releaseLanguageListener();
   }
@@ -55,7 +60,7 @@ export class FancyTooltipComponent implements OnDestroy {
   /**
    *  Subscribe to language change
    */
-  private refreshLanguageTokens() {
+  private initializeLanguageChangeListener(): void {
     // stop refresh language tokens
     this.releaseLanguageListener();
 
