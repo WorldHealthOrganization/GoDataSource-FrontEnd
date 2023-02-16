@@ -456,11 +456,11 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    * Initialize resources
    */
   ngOnInit(): void {
-    // subscribe to language change
-    this.refreshLanguageTokens();
-
     // update table size
     this.resizeTable();
+
+    // subscribe to language change
+    this.refreshLanguageTokens();
   }
 
   /**
@@ -481,6 +481,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    *  Subscribe to language change
    */
   private refreshLanguageTokens() {
+    // stop refresh language tokens
+    this.releaseLanguageListener();
+
     // attach event
     this.languageSubscription = this.i18nService.languageChangedEvent
       .subscribe(() => {

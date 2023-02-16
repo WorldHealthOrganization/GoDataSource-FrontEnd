@@ -43,6 +43,9 @@ class CustomMatPaginatorIntl
    *  Subscribe to language change
    */
   private refreshLanguageTokens() {
+    // stop refresh language tokens
+    this.releaseLanguageListener();
+
     // attach event
     this.languageSubscription = this.i18nService.languageChangedEvent
       .subscribe(() => {
