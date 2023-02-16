@@ -636,8 +636,18 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    */
   triggerListInputChanged(
     input: ICreateViewModifyV2TabInputChanged,
-    itemIndex?: number
+    itemIndex?: number,
+    form?: NgForm,
+    groupName?: string
   ): void {
+    // mark all items as dirty
+    if (groupName) {
+      this.markArrayItemsAsDirty(
+        form,
+        groupName
+      );
+    }
+
     // nothing to do ?
     if (!input.changed) {
       return;
