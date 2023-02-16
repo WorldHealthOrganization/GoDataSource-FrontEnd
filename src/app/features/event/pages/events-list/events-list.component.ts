@@ -202,7 +202,8 @@ export class EventsListComponent
                             name: item.name
                           })
                         }
-                      }
+                      },
+                      yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
                     })
                     .subscribe((response) => {
                       // canceled ?
@@ -392,7 +393,8 @@ export class EventsListComponent
                           get: () => 'LNG_DIALOG_CONFIRM_RESTORE_EVENT',
                           data: () => item as any
                         }
-                      }
+                      },
+                      yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
                     })
                     .subscribe((response) => {
                       // canceled ?
