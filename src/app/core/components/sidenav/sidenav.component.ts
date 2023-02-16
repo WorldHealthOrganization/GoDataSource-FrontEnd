@@ -457,7 +457,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
   /**
    * Component initialized
    */
-  ngOnInit() {
+  ngOnInit(): void {
     // retrieve list of outbreaks
     if (OutbreakModel.canView(this.authUser)) {
       this.outbreakDataService
@@ -498,13 +498,13 @@ export class SidenavComponent implements OnInit, OnDestroy {
     this.updateMenuVisibility();
 
     // subscribe to language change
-    this.refreshLanguageTokens();
+    this.initializeLanguageChangeListener();
   }
 
   /**
    * Component destroyed
    */
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     // outbreak subscriber
     if (this.outbreakSubscriber) {
       this.outbreakSubscriber.unsubscribe();
@@ -512,15 +512,15 @@ export class SidenavComponent implements OnInit, OnDestroy {
     }
 
     // stop refresh language tokens
-    this.releaseLanguageListener();
+    this.releaseLanguageChangeListener();
   }
 
   /**
    *  Subscribe to language change
    */
-  private refreshLanguageTokens() {
+  private initializeLanguageChangeListener(): void {
     // stop refresh language tokens
-    this.releaseLanguageListener();
+    this.releaseLanguageChangeListener();
 
     // attach event
     this.languageSubscription = this.i18nService.languageChangedEvent
@@ -533,7 +533,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
   /**
    * Release language listener
    */
-  private releaseLanguageListener() {
+  private releaseLanguageChangeListener(): void {
     // release language listener
     if (this.languageSubscription) {
       this.languageSubscription.unsubscribe();

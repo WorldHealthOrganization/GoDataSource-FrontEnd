@@ -76,7 +76,7 @@ export class AppBasicPageV2Component implements OnInit, OnDestroy {
     this.resizeTable();
 
     // subscribe to language change
-    this.refreshLanguageTokens();
+    this.initializeLanguageChangeListener();
   }
 
   /**
@@ -87,7 +87,7 @@ export class AppBasicPageV2Component implements OnInit, OnDestroy {
     TopnavComponent.SELECTED_OUTBREAK_DROPDOWN_DISABLED = false;
 
     // stop refresh language tokens
-    this.releaseLanguageListener();
+    this.releaseLanguageChangeListener();
   }
 
   /**
@@ -137,9 +137,9 @@ export class AppBasicPageV2Component implements OnInit, OnDestroy {
   /**
    *  Subscribe to language change
    */
-  private refreshLanguageTokens() {
+  private initializeLanguageChangeListener(): void {
     // stop refresh language tokens
-    this.releaseLanguageListener();
+    this.releaseLanguageChangeListener();
 
     // attach event
     this.languageSubscription = this.i18nService.languageChangedEvent
@@ -152,7 +152,7 @@ export class AppBasicPageV2Component implements OnInit, OnDestroy {
   /**
    * Release language listener
    */
-  private releaseLanguageListener() {
+  private releaseLanguageChangeListener(): void {
     // release language listener
     if (this.languageSubscription) {
       this.languageSubscription.unsubscribe();

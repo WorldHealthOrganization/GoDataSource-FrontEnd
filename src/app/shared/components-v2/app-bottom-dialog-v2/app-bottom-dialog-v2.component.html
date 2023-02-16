@@ -69,19 +69,19 @@
     #showLoading>
     <div
       *ngIf="loading"
-      class="gd-app-side-dialog-v2-content-loading"
+      class="gd-app-bottom-dialog-v2-content-loading"
       fxLayout="column" fxLayoutAlign="start center">
 
       <!-- Spinner -->
       <mat-progress-spinner
-        class="gd-app-side-dialog-v2-content-loading-spinner"
+        class="gd-app-bottom-dialog-v2-content-loading-spinner"
         mode="indeterminate"
         diameter="32"></mat-progress-spinner>
 
       <!-- Message -->
       <div
         *ngIf="loading.message"
-        class="gd-app-side-dialog-v2-content-loading-message">
+        class="gd-app-bottom-dialog-v2-content-loading-message">
         {{loading.message | translate:loading.messageData}}
       </div>
     </div>
