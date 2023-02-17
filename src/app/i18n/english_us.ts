@@ -11,6 +11,8 @@ export const EnglishUsLang = {
      */
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
+    'LNG_COMMON_LABEL_FOOTER_SHOW': 'Show legend and pagination',
+    'LNG_COMMON_LABEL_FOOTER_HIDE': 'Hide legend and pagination'
 
 
 
