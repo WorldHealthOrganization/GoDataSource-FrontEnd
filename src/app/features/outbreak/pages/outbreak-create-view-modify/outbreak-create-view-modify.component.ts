@@ -1207,11 +1207,14 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
    */
   private checkDuplicateEntityMasks() {
     // create an array with all masks
-    const entityMask = [this.itemData.caseIdMask, this.itemData.contactIdMask, this.itemData.contactOfContactIdMask];
+    const entityMasks = [this.itemData.caseIdMask, this.itemData.contactIdMask, this.itemData.contactOfContactIdMask];
 
-    // remove duplicates from the initial array and check new length
+    // find duplicates and also check if any of them contains at least one "9" digit
+    // "9" means that there is an auto-generated sequence number
     if (
-      [...new Set(entityMask)].length < entityMask.length
+      entityMasks
+        .filter((item, index) => index !== entityMasks.indexOf(item))
+        .filter(item => item.includes('9')).length
     ) {
       this.toastV2Service.notice(
         'LNG_OUTBREAK_FIELD_CHECK_DUPLICATE_ENTITY_MASK',
