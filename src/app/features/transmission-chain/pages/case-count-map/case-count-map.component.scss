@@ -1,19 +1,33 @@
 @import 'mixins';
 
 app-case-count-map {
-  .gd-case-count-map-distance {
-    padding: 1.6rem;
-
-    > div {
-      white-space: nowrap;
-    }
+  .gd-form-toggle-v2 {
+    @include flex(flex);
   }
-  
-  app-world-map {
-    height: calc(100% - 8rem);
 
-    @include breakpoint('lt-sm') {
-      height: calc(100% - 10.9rem);
+  .gd-case-count-map-distance {
+    @include flex(flex);
+    @include flex_align_items(flex-end);
+    @include flex_direction(column);
+    position: absolute;
+    right: 15rem;
+    top: 0.8rem;
+    z-index: 9;
+
+    .gd-body-content-right-fullscreen & {
+      z-index: 9999;
+    }
+
+    .gd-case-count-map-distance-button {
+      .mat-icon-button {
+        height: 4rem;
+        min-width: 4rem;
+        width: 4rem;
+      }
+    }
+
+    .gd-case-count-map-distance-content {
+      margin-top: 0.3rem;
     }
   }
 
@@ -21,5 +35,11 @@ app-case-count-map {
     color: var(--gd-secondary);
     font-style: italic;
     text-align: center;
+  }
+
+  .gd-basic-content.mat-card {
+    .gd-body-content-right-fullscreen & {
+      position: static;
+    }
   }
 }

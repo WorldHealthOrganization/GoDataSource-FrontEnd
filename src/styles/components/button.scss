@@ -105,6 +105,18 @@ a.mat-flat-button {
     }
   }
 
+  /* White button */
+  &.mat-white {
+    background-color: var(--gd-background);
+    border: 0.1rem solid var(--gd-secondary);
+    color: var(--gd-primary);
+
+    &.mat-button-disabled {
+      background-color: var(--gd-background);
+      color: var(--gd-secondary);
+    }
+  }
+
   .mat-button-wrapper {
     @include flex(flex);
     @include flex_align_items(center);

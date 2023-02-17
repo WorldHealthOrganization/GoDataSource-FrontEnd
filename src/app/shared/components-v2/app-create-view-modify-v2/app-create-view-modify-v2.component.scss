@@ -336,8 +336,11 @@
         background-color: var(--gd-primary-alt);
         @include border-radius(0 0.4rem 0.4rem 0);
         padding: 1rem;
-        right: -3.8rem;
-        top: 0;
+      }
+
+      @include breakpoint('lg') {
+        right: -4.6rem;
+        top: 0.4rem;
       }
 
       .material-icons {
@@ -367,8 +370,8 @@
   .gd-create-view-modify-top {
     padding-bottom: 2.4rem;
 
-    @include breakpoint('xs') {
-      padding-bottom: 1.6rem;
+    @include breakpoint('lt-lg') {
+      padding-bottom: 0.8rem;
     }
 
     .gd-create-view-modify-top-title-buttons {

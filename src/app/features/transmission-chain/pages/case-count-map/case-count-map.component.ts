@@ -24,6 +24,7 @@ import { ReferenceDataEntryModel } from '../../../../core/models/reference-data.
 import { TransmissionChainFilters } from '../../classes/filter';
 import { IV2ActionMenuLabel, V2ActionType } from '../../../../shared/components-v2/app-list-table-v2/models/action.model';
 import { IV2SideDialogAdvancedFiltersResponse } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 
 @Component({
   selector: 'app-case-count-map',
@@ -52,7 +53,26 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
 
   filters: TransmissionChainFilters = new TransmissionChainFilters();
 
+  // cluster distance
+  displayClusterDistance: boolean = false;
+
   clusterDistance: number = 10;
+
+  clusterDistanceOptions: ILabelValuePairModel[] = [
+    {
+      label: '10',
+      value: 10
+    }, {
+      label: '50',
+      value: 50
+    }, {
+      label: '100',
+      value: 100
+    }, {
+      label: '150',
+      value: 150
+    }
+  ];
 
   @ViewChild('worldMap') worldMap: WorldMapComponent;
 
