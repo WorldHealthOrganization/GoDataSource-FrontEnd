@@ -17,6 +17,11 @@
     height: calc(100% + 5.2rem);
     margin: -1.2rem -4rem -4rem;
 
+    @include breakpoint('lg') {
+      height: calc(100% + 2.4rem);
+      margin: -0.8rem -1.6rem -1.6rem -3.2rem;
+    }
+
     @include breakpoint('lt-md') {
       height: calc(100% + 2.4rem);
       margin: -0.8rem -1.6rem -1.6rem -2.4rem;
@@ -261,6 +266,10 @@
       overflow: hidden;
       padding: 1.2rem 4rem 4rem;
 
+      @media only screen and (max-height: 599px) {
+        overflow-y: overlay;
+      }
+
       @include breakpoint('lt-md') {
         padding: 1.2rem 2rem 2rem;
       }
@@ -336,11 +345,7 @@
         background-color: var(--gd-primary-alt);
         @include border-radius(0 0.4rem 0.4rem 0);
         padding: 1rem;
-      }
-
-      @include breakpoint('lg') {
-        right: -4.6rem;
-        top: 0.4rem;
+        right: -3.8rem;
       }
 
       .material-icons {
@@ -420,6 +425,10 @@
 
   .gd-create-view-modify-bottom {
     position: relative;
+
+    @media only screen and (max-height: 599px) {
+      height: auto !important;
+    }
 
     .gd-conf-tabs-button {
       @include border-radius(0.4rem 0.4rem 0 0);
