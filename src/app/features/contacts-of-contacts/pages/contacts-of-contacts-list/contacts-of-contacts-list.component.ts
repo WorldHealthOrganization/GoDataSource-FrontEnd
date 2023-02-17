@@ -210,7 +210,8 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                         get: () => 'LNG_DIALOG_CONFIRM_DELETE_CONTACT_OF_CONTACT',
                         data: () => ({ name: item.name })
                       }
-                    }
+                    },
+                    yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
                   }).subscribe((response) => {
                     // canceled ?
                     if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
@@ -365,7 +366,8 @@ export class ContactsOfContactsListComponent extends ListComponent<ContactOfCont
                         get: () => 'LNG_DIALOG_CONFIRM_RESTORE_CONTACT_OF_CONTACT',
                         data: () => item as any
                       }
-                    }
+                    },
+                    yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
                   }).subscribe((response) => {
                     // canceled ?
                     if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {

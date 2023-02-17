@@ -126,7 +126,7 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
   protected initializePageTitle(): void {
     // add info accordingly to page type
     if (this.isModify) {
-      this.pageTitle = 'LNG_PAGE_MODIFY_LAB_RESULTS_LIST_TITLE';
+      this.pageTitle = 'LNG_PAGE_MODIFY_LAB_RESULT_LIST_TITLE';
       this.pageTitleData = undefined;
     }
   }
@@ -279,7 +279,7 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
             {
               type: CreateViewModifyV2TabInputType.LABEL,
               value: {
-                get: () => 'LNG_PAGE_MODIFY_LAB_RESULTS_LIST_MODIFY_DATA_INFO_LABEL'
+                get: () => 'LNG_PAGE_MODIFY_LAB_RESULT_LIST_MODIFY_DATA_INFO_LABEL'
               }
             },
 
@@ -287,7 +287,7 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
             {
               type: CreateViewModifyV2TabInputType.LINK_LIST,
               label: {
-                get: () => 'LNG_PAGE_MODIFY_LAB_RESULTS_SELECTED_CONTACTS'
+                get: () => 'LNG_PAGE_MODIFY_LAB_RESULT_SELECTED_CONTACTS'
               },
               links: this._selectedLabResults.map((result) => ({
                 label: result.labName ?
@@ -509,7 +509,7 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
       // something went wrong ?
       if (selectedLabResultsIds.length < 1) {
         // show error
-        this.toastV2Service.error('LNG_PAGE_MODIFY_LAB_RESULTS_LIST_ERROR_NO_LAB_RESULTS_SELECTED');
+        this.toastV2Service.error('LNG_PAGE_MODIFY_LAB_RESULT_LIST_ERROR_NO_LAB_RESULTS_SELECTED');
 
         // don't do anything
         return;
@@ -545,7 +545,7 @@ export class LabResultsBulkModifyComponent extends CreateViewModifyComponent<Lab
         )
         .subscribe((items) => {
           // success updating event
-          this.toastV2Service.success('LNG_PAGE_MODIFY_LAB_RESULTS_LIST_ACTION_MODIFY_MULTIPLE_LAB_RESULTS_SUCCESS_MESSAGE');
+          this.toastV2Service.success('LNG_PAGE_MODIFY_LAB_RESULT_LIST_ACTION_MODIFY_MULTIPLE_LAB_RESULTS_SUCCESS_MESSAGE');
 
           // finished with success
           finished(undefined, items);

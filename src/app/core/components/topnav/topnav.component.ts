@@ -282,7 +282,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
       });
 
     // subscribe to language change
-    this.refreshLanguageTokens();
+    this.initializeLanguageChangeListener();
   }
 
   /**
@@ -314,7 +314,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
     }
 
     // stop refresh language tokens
-    this.releaseLanguageListener();
+    this.releaseLanguageChangeListener();
 
     // close loading handler
     this.hideLoading();
@@ -323,9 +323,9 @@ export class TopnavComponent implements OnInit, OnDestroy {
   /**
    *  Subscribe to language change
    */
-  private refreshLanguageTokens() {
+  private initializeLanguageChangeListener(): void {
     // stop refresh language tokens
-    this.releaseLanguageListener();
+    this.releaseLanguageChangeListener();
 
     // attach event
     this.languageSubscription = this.i18nService.languageChangedEvent
@@ -338,7 +338,7 @@ export class TopnavComponent implements OnInit, OnDestroy {
   /**
    * Release language listener
    */
-  private releaseLanguageListener() {
+  private releaseLanguageChangeListener(): void {
     // release language listener
     if (this.languageSubscription) {
       this.languageSubscription.unsubscribe();

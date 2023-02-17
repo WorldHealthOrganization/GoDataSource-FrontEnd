@@ -28,23 +28,23 @@ class CustomMatPaginatorIntl
     this.updateTranslations();
 
     // subscribe to language change
-    this.refreshLanguageTokens();
+    this.initializeLanguageChangeListener();
   }
 
   /**
    * Destroyed
    */
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     // stop refresh language tokens
-    this.releaseLanguageListener();
+    this.releaseLanguageChangeListener();
   }
 
   /**
    *  Subscribe to language change
    */
-  private refreshLanguageTokens() {
+  private initializeLanguageChangeListener(): void {
     // stop refresh language tokens
-    this.releaseLanguageListener();
+    this.releaseLanguageChangeListener();
 
     // attach event
     this.languageSubscription = this.i18nService.languageChangedEvent
@@ -56,7 +56,7 @@ class CustomMatPaginatorIntl
   /**
    * Release language listener
    */
-  private releaseLanguageListener() {
+  private releaseLanguageChangeListener(): void {
     // release language listener
     if (this.languageSubscription) {
       this.languageSubscription.unsubscribe();

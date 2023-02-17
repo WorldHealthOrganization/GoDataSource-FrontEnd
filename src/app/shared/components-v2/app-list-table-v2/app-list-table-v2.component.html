@@ -361,12 +361,31 @@
         type="button"
         mat-icon-button
         [matTooltip]="(showHeaderFilters ? 'LNG_COMMON_LABEL_HEADER_FILTER_HIDE' : 'LNG_COMMON_LABEL_HEADER_FILTER_SHOW') | translate"
-        (click)="showHeaderFilters = !showHeaderFilters"
-        [disabled]="savingHeaderFilterVisibility">
+        [disabled]="savingHeaderFilterVisibility"
+        (click)="showHeaderFilters = !showHeaderFilters">
         <mat-icon
           *ngIf="!savingHeaderFilterVisibility; else savingHeaderFilterVisibilityProgress">filter_alt</mat-icon>
         <ng-template
           #savingHeaderFilterVisibilityProgress>
+          <mat-progress-spinner
+            mode="indeterminate"
+            diameter="16"></mat-progress-spinner>
+        </ng-template>
+      </button>
+
+      <!-- Collapse / Expand footer -->
+      <button
+        *ngIf="!paginatorDisabled || (!isSmallScreenMode && legends?.length > 0)"
+        [class.gd-list-table-header-right-footer-active]="!bottomSectionIsCollapsed"
+        type="button"
+        mat-icon-button
+        [matTooltip]="(bottomSectionIsCollapsed ? 'LNG_COMMON_LABEL_FOOTER_SHOW' : 'LNG_COMMON_LABEL_FOOTER_HIDE') | translate"
+        [disabled]="bottomSectionSavingConfig"
+        (click)="expandCollapseBottomSection()">
+        <mat-icon
+          *ngIf="!bottomSectionSavingConfig; else savingBottomSectionConfig">{{bottomSectionIsCollapsed ? 'expand' : 'compress'}}</mat-icon>
+        <ng-template
+          #savingBottomSectionConfig>
           <mat-progress-spinner
             mode="indeterminate"
             diameter="16"></mat-progress-spinner>
@@ -420,67 +439,42 @@
   </ag-grid-angular>
 
   <!-- Bottom -->
-  <ng-container
-    *ngIf="!paginatorDisabled || (!isSmallScreenMode && legends?.length > 0)">
+  <div
+    *ngIf="!paginatorDisabled || (!isSmallScreenMode && legends?.length > 0)"
+    fxLayout="row" fxLayout.sm="column" fxLayoutAlign="space-between start"
+    class="gd-list-table-bottom"
+    [class.gd-list-table-bottom-collapsed]="bottomSectionIsCollapsed">
 
-    <!-- Collapse / Expand bottom part -->
+    <!-- Left -->
     <div
-      class="gd-list-table-bottom-collapse-expand">
-      <!-- Expand / Collapse button -->
-      <button
-        type="button"
-        mat-icon-button
-        [disabled]="bottomSectionSavingConfig"
-        (click)="expandCollapseBottomSection()"
-        class="gd-list-table-bottom-collapse-expand-button">
-        <mat-icon
-          *ngIf="!bottomSectionSavingConfig; else savingBottomSectionConfig">{{bottomSectionIsCollapsed ? 'expand' : 'compress'}}</mat-icon>
-        <ng-template
-          #savingBottomSectionConfig>
-          <mat-progress-spinner
-            mode="indeterminate"
-            diameter="16"></mat-progress-spinner>
-        </ng-template>
-      </button>
+      *ngIf="!isSmallScreenMode && legends?.length > 0"
+      fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="0.4rem"
+      class="gd-list-table-bottom-left">
+
+      <!-- Legends & Messages -->
+      <div
+        *ngFor="let legend of legends"
+        fxLayout="row nowrap" fxLayoutAlign="start start"
+        class="gd-list-table-bottom-left-legend"
+        [innerHTML]="legend.html | safeHtml"></div>
+
     </div>
 
     <!-- Table paginator -->
     <div
-      fxLayout="row" fxLayout.sm="column" fxLayoutAlign="space-between start"
-      class="gd-list-table-bottom"
-      [class.gd-list-table-bottom-collapsed]="bottomSectionIsCollapsed">
-
-      <!-- Left -->
-      <div
-        *ngIf="!isSmallScreenMode"
-        fxLayout="column" fxLayoutAlign="center start" fxLayoutGap="0.4rem"
-        class="gd-list-table-bottom-left">
-
-        <!-- Legends & Messages -->
-        <div
-          *ngFor="let legend of legends"
-          fxLayout="row nowrap" fxLayoutAlign="start start"
-          class="gd-list-table-bottom-left-legend"
-          [innerHTML]="legend.html | safeHtml"></div>
-
-      </div>
-
-      <!-- Right -->
-      <div
-        fxGrow="0"
-        class="gd-list-table-bottom-right">
-        <app-mat-paginator-extended
-          *ngIf="!paginatorDisabled"
-          [pageIndex]="pageIndex"
-          [countData]="pageCount"
-          [pageSize]="pageSize"
-          [pageSizeOptions]="Constants.PAGE_SIZE_OPTIONS"
-          (page)="changePage($event)"
-          [disabled]="!pageCount">
-        </app-mat-paginator-extended>
-      </div>
-
+      *ngIf="!paginatorDisabled"
+      fxGrow="0"
+      class="gd-list-table-bottom-right">
+      <app-mat-paginator-extended
+        [pageIndex]="pageIndex"
+        [countData]="pageCount"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="Constants.PAGE_SIZE_OPTIONS"
+        (page)="changePage($event)"
+        [disabled]="!pageCount">
+      </app-mat-paginator-extended>
     </div>
-  </ng-container>
+
+  </div>
 
 </mat-card>

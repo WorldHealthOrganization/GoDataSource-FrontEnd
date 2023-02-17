@@ -232,7 +232,8 @@ export class ContactsListComponent
                           get: () => 'LNG_DIALOG_CONFIRM_DELETE_CONTACT',
                           data: () => ({ name: item.name })
                         }
-                      }
+                      },
+                      yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
                     })
                     .subscribe((response) => {
                       // canceled ?
@@ -619,7 +620,8 @@ export class ContactsListComponent
                           get: () => 'LNG_DIALOG_CONFIRM_RESTORE_CONTACT',
                           data: () => item as any
                         }
-                      }
+                      },
+                      yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
                     })
                     .subscribe((response) => {
                       // canceled ?
