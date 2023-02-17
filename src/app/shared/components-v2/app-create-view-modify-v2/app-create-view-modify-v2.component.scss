@@ -18,8 +18,8 @@
     margin: -1.2rem -4rem -4rem;
 
     @include breakpoint('lt-md') {
-      height: calc(100% + 3.2rem);
-      margin: -1.2rem -2rem -2rem;
+      height: calc(100% + 2.4rem);
+      margin: -0.8rem -1.6rem -1.6rem -2.4rem;
     }
 
     .gd-create-view-modify-list {
@@ -748,6 +748,10 @@
                       > div:not(.gd-create-view-modify-bottom-section-content-input-list-multiple-rows) {
                         > * {
                           margin-bottom: 1.6rem;
+                        }
+
+                        .gd-form-input-v2-viewonly {
+                          margin-bottom: 0;
                         }
                       }
                     }

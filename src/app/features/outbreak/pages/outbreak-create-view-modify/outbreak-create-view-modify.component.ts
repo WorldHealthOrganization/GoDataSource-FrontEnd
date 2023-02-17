@@ -1222,6 +1222,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
         AppMessages.APP_MESSAGE_DUPLICATE_ENTITY_MASK
       );
 
+      // no need to continue since it will hide warning
       return;
     }
 

@@ -34,7 +34,13 @@ import { V2ActionType } from '../../../../shared/components-v2/app-list-table-v2
 import { IV2ColumnPinned, IV2ColumnStatusFormType, V2ColumnFormat, V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
-import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, IV2SideDialogConfigInputText, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import {
+  IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigInputCheckbox, IV2SideDialogConfigInputMultiDropdown,
+  IV2SideDialogConfigInputSingleDropdown,
+  IV2SideDialogConfigInputText,
+  V2SideDialogConfigInputType
+} from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import * as moment from 'moment';
 import { TranslateService } from '@ngx-translate/core';
@@ -47,6 +53,9 @@ export class ContactsListComponent
   extends ListComponent<ContactModel>
   implements OnDestroy
 {
+  // constants
+  private static readonly RELATIONSHIP_DATA: string = 'relationship';
+
   // contact fields
   contactFields: ILabelValuePairModel[] = [
     { label: 'LNG_CONTACT_FIELD_LABEL_ID', value: 'id' },
@@ -87,7 +96,7 @@ export class ContactsListComponent
     { label: 'LNG_CONTACT_FIELD_LABEL_NUMBER_OF_CONTACTS', value: 'numberOfContacts' },
     { label: 'LNG_CONTACT_FIELD_LABEL_VACCINES_RECEIVED', value: 'vaccinesReceived' },
     { label: 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS', value: 'pregnancyStatus' },
-    { label: 'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP', value: 'relationship' },
+    { label: 'LNG_CONTACT_FIELD_LABEL_RELATIONSHIP', value: ContactsListComponent.RELATIONSHIP_DATA },
     { label: 'LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_TEAM_ID', value: 'followUpTeamId' },
     { label: 'LNG_CONTACT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUser' },
     { label: 'LNG_CONTACT_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value: 'questionnaireAnswers' }
@@ -223,7 +232,8 @@ export class ContactsListComponent
                           get: () => 'LNG_DIALOG_CONFIRM_DELETE_CONTACT',
                           data: () => ({ name: item.name })
                         }
-                      }
+                      },
+                      yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
                     })
                     .subscribe((response) => {
                       // canceled ?
@@ -610,7 +620,8 @@ export class ContactsListComponent
                           get: () => 'LNG_DIALOG_CONFIRM_RESTORE_CONTACT',
                           data: () => item as any
                         }
-                      }
+                      },
+                      yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
                     })
                     .subscribe((response) => {
                       // canceled ?
@@ -1868,9 +1879,45 @@ export class ContactsListComponent
                   },
                   groups: {
                     fields: contactFieldGroups,
-                    required: contactFieldGroupsRequires
+                    required: contactFieldGroupsRequires,
+                    change: (data, handler) => {
+                      // do we need to de-select exposure person data ?
+                      const includeExposurePersonDataCheckbox: IV2SideDialogConfigInputCheckbox = data.map.includePersonExposureFields as IV2SideDialogConfigInputCheckbox;
+                      const allGroups: boolean = (data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox)?.checked;
+                      const fieldsGroupListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsGroupList as IV2SideDialogConfigInputMultiDropdown;
+                      if (
+                        includeExposurePersonDataCheckbox?.checked &&
+                        !allGroups && (
+                          !fieldsGroupListDropdown.values?.length ||
+                          fieldsGroupListDropdown.values.indexOf(Constants.EXPORT_GROUP.RELATIONSHIPS_DATA) < 0
+                        )
+                      ) {
+                        // de-select exposure person data
+                        includeExposurePersonDataCheckbox.checked = false;
+                        handler.detectChanges();
+                      }
+                    }
                   },
-                  fields: this.contactFields,
+                  fields: {
+                    options: this.contactFields,
+                    change: (data, handler) => {
+                      // do we need to de-select exposure person data ?
+                      const includeExposurePersonDataCheckbox: IV2SideDialogConfigInputCheckbox = data.map.includePersonExposureFields as IV2SideDialogConfigInputCheckbox;
+                      const allFields: boolean = (data.map.fieldsAll as IV2SideDialogConfigInputCheckbox)?.checked;
+                      const fieldsListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsList as IV2SideDialogConfigInputMultiDropdown;
+                      if (
+                        includeExposurePersonDataCheckbox?.checked &&
+                        !allFields && (
+                          !fieldsListDropdown.values?.length ||
+                          fieldsListDropdown.values.indexOf(ContactsListComponent.RELATIONSHIP_DATA) < 0
+                        )
+                      ) {
+                        // de-select exposure person data
+                        includeExposurePersonDataCheckbox.checked = false;
+                        handler.detectChanges();
+                      }
+                    }
+                  },
                   dbColumns: true,
                   dbValues: true,
                   jsonReplaceUndefinedWithNull: true,
@@ -1889,7 +1936,47 @@ export class ContactsListComponent
                       placeholder: 'LNG_PAGE_LIST_CONTACTS_EXPORT_EXPOSURE_INFORMATION',
                       tooltip: 'LNG_PAGE_LIST_CONTACTS_EXPORT_EXPOSURE_INFORMATION_DESCRIPTION',
                       name: 'includePersonExposureFields',
-                      checked: false
+                      checked: false,
+                      change: (data, handler) => {
+                        // check if we need to make adjustments
+                        const includeExposurePersonData: boolean = (data.map.includePersonExposureFields as IV2SideDialogConfigInputCheckbox)?.checked;
+                        if (includeExposurePersonData) {
+                          // check groups & fields
+                          const allGroups: boolean = (data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox)?.checked;
+                          const allFields: boolean = (data.map.fieldsAll as IV2SideDialogConfigInputCheckbox)?.checked;
+                          if (!allGroups) {
+                            // do we need to select relationship data ?
+                            const fieldsGroupListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsGroupList as IV2SideDialogConfigInputMultiDropdown;
+                            if (fieldsGroupListDropdown) {
+                              // initialize if necessary
+                              fieldsGroupListDropdown.values = fieldsGroupListDropdown.values || [];
+
+                              // select relationship data since this is necessary
+                              if (fieldsGroupListDropdown.values.indexOf(Constants.EXPORT_GROUP.RELATIONSHIPS_DATA) < 0) {
+                                // select relationship data
+                                fieldsGroupListDropdown.values.push(Constants.EXPORT_GROUP.RELATIONSHIPS_DATA);
+                                fieldsGroupListDropdown.values = [...fieldsGroupListDropdown.values];
+                                handler.detectChanges();
+                              }
+                            }
+                          } else if (!allFields) {
+                            // do we need to select relationship data ?
+                            const fieldsListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsList as IV2SideDialogConfigInputMultiDropdown;
+                            if (fieldsListDropdown) {
+                              // initialize if necessary
+                              fieldsListDropdown.values = fieldsListDropdown.values || [];
+
+                              // select relationship data since this is necessary
+                              if (fieldsListDropdown.values.indexOf(ContactsListComponent.RELATIONSHIP_DATA) < 0) {
+                                // select relationship data
+                                fieldsListDropdown.values.push(ContactsListComponent.RELATIONSHIP_DATA);
+                                fieldsListDropdown.values = [...fieldsListDropdown.values];
+                                handler.detectChanges();
+                              }
+                            }
+                          }
+                        }
+                      }
                     }, {
                       type: V2SideDialogConfigInputType.CHECKBOX,
                       placeholder: 'LNG_PAGE_LIST_CONTACTS_EXPORT_RETRIEVE_OLDEST_EXPOSURE',
@@ -1971,7 +2058,9 @@ export class ContactsListComponent
                     fields: relationshipFieldGroups,
                     required: relationshipFieldGroupsRequires
                   },
-                  fields: this.relationshipFields,
+                  fields: {
+                    options: this.relationshipFields
+                  },
                   dbColumns: true,
                   dbValues: true,
                   jsonReplaceUndefinedWithNull: true

@@ -243,6 +243,7 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                         data: () => message.data
                       }
                     },
+                    yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK',
                     initialized: (handler) => {
                       // display loading
                       handler.loading.show();
@@ -685,7 +686,8 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                         get: () => 'LNG_DIALOG_CONFIRM_RESTORE_CASE',
                         data: () => item as any
                       }
-                    }
+                    },
+                    yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
                   }).subscribe((response) => {
                     // canceled ?
                     if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
@@ -2015,7 +2017,9 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                       fields: caseFieldGroups,
                       required: caseFieldGroupsRequires
                     },
-                    fields: this.caseFields,
+                    fields: {
+                      options: this.caseFields
+                    },
                     dbColumns: true,
                     dbValues: true,
                     jsonReplaceUndefinedWithNull: true,
@@ -2103,7 +2107,9 @@ export class CasesListComponent extends ListComponent<CaseModel> implements OnDe
                       fields: relationshipFieldGroups,
                       required: relationshipFieldGroupsRequires
                     },
-                    fields: this.relationshipFields,
+                    fields: {
+                      options: this.relationshipFields
+                    },
                     dbColumns: true,
                     dbValues: true,
                     jsonReplaceUndefinedWithNull: true

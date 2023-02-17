@@ -127,8 +127,8 @@ export class CasesBasedOnContactStatusDashletComponent implements OnInit, OnDest
   }
 
   /**
-     * Component destroyed
-     */
+   * Component destroyed
+   */
   ngOnDestroy() {
     // outbreak subscriber
     if (this.outbreakSubscriber) {

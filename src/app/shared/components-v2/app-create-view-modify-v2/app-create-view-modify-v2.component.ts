@@ -53,6 +53,7 @@ import {
   V2SideDialogConfigInputType
 } from '../app-side-dialog-v2/models/side-dialog-config.model';
 import { determineIfSmallScreenMode } from '../../../core/methods/small-screen-mode';
+import { I18nService } from '../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -67,6 +68,9 @@ import { determineIfSmallScreenMode } from '../../../core/methods/small-screen-m
 export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   // constants
   private static readonly GENERAL_SETTINGS_TAB_ORDER: string = 'tabsOrder';
+
+  // language handler
+  languageSubscription: Subscription;
 
   // page type
   // - determined from route data
@@ -441,7 +445,8 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     protected toastV2Service: ToastV2Service,
     protected authDataService: AuthDataService,
     protected storageService: StorageService,
-    protected activatedRoute: ActivatedRoute
+    protected activatedRoute: ActivatedRoute,
+    protected i18nService: I18nService
   ) {
     // update render mode
     this.updateRenderMode();
@@ -453,6 +458,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
   ngOnInit(): void {
     // update table size
     this.resizeTable();
+
+    // subscribe to language change
+    this.initializeLanguageChangeListener();
   }
 
   /**
@@ -464,6 +472,35 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
 
     // stop refresh list from search typing
     this.expandListStopSearchApply();
+
+    // stop refresh language tokens
+    this.releaseLanguageChangeListener();
+  }
+
+  /**
+   *  Subscribe to language change
+   */
+  private initializeLanguageChangeListener(): void {
+    // stop refresh language tokens
+    this.releaseLanguageChangeListener();
+
+    // attach event
+    this.languageSubscription = this.i18nService.languageChangedEvent
+      .subscribe(() => {
+        // update ui
+        this.detectChanges();
+      });
+  }
+
+  /**
+   * Release language listener
+   */
+  private releaseLanguageChangeListener(): void {
+    // release language listener
+    if (this.languageSubscription) {
+      this.languageSubscription.unsubscribe();
+      this.languageSubscription = null;
+    }
   }
 
   /**
@@ -599,8 +636,18 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    */
   triggerListInputChanged(
     input: ICreateViewModifyV2TabInputChanged,
-    itemIndex?: number
+    itemIndex?: number,
+    form?: NgForm,
+    groupName?: string
   ): void {
+    // mark all items as dirty
+    if (groupName) {
+      this.markArrayItemsAsDirty(
+        form,
+        groupName
+      );
+    }
+
     // nothing to do ?
     if (!input.changed) {
       return;
@@ -1492,7 +1539,7 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
         {
           type: V2SideDialogConfigInputType.GROUP,
           name: 'tabConfig',
-          inputs: this.tabConfiguration.inputs
+          inputs: _.cloneDeep(this.tabConfiguration.inputs)
         }
       );
     }
@@ -1568,6 +1615,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
             map: confDataMap,
             echo: null
           };
+
+          // update tab configuration values to those that were applied
+          this.tabConfiguration.inputs = confInputs;
 
           // handle tab custom configuration
           this.tabConfiguration.apply(

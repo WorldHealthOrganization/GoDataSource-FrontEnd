@@ -202,7 +202,8 @@ export class EventsListComponent
                             name: item.name
                           })
                         }
-                      }
+                      },
+                      yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
                     })
                     .subscribe((response) => {
                       // canceled ?
@@ -392,7 +393,8 @@ export class EventsListComponent
                           get: () => 'LNG_DIALOG_CONFIRM_RESTORE_EVENT',
                           data: () => item as any
                         }
-                      }
+                      },
+                      yesLabel: 'LNG_DIALOG_CONFIRM_BUTTON_OK'
                     })
                     .subscribe((response) => {
                       // canceled ?
@@ -1153,7 +1155,9 @@ export class EventsListComponent
                       fields: eventFieldGroups,
                       required: eventFieldGroupsRequires
                     },
-                    fields: this.eventFields,
+                    fields: {
+                      options: this.eventFields
+                    },
                     dbColumns: true,
                     dbValues: true,
                     jsonReplaceUndefinedWithNull: true
@@ -1229,7 +1233,9 @@ export class EventsListComponent
                       fields: relationshipFieldGroups,
                       required: relationshipFieldGroupsRequires
                     },
-                    fields: this.relationshipFields,
+                    fields: {
+                      options: this.relationshipFields
+                    },
                     dbColumns: true,
                     dbValues: true,
                     jsonReplaceUndefinedWithNull: true
