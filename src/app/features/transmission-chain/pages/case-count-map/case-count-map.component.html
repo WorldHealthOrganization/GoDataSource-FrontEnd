@@ -6,19 +6,26 @@
   [advancedFilters]="advancedFilters"
   advancedFiltersHideOperator="true"
   (advancedFilterBy)="reloadCases($event)">
-  <div
-    class="gd-case-count-map-distance"
-    fxLayout="row" fxLayout.lt-md="column" fxLayoutAlign="none center" fxLayoutAlign.lt-md="none start" fxLayoutGap="1.6rem" fxLayoutGap.lt-md="0.8rem">
-    <div>
-      {{ 'LNG_PAGE_CASE_COUNT_MAP_DISTANCE_LABEL' | translate }} ( {{ clusterDistance }} )
+  <div class="gd-case-count-map-distance">
+    <div class="gd-case-count-map-distance-button">
+      <button
+        type="button"
+        mat-icon-button
+        color="{{displayClusterDistance ? 'primary' : 'white'}}"
+        matTooltip="{{ 'LNG_PAGE_CASE_COUNT_MAP_DISTANCE_LABEL' | translate }}"
+        [title]="'LNG_PAGE_WORLD_MAP_DISCLAIMER' | translate"
+        (click)="displayClusterDistance = !displayClusterDistance">
+        <mat-icon>linear_scale</mat-icon>
+      </button>
     </div>
-    <mat-slider
-      color="primary"
-      [min]="10"
-      [max]="150"
-      [(ngModel)]="clusterDistance"
-      [tickInterval]="10">
-    </mat-slider>
+    <div
+      *ngIf="displayClusterDistance"
+      class="gd-case-count-map-distance-content">
+      <app-form-toggle-v2
+        [(ngModel)]="clusterDistance"
+        [options]="clusterDistanceOptions"
+        vertical></app-form-toggle-v2>
+    </div>
   </div>
 
   <!-- Count map -->

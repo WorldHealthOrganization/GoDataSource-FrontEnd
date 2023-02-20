@@ -307,12 +307,12 @@
   }
 
   &.gd-form-edit-questionnaire-v2-item-markup {
-    background-color: rgba(var(--gd-warning-rgb), 0.2);
+    background-color: rgba(var(--gd-warning-rgb), 0.1);
     color: var(--gd-primary-alt);
     font-weight: 700;
 
     &:hover {
-      background-color: rgba(var(--gd-warning-rgb), 0.2);
+      background-color: rgba(var(--gd-warning-rgb), 0.1);
     }
   }
 }

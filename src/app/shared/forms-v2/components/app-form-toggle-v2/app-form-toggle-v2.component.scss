@@ -89,5 +89,13 @@
         }
       }
     }
+
+    &.mat-button-toggle-vertical {
+      .mat-button-toggle {
+        + .mat-button-toggle {
+          border-left: 0 none;
+        }
+      }
+    }
   }
 }

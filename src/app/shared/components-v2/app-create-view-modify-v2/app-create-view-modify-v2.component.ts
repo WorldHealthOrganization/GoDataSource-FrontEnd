@@ -448,8 +448,9 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     protected activatedRoute: ActivatedRoute,
     protected i18nService: I18nService
   ) {
+    // #TODO Adrian
     // update render mode
-    this.updateRenderMode();
+    this.updateRenderMode(true);
   }
 
   /**
@@ -1340,12 +1341,18 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    * Update website render mode
    */
   @HostListener('window:resize')
-  private updateRenderMode(): void {
+  private updateRenderMode(dontUpdate?: boolean): void {
     // determine render mode
     this.renderMode = determineRenderMode();
 
     // small screen mode ?
     this.isSmallScreenMode = determineIfSmallScreenMode();
+
+    // #TODO Adrian
+    // must update
+    if (!dontUpdate) {
+      this.resizeTable();
+    }
   }
 
   /**
