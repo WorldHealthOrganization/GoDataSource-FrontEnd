@@ -24,6 +24,7 @@ import { IV2Column, V2ColumnFormat } from '../../../../shared/components-v2/app-
 import { IV2FilterMultipleSelect, V2FilterTextType, V2FilterType } from '../../../../shared/components-v2/app-list-table-v2/models/filter.model';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputSingleDropdown, V2SideDialogConfigInputType } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
   selector: 'app-system-sync-logs-list',
@@ -805,7 +806,8 @@ export class SystemSyncLogsComponent
               name: 'filter[where][includeUsers]',
               value: false,
               visible: (data): boolean => {
-                return !_.isEmpty((data.map['filter[where][exportType]'] as IV2SideDialogConfigInputSingleDropdown).value);
+                return !_.isEmpty((data.map['filter[where][exportType]'] as IV2SideDialogConfigInputSingleDropdown).value) &&
+                  (data.map['filter[where][exportType]'] as IV2SideDialogConfigInputSingleDropdown).value !== Constants.SYNC_PACKAGE_EXPORT_TYPES.MOBILE.value;
               }
             },
             {
@@ -816,6 +818,15 @@ export class SystemSyncLogsComponent
               value: undefined
             }
           ]
+        },
+        formDataPrefilter: (data) => {
+          // remove outbreak filter if no outbreak is selected
+          if (
+            data.filter?.where?.outbreakId &&
+            !data.filter.where.outbreakId.inq
+          ) {
+            delete data.filter.where.outbreakId;
+          }
         }
       }
     });

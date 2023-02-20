@@ -119,7 +119,11 @@ export interface IV2ExportDataConfig {
       append: {
         [key: string]: any
       }
-    }
+    },
+    formDataPrefilter?: (
+      data: any,
+      qb: RequestQueryBuilder
+    ) => void
   };
 
   // optional

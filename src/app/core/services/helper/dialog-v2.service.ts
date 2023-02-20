@@ -641,6 +641,14 @@ export class DialogV2Service {
             });
           }
 
+          // prefilter form data
+          if (config.export.formDataPrefilter) {
+            config.export.formDataPrefilter(
+              formData,
+              qb
+            );
+          }
+
           // show loading dialog
           response.handler.loading.show();
 

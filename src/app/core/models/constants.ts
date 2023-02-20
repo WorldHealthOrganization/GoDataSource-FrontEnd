@@ -929,6 +929,10 @@ export class Constants {
     FILE_ATTACHMENT: {
       label: 'LNG_MODULE_LABEL_FILE_ATTACHMENT',
       value: 'fileAttachment'
+    },
+    IMPORT_MAPPING: {
+      label: 'LNG_MODULE_LABEL_IMPORT_MAPPING',
+      value: 'importMapping'
     }
   };
 
@@ -1021,6 +1025,10 @@ export class Constants {
     DEVICE_HISTORY: {
       label: 'LNG_MODULE_LABEL_DEVICE_HISTORY',
       value: 'deviceHistory'
+    },
+    IMPORT_MAPPING: {
+      label: 'LNG_MODULE_LABEL_IMPORT_MAPPING',
+      value: 'importMapping'
     }
   };
 
