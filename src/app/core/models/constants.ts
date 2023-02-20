@@ -933,7 +933,7 @@ export class Constants {
     IMPORT_MAPPING: {
       label: 'LNG_MODULE_LABEL_IMPORT_MAPPING',
       value: 'importMapping'
-    },
+    }
   };
 
   // possible modules for export sync package
