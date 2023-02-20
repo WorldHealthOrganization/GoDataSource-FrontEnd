@@ -1206,6 +1206,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // re-render page
     this.detectChanges();
+    // #TODO Adrian
+    this.resizeTable();
   }
 
   /**
@@ -2260,17 +2262,18 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     // determine
     const isSmallScreenMode = determineIfSmallScreenMode();
 
-    // same as before ?
-    if (isSmallScreenMode === this.isSmallScreenMode) {
-      return;
-    }
-
     // small screen mode ?
     this.isSmallScreenMode = isSmallScreenMode;
 
+    // #TODO Adrian
     // must update
     if (!dontUpdate) {
-      this.updateColumnDefinitions();
+      // update column definitions only if responsive changes
+      if (isSmallScreenMode === this.isSmallScreenMode) {
+        this.updateColumnDefinitions();
+      }
+
+      // resize layout
       this.resizeTable();
       this.detectChanges();
     }
