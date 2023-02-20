@@ -1200,6 +1200,8 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // re-render page
     this.detectChanges();
+
+    // update table size
     this.resizeTable();
   }
 
@@ -2262,8 +2264,13 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
       // this.detectChanges / this.resizeTable() are called by resize layout by updateColumnDefinitions
       this.updateColumnDefinitions();
+
+      // wait for html to be rendered since isSmallScreenMode was changed
+      setTimeout(() => {
+        this.resizeTable();
+      });
     } else {
-      // resize layout
+      // update table size
       this.resizeTable();
     }
   }
