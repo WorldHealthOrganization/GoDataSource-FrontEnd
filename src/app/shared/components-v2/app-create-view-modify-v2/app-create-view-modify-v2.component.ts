@@ -1341,11 +1341,26 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     // determine render mode
     this.renderMode = determineRenderMode();
 
-    // small screen mode ?
-    this.isSmallScreenMode = determineIfSmallScreenMode();
+    // determine
+    const isSmallScreenMode = determineIfSmallScreenMode();
 
-    // must update
-    this.resizeTable();
+    // update column definitions only if responsive changes
+    if (isSmallScreenMode !== this.isSmallScreenMode) {
+      // small screen mode ?
+      this.isSmallScreenMode = isSmallScreenMode;
+      this.detectChanges();
+
+      // update table size
+      this.resizeTable();
+
+      // wait for html to be rendered since isSmallScreenMode was changed
+      setTimeout(() => {
+        this.resizeTable();
+      });
+    } else {
+      // update table size
+      this.resizeTable();
+    }
   }
 
   /**
