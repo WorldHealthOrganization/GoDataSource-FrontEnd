@@ -447,18 +447,14 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
     protected storageService: StorageService,
     protected activatedRoute: ActivatedRoute,
     protected i18nService: I18nService
-  ) {
-    // #TODO Adrian
-    // update render mode
-    this.updateRenderMode(true);
-  }
+  ) {}
 
   /**
    * Initialize resources
    */
   ngOnInit(): void {
-    // update table size
-    this.resizeTable();
+    // update render mode
+    this.updateRenderMode();
 
     // subscribe to language change
     this.initializeLanguageChangeListener();
@@ -1341,18 +1337,15 @@ export class AppCreateViewModifyV2Component implements OnInit, OnDestroy {
    * Update website render mode
    */
   @HostListener('window:resize')
-  private updateRenderMode(dontUpdate?: boolean): void {
+  private updateRenderMode(): void {
     // determine render mode
     this.renderMode = determineRenderMode();
 
     // small screen mode ?
     this.isSmallScreenMode = determineIfSmallScreenMode();
 
-    // #TODO Adrian
     // must update
-    if (!dontUpdate) {
-      this.resizeTable();
-    }
+    this.resizeTable();
   }
 
   /**

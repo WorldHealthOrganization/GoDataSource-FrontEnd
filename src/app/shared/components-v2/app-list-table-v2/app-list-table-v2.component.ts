@@ -618,9 +618,6 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
     protected authDataService: AuthDataService,
     protected toastV2Service: ToastV2Service
   ) {
-    // update small screen mode
-    this.updateRenderMode(true);
-
     // update bottom section collapse / expand
     this.loadBottomSectionConfig();
   }
@@ -681,12 +678,9 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
       undefined;
     this._showHeaderFilters = filterVisibility === undefined || filterVisibility;
 
-    // update table size
-    // - hack to rectify some things not being rendered
-    this.resizeTable();
-    setTimeout(() => {
-      this.resizeTable();
-    });
+    // update small screen mode
+    // - calls this.resizeTable
+    this.updateRenderMode();
 
     // subscribe to language change
     this.initializeLanguageChangeListener();
@@ -1206,7 +1200,6 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
 
     // re-render page
     this.detectChanges();
-    // #TODO Adrian
     this.resizeTable();
   }
 
@@ -2258,24 +2251,20 @@ export class AppListTableV2Component implements OnInit, OnDestroy {
    * Update
    */
   @HostListener('window:resize')
-  private updateRenderMode(dontUpdate?: boolean): void {
+  private updateRenderMode(): void {
     // determine
     const isSmallScreenMode = determineIfSmallScreenMode();
 
-    // small screen mode ?
-    this.isSmallScreenMode = isSmallScreenMode;
+    // update column definitions only if responsive changes
+    if (isSmallScreenMode !== this.isSmallScreenMode) {
+      // small screen mode ?
+      this.isSmallScreenMode = isSmallScreenMode;
 
-    // #TODO Adrian
-    // must update
-    if (!dontUpdate) {
-      // update column definitions only if responsive changes
-      if (isSmallScreenMode === this.isSmallScreenMode) {
-        this.updateColumnDefinitions();
-      }
-
+      // this.detectChanges / this.resizeTable() are called by resize layout by updateColumnDefinitions
+      this.updateColumnDefinitions();
+    } else {
       // resize layout
       this.resizeTable();
-      this.detectChanges();
     }
   }
 
