@@ -427,7 +427,7 @@
     position: relative;
 
     @media only screen and (max-height: 599px) {
-      height: auto !important;
+      min-height: 35rem;
     }
 
     .gd-conf-tabs-button {
