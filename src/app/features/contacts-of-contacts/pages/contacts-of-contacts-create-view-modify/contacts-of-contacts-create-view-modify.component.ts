@@ -117,7 +117,8 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
   protected createNewItem(): ContactOfContactModel {
     return new ContactOfContactModel({
       addresses: [new AddressModel({
-        typeId: AddressType.CURRENT_ADDRESS
+        typeId: AddressType.CURRENT_ADDRESS,
+        date: moment().toISOString()
       })]
     });
   }
@@ -640,7 +641,9 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
             definition: {
               add: {
                 label: 'LNG_ADDRESS_LABEL_ADD_NEW_ADDRESS',
-                newItem: () => new AddressModel()
+                newItem: () => new AddressModel({
+                  date: moment().toISOString()
+                })
               },
               remove: {
                 label: 'LNG_COMMON_BUTTON_DELETE',

@@ -5,7 +5,7 @@ import {
   RequestFilterGenerator,
   RequestQueryBuilder
 } from '../helperClasses/request-query-builder';
-import { Moment, moment } from '../helperClasses/x-moment';
+import { Moment } from '../helperClasses/x-moment';
 
 // addresses types
 export enum AddressType {
@@ -55,7 +55,7 @@ export class AddressModel {
     this.location = locationsMap && this.locationId ?
       locationsMap[this.locationId] :
       new LocationModel(_.get(data, 'location'));
-    this.date = _.get(data, 'date', moment().toISOString());
+    this.date = _.get(data, 'date');
     this.geoLocation = _.get(data, 'geoLocation', {});
     this.geoLocationAccurate = _.get(data, 'geoLocationAccurate', false);
     this.phoneNumber = _.get(data, 'phoneNumber');

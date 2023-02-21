@@ -34,6 +34,7 @@ import { ClusterModel } from '../../../../core/models/cluster.model';
 import * as _ from 'lodash';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
+import { moment } from '../../../../core/helperClasses/x-moment';
 
 @Component({
   selector: 'app-events-create-view-modify',
@@ -111,7 +112,8 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
   protected createNewItem(): EventModel {
     return new EventModel({
       address: new AddressModel({
-        typeId: AddressType.CURRENT_ADDRESS
+        typeId: AddressType.CURRENT_ADDRESS,
+        date: moment().toISOString()
       })
     });
   }

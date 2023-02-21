@@ -29,6 +29,7 @@ import { CellProperties } from 'handsontable/settings';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { AddressModel } from '../../../../core/models/address.model';
 
 @Component({
   selector: 'app-bulk-create-contacts-of-contacts',
@@ -581,6 +582,19 @@ export class BulkCreateContactsOfContactsComponent extends ConfirmOnFormChanges 
                 loadingDialog.close();
                 this.toastV2Service.error('LNG_PAGE_BULK_ADD_CONTACTS_OF_CONTACTS_WARNING_NO_DATA');
               } else {
+                // add "date" address field
+                dataResponse.data.forEach((contactData) => {
+                  if (
+                    contactData.contactOfContact &&
+                    contactData.contactOfContact.addresses &&
+                    contactData.contactOfContact.addresses.length
+                  ) {
+                    contactData.contactOfContact.addresses.forEach((address: AddressModel) => {
+                      address.date = moment().toISOString();
+                    });
+                  }
+                });
+
                 // create contacts of contacts
                 this.contactsOfContactsDataService
                   .bulkAddContactsOfContacts(

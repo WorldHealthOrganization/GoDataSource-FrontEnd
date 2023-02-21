@@ -38,6 +38,7 @@ import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
+import { AddressModel } from '../../../../core/models/address.model';
 
 @Component({
   selector: 'app-bulk-create-contacts',
@@ -741,6 +742,19 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                 loadingDialog.close();
                 this.toastV2Service.error('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_NO_DATA');
               } else {
+                // add "date" address field
+                dataResponse.data.forEach((contactData) => {
+                  if (
+                    contactData.contact &&
+                    contactData.contact.addresses &&
+                    contactData.contact.addresses.length
+                  ) {
+                    contactData.contact.addresses.forEach((address: AddressModel) => {
+                      address.date = moment().toISOString();
+                    });
+                  }
+                });
+
                 // create contacts
                 this.contactDataService
                   .bulkAddContacts(
