@@ -744,11 +744,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
               } else {
                 // add "date" address field
                 dataResponse.data.forEach((contactData) => {
-                  if (
-                    contactData.contact &&
-                    contactData.contact.addresses &&
-                    contactData.contact.addresses.length
-                  ) {
+                  if (contactData.contact?.addresses?.length) {
                     contactData.contact.addresses.forEach((address: AddressModel) => {
                       address.date = moment().toISOString();
                     });
