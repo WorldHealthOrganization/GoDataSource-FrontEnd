@@ -1214,7 +1214,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
     if (
       entityMasks
         .filter((item, index) => index !== entityMasks.indexOf(item))
-        .filter(item => item.includes('9')).length
+        .filter((item) => item?.includes('9')).length
     ) {
       this.toastV2Service.notice(
         'LNG_OUTBREAK_FIELD_CHECK_DUPLICATE_ENTITY_MASK',
