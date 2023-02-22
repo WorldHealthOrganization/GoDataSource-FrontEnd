@@ -7,6 +7,10 @@
   line-height: 2.4rem;
   min-height: 22rem;
 
+  @media only screen and (max-height: 599px) {
+    min-height: 0;
+  }
+
   &.ag-theme-balham {
     .ag-root-wrapper {
       border-color: rgba(var(--gd-secondary-rgb), 0.25);

@@ -707,6 +707,10 @@
       + .mat-tab-group {
         .mat-tab-header {
           padding-left: 8rem;
+
+          @include breakpoint('lt-md') {
+            padding-left: 6rem;
+          }
         }
       }
     }
