@@ -3,6 +3,8 @@ import { Moment } from 'moment';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { RequestQueryBuilder } from '../../../helperClasses/request-query-builder';
 import { IV2SideDialogData, IV2SideDialogHandler, V2SideDialogConfigInput } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
+import { ObservableInput } from 'rxjs';
+import { ErrorModel } from '../../../models/error.model';
 
 /**
  * Export data config progress answer
@@ -123,7 +125,8 @@ export interface IV2ExportDataConfig {
     formDataPrefilter?: (
       data: any,
       qb: RequestQueryBuilder
-    ) => void
+    ) => void,
+    catchError?: (err: Blob | ErrorModel | Error) => ObservableInput<any>
   };
 
   // optional
