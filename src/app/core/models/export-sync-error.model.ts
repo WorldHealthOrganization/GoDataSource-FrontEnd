@@ -8,9 +8,14 @@ export enum ExportSyncErrorModelCode {
  * Constructor
  */
 export class ExportSyncErrorModel extends ErrorModel {
+  // data
   code: ExportSyncErrorModelCode;
 
+  /**
+   * Constructor
+   */
   constructor(data = null) {
+    // initialize common fields
     super(data);
   }
 }

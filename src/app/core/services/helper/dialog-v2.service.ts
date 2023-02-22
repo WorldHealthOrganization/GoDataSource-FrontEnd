@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject, throwError } from 'rxjs';
+import { Observable, Subject, switchMap, throwError } from 'rxjs';
 import {
   IV2SideDialog,
   IV2SideDialogAdvancedFiltersResponse,
@@ -57,6 +57,7 @@ import { AuthDataService } from '../data/auth.data.service';
 import { BaseModel } from '../../models/base.model';
 import { IResolverV2ResponseModel } from '../resolvers/data/models/resolver-response.model';
 import { AppFormSelectGroupsV2Component } from '../../../shared/forms-v2/components/app-form-select-groups-v2/app-form-select-groups-v2.component';
+import { ErrorModel } from '../../models/error.model';
 
 @Injectable()
 export class DialogV2Service {
@@ -550,6 +551,39 @@ export class DialogV2Service {
       inputs.push(...config.export.inputs.append);
     }
 
+    // handle custom catches
+    const handleCatchError = (err: Blob | Error | ErrorModel) => {
+      // handle blob errors
+      if (
+        err instanceof Blob &&
+        err.type === 'application/json'
+      ) {
+        return new Observable((subscriber) => {
+          err.text()
+            .then((text) => {
+              // any error would be caught by promise.catch
+              const jsonErr = JSON.parse(text);
+              subscriber.next(
+                jsonErr.error ?
+                  jsonErr.error :
+                  jsonErr
+              );
+              subscriber.complete();
+            })
+            .catch((blobErr) => {
+              // couldn't handle the custom error
+              subscriber.next(blobErr);
+              subscriber.complete();
+            });
+        }).pipe(switchMap((localErr: Blob | Error | ErrorModel) => {
+          return config.export.catchError(localErr);
+        }));
+      }
+
+      // continue
+      return config.export.catchError(err);
+    };
+
     // display dialog
     this._sideDialogSubject$
       .next({
@@ -676,11 +710,16 @@ export class DialogV2Service {
           )
             .pipe(
               catchError((err) => {
-                // show error
-                this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
-
                 // close dialog
                 response.handler.hide();
+
+                // custom error handler ?
+                if (config.export.catchError) {
+                  return handleCatchError(err);
+                }
+
+                // show error
+                this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
 
                 // send error down the road
                 return throwError(err);
@@ -804,11 +843,16 @@ export class DialogV2Service {
                   .getExportLog((blobOrJson as { exportLogId: string }).exportLogId)
                   .pipe(
                     catchError((err) => {
-                      // show error
-                      this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
-
                       // close dialog
                       response.handler.hide();
+
+                      // custom error handler ?
+                      if (config.export.catchError) {
+                        return handleCatchError(err);
+                      }
+
+                      // show error
+                      this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
 
                       // send error down the road
                       return throwError(err);
@@ -875,11 +919,16 @@ export class DialogV2Service {
                         )
                         .pipe(
                           catchError((err) => {
-                            // show error
-                            this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
-
                             // close dialog
                             response.handler.hide();
+
+                            // custom error handler ?
+                            if (config.export.catchError) {
+                              return handleCatchError(err);
+                            }
+
+                            // show error
+                            this.toastV2Service.error('LNG_COMMON_LABEL_EXPORT_ERROR');
 
                             // send error down the road
                             return throwError(err);

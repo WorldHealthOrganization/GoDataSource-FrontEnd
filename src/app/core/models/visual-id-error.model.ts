@@ -7,6 +7,7 @@ export enum VisualIdErrorModelCode {
 }
 
 export class VisualIdErrorModel extends ErrorModel {
+  // data
   code: VisualIdErrorModelCode;
   details: {
     visualIdTemplate: string,
@@ -17,9 +18,10 @@ export class VisualIdErrorModel extends ErrorModel {
    * Constructor
    */
   constructor(data = null) {
+    // initialize common fields
     super(data);
 
-    // import specific data
+    // data
     this.details = _.get(data, 'details');
   }
 }
