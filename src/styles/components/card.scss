@@ -5,5 +5,9 @@
     font-family: $gd-font-family;
     min-height: 35rem;
     padding: 0;
+
+    @media only screen and (max-height: 599px) {
+      min-height: 0;
+    }
   }
 }
