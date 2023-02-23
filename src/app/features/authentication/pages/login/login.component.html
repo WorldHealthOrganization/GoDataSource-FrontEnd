@@ -41,7 +41,11 @@
       <!-- Right - middle - logo -->
       <div
         class="gd-login-right-middle-logo">
-        <img src="../../../../assets/images/gd-logo.svg" alt="Go.Data Logo" />
+        <a
+          href="{{goDataWhoLink}}"
+          target="_blank">
+          <img src="../../../../assets/images/gd-logo.svg" alt="Go.Data Logo" />
+        </a>
       </div>
 
       <!-- Right - middle - title -->
@@ -221,7 +225,18 @@
     <!-- Right - bottom -->
     <div
       class="gd-login-right-bottom">
-      {{ 'LNG_LAYOUT_MENU_VERSION_LABEL' | translate: { version: versionData.version, build: versionData.build } }}
+      <!-- GoData link -->
+      <div
+        class="gd-login-right-bottom-link">
+        <a
+          href="{{goDataWhoLink}}"
+          target="_blank">{{goDataWhoLink}}</a>
+      </div>
+
+      <!-- Version -->
+      <span>
+        {{ 'LNG_LAYOUT_MENU_VERSION_LABEL' | translate: { version: versionData.version, build: versionData.build } }}
+      </span>
     </div>
 
   </div>

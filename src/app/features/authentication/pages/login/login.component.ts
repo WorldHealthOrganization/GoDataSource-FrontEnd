@@ -29,6 +29,9 @@ export class LoginComponent {
   // version information
   versionData: SystemSettingsVersionModel;
 
+  // go data who link
+  readonly goDataWhoLink: string = 'https://godata.who.int';
+
   // captcha data
   displayCaptcha = false;
   captchaData$: Observable<SafeHtml>;
