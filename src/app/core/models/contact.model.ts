@@ -826,11 +826,4 @@ export class ContactModel
       return acc;
     }, []);
   }
-
-  /**
-     * Check if contact has questionnaire answers registered as case
-     */
-  get hasQuestionnaireAnswersCase(): boolean {
-    return !_.isEmpty(this.questionnaireAnswersCase);
-  }
 }
