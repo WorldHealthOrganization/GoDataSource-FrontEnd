@@ -787,11 +787,4 @@ export class CaseModel
       return acc;
     }, []);
   }
-
-  /**
-     * Check if case has questionnaire answers registered as contact
-     */
-  get hasQuestionnaireAnswersContact(): boolean {
-    return !_.isEmpty(this.questionnaireAnswersContact);
-  }
 }

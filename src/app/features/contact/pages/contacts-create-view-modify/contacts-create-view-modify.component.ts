@@ -1038,8 +1038,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
       },
       visible: () => (this.isView || !this.selectedOutbreak.disableModifyingLegacyQuestionnaire) &&
         this.selectedOutbreak.caseInvestigationTemplate?.length > 0 &&
-        this.itemData.wasCase &&
-        this.itemData.hasQuestionnaireAnswersCase
+        this.itemData.wasCase
     };
   }
 
