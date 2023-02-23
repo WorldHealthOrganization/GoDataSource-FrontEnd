@@ -184,6 +184,10 @@
     .gd-login-right-bottom {
       color: var(--gd-secondary);
       font-size: 1.2rem;
+
+      .gd-login-right-bottom-link {
+        text-align: center;
+      }
     }
   }
 }
