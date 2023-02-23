@@ -225,6 +225,11 @@
     <!-- Right - bottom -->
     <div
       class="gd-login-right-bottom">
+      <!-- Version -->
+      <span>
+        {{ 'LNG_LAYOUT_MENU_VERSION_LABEL' | translate: { version: versionData.version, build: versionData.build } }}
+      </span>
+
       <!-- GoData link -->
       <div
         class="gd-login-right-bottom-link">
@@ -232,11 +237,6 @@
           href="{{goDataWhoLink}}"
           target="_blank">{{goDataWhoLink}}</a>
       </div>
-
-      <!-- Version -->
-      <span>
-        {{ 'LNG_LAYOUT_MENU_VERSION_LABEL' | translate: { version: versionData.version, build: versionData.build } }}
-      </span>
     </div>
 
   </div>
