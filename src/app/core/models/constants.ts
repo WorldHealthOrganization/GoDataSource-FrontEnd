@@ -1146,6 +1146,9 @@ export class Constants {
     RELATIONSHIPS_DATA: 'LNG_COMMON_LABEL_EXPORT_GROUP_RELATIONSHIPS_DATA'
   };
 
+  // go data who link
+  static GO_DATA_WHO_LINK: string = 'https://godata.who.int';
+
   /**
      * Today date
      */

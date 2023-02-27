@@ -15,6 +15,7 @@ import { NgForm } from '@angular/forms';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { FormHelperService } from '../../../../core/services/helper/form-helper.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
   selector: 'app-reset-password-questions',
@@ -28,6 +29,9 @@ export class ResetPasswordQuestionsComponent {
 
   // version information
   versionData: SystemSettingsVersionModel;
+
+  // go data who link
+  readonly goDataWhoLink: string = Constants.GO_DATA_WHO_LINK;
 
   // captcha data
   displayCaptcha = false;
