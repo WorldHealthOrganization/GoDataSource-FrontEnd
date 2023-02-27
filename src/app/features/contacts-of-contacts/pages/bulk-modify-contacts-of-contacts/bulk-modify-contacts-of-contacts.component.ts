@@ -29,6 +29,7 @@ import { CellProperties } from 'handsontable/settings';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
+import { IAddressColumnIndex } from '../../../../core/models/address.interface';
 
 @Component({
   selector: 'app-bulk-modify-contacts-of-contacts',
@@ -37,6 +38,18 @@ import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/da
   styleUrls: ['./bulk-modify-contacts-of-contacts.component.scss']
 })
 export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges implements OnInit, OnDestroy {
+  // constants
+  private static readonly COLUMN_PROPERTY_DATE: string = 'addresses.date';
+  private static readonly COLUMN_PROPERTY_EMAIL_ADDRESS: string = 'addresses.emailAddress';
+  private static readonly COLUMN_PROPERTY_PHONE_NUMBER: string = 'addresses.phoneNumber';
+  private static readonly COLUMN_PROPERTY_LOCATION: string = 'addresses.locationId';
+  private static readonly COLUMN_PROPERTY_CITY: string = 'addresses.city';
+  private static readonly COLUMN_PROPERTY_POSTAL_CODE: string = 'addresses.postalCode';
+  private static readonly COLUMN_PROPERTY_ADDRESS_LINE1: string = 'addresses.addressLine1';
+  private static readonly COLUMN_PROPERTY_GEOLOCATION_LAT: string = 'addresses.geoLocation.lat';
+  private static readonly COLUMN_PROPERTY_GEOLOCATION_LNG: string = 'addresses.geoLocation.lng';
+  private static readonly COLUMN_PROPERTY_GEOLOCATION_ACCURATE: string = 'addresses.geoLocationAccurate';
+
   // breadcrumbs
   breadcrumbs: IV2Breadcrumb[] = [];
 
@@ -50,10 +63,14 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
   genderList$: Observable<ILabelValuePairModel[]>;
   occupationsList$: Observable<ILabelValuePairModel[]>;
   riskLevelsList$: Observable<ILabelValuePairModel[]>;
+  yesNoList$: Observable<ILabelValuePairModel[]>;
 
   // sheet widget configuration
   sheetContextMenu = {};
   sheetColumns: AbstractSheetColumn[] = [];
+
+  // address column indexes
+  private _addressColumnIndexes: IAddressColumnIndex;
 
   // error messages
   errorMessages: {
@@ -111,6 +128,7 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
     this.genderList$ = of((this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
     this.occupationsList$ = of((this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
     this.riskLevelsList$ = of((this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
+    this.yesNoList$ = of((this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
 
     // init table columns
     this.configureSheetWidget();
@@ -265,33 +283,45 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
             let value;
             let addressModel: AddressModel;
             switch (property) {
-              case 'addresses.phoneNumber':
+              case BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_DATE:
+                addressModel = AddressModel.getCurrentAddress(contactOfContact.addresses);
+                value = addressModel ? addressModel.date : null;
+                break;
+              case BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_EMAIL_ADDRESS:
+                addressModel = AddressModel.getCurrentAddress(contactOfContact.addresses);
+                value = addressModel ? addressModel.emailAddress : null;
+                break;
+              case BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_PHONE_NUMBER:
                 addressModel = AddressModel.getCurrentAddress(contactOfContact.addresses);
                 value = addressModel ? addressModel.phoneNumber : null;
                 break;
-              case 'addresses.city':
-                addressModel = AddressModel.getCurrentAddress(contactOfContact.addresses);
-                value = addressModel ? addressModel.city : null;
-                break;
-              case 'addresses.postalCode':
-                addressModel = AddressModel.getCurrentAddress(contactOfContact.addresses);
-                value = addressModel ? addressModel.postalCode : null;
-                break;
-              case 'addresses.locationId':
+              case BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_LOCATION:
                 addressModel = AddressModel.getCurrentAddress(contactOfContact.addresses);
                 value = addressModel ? addressModel.locationId : null;
                 break;
-              case 'addresses.addressLine1':
+              case BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_CITY:
+                addressModel = AddressModel.getCurrentAddress(contactOfContact.addresses);
+                value = addressModel ? addressModel.city : null;
+                break;
+              case BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_POSTAL_CODE:
+                addressModel = AddressModel.getCurrentAddress(contactOfContact.addresses);
+                value = addressModel ? addressModel.postalCode : null;
+                break;
+              case BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_ADDRESS_LINE1:
                 addressModel = AddressModel.getCurrentAddress(contactOfContact.addresses);
                 value = addressModel ? addressModel.addressLine1 : null;
                 break;
-              case 'addresses.geoLocation.lat':
+              case BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_GEOLOCATION_LAT:
                 addressModel = AddressModel.getCurrentAddress(contactOfContact.addresses);
                 value = addressModel ? addressModel.geoLocation?.lat : null;
                 break;
-              case 'addresses.geoLocation.lng':
+              case BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_GEOLOCATION_LNG:
                 addressModel = AddressModel.getCurrentAddress(contactOfContact.addresses);
                 value = addressModel ? addressModel.geoLocation?.lng : null;
+                break;
+              case BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_GEOLOCATION_ACCURATE:
+                addressModel = AddressModel.getCurrentAddress(contactOfContact.addresses);
+                value = addressModel ? addressModel.geoLocationAccurate : null;
                 break;
               default:
                 value = _.get(contactOfContact, property);
@@ -310,7 +340,13 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
                 break;
               case SheetCellType.DROPDOWN:
                 if ((column as DropdownSheetColumn).idTranslatesToLabel) {
-                  value = value ? this.i18nService.instant(value) : null;
+                  value = (typeof value === 'boolean') ?
+                    value ?
+                      this.i18nService.instant( 'LNG_COMMON_LABEL_YES') :
+                      this.i18nService.instant('LNG_COMMON_LABEL_NO') :
+                    value ?
+                      this.i18nService.instant(value) :
+                      null;
                 }
                 break;
             }
@@ -384,9 +420,27 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
         .setProperty('riskReason'),
 
       // Contact Address(es)
+      new DateSheetColumn()
+        .setTitle('LNG_PAGE_BULK_MODIFY_CONTACTS_OF_CONTACTS_ADDRESS_DATE')
+        .setProperty(BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_DATE),
+      new TextSheetColumn()
+        .setTitle('LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS')
+        .setProperty(BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_EMAIL_ADDRESS)
+        .setAsyncValidator((value: string, _cellProperties: CellProperties, callback: (result: boolean) => void): void => {
+          // validate if only we have value
+          if (_.isEmpty(value)) {
+            callback(true);
+          } else {
+            // validate email using regex
+            callback(Constants.REGEX_EMAIL_VALIDATOR.test(value));
+          }
+        }),
+      new TextSheetColumn()
+        .setTitle('LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER')
+        .setProperty(BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_PHONE_NUMBER),
       new LocationSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_LOCATION')
-        .setProperty('addresses.locationId')
+        .setProperty(BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_LOCATION)
         .setUseOutbreakLocations(true)
         .setLocationChangedCallback((rowNo, locationInfo) => {
           // nothing to do ?
@@ -419,8 +473,8 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
               }
 
               // find lat column
-              const latColumnIndex: number = this.hotTableWrapper.sheetColumns.findIndex((column) => column.property === 'addresses.geoLocation.lat');
-              const lngColumnIndex: number = this.hotTableWrapper.sheetColumns.findIndex((column) => column.property === 'addresses.geoLocation.lng');
+              const latColumnIndex: number = this.hotTableWrapper.sheetColumns.findIndex((column) => column.property === BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_GEOLOCATION_LAT);
+              const lngColumnIndex: number = this.hotTableWrapper.sheetColumns.findIndex((column) => column.property === BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_GEOLOCATION_LNG);
 
               // change location lat & lng
               const sheetCore: Handsontable.default = (this.hotTableWrapper.sheetTable as any).hotInstance;
@@ -435,22 +489,28 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
                 locationInfo.geoLocation.lng
               );
             });
+        })
+        .setAsyncValidator((value, cellProperties: CellProperties, callback: (result: boolean) => void): void => {
+          // location is required if any of the address field is filled
+          if (value) {
+            callback(true);
+          } else {
+            // check address fields
+            return callback(!this.isAddressFilled(cellProperties.row));
+          }
         }),
       new TextSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_CITY')
-        .setProperty('addresses.city'),
-      new TextSheetColumn()
-        .setTitle('LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1')
-        .setProperty('addresses.addressLine1'),
+        .setProperty(BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_CITY),
       new TextSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE')
-        .setProperty('addresses.postalCode'),
+        .setProperty(BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_POSTAL_CODE),
       new TextSheetColumn()
-        .setTitle('LNG_ADDRESS_FIELD_LABEL_PHONE_NUMBER')
-        .setProperty('addresses.phoneNumber'),
+        .setTitle('LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1')
+        .setProperty(BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_ADDRESS_LINE1),
       new NumericSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT')
-        .setProperty('addresses.geoLocation.lat')
+        .setProperty(BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_GEOLOCATION_LAT)
         .setAsyncValidator((value, cellProperties: CellProperties, callback: (result: boolean) => void): void => {
           if (
             value ||
@@ -466,7 +526,7 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
         }),
       new NumericSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG')
-        .setProperty('addresses.geoLocation.lng')
+        .setProperty(BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_GEOLOCATION_LNG)
         .setAsyncValidator((value, cellProperties: CellProperties, callback: (result: boolean) => void): void => {
           if (
             value ||
@@ -479,7 +539,11 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
             const lat: number | string = sheetCore.getDataAtCell(cellProperties.row, cellProperties.col - 1);
             callback(!lat && lat !== 0);
           }
-        })
+        }),
+      new DropdownSheetColumn()
+        .setTitle('LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES')
+        .setProperty(BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_GEOLOCATION_ACCURATE)
+        .setOptions(this.yesNoList$, this.i18nService)
 
       // Contact Document(s)
       // Can't edit since they are multiple
@@ -497,6 +561,50 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
         }
       }
     };
+
+    // get address column indexes
+    this._addressColumnIndexes = {
+      date: this.sheetColumns.findIndex((column) => column.property === BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_DATE),
+      emailAddress: this.sheetColumns.findIndex((column) => column.property === BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_EMAIL_ADDRESS),
+      phoneNumber: this.sheetColumns.findIndex((column) => column.property === BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_PHONE_NUMBER),
+      locationId: this.sheetColumns.findIndex((column) => column.property === BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_LOCATION),
+      city: this.sheetColumns.findIndex((column) => column.property === BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_CITY),
+      postalCode: this.sheetColumns.findIndex((column) => column.property === BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_POSTAL_CODE),
+      addressLine1: this.sheetColumns.findIndex((column) => column.property === BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_ADDRESS_LINE1),
+      geoLocationLat: this.sheetColumns.findIndex((column) => column.property === BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_GEOLOCATION_LAT),
+      geoLocationLng: this.sheetColumns.findIndex((column) => column.property === BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_GEOLOCATION_LNG),
+      geoLocationAccurate: this.sheetColumns.findIndex((column) => column.property === BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_GEOLOCATION_ACCURATE)
+    };
+  }
+
+  /**
+   * Checks if any of the address field is filled
+   *
+   * @param rowNumber Row Number
+   */
+  private isAddressFilled(
+    rowNumber: number
+  ): boolean {
+    // sheet core
+    const sheetCore: Handsontable.default = (this.hotTableWrapper.sheetTable as any).hotInstance;
+
+    // check fields
+    const indexesFiltered: number[] = Object.values(this._addressColumnIndexes).filter((item) => item !== this._addressColumnIndexes.locationId);
+    for (const column of Object.values(indexesFiltered)) {
+      // get "date" column value
+      const value: any = sheetCore.getDataAtCell(
+        rowNumber,
+        column
+      );
+
+      // break if any address field is filled
+      if (value) {
+        return true;
+      }
+    }
+
+    // no address field filled
+    return false;
   }
 
   /**
@@ -550,7 +658,7 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
                 // set data
                 contactOfContactData.id = this.extraContactOfContactData[index].id;
 
-                // create / modify address phone number
+                // create / modify address fields
                 if (contactOfContactData.addresses) {
                   // find address
                   let address: AddressModel = AddressModel.getCurrentAddress(this.extraContactOfContactData[index].addresses);
@@ -570,11 +678,32 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
                     }
                   }
 
+                  // replace address date
+                  if (contactOfContactData.addresses.date !== undefined) {
+                    address.date = contactOfContactData.addresses.date;
+                  } else {
+                    address.date = null;
+                  }
+
+                  // replace email address
+                  if (contactOfContactData.addresses.emailAddress !== undefined) {
+                    address.emailAddress = contactOfContactData.addresses.emailAddress;
+                  } else {
+                    address.emailAddress = null;
+                  }
+
                   // replace phone number
                   if (contactOfContactData.addresses.phoneNumber !== undefined) {
                     address.phoneNumber = contactOfContactData.addresses.phoneNumber;
                   } else {
                     address.phoneNumber = null;
+                  }
+
+                  // replace locationId
+                  if (contactOfContactData.addresses.locationId !== undefined) {
+                    address.locationId = contactOfContactData.addresses.locationId;
+                  } else {
+                    address.locationId = null;
                   }
 
                   // replace city
@@ -589,13 +718,6 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
                     address.postalCode = contactOfContactData.addresses.postalCode;
                   } else {
                     address.postalCode = null;
-                  }
-
-                  // replace locationId
-                  if (contactOfContactData.addresses.locationId !== undefined) {
-                    address.locationId = contactOfContactData.addresses.locationId;
-                  } else {
-                    address.locationId = null;
                   }
 
                   // replace address1
@@ -617,6 +739,13 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
                     address.geoLocation.lng = contactOfContactData.addresses.geoLocation?.lng;
                   } else {
                     address.geoLocation.lng = null;
+                  }
+
+                  // replace geolocation accurate
+                  if (contactOfContactData.addresses.geoLocationAccurate !== undefined) {
+                    address.geoLocationAccurate = contactOfContactData.addresses.geoLocationAccurate;
+                  } else {
+                    address.geoLocationAccurate = null;
                   }
 
                   // replace with correct data

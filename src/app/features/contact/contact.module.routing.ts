@@ -215,7 +215,8 @@ const routes: Routes = [
       exposureType: ExposureTypeDataResolver,
       exposureFrequency: ExposureFrequencyDataResolver,
       exposureDuration: ExposureDurationDataResolver,
-      contextOfTransmission: ContextOfTransmissionDataResolver
+      contextOfTransmission: ContextOfTransmissionDataResolver,
+      yesNo: YesNoDataResolver
     }
   },
   // Bulk Modify Contacts
@@ -235,7 +236,8 @@ const routes: Routes = [
       gender: GenderDataResolver,
       occupation: OccupationDataResolver,
       risk: RiskDataResolver,
-      followUpStatus: FinalFollowUpStatusDataResolver
+      followUpStatus: FinalFollowUpStatusDataResolver,
+      yesNo: YesNoDataResolver
     }
   },
 
