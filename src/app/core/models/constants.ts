@@ -1147,7 +1147,7 @@ export class Constants {
   };
 
   // go data who link
-  static GO_DATA_WHO_LINK: string = 'https://godata.who.int';
+  static readonly GO_DATA_WHO_LINK: string = 'https://godata.who.int';
 
   /**
      * Today date

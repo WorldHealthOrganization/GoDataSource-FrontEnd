@@ -30,9 +30,6 @@ export class LoginComponent {
   // version information
   versionData: SystemSettingsVersionModel;
 
-  // go data who link
-  readonly goDataWhoLink: string = Constants.GO_DATA_WHO_LINK;
-
   // captcha data
   displayCaptcha = false;
   captchaData$: Observable<SafeHtml>;
@@ -47,6 +44,7 @@ export class LoginComponent {
   // constants
   RenderMode = RenderMode;
   CaptchaDataFor = CaptchaDataFor;
+  Constants = Constants;
 
   /**
    * Constructor

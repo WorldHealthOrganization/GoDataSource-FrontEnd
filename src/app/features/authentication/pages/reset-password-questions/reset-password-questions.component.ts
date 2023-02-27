@@ -30,9 +30,6 @@ export class ResetPasswordQuestionsComponent {
   // version information
   versionData: SystemSettingsVersionModel;
 
-  // go data who link
-  readonly goDataWhoLink: string = Constants.GO_DATA_WHO_LINK;
-
   // captcha data
   displayCaptcha = false;
   captchaData$: Observable<SafeHtml>;
@@ -43,6 +40,7 @@ export class ResetPasswordQuestionsComponent {
 
   // constants
   RenderMode = RenderMode;
+  Constants = Constants;
 
   /**
    * Constructor
