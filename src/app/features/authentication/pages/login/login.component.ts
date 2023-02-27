@@ -15,6 +15,7 @@ import { SafeHtml } from '@angular/platform-browser';
 import { CaptchaDataFor, CaptchaDataService } from '../../../../core/services/data/captcha.data.service';
 import { ConfirmOnFormChanges } from '../../../../core/services/guards/page-change-confirmation-guard.service';
 import { UserDataService } from '../../../../core/services/data/user.data.service';
+import { Constants } from '../../../../core/models/constants';
 
 @Component({
   selector: 'app-login',
@@ -28,9 +29,6 @@ export class LoginComponent {
 
   // version information
   versionData: SystemSettingsVersionModel;
-
-  // go data who link
-  readonly goDataWhoLink: string = 'https://godata.who.int';
 
   // captcha data
   displayCaptcha = false;
@@ -46,6 +44,7 @@ export class LoginComponent {
   // constants
   RenderMode = RenderMode;
   CaptchaDataFor = CaptchaDataFor;
+  Constants = Constants;
 
   /**
    * Constructor
