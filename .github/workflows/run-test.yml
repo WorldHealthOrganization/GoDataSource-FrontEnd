@@ -1,0 +1,11 @@
+name: Run Tests
+
+on:
+  pull_request:
+      branches:    
+        - master
+
+jobs:
+  run_tests: 
+    uses: ./.github/workflows/common.yml
+        

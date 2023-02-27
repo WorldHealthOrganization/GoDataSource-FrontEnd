@@ -1,0 +1,34 @@
+name: Common Tests
+on:
+  workflow_call:
+
+jobs:
+  tests:
+    name: Test Code Changes
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16.18.1'
+      - name: Install dependencies
+        run: |
+          echo "---=== Checking node version ===---"
+          node -v
+          npm -v
+          npm install
+      - name: Running Lint Validation
+        run: npm run lint
+      # test not yet setup
+      # - name: Running Unit Tests
+      #   run: npm run test
+     
+  build:
+    name: Build WEB
+    runs-on: ubuntu-20.04
+    needs: [tests]
+    steps:
+      - name: Running npm build
+        run: 
+          npm run build
+        

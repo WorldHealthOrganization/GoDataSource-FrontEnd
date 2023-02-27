@@ -1,0 +1,48 @@
+name: Run Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      REMOTE_LOCATION:
+        description: 'Specify the remote location you want to deploy to.'
+        required: true
+        default: 'common/master/code/client'
+
+jobs:
+  run_tests: 
+    uses: ./.github/workflows/common.yml
+
+  back_up:
+    name: Archiving production build
+    runs-on: ubuntu-20.04
+    needs: [run_tests]
+    steps:
+      - run: tar -czvf dist.tar.gz dist
+
+  deploy:
+    name: Transfer build file to remote server
+    runs-on: ubuntu-20.04
+    needs: [run_tests, back_up]
+    steps: 
+      - uses: actions/checkout@master
+      - name: Copy file via ssh
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+        source: "dist.tar.gz"
+        target: "${{ inputs.REMOTE_LOCATION }}"
+
+      - name: Running post deployment script
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            cd /opt/go.data/${{ inputs.REMOTE_LOCATION }} 
+            rm -rf dist
+            tar -xzvf dist.tar.gz
+            exit 0
+    
