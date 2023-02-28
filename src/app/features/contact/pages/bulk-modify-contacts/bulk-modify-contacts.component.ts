@@ -42,6 +42,7 @@ import { IAddressColumnIndex } from '../../../../core/models/address.interface';
 })
 export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements OnInit, OnDestroy {
   // constants
+  private static readonly COLUMN_PROPERTY_PREGNANCY_STATUS: string = 'pregnancyStatus';
   private static readonly COLUMN_PROPERTY_DATE: string = 'addresses.date';
   private static readonly COLUMN_PROPERTY_EMAIL_ADDRESS: string = 'addresses.emailAddress';
   private static readonly COLUMN_PROPERTY_PHONE_NUMBER: string = 'addresses.phoneNumber';
@@ -433,10 +434,33 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
       new DropdownSheetColumn()
         .setTitle('LNG_CONTACT_FIELD_LABEL_GENDER')
         .setProperty('gender')
-        .setOptions(this.genderList$, this.i18nService),
+        .setOptions(this.genderList$, this.i18nService)
+        .setAsyncValidator((value: string, cellProperties: CellProperties, callback: (result: boolean) => void): void => {
+          // if gender is male reset pregnancy status value and make the cell readonly
+          if (value) {
+            // find pregnancy status column
+            const sheetCore: Handsontable.default = (this.hotTableWrapper.sheetTable as any).hotInstance;
+            const pregnancyStatusColumnIndex: number = this.hotTableWrapper.sheetColumns.findIndex((column) => column.property === BulkModifyContactsComponent.COLUMN_PROPERTY_PREGNANCY_STATUS);
+
+            if (value === this.i18nService.instant(Constants.GENDER_MALE)) {
+              // reset pregnancy status value
+              sheetCore.setDataAtCell(
+                cellProperties.row,
+                pregnancyStatusColumnIndex,
+                null
+              );
+            }
+
+            // change pregnancy status cell state read only/editable
+            sheetCore.setCellMeta(cellProperties.row, pregnancyStatusColumnIndex, 'readOnly', value === this.i18nService.instant(Constants.GENDER_MALE));
+          }
+
+          // return always true to pass the validation (since pregnancy value it was cleared or gender is not male)
+          callback(true);
+        }),
       new DropdownSheetColumn()
         .setTitle('LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS')
-        .setProperty('contact.pregnancyStatus')
+        .setProperty(BulkModifyContactsComponent.COLUMN_PROPERTY_PREGNANCY_STATUS)
         .setOptions(this.pregnancyStatusList$, this.i18nService),
       new DropdownSheetColumn()
         .setTitle('LNG_CONTACT_FIELD_LABEL_OCCUPATION')
