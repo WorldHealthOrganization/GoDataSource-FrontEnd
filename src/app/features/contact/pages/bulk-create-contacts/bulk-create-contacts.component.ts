@@ -79,6 +79,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
   riskLevelsList$: Observable<ILabelValuePairModel[]>;
   documentTypesList$: Observable<ILabelValuePairModel[]>;
   yesNoList$: Observable<ILabelValuePairModel[]>;
+  pregnancyStatusList$: Observable<ILabelValuePairModel[]>;
 
   // relationship options
   certaintyLevelOptions$: Observable<ILabelValuePairModel[]>;
@@ -86,6 +87,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
   exposureFrequencyOptions$: Observable<ILabelValuePairModel[]>;
   exposureDurationOptions$: Observable<ILabelValuePairModel[]>;
   socialRelationshipOptions$: Observable<ILabelValuePairModel[]>;
+  clusterList$: Observable<ILabelValuePairModel[]>;
 
   relatedEntityData: CaseModel | EventModel;
 
@@ -174,6 +176,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     this.exposureDurationOptions$ = of((this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
     this.socialRelationshipOptions$ = of((this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
     this.yesNoList$ = of((this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
+    this.pregnancyStatusList$ = of((this.activatedRoute.snapshot.data.pregnancyStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
+    this.clusterList$ = of((this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
 
     // teams
     if (TeamModel.canList(this.authUser)) {
@@ -318,8 +322,36 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         .setProperty('contact.firstName')
         .setRequired(),
       new TextSheetColumn()
+        .setTitle('LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME')
+        .setProperty('contact.middleName'),
+      new TextSheetColumn()
         .setTitle('LNG_CONTACT_FIELD_LABEL_LAST_NAME')
         .setProperty('contact.lastName'),
+      new DropdownSheetColumn()
+        .setTitle('LNG_CONTACT_FIELD_LABEL_GENDER')
+        .setProperty('contact.gender')
+        .setOptions(this.genderList$, this.i18nService),
+      new DropdownSheetColumn()
+        .setTitle('LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS')
+        .setProperty('contact.pregnancyStatus')
+        .setOptions(this.pregnancyStatusList$, this.i18nService),
+      new DropdownSheetColumn()
+        .setTitle('LNG_CONTACT_FIELD_LABEL_OCCUPATION')
+        .setProperty('contact.occupation')
+        .setOptions(this.occupationsList$, this.i18nService),
+      new IntegerSheetColumn(
+        0,
+        Constants.DEFAULT_AGE_MAX_YEARS)
+        .setTitle('LNG_CONTACT_FIELD_LABEL_AGE_YEARS')
+        .setProperty('contact.age.years'),
+      new IntegerSheetColumn(
+        0,
+        11)
+        .setTitle('LNG_CONTACT_FIELD_LABEL_AGE_MONTHS')
+        .setProperty('contact.age.months'),
+      new DateSheetColumn()
+        .setTitle('LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH')
+        .setProperty('contact.dob'),
       new TextSheetColumn()
         .setTitle('LNG_CONTACT_FIELD_LABEL_VISUAL_ID')
         .setProperty('contact.visualId')
@@ -352,40 +384,15 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
               });
           }
         }),
+
+      // Contact Document(s)
       new DropdownSheetColumn()
-        .setTitle('LNG_CONTACT_FIELD_LABEL_GENDER')
-        .setProperty('contact.gender')
-        .setOptions(this.genderList$, this.i18nService),
-      new DateSheetColumn(
-        null,
-        moment())
-        .setTitle('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING')
-        .setProperty('contact.dateOfReporting')
-        .setRequired(),
-      new DropdownSheetColumn()
-        .setTitle('LNG_CONTACT_FIELD_LABEL_OCCUPATION')
-        .setProperty('contact.occupation')
-        .setOptions(this.occupationsList$, this.i18nService),
-      new IntegerSheetColumn(
-        0,
-        Constants.DEFAULT_AGE_MAX_YEARS)
-        .setTitle('LNG_CONTACT_FIELD_LABEL_AGE_YEARS')
-        .setProperty('contact.age.years'),
-      new IntegerSheetColumn(
-        0,
-        11)
-        .setTitle('LNG_CONTACT_FIELD_LABEL_AGE_MONTHS')
-        .setProperty('contact.age.months'),
-      new DateSheetColumn()
-        .setTitle('LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH')
-        .setProperty('contact.dob'),
-      new DropdownSheetColumn()
-        .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_LEVEL')
-        .setProperty('contact.riskLevel')
-        .setOptions(this.riskLevelsList$, this.i18nService),
+        .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE')
+        .setProperty('contact.documents[0].type')
+        .setOptions(this.documentTypesList$, this.i18nService),
       new TextSheetColumn()
-        .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_REASON')
-        .setProperty('contact.riskReason'),
+        .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER')
+        .setProperty('contact.documents[0].number'),
 
       // Contact Address(es)
       new DateSheetColumn()
@@ -518,43 +525,24 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         .setProperty(BulkCreateContactsComponent.COLUMN_PROPERTY_GEOLOCATION_ACCURATE)
         .setOptions(this.yesNoList$, this.i18nService),
 
-      // Contact Document(s)
-      new DropdownSheetColumn()
-        .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE')
-        .setProperty('contact.documents[0].type')
-        .setOptions(this.documentTypesList$, this.i18nService),
-      new TextSheetColumn()
-        .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER')
-        .setProperty('contact.documents[0].number'),
-
-      // Relationship properties
+      // Epidemiology
       new DateSheetColumn(
         null,
         moment())
-        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE')
-        .setProperty(BulkCreateContactsComponent.COLUMN_PROPERTY_LAST_CONTACT)
+        .setTitle('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING')
+        .setProperty('contact.dateOfReporting')
         .setRequired(),
       new DropdownSheetColumn()
-        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL')
-        .setProperty('relationship.certaintyLevelId')
-        .setOptions(this.certaintyLevelOptions$, this.i18nService)
-        .setRequired(),
+        .setTitle('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE')
+        .setProperty('contact.isDateOfReportingApproximate')
+        .setOptions(this.yesNoList$, this.i18nService),
       new DropdownSheetColumn()
-        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE')
-        .setProperty('relationship.exposureTypeId')
-        .setOptions(this.exposureTypeOptions$, this.i18nService),
-      new DropdownSheetColumn()
-        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY')
-        .setProperty('relationship.exposureFrequencyId')
-        .setOptions(this.exposureFrequencyOptions$, this.i18nService),
-      new DropdownSheetColumn()
-        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION')
-        .setProperty('relationship.exposureDurationId')
-        .setOptions(this.exposureDurationOptions$, this.i18nService),
-      new DropdownSheetColumn()
-        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_RELATION')
-        .setProperty('relationship.socialRelationshipTypeId')
-        .setOptions(this.socialRelationshipOptions$, this.i18nService)
+        .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_LEVEL')
+        .setProperty('contact.riskLevel')
+        .setOptions(this.riskLevelsList$, this.i18nService),
+      new TextSheetColumn()
+        .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_REASON')
+        .setProperty('contact.riskReason')
     ];
 
     // add assigned team if we have permissions to do that
@@ -580,6 +568,56 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
           )
       );
     }
+
+    // Relationship properties
+    this.sheetColumns.push(
+      new DateSheetColumn(
+        null,
+        moment())
+        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT')
+        .setProperty('relationship.dateOfFirstContact'),
+      new DateSheetColumn(
+        null,
+        moment())
+        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE')
+        .setProperty(BulkCreateContactsComponent.COLUMN_PROPERTY_LAST_CONTACT)
+        .setRequired(),
+      new DropdownSheetColumn()
+        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED')
+        .setProperty('relationship.contactDateEstimated')
+        .setOptions(this.yesNoList$, this.i18nService),
+      new DropdownSheetColumn()
+        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL')
+        .setProperty('relationship.certaintyLevelId')
+        .setOptions(this.certaintyLevelOptions$, this.i18nService)
+        .setRequired(),
+      new DropdownSheetColumn()
+        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE')
+        .setProperty('relationship.exposureTypeId')
+        .setOptions(this.exposureTypeOptions$, this.i18nService),
+      new DropdownSheetColumn()
+        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY')
+        .setProperty('relationship.exposureFrequencyId')
+        .setOptions(this.exposureFrequencyOptions$, this.i18nService),
+      new DropdownSheetColumn()
+        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION')
+        .setProperty('relationship.exposureDurationId')
+        .setOptions(this.exposureDurationOptions$, this.i18nService),
+      new DropdownSheetColumn()
+        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_RELATION')
+        .setProperty('relationship.socialRelationshipTypeId')
+        .setOptions(this.socialRelationshipOptions$, this.i18nService),
+      new DropdownSheetColumn()
+        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER')
+        .setProperty('relationship.clusterId')
+        .setOptions(this.clusterList$, this.i18nService),
+      new TextSheetColumn()
+        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP')
+        .setProperty('relationship.socialRelationshipDetail'),
+      new TextSheetColumn()
+        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_COMMENT')
+        .setProperty('relationship.comment')
+    );
 
     // configure the context menu
     this.sheetContextMenu = {
