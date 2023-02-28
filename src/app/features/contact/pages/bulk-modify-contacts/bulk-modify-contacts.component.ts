@@ -486,7 +486,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
 
       // Contact Address(es)
       new DateSheetColumn()
-        .setTitle('LNG_PAGE_BULK_ADD_CONTACTS_ADDRESS_DATE')
+        .setTitle('LNG_PAGE_BULK_MODIFY_CONTACTS_ADDRESS_DATE')
         .setProperty(BulkModifyContactsComponent.COLUMN_PROPERTY_DATE),
       new TextSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS')
