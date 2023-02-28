@@ -240,8 +240,7 @@ const routes: Routes = [
       risk: RiskDataResolver,
       followUpStatus: FinalFollowUpStatusDataResolver,
       yesNo: YesNoDataResolver,
-      pregnancyStatus: PregnancyStatusDataResolver,
-      cluster: ClusterDataResolver
+      pregnancyStatus: PregnancyStatusDataResolver
     }
   },
 

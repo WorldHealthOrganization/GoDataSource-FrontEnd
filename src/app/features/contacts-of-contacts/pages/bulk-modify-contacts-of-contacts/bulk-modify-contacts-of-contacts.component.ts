@@ -64,6 +64,7 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
   occupationsList$: Observable<ILabelValuePairModel[]>;
   riskLevelsList$: Observable<ILabelValuePairModel[]>;
   yesNoList$: Observable<ILabelValuePairModel[]>;
+  pregnancyStatusList$: Observable<ILabelValuePairModel[]>;
 
   // sheet widget configuration
   sheetContextMenu = {};
@@ -129,6 +130,7 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
     this.occupationsList$ = of((this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
     this.riskLevelsList$ = of((this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
     this.yesNoList$ = of((this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
+    this.pregnancyStatusList$ = of((this.activatedRoute.snapshot.data.pregnancyStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
 
     // init table columns
     this.configureSheetWidget();
@@ -382,18 +384,19 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
         .setProperty('firstName')
         .setRequired(),
       new TextSheetColumn()
+        .setTitle('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_MIDDLE_NAME')
+        .setProperty('middleName'),
+      new TextSheetColumn()
         .setTitle('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_LAST_NAME')
         .setProperty('lastName'),
       new DropdownSheetColumn()
         .setTitle('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_GENDER')
         .setProperty('gender')
         .setOptions(this.genderList$, this.i18nService),
-      new DateSheetColumn(
-        null,
-        moment())
-        .setTitle('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING')
-        .setProperty('dateOfReporting')
-        .setRequired(),
+      new DropdownSheetColumn()
+        .setTitle('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PREGNANCY_STATUS')
+        .setProperty('pregnancyStatus')
+        .setOptions(this.pregnancyStatusList$, this.i18nService),
       new DropdownSheetColumn()
         .setTitle('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_OCCUPATION')
         .setProperty('occupation')
@@ -411,13 +414,10 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
       new DateSheetColumn()
         .setTitle('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_BIRTH')
         .setProperty('dob'),
-      new DropdownSheetColumn()
-        .setTitle('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL')
-        .setProperty('riskLevel')
-        .setOptions(this.riskLevelsList$, this.i18nService),
-      new TextSheetColumn()
-        .setTitle('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON')
-        .setProperty('riskReason'),
+
+      // Contact Document(s)
+      // Can't edit since they are multiple
+      // or we could implement something custom..like location to edit a list of items
 
       // Contact Address(es)
       new DateSheetColumn()
@@ -436,7 +436,7 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
           }
         }),
       new TextSheetColumn()
-        .setTitle('LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER')
+        .setTitle('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_PHONE_NUMBER')
         .setProperty(BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_PHONE_NUMBER),
       new LocationSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_LOCATION')
@@ -543,11 +543,26 @@ export class BulkModifyContactsOfContactsComponent extends ConfirmOnFormChanges 
       new DropdownSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES')
         .setProperty(BulkModifyContactsOfContactsComponent.COLUMN_PROPERTY_GEOLOCATION_ACCURATE)
-        .setOptions(this.yesNoList$, this.i18nService)
+        .setOptions(this.yesNoList$, this.i18nService),
 
-      // Contact Document(s)
-      // Can't edit since they are multiple
-      // or we could implement something custom..like location to edit a list of items
+      // Epidemiology
+      new DateSheetColumn(
+        null,
+        moment())
+        .setTitle('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING')
+        .setProperty('dateOfReporting')
+        .setRequired(),
+      new DropdownSheetColumn()
+        .setTitle('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE')
+        .setProperty('isDateOfReportingApproximate')
+        .setOptions(this.yesNoList$, this.i18nService),
+      new DropdownSheetColumn()
+        .setTitle('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_LEVEL')
+        .setProperty('riskLevel')
+        .setOptions(this.riskLevelsList$, this.i18nService),
+      new TextSheetColumn()
+        .setTitle('LNG_CONTACT_OF_CONTACT_FIELD_LABEL_RISK_REASON')
+        .setProperty('riskReason')
     ];
 
     // configure the context menu

@@ -127,7 +127,9 @@ const routes: Routes = [
       exposureFrequency: ExposureFrequencyDataResolver,
       exposureDuration: ExposureDurationDataResolver,
       contextOfTransmission: ContextOfTransmissionDataResolver,
-      yesNo: YesNoDataResolver
+      yesNo: YesNoDataResolver,
+      pregnancyStatus: PregnancyStatusDataResolver,
+      cluster: ClusterDataResolver
     }
   },
   // Bulk Modify Contacts of Contacts
@@ -147,7 +149,8 @@ const routes: Routes = [
       gender: GenderDataResolver,
       occupation: OccupationDataResolver,
       risk: RiskDataResolver,
-      yesNo: YesNoDataResolver
+      yesNo: YesNoDataResolver,
+      pregnancyStatus: PregnancyStatusDataResolver
     }
   },
   // View Contact of contact movement

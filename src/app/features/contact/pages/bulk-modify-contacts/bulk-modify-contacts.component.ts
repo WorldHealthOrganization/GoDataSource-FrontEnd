@@ -68,6 +68,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
   riskLevelsList$: Observable<ILabelValuePairModel[]>;
   finalFollowUpStatus$: Observable<ILabelValuePairModel[]>;
   yesNoList$: Observable<ILabelValuePairModel[]>;
+  pregnancyStatusList$: Observable<ILabelValuePairModel[]>;
 
   // teams
   teamList$: Observable<TeamModel[]>;
@@ -142,6 +143,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
     this.riskLevelsList$ = of((this.activatedRoute.snapshot.data.risk as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
     this.finalFollowUpStatus$ = of((this.activatedRoute.snapshot.data.followUpStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
     this.yesNoList$ = of((this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
+    this.pregnancyStatusList$ = of((this.activatedRoute.snapshot.data.pregnancyStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
 
     // retrieve teams
     if (TeamModel.canList(this.authUser)) {
@@ -423,18 +425,19 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         .setProperty('firstName')
         .setRequired(),
       new TextSheetColumn()
+        .setTitle('LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME')
+        .setProperty('middleName'),
+      new TextSheetColumn()
         .setTitle('LNG_CONTACT_FIELD_LABEL_LAST_NAME')
         .setProperty('lastName'),
       new DropdownSheetColumn()
         .setTitle('LNG_CONTACT_FIELD_LABEL_GENDER')
         .setProperty('gender')
         .setOptions(this.genderList$, this.i18nService),
-      new DateSheetColumn(
-        null,
-        moment())
-        .setTitle('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING')
-        .setProperty('dateOfReporting')
-        .setRequired(),
+      new DropdownSheetColumn()
+        .setTitle('LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS')
+        .setProperty('contact.pregnancyStatus')
+        .setOptions(this.pregnancyStatusList$, this.i18nService),
       new DropdownSheetColumn()
         .setTitle('LNG_CONTACT_FIELD_LABEL_OCCUPATION')
         .setProperty('occupation')
@@ -452,13 +455,10 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
       new DateSheetColumn()
         .setTitle('LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH')
         .setProperty('dob'),
-      new DropdownSheetColumn()
-        .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_LEVEL')
-        .setProperty('riskLevel')
-        .setOptions(this.riskLevelsList$, this.i18nService),
-      new TextSheetColumn()
-        .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_REASON')
-        .setProperty('riskReason'),
+
+      // Contact Document(s)
+      // Can't edit since they are multiple
+      // or we could implement something custom..like location to edit a list of items
 
       // Contact Address(es)
       new DateSheetColumn()
@@ -586,15 +586,24 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         .setProperty(BulkModifyContactsComponent.COLUMN_PROPERTY_GEOLOCATION_ACCURATE)
         .setOptions(this.yesNoList$, this.i18nService),
 
-      // Contact Document(s)
-      // Can't edit since they are multiple
-      // or we could implement something custom..like location to edit a list of items
-
-      // only field available for update contact
+      // Epidemiology
+      new DateSheetColumn(
+        null,
+        moment())
+        .setTitle('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING')
+        .setProperty('dateOfReporting')
+        .setRequired(),
       new DropdownSheetColumn()
-        .setTitle('LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS')
-        .setProperty('followUp.status')
-        .setOptions(this.finalFollowUpStatus$, this.i18nService)
+        .setTitle('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE')
+        .setProperty('contact.isDateOfReportingApproximate')
+        .setOptions(this.yesNoList$, this.i18nService),
+      new DropdownSheetColumn()
+        .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_LEVEL')
+        .setProperty('riskLevel')
+        .setOptions(this.riskLevelsList$, this.i18nService),
+      new TextSheetColumn()
+        .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_REASON')
+        .setProperty('riskReason')
     ];
 
     // add assigned team if we have permissions to do that
@@ -620,6 +629,14 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
           )
       );
     }
+
+    // only field available for update contact
+    this.sheetColumns.push(
+      new DropdownSheetColumn()
+        .setTitle('LNG_CONTACT_FIELD_LABEL_FOLLOW_UP_STATUS')
+        .setProperty('followUp.status')
+        .setOptions(this.finalFollowUpStatus$, this.i18nService)
+    );
 
     // configure the context menu
     this.sheetContextMenu = {
@@ -738,8 +755,6 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                 ) {
                   contactData.followUpTeamId = null;
                 }
-
-                console.log(contactData.addresses);
 
                 // create / modify address fields
                 if (contactData.addresses) {
