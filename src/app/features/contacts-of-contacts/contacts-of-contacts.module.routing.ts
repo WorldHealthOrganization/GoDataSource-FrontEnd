@@ -24,6 +24,7 @@ import { ExposureDurationDataResolver } from '../../core/services/resolvers/data
 import { ContextOfTransmissionDataResolver } from '../../core/services/resolvers/data/context-of-transmission.resolver';
 import { SelectedOutbreakDataResolver } from '../../core/services/resolvers/data/selected-outbreak.resolver';
 import { RelationshipPersonDataResolver } from '../../core/services/resolvers/data/relationship-person.resolver';
+import { YesNoDataResolver } from '../../core/services/resolvers/data/yes-no.resolver';
 
 // common base - create / view / modify
 const createViewModifyFoundation: Route = {
@@ -125,7 +126,10 @@ const routes: Routes = [
       exposureType: ExposureTypeDataResolver,
       exposureFrequency: ExposureFrequencyDataResolver,
       exposureDuration: ExposureDurationDataResolver,
-      contextOfTransmission: ContextOfTransmissionDataResolver
+      contextOfTransmission: ContextOfTransmissionDataResolver,
+      yesNo: YesNoDataResolver,
+      pregnancyStatus: PregnancyStatusDataResolver,
+      cluster: ClusterDataResolver
     }
   },
   // Bulk Modify Contacts of Contacts
@@ -144,7 +148,9 @@ const routes: Routes = [
     resolve: {
       gender: GenderDataResolver,
       occupation: OccupationDataResolver,
-      risk: RiskDataResolver
+      risk: RiskDataResolver,
+      yesNo: YesNoDataResolver,
+      pregnancyStatus: PregnancyStatusDataResolver
     }
   },
   // View Contact of contact movement

@@ -806,8 +806,10 @@ export class SystemSyncLogsComponent
               name: 'filter[where][includeUsers]',
               value: false,
               visible: (data): boolean => {
-                return !_.isEmpty((data.map['filter[where][exportType]'] as IV2SideDialogConfigInputSingleDropdown).value) &&
-                  (data.map['filter[where][exportType]'] as IV2SideDialogConfigInputSingleDropdown).value !== Constants.SYNC_PACKAGE_EXPORT_TYPES.MOBILE.value;
+                // display only if Export Type is selected, excluding "Mobile" (because the Users, including Teams and Roles collections, are included by default in Mobile)
+                const exportType = (data.map['filter[where][exportType]'] as IV2SideDialogConfigInputSingleDropdown).value;
+                return !_.isEmpty(exportType) &&
+                 exportType !== Constants.SYNC_PACKAGE_EXPORT_TYPES.MOBILE.value;
               }
             },
             {

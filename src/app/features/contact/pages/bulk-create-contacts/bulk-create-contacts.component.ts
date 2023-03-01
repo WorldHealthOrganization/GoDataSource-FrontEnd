@@ -38,6 +38,8 @@ import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
+import { HotTableComponent } from '@handsontable/angular';
+import { IAddressColumnIndex } from '../../../../core/models/address-column-index.interface';
 
 @Component({
   selector: 'app-bulk-create-contacts',
@@ -47,7 +49,18 @@ import { AppMessages } from '../../../../core/enums/app-messages.enum';
 })
 export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements OnInit, OnDestroy {
   // constants
+  private static readonly COLUMN_PROPERTY_PREGNANCY_STATUS: string = 'contact.pregnancyStatus';
   private static readonly COLUMN_PROPERTY_LAST_CONTACT: string = 'relationship.contactDate';
+  private static readonly COLUMN_PROPERTY_DATE: string = 'contact.addresses[0].date';
+  private static readonly COLUMN_PROPERTY_EMAIL_ADDRESS: string = 'contact.addresses[0].emailAddress';
+  private static readonly COLUMN_PROPERTY_PHONE_NUMBER: string = 'contact.addresses[0].phoneNumber';
+  private static readonly COLUMN_PROPERTY_LOCATION: string = 'contact.addresses[0].locationId';
+  private static readonly COLUMN_PROPERTY_CITY: string = 'contact.addresses[0].city';
+  private static readonly COLUMN_PROPERTY_POSTAL_CODE: string = 'contact.addresses[0].postalCode';
+  private static readonly COLUMN_PROPERTY_ADDRESS_LINE1: string = 'contact.addresses[0].addressLine1';
+  private static readonly COLUMN_PROPERTY_GEOLOCATION_LAT: string = 'contact.addresses[0].geoLocation.lat';
+  private static readonly COLUMN_PROPERTY_GEOLOCATION_LNG: string = 'contact.addresses[0].geoLocation.lng';
+  private static readonly COLUMN_PROPERTY_GEOLOCATION_ACCURATE: string = 'contact.addresses[0].geoLocationAccurate';
 
   // breadcrumbs
   breadcrumbs: IV2Breadcrumb[] = [];
@@ -66,6 +79,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
   occupationsList$: Observable<ILabelValuePairModel[]>;
   riskLevelsList$: Observable<ILabelValuePairModel[]>;
   documentTypesList$: Observable<ILabelValuePairModel[]>;
+  yesNoList$: Observable<ILabelValuePairModel[]>;
+  pregnancyStatusList$: Observable<ILabelValuePairModel[]>;
 
   // relationship options
   certaintyLevelOptions$: Observable<ILabelValuePairModel[]>;
@@ -73,12 +88,25 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
   exposureFrequencyOptions$: Observable<ILabelValuePairModel[]>;
   exposureDurationOptions$: Observable<ILabelValuePairModel[]>;
   socialRelationshipOptions$: Observable<ILabelValuePairModel[]>;
+  clusterList$: Observable<ILabelValuePairModel[]>;
 
   relatedEntityData: CaseModel | EventModel;
 
   // sheet widget configuration
   sheetContextMenu = {};
   sheetColumns: any[] = [];
+
+  // sheet column indexes
+  private _addressColumnIndexes: IAddressColumnIndex;
+  private _addressColumnIndexesMap: {
+    [columnIndex: number]: true
+  } = {};
+  private _pregnancyStatusColumnIndex: number;
+
+  // manual cleared "date" cells
+  private _manualClearedDateCells: {
+    [rowNumber: number]: true
+  } = {};
 
   // error messages
   errorMessages: {
@@ -152,6 +180,9 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
     this.exposureFrequencyOptions$ = of((this.activatedRoute.snapshot.data.exposureFrequency as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
     this.exposureDurationOptions$ = of((this.activatedRoute.snapshot.data.exposureDuration as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
     this.socialRelationshipOptions$ = of((this.activatedRoute.snapshot.data.contextOfTransmission as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
+    this.yesNoList$ = of((this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
+    this.pregnancyStatusList$ = of((this.activatedRoute.snapshot.data.pregnancyStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
+    this.clusterList$ = of((this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ReferenceDataEntryModel>).options).pipe(share());
 
     // teams
     if (TeamModel.canList(this.authUser)) {
@@ -296,8 +327,59 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         .setProperty('contact.firstName')
         .setRequired(),
       new TextSheetColumn()
+        .setTitle('LNG_CONTACT_FIELD_LABEL_MIDDLE_NAME')
+        .setProperty('contact.middleName'),
+      new TextSheetColumn()
         .setTitle('LNG_CONTACT_FIELD_LABEL_LAST_NAME')
         .setProperty('contact.lastName'),
+      new DropdownSheetColumn()
+        .setTitle('LNG_CONTACT_FIELD_LABEL_GENDER')
+        .setProperty('contact.gender')
+        .setOptions(this.genderList$, this.i18nService)
+        .setAsyncValidator((value: string, cellProperties: CellProperties, callback: (result: boolean) => void): void => {
+          // if gender is male reset pregnancy status value and make the cell readonly
+          if (value) {
+            // find pregnancy status column
+            const sheetCore: Handsontable.default = (this.hotTableWrapper.sheetTable as any).hotInstance;
+
+            // check if it's "male"
+            if (value === this.i18nService.instant(Constants.GENDER_MALE)) {
+              // reset pregnancy status value
+              sheetCore.setDataAtCell(
+                cellProperties.row,
+                this._pregnancyStatusColumnIndex,
+                null
+              );
+            }
+
+            // change pregnancy status cell state read only/editable
+            sheetCore.setCellMeta(cellProperties.row, this._pregnancyStatusColumnIndex, 'readOnly', value === this.i18nService.instant(Constants.GENDER_MALE));
+          }
+
+          // return always true to pass the validation (since pregnancy value it was cleared or gender is not male)
+          callback(true);
+        }),
+      new DropdownSheetColumn()
+        .setTitle('LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS')
+        .setProperty(BulkCreateContactsComponent.COLUMN_PROPERTY_PREGNANCY_STATUS)
+        .setOptions(this.pregnancyStatusList$, this.i18nService),
+      new DropdownSheetColumn()
+        .setTitle('LNG_CONTACT_FIELD_LABEL_OCCUPATION')
+        .setProperty('contact.occupation')
+        .setOptions(this.occupationsList$, this.i18nService),
+      new IntegerSheetColumn(
+        0,
+        Constants.DEFAULT_AGE_MAX_YEARS)
+        .setTitle('LNG_CONTACT_FIELD_LABEL_AGE_YEARS')
+        .setProperty('contact.age.years'),
+      new IntegerSheetColumn(
+        0,
+        11)
+        .setTitle('LNG_CONTACT_FIELD_LABEL_AGE_MONTHS')
+        .setProperty('contact.age.months'),
+      new DateSheetColumn()
+        .setTitle('LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH')
+        .setProperty('contact.dob'),
       new TextSheetColumn()
         .setTitle('LNG_CONTACT_FIELD_LABEL_VISUAL_ID')
         .setProperty('contact.visualId')
@@ -330,45 +412,38 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
               });
           }
         }),
+
+      // Contact Document(s)
       new DropdownSheetColumn()
-        .setTitle('LNG_CONTACT_FIELD_LABEL_GENDER')
-        .setProperty('contact.gender')
-        .setOptions(this.genderList$, this.i18nService),
-      new DateSheetColumn(
-        null,
-        moment())
-        .setTitle('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING')
-        .setProperty('contact.dateOfReporting')
-        .setRequired(),
-      new DropdownSheetColumn()
-        .setTitle('LNG_CONTACT_FIELD_LABEL_OCCUPATION')
-        .setProperty('contact.occupation')
-        .setOptions(this.occupationsList$, this.i18nService),
-      new IntegerSheetColumn(
-        0,
-        Constants.DEFAULT_AGE_MAX_YEARS)
-        .setTitle('LNG_CONTACT_FIELD_LABEL_AGE_YEARS')
-        .setProperty('contact.age.years'),
-      new IntegerSheetColumn(
-        0,
-        11)
-        .setTitle('LNG_CONTACT_FIELD_LABEL_AGE_MONTHS')
-        .setProperty('contact.age.months'),
-      new DateSheetColumn()
-        .setTitle('LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH')
-        .setProperty('contact.dob'),
-      new DropdownSheetColumn()
-        .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_LEVEL')
-        .setProperty('contact.riskLevel')
-        .setOptions(this.riskLevelsList$, this.i18nService),
+        .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE')
+        .setProperty('contact.documents[0].type')
+        .setOptions(this.documentTypesList$, this.i18nService),
       new TextSheetColumn()
-        .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_REASON')
-        .setProperty('contact.riskReason'),
+        .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER')
+        .setProperty('contact.documents[0].number'),
 
       // Contact Address(es)
+      new DateSheetColumn()
+        .setTitle('LNG_PAGE_BULK_ADD_CONTACTS_ADDRESS_DATE')
+        .setProperty(BulkCreateContactsComponent.COLUMN_PROPERTY_DATE),
+      new TextSheetColumn()
+        .setTitle('LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS')
+        .setProperty(BulkCreateContactsComponent.COLUMN_PROPERTY_EMAIL_ADDRESS)
+        .setAsyncValidator((value: string, _cellProperties: CellProperties, callback: (result: boolean) => void): void => {
+          // validate if only we have value
+          if (!value) {
+            callback(true);
+          } else {
+            // validate email using regex
+            callback(Constants.REGEX_EMAIL_VALIDATOR.test(value));
+          }
+        }),
+      new TextSheetColumn()
+        .setTitle('LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER')
+        .setProperty(BulkCreateContactsComponent.COLUMN_PROPERTY_PHONE_NUMBER),
       new LocationSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_LOCATION')
-        .setProperty('contact.addresses[0].locationId')
+        .setProperty(BulkCreateContactsComponent.COLUMN_PROPERTY_LOCATION)
         .setUseOutbreakLocations(true)
         .setLocationChangedCallback((rowNo, locationInfo) => {
           // nothing to do ?
@@ -400,39 +475,46 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                 return;
               }
 
-              // find lat column
-              const latColumnIndex: number = this.hotTableWrapper.sheetColumns.findIndex((column) => column.property === 'contact.addresses[0].geoLocation.lat');
-              const lngColumnIndex: number = this.hotTableWrapper.sheetColumns.findIndex((column) => column.property === 'contact.addresses[0].geoLocation.lng');
-
               // change location lat & lng
               const sheetCore: Handsontable.default = (this.hotTableWrapper.sheetTable as any).hotInstance;
               sheetCore.setDataAtCell(
                 rowNo,
-                latColumnIndex,
+                this._addressColumnIndexes.geoLocationLat,
                 locationInfo.geoLocation.lat
               );
               sheetCore.setDataAtCell(
                 rowNo,
-                lngColumnIndex,
+                this._addressColumnIndexes.geoLocationLng,
                 locationInfo.geoLocation.lng
               );
             });
+        })
+        .setAsyncValidator((value, cellProperties: CellProperties, callback: (result: boolean) => void): void => {
+          // location is required if any of the address field is filled
+          if (value) {
+            callback(true);
+          } else {
+            // check address fields
+            return callback(
+              !this.isAddressFilled(
+                cellProperties.row,
+                this._addressColumnIndexes.locationId
+              )
+            );
+          }
         }),
       new TextSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_CITY')
-        .setProperty('contact.addresses[0].city'),
-      new TextSheetColumn()
-        .setTitle('LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1')
-        .setProperty('contact.addresses[0].addressLine1'),
+        .setProperty(BulkCreateContactsComponent.COLUMN_PROPERTY_CITY),
       new TextSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE')
-        .setProperty('contact.addresses[0].postalCode'),
+        .setProperty(BulkCreateContactsComponent.COLUMN_PROPERTY_POSTAL_CODE),
       new TextSheetColumn()
-        .setTitle('LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER')
-        .setProperty('contact.addresses[0].phoneNumber'),
+        .setTitle('LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1')
+        .setProperty(BulkCreateContactsComponent.COLUMN_PROPERTY_ADDRESS_LINE1),
       new NumericSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT')
-        .setProperty('contact.addresses[0].geoLocation.lat')
+        .setProperty(BulkCreateContactsComponent.COLUMN_PROPERTY_GEOLOCATION_LAT)
         .setAsyncValidator((value, cellProperties: CellProperties, callback: (result: boolean) => void): void => {
           if (
             value ||
@@ -448,7 +530,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         }),
       new NumericSheetColumn()
         .setTitle('LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LNG')
-        .setProperty('contact.addresses[0].geoLocation.lng')
+        .setProperty(BulkCreateContactsComponent.COLUMN_PROPERTY_GEOLOCATION_LNG)
         .setAsyncValidator((value, cellProperties: CellProperties, callback: (result: boolean) => void): void => {
           if (
             value ||
@@ -462,44 +544,29 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
             callback(!lat && lat !== 0);
           }
         }),
-
-      // Contact Document(s)
       new DropdownSheetColumn()
-        .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_TYPE')
-        .setProperty('contact.documents[0].type')
-        .setOptions(this.documentTypesList$, this.i18nService),
-      new TextSheetColumn()
-        .setTitle('LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER')
-        .setProperty('contact.documents[0].number'),
+        .setTitle('LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES')
+        .setProperty(BulkCreateContactsComponent.COLUMN_PROPERTY_GEOLOCATION_ACCURATE)
+        .setOptions(this.yesNoList$, this.i18nService),
 
-      // Relationship properties
+      // Epidemiology
       new DateSheetColumn(
         null,
         moment())
-        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE')
-        .setProperty(BulkCreateContactsComponent.COLUMN_PROPERTY_LAST_CONTACT)
+        .setTitle('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING')
+        .setProperty('contact.dateOfReporting')
         .setRequired(),
       new DropdownSheetColumn()
-        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL')
-        .setProperty('relationship.certaintyLevelId')
-        .setOptions(this.certaintyLevelOptions$, this.i18nService)
-        .setRequired(),
+        .setTitle('LNG_CONTACT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE')
+        .setProperty('contact.isDateOfReportingApproximate')
+        .setOptions(this.yesNoList$, this.i18nService),
       new DropdownSheetColumn()
-        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE')
-        .setProperty('relationship.exposureTypeId')
-        .setOptions(this.exposureTypeOptions$, this.i18nService),
-      new DropdownSheetColumn()
-        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY')
-        .setProperty('relationship.exposureFrequencyId')
-        .setOptions(this.exposureFrequencyOptions$, this.i18nService),
-      new DropdownSheetColumn()
-        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION')
-        .setProperty('relationship.exposureDurationId')
-        .setOptions(this.exposureDurationOptions$, this.i18nService),
-      new DropdownSheetColumn()
-        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_RELATION')
-        .setProperty('relationship.socialRelationshipTypeId')
-        .setOptions(this.socialRelationshipOptions$, this.i18nService)
+        .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_LEVEL')
+        .setProperty('contact.riskLevel')
+        .setOptions(this.riskLevelsList$, this.i18nService),
+      new TextSheetColumn()
+        .setTitle('LNG_CONTACT_FIELD_LABEL_RISK_REASON')
+        .setProperty('contact.riskReason')
     ];
 
     // add assigned team if we have permissions to do that
@@ -526,6 +593,56 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
       );
     }
 
+    // Relationship properties
+    this.sheetColumns.push(
+      new DateSheetColumn(
+        null,
+        moment())
+        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_DATE_OF_FIRST_CONTACT')
+        .setProperty('relationship.dateOfFirstContact'),
+      new DateSheetColumn(
+        null,
+        moment())
+        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE')
+        .setProperty(BulkCreateContactsComponent.COLUMN_PROPERTY_LAST_CONTACT)
+        .setRequired(),
+      new DropdownSheetColumn()
+        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_CONTACT_DATE_ESTIMATED')
+        .setProperty('relationship.contactDateEstimated')
+        .setOptions(this.yesNoList$, this.i18nService),
+      new DropdownSheetColumn()
+        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_CERTAINTY_LEVEL')
+        .setProperty('relationship.certaintyLevelId')
+        .setOptions(this.certaintyLevelOptions$, this.i18nService)
+        .setRequired(),
+      new DropdownSheetColumn()
+        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_TYPE')
+        .setProperty('relationship.exposureTypeId')
+        .setOptions(this.exposureTypeOptions$, this.i18nService),
+      new DropdownSheetColumn()
+        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_FREQUENCY')
+        .setProperty('relationship.exposureFrequencyId')
+        .setOptions(this.exposureFrequencyOptions$, this.i18nService),
+      new DropdownSheetColumn()
+        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_EXPOSURE_DURATION')
+        .setProperty('relationship.exposureDurationId')
+        .setOptions(this.exposureDurationOptions$, this.i18nService),
+      new DropdownSheetColumn()
+        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_RELATION')
+        .setProperty('relationship.socialRelationshipTypeId')
+        .setOptions(this.socialRelationshipOptions$, this.i18nService),
+      new DropdownSheetColumn()
+        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_CLUSTER')
+        .setProperty('relationship.clusterId')
+        .setOptions(this.clusterList$, this.i18nService),
+      new TextSheetColumn()
+        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_RELATIONSHIP')
+        .setProperty('relationship.socialRelationshipDetail'),
+      new TextSheetColumn()
+        .setTitle('LNG_RELATIONSHIP_FIELD_LABEL_COMMENT')
+        .setProperty('relationship.comment')
+    );
+
     // configure the context menu
     this.sheetContextMenu = {
       items: {
@@ -546,52 +663,188 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         }
       }
     };
+
+    // get address column indexes
+    this._addressColumnIndexes = {
+      date: this.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_DATE),
+      emailAddress: this.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_EMAIL_ADDRESS),
+      phoneNumber: this.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_PHONE_NUMBER),
+      locationId: this.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_LOCATION),
+      city: this.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_CITY),
+      postalCode: this.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_POSTAL_CODE),
+      addressLine1: this.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_ADDRESS_LINE1),
+      geoLocationLat: this.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_GEOLOCATION_LAT),
+      geoLocationLng: this.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_GEOLOCATION_LNG),
+      geoLocationAccurate: this.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_GEOLOCATION_ACCURATE)
+    };
+
+    // map address column indexes
+    this._addressColumnIndexesMap = Object.assign({}, ...Object.values(this._addressColumnIndexes).map((index: number) => ({ [index]: true })));
+
+    // get pregnancy status column index
+    this._pregnancyStatusColumnIndex = this.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_PREGNANCY_STATUS);
   }
 
   /**
    * After changes
    */
   afterChange(event: IHotTableWrapperEvent) {
-    // validate if only the feature is enabled or there are changes
-    if (
-      !event.typeSpecificData.changes ||
-      !this.selectedOutbreak.checkLastContactDateAgainstDateOnSet
-    ) {
+    // validate if only there are changes
+    if (!event.typeSpecificData.changes) {
       return;
     }
 
     // get the contact date column index
     const lastContactColumnIndex: number = this.hotTableWrapper.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_LAST_CONTACT);
 
-    // check if the date of onset was changed
+    // check if the date of onset or address fields were changed
     let refreshWarning = false;
-    event.typeSpecificData.changes.forEach((cell) => {
+    let isLastContactDateModified = false;
+    event.typeSpecificData.changes.forEach((cell: any) => {
       // cell[0] - row number, cell[1] - column index, cell[2] - old value, cell[3] - new value
-      if (cell[1] !== lastContactColumnIndex) {
-        return;
-      }
+      const columnIndex: number = cell[1];
 
-      // check if there is a new value
-      if (
-        cell[3] &&
-        moment(cell[3]).isValid() &&
-        this.relatedEntityData instanceof CaseModel &&
-        this.relatedEntityData.dateOfOnset &&
-        moment(cell[3]).isBefore(moment(this.relatedEntityData.dateOfOnset))
+      // check changed column
+      if (this._addressColumnIndexesMap[columnIndex]) {
+        // address fields
+        this.setAddressDate(
+          event.sheetTable,
+          cell
+        );
+      } else if (
+        columnIndex === lastContactColumnIndex &&
+        this.selectedOutbreak.checkLastContactDateAgainstDateOnSet
       ) {
-        this._warnings.dateOfOnset = moment(this.relatedEntityData.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-        this._warnings.rows[cell[0] + 1] = true;
-
-        refreshWarning = true;
-      } else {
-        // remove the row if exists
-        if (this._warnings.rows[cell[0] + 1]) {
-          refreshWarning = true;
-          delete this._warnings.rows[cell[0] + 1];
-        }
+        // validate last contact against date of onset
+        isLastContactDateModified = true;
+        const mustRefreshWarning = this.checkForLastContactBeforeCaseOnSet(cell);
+        refreshWarning = refreshWarning || mustRefreshWarning;
       }
     });
 
+    // show warnings if only last contact cell was modified
+    if (isLastContactDateModified) {
+      this.showWarnings(refreshWarning);
+    }
+  }
+
+  /**
+   * Check if "Date of Last Contact" is before "Date of Onset" of the source case
+   */
+  private checkForLastContactBeforeCaseOnSet(
+    cell: any
+  ): boolean {
+    // cell[0] - row number, cell[1] - column index, cell[2] - old value, cell[3] - new value
+    const rowNumber = cell[0];
+    const newValue = cell[3];
+    let refreshWarning = false;
+
+    // check if there is a new value
+    if (
+      newValue &&
+      moment(newValue).isValid() &&
+      this.relatedEntityData instanceof CaseModel &&
+      this.relatedEntityData.dateOfOnset &&
+      moment(newValue).isBefore(moment(this.relatedEntityData.dateOfOnset))
+    ) {
+      this._warnings.dateOfOnset = moment(this.relatedEntityData.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+      this._warnings.rows[rowNumber + 1] = true;
+
+      refreshWarning = true;
+    } else {
+      // remove the row if exists
+      if (this._warnings.rows[rowNumber + 1]) {
+        refreshWarning = true;
+        delete this._warnings.rows[rowNumber + 1];
+      }
+    }
+
+    // return
+    return refreshWarning;
+  }
+
+  /**
+   * Sets "date" address field to current date if it's not set
+   */
+  private setAddressDate(
+    sheetTable: HotTableComponent,
+    cell: any[]
+  ): void {
+    // get cell info
+    const rowNumber: number = cell[0];
+    const columnIndex: number = cell[1];
+    const newValue: string = cell[3];
+
+    // return if the date was manually cleared
+    if (this._manualClearedDateCells[rowNumber]) {
+      return;
+    }
+
+    // check if "date" was changed
+    if (columnIndex === this._addressColumnIndexes.date) {
+      // save if date was manually cleared
+      if (!newValue) {
+        this._manualClearedDateCells[rowNumber] = true;
+      }
+
+      // return
+      return;
+    }
+
+    // return if "date" field is filled
+    const sheetCore: Handsontable.default = (sheetTable as any).hotInstance;
+    if (
+      sheetCore.getDataAtCell(
+        rowNumber,
+        this._addressColumnIndexes.date
+      )
+    ) {
+      return;
+    }
+
+    // set "date" address field to current date if at least an address field is filled
+    if (this.isAddressFilled(rowNumber)) {
+      sheetCore.setDataAtCell(
+        rowNumber,
+        this._addressColumnIndexes.date,
+        moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
+      );
+    }
+  }
+
+  /**
+   * Checks if any of the address field is filled
+   */
+  private isAddressFilled(
+    rowNumber: number,
+    ignoredColumn: number = this._addressColumnIndexes.date
+  ): boolean {
+    // sheet core
+    const sheetCore: Handsontable.default = (this.hotTableWrapper.sheetTable as any).hotInstance;
+
+    // check fields
+    const indexesFiltered: number[] = Object.values(this._addressColumnIndexes).filter((item) => item !== ignoredColumn);
+    for (const column of Object.values(indexesFiltered)) {
+      // get "date" column value
+      const value: any = sheetCore.getDataAtCell(
+        rowNumber,
+        column
+      );
+
+      // break if any address field is filled
+      if (value) {
+        return true;
+      }
+    }
+
+    // no address field filled
+    return false;
+  }
+
+  /**
+   * Show warnings
+   */
+  private showWarnings(refreshWarning) {
     // hide previous message if the warning message was updated
     if (refreshWarning) {
       this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);

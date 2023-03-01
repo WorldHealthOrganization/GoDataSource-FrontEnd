@@ -1149,6 +1149,9 @@ export class Constants {
   // go data who link
   static readonly GO_DATA_WHO_LINK: string = 'https://godata.who.int';
 
+  // regex email
+  static readonly REGEX_EMAIL_VALIDATOR = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+
   /**
      * Today date
      */
