@@ -39,7 +39,7 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
 import { HotTableComponent } from '@handsontable/angular';
-import { IAddressColumnIndex } from '../../../../core/models/address.interface';
+import { IAddressColumnIndex } from '../../../../core/models/address-column-index.interface';
 
 @Component({
   selector: 'app-bulk-create-contacts',
@@ -96,8 +96,12 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
   sheetContextMenu = {};
   sheetColumns: any[] = [];
 
-  // address column indexes
+  // sheet column indexes
   private _addressColumnIndexes: IAddressColumnIndex;
+  private _addressColumnIndexesMap: {
+    [columnIndex: number]: true
+  } = {};
+  private _pregnancyStatusColumnIndex: number;
 
   // manual cleared "date" cells
   private _manualClearedDateCells: {
@@ -337,19 +341,19 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
           if (value) {
             // find pregnancy status column
             const sheetCore: Handsontable.default = (this.hotTableWrapper.sheetTable as any).hotInstance;
-            const pregnancyStatusColumnIndex: number = this.hotTableWrapper.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_PREGNANCY_STATUS);
 
+            // check if it's "male"
             if (value === this.i18nService.instant(Constants.GENDER_MALE)) {
               // reset pregnancy status value
               sheetCore.setDataAtCell(
                 cellProperties.row,
-                pregnancyStatusColumnIndex,
+                this._pregnancyStatusColumnIndex,
                 null
               );
             }
 
             // change pregnancy status cell state read only/editable
-            sheetCore.setCellMeta(cellProperties.row, pregnancyStatusColumnIndex, 'readOnly', value === this.i18nService.instant(Constants.GENDER_MALE));
+            sheetCore.setCellMeta(cellProperties.row, this._pregnancyStatusColumnIndex, 'readOnly', value === this.i18nService.instant(Constants.GENDER_MALE));
           }
 
           // return always true to pass the validation (since pregnancy value it was cleared or gender is not male)
@@ -426,8 +430,8 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
         .setTitle('LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS')
         .setProperty(BulkCreateContactsComponent.COLUMN_PROPERTY_EMAIL_ADDRESS)
         .setAsyncValidator((value: string, _cellProperties: CellProperties, callback: (result: boolean) => void): void => {
-          // validate email
-          if (_.isEmpty(value)) {
+          // validate if only we have value
+          if (!value) {
             callback(true);
           } else {
             // validate email using regex
@@ -471,20 +475,16 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
                 return;
               }
 
-              // find lat column
-              const latColumnIndex: number = this.hotTableWrapper.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_GEOLOCATION_LAT);
-              const lngColumnIndex: number = this.hotTableWrapper.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_GEOLOCATION_LNG);
-
               // change location lat & lng
               const sheetCore: Handsontable.default = (this.hotTableWrapper.sheetTable as any).hotInstance;
               sheetCore.setDataAtCell(
                 rowNo,
-                latColumnIndex,
+                this._addressColumnIndexes.geoLocationLat,
                 locationInfo.geoLocation.lat
               );
               sheetCore.setDataAtCell(
                 rowNo,
-                lngColumnIndex,
+                this._addressColumnIndexes.geoLocationLng,
                 locationInfo.geoLocation.lng
               );
             });
@@ -677,6 +677,12 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
       geoLocationLng: this.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_GEOLOCATION_LNG),
       geoLocationAccurate: this.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_GEOLOCATION_ACCURATE)
     };
+
+    // map address column indexes
+    this._addressColumnIndexesMap = Object.assign({}, ...Object.values(this._addressColumnIndexes).map((index: number) => ({ [index]: true })));
+
+    // get pregnancy status column index
+    this._pregnancyStatusColumnIndex = this.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_PREGNANCY_STATUS);
   }
 
   /**
@@ -699,7 +705,7 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
       const columnIndex: number = cell[1];
 
       // check changed column
-      if (Object.values(this._addressColumnIndexes).indexOf(columnIndex) > -1) {
+      if (this._addressColumnIndexesMap[columnIndex]) {
         // address fields
         this.setAddressDate(
           event.sheetTable,
@@ -808,8 +814,6 @@ export class BulkCreateContactsComponent extends ConfirmOnFormChanges implements
 
   /**
    * Checks if any of the address field is filled
-   *
-   * @param rowNumber Row Number
    */
   private isAddressFilled(
     rowNumber: number,

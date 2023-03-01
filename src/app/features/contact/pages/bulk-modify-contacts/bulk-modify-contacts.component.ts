@@ -32,7 +32,7 @@ import { CellProperties } from 'handsontable/settings';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
 import { IResolverV2ResponseModel } from '../../../../core/services/resolvers/data/models/resolver-response.model';
-import { IAddressColumnIndex } from '../../../../core/models/address.interface';
+import { IAddressColumnIndex } from '../../../../core/models/address-column-index.interface';
 
 @Component({
   selector: 'app-bulk-modify-contacts',
@@ -81,8 +81,9 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
   sheetContextMenu = {};
   sheetColumns: AbstractSheetColumn[] = [];
 
-  // address column indexes
+  // sheet column indexes
   private _addressColumnIndexes: IAddressColumnIndex;
+  private _pregnancyStatusColumnIndex: number;
 
   // error messages
   errorMessages: {
@@ -307,9 +308,12 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         return throwError(err);
       }))
       .subscribe((contactModels) => {
+        // sheet core
+        const sheetCore: Handsontable.default = (this.hotTableWrapper.sheetTable as any).hotInstance;
+
         // construct hot table data
         this.extraContactData = [];
-        this.data = (contactModels as ContactModel[] || []).map((contact: ContactModel) => {
+        this.data = (contactModels as ContactModel[] || []).map((contact: ContactModel, index: number) => {
           // determine contact data
           const contactData = [];
           this.sheetColumns.forEach((column: AbstractSheetColumn) => {
@@ -398,6 +402,11 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
             contactData.push(value !== undefined ? value : null);
           });
 
+          // make pregnancy status cell state read only if gender is male
+          if (contact.gender === Constants.GENDER_MALE) {
+            sheetCore.setCellMeta(index, this._pregnancyStatusColumnIndex, 'readOnly', true);
+          }
+
           // return spreadsheet data
           this.extraContactData.push({
             id: contact.id,
@@ -440,19 +449,19 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
           if (value) {
             // find pregnancy status column
             const sheetCore: Handsontable.default = (this.hotTableWrapper.sheetTable as any).hotInstance;
-            const pregnancyStatusColumnIndex: number = this.hotTableWrapper.sheetColumns.findIndex((column) => column.property === BulkModifyContactsComponent.COLUMN_PROPERTY_PREGNANCY_STATUS);
 
+            // check if it's "male"
             if (value === this.i18nService.instant(Constants.GENDER_MALE)) {
               // reset pregnancy status value
               sheetCore.setDataAtCell(
                 cellProperties.row,
-                pregnancyStatusColumnIndex,
+                this._pregnancyStatusColumnIndex,
                 null
               );
             }
 
             // change pregnancy status cell state read only/editable
-            sheetCore.setCellMeta(cellProperties.row, pregnancyStatusColumnIndex, 'readOnly', value === this.i18nService.instant(Constants.GENDER_MALE));
+            sheetCore.setCellMeta(cellProperties.row, this._pregnancyStatusColumnIndex, 'readOnly', value === this.i18nService.instant(Constants.GENDER_MALE));
           }
 
           // return always true to pass the validation (since pregnancy value it was cleared or gender is not male)
@@ -493,7 +502,7 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
         .setProperty(BulkModifyContactsComponent.COLUMN_PROPERTY_EMAIL_ADDRESS)
         .setAsyncValidator((value: string, _cellProperties: CellProperties, callback: (result: boolean) => void): void => {
           // validate if only we have value
-          if (_.isEmpty(value)) {
+          if (!value) {
             callback(true);
           } else {
             // validate email using regex
@@ -537,20 +546,16 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
                 return;
               }
 
-              // find lat column
-              const latColumnIndex: number = this.hotTableWrapper.sheetColumns.findIndex((column) => column.property === BulkModifyContactsComponent.COLUMN_PROPERTY_GEOLOCATION_LAT);
-              const lngColumnIndex: number = this.hotTableWrapper.sheetColumns.findIndex((column) => column.property === BulkModifyContactsComponent.COLUMN_PROPERTY_GEOLOCATION_LNG);
-
               // change location lat & lng
               const sheetCore: Handsontable.default = (this.hotTableWrapper.sheetTable as any).hotInstance;
               sheetCore.setDataAtCell(
                 rowNo,
-                latColumnIndex,
+                this._addressColumnIndexes.geoLocationLat,
                 locationInfo.geoLocation.lat
               );
               sheetCore.setDataAtCell(
                 rowNo,
-                lngColumnIndex,
+                this._addressColumnIndexes.geoLocationLng,
                 locationInfo.geoLocation.lng
               );
             });
@@ -687,12 +692,13 @@ export class BulkModifyContactsComponent extends ConfirmOnFormChanges implements
       geoLocationLng: this.sheetColumns.findIndex((column) => column.property === BulkModifyContactsComponent.COLUMN_PROPERTY_GEOLOCATION_LNG),
       geoLocationAccurate: this.sheetColumns.findIndex((column) => column.property === BulkModifyContactsComponent.COLUMN_PROPERTY_GEOLOCATION_ACCURATE)
     };
+
+    // get pregnancy status column index
+    this._pregnancyStatusColumnIndex = this.sheetColumns.findIndex((column) => column.property === BulkModifyContactsComponent.COLUMN_PROPERTY_PREGNANCY_STATUS);
   }
 
   /**
    * Checks if any of the address field is filled
-   *
-   * @param rowNumber Row Number
    */
   private isAddressFilled(
     rowNumber: number
