@@ -12,7 +12,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { ILabelValuePairModel } from '../../core/label-value-pair.model';
-import { MAT_SELECT_CONFIG } from '@angular/material/select';
+import { MAT_SELECT_CONFIG, MatSelect } from '@angular/material/select';
 import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 
 @Component({
@@ -155,6 +155,7 @@ export class AppFormSelectSingleV2Component
   }
 
   // search value
+  startSearch: string;
   private _searchValue: string;
 
   // allow disabled options to be selected ?
@@ -162,6 +163,22 @@ export class AppFormSelectSingleV2Component
 
   // vscroll handler
   @ViewChild('cdkVirtualScrollViewport') cdkVirtualScrollViewport: CdkVirtualScrollViewport;
+
+  // input
+  private _input: MatSelect;
+  private _openAfterInit: boolean = false;
+  @ViewChild(MatSelect) set input(input: MatSelect) {
+    // set
+    this._input = input;
+
+    // do we need to open after init ?
+    if (this._openAfterInit) {
+      this.open();
+    }
+  }
+  get input(): MatSelect {
+    return this._input;
+  }
 
   /**
    * Constructor
@@ -291,5 +308,26 @@ export class AppFormSelectSingleV2Component
     if (iconB.clickAction) {
       iconB.clickAction(this);
     }
+  }
+
+  /**
+   * Open select
+   */
+  open(startSearch?: string): void {
+    setTimeout(() => {
+      if (this.input) {
+        // init
+        this._openAfterInit = false;
+        this.startSearch = startSearch;
+        this.input.open();
+
+        // filter ?
+        if (this.startSearch) {
+          this.filterOptions(this.startSearch);
+        }
+      } else {
+        this._openAfterInit = true;
+      }
+    });
   }
 }

@@ -67,7 +67,7 @@
       <!-- Search filter -->
       <mat-option>
         <ngx-mat-select-search
-          ngModel
+          [ngModel]="startSearch"
           [placeholderLabel]="'LNG_COMMON_LABEL_SEARCH' | translate"
           [noEntriesFoundLabel]="null"
           [clearSearchInput]="true"

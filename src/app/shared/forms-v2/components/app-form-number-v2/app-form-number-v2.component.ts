@@ -5,12 +5,13 @@ import {
   Host, Input,
   OnDestroy,
   Optional,
-  SkipSelf, ViewEncapsulation
+  SkipSelf, ViewChild, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
+import { MatInput } from '@angular/material/input';
 
 @Component({
   selector: 'app-form-number-v2',
@@ -67,6 +68,22 @@ export class AppFormNumberV2Component
     return this._tooltip;
   }
 
+  // input
+  private _input: MatInput;
+  private _focusAfterInit: boolean = false;
+  @ViewChild(MatInput) set input(input: MatInput) {
+    // set
+    this._input = input;
+
+    // do we need to focus after init ?
+    if (this._focusAfterInit) {
+      this.focus();
+    }
+  }
+  get input(): MatInput {
+    return this._input;
+  }
+
   /**
    * Constructor
    */
@@ -112,5 +129,19 @@ export class AppFormNumberV2Component
 
     // write value
     super.writeValue(value);
+  }
+
+  /**
+   * Focus
+   */
+  focus(): void {
+    setTimeout(() => {
+      if (this.input) {
+        this._focusAfterInit = false;
+        this.input.focus();
+      } else {
+        this._focusAfterInit = true;
+      }
+    });
   }
 }

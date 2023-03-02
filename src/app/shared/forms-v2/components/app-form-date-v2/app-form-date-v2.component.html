@@ -46,14 +46,14 @@
       [min]="minDate"
       [matDatepicker]="pickerStartDate"
       (click)="pickerStartDate.open()"
-      (blur)="onTouchItem()"
-      (ngModelChange)="onTouchItem()">
+      (blur)="onTouchItem()">
     <mat-datepicker-toggle
       tabindex="-1"
       matSuffix
       [for]="pickerStartDate"></mat-datepicker-toggle>
     <mat-datepicker
-      #pickerStartDate></mat-datepicker>
+      #pickerStartDate
+      (closed)="calendarClosed.emit()"></mat-datepicker>
 
     <!-- Right - Icon buttons -->
     <button
