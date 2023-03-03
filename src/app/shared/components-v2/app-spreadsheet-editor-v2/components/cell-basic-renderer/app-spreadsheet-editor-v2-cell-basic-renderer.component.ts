@@ -16,6 +16,7 @@ import { AppFormDateV2Component } from '../../../../forms-v2/components/app-form
 })
 export class AppSpreadsheetEditorV2CellBasicRendererComponent implements ICellRendererAngularComp {
   // data
+  selectedId: string;
   params: ICellRendererParams;
   colDef: IV2SpreadsheetEditorExtendedColDef;
 
@@ -54,6 +55,7 @@ export class AppSpreadsheetEditorV2CellBasicRendererComponent implements ICellRe
     // - important to use getUserProvidedColDef to retrieve for location columns to work properly
     this.params = params;
     this.colDef = this.params.column.getUserProvidedColDef() as IV2SpreadsheetEditorExtendedColDef;
+    this.selectedId = `gd-spreadsheet-editor-v2-cell-basic-renderer-selected-${this.params.rowIndex}-${this.colDef.editor.columnsMap[this.colDef.columnDefinition.field].index}`;
 
     // update ui
     this.changeDetectorRef.detectChanges();
@@ -74,5 +76,42 @@ export class AppSpreadsheetEditorV2CellBasicRendererComponent implements ICellRe
       colKey: this.colDef.columnDefinition.field,
       key
     });
+  }
+
+  /**
+   * Mouse enter
+   */
+  mouseEnter(event: MouseEvent): void {
+    this.colDef.editor.selection.mouseEnter(
+      this.params.rowIndex,
+      this.colDef.editor.columnsMap[this.colDef.columnDefinition.field].index,
+      event.buttons === 1
+    );
+  }
+
+  /**
+   * Mouse down
+   */
+  mouseDown(event: MouseEvent): void {
+    this.colDef.editor.selection.mouseDown(
+      this.params.rowIndex,
+      this.colDef.editor.columnsMap[this.colDef.columnDefinition.field].index,
+      event.ctrlKey,
+      event.shiftKey
+    );
+  }
+
+  /**
+   * Mouse up
+   */
+  mouseUp(): void {
+    this.colDef.editor.selection.mouseUp();
+  }
+
+  /**
+   * Mouse leave
+   */
+  mouseLeave(): void {
+    this.colDef.editor.selection.mouseLeave();
   }
 }

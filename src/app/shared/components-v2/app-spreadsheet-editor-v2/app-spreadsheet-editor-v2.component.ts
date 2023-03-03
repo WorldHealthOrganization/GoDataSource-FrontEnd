@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit } from '@angular/core';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
 import { IV2ActionIconLabel, V2ActionType } from '../app-list-table-v2/models/action.model';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
@@ -7,9 +7,10 @@ import { ColumnApi } from '@ag-grid-community/core/dist/cjs/es5/columns/columnAp
 import { GridReadyEvent } from '@ag-grid-community/core';
 import { V2SpreadsheetEditorColumn, V2SpreadsheetEditorColumnType, V2SpreadsheetEditorColumnTypeToEditor } from './models/column.model';
 import { I18nService } from '../../../core/services/helper/i18n.service';
-import { IV2SpreadsheetEditorExtendedColDef } from './models/extended-column.model';
+import { IV2SpreadsheetEditorExtendedColDef, IV2SpreadsheetEditorExtendedColDefEditor, IV2SpreadsheetEditorExtendedColDefEditorSelectionRange } from './models/extended-column.model';
 import { AppSpreadsheetEditorV2CellBasicRendererComponent } from './components/cell-basic-renderer/app-spreadsheet-editor-v2-cell-basic-renderer.component';
 import { MenuItemDef } from '@ag-grid-community/core/dist/cjs/es5/entities/gridOptions';
+import * as moment from 'moment';
 
 /**
  * Component
@@ -21,6 +22,9 @@ import { MenuItemDef } from '@ag-grid-community/core/dist/cjs/es5/entities/gridO
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
+  // max number of ms until outside leave is consider mouse out
+  private static readonly HOVER_OUSIDE_LIMIT_UNTIL_MOUSE_OUT: number = 200;
+
   // breadcrumbs
   @Input() breadcrumbs: IV2Breadcrumb[];
 
@@ -28,12 +32,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   @Input() pageTitle: string;
 
   // columns
-  private _columnsMap: {
-    [field: string]: {
-      index: number,
-      colDef: IV2SpreadsheetEditorExtendedColDef
-    }
-  } = {};
   private _locationColumns: string[];
   private _columns: V2SpreadsheetEditorColumn[];
   @Input() set columns(columns: V2SpreadsheetEditorColumn[]) {
@@ -43,16 +41,61 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // update columns definitions
     this.updateColumnDefinitions();
   }
+  get columns(): V2SpreadsheetEditorColumn[] {
+    return this._columns;
+  }
 
   // editor
-  editor: {
-    // location name caching
-    locationNamesMap: {
-      [locationId: string]: string
+  editor: IV2SpreadsheetEditorExtendedColDefEditor = {
+    // columns map
+    columnsMap: {},
+
+    // location
+    locationNamesMap: {},
+
+    // selection range handlers
+    selection: {
+      // data
+      selected: {
+        collecting: undefined,
+        previousCollecting: undefined,
+        outTime: undefined,
+        ranges: []
+      },
+
+      // events
+      mouseDown: (
+        row,
+        column,
+        ctrlKey,
+        shiftKey
+      ) => {
+        this.cellMouseDown(
+          row,
+          column,
+          ctrlKey,
+          shiftKey
+        );
+      },
+      mouseUp: () => {
+        this.cellMouseUp();
+      },
+      mouseLeave: () => {
+        this.cellMouseLeave();
+      },
+      mouseEnter: (
+        row,
+        column,
+        primaryButtonStillDown
+      ) => {
+        this.cellMouseEnter(
+          row,
+          column,
+          primaryButtonStillDown
+        );
+      }
     }
-  } = {
-      locationNamesMap: {}
-    };
+  };
 
   // action button
   actionButton: IV2ActionIconLabel = {
@@ -85,7 +128,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    */
   constructor(
     protected changeDetectorRef: ChangeDetectorRef,
-    protected i18nService: I18nService
+    protected i18nService: I18nService,
+    protected elementRef: ElementRef
   ) {}
 
   /**
@@ -139,9 +183,15 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    */
   updateColumnDefinitions(): void {
     // reset
-    this._columnsMap = {};
     this._locationColumns = [];
+    this.editor.columnsMap = {};
     this.editor.locationNamesMap = {};
+    this.editor.selection.selected = {
+      collecting: undefined,
+      previousCollecting: undefined,
+      outTime: undefined,
+      ranges: []
+    };
 
     // ag table not initialized ?
     if (!this._agTable) {
@@ -174,6 +224,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       suppressPaste: true,
       suppressNavigable: true,
       editable: false,
+      pinned: 'left',
       width: 50,
       cellClass: 'gd-spreadsheet-editor-row-no',
       editor: this.editor
@@ -238,14 +289,18 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         //   // custom format
         //   return params.value;
         // },
-        cellRenderer: AppSpreadsheetEditorV2CellBasicRendererComponent
+        cellRenderer: AppSpreadsheetEditorV2CellBasicRendererComponent,
+        cellStyle: {
+          padding: '0',
+          border: 'none'
+        }
       };
 
       // map
-      this._columnsMap[columnKey] = {
+      this.editor.columnsMap[columnKey] = {
         // +1 to jump over row number column
         index: index + 1,
-        colDef
+        columnDefinition: column
       };
 
       // attach column to list of visible columns
@@ -294,5 +349,419 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   getContextMenuItems(_params): (string | MenuItemDef)[] {
     // #TODO
     return [];
+  }
+
+  /**
+   * Merge 2 ranges if necessary
+   */
+  private cellMergeTwoRangesIfNecessary(
+    range1: IV2SpreadsheetEditorExtendedColDefEditorSelectionRange,
+    range2: IV2SpreadsheetEditorExtendedColDefEditorSelectionRange
+  ): IV2SpreadsheetEditorExtendedColDefEditorSelectionRange {
+    // check if we should merge this range with collecting one
+    if (
+      range1.columns.start === range2.columns.start &&
+      range1.columns.end === range2.columns.end && (
+        (
+          range1.rows.start >= range2.rows.start - 1 &&
+          range1.rows.start <= range2.rows.end + 1
+        ) || (
+          range1.rows.end >= range2.rows.start - 1 &&
+          range1.rows.end <= range2.rows.end + 1
+        ) || (
+          range2.rows.start >= range1.rows.start - 1 &&
+          range2.rows.start <= range1.rows.end + 1
+        ) || (
+          range2.rows.end >= range1.rows.start - 1 &&
+          range2.rows.end <= range1.rows.end + 1
+        )
+      )
+    ) {
+      // merge
+      range1.rows.start = range1.rows.start < range2.rows.start ?
+        range1.rows.start :
+        range2.rows.start;
+      range1.rows.end = range1.rows.end > range2.rows.end ?
+        range1.rows.end :
+        range2.rows.end;
+
+      // finished
+      return range1;
+    } else if (
+      range1.rows.start === range2.rows.start &&
+      range1.rows.end === range2.rows.end && (
+        (
+          range1.columns.start >= range2.columns.start - 1 &&
+          range1.columns.start <= range2.columns.end + 1
+        ) || (
+          range1.columns.end >= range2.columns.start - 1 &&
+          range1.columns.end <= range2.columns.end + 1
+        ) || (
+          range2.columns.start >= range1.columns.start - 1 &&
+          range2.columns.start <= range1.columns.end + 1
+        ) || (
+          range2.columns.end >= range1.columns.start - 1 &&
+          range2.columns.end <= range1.columns.end + 1
+        )
+      )
+    ) {
+      // merge
+      range1.columns.start = range1.columns.start < range2.columns.start ?
+        range1.columns.start :
+        range2.columns.start;
+      range1.columns.end = range1.columns.end > range2.columns.end ?
+        range1.columns.end :
+        range2.columns.end;
+
+      // finished
+      return range1;
+    } else if (
+      (
+        range1.rows.start <= range2.rows.start &&
+        range1.rows.end >= range2.rows.end &&
+        range1.columns.start <= range2.columns.start &&
+        range1.columns.end >= range2.columns.end
+      ) || (
+        range2.rows.start <= range1.rows.start &&
+        range2.rows.end >= range1.rows.end &&
+        range2.columns.start <= range1.columns.start &&
+        range2.columns.end >= range1.columns.end
+      )
+    ) {
+      // merge
+      range1.rows.start = range1.rows.start < range2.rows.start ?
+        range1.rows.start :
+        range2.rows.start;
+      range1.rows.end = range1.rows.end > range2.rows.end ?
+        range1.rows.end :
+        range2.rows.end;
+      range1.columns.start = range1.columns.start < range2.columns.start ?
+        range1.columns.start :
+        range2.columns.start;
+      range1.columns.end = range1.columns.end > range2.columns.end ?
+        range1.columns.end :
+        range2.columns.end;
+
+      // finished
+      return range1;
+    }
+
+    // not merged
+    return undefined;
+  }
+
+  /**
+   * Merge ranges
+   */
+  private cellMergeRanges(): void {
+    // nothing to do ?
+    if (!this.editor.selection.selected.collecting) {
+      return;
+    }
+
+    // update previous
+    const collecting = this.editor.selection.selected.collecting;
+    this.editor.selection.selected.previousCollecting = collecting;
+
+    // no merge necessary ?
+    if (this.editor.selection.selected.ranges.length < 1) {
+      // add to list
+      this.editor.selection.selected.ranges.push(collecting.range);
+
+      // finished
+      return;
+    }
+
+    // go through ranges and merge with first one that matches
+    let merged: boolean = false;
+    for (let rangeIndex = 0; rangeIndex < this.editor.selection.selected.ranges.length; rangeIndex++) {
+      // retrieve range
+      const range: IV2SpreadsheetEditorExtendedColDefEditorSelectionRange = this.editor.selection.selected.ranges[rangeIndex];
+      const mergedResultRange = this.cellMergeTwoRangesIfNecessary(
+        range,
+        collecting.range
+      );
+      if (mergedResultRange) {
+        // if we merged the collecting range then we need to update previous
+        this.editor.selection.selected.previousCollecting.range = mergedResultRange;
+        this.editor.selection.selected.previousCollecting.startingPoint = {
+          row: mergedResultRange.rows.start,
+          column: mergedResultRange.columns.start
+        };
+
+        // merged - finished
+        merged = true;
+        break;
+      }
+    }
+
+    // not merged ?
+    if (!merged) {
+      // add to list
+      this.editor.selection.selected.ranges.push(collecting.range);
+    } else {
+      // if a merge was done then we might need to readjust other ranges too
+      while (merged) {
+        // reset
+        merged = false;
+
+        // try merging again
+        for (let range1Index = 0; range1Index < this.editor.selection.selected.ranges.length; range1Index++) {
+          // try merging with others
+          for (let range2Index = range1Index + 1; range2Index < this.editor.selection.selected.ranges.length; range2Index++) {
+            // try merging ranges
+            const mergedResultRange = this.cellMergeTwoRangesIfNecessary(
+              this.editor.selection.selected.ranges[range1Index],
+              this.editor.selection.selected.ranges[range2Index]
+            );
+
+            // merged ?
+            if (mergedResultRange) {
+              // remove the second one since we merged it into first one
+              this.editor.selection.selected.ranges.splice(range2Index, 1);
+
+              // try again from the start
+              merged = true;
+              break;
+            }
+          }
+
+          // must start again ?
+          if (merged) {
+            break;
+          }
+        }
+      }
+
+      // remove intersections
+      // - split into multiple ranges
+      // - Microsoft Excel doesn't do it, so we will keep overlapping selections too
+
+      // if we merged the collecting range then we need to update previous
+      // - can't continue from previous one
+      this.editor.selection.selected.previousCollecting = undefined;
+    }
+  }
+
+  /**
+   * Finished range collecting
+   */
+  private cellFinishCollecting(): void {
+    // nothing to do ?
+    if (!this.editor.selection.selected.collecting) {
+      return;
+    }
+
+    // merge ranges with collecting one if necessary
+    this.cellMergeRanges();
+
+    // cleanup
+    this.editor.selection.selected.collecting = undefined;
+    this.editor.selection.selected.outTime = undefined;
+
+    // update css
+    this.cellUpdateRangeClasses();
+  }
+
+  /**
+   * Add proper css classes
+   */
+  private cellProcessRange(range: IV2SpreadsheetEditorExtendedColDefEditorSelectionRange): void {
+    for (let rowIndex: number = range.rows.start; rowIndex <= range.rows.end; rowIndex++) {
+      for (let columnIndex: number = range.columns.start; columnIndex <= range.columns.end; columnIndex++) {
+        // retrieve cell html
+        const cellHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-basic-renderer-selected-${rowIndex}-${columnIndex}`);
+
+        // attach selected class
+        cellHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-renderer-selected-visible');
+
+        // left border
+        if (columnIndex === range.columns.start) {
+          cellHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-renderer-selected-border-left');
+        }
+
+        // right border
+        if (columnIndex === range.columns.end) {
+          cellHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-renderer-selected-border-right');
+        }
+
+        // top border
+        if (rowIndex === range.rows.start) {
+          cellHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-renderer-selected-border-top');
+        }
+
+        // bottom border
+        if (rowIndex === range.rows.end) {
+          cellHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-renderer-selected-border-bottom');
+        }
+      }
+    }
+  }
+
+  /**
+   * Update css
+   */
+  private cellUpdateRangeClasses(): void {
+    // remove selected
+    const elements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-basic-renderer-selected');
+    for (let elementIndex = 0; elementIndex < elements.length; elementIndex++) {
+      elements[elementIndex].classList.remove(
+        'gd-spreadsheet-editor-v2-cell-basic-renderer-selected-visible',
+        'gd-spreadsheet-editor-v2-cell-basic-renderer-selected-border-left',
+        'gd-spreadsheet-editor-v2-cell-basic-renderer-selected-border-right',
+        'gd-spreadsheet-editor-v2-cell-basic-renderer-selected-border-top',
+        'gd-spreadsheet-editor-v2-cell-basic-renderer-selected-border-bottom'
+      );
+    }
+
+    // render already selected ranges
+    this.editor.selection.selected.ranges.forEach((range) => {
+      this.cellProcessRange(range);
+    });
+
+    // update cell classes for currently collecting
+    if (this.editor.selection.selected.collecting) {
+      this.cellProcessRange(this.editor.selection.selected.collecting.range);
+    }
+  }
+
+  /**
+   * Column mouse down
+   */
+  private cellMouseDown(
+    row: number,
+    column: number,
+    ctrlKey: boolean,
+    shiftKey: boolean
+  ): void {
+    // cleanup - if no need to continue
+    if (
+      !ctrlKey &&
+      !shiftKey
+    ) {
+      this.editor.selection.selected.ranges = [];
+      this.editor.selection.selected.previousCollecting = undefined;
+    }
+
+    // start collecting
+    if (
+      shiftKey &&
+      this.editor.selection.selected.previousCollecting
+    ) {
+      // continue previous
+      this.editor.selection.selected.collecting = this.editor.selection.selected.previousCollecting;
+    } else {
+      // clean start
+      this.editor.selection.selected.collecting = {
+        startingPoint: {
+          row,
+          column
+        },
+        range: {
+          rows: {
+            start: row,
+            end: row
+          },
+          columns: {
+            start: column,
+            end: column
+          }
+        }
+      };
+    }
+
+    // update css
+    this.cellUpdateRangeClasses();
+  }
+
+  /**
+   * Column mouse up
+   */
+  private cellMouseUp(): void {
+    // finished
+    this.cellFinishCollecting();
+  }
+
+  /**
+   * Column mouse leave
+   */
+  private cellMouseLeave(): void {
+    // are we collecting cells ?
+    if (!this.editor.selection.selected.collecting) {
+      return;
+    }
+
+    // listen for leaving cells zone
+    this.editor.selection.selected.outTime = moment();
+  }
+
+  /**
+   * Column mouse enter
+   */
+  private cellMouseEnter(
+    row: number,
+    column: number,
+    primaryButtonStillDown: boolean
+  ): void {
+    // are we collecting cells ?
+    if (!this.editor.selection.selected.collecting) {
+      return;
+    }
+
+    // too late ?
+    if (
+      !primaryButtonStillDown || (
+        this.editor.selection.selected.outTime &&
+        moment().diff(this.editor.selection.selected.outTime) > AppSpreadsheetEditorV2Component.HOVER_OUSIDE_LIMIT_UNTIL_MOUSE_OUT
+      )
+    ) {
+      // wrap up
+      this.cellMouseUp();
+
+      // finished
+      return;
+    }
+
+    // reset
+    this.editor.selection.selected.outTime = undefined;
+
+    // add to range - row start
+    if (row < this.editor.selection.selected.collecting.startingPoint.row) {
+      this.editor.selection.selected.collecting.range.rows.start = row;
+    } else {
+      this.editor.selection.selected.collecting.range.rows.start = this.editor.selection.selected.collecting.startingPoint.row;
+    }
+
+    // add to range - row end
+    if (row > this.editor.selection.selected.collecting.startingPoint.row) {
+      this.editor.selection.selected.collecting.range.rows.end = row;
+    } else {
+      this.editor.selection.selected.collecting.range.rows.end = this.editor.selection.selected.collecting.startingPoint.row;
+    }
+
+    // add to range - column start
+    if (column < this.editor.selection.selected.collecting.startingPoint.column) {
+      this.editor.selection.selected.collecting.range.columns.start = column;
+    } else {
+      this.editor.selection.selected.collecting.range.columns.start = this.editor.selection.selected.collecting.startingPoint.column;
+    }
+
+    // add to range - column end
+    if (column > this.editor.selection.selected.collecting.startingPoint.column) {
+      this.editor.selection.selected.collecting.range.columns.end = column;
+    } else {
+      this.editor.selection.selected.collecting.range.columns.end = this.editor.selection.selected.collecting.startingPoint.column;
+    }
+
+    // update css
+    this.cellUpdateRangeClasses();
+  }
+
+  /**
+   * Mouse leave
+   */
+  gridMouseLeave(): void {
+    // end collecting
+    this.cellFinishCollecting();
   }
 }

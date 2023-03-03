@@ -1,6 +1,7 @@
 <div
   class="gd-spreadsheet-editor-v2-cell-basic-renderer"
-  [ngSwitch]="colDef.columnDefinition?.type">
+  [ngSwitch]="colDef.columnDefinition?.type"
+  (mouseenter)="mouseEnter($event)" (mousedown)="mouseDown($event)" (mouseup)="mouseUp()" (mouseleave)="mouseLeave()">
 
   <!-- Value -->
   <div
@@ -71,10 +72,15 @@
 
     <!-- Default: text, textarea ... -->
     <div
-      *ngSwitchDefault>
+      *ngSwitchDefault
+      class="gd-spreadsheet-editor-v2-cell-basic-renderer-value-default">
       {{ params.value }}
     </div>
 
   </div>
 
+  <!-- Selected -->
+  <div
+    [id]="selectedId"
+    class="gd-spreadsheet-editor-v2-cell-basic-renderer-selected"></div>
 </div>

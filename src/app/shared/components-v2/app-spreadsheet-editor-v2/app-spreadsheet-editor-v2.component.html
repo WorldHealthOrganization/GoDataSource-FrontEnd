@@ -36,7 +36,8 @@
     [modules]="modules"
     singleClickEdit="false"
     rowSelection="multiple"
-    (gridReady)="gridReady($event)">
+    (gridReady)="gridReady($event)"
+    (mouseleave)="gridMouseLeave()">
   </ag-grid-angular>
 
 </app-basic-page-v2>
