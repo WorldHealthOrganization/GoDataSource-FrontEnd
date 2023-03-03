@@ -38,7 +38,8 @@
     rowSelection="multiple"
     [cdkContextMenuTriggerFor]="editorContextMenu"
     (gridReady)="gridReady($event)"
-    (mouseleave)="gridMouseLeave()">
+    (mouseleave)="gridMouseLeave()"
+    (cellKeyDown)="cellKeyDown($event)">
   </ag-grid-angular>
 
   <!-- Context menu for spreadsheet-editor -->
@@ -52,14 +53,14 @@
         cdkMenuItem
         [disabled]="editor.selection.selected.ranges.length < 1"
         (click)="cellCut()">
-        Cut
+        Cut ...ctrl+x
       </button>
       <button
         class="gd-spreadsheet-editor-context-menu-item"
         cdkMenuItem
         [disabled]="editor.selection.selected.ranges.length < 1"
         (click)="cellCopy()">
-        Copy
+        Copy...ctrl+c
       </button>
       <button
         class="gd-spreadsheet-editor-context-menu-item"

@@ -4,7 +4,7 @@ import { IV2ActionIconLabel, V2ActionType } from '../app-list-table-v2/models/ac
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { GridApi } from '@ag-grid-community/core/dist/cjs/es5/gridApi';
 import { ColumnApi } from '@ag-grid-community/core/dist/cjs/es5/columns/columnApi';
-import { GridReadyEvent } from '@ag-grid-community/core';
+import { CellKeyDownEvent, GridReadyEvent } from '@ag-grid-community/core';
 import { V2SpreadsheetEditorColumn, V2SpreadsheetEditorColumnType, V2SpreadsheetEditorColumnTypeToEditor } from './models/column.model';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { IV2SpreadsheetEditorExtendedColDef, IV2SpreadsheetEditorExtendedColDefEditor, IV2SpreadsheetEditorExtendedColDefEditorSelectionRange } from './models/extended-column.model';
@@ -808,5 +808,28 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    */
   cellCopy(): void {
     // #TODO
+    this.cellCut();
+  }
+
+  /**
+   * Cell key down
+   */
+  cellKeyDown(cellKeyDownEvent: CellKeyDownEvent): void {
+    // nothing to do ?
+    if (
+      this.editor.selection.selected.ranges.length < 1 ||
+      cellKeyDownEvent.api.getEditingCells().length > 0
+    ) {
+      return;
+    }
+
+    // #TODO
+    const keyboardEvent: KeyboardEvent = cellKeyDownEvent.event as KeyboardEvent;
+    if (
+      keyboardEvent.ctrlKey &&
+      keyboardEvent.code === 'KeyC'
+    ) {
+      this.cellCopy();
+    }
   }
 }
