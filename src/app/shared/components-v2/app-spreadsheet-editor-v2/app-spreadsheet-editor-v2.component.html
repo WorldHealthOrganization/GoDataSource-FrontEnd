@@ -1,0 +1,42 @@
+<app-basic-page-v2
+  [breadcrumbs]="breadcrumbs"
+  [pageTitle]="pageTitle"
+  [actionButton]="actionButton">
+
+<!--  [rowSelection]="groupActionsSingleRecord ? 'single' : 'multiple'"-->
+<!--  suppressRowClickSelection="true"-->
+<!--  suppressPropertyNamesCheck="true"-->
+<!--  enableCellTextSelection="true"-->
+<!--  suppressDragLeaveHidesColumns="true"-->
+<!--  suppressCellFocus="true"-->
+<!--  columnHoverHighlight="true"-->
+<!--  [loadingOverlayComponent]="AppListTableV2LoadingComponent"-->
+<!--  [noRowsOverlayComponent]="AppListTableV2NoDataComponent"-->
+<!--  [getRowHeight]="getRowHeight"-->
+<!--  [isFullWidthRow]="isFullWidthRow"-->
+<!--  [fullWidthCellRenderer]="AppListTableV2DetailRowComponent"-->
+<!--  [isExternalFilterPresent]="isExternalFilterPresent"-->
+<!--  [doesExternalFilterPass]="doesExternalFilterPass"-->
+<!--  (firstDataRendered)="firstDataRendered()"-->
+<!--  (dragStopped)="saveVisibleAndOrderOfColumns($event)"-->
+<!--  (selectionChanged)="selectionChanged()"-->
+
+<!--  enableRangeSelection="true"-->
+<!--  enableFillHandle="true"-->
+<!--  enableCellTextSelection="true"-->
+<!--  clipboardDelimiter=""-->
+
+<!--  [getContextMenuItems]="getContextMenuItems"-->
+<!--  columnHoverHighlight="true"-->
+
+
+  <!-- Spreadsheet Editor -->
+  <ag-grid-angular
+    class="ag-theme-balham gd-spreadsheet-editor"
+    [modules]="modules"
+    singleClickEdit="false"
+    rowSelection="multiple"
+    (gridReady)="gridReady($event)">
+  </ag-grid-angular>
+
+</app-basic-page-v2>

@@ -16,6 +16,12 @@ import { AppListTableV2ObfuscateComponent } from './app-list-table-v2/components
 import { AppListTableV2DetailRowComponent } from './app-list-table-v2/components/detail/app-list-table-v2-detail-row.component';
 import { AppListTableV2DetailColumnComponent } from './app-list-table-v2/components/detail/app-list-table-v2-detail-column.component';
 import { AppChangesV2Component } from './app-changes-v2/app-changes-v2.component';
+import { AppSpreadsheetEditorV2Component } from './app-spreadsheet-editor-v2/app-spreadsheet-editor-v2.component';
+import { AppSpreadsheetEditorV2CellBasicRendererComponent } from './app-spreadsheet-editor-v2/components/cell-basic-renderer/app-spreadsheet-editor-v2-cell-basic-renderer.component';
+import { AppSpreadsheetEditorV2EditorSingleSelectComponent } from './app-spreadsheet-editor-v2/components/editor-single-select/app-spreadsheet-editor-v2-editor-single-select.component';
+import { AppSpreadsheetEditorV2EditorDateComponent } from './app-spreadsheet-editor-v2/components/editor-date/app-spreadsheet-editor-v2-editor-date.component';
+import { AppSpreadsheetEditorV2EditorLocationComponent } from './app-spreadsheet-editor-v2/components/editor-location/app-spreadsheet-editor-v2-editor-location.component';
+import { AppSpreadsheetEditorV2EditorNumberComponent } from './app-spreadsheet-editor-v2/components/editor-number/app-spreadsheet-editor-v2-editor-number.component';
 
 export const components: any[] = [
   AppBasicPageV2Component,
@@ -35,5 +41,11 @@ export const components: any[] = [
   AppListTableV2SelectionHeaderComponent,
   AppLoadingDialogV2Component,
   AppSelectLanguageV2Component,
-  AppSideDialogV2Component
+  AppSideDialogV2Component,
+  AppSpreadsheetEditorV2CellBasicRendererComponent,
+  AppSpreadsheetEditorV2Component,
+  AppSpreadsheetEditorV2EditorDateComponent,
+  AppSpreadsheetEditorV2EditorLocationComponent,
+  AppSpreadsheetEditorV2EditorNumberComponent,
+  AppSpreadsheetEditorV2EditorSingleSelectComponent
 ];
