@@ -15,7 +15,7 @@
       <div
         class="gd-spreadsheet-editor-v2-cell-basic-renderer-value-select-text"
         fxFlex>
-        {{ params.value && colDef.columnDefinition.optionsMap[params.value] ? (colDef.columnDefinition.optionsMap[params.value].label | translate) : params.value }}
+        {{ params.value && colDef.columnDefinition.optionsMap![params.value] ? (colDef.columnDefinition.optionsMap![params.value].label | translate) : params.value }}
       </div>
 
       <!-- Editor open -->
