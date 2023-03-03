@@ -17,6 +17,7 @@ import { AppFormDateV2Component } from '../../../../forms-v2/components/app-form
 export class AppSpreadsheetEditorV2CellBasicRendererComponent implements ICellRendererAngularComp {
   // data
   selectedId: string;
+  fillId: string;
   params: ICellRendererParams;
   colDef: IV2SpreadsheetEditorExtendedColDef;
 
@@ -56,6 +57,7 @@ export class AppSpreadsheetEditorV2CellBasicRendererComponent implements ICellRe
     this.params = params;
     this.colDef = this.params.column.getUserProvidedColDef() as IV2SpreadsheetEditorExtendedColDef;
     this.selectedId = `gd-spreadsheet-editor-v2-cell-basic-renderer-selected-${this.params.rowIndex}-${this.colDef.editor.columnsMap[this.colDef.columnDefinition.field].index}`;
+    this.fillId = `gd-spreadsheet-editor-v2-cell-basic-renderer-fill-${this.params.rowIndex}-${this.colDef.editor.columnsMap[this.colDef.columnDefinition.field].index}`;
 
     // update ui
     this.changeDetectorRef.detectChanges();
@@ -119,5 +121,13 @@ export class AppSpreadsheetEditorV2CellBasicRendererComponent implements ICellRe
    */
   mouseLeave(): void {
     this.colDef.editor.selection.mouseLeave();
+  }
+
+  /**
+   * Fill mouse down
+   */
+  fillMouseDown(event: MouseEvent): void {
+    // stop propagation
+    event.stopPropagation();
   }
 }

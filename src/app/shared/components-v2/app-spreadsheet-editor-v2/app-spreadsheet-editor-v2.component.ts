@@ -553,7 +553,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     this.editor.selection.selected.outTime = undefined;
 
     // update css
-    this.cellUpdateRangeClasses();
+    this.cellUpdateRangeClasses(true);
   }
 
   /**
@@ -565,7 +565,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // retrieve cell html
         const cellHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-basic-renderer-selected-${rowIndex}-${columnIndex}`);
 
-        // attach selected class
+        // make it visible
         cellHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-renderer-selected-visible');
 
         // left border
@@ -594,11 +594,11 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   /**
    * Update css
    */
-  private cellUpdateRangeClasses(): void {
+  private cellUpdateRangeClasses(showFillIfPossible: boolean): void {
     // remove selected
-    const elements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-basic-renderer-selected');
-    for (let elementIndex = 0; elementIndex < elements.length; elementIndex++) {
-      elements[elementIndex].classList.remove(
+    const selectedHtmlElements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-basic-renderer-selected');
+    for (let elementIndex = 0; elementIndex < selectedHtmlElements.length; elementIndex++) {
+      selectedHtmlElements[elementIndex].classList.remove(
         'gd-spreadsheet-editor-v2-cell-basic-renderer-selected-visible',
         'gd-spreadsheet-editor-v2-cell-basic-renderer-selected-border-left',
         'gd-spreadsheet-editor-v2-cell-basic-renderer-selected-border-right',
@@ -615,6 +615,24 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // update cell classes for currently collecting
     if (this.editor.selection.selected.collecting) {
       this.cellProcessRange(this.editor.selection.selected.collecting.range);
+    }
+
+    // hide previous fills
+    const fillHtmlElements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-basic-renderer-fill');
+    for (let elementIndex = 0; elementIndex < fillHtmlElements.length; elementIndex++) {
+      fillHtmlElements[elementIndex].classList.remove('gd-spreadsheet-editor-v2-cell-basic-renderer-fill-visible');
+    }
+
+    // display fill ?
+    // - only after we finish selecting
+    // - only if just one selection (similar to Microsoft Excel)
+    if (
+      showFillIfPossible &&
+      this.editor.selection.selected.ranges.length === 1
+    ) {
+      // show fill
+      const cellHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-basic-renderer-fill-${this.editor.selection.selected.ranges[0].rows.end}-${this.editor.selection.selected.ranges[0].columns.end}`);
+      cellHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-renderer-fill-visible');
     }
   }
 
@@ -664,7 +682,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     }
 
     // update css
-    this.cellUpdateRangeClasses();
+    this.cellUpdateRangeClasses(false);
   }
 
   /**
@@ -709,7 +727,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       )
     ) {
       // wrap up
-      this.cellMouseUp();
+      this.cellFinishCollecting();
 
       // finished
       return;
@@ -747,7 +765,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     }
 
     // update css
-    this.cellUpdateRangeClasses();
+    this.cellUpdateRangeClasses(false);
   }
 
   /**
