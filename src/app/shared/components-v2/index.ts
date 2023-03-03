@@ -22,6 +22,7 @@ import { AppSpreadsheetEditorV2EditorSingleSelectComponent } from './app-spreads
 import { AppSpreadsheetEditorV2EditorDateComponent } from './app-spreadsheet-editor-v2/components/editor-date/app-spreadsheet-editor-v2-editor-date.component';
 import { AppSpreadsheetEditorV2EditorLocationComponent } from './app-spreadsheet-editor-v2/components/editor-location/app-spreadsheet-editor-v2-editor-location.component';
 import { AppSpreadsheetEditorV2EditorNumberComponent } from './app-spreadsheet-editor-v2/components/editor-number/app-spreadsheet-editor-v2-editor-number.component';
+import { AppSpreadsheetEditorV2CellBasicHeaderComponent } from './app-spreadsheet-editor-v2/components/header-basic/app-spreadsheet-editor-v2-cell-basic-header.component';
 
 export const components: any[] = [
   AppBasicPageV2Component,
@@ -42,6 +43,7 @@ export const components: any[] = [
   AppLoadingDialogV2Component,
   AppSelectLanguageV2Component,
   AppSideDialogV2Component,
+  AppSpreadsheetEditorV2CellBasicHeaderComponent,
   AppSpreadsheetEditorV2CellBasicRendererComponent,
   AppSpreadsheetEditorV2Component,
   AppSpreadsheetEditorV2EditorDateComponent,

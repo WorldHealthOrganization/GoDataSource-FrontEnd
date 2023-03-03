@@ -52,6 +52,7 @@ export interface IV2SpreadsheetEditorExtendedColDefEditor {
       collecting: IV2SpreadsheetEditorExtendedColDefEditorSelectionRangeCollecting,
       previousCollecting: IV2SpreadsheetEditorExtendedColDefEditorSelectionRangeCollecting,
       outTime: Moment,
+      previousEntireColumn: number,
 
       // selected ranges
       ranges: IV2SpreadsheetEditorExtendedColDefEditorSelectionRange[]
@@ -70,6 +71,11 @@ export interface IV2SpreadsheetEditorExtendedColDefEditor {
       row: number,
       column: number,
       primaryButtonStillDown: boolean
+    ) => void,
+    headerMouseUp: (
+      columnIndex: number,
+      ctrlKey: boolean,
+      shiftKey: boolean
     ) => void
   };
 }

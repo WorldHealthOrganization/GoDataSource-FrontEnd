@@ -4,13 +4,14 @@ import { IV2ActionIconLabel, V2ActionType } from '../app-list-table-v2/models/ac
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { GridApi } from '@ag-grid-community/core/dist/cjs/es5/gridApi';
 import { ColumnApi } from '@ag-grid-community/core/dist/cjs/es5/columns/columnApi';
-import { CellKeyDownEvent, GridReadyEvent } from '@ag-grid-community/core';
+import { GridReadyEvent } from '@ag-grid-community/core';
 import { V2SpreadsheetEditorColumn, V2SpreadsheetEditorColumnType, V2SpreadsheetEditorColumnTypeToEditor } from './models/column.model';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { IV2SpreadsheetEditorExtendedColDef, IV2SpreadsheetEditorExtendedColDefEditor, IV2SpreadsheetEditorExtendedColDefEditorSelectionRange } from './models/extended-column.model';
 import { AppSpreadsheetEditorV2CellBasicRendererComponent } from './components/cell-basic-renderer/app-spreadsheet-editor-v2-cell-basic-renderer.component';
 import * as moment from 'moment';
 import { Clipboard } from '@angular/cdk/clipboard';
+import { AppSpreadsheetEditorV2CellBasicHeaderComponent } from './components/header-basic/app-spreadsheet-editor-v2-cell-basic-header.component';
 
 /**
  * Component
@@ -23,7 +24,7 @@ import { Clipboard } from '@angular/cdk/clipboard';
 })
 export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   // max number of ms until outside leave is consider mouse out
-  private static readonly HOVER_OUSIDE_LIMIT_UNTIL_MOUSE_OUT: number = 200;
+  private static readonly HOVER_OUTSIDE_LIMIT_UNTIL_MOUSE_OUT: number = 200;
 
   // breadcrumbs
   @Input() breadcrumbs: IV2Breadcrumb[];
@@ -60,6 +61,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         collecting: undefined,
         previousCollecting: undefined,
         outTime: undefined,
+        previousEntireColumn: undefined,
         ranges: []
       },
 
@@ -92,6 +94,17 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           row,
           column,
           primaryButtonStillDown
+        );
+      },
+      headerMouseUp: (
+        columnIndex,
+        ctrlKey: boolean,
+        shiftKey: boolean
+      ) => {
+        this.columnHeaderMouseUp(
+          columnIndex,
+          ctrlKey,
+          shiftKey
         );
       }
     }
@@ -191,6 +204,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       collecting: undefined,
       previousCollecting: undefined,
       outTime: undefined,
+      previousEntireColumn: undefined,
       ranges: []
     };
 
@@ -218,7 +232,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // determine columns
     const columnDefs: IV2SpreadsheetEditorExtendedColDef[] = [{
       headerName: '',
-      field: 'rowNo',
+      field: AppSpreadsheetEditorV2CellBasicHeaderComponent.DEFAULT_COLUMN_ROW_NO,
       resizable: false,
       suppressMovable: true,
       suppressFillHandle: true,
@@ -228,7 +242,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       pinned: 'left',
       width: 50,
       cellClass: 'gd-spreadsheet-editor-row-no',
-      editor: this.editor
+      editor: this.editor,
+      headerComponent: AppSpreadsheetEditorV2CellBasicHeaderComponent
     }];
 
     // process columns in default order
@@ -268,6 +283,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         cellEditorParams: column.editor?.params,
         columnDefinition: column,
         editor: this.editor,
+        // #TODO
         // valueFormatter: (params): string => {
         //   // nothing to format ?
         //   const colDef: IV2SpreadsheetEditorExtendedColDef = params.colDef;
@@ -294,7 +310,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         cellStyle: {
           padding: '0',
           border: 'none'
-        }
+        },
+        headerComponent: AppSpreadsheetEditorV2CellBasicHeaderComponent
       };
 
       // map
@@ -444,6 +461,45 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Actual merge
+   */
+  private cellActualMergeRanges(): void {
+    // if a merge was done then we might need to readjust other ranges too
+    let merged: boolean = true;
+    while (merged) {
+      // reset
+      merged = false;
+
+      // merge ranges if need be
+      for (let range1Index = 0; range1Index < this.editor.selection.selected.ranges.length; range1Index++) {
+        // try merging with others
+        for (let range2Index = range1Index + 1; range2Index < this.editor.selection.selected.ranges.length; range2Index++) {
+          // try merging ranges
+          const mergedResultRange = this.cellMergeTwoRangesIfNecessary(
+            this.editor.selection.selected.ranges[range1Index],
+            this.editor.selection.selected.ranges[range2Index]
+          );
+
+          // merged ?
+          if (mergedResultRange) {
+            // remove the second one since we merged it into first one
+            this.editor.selection.selected.ranges.splice(range2Index, 1);
+
+            // try again from the start
+            merged = true;
+            break;
+          }
+        }
+
+        // must start again ?
+        if (merged) {
+          break;
+        }
+      }
+    }
+  }
+
+  /**
    * Merge ranges
    */
   private cellMergeRanges(): void {
@@ -493,38 +549,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       // add to list
       this.editor.selection.selected.ranges.push(collecting.range);
     } else {
-      // if a merge was done then we might need to readjust other ranges too
-      while (merged) {
-        // reset
-        merged = false;
-
-        // try merging again
-        for (let range1Index = 0; range1Index < this.editor.selection.selected.ranges.length; range1Index++) {
-          // try merging with others
-          for (let range2Index = range1Index + 1; range2Index < this.editor.selection.selected.ranges.length; range2Index++) {
-            // try merging ranges
-            const mergedResultRange = this.cellMergeTwoRangesIfNecessary(
-              this.editor.selection.selected.ranges[range1Index],
-              this.editor.selection.selected.ranges[range2Index]
-            );
-
-            // merged ?
-            if (mergedResultRange) {
-              // remove the second one since we merged it into first one
-              this.editor.selection.selected.ranges.splice(range2Index, 1);
-
-              // try again from the start
-              merged = true;
-              break;
-            }
-          }
-
-          // must start again ?
-          if (merged) {
-            break;
-          }
-        }
-      }
+      // merge ranges
+      this.cellActualMergeRanges();
 
       // remove intersections
       // - split into multiple ranges
@@ -551,6 +577,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // cleanup
     this.editor.selection.selected.collecting = undefined;
     this.editor.selection.selected.outTime = undefined;
+    this.editor.selection.selected.previousEntireColumn = undefined;
 
     // update css
     this.cellUpdateRangeClasses(true);
@@ -654,6 +681,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     ctrlKey: boolean,
     shiftKey: boolean
   ): void {
+    // reset
+    this.editor.selection.selected.previousEntireColumn = undefined;
+
     // cleanup - if no need to continue
     if (
       !ctrlKey &&
@@ -732,7 +762,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     if (
       !primaryButtonStillDown || (
         this.editor.selection.selected.outTime &&
-        moment().diff(this.editor.selection.selected.outTime) > AppSpreadsheetEditorV2Component.HOVER_OUSIDE_LIMIT_UNTIL_MOUSE_OUT
+        moment().diff(this.editor.selection.selected.outTime) > AppSpreadsheetEditorV2Component.HOVER_OUTSIDE_LIMIT_UNTIL_MOUSE_OUT
       )
     ) {
       // wrap up
@@ -839,19 +869,18 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   }
 
   /**
-   * Cell key down
+   * Grid key down
    */
-  cellKeyDown(cellKeyDownEvent: CellKeyDownEvent): void {
+  gridKeyDown(keyboardEvent: KeyboardEvent): void {
     // nothing to do ?
     if (
       this.editor.selection.selected.ranges.length < 1 ||
-      cellKeyDownEvent.api.getEditingCells().length > 0
+      this._agTable.api.getEditingCells().length > 0
     ) {
       return;
     }
 
     // #TODO
-    const keyboardEvent: KeyboardEvent = cellKeyDownEvent.event as KeyboardEvent;
     if (
       keyboardEvent.ctrlKey &&
       keyboardEvent.code === 'KeyC'
@@ -881,5 +910,82 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   gridBodyScroll(): void {
     // redraw ranges since they might've disappeared when cells were destroyed
     this.cellUpdateRangeClasses(true);
+  }
+
+  /**
+   * Header column click - select all
+   */
+  columnHeaderMouseUp(
+    column: number,
+    ctrlKey: boolean,
+    shiftKey: boolean
+  ): void {
+    // no way of continuing previous
+    this.editor.selection.selected.previousCollecting = undefined;
+    this.editor.selection.selected.collecting = undefined;
+    this.editor.selection.selected.outTime = undefined;
+
+    // row no header - select all ?
+    if (column === 0) {
+      // reset
+      this.editor.selection.selected.ranges = [];
+      this.editor.selection.selected.previousEntireColumn = undefined;
+
+      // select everything
+      this.editor.selection.selected.ranges.push({
+        rows: {
+          start: 0,
+          end: this._agTable.api.getDisplayedRowCount() - 1
+        },
+        columns: {
+          start: 1,
+          end: this.columns.length
+        }
+      });
+
+      // redraw ranges
+      this.cellUpdateRangeClasses(false);
+
+      // finished
+      return;
+    }
+
+    // cleanup ?
+    if (
+      !ctrlKey &&
+      !shiftKey
+    ) {
+      this.editor.selection.selected.ranges = [];
+    }
+
+    // select all cells from this column
+    // - take in account shift key
+    this.editor.selection.selected.ranges.push({
+      rows: {
+        start: 0,
+        end: this._agTable.api.getDisplayedRowCount() - 1
+      },
+      columns: shiftKey && this.editor.selection.selected.previousEntireColumn !== undefined ?
+        {
+          start: column < this.editor.selection.selected.previousEntireColumn ?
+            column :
+            this.editor.selection.selected.previousEntireColumn,
+          end: column > this.editor.selection.selected.previousEntireColumn ?
+            column :
+            this.editor.selection.selected.previousEntireColumn
+        } : {
+          start: column,
+          end: column
+        }
+    });
+
+    // merge ranges
+    this.cellActualMergeRanges();
+
+    // redraw ranges
+    this.cellUpdateRangeClasses(false);
+
+    // remember
+    this.editor.selection.selected.previousEntireColumn = column;
   }
 }
