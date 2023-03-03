@@ -1,3 +1,36 @@
 .gd-spreadsheet-editor {
   height: 100%;
 }
+
+.gd-spreadsheet-editor-context-menu {
+  display: inline-flex;
+  flex-direction: column;
+  min-width: 180px;
+  max-width: 280px;
+  background-color: rgb(255, 255, 255);
+  padding: 6px 0;
+
+  .gd-spreadsheet-editor-context-menu-item {
+    background-color: transparent;
+    cursor: pointer;
+    border: none;
+
+    user-select: none;
+    min-width: 64px;
+    line-height: 36px;
+    padding: 0 16px;
+
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    flex: 1;
+
+    &:hover {
+      background-color: rgb(208, 208, 208);
+    }
+
+    &:active {
+      background-color: rgb(170, 170, 170);
+    }
+  }
+}

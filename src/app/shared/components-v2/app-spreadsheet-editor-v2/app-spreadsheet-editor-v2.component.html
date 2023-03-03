@@ -36,8 +36,37 @@
     [modules]="modules"
     singleClickEdit="false"
     rowSelection="multiple"
+    [cdkContextMenuTriggerFor]="editorContextMenu"
     (gridReady)="gridReady($event)"
     (mouseleave)="gridMouseLeave()">
   </ag-grid-angular>
+
+  <!-- Context menu for spreadsheet-editor -->
+  <ng-template
+    #editorContextMenu>
+    <div
+      cdkMenu
+      class="gd-spreadsheet-editor-context-menu">
+      <button
+        class="gd-spreadsheet-editor-context-menu-item"
+        cdkMenuItem
+        [disabled]="editor.selection.selected.ranges.length < 1"
+        (click)="cellCut()">
+        Cut
+      </button>
+      <button
+        class="gd-spreadsheet-editor-context-menu-item"
+        cdkMenuItem
+        [disabled]="editor.selection.selected.ranges.length < 1"
+        (click)="cellCopy()">
+        Copy
+      </button>
+      <button
+        class="gd-spreadsheet-editor-context-menu-item"
+        cdkMenuItem>
+        ...
+      </button>
+    </div>
+  </ng-template>
 
 </app-basic-page-v2>

@@ -93,6 +93,12 @@ export class AppSpreadsheetEditorV2CellBasicRendererComponent implements ICellRe
    * Mouse down
    */
   mouseDown(event: MouseEvent): void {
+    // only primary button is relevant
+    if (event.buttons !== 1) {
+      return;
+    }
+
+    // execute mouse down
     this.colDef.editor.selection.mouseDown(
       this.params.rowIndex,
       this.colDef.editor.columnsMap[this.colDef.columnDefinition.field].index,

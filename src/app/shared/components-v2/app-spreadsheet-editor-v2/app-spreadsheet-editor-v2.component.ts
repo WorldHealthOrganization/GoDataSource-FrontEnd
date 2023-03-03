@@ -9,8 +9,8 @@ import { V2SpreadsheetEditorColumn, V2SpreadsheetEditorColumnType, V2Spreadsheet
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { IV2SpreadsheetEditorExtendedColDef, IV2SpreadsheetEditorExtendedColDefEditor, IV2SpreadsheetEditorExtendedColDefEditorSelectionRange } from './models/extended-column.model';
 import { AppSpreadsheetEditorV2CellBasicRendererComponent } from './components/cell-basic-renderer/app-spreadsheet-editor-v2-cell-basic-renderer.component';
-import { MenuItemDef } from '@ag-grid-community/core/dist/cjs/es5/entities/gridOptions';
 import * as moment from 'moment';
+import { Clipboard } from '@angular/cdk/clipboard';
 
 /**
  * Component
@@ -129,7 +129,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   constructor(
     protected changeDetectorRef: ChangeDetectorRef,
     protected i18nService: I18nService,
-    protected elementRef: ElementRef
+    protected elementRef: ElementRef,
+    protected clipboard: Clipboard
   ) {}
 
   /**
@@ -341,14 +342,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // re-render page
     this.detectChanges();
-  }
-
-  /**
-   * Get context menu
-   */
-  getContextMenuItems(_params): (string | MenuItemDef)[] {
-    // #TODO
-    return [];
   }
 
   /**
@@ -763,5 +756,57 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   gridMouseLeave(): void {
     // end collecting
     this.cellFinishCollecting();
+  }
+
+  /**
+   * Context menu option - cut
+   */
+  cellCut(): void {
+    // nothing to do ?
+    if (this.editor.selection.selected.ranges.length < 1) {
+      return;
+    }
+
+    // ask how to cut (separator)
+    // #TODO
+
+    // determine unique cells so we don't export the same cell data if there is an intersection between ranges
+    // #TODO
+
+    // retrieve row data
+    // #TODO
+    const data: any[] = [];
+    this._agTable.api.forEachNode((node) => {
+      data.push(node.data);
+    });
+
+    // cut data
+    // #TODO
+    let finalString: string = '';
+    this.editor.selection.selected.ranges.forEach((range) => {
+      for (let rowIndex = range.rows.start; rowIndex <= range.rows.end; rowIndex++) {
+        // copy row data
+        for (let columnIndex = range.columns.start; columnIndex <= range.columns.end; columnIndex++) {
+          // #TODO
+          // columnIndex - 1 to exclude row number column which isn't in this.columns
+          let value: string = data[rowIndex][this.columns[columnIndex - 1].field];
+          value = value === undefined || value == null ? '' : value;
+          finalString += columnIndex === range.columns.start ? value : `\t${value}`;
+        }
+
+        // end of line
+        finalString += '\r\n';
+      }
+    });
+
+    // copy to clipboard
+    this.clipboard.copy(finalString);
+  }
+
+  /**
+   * Context menu option - copy
+   */
+  cellCopy(): void {
+    // #TODO
   }
 }

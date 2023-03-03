@@ -22,10 +22,14 @@ import { ToastrModule } from 'ngx-toastr';
 import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
 import { HotTableModule } from '@handsontable/angular';
 import { ColorPickerModule } from 'ngx-color-picker';
+import { CdkMenuModule } from '@angular/cdk/menu';
+import { ClipboardModule } from '@angular/cdk/clipboard';
 
 @NgModule({
   imports: [
     AgGridModule,
+    CdkMenuModule,
+    ClipboardModule,
     ColorPickerModule,
     CommonModule,
     DragDropModule,
