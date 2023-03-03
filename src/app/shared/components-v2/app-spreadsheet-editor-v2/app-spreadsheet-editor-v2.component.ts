@@ -565,6 +565,11 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // retrieve cell html
         const cellHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-basic-renderer-selected-${rowIndex}-${columnIndex}`);
 
+        // scrolled and not visible anymore ?
+        if (!cellHtml) {
+          continue;
+        }
+
         // make it visible
         cellHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-renderer-selected-visible');
 
@@ -630,9 +635,13 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       showFillIfPossible &&
       this.editor.selection.selected.ranges.length === 1
     ) {
-      // show fill
+      // find cell
       const cellHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-basic-renderer-fill-${this.editor.selection.selected.ranges[0].rows.end}-${this.editor.selection.selected.ranges[0].columns.end}`);
-      cellHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-renderer-fill-visible');
+
+      // scrolled and not visible anymore ?
+      if (cellHtml) {
+        cellHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-renderer-fill-visible');
+      }
     }
   }
 
@@ -849,5 +858,28 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     ) {
       this.cellCopy();
     }
+  }
+
+  /**
+   * Gird mouse move
+   */
+  gridMouseMove(_event: MouseEvent): void {
+    // nothing to do ?
+    if (!this.editor.selection.selected.collecting) {
+      return;
+    }
+
+    // #TODO
+    // left top bottom right
+    // console.log(event);
+    // this._agTable.api.ensureIndexVisible(this.editor.selection.selected.collecting.range.rows.end + 1);
+  }
+
+  /**
+   * Scroll
+   */
+  gridBodyScroll(): void {
+    // redraw ranges since they might've disappeared when cells were destroyed
+    this.cellUpdateRangeClasses(true);
   }
 }

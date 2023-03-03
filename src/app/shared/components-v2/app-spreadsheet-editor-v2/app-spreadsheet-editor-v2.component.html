@@ -39,7 +39,9 @@
     [cdkContextMenuTriggerFor]="editorContextMenu"
     (gridReady)="gridReady($event)"
     (mouseleave)="gridMouseLeave()"
-    (cellKeyDown)="cellKeyDown($event)">
+    (mousemove)="gridMouseMove($event)"
+    (cellKeyDown)="cellKeyDown($event)"
+    (bodyScroll)="gridBodyScroll()">
   </ag-grid-angular>
 
   <!-- Context menu for spreadsheet-editor -->
