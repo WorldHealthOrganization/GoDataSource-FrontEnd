@@ -3,45 +3,22 @@
   [pageTitle]="pageTitle"
   [actionButton]="actionButton">
 
-<!--  [rowSelection]="groupActionsSingleRecord ? 'single' : 'multiple'"-->
-<!--  suppressRowClickSelection="true"-->
-<!--  suppressPropertyNamesCheck="true"-->
-<!--  enableCellTextSelection="true"-->
-<!--  suppressDragLeaveHidesColumns="true"-->
-<!--  suppressCellFocus="true"-->
-<!--  columnHoverHighlight="true"-->
 <!--  [loadingOverlayComponent]="AppListTableV2LoadingComponent"-->
 <!--  [noRowsOverlayComponent]="AppListTableV2NoDataComponent"-->
-<!--  [getRowHeight]="getRowHeight"-->
-<!--  [isFullWidthRow]="isFullWidthRow"-->
-<!--  [fullWidthCellRenderer]="AppListTableV2DetailRowComponent"-->
-<!--  [isExternalFilterPresent]="isExternalFilterPresent"-->
-<!--  [doesExternalFilterPass]="doesExternalFilterPass"-->
-<!--  (firstDataRendered)="firstDataRendered()"-->
-<!--  (dragStopped)="saveVisibleAndOrderOfColumns($event)"-->
-<!--  (selectionChanged)="selectionChanged()"-->
-
-<!--  enableRangeSelection="true"-->
-<!--  enableFillHandle="true"-->
-<!--  enableCellTextSelection="true"-->
-<!--  clipboardDelimiter=""-->
-
-<!--  [getContextMenuItems]="getContextMenuItems"-->
-<!--  columnHoverHighlight="true"-->
-
 
   <!-- Spreadsheet Editor -->
   <ag-grid-angular
     class="ag-theme-balham gd-spreadsheet-editor"
     [modules]="modules"
-    singleClickEdit="false"
-    rowSelection="multiple"
     [cdkContextMenuTriggerFor]="editorContextMenu"
+    enableCellChangeFlash="true"
+    undoRedoCellEditing="false"
+    suppressRowClickSelection="true"
     (gridReady)="gridReady($event)"
     (mouseleave)="gridMouseLeave()"
     (mousemove)="gridMouseMove($event)"
     (keydown)="gridKeyDown($event)"
-    (bodyScroll)="gridBodyScroll()">
+    (bodyScrollEnd)="gridBodyScrollEnd()">
   </ag-grid-angular>
 
   <!-- Context menu for spreadsheet-editor -->
@@ -66,8 +43,30 @@
       </button>
       <button
         class="gd-spreadsheet-editor-context-menu-item"
+        cdkMenuItem
+        [disabled]="editor.selection.selected.ranges.length < 1"
+        (click)="cellCopy()">
+        Copy and configure
+      </button>
+      <button
+        class="gd-spreadsheet-editor-context-menu-item"
         cdkMenuItem>
-        ...
+        Paste...ctrl+v
+      </button>
+      <button
+        class="gd-spreadsheet-editor-context-menu-item"
+        cdkMenuItem>
+        Paste and configure...
+      </button>
+      <button
+        class="gd-spreadsheet-editor-context-menu-item"
+        cdkMenuItem>
+        Insert / Append rows (configure how many)
+      </button>
+      <button
+        class="gd-spreadsheet-editor-context-menu-item"
+        cdkMenuItem>
+        Undo / Redo...
       </button>
     </div>
   </ng-template>

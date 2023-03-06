@@ -1,5 +1,5 @@
 <div
-  class="gd-spreadsheet-editor-v2-cell-basic-header"
+  class="gd-spreadsheet-editor-v2-cell-row-no-renderer"
   (mouseenter)="mouseEnter($event)"
   (mousedown)="mouseDown($event)"
   (mouseup)="mouseUp()"
@@ -7,12 +7,12 @@
 
   <!-- Value -->
   <div
-    class="gd-spreadsheet-editor-v2-cell-basic-header-value">
-    {{label}}
+    class="gd-spreadsheet-editor-v2-cell-row-no-renderer-value">
+    {{rowNo}}
   </div>
 
   <!-- Selected -->
   <div
     [id]="selectedId"
-    class="gd-spreadsheet-editor-v2-cell-basic-header-selected"></div>
+    class="gd-spreadsheet-editor-v2-cell-row-no-renderer-selected"></div>
 </div>

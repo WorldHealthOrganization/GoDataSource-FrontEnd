@@ -1,5 +1,19 @@
-.gd-spreadsheet-editor {
-  height: 100%;
+app-spreadsheet-editor-v2 {
+  .gd-spreadsheet-editor {
+    height: 100%;
+  }
+
+  .ag-header-cell {
+    padding: 0;
+    .gd-spreadsheet-editor-v2-cell-basic-header {
+      padding-left: 6px;
+      padding-right: 6px;
+    }
+  }
+
+  .gd-spreadsheet-editor-row-no {
+    background-color: #e2e9eb;
+  }
 }
 
 .gd-spreadsheet-editor-context-menu {

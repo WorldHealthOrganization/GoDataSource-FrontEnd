@@ -1,7 +1,10 @@
 <div
   class="gd-spreadsheet-editor-v2-cell-basic-renderer"
   [ngSwitch]="colDef.columnDefinition?.type"
-  (mouseenter)="mouseEnter($event)" (mousedown)="mouseDown($event)" (mouseup)="mouseUp()" (mouseleave)="mouseLeave()">
+  (mouseenter)="mouseEnter($event)"
+  (mousedown)="mouseDown($event)"
+  (mouseup)="mouseUp()"
+  (mouseleave)="mouseLeave()">
 
   <!-- Value -->
   <div

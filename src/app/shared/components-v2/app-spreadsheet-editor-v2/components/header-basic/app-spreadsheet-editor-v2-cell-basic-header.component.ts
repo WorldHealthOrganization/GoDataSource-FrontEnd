@@ -18,8 +18,10 @@ export class AppSpreadsheetEditorV2CellBasicHeaderComponent implements IHeaderAn
   static readonly DEFAULT_COLUMN_ROW_NO: string = 'rowNo';
 
   // data
+  selectedId: string;
   label: string;
   colDef: IV2SpreadsheetEditorExtendedColDef;
+  columnIndex: number;
 
   /**
    * Constructor
@@ -51,27 +53,53 @@ export class AppSpreadsheetEditorV2CellBasicHeaderComponent implements IHeaderAn
     // data
     this.label = params.displayName;
     this.colDef = params.column.getUserProvidedColDef() as IV2SpreadsheetEditorExtendedColDef;
+    this.columnIndex = this.colDef.field === AppSpreadsheetEditorV2CellBasicHeaderComponent.DEFAULT_COLUMN_ROW_NO ?
+      0 :
+      this.colDef.editor.columnsMap[this.colDef.columnDefinition.field].index;
+    this.selectedId = `gd-spreadsheet-editor-v2-cell-basic-header-selected-${this.columnIndex}`;
 
     // update ui
     this.changeDetectorRef.detectChanges();
   }
 
   /**
-   * Header click
+   * Mouse enter
    */
-  mouseUp(event: MouseEvent): void {
+  mouseEnter(event: MouseEvent): void {
+    this.colDef.editor.selection.header.top.mouseEnter(
+      this.columnIndex,
+      event.buttons === 1
+    );
+  }
+
+  /**
+   * Mouse down
+   */
+  mouseDown(event: MouseEvent): void {
     // only primary button is relevant
-    if (event.button !== 0) {
+    if (event.buttons !== 1) {
       return;
     }
 
-    // trigger event
-    this.colDef.editor.selection.headerMouseUp(
-      this.colDef.field === AppSpreadsheetEditorV2CellBasicHeaderComponent.DEFAULT_COLUMN_ROW_NO ?
-        0 :
-        this.colDef.editor.columnsMap[this.colDef.columnDefinition.field].index,
+    // execute mouse down
+    this.colDef.editor.selection.header.top.mouseDown(
+      this.columnIndex,
       event.ctrlKey,
       event.shiftKey
     );
+  }
+
+  /**
+   * Mouse up
+   */
+  mouseUp(): void {
+    this.colDef.editor.selection.header.top.mouseUp();
+  }
+
+  /**
+   * Mouse leave
+   */
+  mouseLeave(): void {
+    this.colDef.editor.selection.header.top.mouseLeave();
   }
 }

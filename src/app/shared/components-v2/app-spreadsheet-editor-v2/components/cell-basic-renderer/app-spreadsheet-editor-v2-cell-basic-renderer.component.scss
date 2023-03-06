@@ -30,6 +30,11 @@
 
     &.gd-spreadsheet-editor-v2-cell-basic-renderer-selected-visible {
       display: inline-block;
+
+      &.gd-spreadsheet-editor-v2-cell-basic-renderer-selected-fill {
+        background-color: rgba(var(--gd-secondary-rgb), 0.40);
+        cursor: cell;
+      }
     }
     &.gd-spreadsheet-editor-v2-cell-basic-renderer-selected-border-left {
       border-left: 1px solid;

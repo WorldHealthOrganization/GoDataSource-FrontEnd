@@ -52,31 +52,62 @@ export interface IV2SpreadsheetEditorExtendedColDefEditor {
       collecting: IV2SpreadsheetEditorExtendedColDefEditorSelectionRangeCollecting,
       previousCollecting: IV2SpreadsheetEditorExtendedColDefEditorSelectionRangeCollecting,
       outTime: Moment,
-      previousEntireColumn: number,
+
+      // filling
+      fill: IV2SpreadsheetEditorExtendedColDefEditorSelectionRange,
 
       // selected ranges
       ranges: IV2SpreadsheetEditorExtendedColDefEditorSelectionRange[]
     },
 
     // events
-    mouseDown: (
-      row: number,
-      column: number,
-      ctrlKey: boolean,
-      shiftKey: boolean
-    ) => void,
-    mouseUp: () => void,
-    mouseLeave: () => void,
-    mouseEnter: (
-      row: number,
-      column: number,
-      primaryButtonStillDown: boolean
-    ) => void,
-    headerMouseUp: (
-      columnIndex: number,
-      ctrlKey: boolean,
-      shiftKey: boolean
-    ) => void
+    cell: {
+      mouseDown: (
+        row: number,
+        column: number,
+        ctrlKey: boolean,
+        shiftKey: boolean
+      ) => void,
+      mouseUp: () => void,
+      mouseLeave: () => void,
+      mouseEnter: (
+        row: number,
+        column: number,
+        primaryButtonStillDown: boolean
+      ) => void,
+      fill: () => void
+    },
+    header: {
+      // row no
+      left: {
+        mouseDown: (
+          row: number,
+          ctrlKey: boolean,
+          shiftKey: boolean
+        ) => void,
+        mouseUp: () => void,
+        mouseLeave: () => void,
+        mouseEnter: (
+          row: number,
+          primaryButtonStillDown: boolean
+        ) => void
+      },
+
+      // column headers
+      top: {
+        mouseDown: (
+          column: number,
+          ctrlKey: boolean,
+          shiftKey: boolean
+        ) => void,
+        mouseUp: () => void,
+        mouseLeave: () => void,
+        mouseEnter: (
+          column: number,
+          primaryButtonStillDown: boolean
+        ) => void
+      }
+    }
   };
 }
 

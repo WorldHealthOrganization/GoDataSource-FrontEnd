@@ -1,0 +1,31 @@
+.gd-spreadsheet-editor-v2-cell-row-no-renderer {
+  display: block;
+  width: 100%;
+  height: 100%;
+
+  .gd-spreadsheet-editor-v2-cell-row-no-renderer-value {
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
+  }
+
+  .gd-spreadsheet-editor-v2-cell-row-no-renderer-selected {
+    display: none;
+    position: absolute;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    z-index: 99998;
+    top: 0;
+    left: 0;
+    border: none;
+
+    &.gd-spreadsheet-editor-v2-cell-row-no-renderer-selected-partial {
+      display: inline-block;
+      background-color: rgba(var(--gd-primary-rgb), 0.15);
+    }
+    &.gd-spreadsheet-editor-v2-cell-row-no-renderer-selected-full {
+      display: inline-block;
+      background-color: rgba(var(--gd-primary-rgb), 0.50);
+    }
+  }
+}

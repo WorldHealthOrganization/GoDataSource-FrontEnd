@@ -84,7 +84,7 @@ export class AppSpreadsheetEditorV2CellBasicRendererComponent implements ICellRe
    * Mouse enter
    */
   mouseEnter(event: MouseEvent): void {
-    this.colDef.editor.selection.mouseEnter(
+    this.colDef.editor.selection.cell.mouseEnter(
       this.params.rowIndex,
       this.colDef.editor.columnsMap[this.colDef.columnDefinition.field].index,
       event.buttons === 1
@@ -101,7 +101,7 @@ export class AppSpreadsheetEditorV2CellBasicRendererComponent implements ICellRe
     }
 
     // execute mouse down
-    this.colDef.editor.selection.mouseDown(
+    this.colDef.editor.selection.cell.mouseDown(
       this.params.rowIndex,
       this.colDef.editor.columnsMap[this.colDef.columnDefinition.field].index,
       event.ctrlKey,
@@ -113,14 +113,14 @@ export class AppSpreadsheetEditorV2CellBasicRendererComponent implements ICellRe
    * Mouse up
    */
   mouseUp(): void {
-    this.colDef.editor.selection.mouseUp();
+    this.colDef.editor.selection.cell.mouseUp();
   }
 
   /**
    * Mouse leave
    */
   mouseLeave(): void {
-    this.colDef.editor.selection.mouseLeave();
+    this.colDef.editor.selection.cell.mouseLeave();
   }
 
   /**
@@ -129,5 +129,8 @@ export class AppSpreadsheetEditorV2CellBasicRendererComponent implements ICellRe
   fillMouseDown(event: MouseEvent): void {
     // stop propagation
     event.stopPropagation();
+
+    // trigger fill process
+    this.colDef.editor.selection.cell.fill();
   }
 }
