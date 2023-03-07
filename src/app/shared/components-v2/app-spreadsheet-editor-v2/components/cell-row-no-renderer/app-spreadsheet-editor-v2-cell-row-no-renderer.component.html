@@ -1,6 +1,6 @@
 <div
   class="gd-spreadsheet-editor-v2-cell-row-no-renderer"
-  [cdkContextMenuTriggerFor]="contextMenuTemplate"
+  [cdkContextMenuTriggerFor]="colDef.editor.rowNoContextMenu"
   (mouseenter)="mouseEnter($event)"
   (mousedown)="mouseDown($event)"
   (mouseup)="mouseUp()"
@@ -17,52 +17,3 @@
     [id]="selectedId"
     class="gd-spreadsheet-editor-v2-cell-row-no-renderer-selected"></div>
 </div>
-
-<!-- Context menu for spreadsheet-editor -->
-<ng-template
-  #contextMenuTemplate>
-  <div
-    cdkMenu
-    class="gd-context-menu">
-
-    <!-- Add rows above -->
-    <button
-      class="gd-context-menu-item"
-      cdkMenuItem
-      fxLayout="row">
-      <!-- Label -->
-      <div
-        class="gd-context-menu-item-label"
-        fxFlex fxLayoutAlign="start">
-        {{'LNG_SHEET_CONTEXT_MENU_ROW_ABOVE' | translate}}
-      </div>
-    </button>
-
-    <!-- Add rows bellow -->
-    <button
-      class="gd-context-menu-item"
-      fxLayout="row"
-      cdkMenuItem>
-      <!-- Label -->
-      <div
-        class="gd-context-menu-item-label"
-        fxFlex fxLayoutAlign="start">
-        {{'LNG_SHEET_CONTEXT_MENU_ROW_BELOW' | translate}}
-      </div>
-    </button>
-
-    <!-- Delete rows -->
-    <button
-      class="gd-context-menu-item"
-      fxLayout="row"
-      cdkMenuItem>
-      <!-- Label -->
-      <div
-        class="gd-context-menu-item-label"
-        fxFlex fxLayoutAlign="start">
-        {{'LNG_SHEET_CONTEXT_MENU_REMOVE_ROW' | translate}}
-      </div>
-    </button>
-
-  </div>
-</ng-template>

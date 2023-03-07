@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit, TemplateRef, ViewChild, ViewEncapsulation } from '@angular/core';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
 import { IV2ActionIconLabel, V2ActionType } from '../app-list-table-v2/models/action.model';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
@@ -31,6 +31,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   private static readonly HOVER_OUTSIDE_LIMIT_UNTIL_MOUSE_OUT: number = 500;
   private static readonly MAX_UNDO_TO_KEEP: number = 100;
 
+  // elements
+  @ViewChild('cellContextMenu', { static: true }) cellContextMenu: TemplateRef<any>;
+  @ViewChild('rowNoContextMenu', { static: true }) rowNoContextMenu: TemplateRef<any>;
+
   // breadcrumbs
   @Input() breadcrumbs: IV2Breadcrumb[];
 
@@ -57,6 +61,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
   // editor
   editor: IV2SpreadsheetEditorExtendedColDefEditor = {
+    // elements
+    cellContextMenu: undefined,
+    rowNoContextMenu: undefined,
+
     // columns map
     columnsMap: {},
 
@@ -282,6 +290,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       // finished
       return;
     }
+
+    // update editor elements
+    this.editor.cellContextMenu = this.cellContextMenu;
+    this.editor.rowNoContextMenu = this.rowNoContextMenu;
 
     // determine columns
     const columnDefs: IV2SpreadsheetEditorExtendedColDef[] = [{
