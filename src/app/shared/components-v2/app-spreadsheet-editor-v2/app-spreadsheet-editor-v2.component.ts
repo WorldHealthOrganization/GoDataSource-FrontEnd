@@ -795,10 +795,21 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     ) {
       // go through rows and update with selected fill data
       // +1 since %n is 0
+      const change: IV2SpreadsheetEditorChangeValues = {
+        type: V2SpreadsheetEditorChangeType.VALUES,
+        changes: {
+          rows: {}
+        }
+      };
       const rowsThatWeCanCopy: number = 1 + this.editor.selection.selected.fill.rows.end - this.editor.selection.selected.fill.rows.start;
       const rowsToCopyInto: number = 1 + end - start;
       const reverse: boolean = start < this.editor.selection.selected.fill.rows.start;
       for (let rowIndex: number = start; rowIndex <= end; rowIndex++) {
+        // initialize change row
+        change.changes.rows[rowIndex] = {
+          columns: {}
+        };
+
         // determine row from which we should copy data
         const copyFromRowIndex: number = (
           reverse ?
@@ -822,6 +833,15 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
             columnField
           );
 
+          // remember previous value
+          change.changes.rows[rowIndex].columns[columnIndex] = {
+            old: _.get(
+              rowData,
+              columnField
+            ),
+            new: value
+          };
+
           // update data
           _.set(
             rowData,
@@ -830,6 +850,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           );
         }
       }
+
+      // add change to list of changes
+      this.cellAppendChange(change);
 
       // refresh
       this._agTable.api.refreshCells({
