@@ -1508,6 +1508,57 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Make change visible on screen
+   */
+  private cellScrollToChange(change: V2SpreadsheetEditorChange): void {
+    // cell
+    let rowIndex: number = -1;
+    let columnIndex: number = -1;
+
+    // undo change
+    switch (change.type) {
+      case V2SpreadsheetEditorChangeType.VALUES:
+
+        // first one
+        rowIndex = parseInt(Object.keys(change.changes.rows)[0], 10);
+        columnIndex = parseInt(Object.keys(change.changes.rows[rowIndex].columns)[0], 10);
+
+        // finished
+        break;
+
+      case V2SpreadsheetEditorChangeType.ADD_ROWS:
+
+        // clear selection
+        // this.editorClearSelected(true);
+        // #TODO
+
+        // finished
+        break;
+
+      case V2SpreadsheetEditorChangeType.REMOVE_ROWS:
+
+        // clear selection
+        // this.editorClearSelected(true);
+        // #TODO
+
+        // finished
+        break;
+    }
+
+    // nothing to do ?
+    if (
+      rowIndex < 0 ||
+      columnIndex < 0
+    ) {
+      return;
+    }
+
+    // scroll to cell
+    this._agTable.api.ensureIndexVisible(rowIndex);
+    this._agTable.api.ensureColumnVisible(this.columns[columnIndex].field);
+  }
+
+  /**
    * Context menu option - undo
    */
   private cellUndo(): void {
@@ -1521,6 +1572,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // determine change without removing it from the list since we need it for cell redo
     this._changesIndex--;
     const change = this._changes[this._changesIndex];
+
+    // make cell visible
+    this.cellScrollToChange(change);
 
     // undo change
     switch (change.type) {
@@ -1585,6 +1639,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // determine change
     const change = this._changes[this._changesIndex];
     this._changesIndex++;
+
+    // make cell visible
+    this.cellScrollToChange(change);
 
     // redo change
     switch (change.type) {
@@ -1691,16 +1748,24 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   }
 
   /**
-   * Cell - tab to next cell
+   * Select focused cell
    */
-  private cellTabToNext(): void {
+  private cellSelectFocused(): void {
     // focused cell
-    this._agTable.api.tabToNextCell();
-    const focusedCell = this._agTable.api.getFocusedCell();
+    let focusedCell = this._agTable.api.getFocusedCell();
 
     // nothing to do ?
     if (!focusedCell) {
       return;
+    }
+
+    // if focused cell is the first one (row no) we need to select the next one
+    if (focusedCell.column.getUserProvidedColDef().field === AppSpreadsheetEditorV2CellBasicHeaderComponent.DEFAULT_COLUMN_ROW_NO) {
+      // next cell
+      this._agTable.api.tabToNextCell();
+
+      // update focused
+      focusedCell = this._agTable.api.getFocusedCell();
     }
 
     // display the newly focused cell
@@ -1724,6 +1789,17 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // redraw ranges
     this.cellUpdateRangeClasses(true);
+  }
+
+  /**
+   * Cell - tab to next cell
+   */
+  private cellTabToNext(): void {
+    // focus next cell
+    this._agTable.api.tabToNextCell();
+
+    // update focused selection
+    this.cellSelectFocused();
   }
 
   /**
@@ -1756,6 +1832,30 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       return true;
     }
 
+    // allow navigation, but we need to update selection
+    // ← ↑ → ↓ Arrow keys will not navigate focused cell.
+    if (
+      params.event.code === 'ArrowRight' ||
+      params.event.code === 'ArrowLeft' ||
+      params.event.code === 'ArrowDown' ||
+      params.event.code === 'ArrowUp' ||
+      params.event.code === 'Home' ||
+      params.event.code === 'End' ||
+      params.event.code === 'PageUp' ||
+      params.event.code === 'PageDown'
+    ) {
+      // allow bubble
+
+      // update focused selection after focused cell is changed by ag-grid (return false)
+      setTimeout(() => {
+        // update focused selection
+        this.cellSelectFocused();
+      });
+
+      // don't block caller
+      return false;
+    }
+
     // cut selected cells
     if (
       params.event.ctrlKey &&
@@ -1786,12 +1886,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       // block caller
       return true;
     }
-
-    // #TODO
-    // Page Up and Page Down will not get handled by the grid.
-    //   Home will not focus top left cell.
-    // End will not focus bottom right cell.
-    // ← ↑ → ↓ Arrow keys will not navigate focused cell.
 
     // delete cell content ?
     if (params.event.code === 'Delete') {
