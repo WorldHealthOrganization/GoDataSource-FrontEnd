@@ -3,9 +3,6 @@
   [pageTitle]="pageTitle"
   [actionButton]="actionButton">
 
-<!--  [loadingOverlayComponent]="AppListTableV2LoadingComponent"-->
-<!--  [noRowsOverlayComponent]="AppListTableV2NoDataComponent"-->
-
   <!-- Spreadsheet Editor -->
   <ag-grid-angular
     class="ag-theme-balham gd-spreadsheet-editor"
@@ -14,11 +11,14 @@
     undoRedoCellEditing="false"
     suppressRowClickSelection="true"
     suppressClipboardPaste="true"
+    [loadingOverlayComponent]="AppSpreadsheetEditorV2LoadingComponent"
+    [noRowsOverlayComponent]="AppSpreadsheetEditorV2NoDataComponent"
     (gridReady)="gridReady($event)"
     (mouseleave)="gridMouseLeave()"
     (mousemove)="gridMouseMove($event)"
     (bodyScrollEnd)="gridBodyScrollEnd()">
   </ag-grid-angular>
+
 </app-basic-page-v2>
 
 <!-- Cell - Context menu for spreadsheet-editor -->

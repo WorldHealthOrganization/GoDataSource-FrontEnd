@@ -24,6 +24,8 @@ import { AppSpreadsheetEditorV2EditorLocationComponent } from './app-spreadsheet
 import { AppSpreadsheetEditorV2EditorNumberComponent } from './app-spreadsheet-editor-v2/components/editor-number/app-spreadsheet-editor-v2-editor-number.component';
 import { AppSpreadsheetEditorV2CellBasicHeaderComponent } from './app-spreadsheet-editor-v2/components/header-basic/app-spreadsheet-editor-v2-cell-basic-header.component';
 import { AppSpreadsheetEditorV2CellRowNoRendererComponent } from './app-spreadsheet-editor-v2/components/cell-row-no-renderer/app-spreadsheet-editor-v2-cell-row-no-renderer.component';
+import { AppSpreadsheetEditorV2LoadingComponent } from './app-spreadsheet-editor-v2/components/loading/app-spreadsheet-editor-v2-loading.component';
+import { AppSpreadsheetEditorV2NoDataComponent } from './app-spreadsheet-editor-v2/components/no-data/app-spreadsheet-editor-v2-no-data.component';
 
 export const components: any[] = [
   AppBasicPageV2Component,
@@ -51,5 +53,7 @@ export const components: any[] = [
   AppSpreadsheetEditorV2EditorDateComponent,
   AppSpreadsheetEditorV2EditorLocationComponent,
   AppSpreadsheetEditorV2EditorNumberComponent,
-  AppSpreadsheetEditorV2EditorSingleSelectComponent
+  AppSpreadsheetEditorV2EditorSingleSelectComponent,
+  AppSpreadsheetEditorV2LoadingComponent,
+  AppSpreadsheetEditorV2NoDataComponent
 ];

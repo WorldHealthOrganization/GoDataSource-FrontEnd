@@ -15,6 +15,11 @@ import { AppSpreadsheetEditorV2CellBasicHeaderComponent } from './components/hea
 import { AppSpreadsheetEditorV2CellRowNoRendererComponent } from './components/cell-row-no-renderer/app-spreadsheet-editor-v2-cell-row-no-renderer.component';
 import { NewValueParams, SuppressHeaderKeyboardEventParams, SuppressKeyboardEventParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 import { IV2SpreadsheetEditorChangeValues, V2SpreadsheetEditorChange, V2SpreadsheetEditorChangeType } from './models/change.model';
+import { Observable, Subscription, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
+import { AppSpreadsheetEditorV2LoadingComponent } from './components/loading/app-spreadsheet-editor-v2-loading.component';
+import { AppSpreadsheetEditorV2NoDataComponent } from './components/no-data/app-spreadsheet-editor-v2-no-data.component';
 
 /**
  * Component
@@ -53,6 +58,17 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   }
   get columns(): V2SpreadsheetEditorColumn[] {
     return this._columns;
+  }
+
+  // rows data
+  private _recordsSubscription: Subscription;
+  private _records$: Observable<any[]>;
+  @Input() set records$(records$: Observable<any[]>) {
+    // set the new observable
+    this._records$ = records$;
+
+    // retrieve data
+    this.retrieveData();
   }
 
   // keep changes
@@ -202,8 +218,13 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     columnApi: ColumnApi
   } = null;
   private _callWhenReady: {
+    retrieveData?: true,
     updateColumnDefinitions?: true
   } = {};
+
+  // constants
+  AppSpreadsheetEditorV2LoadingComponent = AppSpreadsheetEditorV2LoadingComponent;
+  AppSpreadsheetEditorV2NoDataComponent = AppSpreadsheetEditorV2NoDataComponent;
 
   /**
    * Constructor
@@ -212,7 +233,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     protected changeDetectorRef: ChangeDetectorRef,
     protected i18nService: I18nService,
     protected elementRef: ElementRef,
-    protected clipboard: Clipboard
+    protected clipboard: Clipboard,
+    protected toastV2Service: ToastV2Service
   ) {}
 
   /**
@@ -229,6 +251,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    */
   ngOnDestroy(): void {
     // stop retrieving data
+    this.stopGetRecords();
+
+    // stop retrieving data
     // #TODO
     // this.stopGetRecords();
 
@@ -244,6 +269,79 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Stop retrieving data
+   */
+  private stopGetRecords(): void {
+    // stop retrieving data
+    if (this._recordsSubscription) {
+      this._recordsSubscription.unsubscribe();
+      this._recordsSubscription = undefined;
+    }
+  }
+
+  /**
+   * Retrieve data
+   */
+  private retrieveData(): void {
+    // ag table not initialized ?
+    if (!this._agTable) {
+      // call later
+      this._callWhenReady.retrieveData = true;
+
+      // finished
+      return;
+    }
+
+    // already called
+    delete this._callWhenReady.retrieveData;
+
+    // nothing to do ?
+    if (!this._records$) {
+      // reset data
+      this._agTable.api.setRowData([]);
+      this._agTable.api.hideOverlay();
+
+      // re-render page
+      this.detectChanges();
+
+      // finished
+      return;
+    }
+
+    // cancel previous one
+    this.stopGetRecords();
+
+    // retrieve data
+    this._agTable.api.showLoadingOverlay();
+    this._recordsSubscription = this._records$
+      .pipe(
+        catchError((err) => {
+          // show error
+          this.toastV2Service.error(err);
+
+          // send error down the road
+          return throwError(err);
+        })
+      )
+      .subscribe((data) => {
+        // finished
+        this._recordsSubscription = undefined;
+
+        // must always have an array
+        data = data || [];
+
+        // set data & hide loading overlay
+        this._agTable.api.setRowData(data);
+
+        // unselect everything
+        this._agTable.api.deselectAll();
+
+        // re-render page
+        this.detectChanges();
+      });
+  }
+
+  /**
    * Grid ready
    */
   gridReady(event: GridReadyEvent): void {
@@ -252,6 +350,12 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       api: event.api,
       columnApi: event.columnApi
     };
+
+    // call methods to finish setup - retrieveData
+    if (this._callWhenReady.retrieveData) {
+      // call
+      this.retrieveData();
+    }
 
     // call methods to finish setup - updateColumnDefinitions
     if (this._callWhenReady.updateColumnDefinitions) {
@@ -390,32 +494,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // update column defs
     this._agTable.api.setColumnDefs(columnDefs);
-
-    // #TODO - remove
-    const aaa = [];
-    for (let i = 1; i < 10000; i++) {
-      aaa.push({
-        aaa: `aa${i}`,
-        bbb: `bb${i}`,
-        ccc: 2,
-        eee: '36b07a5c-b2cd-48b6-bb12-9912bc8094de'
-      });
-    }
-    this._agTable.api.setRowData(aaa);
-    // pipe..retrieve locations
-    // this._locationColumns
-    // aaa => records
-    // determine locations that we need to retrieve
-    // put in cache
-    // currentItem.location.name + (
-    //               !_.isEmpty(currentItem.location.synonyms) ?
-    //                 ` ( ${currentItem.location.synonymsAsString} )` :
-    //                 ''
-    //             )
-    this.editor.locationNamesMap = {
-      '36b07a5c-b2cd-48b6-bb12-9912bc8094de': 'Bucharest ( B )'
-    };
-    // remove
 
     // re-render page
     this.detectChanges();
