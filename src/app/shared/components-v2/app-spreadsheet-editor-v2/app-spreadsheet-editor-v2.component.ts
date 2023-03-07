@@ -33,6 +33,7 @@ import { AppSpreadsheetEditorV2NoDataComponent } from './components/no-data/app-
 })
 export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   // max number of ms until outside leave is consider mouse out
+  public static readonly DEFAULT_CREATE_RECORDS_ROW_NO = 20;
   private static readonly HOVER_OUTSIDE_LIMIT_UNTIL_MOUSE_OUT: number = 500;
   private static readonly MAX_UNDO_TO_KEEP: number = 100;
 
@@ -899,12 +900,32 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         }
       }
     }
+
+    // focused cell
+    const focusedCell = this._agTable.api.getFocusedCell();
+    if (focusedCell) {
+      // determine if selectable column
+      const columnField: string = focusedCell.column.getUserProvidedColDef().field;
+      if (columnField !== AppSpreadsheetEditorV2CellBasicHeaderComponent.DEFAULT_COLUMN_ROW_NO) {
+        const columnIndex: number = this.editor.columnsMap[columnField].index;
+        const focusedHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-basic-renderer-${focusedCell.rowIndex}-${columnIndex}`);
+        if (focusedHtml) {
+          focusedHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-renderer-focused');
+        }
+      }
+    }
   }
 
   /**
    * Update css
    */
   private cellUpdateRangeClasses(showFillIfPossible: boolean): void {
+    // remove focused from cells
+    const focusedHtmlElements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-basic-renderer');
+    for (let elementIndex = 0; elementIndex < focusedHtmlElements.length; elementIndex++) {
+      focusedHtmlElements[elementIndex].classList.remove('gd-spreadsheet-editor-v2-cell-basic-renderer-focused');
+    }
+
     // remove selected from previous cells
     const selectedHtmlElements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-basic-renderer-selected');
     for (let elementIndex = 0; elementIndex < selectedHtmlElements.length; elementIndex++) {

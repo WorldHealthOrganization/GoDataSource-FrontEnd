@@ -16,6 +16,7 @@ import { AppFormDateV2Component } from '../../../../forms-v2/components/app-form
 })
 export class AppSpreadsheetEditorV2CellBasicRendererComponent implements ICellRendererAngularComp {
   // data
+  id: string;
   selectedId: string;
   fillId: string;
   params: ICellRendererParams;
@@ -56,8 +57,12 @@ export class AppSpreadsheetEditorV2CellBasicRendererComponent implements ICellRe
     // - important to use getUserProvidedColDef to retrieve for location columns to work properly
     this.params = params;
     this.colDef = this.params.column.getUserProvidedColDef() as IV2SpreadsheetEditorExtendedColDef;
-    this.selectedId = `gd-spreadsheet-editor-v2-cell-basic-renderer-selected-${this.params.rowIndex}-${this.colDef.editor.columnsMap[this.colDef.columnDefinition.field].index}`;
-    this.fillId = `gd-spreadsheet-editor-v2-cell-basic-renderer-fill-${this.params.rowIndex}-${this.colDef.editor.columnsMap[this.colDef.columnDefinition.field].index}`;
+
+    // ids
+    const columnIndex: number = this.colDef.editor.columnsMap[this.colDef.columnDefinition.field].index;
+    this.id = `gd-spreadsheet-editor-v2-cell-basic-renderer-${this.params.rowIndex}-${columnIndex}`;
+    this.selectedId = `gd-spreadsheet-editor-v2-cell-basic-renderer-selected-${this.params.rowIndex}-${columnIndex}`;
+    this.fillId = `gd-spreadsheet-editor-v2-cell-basic-renderer-fill-${this.params.rowIndex}-${columnIndex}`;
 
     // update ui
     this.changeDetectorRef.detectChanges();

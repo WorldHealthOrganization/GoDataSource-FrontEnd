@@ -6,6 +6,14 @@ import { AppSpreadsheetEditorV2EditorLocationComponent } from '../components/edi
 import { AppSpreadsheetEditorV2EditorNumberComponent } from '../components/editor-number/app-spreadsheet-editor-v2-editor-number.component';
 
 /**
+ * Validator - required
+ */
+interface IV2SpreadsheetEditorColumnValidatorRequired {
+  // optional
+  required?: (rowData: any) => boolean;
+}
+
+/**
  * Column type
  */
 export enum V2SpreadsheetEditorColumnType {
@@ -42,6 +50,7 @@ export interface IV2SpreadsheetEditorColumnText extends Omit<IV2SpreadsheetEdito
   editor?: {
     params?: ITextCellEditorParams
   };
+  validators?: IV2SpreadsheetEditorColumnValidatorRequired;
 }
 
 /**

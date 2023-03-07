@@ -16,6 +16,10 @@
     }
   }
 
+  &.gd-spreadsheet-editor-v2-cell-basic-renderer-focused {
+    border: 1px solid rgba(red, 0.6);
+  }
+
   .gd-spreadsheet-editor-v2-cell-basic-renderer-selected {
     display: none;
     position: absolute;
