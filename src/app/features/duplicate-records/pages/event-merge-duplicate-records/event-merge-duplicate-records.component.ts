@@ -32,6 +32,7 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
     date: ILabelValuePairModel[],
     dateOfReporting: ILabelValuePairModel[],
     isDateOfReportingApproximate: ILabelValuePairModel[],
+    visualId: ILabelValuePairModel[],
     responsibleUserId: ILabelValuePairModel[],
     eventCategory: ILabelValuePairModel[],
     endDate: ILabelValuePairModel[],
@@ -129,6 +130,10 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
                 mergeRecords,
                 'isDateOfReportingApproximate'
               ).options,
+              visualId: this.getFieldOptions(
+                mergeRecords,
+                'visualId'
+              ).options,
               responsibleUserId: this.getFieldOptions(
                 mergeRecords,
                 'responsibleUserId'
@@ -191,6 +196,9 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
             data.isDateOfReportingApproximate = this._uniqueOptions.isDateOfReportingApproximate.length === 1 ?
               this._uniqueOptions.isDateOfReportingApproximate[0].value :
               data.isDateOfReportingApproximate;
+            data.visualId = this._uniqueOptions.visualId.length === 1 ?
+              this._uniqueOptions.visualId[0].value :
+              data.visualId;
             data.responsibleUserId = this._uniqueOptions.responsibleUserId.length === 1 ?
               this._uniqueOptions.responsibleUserId[0].value :
               data.responsibleUserId;
@@ -527,6 +535,21 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
               get: () => this.itemData.isDateOfReportingApproximate as any,
               set: (value) => {
                 this.itemData.isDateOfReportingApproximate = value as any;
+              }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.SELECT_SINGLE,
+            name: 'visualId',
+            placeholder: () => 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
+            description: () => this.translateService.instant(
+              'LNG_EVENT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
+              this.selectedOutbreak.eventIdMask
+            ),
+            options: this._uniqueOptions.visualId,
+            value: {
+              get: () => this.itemData.visualId,
+              set: (value) => {
+                this.itemData.visualId = value;
               }
             }
           }, {

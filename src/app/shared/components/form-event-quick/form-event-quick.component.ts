@@ -7,6 +7,8 @@ import { OutbreakDataService } from '../../../core/services/data/outbreak.data.s
 import { Constants } from '../../../core/models/constants';
 import { EventModel } from '../../../core/models/event.model';
 import { Subscription } from 'rxjs/internal/Subscription';
+import { IAppFormIconButtonV2 } from '../../forms-v2/core/app-form-icon-button-v2';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-form-event-quick',
@@ -26,13 +28,35 @@ export class FormEventQuickComponent extends GroupBase<EventModel> implements On
   // selected outbreak
   selectedOutbreak: OutbreakModel;
 
+  visualIDTooltip: string;
+
   outbreakSubscriber: Subscription;
+
+  visualIdSuffixIconButtons: IAppFormIconButtonV2[] = [{
+    icon: 'refresh',
+    tooltip: 'LNG_PAGE_ACTION_REFRESH_VISUAL_ID_DESCRIPTION',
+    clickAction: (input) => {
+      // nothing to do ?
+      if (!this.selectedOutbreak?.eventIdMask) {
+        return;
+      }
+
+      // generate
+      this.event.visualId = EventModel.generateEventIDMask(this.selectedOutbreak.eventIdMask);
+      this.groupForm.controls.visualId.markAsDirty();
+      this.onChange();
+
+      // mark as dirty
+      input.control?.markAsDirty();
+    }
+  }];
 
   constructor(
   @Optional() @Host() @SkipSelf() controlContainer: ControlContainer,
     @Optional() @Inject(NG_VALIDATORS) validators: Array<any>,
     @Optional() @Inject(NG_ASYNC_VALIDATORS) asyncValidators: Array<any>,
-    private outbreakDataService: OutbreakDataService
+    private outbreakDataService: OutbreakDataService,
+    private translateService: TranslateService
   ) {
     super(controlContainer, validators, asyncValidators);
   }
@@ -50,6 +74,13 @@ export class FormEventQuickComponent extends GroupBase<EventModel> implements On
       .subscribe((selectedOutbreak: OutbreakModel) => {
         this.selectedOutbreak = selectedOutbreak;
       });
+
+    // set visual ID translate data
+    this.visualIDTooltip = this.translateService.instant(
+      'LNG_EVENT_FIELD_LABEL_VISUAL_ID_DESCRIPTION', {
+        mask: EventModel.generateEventIDMask(this.selectedOutbreak.eventIdMask)
+      }
+    );
   }
 
   ngOnDestroy() {
