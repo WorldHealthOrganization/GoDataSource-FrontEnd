@@ -1,6 +1,7 @@
 <div
   class="gd-spreadsheet-editor-v2-cell-basic-renderer"
   [ngSwitch]="colDef.columnDefinition?.type"
+  [cdkContextMenuTriggerFor]="contextMenuTemplate"
   (mouseenter)="mouseEnter($event)"
   (mousedown)="mouseDown($event)"
   (mouseup)="mouseUp()"
@@ -93,3 +94,111 @@
     class="gd-spreadsheet-editor-v2-cell-basic-renderer-fill"
     (mousedown)="fillMouseDown($event)"></div>
 </div>
+
+<!-- Context menu for spreadsheet-editor -->
+<ng-template
+  #contextMenuTemplate>
+  <div
+    cdkMenu
+    class="gd-context-menu">
+
+    <!-- Cut -->
+    <button
+      class="gd-context-menu-item"
+      fxLayout="row"
+      cdkMenuItem
+      [disabled]="colDef.editor.selection.selected.ranges.length < 1">
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_CUT' | translate}}
+      </div>
+
+      <!-- Shortcut -->
+      <div
+        fxGrow="0">
+        Ctrl+X
+      </div>
+    </button>
+
+    <!-- Copy -->
+    <button
+      class="gd-context-menu-item"
+      fxLayout="row"
+      cdkMenuItem
+      [disabled]="colDef.editor.selection.selected.ranges.length < 1">
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_COPY' | translate}}
+      </div>
+
+      <!-- Shortcut -->
+      <div
+        fxGrow="0">
+        Ctrl+C
+      </div>
+    </button>
+
+    <!-- Paste -->
+    <button
+      class="gd-context-menu-item"
+      fxLayout="row"
+      cdkMenuItem
+      [disabled]="colDef.editor.selection.selected.ranges.length !== 1">
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_PASTE' | translate}}
+      </div>
+
+      <!-- Shortcut -->
+      <div
+        fxGrow="0">
+        Ctrl+V
+      </div>
+    </button>
+
+    <!-- Delete -->
+    <button
+      class="gd-context-menu-item"
+      fxLayout="row"
+      cdkMenuItem
+      [disabled]="colDef.editor.selection.selected.ranges.length !== 1">
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_DELETE' | translate}}
+      </div>
+
+      <!-- Shortcut -->
+      <div
+        fxGrow="0">
+        Delete
+      </div>
+    </button>
+
+
+    <button
+      class="gd-context-menu-item"
+      cdkMenuItem
+      [disabled]="colDef.editor.selection.selected.ranges.length < 1">
+      Copy and configure
+    </button>
+    <button
+      class="gd-context-menu-item"
+      cdkMenuItem>
+      Paste and configure...
+    </button>
+    <button
+      class="gd-context-menu-item"
+      cdkMenuItem>
+      Undo / Redo...
+    </button>
+  </div>
+</ng-template>
+

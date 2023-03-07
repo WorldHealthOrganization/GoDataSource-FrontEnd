@@ -13,6 +13,8 @@ import * as moment from 'moment';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { AppSpreadsheetEditorV2CellBasicHeaderComponent } from './components/header-basic/app-spreadsheet-editor-v2-cell-basic-header.component';
 import { AppSpreadsheetEditorV2CellRowNoRendererComponent } from './components/cell-row-no-renderer/app-spreadsheet-editor-v2-cell-row-no-renderer.component';
+import { NewValueParams, SuppressHeaderKeyboardEventParams, SuppressKeyboardEventParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
+import { IV2SpreadsheetEditorChangeValues, V2SpreadsheetEditorChange, V2SpreadsheetEditorChangeType } from './models/change.model';
 
 /**
  * Component
@@ -27,6 +29,7 @@ import { AppSpreadsheetEditorV2CellRowNoRendererComponent } from './components/c
 export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   // max number of ms until outside leave is consider mouse out
   private static readonly HOVER_OUTSIDE_LIMIT_UNTIL_MOUSE_OUT: number = 500;
+  private static readonly MAX_UNDO_TO_KEEP: number = 100;
 
   // breadcrumbs
   @Input() breadcrumbs: IV2Breadcrumb[];
@@ -47,6 +50,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   get columns(): V2SpreadsheetEditorColumn[] {
     return this._columns;
   }
+
+  // keep changes
+  private _changes: V2SpreadsheetEditorChange[] = [];
+  private _changesIndex: number = 0;
 
   // editor
   editor: IV2SpreadsheetEditorExtendedColDefEditor = {
@@ -253,13 +260,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     this._locationColumns = [];
     this.editor.columnsMap = {};
     this.editor.locationNamesMap = {};
-    this.editor.selection.selected = {
-      collecting: undefined,
-      previousCollecting: undefined,
-      outTime: undefined,
-      fill: undefined,
-      ranges: []
-    };
+    this.editorClearSelected(false);
 
     // ag table not initialized ?
     if (!this._agTable) {
@@ -301,7 +302,13 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         padding: '0',
         border: 'none'
       },
-      headerComponent: AppSpreadsheetEditorV2CellBasicHeaderComponent
+      headerComponent: AppSpreadsheetEditorV2CellBasicHeaderComponent,
+      suppressKeyboardEvent: (params): boolean => {
+        return this.suppressKeyboardEvent(params);
+      },
+      suppressHeaderKeyboardEvent: (params): boolean => {
+        return this.suppressKeyboardEvent(params);
+      }
     }];
 
     // process columns in default order
@@ -346,7 +353,16 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           padding: '0',
           border: 'none'
         },
-        headerComponent: AppSpreadsheetEditorV2CellBasicHeaderComponent
+        headerComponent: AppSpreadsheetEditorV2CellBasicHeaderComponent,
+        suppressKeyboardEvent: (params): boolean => {
+          return this.suppressKeyboardEvent(params);
+        },
+        suppressHeaderKeyboardEvent: (params): boolean => {
+          return this.suppressKeyboardEvent(params);
+        },
+        onCellValueChanged: (event) => {
+          this.cellValueChanged(event);
+        }
       };
 
       // map
@@ -490,6 +506,25 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // not merged
     return undefined;
+  }
+
+  /**
+   * Clear selected
+   */
+  private editorClearSelected(redrawSelected: boolean): void {
+    // clear selected
+    this.editor.selection.selected = {
+      collecting: undefined,
+      previousCollecting: undefined,
+      outTime: undefined,
+      fill: undefined,
+      ranges: []
+    };
+
+    // redraw ?
+    if (redrawSelected) {
+      this.cellUpdateRangeClasses(false);
+    }
   }
 
   /**
@@ -1297,9 +1332,37 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Cell value changed
+   */
+  private cellValueChanged(event: NewValueParams): void {
+    // nothing to do ?
+    const columnField: string = event.column.getUserProvidedColDef().field;
+    if (columnField === AppSpreadsheetEditorV2CellBasicHeaderComponent.DEFAULT_COLUMN_ROW_NO) {
+      return;
+    }
+
+    // append to changes for redo
+    this.cellAppendChange({
+      type: V2SpreadsheetEditorChangeType.VALUES,
+      changes: {
+        rows: {
+          [event.node.rowIndex]: {
+            columns: {
+              [this.editor.columnsMap[columnField].index]: {
+                old: event.oldValue,
+                new: event.newValue
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  /**
    * Context menu option - cut
    */
-  cellCut(): void {
+  private cellCut(): void {
     // nothing to do ?
     if (this.editor.selection.selected.ranges.length < 1) {
       return;
@@ -1431,65 +1494,420 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   /**
    * Context menu option - copy
    */
-  cellCopy(): void {
+  private cellCopy(): void {
     // #TODO
     this.cellCut();
   }
 
   /**
-   * Grid key down
+   * Context menu option - paste
    */
-  gridKeyDown(keyboardEvent: KeyboardEvent): void {
+  private cellPaste(): void {
+    // #TODO
+    console.log('cellPaste');
+  }
+
+  /**
+   * Context menu option - undo
+   */
+  private cellUndo(): void {
+    // nothing to do ?
+    if (this._changesIndex < 1) {
+      return;
+    }
+
+    // no clear selection because this will lose focus, and we can't chain cell undo
+
+    // determine change without removing it from the list since we need it for cell redo
+    this._changesIndex--;
+    const change = this._changes[this._changesIndex];
+
+    // undo change
+    switch (change.type) {
+      case V2SpreadsheetEditorChangeType.VALUES:
+
+        // put values back
+        const rowIndexes = Object.keys(change.changes.rows).map((rowIndex) => parseInt(rowIndex, 10));
+        rowIndexes.forEach((rowIndex) => {
+          // determine column indexes
+          const columnIndexes = Object.keys(change.changes.rows[rowIndex].columns).map((columnIndex) => parseInt(columnIndex, 10));
+          columnIndexes.forEach((columnIndex) => {
+            // put back old value
+            const oldValue = change.changes.rows[rowIndex].columns[columnIndex].old;
+            const rowNode = this._agTable.api.getDisplayedRowAtIndex(rowIndex);
+
+            // update value without triggering value changed
+            const columnField = this.columns[columnIndex - 1].field;
+            rowNode.data[columnField] = oldValue;
+          });
+        });
+
+        // finished
+        break;
+
+      case V2SpreadsheetEditorChangeType.ADD_ROWS:
+
+        // clear selection
+        // this.editorClearSelected(true);
+        // #TODO
+
+        // finished
+        break;
+
+      case V2SpreadsheetEditorChangeType.REMOVE_ROWS:
+
+        // clear selection
+        // this.editorClearSelected(true);
+        // #TODO
+
+        // finished
+        break;
+    }
+
+    // redraw
+    this._agTable.api.refreshCells({
+      force: false,
+      suppressFlash: false
+    });
+  }
+
+  /**
+   * Context menu option - redo
+   */
+  private cellRedo(): void {
+    // nothing to do ?
+    if (this._changesIndex >= this._changes.length) {
+      return;
+    }
+
+    // no clear selection because this will lose focus, and we can't chain cell redo
+
+    // determine change
+    const change = this._changes[this._changesIndex];
+    this._changesIndex++;
+
+    // redo change
+    switch (change.type) {
+      case V2SpreadsheetEditorChangeType.VALUES:
+
+        // put values back
+        const rowIndexes = Object.keys(change.changes.rows).map((rowIndex) => parseInt(rowIndex, 10));
+        rowIndexes.forEach((rowIndex) => {
+          // determine column indexes
+          const columnIndexes = Object.keys(change.changes.rows[rowIndex].columns).map((columnIndex) => parseInt(columnIndex, 10));
+          columnIndexes.forEach((columnIndex) => {
+            // put back new value
+            const newValue = change.changes.rows[rowIndex].columns[columnIndex].new;
+            const rowNode = this._agTable.api.getDisplayedRowAtIndex(rowIndex);
+
+            // update value without triggering value changed
+            const columnField = this.columns[columnIndex - 1].field;
+            rowNode.data[columnField] = newValue;
+          });
+        });
+
+        // finished
+        break;
+
+      case V2SpreadsheetEditorChangeType.ADD_ROWS:
+
+        // clear selection
+        // this.editorClearSelected(true);
+        // #TODO
+
+        // finished
+        break;
+
+      case V2SpreadsheetEditorChangeType.REMOVE_ROWS:
+
+        // clear selection
+        // this.editorClearSelected(true);
+        // #TODO
+
+        // finished
+        break;
+    }
+
+    // redraw
+    this._agTable.api.refreshCells({
+      force: false,
+      suppressFlash: false
+    });
+  }
+
+  /**
+   * Cell - delete content
+   */
+  private cellDeleteContent(): void {
+    // nothing to delete ?
+    if (this.editor.selection.selected.ranges.length < 1) {
+      return;
+    }
+
+    // go through ranges and delete
+    const change: IV2SpreadsheetEditorChangeValues = {
+      type: V2SpreadsheetEditorChangeType.VALUES,
+      changes: {
+        rows: {}
+      }
+    };
+    this.editor.selection.selected.ranges.forEach((range) => {
+      // go through rows
+      for (let rowIndex: number = range.rows.start; rowIndex <= range.rows.end; rowIndex++) {
+        // initialize
+        change.changes.rows[rowIndex] = {
+          columns: {}
+        };
+
+        // retrieve row data
+        const rowNode = this._agTable.api.getDisplayedRowAtIndex(rowIndex);
+
+        // go through columns
+        for (let columnIndex: number = range.columns.start; columnIndex <= range.columns.end; columnIndex++) {
+          // determine column field
+          // -1 because row no not included in this.columns
+          const columnField: string = this.columns[columnIndex - 1].field;
+
+          // save value
+          change.changes.rows[rowIndex].columns[columnIndex] = {
+            old: rowNode.data[columnField],
+            new: null
+          };
+
+          // delete value
+          rowNode.data[columnField] = null;
+        }
+      }
+    });
+
+    // redraw
+    this._agTable.api.refreshCells({
+      force: false,
+      suppressFlash: true
+    });
+
+    // append change
+    this.cellAppendChange(change);
+  }
+
+  /**
+   * Cell - tab to next cell
+   */
+  private cellTabToNext(): void {
+    // focused cell
+    this._agTable.api.tabToNextCell();
+    const focusedCell = this._agTable.api.getFocusedCell();
+
+    // nothing to do ?
+    if (!focusedCell) {
+      return;
+    }
+
+    // display the newly focused cell
+    const columnIndex: number = this.editor.columnsMap[focusedCell.column.getUserProvidedColDef().field].index;
+    this.editor.selection.selected = {
+      collecting: undefined,
+      previousCollecting: undefined,
+      outTime: undefined,
+      fill: undefined,
+      ranges: [{
+        rows: {
+          start: focusedCell.rowIndex,
+          end: focusedCell.rowIndex
+        },
+        columns: {
+          start: columnIndex,
+          end: columnIndex
+        }
+      }]
+    };
+
+    // redraw ranges
+    this.cellUpdateRangeClasses(true);
+  }
+
+  /**
+   * Cell key down
+   */
+  private suppressKeyboardEvent(
+    params: SuppressKeyboardEventParams | SuppressHeaderKeyboardEventParams
+  ): boolean {
     // nothing to do ?
     if (
       this.editor.selection.selected.ranges.length < 1 ||
       this._agTable.api.getEditingCells().length > 0
     ) {
-      return;
+      // don't block caller
+      return false;
     }
 
     // select next cell ?
-    const focusedCell = this._agTable.api.getFocusedCell();
-    if (
-      focusedCell &&
-      keyboardEvent.code === 'Tab'
-    ) {
-      // display the newly focused cell
-      const columnIndex = this.editor.columnsMap[focusedCell.column.getUserProvidedColDef().field].index;
-      this.editor.selection.selected = {
-        collecting: undefined,
-        previousCollecting: undefined,
-        outTime: undefined,
-        fill: undefined,
-        ranges: [{
-          rows: {
-            start: focusedCell.rowIndex,
-            end: focusedCell.rowIndex
-          },
-          columns: {
-            start: columnIndex,
-            end: columnIndex
-          }
-        }]
-      };
+    if (params.event.code === 'Tab') {
+      // allow bubble
 
-      // redraw ranges
-      this.cellUpdateRangeClasses(true);
+      // select next cel
+      this.cellTabToNext();
 
-      // finished
-      return;
+      // stop tba jumping to next html element that allows tab
+      // - browser default
+      params.event.preventDefault();
+
+      // block caller
+      return true;
     }
 
-    // undo / redo
-    // #TODO
+    // cut selected cells
+    if (
+      params.event.ctrlKey &&
+      params.event.code === 'KeyA'
+    ) {
+      // stop browser default
+      params.event.preventDefault();
+
+      // just ignore if bubble
+      if (params.event.repeat) {
+        // block caller
+        return true;
+      }
+
+      // select all
+      this.rangeMouseDown(
+        {
+          start: 0,
+          end: this._agTable.api.getDisplayedRowCount() - 1
+        }, {
+          start: 1,
+          end: this.columns.length
+        },
+        false,
+        false
+      );
+
+      // block caller
+      return true;
+    }
 
     // #TODO
+    // Page Up and Page Down will not get handled by the grid.
+    //   Home will not focus top left cell.
+    // End will not focus bottom right cell.
+    // ← ↑ → ↓ Arrow keys will not navigate focused cell.
+
+    // delete cell content ?
+    if (params.event.code === 'Delete') {
+      // just ignore if bubble
+      if (params.event.repeat) {
+        // block caller
+        return true;
+      }
+
+      // delete content
+      this.cellDeleteContent();
+
+      // block caller
+      return true;
+    }
+
+    // cut selected cells
     if (
-      keyboardEvent.ctrlKey &&
-      keyboardEvent.code === 'KeyC'
+      params.event.ctrlKey &&
+      params.event.code === 'KeyX'
     ) {
+      // just ignore if bubble
+      if (params.event.repeat) {
+        // block caller
+        return true;
+      }
+
+      // cut selected
+      this.cellCut();
+
+      // block caller
+      return true;
+    }
+
+    // copy selected cells
+    if (
+      params.event.ctrlKey &&
+      params.event.code === 'KeyC'
+    ) {
+      // just ignore if bubble
+      if (params.event.repeat) {
+        // block caller
+        return true;
+      }
+
+      // copy selected
       this.cellCopy();
+
+      // block caller
+      return true;
     }
+
+    // paste
+    if (
+      params.event.ctrlKey &&
+      params.event.code === 'KeyV'
+    ) {
+      // just ignore if bubble
+      if (params.event.repeat) {
+        // block caller
+        return true;
+      }
+
+      // paste
+      this.cellPaste();
+
+      // block caller
+      return true;
+    }
+
+    // undo
+    if (
+      params.event.ctrlKey &&
+      params.event.code === 'KeyZ'
+    ) {
+      // stop browser default
+      params.event.preventDefault();
+
+      // just ignore if bubble
+      if (params.event.repeat) {
+        // block caller
+        return true;
+      }
+
+      // undo
+      this.cellUndo();
+
+      // block caller
+      return true;
+    }
+
+    // redo
+    if (
+      params.event.ctrlKey &&
+      params.event.code === 'KeyY'
+    ) {
+      // stop browser default
+      params.event.preventDefault();
+
+      // just ignore if bubble
+      if (params.event.repeat) {
+        // block caller
+        return true;
+      }
+
+      // redo
+      this.cellRedo();
+
+      // block caller
+      return true;
+    }
+
+    // don't block caller
+    // - do whatever the default behavior would be
+    // - let God decide
+    return false;
   }
 
   /**
@@ -1497,6 +1915,27 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    */
   gridBodyScrollEnd(): void {
     // redraw ranges since they might've disappeared when cells were destroyed
+    // #TODO
     this.cellUpdateRangeClasses(true);
+  }
+
+  /**
+   * Append change
+   */
+  private cellAppendChange(change: V2SpreadsheetEditorChange): void {
+    // on first change remove all undo, since we need to overwrite them
+    while (this._changes.length > this._changesIndex) {
+      this._changes.pop();
+    }
+
+    // round-robin
+    while (this._changes.length >= AppSpreadsheetEditorV2Component.MAX_UNDO_TO_KEEP) {
+      // remove first element - oldest element
+      this._changes.shift();
+    }
+
+    // add the new change at the end
+    this._changes.push(change);
+    this._changesIndex = this._changes.length;
   }
 }

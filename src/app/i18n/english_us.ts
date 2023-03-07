@@ -11,7 +11,11 @@ export const EnglishUsLang = {
      */
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
-
+    'LNG_SHEET_CONTEXT_MENU_PASTE': 'Paste',
+    'LNG_SHEET_CONTEXT_MENU_DELETE': 'Delete',
+    'LNG_SHEET_CONTEXT_MENU_ROW_ABOVE': 'Add row(s) above',
+    'LNG_SHEET_CONTEXT_MENU_ROW_BELOW': 'Add row(s) below',
+    'LNG_SHEET_CONTEXT_MENU_REMOVE_ROW': 'Delete selected rows'
 
 
     /**

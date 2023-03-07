@@ -16,7 +16,8 @@ app-spreadsheet-editor-v2 {
   }
 }
 
-.gd-spreadsheet-editor-context-menu {
+// #TODO - move somewhere global ?
+.gd-context-menu {
   display: inline-flex;
   flex-direction: column;
   min-width: 180px;
@@ -24,7 +25,7 @@ app-spreadsheet-editor-v2 {
   background-color: rgb(255, 255, 255);
   padding: 6px 0;
 
-  .gd-spreadsheet-editor-context-menu-item {
+  .gd-context-menu-item {
     background-color: transparent;
     cursor: pointer;
     border: none;
