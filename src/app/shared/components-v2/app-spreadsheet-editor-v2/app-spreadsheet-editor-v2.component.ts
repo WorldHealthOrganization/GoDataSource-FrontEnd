@@ -2191,6 +2191,14 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Cell editing stopped
+   */
+  gridCellEditingStopped(): void {
+    // update css
+    this.cellUpdateRangeClasses(true);
+  }
+
+  /**
    * Append change
    */
   private cellAppendChange(change: V2SpreadsheetEditorChange): void {
