@@ -20,6 +20,7 @@ import { catchError } from 'rxjs/operators';
 import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 import { AppSpreadsheetEditorV2LoadingComponent } from './components/loading/app-spreadsheet-editor-v2-loading.component';
 import { AppSpreadsheetEditorV2NoDataComponent } from './components/no-data/app-spreadsheet-editor-v2-no-data.component';
+import * as _ from 'lodash';
 
 /**
  * Component
@@ -479,6 +480,23 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         },
         onCellValueChanged: (event) => {
           this.cellValueChanged(event);
+        },
+        valueGetter: (params): any => {
+          return _.get(
+            params.data,
+            params.column.getUserProvidedColDef().field
+          );
+        },
+        valueSetter: (params) => {
+          // set value
+          _.set(
+            params.data,
+            params.column.getUserProvidedColDef().field,
+            params.newValue
+          );
+
+          // finished
+          return true;
         }
       };
 
@@ -799,10 +817,17 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           // determine value
           // -1 because we need to exclude row no column which isn't in this.columns
           const columnField: string = this.columns[columnIndex - 1].field;
-          const value = copyFromRowData[columnField];
+          const value = _.get(
+            copyFromRowData,
+            columnField
+          );
 
           // update data
-          rowData[columnField] = value;
+          _.set(
+            rowData,
+            columnField,
+            value
+          );
         }
       }
 
@@ -903,7 +928,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // focused cell
     const focusedCell = this._agTable.api.getFocusedCell();
-    if (focusedCell) {
+    if (
+      focusedCell &&
+      !this.editor.selection.selected.collecting
+    ) {
       // determine if selectable column
       const columnField: string = focusedCell.column.getUserProvidedColDef().field;
       if (columnField !== AppSpreadsheetEditorV2CellBasicHeaderComponent.DEFAULT_COLUMN_ROW_NO) {
@@ -1592,9 +1620,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
       // flash
       this._agTable.api.flashCells({
-        rowNodes: rowNodes.filter((_, rowIndex) => mustCopy[rowIndex]),
+        rowNodes: rowNodes.filter((_n, rowIndex) => mustCopy[rowIndex]),
         // +1 because we need to exclude row no column which isn't in this.columns
-        columns: this.columns.filter((_, columnIndex) => mustAppendColumn[columnIndex + 1]).map((col) => col.field)
+        columns: this.columns.filter((_n, columnIndex) => mustAppendColumn[columnIndex + 1]).map((col) => col.field)
       });
     }
 
@@ -1703,7 +1731,11 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
             // update value without triggering value changed
             const columnField = this.columns[columnIndex - 1].field;
-            rowNode.data[columnField] = oldValue;
+            _.set(
+              rowNode.data,
+              columnField,
+              oldValue
+            );
           });
         });
 
@@ -1770,7 +1802,11 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
             // update value without triggering value changed
             const columnField = this.columns[columnIndex - 1].field;
-            rowNode.data[columnField] = newValue;
+            _.set(
+              rowNode.data,
+              columnField,
+              newValue
+            );
           });
         });
 
@@ -1838,12 +1874,19 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
           // save value
           change.changes.rows[rowIndex].columns[columnIndex] = {
-            old: rowNode.data[columnField],
+            old: _.get(
+              rowNode.data,
+              columnField
+            ),
             new: null
           };
 
           // delete value
-          rowNode.data[columnField] = null;
+          _.set(
+            rowNode.data,
+            columnField,
+            null
+          );
         }
       }
     });
