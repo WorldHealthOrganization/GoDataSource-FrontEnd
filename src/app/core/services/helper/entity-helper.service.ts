@@ -571,6 +571,9 @@ export class EntityHelperService {
     if (entity instanceof EventModel) {
       lightObject.push(
         {
+          label: 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
+          value: entity.visualId
+        }, {
           label: 'LNG_EVENT_FIELD_LABEL_NAME',
           value: entity.name
         }, {
