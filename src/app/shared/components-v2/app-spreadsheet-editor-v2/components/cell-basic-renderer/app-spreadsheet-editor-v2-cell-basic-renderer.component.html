@@ -14,19 +14,16 @@
 
     <!-- Single select -->
     <div
-      *ngSwitchCase="V2SpreadsheetEditorColumnType.SINGLE_SELECT"
-      class="gd-spreadsheet-editor-v2-cell-basic-renderer-value-select">
+      *ngSwitchCase="V2SpreadsheetEditorColumnType.SINGLE_SELECT">
 
       <!-- Text -->
       <div
-        class="gd-spreadsheet-editor-v2-cell-basic-renderer-value-select-text"
         fxFlex>
         {{ params.value && colDef.columnDefinition.optionsMap![params.value] ? (colDef.columnDefinition.optionsMap![params.value].label | translate) : params.value }}
       </div>
 
       <!-- Editor open -->
       <div
-        class="gd-spreadsheet-editor-v2-cell-basic-renderer-value-select-editor"
         fxGrow="0" fxLayoutAlign="start center">
         <mat-icon
           (click)="startEditCell()">unfold_more</mat-icon>
@@ -35,19 +32,16 @@
 
     <!-- Date -->
     <div
-      *ngSwitchCase="V2SpreadsheetEditorColumnType.DATE"
-      class="gd-spreadsheet-editor-v2-cell-basic-renderer-value-date">
+      *ngSwitchCase="V2SpreadsheetEditorColumnType.DATE">
 
       <!-- Text -->
       <div
-        class="gd-spreadsheet-editor-v2-cell-basic-renderer-value-date-text"
         fxFlex>
         {{ params.value | dateDefault }}
       </div>
 
       <!-- Editor open -->
       <div
-        class="gd-spreadsheet-editor-v2-cell-basic-renderer-value-date-editor"
         fxGrow="0" fxLayoutAlign="start center">
         <mat-icon
           (click)="startEditCell(AppFormDateV2Component.ACTION_KEY_CALENDAR)">today</mat-icon>
@@ -56,19 +50,16 @@
 
     <!-- Location -->
     <div
-      *ngSwitchCase="V2SpreadsheetEditorColumnType.LOCATION"
-      class="gd-spreadsheet-editor-v2-cell-basic-renderer-value-location">
+      *ngSwitchCase="V2SpreadsheetEditorColumnType.LOCATION">
 
       <!-- Text -->
       <div
-        class="gd-spreadsheet-editor-v2-cell-basic-renderer-value-location-text"
         fxFlex>
         {{ params.value && colDef.editor.locationNamesMap && colDef.editor.locationNamesMap[params.value] ? colDef.editor.locationNamesMap[params.value] : params.value }}
       </div>
 
       <!-- Editor open -->
       <div
-        class="gd-spreadsheet-editor-v2-cell-basic-renderer-value-location-editor"
         fxGrow="0" fxLayoutAlign="start center">
         <mat-icon
           (click)="startEditCell()">location_on</mat-icon>
@@ -77,8 +68,7 @@
 
     <!-- Default: text, textarea ... -->
     <div
-      *ngSwitchDefault
-      class="gd-spreadsheet-editor-v2-cell-basic-renderer-value-default">
+      *ngSwitchDefault>
       {{ params.value }}
     </div>
 
