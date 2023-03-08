@@ -6,6 +6,14 @@ import { AppSpreadsheetEditorV2EditorLocationComponent } from '../components/edi
 import { AppSpreadsheetEditorV2EditorNumberComponent } from '../components/editor-number/app-spreadsheet-editor-v2-editor-number.component';
 
 /**
+ * Editor handler
+ */
+export interface IV2SpreadsheetEditorHandler {
+  // required
+  rowValidate(rowIndex: number): void;
+}
+
+/**
  * Validator - required
  */
 interface IV2SpreadsheetEditorColumnValidatorRequired {
@@ -38,6 +46,7 @@ interface IV2SpreadsheetEditorColumnBase {
   editor?: never;
   optionsMap?: never;
   validators?: never;
+  change?: never;
 }
 
 /**
@@ -70,7 +79,7 @@ export interface IV2SpreadsheetEditorColumnTextarea extends Omit<IV2SpreadsheetE
 /**
  * Column - dropdown
  */
-export interface IV2SpreadsheetEditorColumnSingleSelect extends Omit<IV2SpreadsheetEditorColumnBase, 'optionsMap'> {
+export interface IV2SpreadsheetEditorColumnSingleSelect extends Omit<IV2SpreadsheetEditorColumnBase, 'optionsMap' | 'change'> {
   // required
   type: V2SpreadsheetEditorColumnType.SINGLE_SELECT;
   options: ILabelValuePairModel[];
@@ -79,6 +88,11 @@ export interface IV2SpreadsheetEditorColumnSingleSelect extends Omit<IV2Spreadsh
   optionsMap?: {
     [key: string]: ILabelValuePairModel
   };
+  change?: (
+    rowIndex: number,
+    rowData: any,
+    handler: IV2SpreadsheetEditorHandler
+  ) => void;
 }
 
 /**

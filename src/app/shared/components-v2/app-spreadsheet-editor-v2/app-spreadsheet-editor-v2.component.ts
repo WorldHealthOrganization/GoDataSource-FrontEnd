@@ -882,7 +882,16 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
             columnField,
             value
           );
+
+          // trigger events
+          this.cellTriggerEvents(
+            rowIndex,
+            columnField
+          );
         }
+
+        // validate
+        this.rowValidate(rowIndex);
       }
 
       // add change to list of changes
@@ -1646,6 +1655,32 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         }
       }
     });
+
+    // trigger events
+    this.cellTriggerEvents(
+      event.node.rowIndex,
+      columnField
+    );
+  }
+
+  /**
+   * Cell trigger events
+   */
+  private cellTriggerEvents(
+    rowIndex: number,
+    columnField: string
+  ): void {
+    // trigger change
+    if (this.editor.columnsMap[columnField].columnDefinition.change) {
+      this.editor.columnsMap[columnField].columnDefinition.change(
+        rowIndex,
+        this._agTable.api.getDisplayedRowAtIndex(rowIndex).data, {
+          rowValidate(localRowIndex: number) {
+            this.rowValidate(localRowIndex);
+          }
+        }
+      );
+    }
   }
 
   /**
@@ -1888,6 +1923,12 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
               columnField,
               oldValue
             );
+
+            // trigger events
+            this.cellTriggerEvents(
+              rowIndex,
+              columnField
+            );
           });
 
           // validate
@@ -1966,6 +2007,12 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
               rowNode.data,
               columnField,
               newValue
+            );
+
+            // trigger events
+            this.cellTriggerEvents(
+              rowIndex,
+              columnField
             );
           });
 
@@ -2054,6 +2101,12 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
             rowNode.data,
             columnField,
             null
+          );
+
+          // trigger events
+          this.cellTriggerEvents(
+            rowIndex,
+            columnField
           );
         }
 
