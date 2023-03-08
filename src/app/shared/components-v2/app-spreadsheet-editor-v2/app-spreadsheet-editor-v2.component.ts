@@ -290,6 +290,11 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    * Retrieve data
    */
   private retrieveData(): void {
+    // clear
+    this.editor.locationNamesMap = {};
+    this.editorClearSelected(false);
+    this.editorClearInvalid(false);
+
     // ag table not initialized ?
     if (!this._agTable) {
       // call later
@@ -376,10 +381,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    */
   updateColumnDefinitions(): void {
     // reset
-    this._locationColumns = [];
     this.editor.columnsMap = {};
-    this.editor.locationNamesMap = {};
+    this._locationColumns = [];
     this.editorClearSelected(false);
+    this.editorClearInvalid(false);
 
     // ag table not initialized ?
     if (!this._agTable) {
@@ -633,6 +638,21 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       outTime: undefined,
       fill: undefined,
       ranges: []
+    };
+
+    // redraw ?
+    if (redrawSelected) {
+      this.cellUpdateRangeClasses(false);
+    }
+  }
+
+  /**
+   * Clear invalid
+   */
+  private editorClearInvalid(redrawSelected: boolean): void {
+    // clear selected
+    this.editor.invalid = {
+      rows: {}
     };
 
     // redraw ?
@@ -1767,6 +1787,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
         // clear selection
         // this.editorClearSelected(true);
+        // this.editorClearInvalid(false);
         // #TODO
 
         // finished
@@ -1776,6 +1797,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
         // clear selection
         // this.editorClearSelected(true);
+        // this.editorClearInvalid(false);
         // #TODO
 
         // finished
@@ -1834,6 +1856,12 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
               columnField,
               oldValue
             );
+
+            // validate
+            this.cellValidate(
+              rowIndex,
+              columnIndex
+            );
           });
         });
 
@@ -1844,6 +1872,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
         // clear selection
         // this.editorClearSelected(true);
+        // this.editorClearInvalid(false);
         // #TODO
 
         // finished
@@ -1853,6 +1882,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
         // clear selection
         // this.editorClearSelected(true);
+        // this.editorClearInvalid(false);
         // #TODO
 
         // finished
@@ -1864,6 +1894,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       force: false,
       suppressFlash: false
     });
+
+    // redraw ranges
+    this.cellUpdateRangeClasses(true);
   }
 
   /**
@@ -1905,6 +1938,12 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
               columnField,
               newValue
             );
+
+            // validate
+            this.cellValidate(
+              rowIndex,
+              columnIndex
+            );
           });
         });
 
@@ -1915,6 +1954,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
         // clear selection
         // this.editorClearSelected(true);
+        // this.editorClearInvalid(false);
         // #TODO
 
         // finished
@@ -1924,6 +1964,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
         // clear selection
         // this.editorClearSelected(true);
+        // this.editorClearInvalid(false);
         // #TODO
 
         // finished
@@ -1935,6 +1976,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       force: false,
       suppressFlash: false
     });
+
+    // redraw ranges
+    this.cellUpdateRangeClasses(true);
   }
 
   /**
