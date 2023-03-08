@@ -89,6 +89,51 @@
       </div>
     </button>
 
+    <!-- Undo -->
+    <button
+      class="gd-context-menu-item"
+      fxLayout="row"
+      cdkMenuItem
+      [disabled]="changesIndex < 1"
+      (click)="cellUndo()">
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_UNDO' | translate}}
+      </div>
+
+      <!-- Shortcut -->
+      <div
+        fxGrow="0">
+        Ctrl+Z
+      </div>
+    </button>
+
+    <!-- Redo -->
+    <button
+      class="gd-context-menu-item"
+      fxLayout="row"
+      cdkMenuItem
+      [disabled]="changesIndex >= changes.length"
+      (click)="cellRedo()">
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_REDO' | translate}}
+      </div>
+
+      <!-- Shortcut -->
+      <div
+        fxGrow="0">
+        Ctrl+Y
+      </div>
+    </button>
+
+    <!-- Splitter -->
+    <hr />
+
     <!-- Delete -->
     <button
       class="gd-context-menu-item"
@@ -119,11 +164,6 @@
       class="gd-context-menu-item"
       cdkMenuItem>
       Paste and configure...
-    </button>
-    <button
-      class="gd-context-menu-item"
-      cdkMenuItem>
-      Undo / Redo...
     </button>
   </div>
 </ng-template>
@@ -160,6 +200,9 @@
         {{'LNG_SHEET_CONTEXT_MENU_ROW_BELOW' | translate}}
       </div>
     </button>
+
+    <!-- Splitter -->
+    <hr />
 
     <!-- Delete rows -->
     <button

@@ -25,6 +25,12 @@ app-spreadsheet-editor-v2 {
   background-color: rgb(255, 255, 255);
   padding: 6px 0;
 
+  hr {
+    width: 100%;
+    color: rgba(0, 0, 0, 0.12);
+    height: 1px;
+  }
+
   .gd-context-menu-item {
     background-color: transparent;
     cursor: pointer;

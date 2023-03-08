@@ -2,6 +2,7 @@ import { ColDef } from '@ag-grid-community/core';
 import { V2SpreadsheetEditorColumn } from './column.model';
 import { Moment } from 'moment';
 import { TemplateRef } from '@angular/core';
+import { CreateViewModifyV2Action } from '../../app-create-view-modify-v2/models/action.model';
 
 /**
  Extended AG-Grid column definition - selection range collecting
@@ -32,6 +33,9 @@ export interface IV2SpreadsheetEditorExtendedColDefEditorSelectionRange {
  * Extended AG-Grid column definition - editor
  */
 export interface IV2SpreadsheetEditorExtendedColDefEditor {
+  // setup
+  action: CreateViewModifyV2Action.CREATE | CreateViewModifyV2Action.MODIFY,
+
   // elements
   cellContextMenu: TemplateRef<any>,
   rowNoContextMenu: TemplateRef<any>,

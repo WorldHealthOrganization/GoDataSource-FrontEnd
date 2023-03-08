@@ -6,6 +6,7 @@ import { OutbreakDataService } from '../services/data/outbreak.data.service';
 import { UserModel } from '../models/user.model';
 import { AuthDataService } from '../services/data/auth.data.service';
 import { V2SpreadsheetEditorColumn } from '../../shared/components-v2/app-spreadsheet-editor-v2/models/column.model';
+import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 
 /**
  * Bulk create / modify component
@@ -27,6 +28,9 @@ export abstract class BulkCreateModifyComponent<T> {
 
   // records
   records$: Observable<T[]>;
+
+  // constants
+  CreateViewModifyV2Action = CreateViewModifyV2Action;
 
   /**
    * Constructor

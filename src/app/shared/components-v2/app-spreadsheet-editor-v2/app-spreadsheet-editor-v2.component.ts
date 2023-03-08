@@ -21,6 +21,7 @@ import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 import { AppSpreadsheetEditorV2LoadingComponent } from './components/loading/app-spreadsheet-editor-v2-loading.component';
 import { AppSpreadsheetEditorV2NoDataComponent } from './components/no-data/app-spreadsheet-editor-v2-no-data.component';
 import * as _ from 'lodash';
+import { CreateViewModifyV2Action } from '../app-create-view-modify-v2/models/action.model';
 
 /**
  * Component
@@ -39,14 +40,23 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   private static readonly MAX_UNDO_TO_KEEP: number = 100;
 
   // elements
-  @ViewChild('cellContextMenu', { static: true }) cellContextMenu: TemplateRef<any>;
-  @ViewChild('rowNoContextMenu', { static: true }) rowNoContextMenu: TemplateRef<any>;
+  @ViewChild('cellContextMenu', { static: true }) set cellContextMenu(cellContextMenu: TemplateRef<any>) {
+    this.editor.cellContextMenu = cellContextMenu;
+  }
+  @ViewChild('rowNoContextMenu', { static: true }) set rowNoContextMenu(rowNoContextMenu: TemplateRef<any>) {
+    this.editor.rowNoContextMenu = rowNoContextMenu;
+  }
 
   // breadcrumbs
   @Input() breadcrumbs: IV2Breadcrumb[];
 
   // title
   @Input() pageTitle: string;
+
+  // create or modify ?
+  @Input() set action(action: CreateViewModifyV2Action.CREATE | CreateViewModifyV2Action.MODIFY) {
+    this.editor.action = action;
+  }
 
   // columns
   private _locationColumns: string[];
@@ -74,11 +84,14 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   }
 
   // keep changes
-  private _changes: V2SpreadsheetEditorChange[] = [];
-  private _changesIndex: number = 0;
+  changes: V2SpreadsheetEditorChange[] = [];
+  changesIndex: number = 0;
 
   // editor
   editor: IV2SpreadsheetEditorExtendedColDefEditor = {
+    // setup
+    action: undefined,
+
     // elements
     cellContextMenu: undefined,
     rowNoContextMenu: undefined,
@@ -406,10 +419,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       // finished
       return;
     }
-
-    // update editor elements
-    this.editor.cellContextMenu = this.cellContextMenu;
-    this.editor.rowNoContextMenu = this.rowNoContextMenu;
 
     // determine columns
     const columnDefs: IV2SpreadsheetEditorExtendedColDef[] = [{
@@ -1820,17 +1829,17 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   /**
    * Context menu option - undo
    */
-  private cellUndo(): void {
+  cellUndo(): void {
     // nothing to do ?
-    if (this._changesIndex < 1) {
+    if (this.changesIndex < 1) {
       return;
     }
 
     // no clear selection because this will lose focus, and we can't chain cell undo
 
     // determine change without removing it from the list since we need it for cell redo
-    this._changesIndex--;
-    const change = this._changes[this._changesIndex];
+    this.changesIndex--;
+    const change = this.changes[this.changesIndex];
 
     // make cell visible
     this.cellScrollToChange(change);
@@ -1902,17 +1911,17 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   /**
    * Context menu option - redo
    */
-  private cellRedo(): void {
+  cellRedo(): void {
     // nothing to do ?
-    if (this._changesIndex >= this._changes.length) {
+    if (this.changesIndex >= this.changes.length) {
       return;
     }
 
     // no clear selection because this will lose focus, and we can't chain cell redo
 
     // determine change
-    const change = this._changes[this._changesIndex];
-    this._changesIndex++;
+    const change = this.changes[this.changesIndex];
+    this.changesIndex++;
 
     // make cell visible
     this.cellScrollToChange(change);
@@ -2112,19 +2121,19 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    */
   private cellAppendChange(change: V2SpreadsheetEditorChange): void {
     // on first change remove all undo, since we need to overwrite them
-    while (this._changes.length > this._changesIndex) {
-      this._changes.pop();
+    while (this.changes.length > this.changesIndex) {
+      this.changes.pop();
     }
 
     // round-robin
-    while (this._changes.length >= AppSpreadsheetEditorV2Component.MAX_UNDO_TO_KEEP) {
+    while (this.changes.length >= AppSpreadsheetEditorV2Component.MAX_UNDO_TO_KEEP) {
       // remove first element - oldest element
-      this._changes.shift();
+      this.changes.shift();
     }
 
     // add the new change at the end
-    this._changes.push(change);
-    this._changesIndex = this._changes.length;
+    this.changes.push(change);
+    this.changesIndex = this.changes.length;
   }
 
   /**

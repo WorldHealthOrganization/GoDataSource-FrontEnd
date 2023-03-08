@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component } from '@angular/
 import { ICellRendererAngularComp } from '@ag-grid-community/angular';
 import { ICellRendererParams } from '@ag-grid-community/core';
 import { IV2SpreadsheetEditorExtendedColDef } from '../../models/extended-column.model';
+import { CreateViewModifyV2Action } from '../../../app-create-view-modify-v2/models/action.model';
 
 /**
  * Component
@@ -18,6 +19,9 @@ export class AppSpreadsheetEditorV2CellRowNoRendererComponent implements ICellRe
   rowNo: number;
   params: ICellRendererParams;
   colDef: IV2SpreadsheetEditorExtendedColDef;
+
+  // constants
+  CreateViewModifyV2Action = CreateViewModifyV2Action;
 
   /**
    * Constructor
