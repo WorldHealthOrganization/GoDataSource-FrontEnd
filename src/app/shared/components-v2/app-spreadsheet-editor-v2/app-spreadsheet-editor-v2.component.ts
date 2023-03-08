@@ -884,6 +884,11 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
         // go through columns
         for (let columnIndex: number = this.editor.selection.selected.fill.columns.start; columnIndex <= this.editor.selection.selected.fill.columns.end; columnIndex++) {
+          // if readonly - ignore
+          if (this.editor.readonly.rows[rowIndex]?.columns[columnIndex]) {
+            continue;
+          }
+
           // determine value
           // -1 because we need to exclude row no column which isn't in this.columns
           const columnField: string = this.columns[columnIndex - 1].field;
@@ -1976,7 +1981,11 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // nothing to do ?
     if (
       rowIndex < 0 ||
-      columnIndex < 0
+      columnIndex < 0 ||
+      rowIndex === undefined ||
+      columnIndex === undefined ||
+      isNaN(rowIndex) ||
+      isNaN(columnIndex)
     ) {
       return;
     }
@@ -2191,6 +2200,11 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
         // go through columns
         for (let columnIndex: number = range.columns.start; columnIndex <= range.columns.end; columnIndex++) {
+          // if readonly - ignore
+          if (this.editor.readonly.rows[rowIndex]?.columns[columnIndex]) {
+            continue;
+          }
+
           // determine column field
           // -1 because row no not included in this.columns
           const columnField: string = this.columns[columnIndex - 1].field;
