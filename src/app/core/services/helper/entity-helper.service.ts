@@ -570,7 +570,7 @@ export class EntityHelperService {
     // entity type = Event
     if (entity instanceof EventModel) {
       lightObject.push(
-       {
+        {
           label: 'LNG_EVENT_FIELD_LABEL_NAME',
           value: entity.name
         }, {
