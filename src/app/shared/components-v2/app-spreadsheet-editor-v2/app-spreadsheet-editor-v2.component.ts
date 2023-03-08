@@ -897,12 +897,18 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
             columnField
           );
 
+          // same value - ignore ?
+          const oldValue: any = _.get(
+            rowData,
+            columnField
+          );
+          if (oldValue === value) {
+            continue;
+          }
+
           // remember previous value
           change.changes.rows[rowIndex].columns[columnIndex] = {
-            old: _.get(
-              rowData,
-              columnField
-            ),
+            old: oldValue,
             new: value
           };
 
@@ -2027,8 +2033,17 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
             const oldValue = change.changes.rows[rowIndex].columns[columnIndex].old;
             const rowNode = this._agTable.api.getDisplayedRowAtIndex(rowIndex);
 
-            // update value without triggering value changed
+            // same value - ignore ?
             const columnField = this.columns[columnIndex - 1].field;
+            const currentValue: any = _.get(
+              rowNode.data,
+              columnField
+            );
+            if (oldValue === currentValue) {
+              return;
+            }
+
+            // update value without triggering value changed
             _.set(
               rowNode.data,
               columnField,
@@ -2115,8 +2130,17 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
             const newValue = change.changes.rows[rowIndex].columns[columnIndex].new;
             const rowNode = this._agTable.api.getDisplayedRowAtIndex(rowIndex);
 
-            // update value without triggering value changed
+            // same value - ignore ?
             const columnField = this.columns[columnIndex - 1].field;
+            const currentValue: any = _.get(
+              rowNode.data,
+              columnField
+            );
+            if (newValue === currentValue) {
+              return;
+            }
+
+            // update value without triggering value changed
             _.set(
               rowNode.data,
               columnField,
@@ -2208,21 +2232,29 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           // determine column field
           // -1 because row no not included in this.columns
           const columnField: string = this.columns[columnIndex - 1].field;
+          const oldValue: any = _.get(
+            rowNode.data,
+            columnField
+          );
+
+          // same value - ignore ?
+          const newValue = null;
+          if (oldValue === newValue) {
+            continue;
+          }
 
           // save value
+
           change.changes.rows[rowIndex].columns[columnIndex] = {
-            old: _.get(
-              rowNode.data,
-              columnField
-            ),
-            new: null
+            old: oldValue,
+            new: newValue
           };
 
           // delete value
           _.set(
             rowNode.data,
             columnField,
-            null
+            newValue
           );
 
           // trigger events
