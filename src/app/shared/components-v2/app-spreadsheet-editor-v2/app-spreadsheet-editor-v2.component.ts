@@ -5,7 +5,7 @@ import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-mod
 import { GridApi } from '@ag-grid-community/core/dist/cjs/es5/gridApi';
 import { ColumnApi } from '@ag-grid-community/core/dist/cjs/es5/columns/columnApi';
 import { CellEditingStoppedEvent, GridReadyEvent } from '@ag-grid-community/core';
-import { V2SpreadsheetEditorColumn, V2SpreadsheetEditorColumnType, V2SpreadsheetEditorColumnTypeToEditor } from './models/column.model';
+import { IV2SpreadsheetEditorEventData, IV2SpreadsheetEditorHandler, V2SpreadsheetEditorColumn, V2SpreadsheetEditorColumnType, V2SpreadsheetEditorColumnTypeToEditor, V2SpreadsheetEditorEventType } from './models/column.model';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { IV2SpreadsheetEditorExtendedColDef, IV2SpreadsheetEditorExtendedColDefEditor, IV2SpreadsheetEditorExtendedColDefEditorSelectionRange } from './models/extended-column.model';
 import { AppSpreadsheetEditorV2CellBasicRendererComponent } from './components/cell-basic-renderer/app-spreadsheet-editor-v2-cell-basic-renderer.component';
@@ -104,6 +104,11 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // invalid
     invalid: {
+      rows: {}
+    },
+
+    // readonly
+    readonly: {
       rows: {}
     },
 
@@ -307,6 +312,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     this.editor.locationNamesMap = {};
     this.editorClearSelected(false);
     this.editorClearInvalid(false);
+    this.editorClearReadonly(false);
 
     // ag table not initialized ?
     if (!this._agTable) {
@@ -398,6 +404,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     this._locationColumns = [];
     this.editorClearSelected(false);
     this.editorClearInvalid(false);
+    this.editorClearReadonly(false);
 
     // ag table not initialized ?
     if (!this._agTable) {
@@ -480,7 +487,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         field: column.field,
         resizable: true,
         suppressMovable: true,
-        editable: true,
+        editable: (params): boolean => {
+          return params.colDef.field !== AppSpreadsheetEditorV2CellBasicHeaderComponent.DEFAULT_COLUMN_ROW_NO &&
+            !this.editor.readonly.rows[params.node.rowIndex]?.columns[this.editor.columnsMap[params.colDef.field].index];
+        },
         cellEditor: V2SpreadsheetEditorColumnTypeToEditor[column.type].type,
         cellEditorParams: column.editor?.params,
         columnDefinition: column,
@@ -661,6 +671,21 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   private editorClearInvalid(redrawSelected: boolean): void {
     // clear selected
     this.editor.invalid = {
+      rows: {}
+    };
+
+    // redraw ?
+    if (redrawSelected) {
+      this.cellUpdateRangeClasses(false);
+    }
+  }
+
+  /**
+   * Clear readonly
+   */
+  private editorClearReadonly(redrawSelected: boolean): void {
+    // clear selected
+    this.editor.readonly = {
       rows: {}
     };
 
@@ -886,7 +911,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           // trigger events
           this.cellTriggerEvents(
             rowIndex,
-            columnField
+            columnField,
+            V2SpreadsheetEditorEventType.CHANGE
           );
         }
 
@@ -1002,6 +1028,16 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       }
     }
 
+    // readonly cells
+    for (const rowIndex in this.editor.readonly.rows) {
+      for (const columnIndex in this.editor.readonly.rows[rowIndex].columns) {
+        const invalidHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-basic-renderer-${rowIndex}-${columnIndex}`);
+        if (invalidHtml) {
+          invalidHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-renderer-readonly');
+        }
+      }
+    }
+
     // focused cell
     const focusedCell = this._agTable.api.getFocusedCell();
     if (
@@ -1029,7 +1065,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     for (let elementIndex = 0; elementIndex < focusedHtmlElements.length; elementIndex++) {
       focusedHtmlElements[elementIndex].classList.remove(
         'gd-spreadsheet-editor-v2-cell-basic-renderer-focused',
-        'gd-spreadsheet-editor-v2-cell-basic-renderer-invalid'
+        'gd-spreadsheet-editor-v2-cell-basic-renderer-invalid',
+        'gd-spreadsheet-editor-v2-cell-basic-renderer-readonly'
       );
     }
 
@@ -1659,7 +1696,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // trigger events
     this.cellTriggerEvents(
       event.node.rowIndex,
-      columnField
+      columnField,
+      V2SpreadsheetEditorEventType.CHANGE
     );
   }
 
@@ -1668,18 +1706,80 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    */
   private cellTriggerEvents(
     rowIndex: number,
-    columnField: string
+    columnField: string,
+    eventType: V2SpreadsheetEditorEventType
   ): void {
-    // trigger change
-    if (this.editor.columnsMap[columnField].columnDefinition.change) {
-      this.editor.columnsMap[columnField].columnDefinition.change(
-        rowIndex,
-        this._agTable.api.getDisplayedRowAtIndex(rowIndex).data, {
-          rowValidate(localRowIndex: number) {
-            this.rowValidate(localRowIndex);
+    // anything to trigger for this cell ?
+    if (
+      eventType === V2SpreadsheetEditorEventType.CHANGE &&
+      !this.editor.columnsMap[columnField].columnDefinition.change
+    ) {
+      // no point in creating objects if we don't have anything to do
+      return;
+    }
+
+    // define handler
+    const handler: IV2SpreadsheetEditorHandler = {
+      rowValidate: (localRowIndex: number) => {
+        this.rowValidate(localRowIndex);
+      },
+      cellReadonly: (
+        localRowIndex: number,
+        localColumnIndex: number,
+        readonly: boolean
+      ) => {
+        // set readonly
+        if (readonly) {
+          // initialize ?
+          if (!this.editor.readonly.rows[localRowIndex]) {
+            this.editor.readonly.rows[localRowIndex] = {
+              columns: {}
+            };
+          }
+
+          // mark as readonly
+          this.editor.readonly.rows[localRowIndex].columns[localColumnIndex] = true;
+        } else {
+          // cleanup - column
+          if (this.editor.readonly.rows[localRowIndex]?.columns[localColumnIndex]) {
+            delete this.editor.readonly.rows[localRowIndex].columns[localColumnIndex];
+          }
+
+          // cleanup - row
+          if (
+            this.editor.readonly.rows[localRowIndex] &&
+            Object.keys(this.editor.readonly.rows[localRowIndex].columns).length < 1
+          ) {
+            delete this.editor.readonly.rows[localRowIndex];
           }
         }
-      );
+
+        // refresh cells
+        this._agTable.api.refreshCells({
+          force: false,
+          suppressFlash: false
+        });
+
+        // redraw ranges
+        this.cellUpdateRangeClasses(true);
+      }
+    };
+
+    // define event data
+    const eventData: IV2SpreadsheetEditorEventData = {
+      rowIndex,
+      columnIndex: this.editor.columnsMap[columnField].index,
+      rowData: this._agTable.api.getDisplayedRowAtIndex(rowIndex).data,
+      handler,
+      columnsMap: this.editor.columnsMap
+    };
+
+    // trigger change
+    if (
+      eventType === V2SpreadsheetEditorEventType.CHANGE &&
+      this.editor.columnsMap[columnField].columnDefinition.change
+    ) {
+      this.editor.columnsMap[columnField].columnDefinition.change(eventData);
     }
   }
 
@@ -1855,6 +1955,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // clear selection
         // this.editorClearSelected(true);
         // this.editorClearInvalid(false);
+        // this.editorClearReadonly(false);
         // #TODO
 
         // finished
@@ -1865,6 +1966,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // clear selection
         // this.editorClearSelected(true);
         // this.editorClearInvalid(false);
+        // this.editorClearReadonly(false);
         // #TODO
 
         // finished
@@ -1927,7 +2029,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
             // trigger events
             this.cellTriggerEvents(
               rowIndex,
-              columnField
+              columnField,
+              V2SpreadsheetEditorEventType.CHANGE
             );
           });
 
@@ -1943,6 +2046,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // clear selection
         // this.editorClearSelected(true);
         // this.editorClearInvalid(false);
+        // this.editorClearReadonly(false);
         // #TODO
 
         // finished
@@ -1953,6 +2057,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // clear selection
         // this.editorClearSelected(true);
         // this.editorClearInvalid(false);
+        // this.editorClearReadonly(false);
         // #TODO
 
         // finished
@@ -2012,7 +2117,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
             // trigger events
             this.cellTriggerEvents(
               rowIndex,
-              columnField
+              columnField,
+              V2SpreadsheetEditorEventType.CHANGE
             );
           });
 
@@ -2028,6 +2134,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // clear selection
         // this.editorClearSelected(true);
         // this.editorClearInvalid(false);
+        // this.editorClearReadonly(false);
         // #TODO
 
         // finished
@@ -2038,6 +2145,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // clear selection
         // this.editorClearSelected(true);
         // this.editorClearInvalid(false);
+        // this.editorClearReadonly(false);
         // #TODO
 
         // finished
@@ -2106,7 +2214,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           // trigger events
           this.cellTriggerEvents(
             rowIndex,
-            columnField
+            columnField,
+            V2SpreadsheetEditorEventType.CHANGE
           );
         }
 

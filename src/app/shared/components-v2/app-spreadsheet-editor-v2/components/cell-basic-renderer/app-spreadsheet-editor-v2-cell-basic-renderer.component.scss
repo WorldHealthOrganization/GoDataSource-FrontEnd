@@ -84,4 +84,11 @@
       background-color: rgba(red, 0.40);
     }
   }
+  &.gd-spreadsheet-editor-v2-cell-basic-renderer-readonly {
+    background-color: rgba(green, 0.40);
+    // !!??
+    .gd-spreadsheet-editor-v2-cell-basic-renderer-selected {
+      background-color: rgba(green, 0.40);
+    }
+  }
 }

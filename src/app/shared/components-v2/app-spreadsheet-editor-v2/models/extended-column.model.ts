@@ -30,6 +30,16 @@ export interface IV2SpreadsheetEditorExtendedColDefEditorSelectionRange {
 }
 
 /**
+ * Extended AG-Grid column definition - editor columns map
+ */
+export interface IV2SpreadsheetEditorExtendedColDefEditorColumnMap {
+  [field: string]: {
+    index: number,
+    columnDefinition: V2SpreadsheetEditorColumn
+  }
+}
+
+/**
  * Extended AG-Grid column definition - editor
  */
 export interface IV2SpreadsheetEditorExtendedColDefEditor {
@@ -41,12 +51,7 @@ export interface IV2SpreadsheetEditorExtendedColDefEditor {
   rowNoContextMenu: TemplateRef<any>,
 
   // columns map
-  columnsMap: {
-    [field: string]: {
-      index: number,
-      columnDefinition: V2SpreadsheetEditorColumn
-    }
-  };
+  columnsMap: IV2SpreadsheetEditorExtendedColDefEditorColumnMap,
 
   // location name caching
   locationNamesMap: {
@@ -55,6 +60,17 @@ export interface IV2SpreadsheetEditorExtendedColDefEditor {
 
   // invalid
   invalid: {
+    rows: {
+      [rowId: number]: {
+        columns: {
+          [columnNumber: number]: true
+        }
+      }
+    }
+  },
+
+  // readonly
+  readonly: {
     rows: {
       [rowId: number]: {
         columns: {

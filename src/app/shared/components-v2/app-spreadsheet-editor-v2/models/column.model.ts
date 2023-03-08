@@ -4,6 +4,7 @@ import { AppSpreadsheetEditorV2EditorSingleSelectComponent } from '../components
 import { AppSpreadsheetEditorV2EditorDateComponent } from '../components/editor-date/app-spreadsheet-editor-v2-editor-date.component';
 import { AppSpreadsheetEditorV2EditorLocationComponent } from '../components/editor-location/app-spreadsheet-editor-v2-editor-location.component';
 import { AppSpreadsheetEditorV2EditorNumberComponent } from '../components/editor-number/app-spreadsheet-editor-v2-editor-number.component';
+import { IV2SpreadsheetEditorExtendedColDefEditorColumnMap } from './extended-column.model';
 
 /**
  * Editor handler
@@ -11,6 +12,26 @@ import { AppSpreadsheetEditorV2EditorNumberComponent } from '../components/edito
 export interface IV2SpreadsheetEditorHandler {
   // required
   rowValidate(rowIndex: number): void;
+  cellReadonly(rowIndex: number, columnIndex: number, readonly: boolean): void;
+}
+
+/**
+ * Editor event data
+ */
+export interface IV2SpreadsheetEditorEventData {
+  // required
+  rowIndex: number;
+  columnIndex: number;
+  rowData: any;
+  handler: IV2SpreadsheetEditorHandler;
+  columnsMap: IV2SpreadsheetEditorExtendedColDefEditorColumnMap;
+}
+
+/**
+ * Event types
+ */
+export enum V2SpreadsheetEditorEventType {
+  CHANGE
 }
 
 /**
@@ -88,11 +109,7 @@ export interface IV2SpreadsheetEditorColumnSingleSelect extends Omit<IV2Spreadsh
   optionsMap?: {
     [key: string]: ILabelValuePairModel
   };
-  change?: (
-    rowIndex: number,
-    rowData: any,
-    handler: IV2SpreadsheetEditorHandler
-  ) => void;
+  change?: (data: IV2SpreadsheetEditorEventData) => void;
 }
 
 /**
