@@ -1031,8 +1031,15 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // invalid cells
     for (const rowIndex in this.editor.invalid.rows) {
+      // row no
+      let invalidHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-row-no-renderer-${rowIndex}`);
+      if (invalidHtml) {
+        invalidHtml.classList.add('gd-spreadsheet-editor-v2-cell-row-no-renderer-invalid');
+      }
+
+      // cell
       for (const columnIndex in this.editor.invalid.rows[rowIndex].columns) {
-        const invalidHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-basic-renderer-${rowIndex}-${columnIndex}`);
+        invalidHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-basic-renderer-${rowIndex}-${columnIndex}`);
         if (invalidHtml) {
           invalidHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-renderer-invalid');
         }
@@ -1071,7 +1078,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    * Update css
    */
   private cellUpdateRangeClasses(showFillIfPossible: boolean): void {
-    // remove focused from cells
+    // remove main cells classes
     const focusedHtmlElements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-basic-renderer');
     for (let elementIndex = 0; elementIndex < focusedHtmlElements.length; elementIndex++) {
       focusedHtmlElements[elementIndex].classList.remove(
@@ -1081,7 +1088,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       );
     }
 
-    // remove selected from previous cells
+    // remove selected & fill from previous cells
     const selectedHtmlElements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-basic-renderer-selected');
     for (let elementIndex = 0; elementIndex < selectedHtmlElements.length; elementIndex++) {
       selectedHtmlElements[elementIndex].classList.remove(
@@ -1094,16 +1101,24 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       );
     }
 
-    // remove full / partial from previous row no
-    const rowNoHtmlElements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-row-no-renderer-selected');
+    // remove main row no cells classes
+    const rowNoHtmlElements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-row-no-renderer');
     for (let elementIndex = 0; elementIndex < rowNoHtmlElements.length; elementIndex++) {
       rowNoHtmlElements[elementIndex].classList.remove(
+        'gd-spreadsheet-editor-v2-cell-row-no-renderer-invalid'
+      );
+    }
+
+    // remove full / partial from previous row no
+    const rowNoSelectedHtmlElements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-row-no-renderer-selected');
+    for (let elementIndex = 0; elementIndex < rowNoSelectedHtmlElements.length; elementIndex++) {
+      rowNoSelectedHtmlElements[elementIndex].classList.remove(
         'gd-spreadsheet-editor-v2-cell-row-no-renderer-selected-partial',
         'gd-spreadsheet-editor-v2-cell-row-no-renderer-selected-full'
       );
     }
 
-    // remove full / partial from previous headers
+    // remove full / partial from headers
     const headerHtmlElements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-basic-header-selected');
     for (let elementIndex = 0; elementIndex < headerHtmlElements.length; elementIndex++) {
       headerHtmlElements[elementIndex].classList.remove(
