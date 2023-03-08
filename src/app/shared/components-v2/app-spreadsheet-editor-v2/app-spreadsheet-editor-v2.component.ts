@@ -1571,57 +1571,80 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   /**
    * Validate cell
    */
-  private cellValidate(
-    rowIndex: number,
-    columnIndex: number
-  ): void {
-    // nothing to do ?
-    if (columnIndex < 1) {
-      return;
-    }
-
-    // retrieve definition, row data and cell data
-    const column = this.columns[columnIndex - 1];
+  private rowValidate(rowIndex: number): void {
+    // retrieve row data
     const rowData = this._agTable.api.getDisplayedRowAtIndex(rowIndex).data;
-    const cellData = _.get(
-      rowData,
-      column.field
-    );
 
-    // valid
-    let isValid: boolean = true;
+    // go through columns
+    const invalidColumnIndexes: number[] = [];
+    let rowHasColumnData: boolean = this.editor.action === CreateViewModifyV2Action.MODIFY;
+    for (let columnIndex = 0; columnIndex < this.columns.length; columnIndex++) {
+      // retrieve column & cell data
+      const column = this.columns[columnIndex];
+      const cellData = _.get(
+        rowData,
+        column.field
+      );
 
-    // validate - required
-    if (
-      isValid &&
-      column.validators?.required &&
-      column.validators?.required(rowData) &&
-      !cellData
-    ) {
-      isValid = false;
-    }
+      // found gold ?
+      if (
+        cellData !== null &&
+        cellData !== undefined &&
+        cellData !== ''
+      ) {
+        rowHasColumnData = true;
+      }
 
-    // valid ?
-    if (isValid) {
+      // validate cell
+      let isValid: boolean = true;
+
+      // validate - required
+      if (
+        isValid &&
+        column.validators?.required &&
+        column.validators?.required(rowData) &&
+        !cellData
+      ) {
+        isValid = false;
+      }
+
+      // invalid ?
+      if (!isValid) {
+        invalidColumnIndexes.push(columnIndex);
+      }
+
+      // cleanup
       if (this.editor.invalid.rows[rowIndex]?.columns[columnIndex]) {
         // mark as valid
         delete this.editor.invalid.rows[rowIndex].columns[columnIndex];
+      }
+    }
 
-        // cleanup row
-        if (Object.keys(this.editor.invalid.rows[rowIndex].columns).length < 1) {
-          delete this.editor.invalid.rows[rowIndex];
+    // cleanup row
+    if (
+      this.editor.invalid.rows[rowIndex] &&
+      Object.keys(this.editor.invalid.rows[rowIndex].columns).length < 1
+    ) {
+      delete this.editor.invalid.rows[rowIndex];
+    }
+
+    // mark invalid ?
+    if (
+      rowHasColumnData &&
+      invalidColumnIndexes.length > 0
+    ) {
+      invalidColumnIndexes.forEach((invalidColumnIndex) => {
+        // must initialize ?
+        if (!this.editor.invalid.rows[rowIndex]) {
+          this.editor.invalid.rows[rowIndex] = {
+            columns: {}
+          };
         }
-      }
-    } else {
-      // must initialize ?
-      if (!this.editor.invalid.rows[rowIndex]) {
-        this.editor.invalid.rows[rowIndex] = {
-          columns: {}
-        };
-      }
 
-      // make it invalid
-      this.editor.invalid.rows[rowIndex].columns[columnIndex] = true;
+        // make it invalid
+        // +1 because we need to take in account row no column which isn't in this.columns
+        this.editor.invalid.rows[rowIndex].columns[invalidColumnIndex + 1] = true;
+      });
     }
   }
 
@@ -1865,13 +1888,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
               columnField,
               oldValue
             );
-
-            // validate
-            this.cellValidate(
-              rowIndex,
-              columnIndex
-            );
           });
+
+          // validate
+          this.rowValidate(rowIndex);
         });
 
         // finished
@@ -1947,13 +1967,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
               columnField,
               newValue
             );
-
-            // validate
-            this.cellValidate(
-              rowIndex,
-              columnIndex
-            );
           });
+
+          // validate
+          this.rowValidate(rowIndex);
         });
 
         // finished
@@ -2038,13 +2055,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
             columnField,
             null
           );
-
-          // validate
-          this.cellValidate(
-            rowIndex,
-            columnIndex
-          );
         }
+
+        // validate
+        this.rowValidate(rowIndex);
       }
     });
 
@@ -2355,10 +2369,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    */
   gridCellEditingStopped(event: CellEditingStoppedEvent): void {
     // validate
-    this.cellValidate(
-      event.rowIndex,
-      this.editor.columnsMap[event.colDef.field].index
-    );
+    this.rowValidate(event.rowIndex);
 
     // update css
     this.cellUpdateRangeClasses(true);
