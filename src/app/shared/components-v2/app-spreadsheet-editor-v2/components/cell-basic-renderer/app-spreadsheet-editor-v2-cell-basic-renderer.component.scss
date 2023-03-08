@@ -28,6 +28,9 @@
     background-color: rgba(var(--gd-primary-rgb), 0.15);
     border-color: rgba(var(--gd-primary-rgb), 0.6);
 
+    // #TODO - necessary
+    pointer-events: none;
+
     &.gd-spreadsheet-editor-v2-cell-basic-renderer-selected-visible {
       display: inline-block;
 
