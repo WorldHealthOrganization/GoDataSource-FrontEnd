@@ -32,7 +32,7 @@
       display: inline-block;
 
       &.gd-spreadsheet-editor-v2-cell-basic-renderer-selected-fill {
-        background-color: rgba(var(--gd-secondary-rgb), 0.40);
+        background-color: rgba(green, 0.40);
         cursor: cell;
       }
     }
@@ -59,7 +59,7 @@
     z-index: 99999;
     right: 0;
     bottom: 0;
-    background-color: blue;
+    background-color: green;
 
     &.gd-spreadsheet-editor-v2-cell-basic-renderer-fill-visible {
       display: inline-block;
@@ -85,10 +85,10 @@
     }
   }
   &.gd-spreadsheet-editor-v2-cell-basic-renderer-readonly {
-    background-color: rgba(green, 0.40);
+    background-color: rgba(grey, 0.40);
     // !!??
     .gd-spreadsheet-editor-v2-cell-basic-renderer-selected {
-      background-color: rgba(green, 0.40);
+      background-color: rgba(grey, 0.40);
     }
   }
 }
