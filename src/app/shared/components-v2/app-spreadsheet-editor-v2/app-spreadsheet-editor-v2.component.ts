@@ -4,7 +4,7 @@ import { IV2ActionIconLabel, V2ActionType } from '../app-list-table-v2/models/ac
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { GridApi } from '@ag-grid-community/core/dist/cjs/es5/gridApi';
 import { ColumnApi } from '@ag-grid-community/core/dist/cjs/es5/columns/columnApi';
-import { GridReadyEvent } from '@ag-grid-community/core';
+import { CellEditingStoppedEvent, GridReadyEvent } from '@ag-grid-community/core';
 import { V2SpreadsheetEditorColumn, V2SpreadsheetEditorColumnType, V2SpreadsheetEditorColumnTypeToEditor } from './models/column.model';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { IV2SpreadsheetEditorExtendedColDef, IV2SpreadsheetEditorExtendedColDefEditor, IV2SpreadsheetEditorExtendedColDefEditorSelectionRange } from './models/extended-column.model';
@@ -88,6 +88,11 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // location
     locationNamesMap: {},
+
+    // invalid
+    invalid: {
+      rows: {}
+    },
 
     // selection range handlers
     selection: {
@@ -949,6 +954,16 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       }
     }
 
+    // invalid cells
+    for (const rowIndex in this.editor.invalid.rows) {
+      for (const columnIndex in this.editor.invalid.rows[rowIndex].columns) {
+        const invalidHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-basic-renderer-${rowIndex}-${columnIndex}`);
+        if (invalidHtml) {
+          invalidHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-renderer-invalid');
+        }
+      }
+    }
+
     // focused cell
     const focusedCell = this._agTable.api.getFocusedCell();
     if (
@@ -974,7 +989,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // remove focused from cells
     const focusedHtmlElements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-basic-renderer');
     for (let elementIndex = 0; elementIndex < focusedHtmlElements.length; elementIndex++) {
-      focusedHtmlElements[elementIndex].classList.remove('gd-spreadsheet-editor-v2-cell-basic-renderer-focused');
+      focusedHtmlElements[elementIndex].classList.remove(
+        'gd-spreadsheet-editor-v2-cell-basic-renderer-focused',
+        'gd-spreadsheet-editor-v2-cell-basic-renderer-invalid'
+      );
     }
 
     // remove selected from previous cells
@@ -1522,6 +1540,63 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Validate cell
+   */
+  private cellValidate(
+    rowIndex: number,
+    columnIndex: number
+  ): void {
+    // nothing to do ?
+    if (columnIndex < 1) {
+      return;
+    }
+
+    // retrieve definition, row data and cell data
+    const column = this.columns[columnIndex - 1];
+    const rowData = this._agTable.api.getDisplayedRowAtIndex(rowIndex).data;
+    const cellData = _.get(
+      rowData,
+      column.field
+    );
+
+    // valid
+    let isValid: boolean = true;
+
+    // validate - required
+    if (
+      isValid &&
+      column.validators?.required &&
+      column.validators?.required(rowData) &&
+      !cellData
+    ) {
+      isValid = false;
+    }
+
+    // valid ?
+    if (isValid) {
+      if (this.editor.invalid.rows[rowIndex]?.columns[columnIndex]) {
+        // mark as valid
+        delete this.editor.invalid.rows[rowIndex].columns[columnIndex];
+
+        // cleanup row
+        if (Object.keys(this.editor.invalid.rows[rowIndex].columns).length < 1) {
+          delete this.editor.invalid.rows[rowIndex];
+        }
+      }
+    } else {
+      // must initialize ?
+      if (!this.editor.invalid.rows[rowIndex]) {
+        this.editor.invalid.rows[rowIndex] = {
+          columns: {}
+        };
+      }
+
+      // make it invalid
+      this.editor.invalid.rows[rowIndex].columns[columnIndex] = true;
+    }
+  }
+
+  /**
    * Context menu option - cut
    */
   private cellCut(): void {
@@ -1910,6 +1985,12 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
             columnField,
             null
           );
+
+          // validate
+          this.cellValidate(
+            rowIndex,
+            columnIndex
+          );
         }
       }
     });
@@ -1922,6 +2003,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // append change
     this.cellAppendChange(change);
+
+    // update css
+    this.cellUpdateRangeClasses(true);
   }
 
   /**
@@ -1980,16 +2064,33 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Append change
+   */
+  private cellAppendChange(change: V2SpreadsheetEditorChange): void {
+    // on first change remove all undo, since we need to overwrite them
+    while (this._changes.length > this._changesIndex) {
+      this._changes.pop();
+    }
+
+    // round-robin
+    while (this._changes.length >= AppSpreadsheetEditorV2Component.MAX_UNDO_TO_KEEP) {
+      // remove first element - oldest element
+      this._changes.shift();
+    }
+
+    // add the new change at the end
+    this._changes.push(change);
+    this._changesIndex = this._changes.length;
+  }
+
+  /**
    * Cell key down
    */
   private suppressKeyboardEvent(
     params: SuppressKeyboardEventParams | SuppressHeaderKeyboardEventParams
   ): boolean {
     // nothing to do ?
-    if (
-      this.editor.selection.selected.ranges.length < 1 ||
-      this._agTable.api.getEditingCells().length > 0
-    ) {
+    if (this.editor.selection.selected.ranges.length < 1) {
       // don't block caller
       return false;
     }
@@ -2007,6 +2108,12 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
       // block caller
       return true;
+    }
+
+    // edit mode ?
+    if (this._agTable.api.getEditingCells().length > 0) {
+      // don't block caller
+      return false;
     }
 
     // allow navigation, but we need to update selection
@@ -2193,28 +2300,14 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   /**
    * Cell editing stopped
    */
-  gridCellEditingStopped(): void {
+  gridCellEditingStopped(event: CellEditingStoppedEvent): void {
+    // validate
+    this.cellValidate(
+      event.rowIndex,
+      this.editor.columnsMap[event.colDef.field].index
+    );
+
     // update css
     this.cellUpdateRangeClasses(true);
-  }
-
-  /**
-   * Append change
-   */
-  private cellAppendChange(change: V2SpreadsheetEditorChange): void {
-    // on first change remove all undo, since we need to overwrite them
-    while (this._changes.length > this._changesIndex) {
-      this._changes.pop();
-    }
-
-    // round-robin
-    while (this._changes.length >= AppSpreadsheetEditorV2Component.MAX_UNDO_TO_KEEP) {
-      // remove first element - oldest element
-      this._changes.shift();
-    }
-
-    // add the new change at the end
-    this._changes.push(change);
-    this._changesIndex = this._changes.length;
   }
 }

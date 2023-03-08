@@ -37,12 +37,13 @@ interface IV2SpreadsheetEditorColumnBase {
   // never
   editor?: never;
   optionsMap?: never;
+  validators?: never;
 }
 
 /**
  * Column - text
  */
-export interface IV2SpreadsheetEditorColumnText extends Omit<IV2SpreadsheetEditorColumnBase, 'editor'> {
+export interface IV2SpreadsheetEditorColumnText extends Omit<IV2SpreadsheetEditorColumnBase, 'editor' | 'validators'> {
   // required
   type: V2SpreadsheetEditorColumnType.TEXT;
 

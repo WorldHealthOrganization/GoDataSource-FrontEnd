@@ -16,10 +16,6 @@
     }
   }
 
-  &.gd-spreadsheet-editor-v2-cell-basic-renderer-focused {
-    border: 2px solid rgba(red, 0.6);
-  }
-
   .gd-spreadsheet-editor-v2-cell-basic-renderer-selected {
     display: none;
     position: absolute;
@@ -71,6 +67,21 @@
 
     &:hover {
       cursor: cell;
+    }
+  }
+
+  &.gd-spreadsheet-editor-v2-cell-basic-renderer-focused {
+    border: 2px solid rgba(blue, 0.6);
+    // !!??
+    .gd-spreadsheet-editor-v2-cell-basic-renderer-selected {
+      border: 2px solid rgba(blue, 0.6);
+    }
+  }
+  &.gd-spreadsheet-editor-v2-cell-basic-renderer-invalid {
+    background-color: rgba(red, 0.40);
+    // !!??
+    .gd-spreadsheet-editor-v2-cell-basic-renderer-selected {
+      background-color: rgba(red, 0.40);
     }
   }
 }

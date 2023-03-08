@@ -49,6 +49,17 @@ export interface IV2SpreadsheetEditorExtendedColDefEditor {
     [locationId: string]: string
   };
 
+  // invalid
+  invalid: {
+    rows: {
+      [rowId: number]: {
+        columns: {
+          [columnNumber: number]: true
+        }
+      }
+    }
+  },
+
   // selection range handlers
   selection: {
     // data

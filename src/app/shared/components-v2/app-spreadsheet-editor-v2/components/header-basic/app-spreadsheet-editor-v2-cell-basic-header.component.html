@@ -8,7 +8,15 @@
   <!-- Value -->
   <div
     class="gd-spreadsheet-editor-v2-cell-basic-header-value">
-    {{label}}
+
+    <!-- Label -->
+    <span>
+      {{label}}
+    </span>
+
+    <!-- Required ? -->
+    <span
+      *ngIf="!!colDef.columnDefinition?.validators?.required">*</span>
   </div>
 
   <!-- Selected -->
