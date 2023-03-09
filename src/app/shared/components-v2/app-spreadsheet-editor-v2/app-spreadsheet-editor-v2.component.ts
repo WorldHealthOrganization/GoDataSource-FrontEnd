@@ -949,7 +949,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // header
     for (let columnIndex: number = range.columns.start; columnIndex <= range.columns.end; columnIndex++) {
       // full header or partial selection ?
-      const headerHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-basic-header-selected-${columnIndex}`);
+      const headerHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-basic-header-${columnIndex}`);
       if (headerHtml) {
         if (
           range.rows.start === 0 &&
@@ -967,7 +967,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // rows
     for (let rowIndex: number = range.rows.start; rowIndex <= range.rows.end; rowIndex++) {
       // full row or partial selection ?
-      const rowNoHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-row-no-renderer-selected-${rowIndex}`);
+      const rowNoHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-row-no-renderer-${rowIndex}`);
       if (rowNoHtml) {
         if (
           range.columns.start === 1 &&
@@ -984,7 +984,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       // attach cell css
       for (let columnIndex: number = range.columns.start; columnIndex <= range.columns.end; columnIndex++) {
         // retrieve cell html
-        const cellHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-basic-renderer-selected-${rowIndex}-${columnIndex}`);
+        const cellHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-basic-renderer-${rowIndex}-${columnIndex}`);
 
         // scrolled and not visible anymore ?
         if (!cellHtml) {
@@ -1082,22 +1082,15 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     const focusedHtmlElements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-basic-renderer');
     for (let elementIndex = 0; elementIndex < focusedHtmlElements.length; elementIndex++) {
       focusedHtmlElements[elementIndex].classList.remove(
-        'gd-spreadsheet-editor-v2-cell-basic-renderer-focused',
-        'gd-spreadsheet-editor-v2-cell-basic-renderer-invalid',
-        'gd-spreadsheet-editor-v2-cell-basic-renderer-readonly'
-      );
-    }
-
-    // remove selected & fill from previous cells
-    const selectedHtmlElements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-basic-renderer-selected');
-    for (let elementIndex = 0; elementIndex < selectedHtmlElements.length; elementIndex++) {
-      selectedHtmlElements[elementIndex].classList.remove(
         'gd-spreadsheet-editor-v2-cell-basic-renderer-selected-visible',
         'gd-spreadsheet-editor-v2-cell-basic-renderer-selected-border-left',
         'gd-spreadsheet-editor-v2-cell-basic-renderer-selected-border-right',
         'gd-spreadsheet-editor-v2-cell-basic-renderer-selected-border-top',
         'gd-spreadsheet-editor-v2-cell-basic-renderer-selected-border-bottom',
-        'gd-spreadsheet-editor-v2-cell-basic-renderer-selected-fill'
+        'gd-spreadsheet-editor-v2-cell-basic-renderer-selected-fill',
+        'gd-spreadsheet-editor-v2-cell-basic-renderer-focused',
+        'gd-spreadsheet-editor-v2-cell-basic-renderer-invalid',
+        'gd-spreadsheet-editor-v2-cell-basic-renderer-readonly'
       );
     }
 
@@ -1105,21 +1098,14 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     const rowNoHtmlElements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-row-no-renderer');
     for (let elementIndex = 0; elementIndex < rowNoHtmlElements.length; elementIndex++) {
       rowNoHtmlElements[elementIndex].classList.remove(
-        'gd-spreadsheet-editor-v2-cell-row-no-renderer-invalid'
-      );
-    }
-
-    // remove full / partial from previous row no
-    const rowNoSelectedHtmlElements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-row-no-renderer-selected');
-    for (let elementIndex = 0; elementIndex < rowNoSelectedHtmlElements.length; elementIndex++) {
-      rowNoSelectedHtmlElements[elementIndex].classList.remove(
+        'gd-spreadsheet-editor-v2-cell-row-no-renderer-invalid',
         'gd-spreadsheet-editor-v2-cell-row-no-renderer-selected-partial',
         'gd-spreadsheet-editor-v2-cell-row-no-renderer-selected-full'
       );
     }
 
     // remove full / partial from headers
-    const headerHtmlElements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-basic-header-selected');
+    const headerHtmlElements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-basic-header');
     for (let elementIndex = 0; elementIndex < headerHtmlElements.length; elementIndex++) {
       headerHtmlElements[elementIndex].classList.remove(
         'gd-spreadsheet-editor-v2-cell-basic-header-selected-partial',

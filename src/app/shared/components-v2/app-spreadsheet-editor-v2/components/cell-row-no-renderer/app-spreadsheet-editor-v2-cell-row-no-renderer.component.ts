@@ -16,7 +16,6 @@ import { CreateViewModifyV2Action } from '../../../app-create-view-modify-v2/mod
 export class AppSpreadsheetEditorV2CellRowNoRendererComponent implements ICellRendererAngularComp {
   // data
   id: string;
-  selectedId: string;
   rowNo: number;
   params: ICellRendererParams;
   colDef: IV2SpreadsheetEditorExtendedColDef;
@@ -55,7 +54,6 @@ export class AppSpreadsheetEditorV2CellRowNoRendererComponent implements ICellRe
     this.rowNo = params.rowIndex + 1;
     this.params = params;
     this.id = `gd-spreadsheet-editor-v2-cell-row-no-renderer-${this.params.rowIndex}`;
-    this.selectedId = `gd-spreadsheet-editor-v2-cell-row-no-renderer-selected-${this.params.rowIndex}`;
     this.colDef = this.params.column.getUserProvidedColDef() as IV2SpreadsheetEditorExtendedColDef;
 
     // update ui

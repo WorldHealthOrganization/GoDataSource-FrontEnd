@@ -17,7 +17,6 @@ import { AppFormDateV2Component } from '../../../../forms-v2/components/app-form
 export class AppSpreadsheetEditorV2CellBasicRendererComponent implements ICellRendererAngularComp {
   // data
   id: string;
-  selectedId: string;
   fillId: string;
   params: ICellRendererParams;
   colDef: IV2SpreadsheetEditorExtendedColDef;
@@ -61,7 +60,6 @@ export class AppSpreadsheetEditorV2CellBasicRendererComponent implements ICellRe
     // ids
     const columnIndex: number = this.colDef.editor.columnsMap[this.colDef.columnDefinition.field].index;
     this.id = `gd-spreadsheet-editor-v2-cell-basic-renderer-${this.params.rowIndex}-${columnIndex}`;
-    this.selectedId = `gd-spreadsheet-editor-v2-cell-basic-renderer-selected-${this.params.rowIndex}-${columnIndex}`;
     this.fillId = `gd-spreadsheet-editor-v2-cell-basic-renderer-fill-${this.params.rowIndex}-${columnIndex}`;
 
     // update ui

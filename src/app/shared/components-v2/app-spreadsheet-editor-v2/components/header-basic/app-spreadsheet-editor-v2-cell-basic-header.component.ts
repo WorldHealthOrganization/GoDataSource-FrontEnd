@@ -18,7 +18,7 @@ export class AppSpreadsheetEditorV2CellBasicHeaderComponent implements IHeaderAn
   static readonly DEFAULT_COLUMN_ROW_NO: string = 'rowNo';
 
   // data
-  selectedId: string;
+  id: string;
   label: string;
   colDef: IV2SpreadsheetEditorExtendedColDef;
   columnIndex: number;
@@ -56,7 +56,7 @@ export class AppSpreadsheetEditorV2CellBasicHeaderComponent implements IHeaderAn
     this.columnIndex = this.colDef.field === AppSpreadsheetEditorV2CellBasicHeaderComponent.DEFAULT_COLUMN_ROW_NO ?
       0 :
       this.colDef.editor.columnsMap[this.colDef.columnDefinition.field].index;
-    this.selectedId = `gd-spreadsheet-editor-v2-cell-basic-header-selected-${this.columnIndex}`;
+    this.id = `gd-spreadsheet-editor-v2-cell-basic-header-${this.columnIndex}`;
 
     // update ui
     this.changeDetectorRef.detectChanges();

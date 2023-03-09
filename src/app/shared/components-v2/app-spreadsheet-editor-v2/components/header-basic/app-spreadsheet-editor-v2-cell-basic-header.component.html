@@ -1,4 +1,5 @@
 <div
+  [id]="id"
   class="gd-spreadsheet-editor-v2-cell-basic-header"
   (mouseenter)="mouseEnter($event)"
   (mousedown)="mouseDown($event)"
@@ -19,8 +20,4 @@
       *ngIf="!!colDef.columnDefinition?.validators?.required">*</span>
   </div>
 
-  <!-- Selected -->
-  <div
-    [id]="selectedId"
-    class="gd-spreadsheet-editor-v2-cell-basic-header-selected"></div>
 </div>
