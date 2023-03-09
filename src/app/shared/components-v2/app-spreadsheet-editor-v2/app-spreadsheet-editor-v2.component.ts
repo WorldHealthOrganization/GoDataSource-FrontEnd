@@ -6,7 +6,7 @@ import { GridApi } from '@ag-grid-community/core/dist/cjs/es5/gridApi';
 import { ColumnApi } from '@ag-grid-community/core/dist/cjs/es5/columns/columnApi';
 import { CellEditingStoppedEvent, GridReadyEvent } from '@ag-grid-community/core';
 import {
-  IV2SpreadsheetEditorColumnValidatorAsync,
+  IV2SpreadsheetEditorColumnValidatorAsync, IV2SpreadsheetEditorColumnValidatorEmail,
   IV2SpreadsheetEditorColumnValidatorInteger,
   IV2SpreadsheetEditorColumnValidatorRequired,
   IV2SpreadsheetEditorEventData,
@@ -34,6 +34,7 @@ import { CreateViewModifyV2Action } from '../app-create-view-modify-v2/models/ac
 import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseErrorMsgV2, AppFormBaseErrorMsgV2Type } from '../../forms-v2/core/app-form-base-error-msg-v2';
 import { AppBasicPageV2Component } from '../app-basic-page-v2/app-basic-page-v2.component';
+import { Constants } from '../../../core/models/constants';
 
 /**
  * Component
@@ -1545,6 +1546,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     }[] = [];
     let rowHasColumnData: boolean = this.editor.action === CreateViewModifyV2Action.MODIFY;
     for (let columnIndex = 0; columnIndex < this.columns.length; columnIndex++) {
+      // +1 to take in account row no column
+      const realColumnIndex: number = columnIndex + 1;
+
       // retrieve column & cell data
       const column = this.columns[columnIndex];
       const cellData = _.get(
@@ -1626,13 +1630,12 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         (column.validators as IV2SpreadsheetEditorColumnValidatorAsync)?.async
       ) {
         // did we already validate this ?
-        // +1 to take in account row no column
         if (
-          this.editor.asyncResponses.rows[rowIndex]?.columns[columnIndex + 1] &&
-          this.editor.asyncResponses.rows[rowIndex]?.columns[columnIndex + 1][cellData]
+          this.editor.asyncResponses.rows[rowIndex]?.columns[realColumnIndex] &&
+          this.editor.asyncResponses.rows[rowIndex]?.columns[realColumnIndex][cellData]
         ) {
           // validate
-          const response = this.editor.asyncResponses.rows[rowIndex]?.columns[columnIndex + 1][cellData];
+          const response = this.editor.asyncResponses.rows[rowIndex]?.columns[realColumnIndex][cellData];
           if (typeof response === 'boolean') {
             if (!response) {
               isValid = false;
@@ -1658,9 +1661,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         } else {
           // stop previous async request
           // +1 to take in account row no column
-          if (this.editor.async.rows[rowIndex]?.columns[columnIndex + 1]?.subscription) {
-            this.editor.async.rows[rowIndex].columns[columnIndex + 1].subscription.unsubscribe();
-            delete this.editor.async.rows[rowIndex].columns[columnIndex + 1];
+          if (this.editor.async.rows[rowIndex]?.columns[realColumnIndex]?.subscription) {
+            this.editor.async.rows[rowIndex].columns[realColumnIndex].subscription.unsubscribe();
+            delete this.editor.async.rows[rowIndex].columns[realColumnIndex];
           }
 
           // construct async request
@@ -1674,18 +1677,16 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           }
 
           // initialize - column ?
-          // +1 to take in account row no column
-          if (!this.editor.async.rows[rowIndex].columns[columnIndex + 1]) {
-            this.editor.async.rows[rowIndex].columns[columnIndex + 1] = {
+          if (!this.editor.async.rows[rowIndex].columns[realColumnIndex]) {
+            this.editor.async.rows[rowIndex].columns[realColumnIndex] = {
               subscription: undefined
             };
           }
 
           // execute async request
-          // +1 to take in account row no column
           this.editor.async.inProgress = true;
           this.basicPage.detectChanges();
-          this.editor.async.rows[rowIndex].columns[columnIndex + 1].subscription = (function(
+          this.editor.async.rows[rowIndex].columns[realColumnIndex].subscription = (function(
             // works as long as value is string - visualId ...
             localValue: string,
             localRowIndex: number,
@@ -1700,7 +1701,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
               )
               .subscribe((response) => {
                 // stop previous async request
-                // +1 to take in account row no column
                 if (this.editor.async.rows[localRowIndex]?.columns[localColumnIndex]?.subscription) {
                   this.editor.async.rows[localRowIndex].columns[localColumnIndex].subscription.unsubscribe();
                   delete this.editor.async.rows[localRowIndex].columns[localColumnIndex];
@@ -1743,23 +1743,37 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
             this,
             cellData,
             rowIndex,
-            columnIndex + 1
+            realColumnIndex
           );
         }
+      }
+
+      // validate - email
+      if (
+        isValid &&
+        cellData &&
+        (column.validators as IV2SpreadsheetEditorColumnValidatorEmail)?.email &&
+        (column.validators as IV2SpreadsheetEditorColumnValidatorEmail).email(rowData) &&
+        !Constants.REGEX_EMAIL_VALIDATOR.test(cellData)
+      ) {
+        isValid = false;
+        error = {
+          key: AppFormBaseErrorMsgV2Type.EMAIL
+        };
       }
 
       // invalid ?
       if (!isValid) {
         invalidColumnIndexes.push({
-          columnIndex,
+          columnIndex: realColumnIndex,
           error
         });
       }
 
       // cleanup
-      if (this.editor.invalid.rows[rowIndex]?.columns[columnIndex]) {
+      if (this.editor.invalid.rows[rowIndex]?.columns[realColumnIndex]) {
         // mark as valid
-        delete this.editor.invalid.rows[rowIndex].columns[columnIndex];
+        delete this.editor.invalid.rows[rowIndex].columns[realColumnIndex];
       }
     }
 
@@ -1785,8 +1799,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         }
 
         // make it invalid
-        // +1 because we need to take in account row no column which isn't in this.columns
-        this.editor.invalid.rows[rowIndex].columns[invalidColumn.columnIndex + 1] = {
+        this.editor.invalid.rows[rowIndex].columns[invalidColumn.columnIndex] = {
           error: invalidColumn.error
         };
       });

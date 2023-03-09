@@ -64,6 +64,14 @@ export interface IV2SpreadsheetEditorColumnValidatorAsync {
 }
 
 /**
+ * Validator - email
+ */
+export interface IV2SpreadsheetEditorColumnValidatorEmail {
+  // optional
+  email?: (rowData: any) => boolean;
+}
+
+/**
  * Column type
  */
 export enum V2SpreadsheetEditorColumnType {
@@ -102,7 +110,7 @@ export interface IV2SpreadsheetEditorColumnText extends Omit<IV2SpreadsheetEdito
   editor?: {
     params?: ITextCellEditorParams
   };
-  validators?: IV2SpreadsheetEditorColumnValidatorRequired | IV2SpreadsheetEditorColumnValidatorAsync;
+  validators?: IV2SpreadsheetEditorColumnValidatorRequired | IV2SpreadsheetEditorColumnValidatorAsync | IV2SpreadsheetEditorColumnValidatorEmail;
 }
 
 /**
