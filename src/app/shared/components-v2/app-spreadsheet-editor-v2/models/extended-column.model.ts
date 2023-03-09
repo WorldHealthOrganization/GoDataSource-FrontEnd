@@ -6,6 +6,7 @@ import { CreateViewModifyV2Action } from '../../app-create-view-modify-v2/models
 import { AppFormBaseErrorMsgV2Type } from '../../../forms-v2/core/app-form-base-error-msg-v2';
 import { Subscription } from 'rxjs';
 import { IGeneralAsyncValidatorResponse } from '../../../xt-forms/validators/general-async-validator.directive';
+import { ILocation } from '../../../forms-v2/core/app-form-location-base-v2';
 
 /**
  Extended AG-Grid column definition - selection range collecting
@@ -65,8 +66,8 @@ export interface IV2SpreadsheetEditorExtendedColDefEditor {
   columnsMap: IV2SpreadsheetEditorExtendedColDefEditorColumnMap,
 
   // location name caching
-  locationNamesMap: {
-    [locationId: string]: string
+  locationsMap: {
+    [locationId: string]: ILocation
   };
 
   // invalid

@@ -28,6 +28,11 @@ export class AppSpreadsheetEditorV2EditorLocationComponent implements ICellEdito
     this._colDef = this._params.column.getUserProvidedColDef() as IV2SpreadsheetEditorExtendedColDef;
     this.value = this._params.value;
 
+    // already writing something, should we replace ?
+    if (/^[0-9a-z]$/i.test(params.charPress)) {
+      this._input.searchValue = params.charPress;
+    }
+
     // focus and open
     this._input.open();
   }
@@ -50,12 +55,12 @@ export class AppSpreadsheetEditorV2EditorLocationComponent implements ICellEdito
    * Location changed
    */
   selectedLocationChanged(location: ILocation): void {
-    if (!this._colDef.editor.locationNamesMap) {
-      this._colDef.editor.locationNamesMap = {
-        [location.id]: location.label
+    if (!this._colDef.editor.locationsMap) {
+      this._colDef.editor.locationsMap = {
+        [location.id]: location
       };
-    } else if (!this._colDef.editor.locationNamesMap[location.id]) {
-      this._colDef.editor.locationNamesMap[location.id] = location.label;
+    } else if (!this._colDef.editor.locationsMap[location.id]) {
+      this._colDef.editor.locationsMap[location.id] = location;
     }
   }
 }

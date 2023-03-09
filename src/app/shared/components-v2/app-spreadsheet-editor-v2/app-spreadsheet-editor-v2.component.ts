@@ -132,7 +132,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     columnsMap: {},
 
     // location
-    locationNamesMap: {},
+    locationsMap: {},
 
     // invalid
     invalid: {
@@ -383,7 +383,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    */
   private retrieveData(): void {
     // clear
-    this.editor.locationNamesMap = {};
+    this.editor.locationsMap = {};
     this.editorClearSelected(false);
     this.editorClearInvalid(false);
     this.editorClearReadonly(false);
@@ -2117,7 +2117,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       columnIndex: this.editor.columnsMap[columnField].index,
       rowData: this._agTable.api.getDisplayedRowAtIndex(rowIndex).data,
       handler,
-      columnsMap: this.editor.columnsMap
+      columnsMap: this.editor.columnsMap,
+      locationsMap: this.editor.locationsMap
     };
 
     // trigger change

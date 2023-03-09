@@ -7,6 +7,7 @@ import { AppSpreadsheetEditorV2EditorNumberComponent } from '../components/edito
 import { IV2SpreadsheetEditorExtendedColDefEditorColumnMap } from './extended-column.model';
 import { Observable } from 'rxjs';
 import { IGeneralAsyncValidatorResponse } from '../../../xt-forms/validators/general-async-validator.directive';
+import { ILocation } from '../../../forms-v2/core/app-form-location-base-v2';
 
 /**
  * Editor handler
@@ -27,6 +28,9 @@ export interface IV2SpreadsheetEditorEventData {
   rowData: any;
   handler: IV2SpreadsheetEditorHandler;
   columnsMap: IV2SpreadsheetEditorExtendedColDefEditorColumnMap;
+  locationsMap: {
+    [locationId: string]: ILocation
+  };
 }
 
 /**
@@ -134,11 +138,13 @@ export interface IV2SpreadsheetEditorColumnSingleSelect extends Omit<IV2Spreadsh
   type: V2SpreadsheetEditorColumnType.SINGLE_SELECT;
   options: ILabelValuePairModel[];
 
+  // optional
+  change?: (data: IV2SpreadsheetEditorEventData) => void;
+
   // used by ui
   optionsMap?: {
     [key: string]: ILabelValuePairModel
   };
-  change?: (data: IV2SpreadsheetEditorEventData) => void;
 }
 
 /**
@@ -152,9 +158,12 @@ export interface IV2SpreadsheetEditorColumnDate extends IV2SpreadsheetEditorColu
 /**
  * Column - location
  */
-export interface IV2SpreadsheetEditorColumnLocation extends IV2SpreadsheetEditorColumnBase {
+export interface IV2SpreadsheetEditorColumnLocation extends Omit<IV2SpreadsheetEditorColumnBase, 'change'> {
   // required
   type: V2SpreadsheetEditorColumnType.LOCATION;
+
+  // optional
+  change?: (data: IV2SpreadsheetEditorEventData) => void;
 }
 
 /**

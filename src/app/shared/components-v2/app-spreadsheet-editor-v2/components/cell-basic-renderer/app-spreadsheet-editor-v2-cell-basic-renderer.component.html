@@ -55,7 +55,7 @@
       <!-- Text -->
       <div
         fxFlex>
-        {{ params.value && colDef.editor.locationNamesMap && colDef.editor.locationNamesMap[params.value] ? colDef.editor.locationNamesMap[params.value] : params.value }}
+        {{ params.value && colDef.editor.locationsMap && colDef.editor.locationsMap[params.value] ? colDef.editor.locationsMap[params.value].label : params.value }}
       </div>
 
       <!-- Editor open -->
