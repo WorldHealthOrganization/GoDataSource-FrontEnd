@@ -6,6 +6,7 @@ import { GridApi } from '@ag-grid-community/core/dist/cjs/es5/gridApi';
 import { ColumnApi } from '@ag-grid-community/core/dist/cjs/es5/columns/columnApi';
 import { CellEditingStoppedEvent, GridReadyEvent } from '@ag-grid-community/core';
 import {
+  IV2SpreadsheetEditorColumnValidatorAsync,
   IV2SpreadsheetEditorColumnValidatorInteger,
   IV2SpreadsheetEditorColumnValidatorRequired,
   IV2SpreadsheetEditorEventData,
@@ -23,7 +24,7 @@ import { AppSpreadsheetEditorV2CellBasicHeaderComponent } from './components/hea
 import { AppSpreadsheetEditorV2CellRowNoRendererComponent } from './components/cell-row-no-renderer/app-spreadsheet-editor-v2-cell-row-no-renderer.component';
 import { NewValueParams, SuppressHeaderKeyboardEventParams, SuppressKeyboardEventParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 import { IV2SpreadsheetEditorChangeValues, V2SpreadsheetEditorChange, V2SpreadsheetEditorChangeType } from './models/change.model';
-import { Observable, Subscription, throwError } from 'rxjs';
+import { Observable, of, Subscription, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 import { AppSpreadsheetEditorV2LoadingComponent } from './components/loading/app-spreadsheet-editor-v2-loading.component';
@@ -114,6 +115,15 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // invalid
     invalid: {
+      rows: {}
+    },
+
+    // async request
+    async: {
+      inProgress: false,
+      rows: {}
+    },
+    asyncResponses: {
       rows: {}
     },
 
@@ -288,6 +298,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // stop retrieving data
     this.stopGetRecords();
 
+    // stop async request
+    this.stopAsyncRequests();
+
     // stop retrieving data
     // #TODO
     // this.stopGetRecords();
@@ -315,6 +328,28 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Stop async requests
+   */
+  private stopAsyncRequests(): void {
+    // stop requests
+    for (const rowIndex in this.editor.async.rows) {
+      // stop subscriptions
+      for (const columnIndex in this.editor.async.rows[rowIndex].columns) {
+        this.editor.async.rows[rowIndex].columns[columnIndex].subscription.unsubscribe();
+      }
+
+      // cleanup
+      delete this.editor.async.rows[rowIndex];
+    }
+
+    // nothing in progress anymore
+    this.editor.async.inProgress = false;
+    this.editor.asyncResponses = {
+      rows: {}
+    };
+  }
+
+  /**
    * Retrieve data
    */
   private retrieveData(): void {
@@ -323,6 +358,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     this.editorClearSelected(false);
     this.editorClearInvalid(false);
     this.editorClearReadonly(false);
+
+    // stop async request
+    this.stopAsyncRequests();
 
     // ag table not initialized ?
     if (!this._agTable) {
@@ -415,6 +453,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     this.editorClearSelected(false);
     this.editorClearInvalid(false);
     this.editorClearReadonly(false);
+
+    // stop async request
+    this.stopAsyncRequests();
 
     // ag table not initialized ?
     if (!this._agTable) {
@@ -1550,6 +1591,131 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         }
       }
 
+      // validate - async
+      if (
+        isValid &&
+        cellData &&
+        (column.validators as IV2SpreadsheetEditorColumnValidatorAsync)?.async
+      ) {
+        // did we already validate this ?
+        // +1 to take in account row no column
+        if (
+          this.editor.asyncResponses.rows[rowIndex]?.columns[columnIndex + 1] &&
+          this.editor.asyncResponses.rows[rowIndex]?.columns[columnIndex + 1][cellData]
+        ) {
+          // validate
+          const response = this.editor.asyncResponses.rows[rowIndex]?.columns[columnIndex + 1][cellData];
+          if (typeof response === 'boolean') {
+            if (!response) {
+              isValid = false;
+              error = {
+                key: AppFormBaseErrorMsgV2Type.GENERAL_ASYNC,
+                data: {
+                  err: 'LNG_FORM_VALIDATION_ERROR_GENERAL_ASYNC'
+                }
+              };
+            }
+          } else {
+            if (!response.isValid) {
+              isValid = false;
+              error = {
+                key: AppFormBaseErrorMsgV2Type.GENERAL_ASYNC,
+                data: {
+                  err: response.errMsg,
+                  details: response.errMsgData
+                }
+              };
+            }
+          }
+        } else {
+          // stop previous async request
+          // +1 to take in account row no column
+          if (this.editor.async.rows[rowIndex]?.columns[columnIndex + 1]?.subscription) {
+            this.editor.async.rows[rowIndex].columns[columnIndex + 1].subscription.unsubscribe();
+            delete this.editor.async.rows[rowIndex].columns[columnIndex + 1];
+          }
+
+          // construct async request
+          const asyncRequest = (column.validators as IV2SpreadsheetEditorColumnValidatorAsync)?.async(rowData);
+
+          // initialize - row ?
+          if (!this.editor.async.rows[rowIndex]) {
+            this.editor.async.rows[rowIndex] = {
+              columns: {}
+            };
+          }
+
+          // initialize - column ?
+          // +1 to take in account row no column
+          if (!this.editor.async.rows[rowIndex].columns[columnIndex + 1]) {
+            this.editor.async.rows[rowIndex].columns[columnIndex + 1] = {
+              subscription: undefined
+            };
+          }
+
+          // execute async request
+          // +1 to take in account row no column
+          this.editor.async.inProgress = true;
+          this.editor.async.rows[rowIndex].columns[columnIndex + 1].subscription = (function(
+            // works as long as value is string - visualId ...
+            localValue: string,
+            localRowIndex: number,
+            localColumnIndex: number
+          ) {
+            return asyncRequest
+              .pipe(
+                catchError(() => {
+                  // resolve as not valid
+                  return of(false);
+                })
+              )
+              .subscribe((response) => {
+                // stop previous async request
+                // +1 to take in account row no column
+                if (this.editor.async.rows[localRowIndex]?.columns[localColumnIndex]?.subscription) {
+                  this.editor.async.rows[localRowIndex].columns[localColumnIndex].subscription.unsubscribe();
+                  delete this.editor.async.rows[localRowIndex].columns[localColumnIndex];
+                }
+
+                // cleanup
+                if (
+                  this.editor.async.rows[localRowIndex]?.columns &&
+                  Object.keys(this.editor.async.rows[localRowIndex].columns).length < 1
+                ) {
+                  delete this.editor.async.rows[localRowIndex];
+                }
+
+                // finished all async requests ?
+                if (Object.keys(this.editor.async.rows).length < 1) {
+                  this.editor.async.inProgress = false;
+                }
+
+                // set validation for this value
+                if (!this.editor.asyncResponses.rows[localRowIndex]) {
+                  this.editor.asyncResponses.rows[localRowIndex] = {
+                    columns: {}
+                  };
+                }
+                if (!this.editor.asyncResponses.rows[localRowIndex].columns[localColumnIndex]) {
+                  this.editor.asyncResponses.rows[localRowIndex].columns[localColumnIndex] = {};
+                }
+                this.editor.asyncResponses.rows[localRowIndex].columns[localColumnIndex][localValue] = response;
+
+                // validate once again since we have async response
+                this.rowValidate(localRowIndex);
+
+                // update css
+                this.cellUpdateRangeClasses(true);
+              });
+          }).call(
+            this,
+            cellData,
+            rowIndex,
+            columnIndex + 1
+          );
+        }
+      }
+
       // invalid ?
       if (!isValid) {
         invalidColumnIndexes.push({
@@ -2089,6 +2255,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
         // clear selection
         // this.editorClearSelected(true);
+        // this.stopAsyncRequests();
         // this.editorClearInvalid(false);
         // this.editorClearReadonly(false);
         // #TODO
@@ -2100,6 +2267,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
         // clear selection
         // this.editorClearSelected(true);
+        // this.stopAsyncRequests();
         // this.editorClearInvalid(false);
         // this.editorClearReadonly(false);
         // #TODO
@@ -2193,6 +2361,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
         // clear selection
         // this.editorClearSelected(true);
+        // this.stopAsyncRequests();
         // this.editorClearInvalid(false);
         // this.editorClearReadonly(false);
         // #TODO
@@ -2204,6 +2373,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
         // clear selection
         // this.editorClearSelected(true);
+        // this.stopAsyncRequests();
         // this.editorClearInvalid(false);
         // this.editorClearReadonly(false);
         // #TODO
@@ -2290,6 +2460,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
         // clear selection
         // this.editorClearSelected(true);
+        // this.stopAsyncRequests();
         // this.editorClearInvalid(false);
         // this.editorClearReadonly(false);
         // #TODO
@@ -2301,6 +2472,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
         // clear selection
         // this.editorClearSelected(true);
+        // this.stopAsyncRequests();
         // this.editorClearInvalid(false);
         // this.editorClearReadonly(false);
         // #TODO

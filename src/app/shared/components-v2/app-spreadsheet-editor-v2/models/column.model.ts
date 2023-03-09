@@ -5,6 +5,8 @@ import { AppSpreadsheetEditorV2EditorDateComponent } from '../components/editor-
 import { AppSpreadsheetEditorV2EditorLocationComponent } from '../components/editor-location/app-spreadsheet-editor-v2-editor-location.component';
 import { AppSpreadsheetEditorV2EditorNumberComponent } from '../components/editor-number/app-spreadsheet-editor-v2-editor-number.component';
 import { IV2SpreadsheetEditorExtendedColDefEditorColumnMap } from './extended-column.model';
+import { Observable } from 'rxjs';
+import { IGeneralAsyncValidatorResponse } from '../../../xt-forms/validators/general-async-validator.directive';
 
 /**
  * Editor handler
@@ -54,6 +56,14 @@ export interface IV2SpreadsheetEditorColumnValidatorInteger {
 }
 
 /**
+ * Validator - async
+ */
+export interface IV2SpreadsheetEditorColumnValidatorAsync {
+  // optional
+  async?: (rowData: any) => Observable<boolean | IGeneralAsyncValidatorResponse>;
+}
+
+/**
  * Column type
  */
 export enum V2SpreadsheetEditorColumnType {
@@ -92,7 +102,7 @@ export interface IV2SpreadsheetEditorColumnText extends Omit<IV2SpreadsheetEdito
   editor?: {
     params?: ITextCellEditorParams
   };
-  validators?: IV2SpreadsheetEditorColumnValidatorRequired;
+  validators?: IV2SpreadsheetEditorColumnValidatorRequired | IV2SpreadsheetEditorColumnValidatorAsync;
 }
 
 /**

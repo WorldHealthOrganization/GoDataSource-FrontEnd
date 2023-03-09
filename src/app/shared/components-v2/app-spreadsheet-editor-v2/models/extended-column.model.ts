@@ -4,6 +4,8 @@ import { Moment } from 'moment';
 import { TemplateRef } from '@angular/core';
 import { CreateViewModifyV2Action } from '../../app-create-view-modify-v2/models/action.model';
 import { AppFormBaseErrorMsgV2Type } from '../../../forms-v2/core/app-form-base-error-msg-v2';
+import { Subscription } from 'rxjs';
+import { IGeneralAsyncValidatorResponse } from '../../../xt-forms/validators/general-async-validator.directive';
 
 /**
  Extended AG-Grid column definition - selection range collecting
@@ -74,6 +76,31 @@ export interface IV2SpreadsheetEditorExtendedColDefEditor {
         columns: {
           [columnIndex: number]: {
             error: IV2SpreadsheetEditorExtendedColDefEditorError
+          }
+        }
+      }
+    }
+  },
+
+  // async request
+  async: {
+    inProgress: boolean,
+    rows: {
+      [rowIndex: number]: {
+        columns: {
+          [columnIndex: number]: {
+            subscription: Subscription
+          }
+        }
+      }
+    }
+  },
+  asyncResponses: {
+    rows: {
+      [rowIndex: number]: {
+        columns: {
+          [columnIndex: number]: {
+            [checkedValue: string]: boolean | IGeneralAsyncValidatorResponse
           }
         }
       }
