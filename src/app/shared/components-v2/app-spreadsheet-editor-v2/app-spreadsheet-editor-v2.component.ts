@@ -5,9 +5,17 @@ import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-mod
 import { GridApi } from '@ag-grid-community/core/dist/cjs/es5/gridApi';
 import { ColumnApi } from '@ag-grid-community/core/dist/cjs/es5/columns/columnApi';
 import { CellEditingStoppedEvent, GridReadyEvent } from '@ag-grid-community/core';
-import { IV2SpreadsheetEditorEventData, IV2SpreadsheetEditorHandler, V2SpreadsheetEditorColumn, V2SpreadsheetEditorColumnType, V2SpreadsheetEditorColumnTypeToEditor, V2SpreadsheetEditorEventType } from './models/column.model';
-import { I18nService } from '../../../core/services/helper/i18n.service';
-import { IV2SpreadsheetEditorExtendedColDef, IV2SpreadsheetEditorExtendedColDefEditor, IV2SpreadsheetEditorExtendedColDefEditorSelectionRange } from './models/extended-column.model';
+import {
+  IV2SpreadsheetEditorColumnValidatorInteger,
+  IV2SpreadsheetEditorColumnValidatorRequired,
+  IV2SpreadsheetEditorEventData,
+  IV2SpreadsheetEditorHandler,
+  V2SpreadsheetEditorColumn,
+  V2SpreadsheetEditorColumnType,
+  V2SpreadsheetEditorColumnTypeToEditor,
+  V2SpreadsheetEditorEventType
+} from './models/column.model';
+import { IV2SpreadsheetEditorExtendedColDef, IV2SpreadsheetEditorExtendedColDefEditor, IV2SpreadsheetEditorExtendedColDefEditorError, IV2SpreadsheetEditorExtendedColDefEditorSelectionRange } from './models/extended-column.model';
 import { AppSpreadsheetEditorV2CellBasicRendererComponent } from './components/cell-basic-renderer/app-spreadsheet-editor-v2-cell-basic-renderer.component';
 import * as moment from 'moment';
 import { Clipboard } from '@angular/cdk/clipboard';
@@ -22,6 +30,8 @@ import { AppSpreadsheetEditorV2LoadingComponent } from './components/loading/app
 import { AppSpreadsheetEditorV2NoDataComponent } from './components/no-data/app-spreadsheet-editor-v2-no-data.component';
 import * as _ from 'lodash';
 import { CreateViewModifyV2Action } from '../app-create-view-modify-v2/models/action.model';
+import { TranslateService } from '@ngx-translate/core';
+import { AppFormBaseErrorMsgV2, AppFormBaseErrorMsgV2Type } from '../../forms-v2/core/app-form-base-error-msg-v2';
 
 /**
  * Component
@@ -256,7 +266,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    */
   constructor(
     protected changeDetectorRef: ChangeDetectorRef,
-    protected i18nService: I18nService,
+    protected translateService: TranslateService,
     protected elementRef: ElementRef,
     protected clipboard: Clipboard,
     protected toastV2Service: ToastV2Service
@@ -482,7 +492,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       // define column
       const colDef: IV2SpreadsheetEditorExtendedColDef = {
         headerName: column.label ?
-          this.i18nService.instant(column.label) :
+          this.translateService.instant(column.label) :
           '',
         field: column.field,
         resizable: true,
@@ -1041,7 +1051,17 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       for (const columnIndex in this.editor.invalid.rows[rowIndex].columns) {
         invalidHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-basic-renderer-${rowIndex}-${columnIndex}`);
         if (invalidHtml) {
+          // add invalid
           invalidHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-renderer-invalid');
+
+          // add error message
+          if (this.editor.invalid.rows[rowIndex].columns[columnIndex].error?.key) {
+            invalidHtml.title = AppFormBaseErrorMsgV2.msg(
+              this.translateService,
+              this.editor.invalid.rows[rowIndex].columns[columnIndex].error.key,
+              this.editor.invalid.rows[rowIndex].columns[columnIndex].error.data
+            );
+          }
         }
       }
     }
@@ -1079,9 +1099,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    */
   private cellUpdateRangeClasses(showFillIfPossible: boolean): void {
     // remove main cells classes
-    const focusedHtmlElements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-basic-renderer');
-    for (let elementIndex = 0; elementIndex < focusedHtmlElements.length; elementIndex++) {
-      focusedHtmlElements[elementIndex].classList.remove(
+    const cellHtmlElements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-basic-renderer');
+    for (let elementIndex = 0; elementIndex < cellHtmlElements.length; elementIndex++) {
+      // class cleanup
+      cellHtmlElements[elementIndex].classList.remove(
         'gd-spreadsheet-editor-v2-cell-basic-renderer-selected-visible',
         'gd-spreadsheet-editor-v2-cell-basic-renderer-selected-border-left',
         'gd-spreadsheet-editor-v2-cell-basic-renderer-selected-border-right',
@@ -1092,6 +1113,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         'gd-spreadsheet-editor-v2-cell-basic-renderer-invalid',
         'gd-spreadsheet-editor-v2-cell-basic-renderer-readonly'
       );
+
+      // error message cleanup
+      cellHtmlElements[elementIndex].title = '';
     }
 
     // remove main row no cells classes
@@ -1400,7 +1424,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     const rowData = this._agTable.api.getDisplayedRowAtIndex(rowIndex).data;
 
     // go through columns
-    const invalidColumnIndexes: number[] = [];
+    const invalidColumnIndexes: {
+      columnIndex: number,
+      error: IV2SpreadsheetEditorExtendedColDefEditorError
+    }[] = [];
     let rowHasColumnData: boolean = this.editor.action === CreateViewModifyV2Action.MODIFY;
     for (let columnIndex = 0; columnIndex < this.columns.length; columnIndex++) {
       // retrieve column & cell data
@@ -1421,20 +1448,68 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
       // validate cell
       let isValid: boolean = true;
+      let error: IV2SpreadsheetEditorExtendedColDefEditorError;
 
       // validate - required
       if (
         isValid &&
-        column.validators?.required &&
-        column.validators?.required(rowData) &&
-        !cellData
+        (column.validators as IV2SpreadsheetEditorColumnValidatorRequired)?.required &&
+        !cellData &&
+        (column.validators as IV2SpreadsheetEditorColumnValidatorRequired).required.apply(rowData)
       ) {
         isValid = false;
+        error = {
+          key: AppFormBaseErrorMsgV2Type.REQUIRED
+        };
+      }
+
+      // validate - integer
+      if (
+        isValid &&
+        cellData &&
+        (column.validators as IV2SpreadsheetEditorColumnValidatorInteger)?.integer
+      ) {
+        // column integer setups
+        const integerConf = (column.validators as IV2SpreadsheetEditorColumnValidatorInteger)?.integer(rowData);
+        isValid = typeof cellData === 'number' &&
+          /^-?[0-9.]+$/.test(cellData.toString());
+
+        // not integer ?
+        if (!isValid) {
+          error = {
+            key: AppFormBaseErrorMsgV2Type.INTEGER
+          };
+        } else {
+          // min
+          isValid = integerConf.min === undefined || cellData >= integerConf.min;
+          if (!isValid) {
+            error = {
+              key: AppFormBaseErrorMsgV2Type.MIN_NUMBER,
+              data: {
+                min: integerConf.min
+              }
+            };
+          } else {
+            // max
+            isValid = integerConf.max === undefined || cellData <= integerConf.max;
+            if (!isValid) {
+              error = {
+                key: AppFormBaseErrorMsgV2Type.MAX_NUMBER,
+                data: {
+                  max: integerConf.max
+                }
+              };
+            }
+          }
+        }
       }
 
       // invalid ?
       if (!isValid) {
-        invalidColumnIndexes.push(columnIndex);
+        invalidColumnIndexes.push({
+          columnIndex,
+          error
+        });
       }
 
       // cleanup
@@ -1457,7 +1532,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       rowHasColumnData &&
       invalidColumnIndexes.length > 0
     ) {
-      invalidColumnIndexes.forEach((invalidColumnIndex) => {
+      invalidColumnIndexes.forEach((invalidColumn) => {
         // must initialize ?
         if (!this.editor.invalid.rows[rowIndex]) {
           this.editor.invalid.rows[rowIndex] = {
@@ -1467,7 +1542,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
         // make it invalid
         // +1 because we need to take in account row no column which isn't in this.columns
-        this.editor.invalid.rows[rowIndex].columns[invalidColumnIndex + 1] = true;
+        this.editor.invalid.rows[rowIndex].columns[invalidColumn.columnIndex + 1] = {
+          error: invalidColumn.error
+        };
       });
     }
   }

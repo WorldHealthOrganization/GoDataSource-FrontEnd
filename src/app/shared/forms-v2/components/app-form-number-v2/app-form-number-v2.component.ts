@@ -125,6 +125,15 @@ export class AppFormNumberV2Component
           value = Math.round(value * 1000000) / 1000000;
         }
       }
+
+      // convert to number
+      if (typeof value === 'string') {
+        try {
+          // trigger change
+          this.value = parseFloat(value);
+          return;
+        } catch (e) {}
+      }
     }
 
     // write value

@@ -37,9 +37,20 @@ export enum V2SpreadsheetEditorEventType {
 /**
  * Validator - required
  */
-interface IV2SpreadsheetEditorColumnValidatorRequired {
+export interface IV2SpreadsheetEditorColumnValidatorRequired {
   // optional
   required?: (rowData: any) => boolean;
+}
+
+/**
+ * Validator - integer
+ */
+export interface IV2SpreadsheetEditorColumnValidatorInteger {
+  // optional
+  integer?: (rowData: any) => {
+    min?: number,
+    max?: number
+  };
 }
 
 /**
@@ -131,9 +142,12 @@ export interface IV2SpreadsheetEditorColumnLocation extends IV2SpreadsheetEditor
 /**
  * Column - number
  */
-export interface IV2SpreadsheetEditorColumnNumber extends IV2SpreadsheetEditorColumnBase {
+export interface IV2SpreadsheetEditorColumnNumber extends Omit<IV2SpreadsheetEditorColumnBase, 'validators'> {
   // required
   type: V2SpreadsheetEditorColumnType.NUMBER;
+
+  // optional
+  validators?: IV2SpreadsheetEditorColumnValidatorInteger;
 }
 
 /**
