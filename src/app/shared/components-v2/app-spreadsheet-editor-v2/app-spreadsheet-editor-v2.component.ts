@@ -1041,17 +1041,21 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // invalid cells
     for (const rowIndex in this.editor.invalid.rows) {
-      // row no
-      let invalidHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-row-no-renderer-${rowIndex}`);
-      if (invalidHtml) {
-        invalidHtml.classList.add('gd-spreadsheet-editor-v2-cell-row-no-renderer-invalid');
-      }
-
       // cell
-      for (const columnIndex in this.editor.invalid.rows[rowIndex].columns) {
+      let invalidHtml;
+      let columnIndex;
+      let invalidFields: string = '';
+      for (columnIndex in this.editor.invalid.rows[rowIndex].columns) {
+        // put field in list of invalid fields
+        // -1 because row no doesn't exist in this.columns
+        columnIndex = parseInt(columnIndex, 10);
+        invalidFields += (invalidFields ? ', ' : '') +
+          this.translateService.instant(this.columns[columnIndex - 1].label);
+
+        // mark cell as invalid
         invalidHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-basic-renderer-${rowIndex}-${columnIndex}`);
         if (invalidHtml) {
-          // add invalid
+          // add invalid class
           invalidHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-renderer-invalid');
 
           // add error message
@@ -1063,6 +1067,20 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
             );
           }
         }
+      }
+
+      // row no
+      invalidHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-row-no-renderer-${rowIndex}`);
+      if (invalidHtml) {
+        // add invalid class
+        invalidHtml.classList.add('gd-spreadsheet-editor-v2-cell-row-no-renderer-invalid');
+
+        // add error message
+        invalidHtml.title = this.translateService.instant(
+          'LNG_FORM_VALIDATION_ERROR_INVALID_COLUMNS', {
+            fields: invalidFields
+          }
+        );
       }
     }
 
@@ -1121,11 +1139,15 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // remove main row no cells classes
     const rowNoHtmlElements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-row-no-renderer');
     for (let elementIndex = 0; elementIndex < rowNoHtmlElements.length; elementIndex++) {
+      // class cleanup
       rowNoHtmlElements[elementIndex].classList.remove(
         'gd-spreadsheet-editor-v2-cell-row-no-renderer-invalid',
         'gd-spreadsheet-editor-v2-cell-row-no-renderer-selected-partial',
         'gd-spreadsheet-editor-v2-cell-row-no-renderer-selected-full'
       );
+
+      // error message cleanup
+      rowNoHtmlElements[elementIndex].title = '';
     }
 
     // remove full / partial from headers
