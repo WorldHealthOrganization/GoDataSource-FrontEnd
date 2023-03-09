@@ -33,6 +33,7 @@ import * as _ from 'lodash';
 import { CreateViewModifyV2Action } from '../app-create-view-modify-v2/models/action.model';
 import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseErrorMsgV2, AppFormBaseErrorMsgV2Type } from '../../forms-v2/core/app-form-base-error-msg-v2';
+import { AppBasicPageV2Component } from '../app-basic-page-v2/app-basic-page-v2.component';
 
 /**
  * Component
@@ -57,6 +58,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   @ViewChild('rowNoContextMenu', { static: true }) set rowNoContextMenu(rowNoContextMenu: TemplateRef<any>) {
     this.editor.rowNoContextMenu = rowNoContextMenu;
   }
+
+  // basic page
+  @ViewChild(AppBasicPageV2Component, { static: true }) basicPage: AppBasicPageV2Component;
 
   // breadcrumbs
   @Input() breadcrumbs: IV2Breadcrumb[];
@@ -249,6 +253,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       click: () => {
         // #TODO
       }
+    },
+    disable: () => {
+      return this.editor.async.inProgress;
     }
   };
 
@@ -270,6 +277,11 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   // constants
   AppSpreadsheetEditorV2LoadingComponent = AppSpreadsheetEditorV2LoadingComponent;
   AppSpreadsheetEditorV2NoDataComponent = AppSpreadsheetEditorV2NoDataComponent;
+
+  // async in progress ?
+  actionButtonLoading: () => boolean = () => {
+    return this.editor.async.inProgress;
+  };
 
   /**
    * Constructor
@@ -1656,6 +1668,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           // execute async request
           // +1 to take in account row no column
           this.editor.async.inProgress = true;
+          this.basicPage.detectChanges();
           this.editor.async.rows[rowIndex].columns[columnIndex + 1].subscription = (function(
             // works as long as value is string - visualId ...
             localValue: string,
@@ -1700,6 +1713,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
                   this.editor.asyncResponses.rows[localRowIndex].columns[localColumnIndex] = {};
                 }
                 this.editor.asyncResponses.rows[localRowIndex].columns[localColumnIndex][localValue] = response;
+
+                // update ui buttons
+                this.basicPage.detectChanges();
 
                 // validate once again since we have async response
                 this.rowValidate(localRowIndex);
