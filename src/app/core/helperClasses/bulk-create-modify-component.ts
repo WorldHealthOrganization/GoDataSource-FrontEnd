@@ -103,6 +103,11 @@ export abstract class BulkCreateModifyComponent<T> {
   protected abstract initializeRecords(): void;
 
   /**
+   * Used to generate a new record
+   */
+  abstract newRecord(): T;
+
+  /**
    * Release subscribers
    */
   private releaseSubscribers() {

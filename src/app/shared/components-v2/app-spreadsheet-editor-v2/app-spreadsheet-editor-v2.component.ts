@@ -47,7 +47,7 @@ import { AppBasicPageV2Component } from '../app-basic-page-v2/app-basic-page-v2.
 })
 export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   // max number of ms until outside leave is consider mouse out
-  public static readonly DEFAULT_CREATE_RECORDS_ROW_NO = 20;
+  private static readonly DEFAULT_CREATE_RECORDS_ROW_NO = 20;
   private static readonly HOVER_OUTSIDE_LIMIT_UNTIL_MOUSE_OUT: number = 500;
   private static readonly MAX_UNDO_TO_KEEP: number = 100;
 
@@ -70,7 +70,20 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
   // create or modify ?
   @Input() set action(action: CreateViewModifyV2Action.CREATE | CreateViewModifyV2Action.MODIFY) {
+    // set action
     this.editor.action = action;
+
+    // if create generate new records
+    if (this.editor.action === CreateViewModifyV2Action.CREATE) {
+      // create
+      const records: any[] = [];
+      for (let i = 0; i < AppSpreadsheetEditorV2Component.DEFAULT_CREATE_RECORDS_ROW_NO; i++) {
+        records.push(this.newRecord());
+      }
+
+      // finished
+      this.records$ = of(records);
+    }
   }
 
   // columns
@@ -97,6 +110,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // retrieve data
     this.retrieveData();
   }
+
+  // Used to generate a new record
+  @Input() newRecord: () => any;
 
   // keep changes
   changes: V2SpreadsheetEditorChange[] = [];
