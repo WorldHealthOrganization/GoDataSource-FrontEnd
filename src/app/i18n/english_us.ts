@@ -19,7 +19,8 @@ export const EnglishUsLang = {
     'LNG_SHEET_CONTEXT_MENU_ROW_BELOW': 'Add row(s) below',
     'LNG_SHEET_CONTEXT_MENU_REMOVE_ROW': 'Delete selected rows',
     'LNG_FORM_VALIDATION_ERROR_INTEGER': 'Field must be an integer',
-    'LNG_FORM_VALIDATION_ERROR_INVALID_COLUMNS': 'Columns "{{fields}}" are invalid'
+    'LNG_FORM_VALIDATION_ERROR_INVALID_COLUMNS': 'Column(s) "{{fields}}" are invalid',
+    'LNG_FORM_VALIDATION_ERROR_INVALID_ROWS': 'Row(s) "{{rows}}" are invalid'
 
 
     /**

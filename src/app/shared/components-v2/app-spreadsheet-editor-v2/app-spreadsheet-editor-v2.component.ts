@@ -1040,17 +1040,16 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     }
 
     // invalid cells
+    let invalidRows: string = '';
     for (const rowIndex in this.editor.invalid.rows) {
       // cell
       let invalidHtml;
-      let columnIndex;
       let invalidFields: string = '';
-      for (columnIndex in this.editor.invalid.rows[rowIndex].columns) {
+      for (const columnIndex in this.editor.invalid.rows[rowIndex].columns) {
         // put field in list of invalid fields
         // -1 because row no doesn't exist in this.columns
-        columnIndex = parseInt(columnIndex, 10);
         invalidFields += (invalidFields ? ', ' : '') +
-          this.translateService.instant(this.columns[columnIndex - 1].label);
+          this.translateService.instant(this.columns[parseInt(columnIndex, 10) - 1].label);
 
         // mark cell as invalid
         invalidHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-basic-renderer-${rowIndex}-${columnIndex}`);
@@ -1069,6 +1068,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         }
       }
 
+      // invalid rows
+      invalidRows += (invalidRows ? ', ' : '') +
+        (parseInt(rowIndex, 10) + 1);
+
       // row no
       invalidHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-row-no-renderer-${rowIndex}`);
       if (invalidHtml) {
@@ -1079,6 +1082,22 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         invalidHtml.title = this.translateService.instant(
           'LNG_FORM_VALIDATION_ERROR_INVALID_COLUMNS', {
             fields: invalidFields
+          }
+        );
+      }
+    }
+
+    // announce that we have invalid rows
+    if (invalidRows) {
+      const headerHtml = document.getElementById('gd-spreadsheet-editor-v2-cell-basic-header-0');
+      if (headerHtml) {
+        // add invalid class
+        headerHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-header-invalid');
+
+        // add error message
+        headerHtml.title = this.translateService.instant(
+          'LNG_FORM_VALIDATION_ERROR_INVALID_ROWS', {
+            rows: invalidRows
           }
         );
       }
@@ -1153,10 +1172,15 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // remove full / partial from headers
     const headerHtmlElements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-basic-header');
     for (let elementIndex = 0; elementIndex < headerHtmlElements.length; elementIndex++) {
+      // class cleanup
       headerHtmlElements[elementIndex].classList.remove(
         'gd-spreadsheet-editor-v2-cell-basic-header-selected-partial',
-        'gd-spreadsheet-editor-v2-cell-basic-header-selected-full'
+        'gd-spreadsheet-editor-v2-cell-basic-header-selected-full',
+        'gd-spreadsheet-editor-v2-cell-basic-header-invalid'
       );
+
+      // error message cleanup
+      headerHtmlElements[elementIndex].title = '';
     }
 
     // render already selected ranges

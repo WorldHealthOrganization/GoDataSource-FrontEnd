@@ -70,9 +70,9 @@ export interface IV2SpreadsheetEditorExtendedColDefEditor {
   // invalid
   invalid: {
     rows: {
-      [rowId: number]: {
+      [rowIndex: number]: {
         columns: {
-          [columnNumber: number]: {
+          [columnIndex: number]: {
             error: IV2SpreadsheetEditorExtendedColDefEditorError
           }
         }
@@ -83,9 +83,9 @@ export interface IV2SpreadsheetEditorExtendedColDefEditor {
   // readonly
   readonly: {
     rows: {
-      [rowId: number]: {
+      [rowIndex: number]: {
         columns: {
-          [columnNumber: number]: true
+          [columnIndex: number]: true
         }
       }
     }
