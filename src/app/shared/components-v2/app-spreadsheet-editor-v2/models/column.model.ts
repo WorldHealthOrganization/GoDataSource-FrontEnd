@@ -179,7 +179,7 @@ export interface IV2SpreadsheetEditorColumnNumber extends Omit<IV2SpreadsheetEdi
   type: V2SpreadsheetEditorColumnType.NUMBER;
 
   // optional
-  validators?: IV2SpreadsheetEditorColumnValidatorInteger;
+  validators?: IV2SpreadsheetEditorColumnValidatorRequired | IV2SpreadsheetEditorColumnValidatorInteger;
 }
 
 /**
