@@ -8,6 +8,7 @@ import { AuthDataService } from '../services/data/auth.data.service';
 import { V2SpreadsheetEditorColumn } from '../../shared/components-v2/app-spreadsheet-editor-v2/models/column.model';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { IV2SpreadsheetEditorEventSave } from '../../shared/components-v2/app-spreadsheet-editor-v2/models/event.model';
+import { ActivatedRoute } from '@angular/router';
 
 /**
  * Bulk create / modify component
@@ -30,21 +31,38 @@ export abstract class BulkCreateModifyComponent<T> {
   // records
   records$: Observable<T[]>;
 
-  // constants
-  CreateViewModifyV2Action = CreateViewModifyV2Action;
+  // page type
+  // - determined from route data
+  readonly action: CreateViewModifyV2Action.CREATE | CreateViewModifyV2Action.MODIFY;
+  get isCreate(): boolean {
+    return this.action === CreateViewModifyV2Action.CREATE;
+  }
+  get isModify(): boolean {
+    return this.action === CreateViewModifyV2Action.MODIFY;
+  }
+
+  // page title
+  pageTitle: string;
 
   /**
    * Constructor
    */
   protected constructor(
+    protected activatedRoute: ActivatedRoute,
     protected authDataService: AuthDataService,
     protected outbreakDataService: OutbreakDataService
   ) {
     // get auth data
     this.authUser = authDataService.getAuthenticatedUser();
 
+    // retrieve basic data
+    this.action = activatedRoute.snapshot.data.action;
+
     // wait for binding so some things get processed
     setTimeout(() => {
+      // initialize page title
+      this.initializePageTitle();
+
       // initialize breadcrumbs
       this.initializeBreadcrumbs();
 
@@ -87,6 +105,11 @@ export abstract class BulkCreateModifyComponent<T> {
     // release subscribers
     this.releaseSubscribers();
   }
+
+  /**
+   * Initialize page title
+   */
+  protected abstract initializePageTitle(): void;
 
   /**
    * Initialize breadcrumbs

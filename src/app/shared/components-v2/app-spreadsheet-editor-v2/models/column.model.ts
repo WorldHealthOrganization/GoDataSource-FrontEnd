@@ -7,7 +7,6 @@ import { AppSpreadsheetEditorV2EditorNumberComponent } from '../components/edito
 import { IV2SpreadsheetEditorExtendedColDefEditorColumnMap } from './extended-column.model';
 import { Observable } from 'rxjs';
 import { IGeneralAsyncValidatorResponse } from '../../../xt-forms/validators/general-async-validator.directive';
-import { ILocation } from '../../../forms-v2/core/app-form-location-base-v2';
 import { V2SpreadsheetEditorChange } from './change.model';
 import { Moment } from '../../../../core/helperClasses/x-moment';
 
@@ -23,6 +22,19 @@ export interface IV2SpreadsheetEditorHandler {
 }
 
 /**
+ * Editor event data - location
+ */
+export interface IV2SpreadsheetEditorEventDataLocation {
+  // required
+  id: string;
+  label: string;
+  geoLocation: {
+    lat: number,
+    lng: number
+  };
+}
+
+/**
  * Editor event data
  */
 export interface IV2SpreadsheetEditorEventData {
@@ -33,7 +45,7 @@ export interface IV2SpreadsheetEditorEventData {
   handler: IV2SpreadsheetEditorHandler;
   columnsMap: IV2SpreadsheetEditorExtendedColDefEditorColumnMap;
   locationsMap: {
-    [locationId: string]: ILocation
+    [locationId: string]: IV2SpreadsheetEditorEventDataLocation
   };
   change: V2SpreadsheetEditorChange;
 }
@@ -111,6 +123,9 @@ interface IV2SpreadsheetEditorColumnBase {
   type: V2SpreadsheetEditorColumnType;
   field: string;
   label: string;
+
+  // optional
+  visible?: boolean;
 
   // never
   editor?: never;

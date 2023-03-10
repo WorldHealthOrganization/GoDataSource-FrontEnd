@@ -24,8 +24,8 @@ import { AppSpreadsheetEditorV2CellBasicHeaderComponent } from './components/hea
 import { AppSpreadsheetEditorV2CellRowNoRendererComponent } from './components/cell-row-no-renderer/app-spreadsheet-editor-v2-cell-row-no-renderer.component';
 import { NewValueParams, SuppressHeaderKeyboardEventParams, SuppressKeyboardEventParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 import { IV2SpreadsheetEditorChangeValues, V2SpreadsheetEditorChange, V2SpreadsheetEditorChangeType } from './models/change.model';
-import { Observable, of, Subscription, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Observable, of, Subscription, switchMap, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { ToastV2Service } from '../../../core/services/helper/toast-v2.service';
 import { AppSpreadsheetEditorV2LoadingComponent } from './components/loading/app-spreadsheet-editor-v2-loading.component';
 import { AppSpreadsheetEditorV2NoDataComponent } from './components/no-data/app-spreadsheet-editor-v2-no-data.component';
@@ -38,6 +38,8 @@ import { Constants } from '../../../core/models/constants';
 import { Moment } from 'moment';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
 import { IV2SpreadsheetEditorEventSave } from './models/event.model';
+import { LocationDataService } from '../../../core/services/data/location.data.service';
+import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 
 /**
  * Component
@@ -92,7 +94,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   private _columns: V2SpreadsheetEditorColumn[];
   @Input() set columns(columns: V2SpreadsheetEditorColumn[]) {
     // set data
-    this._columns = columns;
+    this._columns = (columns || [])
+      .filter((column) => column.visible === undefined || column.visible);
 
     // update columns definitions
     this.updateColumnDefinitions();
@@ -321,7 +324,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     protected elementRef: ElementRef,
     protected clipboard: Clipboard,
     protected toastV2Service: ToastV2Service,
-    protected dialogV2Service: DialogV2Service
+    protected dialogV2Service: DialogV2Service,
+    protected locationDataService: LocationDataService
   ) {}
 
   /**
@@ -443,6 +447,86 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     this._agTable.api.showLoadingOverlay();
     this._recordsSubscription = this._records$
       .pipe(
+        // retrieve locations
+        switchMap((data) => {
+          // nothing to retrieve ?
+          if (
+            !this._locationColumns?.length ||
+            !data.length
+          ) {
+            return of(data);
+          }
+
+          // determine locations that we need to retrieve
+          const locationIdsMap: {
+            [locationId: string]: true
+          } = {};
+          this._locationColumns.forEach((field) => {
+            data.forEach((item) => {
+              // get location id
+              const locationId: string = _.get(
+                item,
+                field
+              );
+
+              // nothing to do ?
+              if (!locationId) {
+                return;
+              }
+
+              // attach to list of locations ids to retrieve
+              locationIdsMap[locationId] = true;
+            });
+          });
+
+          // nothing to retrieve ?
+          const locationIds: string[] = Object.keys(locationIdsMap);
+          if (locationIds.length < 1) {
+            return of(data);
+          }
+
+          // construct location query
+          const qb: RequestQueryBuilder = new RequestQueryBuilder();
+
+          // we need just some fields
+          qb.fields(
+            'id',
+            'name',
+            'synonyms',
+            'geoLocation'
+          );
+
+          // retrieve locations that we need
+          qb.filter.bySelect(
+            'id',
+            locationIds,
+            false,
+            null
+          );
+
+          // retrieve locations
+          return this.locationDataService
+            .getLocationsList(qb)
+            .pipe(map((locations) => {
+              // map locations
+              locations.forEach((location) => {
+                this.editor.locationsMap[location.id] = {
+                  id: location.id,
+                  geoLocation: location.geoLocation,
+                  label: location.name + (
+                    location.synonyms?.length < 1 ?
+                      '' :
+                      ` ( ${location.synonymsAsString} )`
+                  )
+                };
+              });
+
+              // finished
+              return data;
+            }));
+        }),
+
+        // handle error
         catchError((err) => {
           // show error
           this.toastV2Service.error(err);
@@ -466,6 +550,22 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
         // re-render page
         this.detectChanges();
+
+        // validate all rows
+        this.validateAllRows();
+
+        // select first cell
+        // - fix for first render issue (necessary to render css properly from this.validateAllRows)
+        if (data.length > 0) {
+          // start edit
+          this._agTable.api.startEditingCell({
+            rowIndex: 0,
+            colKey: this.columns[0].field
+          });
+
+          // cancel edit
+          this._agTable.api.stopEditing(true);
+        }
       });
   }
 
@@ -1145,7 +1245,12 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         }
       }
     }
+  }
 
+  /**
+   * Render remaining stuff other than selected range
+   */
+  private cellProcessRemaining(showFillIfPossible: boolean): void {
     // invalid cells
     let invalidRows: string = '';
     for (const rowIndex in this.editor.invalid.rows) {
@@ -1236,6 +1341,22 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         }
       }
     }
+
+    // display fill ?
+    // - only after we finish selecting
+    // - only if just one selection (similar to Microsoft Excel)
+    if (
+      showFillIfPossible &&
+      this.editor.selection.selected.ranges.length === 1
+    ) {
+      // find cell
+      const cellHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-basic-renderer-fill-${this.editor.selection.selected.ranges[0].rows.end}-${this.editor.selection.selected.ranges[0].columns.end}`);
+
+      // scrolled and not visible anymore ?
+      if (cellHtml) {
+        cellHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-renderer-fill-visible');
+      }
+    }
   }
 
   /**
@@ -1290,6 +1411,12 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       headerHtmlElements[elementIndex].title = '';
     }
 
+    // hide previous fills
+    const fillHtmlElements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-basic-renderer-fill');
+    for (let elementIndex = 0; elementIndex < fillHtmlElements.length; elementIndex++) {
+      fillHtmlElements[elementIndex].classList.remove('gd-spreadsheet-editor-v2-cell-basic-renderer-fill-visible');
+    }
+
     // render already selected ranges
     this.editor.selection.selected.ranges.forEach((range) => {
       this.cellProcessRange(range);
@@ -1300,27 +1427,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       this.cellProcessRange(this.editor.selection.selected.collecting.range);
     }
 
-    // hide previous fills
-    const fillHtmlElements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-basic-renderer-fill');
-    for (let elementIndex = 0; elementIndex < fillHtmlElements.length; elementIndex++) {
-      fillHtmlElements[elementIndex].classList.remove('gd-spreadsheet-editor-v2-cell-basic-renderer-fill-visible');
-    }
-
-    // display fill ?
-    // - only after we finish selecting
-    // - only if just one selection (similar to Microsoft Excel)
-    if (
-      showFillIfPossible &&
-      this.editor.selection.selected.ranges.length === 1
-    ) {
-      // find cell
-      const cellHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-basic-renderer-fill-${this.editor.selection.selected.ranges[0].rows.end}-${this.editor.selection.selected.ranges[0].columns.end}`);
-
-      // scrolled and not visible anymore ?
-      if (cellHtml) {
-        cellHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-renderer-fill-visible');
-      }
-    }
+    // render stuff not related to ranges
+    this.cellProcessRemaining(showFillIfPossible);
   }
 
   /**
@@ -3068,6 +3176,20 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Validate all rows
+   */
+  private validateAllRows(): void {
+    // validate
+    const rowsNo: number = this._agTable.api.getDisplayedRowCount();
+    for (let rowIndex = 0; rowIndex < rowsNo; rowIndex++) {
+      this.rowValidate(rowIndex);
+    }
+
+    // update css
+    this.cellUpdateRangeClasses(true);
+  }
+
+  /**
    * Save
    */
   private saveRecords(): void {
@@ -3083,10 +3205,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     const loading = this.dialogV2Service.showLoadingDialog();
 
     // validate once again all rows
-    const rowsNo: number = this._agTable.api.getDisplayedRowCount();
-    for (let rowIndex = 0; rowIndex < rowsNo; rowIndex++) {
-      this.rowValidate(rowIndex);
-    }
+    this.validateAllRows();
 
     // stop timers - waitForAsyncToFinish
     this.stopWaitForAsyncToFinish();

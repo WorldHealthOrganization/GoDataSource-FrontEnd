@@ -1,12 +1,11 @@
 import { ColDef } from '@ag-grid-community/core';
-import { V2SpreadsheetEditorColumn } from './column.model';
+import { IV2SpreadsheetEditorEventDataLocation, V2SpreadsheetEditorColumn } from './column.model';
 import { Moment } from 'moment';
 import { TemplateRef } from '@angular/core';
 import { CreateViewModifyV2Action } from '../../app-create-view-modify-v2/models/action.model';
 import { AppFormBaseErrorMsgV2Type } from '../../../forms-v2/core/app-form-base-error-msg-v2';
 import { Subscription } from 'rxjs';
 import { IGeneralAsyncValidatorResponse } from '../../../xt-forms/validators/general-async-validator.directive';
-import { ILocation } from '../../../forms-v2/core/app-form-location-base-v2';
 
 /**
  Extended AG-Grid column definition - selection range collecting
@@ -66,7 +65,7 @@ export interface IV2SpreadsheetEditorExtendedColDefEditor {
 
   // location name caching
   locationsMap: {
-    [locationId: string]: ILocation
+    [locationId: string]: IV2SpreadsheetEditorEventDataLocation
   };
 
   // invalid
