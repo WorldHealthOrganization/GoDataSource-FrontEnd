@@ -2487,7 +2487,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    */
   private cellPaste(): void {
     // #TODO
-    console.log('cellPaste');
   }
 
   /**
@@ -2761,7 +2760,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   /**
    * Cell - delete content
    */
-  private cellDeleteContent(): void {
+  cellDeleteContent(): void {
     // nothing to delete ?
     if (this.editor.selection.selected.ranges.length < 1) {
       return;
