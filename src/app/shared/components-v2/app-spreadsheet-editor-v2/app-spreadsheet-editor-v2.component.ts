@@ -330,11 +330,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // stop async request
     this.stopAsyncRequests();
 
-    // stop retrieving data
-    // #TODO
-    // this.stopGetRecords();
-
     // stop refresh language tokens
+    // #TODO
     // this.releaseLanguageChangeListener();
   }
 
@@ -1003,7 +1000,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           this.cellTriggerEvents(
             rowIndex,
             columnField,
-            V2SpreadsheetEditorEventType.CHANGE
+            V2SpreadsheetEditorEventType.CHANGE,
+            change
           );
         }
 
@@ -2023,7 +2021,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     }
 
     // append to changes for redo
-    this.cellAppendChange({
+    const change: V2SpreadsheetEditorChange = {
       type: V2SpreadsheetEditorChangeType.VALUES,
       changes: {
         rows: {
@@ -2037,13 +2035,15 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           }
         }
       }
-    });
+    };
+    this.cellAppendChange(change);
 
     // trigger events
     this.cellTriggerEvents(
       event.node.rowIndex,
       columnField,
-      V2SpreadsheetEditorEventType.CHANGE
+      V2SpreadsheetEditorEventType.CHANGE,
+      change
     );
   }
 
@@ -2053,7 +2053,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   private cellTriggerEvents(
     rowIndex: number,
     columnField: string,
-    eventType: V2SpreadsheetEditorEventType
+    eventType: V2SpreadsheetEditorEventType,
+    change: V2SpreadsheetEditorChange
   ): void {
     // anything to trigger for this cell ?
     if (
@@ -2099,7 +2100,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
             delete this.editor.readonly.rows[localRowIndex];
           }
         }
-
+      },
+      redraw: () => {
         // refresh cells
         this._agTable.api.refreshCells({
           force: false,
@@ -2108,6 +2110,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
         // redraw ranges
         this.cellUpdateRangeClasses(true);
+      },
+      addChange: (localChange) => {
+        this.cellAppendChange(localChange);
       }
     };
 
@@ -2118,7 +2123,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       rowData: this._agTable.api.getDisplayedRowAtIndex(rowIndex).data,
       handler,
       columnsMap: this.editor.columnsMap,
-      locationsMap: this.editor.locationsMap
+      locationsMap: this.editor.locationsMap,
+      change
     };
 
     // trigger change
@@ -2335,8 +2341,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     }
 
     // scroll to cell
+    // -1 because this.columns doesn't contain row no column and change.changes.rows[rowIndex].columns contains row column
     this._agTable.api.ensureIndexVisible(rowIndex);
-    this._agTable.api.ensureColumnVisible(this.columns[columnIndex].field);
+    this._agTable.api.ensureColumnVisible(this.columns[columnIndex - 1].field);
   }
 
   /**
@@ -2392,7 +2399,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
             this.cellTriggerEvents(
               rowIndex,
               columnField,
-              V2SpreadsheetEditorEventType.CHANGE
+              V2SpreadsheetEditorEventType.CHANGE,
+              undefined
             );
           });
 
@@ -2491,7 +2499,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
             this.cellTriggerEvents(
               rowIndex,
               columnField,
-              V2SpreadsheetEditorEventType.CHANGE
+              V2SpreadsheetEditorEventType.CHANGE,
+              undefined
             );
           });
 
@@ -2586,7 +2595,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           }
 
           // save value
-
           change.changes.rows[rowIndex].columns[columnIndex] = {
             old: oldValue,
             new: newValue
@@ -2603,7 +2611,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           this.cellTriggerEvents(
             rowIndex,
             columnField,
-            V2SpreadsheetEditorEventType.CHANGE
+            V2SpreadsheetEditorEventType.CHANGE,
+            change
           );
         }
 

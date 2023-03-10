@@ -8,6 +8,7 @@ import { IV2SpreadsheetEditorExtendedColDefEditorColumnMap } from './extended-co
 import { Observable } from 'rxjs';
 import { IGeneralAsyncValidatorResponse } from '../../../xt-forms/validators/general-async-validator.directive';
 import { ILocation } from '../../../forms-v2/core/app-form-location-base-v2';
+import { V2SpreadsheetEditorChange } from './change.model';
 
 /**
  * Editor handler
@@ -16,6 +17,8 @@ export interface IV2SpreadsheetEditorHandler {
   // required
   rowValidate(rowIndex: number): void;
   cellReadonly(rowIndex: number, columnIndex: number, readonly: boolean): void;
+  redraw(): void;
+  addChange(change: V2SpreadsheetEditorChange): void;
 }
 
 /**
@@ -31,6 +34,7 @@ export interface IV2SpreadsheetEditorEventData {
   locationsMap: {
     [locationId: string]: ILocation
   };
+  change: V2SpreadsheetEditorChange;
 }
 
 /**
