@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit, TemplateRef, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef, ViewChild, ViewEncapsulation } from '@angular/core';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
 import { IV2ActionIconLabel, V2ActionType } from '../app-list-table-v2/models/action.model';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
@@ -36,6 +36,8 @@ import { AppFormBaseErrorMsgV2, AppFormBaseErrorMsgV2Type } from '../../forms-v2
 import { AppBasicPageV2Component } from '../app-basic-page-v2/app-basic-page-v2.component';
 import { Constants } from '../../../core/models/constants';
 import { Moment } from 'moment';
+import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
+import { IV2SpreadsheetEditorEventSave } from './models/event.model';
 
 /**
  * Component
@@ -113,6 +115,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   // Used to generate a new record
   @Input() newRecord: () => any;
 
+  // save
+  @Output() save: EventEmitter<IV2SpreadsheetEditorEventSave> = new EventEmitter<IV2SpreadsheetEditorEventSave>();
+
   // keep changes
   changes: V2SpreadsheetEditorChange[] = [];
   changesIndex: number = 0;
@@ -142,6 +147,11 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       rows: {}
     },
     asyncResponses: {
+      rows: {}
+    },
+
+    // has data
+    hasData: {
       rows: {}
     },
 
@@ -265,7 +275,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     label: 'LNG_COMMON_BUTTON_SAVE',
     action: {
       click: () => {
-        // #TODO
+        this.saveRecords();
       }
     },
     disable: () => {
@@ -288,6 +298,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     updateColumnDefinitions?: true
   } = {};
 
+  // timers
+  timerCellSelectFocused: any;
+  waitForAsyncToFinish: any;
+
   // constants
   AppSpreadsheetEditorV2LoadingComponent = AppSpreadsheetEditorV2LoadingComponent;
   AppSpreadsheetEditorV2NoDataComponent = AppSpreadsheetEditorV2NoDataComponent;
@@ -306,7 +320,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     protected translateService: TranslateService,
     protected elementRef: ElementRef,
     protected clipboard: Clipboard,
-    protected toastV2Service: ToastV2Service
+    protected toastV2Service: ToastV2Service,
+    protected dialogV2Service: DialogV2Service
   ) {}
 
   /**
@@ -327,6 +342,15 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // stop async request
     this.stopAsyncRequests();
+
+    // stop timers - cellSelectFocused
+    if (this.timerCellSelectFocused) {
+      clearTimeout(this.timerCellSelectFocused);
+      this.timerCellSelectFocused = undefined;
+    }
+
+    // stop timers - waitForAsyncToFinish
+    this.stopWaitForAsyncToFinish();
 
     // stop refresh language tokens
     // #TODO
@@ -382,6 +406,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     this.editorClearSelected(false);
     this.editorClearInvalid(false);
     this.editorClearReadonly(false);
+    this.editorClearHasData(false);
 
     // stop async request
     this.stopAsyncRequests();
@@ -477,6 +502,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     this.editorClearSelected(false);
     this.editorClearInvalid(false);
     this.editorClearReadonly(false);
+    this.editorClearHasData(false);
 
     // stop async request
     this.stopAsyncRequests();
@@ -725,7 +751,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    * Clear selected
    */
   private editorClearSelected(redrawSelected: boolean): void {
-    // clear selected
+    // clear
     this.editor.selection.selected = {
       collecting: undefined,
       previousCollecting: undefined,
@@ -744,7 +770,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    * Clear invalid
    */
   private editorClearInvalid(redrawSelected: boolean): void {
-    // clear selected
+    // clear
     this.editor.invalid = {
       rows: {}
     };
@@ -759,8 +785,23 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    * Clear readonly
    */
   private editorClearReadonly(redrawSelected: boolean): void {
-    // clear selected
+    // clear
     this.editor.readonly = {
+      rows: {}
+    };
+
+    // redraw ?
+    if (redrawSelected) {
+      this.cellUpdateRangeClasses(false);
+    }
+  }
+
+  /**
+   * Clear has data
+   */
+  private editorClearHasData(redrawSelected: boolean): void {
+    // clear
+    this.editor.hasData = {
       rows: {}
     };
 
@@ -1847,6 +1888,13 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         };
       });
     }
+
+    // mark that row has data
+    if (rowHasColumnData) {
+      this.editor.hasData.rows[rowIndex] = true;
+    } else {
+      delete this.editor.hasData.rows[rowIndex];
+    }
   }
 
   /**
@@ -2355,6 +2403,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // this.stopAsyncRequests();
         // this.editorClearInvalid(false);
         // this.editorClearReadonly(false);
+        // this.editorClearHasData(false);
         // #TODO
 
         // finished
@@ -2367,6 +2416,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // this.stopAsyncRequests();
         // this.editorClearInvalid(false);
         // this.editorClearReadonly(false);
+        // this.editorClearHasData(false);
         // #TODO
 
         // finished
@@ -2463,6 +2513,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // this.stopAsyncRequests();
         // this.editorClearInvalid(false);
         // this.editorClearReadonly(false);
+        // this.editorClearHasData(false);
         // #TODO
 
         // finished
@@ -2475,6 +2526,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // this.stopAsyncRequests();
         // this.editorClearInvalid(false);
         // this.editorClearReadonly(false);
+        // this.editorClearHasData(false);
         // #TODO
 
         // finished
@@ -2563,6 +2615,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // this.stopAsyncRequests();
         // this.editorClearInvalid(false);
         // this.editorClearReadonly(false);
+        // this.editorClearHasData(false);
         // #TODO
 
         // finished
@@ -2575,6 +2628,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // this.stopAsyncRequests();
         // this.editorClearInvalid(false);
         // this.editorClearReadonly(false);
+        // this.editorClearHasData(false);
         // #TODO
 
         // finished
@@ -2802,9 +2856,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       // allow bubble
 
       // update focused selection after focused cell is changed by ag-grid (return false)
-      setTimeout(() => {
+      this.timerCellSelectFocused = setTimeout(() => {
         // update focused selection
         this.cellSelectFocused();
+        this.timerCellSelectFocused = undefined;
       });
 
       // don't block caller
@@ -2977,5 +3032,124 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // update css
     this.cellUpdateRangeClasses(true);
+  }
+
+  /**
+   * Clear wait for async to finish
+   */
+  private stopWaitForAsyncToFinish(): void {
+    if (this.waitForAsyncToFinish) {
+      clearTimeout(this.waitForAsyncToFinish);
+      this.waitForAsyncToFinish = undefined;
+    }
+  }
+
+  /**
+   * Retrieve rows to save
+   */
+  private retrieveRowsToSave(): any[] {
+    // list of rows
+    const rows: any[] = [];
+
+    // validate once again all rows
+    const rowsNo: number = this._agTable.api.getDisplayedRowCount();
+    for (let rowIndex = 0; rowIndex < rowsNo; rowIndex++) {
+      // no need to add it if we don't have data
+      if (!this.editor.hasData.rows[rowIndex]) {
+        continue;
+      }
+
+      // add it to the list
+      rows.push(this._agTable.api.getDisplayedRowAtIndex(rowIndex).data);
+    }
+
+    // finished
+    return rows;
+  }
+
+  /**
+   * Save
+   */
+  private saveRecords(): void {
+    // wrap up any editing
+    this._agTable.api.stopEditing();
+
+    // can't save ?
+    if (this.editor.async.inProgress) {
+      return;
+    }
+
+    // show loading
+    const loading = this.dialogV2Service.showLoadingDialog();
+
+    // validate once again all rows
+    const rowsNo: number = this._agTable.api.getDisplayedRowCount();
+    for (let rowIndex = 0; rowIndex < rowsNo; rowIndex++) {
+      this.rowValidate(rowIndex);
+    }
+
+    // stop timers - waitForAsyncToFinish
+    this.stopWaitForAsyncToFinish();
+
+    // check periodically if async finished
+    const checkIfAsyncFinished = () => {
+      // executed
+      this.waitForAsyncToFinish = undefined;
+
+      // async finished ?
+      if (this.editor.async.inProgress) {
+        // try again later
+        this.waitForAsyncToFinish = setTimeout(
+          checkIfAsyncFinished,
+          500
+        );
+      } else {
+        // finished
+        asyncFinished();
+      }
+    };
+    this.waitForAsyncToFinish = setTimeout(
+      checkIfAsyncFinished,
+      500
+    );
+
+    // execute once async finished
+    const asyncFinished = () => {
+      // if we have invalid data we need to resolve this before
+      if (Object.keys(this.editor.invalid.rows).length > 0) {
+        // message
+        this.toastV2Service.error('LNG_COMMON_INVALID_ROWS');
+
+        // hide loading
+        loading.close();
+
+        // finished
+        return;
+      }
+
+      // retrieve only rows that need to be saved
+      const rows: any[] = this.retrieveRowsToSave();
+
+      // nothing to save ?
+      if (rows.length < 1) {
+        // message
+        this.toastV2Service.notice('LNG_COMMON_NOTHING_TO_SAVE');
+
+        // hide loading
+        loading.close();
+
+        // finished
+        return;
+      }
+
+      // emit save event so parent component can do the heavy lifting
+      this.save.emit({
+        rows,
+        finished: () => {
+          // hide loading when parent finishes
+          loading.close();
+        }
+      });
+    };
   }
 }

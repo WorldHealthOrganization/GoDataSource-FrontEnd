@@ -7,6 +7,7 @@ import { UserModel } from '../models/user.model';
 import { AuthDataService } from '../services/data/auth.data.service';
 import { V2SpreadsheetEditorColumn } from '../../shared/components-v2/app-spreadsheet-editor-v2/models/column.model';
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
+import { IV2SpreadsheetEditorEventSave } from '../../shared/components-v2/app-spreadsheet-editor-v2/models/event.model';
 
 /**
  * Bulk create / modify component
@@ -106,6 +107,11 @@ export abstract class BulkCreateModifyComponent<T> {
    * Used to generate a new record
    */
   abstract newRecord(): T;
+
+  /**
+   * Save handler
+   */
+  abstract save(event: IV2SpreadsheetEditorEventSave);
 
   /**
    * Release subscribers

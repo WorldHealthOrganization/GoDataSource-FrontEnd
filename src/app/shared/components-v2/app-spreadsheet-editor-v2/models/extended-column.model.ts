@@ -107,6 +107,13 @@ export interface IV2SpreadsheetEditorExtendedColDefEditor {
     }
   },
 
+  // row has data ?
+  hasData: {
+    rows: {
+      [rowIndex: number]: true
+    }
+  },
+
   // readonly
   readonly: {
     rows: {
