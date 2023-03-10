@@ -676,6 +676,36 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         }
       },
       {
+        field: 'contact.gender',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_GENDER',
+        format: {
+          type: (item) => item.person?.gender && (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.gender] ?
+            this.translateService.instant((this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.gender].value) :
+            '—'
+        },
+        filter: {
+          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          includeNoValue: true
+        }
+      },
+      {
+        field: 'contact.occupation',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_OCCUPATION',
+        format: {
+          type: (item) => item.person?.occupation && (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.occupation] ?
+            this.translateService.instant((this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.occupation].value) :
+            '—'
+        },
+        filter: {
+          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          includeNoValue: true
+        }
+      },
+      {
         field: 'date',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
         sortable: true,
