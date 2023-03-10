@@ -9,6 +9,7 @@ import { Observable } from 'rxjs';
 import { IGeneralAsyncValidatorResponse } from '../../../xt-forms/validators/general-async-validator.directive';
 import { ILocation } from '../../../forms-v2/core/app-form-location-base-v2';
 import { V2SpreadsheetEditorChange } from './change.model';
+import { Moment } from '../../../../core/helperClasses/x-moment';
 
 /**
  * Editor handler
@@ -77,6 +78,17 @@ export interface IV2SpreadsheetEditorColumnValidatorAsync {
 export interface IV2SpreadsheetEditorColumnValidatorEmail {
   // optional
   email?: (rowData: any) => boolean;
+}
+
+/**
+ * Validator - date
+ */
+export interface IV2SpreadsheetEditorColumnValidatorDate {
+  // optional
+  date?: (rowData: any) => {
+    min?: Moment,
+    max?: Moment
+  };
 }
 
 /**
@@ -154,9 +166,12 @@ export interface IV2SpreadsheetEditorColumnSingleSelect extends Omit<IV2Spreadsh
 /**
  * Column - date
  */
-export interface IV2SpreadsheetEditorColumnDate extends IV2SpreadsheetEditorColumnBase {
+export interface IV2SpreadsheetEditorColumnDate extends Omit<IV2SpreadsheetEditorColumnBase, 'validators'> {
   // required
   type: V2SpreadsheetEditorColumnType.DATE;
+
+  // optional
+  validators?: IV2SpreadsheetEditorColumnValidatorRequired | IV2SpreadsheetEditorColumnValidatorDate;
 }
 
 /**

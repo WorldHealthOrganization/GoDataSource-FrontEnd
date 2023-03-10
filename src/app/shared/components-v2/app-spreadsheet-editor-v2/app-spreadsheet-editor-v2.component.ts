@@ -6,7 +6,7 @@ import { GridApi } from '@ag-grid-community/core/dist/cjs/es5/gridApi';
 import { ColumnApi } from '@ag-grid-community/core/dist/cjs/es5/columns/columnApi';
 import { CellEditingStoppedEvent, GridReadyEvent } from '@ag-grid-community/core';
 import {
-  IV2SpreadsheetEditorColumnValidatorAsync, IV2SpreadsheetEditorColumnValidatorEmail,
+  IV2SpreadsheetEditorColumnValidatorAsync, IV2SpreadsheetEditorColumnValidatorDate, IV2SpreadsheetEditorColumnValidatorEmail,
   IV2SpreadsheetEditorColumnValidatorInteger,
   IV2SpreadsheetEditorColumnValidatorRequired,
   IV2SpreadsheetEditorEventData,
@@ -35,6 +35,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseErrorMsgV2, AppFormBaseErrorMsgV2Type } from '../../forms-v2/core/app-form-base-error-msg-v2';
 import { AppBasicPageV2Component } from '../app-basic-page-v2/app-basic-page-v2.component';
 import { Constants } from '../../../core/models/constants';
+import { Moment } from 'moment';
 
 /**
  * Component
@@ -1583,8 +1584,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         cellData &&
         (column.validators as IV2SpreadsheetEditorColumnValidatorInteger)?.integer
       ) {
-        // column integer setups
-        const integerConf = (column.validators as IV2SpreadsheetEditorColumnValidatorInteger)?.integer(rowData);
+        // number validation
         isValid = typeof cellData === 'number' &&
           /^-?[0-9.]+$/.test(cellData.toString());
 
@@ -1594,6 +1594,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
             key: AppFormBaseErrorMsgV2Type.INTEGER
           };
         } else {
+          // column setup
+          const integerConf = (column.validators as IV2SpreadsheetEditorColumnValidatorInteger)?.integer(rowData);
+
           // min
           isValid = integerConf.min === undefined || cellData >= integerConf.min;
           if (!isValid) {
@@ -1755,6 +1758,51 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         error = {
           key: AppFormBaseErrorMsgV2Type.EMAIL
         };
+      }
+
+      // validate - date
+      if (
+        isValid &&
+        cellData &&
+        (column.validators as IV2SpreadsheetEditorColumnValidatorDate)?.date
+      ) {
+        // date validation
+        const cellDataMoment: Moment = moment(cellData);
+        isValid = cellDataMoment.isValid();
+
+        // not integer ?
+        if (!isValid) {
+          error = {
+            key: AppFormBaseErrorMsgV2Type.INVALID_DATE
+          };
+        } else {
+          // column setup
+          const dateConf = (column.validators as IV2SpreadsheetEditorColumnValidatorDate)?.date(rowData);
+
+          // min
+          isValid = dateConf.min === undefined || cellDataMoment.isSameOrAfter(moment(dateConf.min));
+          if (!isValid) {
+            error = {
+              key: AppFormBaseErrorMsgV2Type.DATE,
+              data: {
+                field: moment(dateConf.min).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+                comparator: this.translateService.instant('LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME_OR_AFTER')
+              }
+            };
+          } else {
+            // max
+            isValid = dateConf.max === undefined || cellDataMoment.isSameOrBefore(moment(dateConf.max));
+            if (!isValid) {
+              error = {
+                key: AppFormBaseErrorMsgV2Type.DATE,
+                data: {
+                  field: moment(dateConf.min).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
+                  comparator: this.translateService.instant('LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME_OR_BEFORE')
+                }
+              };
+            }
+          }
+        }
       }
 
       // invalid ?
