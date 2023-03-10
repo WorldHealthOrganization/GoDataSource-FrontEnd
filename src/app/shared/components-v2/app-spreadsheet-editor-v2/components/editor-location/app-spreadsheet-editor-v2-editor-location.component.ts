@@ -55,6 +55,12 @@ export class AppSpreadsheetEditorV2EditorLocationComponent implements ICellEdito
    * Location changed
    */
   selectedLocationChanged(location: ILocation): void {
+    // nothing to attach ?
+    if (!location) {
+      return;
+    }
+
+    // attach location
     if (!this._colDef.editor.locationsMap) {
       this._colDef.editor.locationsMap = {
         [location.id]: location
