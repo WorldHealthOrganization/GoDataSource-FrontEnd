@@ -19,7 +19,7 @@
       <!-- Text -->
       <div
         fxFlex>
-        {{ params.value && colDef.columnDefinition.optionsMap![params.value] ? (colDef.columnDefinition.optionsMap![params.value].label | translate) : params.value }}
+        {{ params.value !== undefined && params.value !== null && colDef.columnDefinition.optionsMap![params.value] ? (colDef.columnDefinition.optionsMap![params.value].label | translate) : params.value }}
       </div>
 
       <!-- Editor open -->
