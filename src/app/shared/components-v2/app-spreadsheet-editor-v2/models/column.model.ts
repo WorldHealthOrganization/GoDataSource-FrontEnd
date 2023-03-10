@@ -162,12 +162,13 @@ export interface IV2SpreadsheetEditorColumnDate extends IV2SpreadsheetEditorColu
 /**
  * Column - location
  */
-export interface IV2SpreadsheetEditorColumnLocation extends Omit<IV2SpreadsheetEditorColumnBase, 'change'> {
+export interface IV2SpreadsheetEditorColumnLocation extends Omit<IV2SpreadsheetEditorColumnBase, 'change' | 'validators'> {
   // required
   type: V2SpreadsheetEditorColumnType.LOCATION;
 
   // optional
   change?: (data: IV2SpreadsheetEditorEventData) => void;
+  validators?: IV2SpreadsheetEditorColumnValidatorRequired;
 }
 
 /**

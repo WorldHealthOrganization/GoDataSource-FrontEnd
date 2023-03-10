@@ -1569,7 +1569,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         isValid &&
         (column.validators as IV2SpreadsheetEditorColumnValidatorRequired)?.required &&
         !cellData &&
-        (column.validators as IV2SpreadsheetEditorColumnValidatorRequired).required.apply(rowData)
+        (column.validators as IV2SpreadsheetEditorColumnValidatorRequired).required(rowData)
       ) {
         isValid = false;
         error = {
