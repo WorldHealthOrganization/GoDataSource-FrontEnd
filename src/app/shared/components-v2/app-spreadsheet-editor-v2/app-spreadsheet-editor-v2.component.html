@@ -136,6 +136,40 @@
     </button>
 
     <!-- Splitter -->
+    <hr
+      *ngIf="editor.action === CreateViewModifyV2Action.CREATE" />
+
+    <!-- Add rows above -->
+    <!-- #TODO -->
+    <button
+      *ngIf="editor.action === CreateViewModifyV2Action.CREATE"
+      class="gd-context-menu-item"
+      cdkMenuItem
+      fxLayout="row">
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_ROW_ABOVE' | translate}}
+      </div>
+    </button>
+
+    <!-- Add rows bellow -->
+    <!-- #TODO -->
+    <button
+      *ngIf="editor.action === CreateViewModifyV2Action.CREATE"
+      class="gd-context-menu-item"
+      fxLayout="row"
+      cdkMenuItem>
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_ROW_BELOW' | translate}}
+      </div>
+    </button>
+
+    <!-- Splitter -->
     <hr />
 
     <!-- Delete -->
@@ -159,6 +193,22 @@
       </div>
     </button>
 
+    <!-- Delete rows -->
+    <!-- #TODO -->
+    <button
+      *ngIf="editor.action === CreateViewModifyV2Action.CREATE"
+      class="gd-context-menu-item"
+      fxLayout="row"
+      cdkMenuItem>
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_REMOVE_ROW' | translate}}
+      </div>
+    </button>
+
+
 
     <!-- #TODO -->
     <button
@@ -171,60 +221,5 @@
       cdkMenuItem>
       Paste and configure...
     </button>
-  </div>
-</ng-template>
-
-<!-- Row no - Context menu for spreadsheet-editor -->
-<ng-template
-  #rowNoContextMenu>
-  <div
-    cdkMenu
-    class="gd-context-menu">
-
-    <!-- Add rows above -->
-    <!-- #TODO -->
-    <button
-      class="gd-context-menu-item"
-      cdkMenuItem
-      fxLayout="row">
-      <!-- Label -->
-      <div
-        class="gd-context-menu-item-label"
-        fxFlex fxLayoutAlign="start">
-        {{'LNG_SHEET_CONTEXT_MENU_ROW_ABOVE' | translate}}
-      </div>
-    </button>
-
-    <!-- Add rows bellow -->
-    <!-- #TODO -->
-    <button
-      class="gd-context-menu-item"
-      fxLayout="row"
-      cdkMenuItem>
-      <!-- Label -->
-      <div
-        class="gd-context-menu-item-label"
-        fxFlex fxLayoutAlign="start">
-        {{'LNG_SHEET_CONTEXT_MENU_ROW_BELOW' | translate}}
-      </div>
-    </button>
-
-    <!-- Splitter -->
-    <hr />
-
-    <!-- Delete rows -->
-    <!-- #TODO -->
-    <button
-      class="gd-context-menu-item"
-      fxLayout="row"
-      cdkMenuItem>
-      <!-- Label -->
-      <div
-        class="gd-context-menu-item-label"
-        fxFlex fxLayoutAlign="start">
-        {{'LNG_SHEET_CONTEXT_MENU_REMOVE_ROW' | translate}}
-      </div>
-    </button>
-
   </div>
 </ng-template>

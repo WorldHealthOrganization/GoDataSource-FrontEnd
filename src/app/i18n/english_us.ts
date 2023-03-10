@@ -12,12 +12,12 @@ export const EnglishUsLang = {
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
     'LNG_SHEET_CONTEXT_MENU_PASTE': 'Paste',
-    'LNG_SHEET_CONTEXT_MENU_DELETE': 'Delete',
+    'LNG_SHEET_CONTEXT_MENU_DELETE': 'Delete content',
     'LNG_SHEET_CONTEXT_MENU_UNDO': 'Undo',
     'LNG_SHEET_CONTEXT_MENU_REDO': 'Redo',
     'LNG_SHEET_CONTEXT_MENU_ROW_ABOVE': 'Add row(s) above',
     'LNG_SHEET_CONTEXT_MENU_ROW_BELOW': 'Add row(s) below',
-    'LNG_SHEET_CONTEXT_MENU_REMOVE_ROW': 'Delete selected rows',
+    'LNG_SHEET_CONTEXT_MENU_REMOVE_ROW': 'Delete rows',
     'LNG_FORM_VALIDATION_ERROR_INTEGER': 'Field must be an integer',
     'LNG_FORM_VALIDATION_ERROR_INVALID_COLUMNS': 'Column(s) "{{fields}}" are invalid',
     'LNG_FORM_VALIDATION_ERROR_INVALID_ROWS': 'Row(s) "{{rows}}" are invalid'

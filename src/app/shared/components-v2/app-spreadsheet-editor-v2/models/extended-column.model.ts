@@ -60,7 +60,6 @@ export interface IV2SpreadsheetEditorExtendedColDefEditor {
 
   // elements
   cellContextMenu: TemplateRef<any>,
-  rowNoContextMenu: TemplateRef<any>,
 
   // columns map
   columnsMap: IV2SpreadsheetEditorExtendedColDefEditorColumnMap,

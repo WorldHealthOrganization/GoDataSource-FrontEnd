@@ -1,8 +1,7 @@
 <div
   [id]="id"
   class="gd-spreadsheet-editor-v2-cell-row-no-renderer"
-  [cdkContextMenuTriggerFor]="colDef.editor.rowNoContextMenu"
-  [cdkContextMenuDisabled]="colDef.editor.action !== CreateViewModifyV2Action.CREATE"
+  [cdkContextMenuTriggerFor]="colDef.editor.cellContextMenu"
   (mouseenter)="mouseEnter($event)"
   (mousedown)="mouseDown($event)"
   (mouseup)="mouseUp()"

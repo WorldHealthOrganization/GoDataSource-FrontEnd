@@ -56,9 +56,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   @ViewChild('cellContextMenu', { static: true }) set cellContextMenu(cellContextMenu: TemplateRef<any>) {
     this.editor.cellContextMenu = cellContextMenu;
   }
-  @ViewChild('rowNoContextMenu', { static: true }) set rowNoContextMenu(rowNoContextMenu: TemplateRef<any>) {
-    this.editor.rowNoContextMenu = rowNoContextMenu;
-  }
 
   // basic page
   @ViewChild(AppBasicPageV2Component, { static: true }) basicPage: AppBasicPageV2Component;
@@ -126,7 +123,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // elements
     cellContextMenu: undefined,
-    rowNoContextMenu: undefined,
 
     // columns map
     columnsMap: {},
@@ -294,6 +290,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   // constants
   AppSpreadsheetEditorV2LoadingComponent = AppSpreadsheetEditorV2LoadingComponent;
   AppSpreadsheetEditorV2NoDataComponent = AppSpreadsheetEditorV2NoDataComponent;
+  CreateViewModifyV2Action = CreateViewModifyV2Action;
 
   // async in progress ?
   actionButtonLoading: () => boolean = () => {
