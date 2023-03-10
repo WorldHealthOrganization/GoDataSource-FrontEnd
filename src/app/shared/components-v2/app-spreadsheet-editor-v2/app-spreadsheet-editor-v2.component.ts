@@ -3017,7 +3017,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   /**
    * Scroll
    */
-  gridBodyScrollEnd(): void {
+  gridBodyScroll(): void {
     // redraw ranges since they might've disappeared when cells were destroyed
     // #TODO
     this.cellUpdateRangeClasses(true);
