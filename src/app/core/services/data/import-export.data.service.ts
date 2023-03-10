@@ -45,6 +45,7 @@ export class ImportExportDataService {
       jsonReplaceUndefinedWithNull?: boolean,
       dontTranslateValues?: boolean,
       useQuestionVariable?: boolean,
+      includeAlerted?: boolean,
       [otherData: string]: any
     },
     queryBuilder: RequestQueryBuilder,
@@ -119,6 +120,15 @@ export class ImportExportDataService {
         data.useQuestionVariable
       );
       delete data.useQuestionVariable;
+    }
+
+    // add flag includeAlerted
+    if (!_.isUndefined(data.includeAlerted)) {
+      queryBuilder.filter.flag(
+        'includeAlerted',
+        data.includeAlerted
+      );
+      delete data.includeAlerted;
     }
 
     // add flag includeContactFields
@@ -251,6 +261,15 @@ export class ImportExportDataService {
         data.useQuestionVariable
       );
       delete data.useQuestionVariable;
+    }
+
+    // add flag includeAlerted
+    if (!_.isUndefined(data.includeAlerted)) {
+      queryBuilder.filter.flag(
+        'includeAlerted',
+        data.includeAlerted
+      );
+      delete data.includeAlerted;
     }
 
     // add flag includeContactFields

@@ -472,7 +472,8 @@ export class DialogV2Service {
       config.export.allow.dbColumns ||
       config.export.allow.dbValues ||
       config.export.allow.jsonReplaceUndefinedWithNull ||
-      config.export.allow.questionnaireVariables
+      config.export.allow.questionnaireVariables ||
+      config.export.allow.includeAlerted
     ) {
       inputs.push(
         {
@@ -539,6 +540,20 @@ export class DialogV2Service {
         placeholder: 'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE',
         tooltip: 'LNG_COMMON_LABEL_EXPORT_USE_QUESTION_VARIABLE_DESCRIPTION',
         name: 'useQuestionVariable',
+        checked: false,
+        disabled: (data): boolean => {
+          return (data.map.useDbColumns as IV2SideDialogConfigInputCheckbox).checked;
+        }
+      });
+    }
+
+    // use question variables instead of translating them
+    if (config.export.allow.includeAlerted) {
+      inputs.push({
+        type: V2SideDialogConfigInputType.CHECKBOX,
+        placeholder: 'LNG_COMMON_LABEL_EXPORT_INCLUDE_ALERTED',
+        tooltip: 'LNG_COMMON_LABEL_EXPORT_INCLUDE_ALERTED_DESCRIPTION',
+        name: 'includeAlerted',
         checked: false,
         disabled: (data): boolean => {
           return (data.map.useDbColumns as IV2SideDialogConfigInputCheckbox).checked;
