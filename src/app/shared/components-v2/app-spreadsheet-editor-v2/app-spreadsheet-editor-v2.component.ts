@@ -6,7 +6,9 @@ import { GridApi } from '@ag-grid-community/core/dist/cjs/es5/gridApi';
 import { ColumnApi } from '@ag-grid-community/core/dist/cjs/es5/columns/columnApi';
 import { CellEditingStoppedEvent, GridReadyEvent } from '@ag-grid-community/core';
 import {
-  IV2SpreadsheetEditorColumnValidatorAsync, IV2SpreadsheetEditorColumnValidatorDate, IV2SpreadsheetEditorColumnValidatorEmail,
+  IV2SpreadsheetEditorColumnValidatorAsync,
+  IV2SpreadsheetEditorColumnValidatorDate,
+  IV2SpreadsheetEditorColumnValidatorEmail,
   IV2SpreadsheetEditorColumnValidatorInteger,
   IV2SpreadsheetEditorColumnValidatorRequired,
   IV2SpreadsheetEditorEventData,
@@ -19,6 +21,7 @@ import {
 import { IV2SpreadsheetEditorExtendedColDef, IV2SpreadsheetEditorExtendedColDefEditor, IV2SpreadsheetEditorExtendedColDefEditorError, IV2SpreadsheetEditorExtendedColDefEditorSelectionRange } from './models/extended-column.model';
 import { AppSpreadsheetEditorV2CellBasicRendererComponent } from './components/cell-basic-renderer/app-spreadsheet-editor-v2-cell-basic-renderer.component';
 import * as moment from 'moment';
+import { Moment } from 'moment';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { AppSpreadsheetEditorV2CellBasicHeaderComponent } from './components/header-basic/app-spreadsheet-editor-v2-cell-basic-header.component';
 import { AppSpreadsheetEditorV2CellRowNoRendererComponent } from './components/cell-row-no-renderer/app-spreadsheet-editor-v2-cell-row-no-renderer.component';
@@ -35,7 +38,6 @@ import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseErrorMsgV2, AppFormBaseErrorMsgV2Type } from '../../forms-v2/core/app-form-base-error-msg-v2';
 import { AppBasicPageV2Component } from '../app-basic-page-v2/app-basic-page-v2.component';
 import { Constants } from '../../../core/models/constants';
-import { Moment } from 'moment';
 import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service';
 import { IV2SpreadsheetEditorEventSave } from './models/event.model';
 import { LocationDataService } from '../../../core/services/data/location.data.service';
@@ -556,7 +558,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
         // select first cell
         // - fix for first render issue (necessary to render css properly from this.validateAllRows)
-        if (data.length > 0) {
+        if (
+          this.editor.action === CreateViewModifyV2Action.MODIFY &&
+          data.length > 0
+        ) {
           // start edit
           this._agTable.api.startEditingCell({
             rowIndex: 0,
