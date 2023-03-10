@@ -149,13 +149,14 @@ export interface IV2SpreadsheetEditorColumnTextarea extends Omit<IV2SpreadsheetE
 /**
  * Column - dropdown
  */
-export interface IV2SpreadsheetEditorColumnSingleSelect extends Omit<IV2SpreadsheetEditorColumnBase, 'optionsMap' | 'change'> {
+export interface IV2SpreadsheetEditorColumnSingleSelect extends Omit<IV2SpreadsheetEditorColumnBase, 'optionsMap' | 'change' | 'validators'> {
   // required
   type: V2SpreadsheetEditorColumnType.SINGLE_SELECT;
   options: ILabelValuePairModel[];
 
   // optional
   change?: (data: IV2SpreadsheetEditorEventData) => void;
+  validators?: IV2SpreadsheetEditorColumnValidatorRequired;
 
   // used by ui
   optionsMap?: {
