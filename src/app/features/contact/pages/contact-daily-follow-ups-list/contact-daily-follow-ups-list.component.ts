@@ -72,6 +72,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_COMMENT', value: 'comment' },
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL', value: 'contact.riskLevel' },
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_GENDER', value: 'contact.gender' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_OCCUPATION', value: 'contact.occupation' },
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_AGE_YEARS', value: 'contact.age.years' },
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_AGE_MONTHS', value: 'contact.age.months' },
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_DOB', value: 'contact.dob' },
