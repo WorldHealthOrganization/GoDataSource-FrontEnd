@@ -42,6 +42,8 @@ import { DialogV2Service } from '../../../core/services/helper/dialog-v2.service
 import { IV2SpreadsheetEditorEventSave } from './models/event.model';
 import { LocationDataService } from '../../../core/services/data/location.data.service';
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
+import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputNumber, V2SideDialogConfigInputType } from '../app-side-dialog-v2/models/side-dialog-config.model';
+import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/bottom-dialog-config.model';
 
 /**
  * Component
@@ -2089,6 +2091,223 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Add rows at the end
+   */
+  rowAppend(): void {
+    // ask how many rows to add
+    this.dialogV2Service
+      .showSideDialog({
+        title: {
+          get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
+        },
+        hideInputFilter: true,
+        inputs: [{
+          type: V2SideDialogConfigInputType.NUMBER,
+          name: 'rowsNo',
+          placeholder: 'LNG_COMMON_ROWS_NO',
+          value: 1,
+          validators: {
+            required: () => true,
+            minMax: () => ({
+              min: 1,
+              max: 100
+            })
+          }
+        }],
+        bottomButtons: [{
+          type: IV2SideDialogConfigButtonType.OTHER,
+          label: 'LNG_COMMON_BUTTON_APPLY',
+          color: 'primary',
+          key: 'apply',
+          disabled: (_data, handler): boolean => {
+            return !handler.form || handler.form.invalid;
+          }
+        }, {
+          type: IV2SideDialogConfigButtonType.CANCEL,
+          label: 'LNG_COMMON_BUTTON_CANCEL',
+          color: 'text'
+        }]
+      })
+      .subscribe((response) => {
+        // cancelled ?
+        if (response.button.type === IV2SideDialogConfigButtonType.CANCEL) {
+          // finished
+          return;
+        }
+
+        // number of rows
+        const noOfRows: number = (response.data.map.rowsNo as IV2SideDialogConfigInputNumber).value;
+        const listToAdd: any[] = [];
+        for (let index = 0; index < noOfRows; index++) {
+          listToAdd.push(this.newRecord());
+        }
+
+        // append rows
+        this._agTable.api.applyTransaction({
+          add: listToAdd
+        });
+
+        // validate and redraw css
+        this.cellUpdateRangeClasses(true);
+
+        // close dialog
+        response.handler.hide();
+      });
+  }
+
+  /**
+   * Delete selected rows
+   */
+  rowDelete(): void {
+    // nothing to do ?
+    if (this.editor.selection.selected.ranges.length < 1) {
+      return;
+    }
+
+    // determine rows to delete
+    const rowsToDeleteMap: {
+      [rowIndex: number]: true
+    } = {};
+    this.editor.selection.selected.ranges.forEach((range) => {
+      for (let rowIndex: number = range.rows.start; rowIndex <= range.rows.end; rowIndex++) {
+        rowsToDeleteMap[rowIndex] = true;
+      }
+    });
+
+    // format
+    const rowsToDelete: number[] = Object.keys(rowsToDeleteMap)
+      .map((rowIndex) => parseInt(rowIndex, 10))
+      .sort((a, b) => a - b);
+
+    // ask for confirmation
+    this.dialogV2Service
+      .showConfirmDialog({
+        config: {
+          title: {
+            get: () => 'LNG_COMMON_LABEL_ATTENTION_REQUIRED'
+          },
+          message: {
+            get: () => 'LNG_DIALOG_CONFIRM_DELETE_SELECTED_ROWS',
+            data: () => ({
+              rows: rowsToDelete.map((rowIndex) => rowIndex + 1).join(', ')
+            })
+          }
+        }
+      })
+      .subscribe((response) => {
+        // canceled ?
+        if (response.button.type === IV2BottomDialogConfigButtonType.CANCEL) {
+          // finished
+          return;
+        }
+
+        // delete
+        this._agTable.api.applyTransaction({
+          remove: rowsToDelete.map((rowIndex) => this._agTable.api.getDisplayedRowAtIndex(rowIndex).data)
+        });
+
+        // cleanup
+        this.editorClearSelected(false);
+
+        // stop async request
+        this.stopAsyncRequests();
+
+        // update rows
+        const updateRowsIndexes = (
+          deleteRowIndex,
+          oldRows: {
+            [rowIndex: number]: any
+          }
+        ): {
+          [rowIndex: number]: any
+        } => {
+          // determine new row indexes
+          const newRows = {};
+          for (const rowIndex in oldRows) {
+            // format
+            const rowIndexNumber: number = parseInt(rowIndex, 10);
+
+            // if deleted row, just ignore
+            if (rowIndexNumber === deleteRowIndex) {
+              continue;
+            }
+
+            // if smaller just add it as it was
+            if (rowIndexNumber < deleteRowIndex) {
+              newRows[rowIndex] = oldRows[rowIndex];
+              continue;
+            }
+
+            // else bigger, we need to update
+            newRows[rowIndexNumber - 1] = oldRows[rowIndex];
+          }
+
+          // finished
+          return newRows;
+        };
+
+        // update everything
+        // - reverse - start from the end, so we don't need to account for previous changes
+        rowsToDelete.reverse();
+        rowsToDelete.forEach((deleteRowIndex) => {
+          // readonly
+          this.editor.readonly.rows = updateRowsIndexes(
+            deleteRowIndex,
+            this.editor.readonly.rows
+          );
+
+          // has data
+          this.editor.hasData.rows = updateRowsIndexes(
+            deleteRowIndex,
+            this.editor.hasData.rows
+          );
+
+          // invalid
+          this.editor.invalid.rows = updateRowsIndexes(
+            deleteRowIndex,
+            this.editor.invalid.rows
+          );
+
+          // changes
+          const oldChanges: V2SpreadsheetEditorChange[] = this.changes;
+          this.changes = [];
+          this.changesIndex = 0;
+          oldChanges.forEach((change) => {
+            // not handled for now ?
+            // - ignore
+            if (change.type !== V2SpreadsheetEditorChangeType.VALUES) {
+              return;
+            }
+
+            // update rows
+            change.changes.rows = updateRowsIndexes(
+              deleteRowIndex,
+              change.changes.rows
+            );
+
+            // empty change ?
+            // - ignore
+            if (Object.keys(change.changes.rows).length < 1) {
+              return;
+            }
+
+            // append to changes
+            this.cellAppendChange(change);
+          });
+        });
+
+        // redraw
+        this._agTable.api.refreshCells({
+          force: true,
+          suppressFlash: true
+        });
+
+        // redraw ranges
+        this.cellUpdateRangeClasses(true);
+      });
+  }
+
+  /**
    * Header - mouse down
    */
   private headerMouseDown(
@@ -2507,32 +2726,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
         // finished
         break;
-
-      case V2SpreadsheetEditorChangeType.ADD_ROWS:
-
-        // clear selection
-        // this.editorClearSelected(true);
-        // this.stopAsyncRequests();
-        // this.editorClearInvalid(false);
-        // this.editorClearReadonly(false);
-        // this.editorClearHasData(false);
-        // #TODO
-
-        // finished
-        break;
-
-      case V2SpreadsheetEditorChangeType.REMOVE_ROWS:
-
-        // clear selection
-        // this.editorClearSelected(true);
-        // this.stopAsyncRequests();
-        // this.editorClearInvalid(false);
-        // this.editorClearReadonly(false);
-        // this.editorClearHasData(false);
-        // #TODO
-
-        // finished
-        break;
     }
 
     // nothing to do ?
@@ -2617,32 +2810,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
         // finished
         break;
-
-      case V2SpreadsheetEditorChangeType.ADD_ROWS:
-
-        // clear selection
-        // this.editorClearSelected(true);
-        // this.stopAsyncRequests();
-        // this.editorClearInvalid(false);
-        // this.editorClearReadonly(false);
-        // this.editorClearHasData(false);
-        // #TODO
-
-        // finished
-        break;
-
-      case V2SpreadsheetEditorChangeType.REMOVE_ROWS:
-
-        // clear selection
-        // this.editorClearSelected(true);
-        // this.stopAsyncRequests();
-        // this.editorClearInvalid(false);
-        // this.editorClearReadonly(false);
-        // this.editorClearHasData(false);
-        // #TODO
-
-        // finished
-        break;
     }
 
     // redraw
@@ -2716,32 +2883,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           // validate
           this.rowValidate(rowIndex);
         });
-
-        // finished
-        break;
-
-      case V2SpreadsheetEditorChangeType.ADD_ROWS:
-
-        // clear selection
-        // this.editorClearSelected(true);
-        // this.stopAsyncRequests();
-        // this.editorClearInvalid(false);
-        // this.editorClearReadonly(false);
-        // this.editorClearHasData(false);
-        // #TODO
-
-        // finished
-        break;
-
-      case V2SpreadsheetEditorChangeType.REMOVE_ROWS:
-
-        // clear selection
-        // this.editorClearSelected(true);
-        // this.stopAsyncRequests();
-        // this.editorClearInvalid(false);
-        // this.editorClearReadonly(false);
-        // this.editorClearHasData(false);
-        // #TODO
 
         // finished
         break;

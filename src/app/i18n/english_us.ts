@@ -15,14 +15,15 @@ export const EnglishUsLang = {
     'LNG_SHEET_CONTEXT_MENU_DELETE': 'Delete content',
     'LNG_SHEET_CONTEXT_MENU_UNDO': 'Undo',
     'LNG_SHEET_CONTEXT_MENU_REDO': 'Redo',
-    'LNG_SHEET_CONTEXT_MENU_ROW_ABOVE': 'Add row(s) above',
-    'LNG_SHEET_CONTEXT_MENU_ROW_BELOW': 'Add row(s) below',
+    'LNG_SHEET_CONTEXT_MENU_APPEND_ROW': 'Add row(s)',
     'LNG_SHEET_CONTEXT_MENU_REMOVE_ROW': 'Delete rows',
     'LNG_FORM_VALIDATION_ERROR_INTEGER': 'Field must be an integer',
     'LNG_FORM_VALIDATION_ERROR_INVALID_COLUMNS': 'Column(s) "{{fields}}" are invalid',
     'LNG_FORM_VALIDATION_ERROR_INVALID_ROWS': 'Row(s) "{{rows}}" are invalid',
     'LNG_COMMON_NOTHING_TO_SAVE': 'Nothing to save',
-    'LNG_COMMON_INVALID_ROWS': 'You have invalid rows'
+    'LNG_COMMON_INVALID_ROWS': 'You have invalid rows',
+    'LNG_COMMON_ROWS_NO': 'No. of rows to append',
+    'LNG_DIALOG_CONFIRM_DELETE_SELECTED_ROWS': 'Are you sure you want to delete selected rows ({{rows}})?'
 
 
     /**
@@ -61,5 +62,7 @@ export const EnglishUsLang = {
     // LNG_PAGE_BULK_ADD_CONTACTS_LABEL_ERROR_MSG
     // LNG_PAGE_BULK_ADD_CONTACTS_WARNING_INVALID_FIELDS
     // LNG_PAGE_BULK_ADD_CONTACTS_WARNING_NO_DATA
+    // LNG_SHEET_CONTEXT_MENU_ROW_BELOW
+    // LNG_SHEET_CONTEXT_MENU_ROW_ABOVE
   }
 };

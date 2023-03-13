@@ -139,33 +139,18 @@
     <hr
       *ngIf="editor.action === CreateViewModifyV2Action.CREATE" />
 
-    <!-- Add rows above -->
-    <!-- #TODO -->
-    <button
-      *ngIf="editor.action === CreateViewModifyV2Action.CREATE"
-      class="gd-context-menu-item"
-      cdkMenuItem
-      fxLayout="row">
-      <!-- Label -->
-      <div
-        class="gd-context-menu-item-label"
-        fxFlex fxLayoutAlign="start">
-        {{'LNG_SHEET_CONTEXT_MENU_ROW_ABOVE' | translate}}
-      </div>
-    </button>
-
-    <!-- Add rows bellow -->
-    <!-- #TODO -->
+    <!-- Append rows at the end -->
     <button
       *ngIf="editor.action === CreateViewModifyV2Action.CREATE"
       class="gd-context-menu-item"
       fxLayout="row"
-      cdkMenuItem>
+      cdkMenuItem
+      (click)="rowAppend()">
       <!-- Label -->
       <div
         class="gd-context-menu-item-label"
         fxFlex fxLayoutAlign="start">
-        {{'LNG_SHEET_CONTEXT_MENU_ROW_BELOW' | translate}}
+        {{'LNG_SHEET_CONTEXT_MENU_APPEND_ROW' | translate}}
       </div>
     </button>
 
@@ -194,12 +179,13 @@
     </button>
 
     <!-- Delete rows -->
-    <!-- #TODO -->
     <button
       *ngIf="editor.action === CreateViewModifyV2Action.CREATE"
       class="gd-context-menu-item"
       fxLayout="row"
-      cdkMenuItem>
+      cdkMenuItem
+      [disabled]="editor.selection.selected.ranges.length < 1"
+      (click)="rowDelete()">
       <!-- Label -->
       <div
         class="gd-context-menu-item-label"
