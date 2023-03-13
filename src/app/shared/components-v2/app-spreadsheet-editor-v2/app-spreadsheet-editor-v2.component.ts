@@ -413,10 +413,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   private retrieveData(): void {
     // clear
     this.editor.locationsMap = {};
-    this.editorClearSelected(false);
-    this.editorClearInvalid(false);
-    this.editorClearReadonly(false);
-    this.editorClearHasData(false);
+    this.editorClearSelected();
+    this.editorClearInvalid();
+    this.editorClearReadonly();
+    this.editorClearHasData();
 
     // stop async request
     this.stopAsyncRequests();
@@ -608,10 +608,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // reset
     this.editor.columnsMap = {};
     this._locationColumns = [];
-    this.editorClearSelected(false);
-    this.editorClearInvalid(false);
-    this.editorClearReadonly(false);
-    this.editorClearHasData(false);
+    this.editorClearSelected();
+    this.editorClearInvalid();
+    this.editorClearReadonly();
+    this.editorClearHasData();
 
     // stop async request
     this.stopAsyncRequests();
@@ -859,7 +859,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   /**
    * Clear selected
    */
-  private editorClearSelected(redrawSelected: boolean): void {
+  private editorClearSelected(): void {
     // clear
     this.editor.selection.selected = {
       collecting: undefined,
@@ -868,56 +868,36 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       fill: undefined,
       ranges: []
     };
-
-    // redraw ?
-    if (redrawSelected) {
-      this.cellUpdateRangeClasses(false);
-    }
   }
 
   /**
    * Clear invalid
    */
-  private editorClearInvalid(redrawSelected: boolean): void {
+  private editorClearInvalid(): void {
     // clear
     this.editor.invalid = {
       rows: {}
     };
-
-    // redraw ?
-    if (redrawSelected) {
-      this.cellUpdateRangeClasses(false);
-    }
   }
 
   /**
    * Clear readonly
    */
-  private editorClearReadonly(redrawSelected: boolean): void {
+  private editorClearReadonly(): void {
     // clear
     this.editor.readonly = {
       rows: {}
     };
-
-    // redraw ?
-    if (redrawSelected) {
-      this.cellUpdateRangeClasses(false);
-    }
   }
 
   /**
    * Clear has data
    */
-  private editorClearHasData(redrawSelected: boolean): void {
+  private editorClearHasData(): void {
     // clear
     this.editor.hasData = {
       rows: {}
     };
-
-    // redraw ?
-    if (redrawSelected) {
-      this.cellUpdateRangeClasses(false);
-    }
   }
 
   /**
@@ -2209,7 +2189,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         });
 
         // cleanup
-        this.editorClearSelected(false);
+        this.editorClearSelected();
 
         // stop async request
         this.stopAsyncRequests();
@@ -2738,7 +2718,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
             value :
             `${columnSeparator}${value}`;
 
-          // flash ?
+          // flash each cell individually ?
           if (flash) {
             this._agTable.api.flashCells({
               rowNodes: [rowNodes[rowIndex]],
@@ -2757,33 +2737,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // finished
     return text;
-  }
-
-  /**
-   * Context menu option - cut
-   */
-  cellCut(): void {
-    // // ask how to cut (separator)
-    // // #TODO
-    //
-    // // determine unique cells so we don't export the same cell data if there is an intersection between ranges
-    // // #TODO
-    //
-    // // flash on copy
-    // // #TODO
-    //
-    // // retrieve row data
-    // // cut / copy data
-    // // #TODO
-    // const rowNodes: any[] = [];
-    // const data: any[] = [];
-    // this._agTable.api.forEachNode((node) => {
-    //   rowNodes.push(node);
-    //   data.push(node.data);
-    // });
-    //
-    // // copy
-    // this.clipboard.copy(finalString);
   }
 
   /**
@@ -2811,6 +2764,20 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    */
   private cellPaste(): void {
     // #TODO
+    // navigator.clipboard.readText().then(
+    //   text => {
+    //     console.log(text);
+    //   }
+    // )
+    //   .catch(error => {
+    //       console.error('Cannot read clipboard text: ', error);
+    //     }
+    //   );
+    // if (this.editor.selection.selected.cut) ||..clipboard
+    // if (this.editor.selection.selected.cut) ||..clipboard
+    // if (this.editor.selection.selected.cut) ||..clipboard
+    // if (this.editor.selection.selected.cut) ||..clipboard
+    // if (this.editor.selection.selected.cut) ||..clipboard
   }
 
   /**
@@ -3270,20 +3237,11 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       return true;
     }
 
-    // cut selected cells
+    // cut selected cells - not implemented
     if (
       params.event.ctrlKey &&
       params.event.code === 'KeyX'
     ) {
-      // just ignore if bubble
-      if (params.event.repeat) {
-        // block caller
-        return true;
-      }
-
-      // cut selected
-      this.cellCut();
-
       // block caller
       return true;
     }

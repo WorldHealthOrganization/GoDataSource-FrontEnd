@@ -30,27 +30,6 @@
     cdkMenu
     class="gd-context-menu">
 
-    <!-- Cut -->
-    <!-- #TODO -->
-    <button
-      class="gd-context-menu-item"
-      fxLayout="row"
-      cdkMenuItem
-      [disabled]="editor.selection.selected.ranges.length < 1">
-      <!-- Label -->
-      <div
-        class="gd-context-menu-item-label"
-        fxFlex fxLayoutAlign="start">
-        {{'LNG_SHEET_CONTEXT_MENU_CUT' | translate}}
-      </div>
-
-      <!-- Shortcut -->
-      <div
-        fxGrow="0">
-        Ctrl+X
-      </div>
-    </button>
-
     <!-- Copy raw -->
     <button
       class="gd-context-menu-item"
