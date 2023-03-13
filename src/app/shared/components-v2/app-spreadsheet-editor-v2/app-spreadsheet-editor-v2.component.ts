@@ -44,6 +44,8 @@ import { LocationDataService } from '../../../core/services/data/location.data.s
 import { RequestQueryBuilder } from '../../../core/helperClasses/request-query-builder';
 import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputNumber, V2SideDialogConfigInputType } from '../app-side-dialog-v2/models/side-dialog-config.model';
 import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { IV2SpreadsheetEditorSelectedMatrix } from './models/selected.model';
+import { IRowNode } from '@ag-grid-community/core/dist/cjs/es5/interfaces/iRowNode';
 
 /**
  * Component
@@ -2436,6 +2438,44 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Convert value to text
+   */
+  private valueToText(
+    value: string | Moment | number | boolean,
+    columnField: string
+  ): string | number {
+    // determine column
+    switch (this.editor.columnsMap[columnField].columnDefinition.type) {
+      case V2SpreadsheetEditorColumnType.TEXT:
+      case V2SpreadsheetEditorColumnType.TEXTAREA:
+        // nothing changes here
+        return value as string;
+
+      case V2SpreadsheetEditorColumnType.NUMBER:
+        // nothing changes here
+        return value as number;
+
+      case V2SpreadsheetEditorColumnType.DATE:
+        // format
+        return value ?
+          moment(value as string | Moment).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+          value as string;
+
+      case V2SpreadsheetEditorColumnType.SINGLE_SELECT:
+        // label
+        return value && this.editor.columnsMap[columnField].columnDefinition.optionsMap[value as string]?.label ?
+          this.translateService.instant(this.editor.columnsMap[columnField].columnDefinition.optionsMap[value as string].label) :
+          value as string;
+
+      case V2SpreadsheetEditorColumnType.LOCATION:
+        // label
+        return value && this.editor.locationsMap[value as string] ?
+          this.editor.locationsMap[value as string].label :
+          value as string;
+    }
+  }
+
+  /**
    * Cell value changed
    */
   private cellValueChanged(event: NewValueParams): void {
@@ -2562,54 +2602,29 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   }
 
   /**
-   * Context menu option - cut
+   * Determine selected matrix
    */
-  private cellCut(): void {
+  private cellDetermineSelectedMatrix(): IV2SpreadsheetEditorSelectedMatrix {
     // nothing to do ?
     if (this.editor.selection.selected.ranges.length < 1) {
-      return;
+      return {
+        minMax: undefined,
+        matrix: undefined
+      };
     }
 
-    // ask how to cut (separator)
-    // #TODO
-
-    // determine unique cells so we don't export the same cell data if there is an intersection between ranges
-    // #TODO
-
-    // flash on copy
-    // #TODO
-
-    // retrieve row data
-    // cut / copy data
-    // #TODO
-    const rowNodes: any[] = [];
-    const data: any[] = [];
-    this._agTable.api.forEachNode((node) => {
-      rowNodes.push(node);
-      data.push(node.data);
-    });
-    let minMax: {
-      rows: {
-        min: number,
-        max: number
-      },
-      columns: {
-        min: number,
-        max: number
+    // determine what is selected
+    const cellsToCopy: IV2SpreadsheetEditorSelectedMatrix = {
+      minMax: undefined,
+      matrix: {
+        cells: {},
+        columns: {}
       }
     };
-    const mustCopy: {
-      [rowIndex: number]: {
-        [columnIndex: number]: true
-      }
-    } = {};
-    const mustAppendColumn: {
-      [columnIndex: number]: true
-    } = {};
     this.editor.selection.selected.ranges.forEach((range) => {
       // determine min / max
-      if (!minMax) {
-        minMax = {
+      if (!cellsToCopy.minMax) {
+        cellsToCopy.minMax = {
           rows: {
             min: range.rows.start,
             max: range.rows.end
@@ -2620,85 +2635,175 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           }
         };
       } else {
-        minMax.rows.min = minMax.rows.min < range.rows.start ?
-          minMax.rows.min :
+        // update
+        cellsToCopy.minMax.rows.min = cellsToCopy.minMax.rows.min < range.rows.start ?
+          cellsToCopy.minMax.rows.min :
           range.rows.start;
-        minMax.rows.max = minMax.rows.max > range.rows.end ?
-          minMax.rows.max :
+        cellsToCopy.minMax.rows.max = cellsToCopy.minMax.rows.max > range.rows.end ?
+          cellsToCopy.minMax.rows.max :
           range.rows.end;
-        minMax.columns.min = minMax.columns.min < range.columns.start ?
-          minMax.columns.min :
+        cellsToCopy.minMax.columns.min = cellsToCopy.minMax.columns.min < range.columns.start ?
+          cellsToCopy.minMax.columns.min :
           range.columns.start;
-        minMax.columns.max = minMax.columns.max > range.columns.end ?
-          minMax.columns.max :
+        cellsToCopy.minMax.columns.max = cellsToCopy.minMax.columns.max > range.columns.end ?
+          cellsToCopy.minMax.columns.max :
           range.columns.end;
       }
 
       // determine copy matrix
       for (let rowIndex = range.rows.start; rowIndex <= range.rows.end; rowIndex++) {
         // initialize ?
-        if (!mustCopy[rowIndex]) {
-          mustCopy[rowIndex] = {};
+        if (!cellsToCopy.matrix.cells[rowIndex]) {
+          cellsToCopy.matrix.cells[rowIndex] = {};
         }
 
-        // ...
+        // mark cells and columns that we need to copy
         for (let columnIndex = range.columns.start; columnIndex <= range.columns.end; columnIndex++) {
-          mustCopy[rowIndex][columnIndex] = true;
-          mustAppendColumn[columnIndex] = true;
+          // cell
+          cellsToCopy.matrix.cells[rowIndex][columnIndex] = true;
+
+          // column
+          cellsToCopy.matrix.columns[columnIndex] = true;
         }
       }
     });
-    let finalString: string = '';
-    if (minMax) {
-      for (let rowIndex = minMax.rows.min; rowIndex <= minMax.rows.max; rowIndex++) {
-        // copy only if we have something
-        if (mustCopy[rowIndex]) {
-          // end of line
-          if (rowIndex !== minMax.rows.min) {
-            finalString += '\r\n';
-          }
 
-          // copy row data
-          for (let columnIndex = minMax.columns.min; columnIndex <= minMax.columns.max; columnIndex++) {
-            // columnIndex - 1 to exclude row number column which isn't in this.columns
-            let value: string;
-            if (
-              mustCopy[rowIndex] &&
-              mustCopy[rowIndex][columnIndex]
-            ) {
-              value = data[rowIndex][this.columns[columnIndex - 1].field];
-              value = value === undefined || value == null ? '' : value;
+    // finished
+    return cellsToCopy;
+  }
 
-              // append
-              finalString += columnIndex === minMax.columns.min ? value : `\t${value}`;
-            } else if (mustAppendColumn[columnIndex]) {
-              value = '';
+  /**
+   * Get text from cells
+   */
+  private cellToText(
+    raw: boolean,
+    flash: boolean,
+    newLine: string = '\r\n',
+    columnSeparator: string = '\t'
+  ): string | undefined {
+    // determine what we need to copy
+    const cellsToCopy: IV2SpreadsheetEditorSelectedMatrix = this.cellDetermineSelectedMatrix();
 
-              // append
-              finalString += columnIndex === minMax.columns.min ? value : `\t${value}`;
-            }
-          }
-        }
-      }
-
-      // flash
-      this._agTable.api.flashCells({
-        rowNodes: rowNodes.filter((_n, rowIndex) => mustCopy[rowIndex]),
-        // +1 because we need to exclude row no column which isn't in this.columns
-        columns: this.columns.filter((_n, columnIndex) => mustAppendColumn[columnIndex + 1]).map((col) => col.field)
-      });
+    // do we have anything to copy ?
+    if (!cellsToCopy.minMax) {
+      return undefined;
     }
 
-    // copy
-    this.clipboard.copy(finalString);
+    // retrieve row data
+    const rowNodes: IRowNode[] = [];
+    this._agTable.api.forEachNode((node) => {
+      rowNodes.push(node);
+    });
+
+    // construct text that we need to copy
+    let text: string = '';
+    for (let rowIndex = cellsToCopy.minMax.rows.min; rowIndex <= cellsToCopy.minMax.rows.max; rowIndex++) {
+      // nothing to do on this row ?
+      // - copy only if we have something
+      if (!cellsToCopy.matrix.cells[rowIndex]) {
+        continue;
+      }
+
+      // append end of line if necessary
+      if (rowIndex !== cellsToCopy.minMax.rows.min) {
+        text += newLine;
+      }
+
+      // copy row data
+      for (let columnIndex = cellsToCopy.minMax.columns.min; columnIndex <= cellsToCopy.minMax.columns.max; columnIndex++) {
+        // do we need to copy cell value, append an empty value or jump over it ?
+        if (cellsToCopy.matrix.cells[rowIndex][columnIndex]) {
+          // columnIndex - 1 to exclude row number column which isn't in this.columns
+          const columnField: string = this.columns[columnIndex - 1].field;
+          let value: string | Moment | number | boolean = _.get(
+            rowNodes[rowIndex].data,
+            columnField
+          );
+
+          // do we want text instead of raw value ?
+          if (!raw) {
+            value = this.valueToText(
+              value,
+              columnField
+            );
+          }
+
+          // format data
+          value = value === undefined || value == null ?
+            '' :
+            value;
+
+          // append
+          text += columnIndex === cellsToCopy.minMax.columns.min ?
+            value :
+            `${columnSeparator}${value}`;
+
+          // flash ?
+          if (flash) {
+            this._agTable.api.flashCells({
+              rowNodes: [rowNodes[rowIndex]],
+              // +1 because we need to exclude row no column which isn't in this.columns
+              columns: [columnField]
+            });
+          }
+        } else if (cellsToCopy.matrix.columns[columnIndex]) {
+          // append
+          text += columnIndex === cellsToCopy.minMax.columns.min ?
+            '' :
+            columnSeparator;
+        }
+      }
+    }
+
+    // finished
+    return text;
+  }
+
+  /**
+   * Context menu option - cut
+   */
+  cellCut(): void {
+    // // ask how to cut (separator)
+    // // #TODO
+    //
+    // // determine unique cells so we don't export the same cell data if there is an intersection between ranges
+    // // #TODO
+    //
+    // // flash on copy
+    // // #TODO
+    //
+    // // retrieve row data
+    // // cut / copy data
+    // // #TODO
+    // const rowNodes: any[] = [];
+    // const data: any[] = [];
+    // this._agTable.api.forEachNode((node) => {
+    //   rowNodes.push(node);
+    //   data.push(node.data);
+    // });
+    //
+    // // copy
+    // this.clipboard.copy(finalString);
   }
 
   /**
    * Context menu option - copy
    */
-  private cellCopy(): void {
-    // #TODO
-    this.cellCut();
+  cellCopy(raw: boolean): void {
+    // copy text
+    const textToCopy: string | undefined = this.cellToText(
+      raw,
+      true
+    );
+
+    // nothing to do ?
+    if (textToCopy === undefined) {
+      return;
+    }
+
+    // copy
+    // - even empty cell
+    this.clipboard.copy(textToCopy);
   }
 
   /**
@@ -3195,7 +3300,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       }
 
       // copy selected
-      this.cellCopy();
+      this.cellCopy(true);
 
       // block caller
       return true;
