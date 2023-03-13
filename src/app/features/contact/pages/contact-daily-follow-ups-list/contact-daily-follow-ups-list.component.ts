@@ -966,6 +966,41 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         }
       },
       {
+        field: 'contact.age',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE',
+        format: {
+          type: (item) => item.person && item.person.age ?
+            item.person?.age.months > 0 ?
+              item.person?.age.months + ' ' + this.translateService.instant('LNG_AGE_FIELD_LABEL_MONTHS') :
+              (
+                item.person?.age.years > 0 ?
+                  (item.person?.age.years + ' ' + this.translateService.instant('LNG_AGE_FIELD_LABEL_YEARS')) :
+                  '-'
+              ) :
+            '-'
+        },
+        sortable: true,
+        filter: {
+          type: V2FilterType.AGE_RANGE,
+          min: 0,
+          max: Constants.DEFAULT_AGE_MAX_YEARS
+        }
+      },
+      {
+        field: 'contact.dob',
+        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
+        sortable: true,
+        format: {
+          type: (item) => item.person?.dob ?
+            moment(item.person.dob).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
+            '—'
+        },
+        filter: {
+          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
         field: 'contact.riskLevel',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL',
         sortable: true,
