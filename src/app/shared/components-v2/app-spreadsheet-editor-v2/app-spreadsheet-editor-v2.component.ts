@@ -11,7 +11,7 @@ import {
   IV2SpreadsheetEditorColumnValidatorEmail,
   IV2SpreadsheetEditorColumnValidatorInteger,
   IV2SpreadsheetEditorColumnValidatorRequired,
-  IV2SpreadsheetEditorEventData,
+  IV2SpreadsheetEditorEventData, IV2SpreadsheetEditorEventDataLocation,
   IV2SpreadsheetEditorHandler,
   V2SpreadsheetEditorColumn,
   V2SpreadsheetEditorColumnType,
@@ -22,7 +22,6 @@ import { IV2SpreadsheetEditorExtendedColDef, IV2SpreadsheetEditorExtendedColDefE
 import { AppSpreadsheetEditorV2CellBasicRendererComponent } from './components/cell-basic-renderer/app-spreadsheet-editor-v2-cell-basic-renderer.component';
 import * as moment from 'moment';
 import { Moment } from 'moment';
-import { Clipboard } from '@angular/cdk/clipboard';
 import { AppSpreadsheetEditorV2CellBasicHeaderComponent } from './components/header-basic/app-spreadsheet-editor-v2-cell-basic-header.component';
 import { AppSpreadsheetEditorV2CellRowNoRendererComponent } from './components/cell-row-no-renderer/app-spreadsheet-editor-v2-cell-row-no-renderer.component';
 import { NewValueParams, SuppressHeaderKeyboardEventParams, SuppressKeyboardEventParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
@@ -328,7 +327,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     protected changeDetectorRef: ChangeDetectorRef,
     protected translateService: TranslateService,
     protected elementRef: ElementRef,
-    protected clipboard: Clipboard,
     protected toastV2Service: ToastV2Service,
     protected dialogV2Service: DialogV2Service,
     protected locationDataService: LocationDataService
@@ -523,7 +521,8 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
                     location.synonyms?.length < 1 ?
                       '' :
                       ` ( ${location.synonymsAsString} )`
-                  )
+                  ),
+                  name: location.name
                 };
               });
 
@@ -559,6 +558,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
         // validate all rows
         this.validateAllRows();
+
+        // make cells read-only
+        // #TODO
 
         // select first cell
         // - fix for first render issue (necessary to render css properly from this.validateAllRows)
@@ -2669,12 +2671,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       return undefined;
     }
 
-    // retrieve row data
-    const rowNodes: IRowNode[] = [];
-    this._agTable.api.forEachNode((node) => {
-      rowNodes.push(node);
-    });
-
     // construct text that we need to copy
     let text: string = '';
     for (let rowIndex = cellsToCopy.minMax.rows.min; rowIndex <= cellsToCopy.minMax.rows.max; rowIndex++) {
@@ -2689,6 +2685,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         text += newLine;
       }
 
+      // retrieve row node
+      const rowNode = this._agTable.api.getDisplayedRowAtIndex(rowIndex);
+
       // copy row data
       for (let columnIndex = cellsToCopy.minMax.columns.min; columnIndex <= cellsToCopy.minMax.columns.max; columnIndex++) {
         // do we need to copy cell value, append an empty value or jump over it ?
@@ -2696,9 +2695,14 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           // columnIndex - 1 to exclude row number column which isn't in this.columns
           const columnField: string = this.columns[columnIndex - 1].field;
           let value: string | Moment | number | boolean = _.get(
-            rowNodes[rowIndex].data,
+            rowNode.data,
             columnField
           );
+
+          // convert date
+          if (value instanceof moment) {
+            value = (value as Moment).toISOString();
+          }
 
           // do we want text instead of raw value ?
           if (!raw) {
@@ -2721,7 +2725,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           // flash each cell individually ?
           if (flash) {
             this._agTable.api.flashCells({
-              rowNodes: [rowNodes[rowIndex]],
+              rowNodes: [rowNode],
               // +1 because we need to exclude row no column which isn't in this.columns
               columns: [columnField]
             });
@@ -2737,6 +2741,438 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // finished
     return text;
+  }
+
+  /**
+   * Paste text into cells
+   */
+  private cellTextToCells(
+    text: string,
+    columnSeparator: string = '\t'
+  ): Observable<void> | void {
+    // nothing to do ?
+    if (this.editor.selection.selected.ranges.length !== 1) {
+      return;
+    }
+
+    // split text into cell values
+    const columnValues: string[][] = text.replace(/\n$/g, '').split('\n')
+      .map((line) => line.replace(/\r/g, '').split(columnSeparator));
+
+    // locations
+    const firstLabelToLocation: {
+      [label: string]: IV2SpreadsheetEditorEventDataLocation
+    } = {};
+    const firstNameToLocation: {
+      [name: string]: IV2SpreadsheetEditorEventDataLocation
+    } = {};
+    const updateFirstsToLocation = () => {
+      Object.values(this.editor.locationsMap).forEach((location) => {
+        // only the first one matters - label
+        if (!firstLabelToLocation[location.label]) {
+          firstLabelToLocation[location.label] = location;
+        }
+
+        // only the first one matters - name
+        if (!firstNameToLocation[location.name]) {
+          firstNameToLocation[location.name] = location;
+        }
+      });
+    };
+
+    // transform locations to array to search through it as a last resort
+    updateFirstsToLocation();
+
+    // just one line ?, then we need to duplicate the same value for entire selected range (columnValues.length === 1)
+    // - same for just one column (columnValues[0].length === 1)
+    // #TODO
+
+    // for undo / redo
+    const change: IV2SpreadsheetEditorChangeValues = {
+      type: V2SpreadsheetEditorChangeType.VALUES,
+      changes: {
+        rows: {}
+      }
+    };
+
+    // handle value update
+    const updateValue = (
+      rowIndex: number,
+      columnIndex: number,
+      oldValue: any,
+      newValue: any,
+      rowNode: IRowNode,
+      columnDefinition: V2SpreadsheetEditorColumn
+    ) => {
+      // add to changes
+      change.changes.rows[rowIndex].columns[columnIndex] = {
+        old: oldValue,
+        new: newValue
+      };
+
+      // paste value
+      _.set(
+        rowNode.data,
+        columnDefinition.field,
+        newValue
+      );
+    };
+
+    // start pasting
+    const locationsToRetrieve: {
+      [key: string]: {
+        rowIndex: number,
+        columnIndex: number
+      }[]
+    } = {};
+    const range = this.editor.selection.selected.ranges[0];
+    for (let rowIndex: number = range.rows.start; rowIndex < range.rows.start + columnValues.length; rowIndex++) {
+      // retrieve row node
+      const rowNode = this._agTable.api.getDisplayedRowAtIndex(rowIndex);
+
+      // initialize row change
+      change.changes.rows[rowIndex] = {
+        columns: {}
+      };
+
+      // go through each cell and paste data
+      const lineIndex: number = rowIndex - range.rows.start;
+      for (let columnIndex: number = range.columns.start; columnIndex < range.columns.start + columnValues[lineIndex].length; columnIndex++) {
+        // get column definition
+        // -1 because row no not included in this.columns
+        const columnDefinition = this.columns[columnIndex - 1];
+
+        // check if column is readonly, then ignore
+        // #TODO
+        // // if readonly - ignore
+        // if (this.editor.readonly.rows[rowIndex]?.columns[columnIndex]) {
+        //   continue;
+        // }
+
+        // determine value
+        const oldValue: string = _.get(
+          rowNode.data,
+          columnDefinition.field
+        );
+        let newValue: any = columnValues[lineIndex][columnIndex - range.columns.start];
+
+        // paste value
+        switch (columnDefinition.type) {
+          case V2SpreadsheetEditorColumnType.TEXT:
+          case V2SpreadsheetEditorColumnType.TEXTAREA:
+
+            // we shouldn't have anything else but strings taking in account what we process is from clipboard
+            newValue = typeof newValue === 'string' ?
+              newValue :
+              newValue.toString();
+
+            // finished
+            break;
+
+          case V2SpreadsheetEditorColumnType.NUMBER:
+
+            // convert to number
+            if (
+              newValue &&
+              typeof newValue === 'string'
+            ) {
+              try {
+                newValue = parseFloat(newValue);
+              } catch (e) {
+                // default value if can't convert
+                newValue = undefined;
+              }
+            } else if (
+              newValue === '' ||
+              typeof newValue !== 'number'
+            ) {
+              newValue = undefined;
+            }
+
+            // finished
+            break;
+
+          case V2SpreadsheetEditorColumnType.DATE:
+
+            // convert to date
+            if (
+              newValue &&
+              typeof newValue === 'string'
+            ) {
+              if (!moment(newValue).isValid()) {
+                newValue = undefined;
+              }
+            } else if (newValue instanceof moment) {
+              // no changes
+            } else {
+              // not supported format
+              newValue = undefined;
+            }
+
+            // finished
+            break;
+
+          case V2SpreadsheetEditorColumnType.SINGLE_SELECT:
+
+            // select option
+            if (
+              !newValue ||
+              typeof newValue !== 'string'
+            ) {
+              newValue = undefined;
+            } else {
+              // search for value in options
+              if (columnDefinition.optionsMap[newValue]) {
+                newValue = columnDefinition.optionsMap[newValue].value;
+              } else {
+                // search first one that matches by name
+                const newValueFirstMatch = columnDefinition.options.find((item) => item.label && (item.label === newValue || this.translateService.instant(item.label) === newValue));
+                if (newValueFirstMatch) {
+                  newValue = newValueFirstMatch.value;
+                } else {
+                  // couldn't find match
+                  newValue = undefined;
+                }
+              }
+            }
+
+            // finished
+            break;
+
+          case V2SpreadsheetEditorColumnType.LOCATION:
+
+            // select option
+            if (
+              !newValue ||
+              typeof newValue !== 'string'
+            ) {
+              newValue = undefined;
+            } else {
+              if (this.editor.locationsMap[newValue]) {
+                // location found
+                // - keep value as it is
+              } else {
+                // search by label (name + synonyms)
+                if (firstLabelToLocation[newValue]) {
+                  newValue = firstLabelToLocation[newValue].id;
+                } else if (firstNameToLocation[newValue]) {
+                  newValue = firstNameToLocation[newValue].id;
+                } else {
+                  // not found, we need to retrieve it
+                  if (!locationsToRetrieve[newValue]) {
+                    locationsToRetrieve[newValue] = [];
+                  }
+
+                  // search on be
+                  locationsToRetrieve[newValue].push({
+                    rowIndex,
+                    columnIndex
+                  });
+
+                  // jump over this one
+                  continue;
+                }
+              }
+            }
+
+            // finished
+            break;
+        }
+
+        // nothing to do ?
+        if (oldValue === newValue) {
+          continue;
+        }
+
+        // update value
+        updateValue(
+          rowIndex,
+          columnIndex,
+          oldValue,
+          newValue,
+          rowNode,
+          columnDefinition
+        );
+      }
+
+      // validate row
+      this.rowValidate(rowIndex);
+    }
+
+    // finished
+    const finished = () => {
+      // go through changes and trigger change event
+      // - now that we have location data too
+      const rowIndexes = Object.keys(change.changes.rows).map((rowIndex) => parseInt(rowIndex, 10));
+      for (let ri: number = 0; ri < rowIndexes.length; ri++) {
+        // row index
+        const rowIndex: number = rowIndexes[ri];
+
+        // determine column indexes
+        const columnIndexes = Object.keys(change.changes.rows[rowIndex].columns).map((columnIndex) => parseInt(columnIndex, 10));
+        for (let ci: number = 0; ci < columnIndexes.length; ci++) {
+          // column index
+          const columnIndex: number = columnIndexes[ci];
+
+          // get column definition
+          // -1 because row no not included in this.columns
+          const columnDefinition = this.columns[columnIndex - 1];
+
+          // trigger value change
+          this.cellTriggerEvents(
+            rowIndex,
+            columnDefinition.field,
+            V2SpreadsheetEditorEventType.CHANGE,
+            change
+          );
+        }
+      }
+
+      // append change
+      this.cellAppendChange(change);
+
+      // redraw rows
+      this._agTable.api.refreshCells({
+        force: false,
+        suppressFlash: false
+      });
+
+      // update css
+      this.cellUpdateRangeClasses(true);
+    };
+
+    // do we have locations to retrieve ?
+    // - if not we finished
+    const locationKeys: string[] = Object.keys(locationsToRetrieve);
+    if (locationKeys.length < 1) {
+      // finish
+      finished();
+
+      // stop
+      return;
+    }
+
+    // retrieve locations
+    return new Observable<void>((observer) => {
+      // construct location query
+      const qb: RequestQueryBuilder = new RequestQueryBuilder();
+
+      // we need just some fields
+      qb.fields(
+        'id',
+        'name',
+        'synonyms',
+        'geoLocation'
+      );
+
+      // retrieve locations that we need
+      qb.filter.where({
+        or: [
+          {
+            id: {
+              inq: locationKeys
+            }
+          }, {
+            name: {
+              inq: locationKeys
+            }
+          }
+        ]
+      });
+
+      // retrieve locations
+      this.locationDataService
+        .getLocationsList(qb)
+        .pipe(
+          // handle error
+          catchError((err) => {
+            // show error
+            this.toastV2Service.error(err);
+
+            // finish
+            finished();
+
+            // finish...
+            observer.next();
+            observer.complete();
+
+            // send error down the road
+            return throwError(err);
+          })
+        )
+        .subscribe((locations) => {
+          // map locations
+          locations.forEach((location) => {
+            this.editor.locationsMap[location.id] = {
+              id: location.id,
+              geoLocation: location.geoLocation,
+              label: location.name + (
+                location.synonyms?.length < 1 ?
+                  '' :
+                  ` ( ${location.synonymsAsString} )`
+              ),
+              name: location.name
+            };
+          });
+
+          // transform locations to array to search through it as a last resort
+          updateFirstsToLocation();
+
+          // update cell values once again
+          locationKeys.forEach((locationKey) => {
+            // try once again to determine location
+            let locationId: string;
+            if (this.editor.locationsMap[locationKey]) {
+              // location found
+              locationId = this.editor.locationsMap[locationKey].id;
+            } else if (firstLabelToLocation[locationKey]) {
+              locationId = firstLabelToLocation[locationKey].id;
+            } else if (firstNameToLocation[locationKey]) {
+              locationId = firstNameToLocation[locationKey].id;
+            }
+
+            // retrieve cell info
+            const cellsInfo = locationsToRetrieve[locationKey];
+            cellsInfo.forEach((cellInfo) => {
+              // retrieve row node
+              const rowNode = this._agTable.api.getDisplayedRowAtIndex(cellInfo.rowIndex);
+
+              // get column definition
+              // -1 because row no not included in this.columns
+              const columnDefinition = this.columns[cellInfo.columnIndex - 1];
+
+              // determine old value
+              const oldValue: string = _.get(
+                rowNode.data,
+                columnDefinition.field
+              );
+
+              // nothing to do ?
+              if (oldValue === locationId) {
+                return;
+              }
+
+              // update value
+              updateValue(
+                cellInfo.rowIndex,
+                cellInfo.columnIndex,
+                oldValue,
+                locationId,
+                rowNode,
+                columnDefinition
+              );
+            });
+          });
+
+          // finish
+          finished();
+
+          // finish
+          observer.next();
+          observer.complete();
+        });
+
+    });
   }
 
   /**
@@ -2756,28 +3192,39 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // copy
     // - even empty cell
-    this.clipboard.copy(textToCopy);
+    navigator.clipboard.writeText(textToCopy)
+      .then()
+      .catch((error) => {
+        this.toastV2Service.error(error.message);
+      });
   }
 
   /**
    * Context menu option - paste
    */
-  private cellPaste(): void {
-    // #TODO
-    // navigator.clipboard.readText().then(
-    //   text => {
-    //     console.log(text);
-    //   }
-    // )
-    //   .catch(error => {
-    //       console.error('Cannot read clipboard text: ', error);
-    //     }
-    //   );
-    // if (this.editor.selection.selected.cut) ||..clipboard
-    // if (this.editor.selection.selected.cut) ||..clipboard
-    // if (this.editor.selection.selected.cut) ||..clipboard
-    // if (this.editor.selection.selected.cut) ||..clipboard
-    // if (this.editor.selection.selected.cut) ||..clipboard
+  cellPaste(): void {
+    // nothing to do ?
+    if (this.editor.selection.selected.ranges.length !== 1) {
+      return;
+    }
+
+    // paste text
+    navigator.clipboard.readText()
+      .then((text) => {
+        // paste into cells
+        const asyncResponse = this.cellTextToCells(text);
+        if (asyncResponse) {
+          const loading = this.dialogV2Service.showLoadingDialog();
+          asyncResponse.subscribe(() => {
+            loading.close();
+          });
+        } else {
+          // not async, no need to display loading
+        }
+      })
+      .catch((error) => {
+        this.toastV2Service.error(error.message);
+      });
   }
 
   /**
@@ -2842,10 +3289,16 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
         // put values back
         const rowIndexes = Object.keys(change.changes.rows).map((rowIndex) => parseInt(rowIndex, 10));
-        rowIndexes.forEach((rowIndex) => {
+        for (let ri: number = 0; ri < rowIndexes.length; ri++) {
+          // row index
+          const rowIndex: number = rowIndexes[ri];
+
           // determine column indexes
           const columnIndexes = Object.keys(change.changes.rows[rowIndex].columns).map((columnIndex) => parseInt(columnIndex, 10));
-          columnIndexes.forEach((columnIndex) => {
+          for (let ci: number = 0; ci < columnIndexes.length; ci++) {
+            // column index
+            const columnIndex: number = columnIndexes[ci];
+
             // put back old value
             const oldValue = change.changes.rows[rowIndex].columns[columnIndex].old;
             const rowNode = this._agTable.api.getDisplayedRowAtIndex(rowIndex);
@@ -2857,7 +3310,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
               columnField
             );
             if (oldValue === currentValue) {
-              return;
+              continue;
             }
 
             // update value without triggering value changed
@@ -2874,11 +3327,11 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
               V2SpreadsheetEditorEventType.CHANGE,
               undefined
             );
-          });
+          }
 
           // validate
           this.rowValidate(rowIndex);
-        });
+        }
 
         // finished
         break;

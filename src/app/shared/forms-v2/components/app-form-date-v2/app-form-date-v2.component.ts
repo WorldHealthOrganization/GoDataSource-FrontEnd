@@ -215,7 +215,10 @@ export class AppFormDateV2Component
   open(): void {
     if (this.calendar) {
       this._openAfterInit = false;
-      this.calendar.open();
+      // wait for this.value to be bind
+      setTimeout(() => {
+        this.calendar.open();
+      });
     } else {
       this._openAfterInit = true;
     }

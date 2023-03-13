@@ -32,6 +32,7 @@ export interface IV2SpreadsheetEditorEventDataLocation {
     lat: number,
     lng: number
   };
+  name: string;
 }
 
 /**

@@ -67,12 +67,12 @@
     </button>
 
     <!-- Paste -->
-    <!-- #TODO -->
     <button
       class="gd-context-menu-item"
       fxLayout="row"
       cdkMenuItem
-      [disabled]="editor.selection.selected.ranges.length !== 1">
+      [disabled]="editor.selection.selected.ranges.length !== 1"
+      (click)="cellPaste()">
       <!-- Label -->
       <div
         class="gd-context-menu-item-label"
@@ -156,7 +156,7 @@
       class="gd-context-menu-item"
       fxLayout="row"
       cdkMenuItem
-      [disabled]="editor.selection.selected.ranges.length !== 1"
+      [disabled]="editor.selection.selected.ranges.length < 1"
       (click)="cellDeleteContent()">
       <!-- Label -->
       <div
