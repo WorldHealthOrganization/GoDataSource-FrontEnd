@@ -19,6 +19,17 @@
       <!-- Text -->
       <div
         fxFlex>
+
+        <!-- Icon -->
+        <mat-icon
+          *ngIf="params.value !== undefined && params.value !== null && colDef.columnDefinition.optionsMap![params.value]?.icon">{{colDef.columnDefinition.optionsMap![params.value].icon}}</mat-icon>
+
+        <!-- Image -->
+        <img
+          *ngIf="params.value !== undefined && params.value !== null && colDef.columnDefinition.optionsMap![params.value]?.iconUrl"
+          [src]="colDef.columnDefinition.optionsMap![params.value].iconUrl"/>
+
+        <!-- Label -->
         {{ params.value !== undefined && params.value !== null && colDef.columnDefinition.optionsMap![params.value] ? (colDef.columnDefinition.optionsMap![params.value].label | translate) : params.value }}
       </div>
 
