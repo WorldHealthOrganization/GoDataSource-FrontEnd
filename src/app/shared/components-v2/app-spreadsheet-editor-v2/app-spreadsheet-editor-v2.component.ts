@@ -33,7 +33,6 @@ import { AppSpreadsheetEditorV2LoadingComponent } from './components/loading/app
 import { AppSpreadsheetEditorV2NoDataComponent } from './components/no-data/app-spreadsheet-editor-v2-no-data.component';
 import * as _ from 'lodash';
 import { CreateViewModifyV2Action } from '../app-create-view-modify-v2/models/action.model';
-import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseErrorMsgV2, AppFormBaseErrorMsgV2Type } from '../../forms-v2/core/app-form-base-error-msg-v2';
 import { AppBasicPageV2Component } from '../app-basic-page-v2/app-basic-page-v2.component';
 import { Constants } from '../../../core/models/constants';
@@ -45,6 +44,7 @@ import { IV2SideDialogConfigButtonType, IV2SideDialogConfigInputNumber, V2SideDi
 import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { IV2SpreadsheetEditorSelectedMatrix } from './models/selected.model';
 import { IRowNode } from '@ag-grid-community/core/dist/cjs/es5/interfaces/iRowNode';
+import { I18nService } from '../../../core/services/helper/i18n.service';
 
 /**
  * Component
@@ -75,6 +75,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
   // title
   @Input() pageTitle: string;
+
+  // language handler
+  languageSubscription: Subscription;
 
   // create or modify ?
   @Input() set action(action: CreateViewModifyV2Action.CREATE | CreateViewModifyV2Action.MODIFY) {
@@ -320,7 +323,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    */
   constructor(
     protected changeDetectorRef: ChangeDetectorRef,
-    protected translateService: TranslateService,
+    protected i18nService: I18nService,
     protected elementRef: ElementRef,
     protected toastV2Service: ToastV2Service,
     protected dialogV2Service: DialogV2Service,
@@ -332,8 +335,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    */
   ngOnInit(): void {
     // subscribe to language change
-    // #TODO
-    // this.initializeLanguageChangeListener();
+    this.initializeLanguageChangeListener();
   }
 
   /**
@@ -356,8 +358,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     this.stopWaitForAsyncToFinish();
 
     // stop refresh language tokens
-    // #TODO
-    // this.releaseLanguageChangeListener();
+    this.releaseLanguageChangeListener();
   }
 
   /**
@@ -365,6 +366,47 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    */
   detectChanges(): void {
     this.changeDetectorRef.detectChanges();
+  }
+
+  /**
+   *  Subscribe to language change
+   */
+  private initializeLanguageChangeListener(): void {
+    // stop refresh language tokens
+    this.releaseLanguageChangeListener();
+
+    // attach event
+    this.languageSubscription = this.i18nService.languageChangedEvent
+      .subscribe(() => {
+        // update columns
+        this.updateColumnDefinitions();
+
+        // update ui
+        this.changeDetectorRef.detectChanges();
+
+        // wait for column bind to take effect
+        setTimeout(() => {
+          // redraw
+          this._agTable.api.refreshCells({
+            force: true,
+            suppressFlash: true
+          });
+
+          // redraw ranges
+          this.cellUpdateRangeClasses(true);
+        });
+      });
+  }
+
+  /**
+   * Release language listener
+   */
+  private releaseLanguageChangeListener(): void {
+    // release language listener
+    if (this.languageSubscription) {
+      this.languageSubscription.unsubscribe();
+      this.languageSubscription = null;
+    }
   }
 
   /**
@@ -684,7 +726,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       // define column
       const colDef: IV2SpreadsheetEditorExtendedColDef = {
         headerName: column.label ?
-          this.translateService.instant(column.label) :
+          this.i18nService.instant(column.label) :
           '',
         field: column.field,
         resizable: true,
@@ -1294,7 +1336,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // put field in list of invalid fields
         // -1 because row no doesn't exist in this.columns
         invalidFields += (invalidFields ? ', ' : '') +
-          this.translateService.instant(this.columns[parseInt(columnIndex, 10) - 1].label);
+          this.i18nService.instant(this.columns[parseInt(columnIndex, 10) - 1].label);
 
         // mark cell as invalid
         invalidHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-basic-renderer-${rowIndex}-${columnIndex}`);
@@ -1305,7 +1347,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           // add error message
           if (this.editor.invalid.rows[rowIndex].columns[columnIndex].error?.key) {
             invalidHtml.title = AppFormBaseErrorMsgV2.msg(
-              this.translateService,
+              this.i18nService,
               this.editor.invalid.rows[rowIndex].columns[columnIndex].error.key,
               this.editor.invalid.rows[rowIndex].columns[columnIndex].error.data
             );
@@ -1324,7 +1366,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         invalidHtml.classList.add('gd-spreadsheet-editor-v2-cell-row-no-renderer-invalid');
 
         // add error message
-        invalidHtml.title = this.translateService.instant(
+        invalidHtml.title = this.i18nService.instant(
           'LNG_FORM_VALIDATION_ERROR_INVALID_COLUMNS', {
             fields: invalidFields
           }
@@ -1340,7 +1382,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         headerHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-header-invalid');
 
         // add error message
-        headerHtml.title = this.translateService.instant(
+        headerHtml.title = this.i18nService.instant(
           'LNG_FORM_VALIDATION_ERROR_INVALID_ROWS', {
             rows: invalidRows
           }
@@ -1971,7 +2013,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
               key: AppFormBaseErrorMsgV2Type.DATE,
               data: {
                 field: moment(dateConf.min).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
-                comparator: this.translateService.instant('LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME_OR_AFTER')
+                comparator: this.i18nService.instant('LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME_OR_AFTER')
               }
             };
           } else {
@@ -1982,7 +2024,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
                 key: AppFormBaseErrorMsgV2Type.DATE,
                 data: {
                   field: moment(dateConf.min).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT),
-                  comparator: this.translateService.instant('LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME_OR_BEFORE')
+                  comparator: this.i18nService.instant('LNG_FORM_VALIDATION_ERROR_DATE_COMPARE_SAME_OR_BEFORE')
                 }
               };
             }
@@ -2485,7 +2527,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       case V2SpreadsheetEditorColumnType.SINGLE_SELECT:
         // label
         return value && this.editor.columnsMap[columnField].columnDefinition.optionsMap[value as string]?.label ?
-          this.translateService.instant(this.editor.columnsMap[columnField].columnDefinition.optionsMap[value as string].label) :
+          this.i18nService.instant(this.editor.columnsMap[columnField].columnDefinition.optionsMap[value as string].label) :
           value as string;
 
       case V2SpreadsheetEditorColumnType.LOCATION:
@@ -2957,7 +2999,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
                 newValue = columnDefinition.optionsMap[newValue].value;
               } else {
                 // search first one that matches by name
-                const newValueFirstMatch = columnDefinition.options.find((item) => item.label && (item.label === newValue || this.translateService.instant(item.label) === newValue));
+                const newValueFirstMatch = columnDefinition.options.find((item) => item.label && (item.label === newValue || this.i18nService.instant(item.label) === newValue));
                 if (newValueFirstMatch) {
                   newValue = newValueFirstMatch.value;
                 } else {
