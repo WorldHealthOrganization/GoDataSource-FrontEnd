@@ -240,14 +240,6 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
             }
           }
 
-          // change pregnancy status cell state read only/editable
-          // - this triggers refresh cells too
-          data.handler.cellReadonly(
-            data.rowIndex,
-            data.columnsMap['model.pregnancyStatus'].index,
-            contact.gender === Constants.GENDER_MALE
-          );
-
           // refresh sheet
           data.handler.redraw();
         }
@@ -255,7 +247,10 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_CONTACT_FIELD_LABEL_PREGNANCY_STATUS',
         field: 'model.pregnancyStatus',
-        options: (this.activatedRoute.snapshot.data.pregnancyStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options
+        options: (this.activatedRoute.snapshot.data.pregnancyStatus as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        readonly: (rowData: EntityModel) => {
+          return (rowData.model as ContactModel).gender === Constants.GENDER_MALE;
+        }
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_CONTACT_FIELD_LABEL_OCCUPATION',

@@ -113,17 +113,6 @@ export interface IV2SpreadsheetEditorExtendedColDefEditor {
     }
   },
 
-  // readonly
-  readonly: {
-    rows: {
-      [rowIndex: number]: {
-        columns: {
-          [columnIndex: number]: true
-        }
-      }
-    }
-  },
-
   // selection range handlers
   selection: {
     // data

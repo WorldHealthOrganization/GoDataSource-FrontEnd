@@ -16,7 +16,6 @@ import { Moment } from '../../../../core/helperClasses/x-moment';
 export interface IV2SpreadsheetEditorHandler {
   // required
   rowValidate(rowIndex: number): void;
-  cellReadonly(rowIndex: number, columnIndex: number, readonly: boolean): void;
   redraw(): void;
   addChange(change: V2SpreadsheetEditorChange): void;
 }
@@ -127,6 +126,7 @@ interface IV2SpreadsheetEditorColumnBase {
 
   // optional
   visible?: boolean;
+  readonly?: (rowData: any) => boolean;
 
   // never
   editor?: never;

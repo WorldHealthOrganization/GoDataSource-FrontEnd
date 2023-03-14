@@ -163,11 +163,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       rows: {}
     },
 
-    // readonly
-    readonly: {
-      rows: {}
-    },
-
     // selection range handlers
     selection: {
       // data
@@ -413,7 +408,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     this.editor.locationsMap = {};
     this.editorClearSelected();
     this.editorClearInvalid();
-    this.editorClearReadonly();
     this.editorClearHasData();
 
     // stop async request
@@ -559,9 +553,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // validate all rows
         this.validateAllRows();
 
-        // make cells read-only
-        // #TODO
-
         // select first cell
         // - fix for first render issue (necessary to render css properly from this.validateAllRows)
         if (
@@ -612,7 +603,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     this._locationColumns = [];
     this.editorClearSelected();
     this.editorClearInvalid();
-    this.editorClearReadonly();
     this.editorClearHasData();
 
     // stop async request
@@ -700,8 +690,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         resizable: true,
         suppressMovable: true,
         editable: (params): boolean => {
-          return params.colDef.field !== AppSpreadsheetEditorV2CellBasicHeaderComponent.DEFAULT_COLUMN_ROW_NO &&
-            !this.editor.readonly.rows[params.node.rowIndex]?.columns[this.editor.columnsMap[params.colDef.field].index];
+          return params.colDef.field !== AppSpreadsheetEditorV2CellBasicHeaderComponent.DEFAULT_COLUMN_ROW_NO && (
+            !column.readonly ||
+            !column.readonly(params.data)
+          );
         },
         cellEditor: V2SpreadsheetEditorColumnTypeToEditor[column.type].type,
         cellEditorParams: column.editor?.params,
@@ -878,16 +870,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   private editorClearInvalid(): void {
     // clear
     this.editor.invalid = {
-      rows: {}
-    };
-  }
-
-  /**
-   * Clear readonly
-   */
-  private editorClearReadonly(): void {
-    // clear
-    this.editor.readonly = {
       rows: {}
     };
   }
@@ -1091,14 +1073,20 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
         // go through columns
         for (let columnIndex: number = this.editor.selection.selected.fill.columns.start; columnIndex <= this.editor.selection.selected.fill.columns.end; columnIndex++) {
+          // column definition
+          const columnDefinition = this.columns[columnIndex - 1];
+
           // if readonly - ignore
-          if (this.editor.readonly.rows[rowIndex]?.columns[columnIndex]) {
+          if (
+            columnDefinition.readonly &&
+            columnDefinition.readonly(rowData)
+          ) {
             continue;
           }
 
           // determine value
           // -1 because we need to exclude row no column which isn't in this.columns
-          const columnField: string = this.columns[columnIndex - 1].field;
+          const columnField: string = columnDefinition.field;
           const value = _.get(
             copyFromRowData,
             columnField
@@ -1239,6 +1227,60 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Determine read-only cells
+   */
+  private cellDetermineReadonly(): {
+    rows: {
+      [rowIndex: number]: {
+        columns: {
+          [columnIndex: number]: true
+        }
+      }
+    }
+  } {
+    // data
+    const response: {
+      rows: {
+        [rowIndex: number]: {
+          columns: {
+            [columnIndex: number]: true
+          }
+        }
+      }
+    } = {
+      rows: {}
+    };
+
+    // determine read-only rows
+    const rowsNo: number = this._agTable.api.getDisplayedRowCount();
+    for (let rowIndex = 0; rowIndex < rowsNo; rowIndex++) {
+      const rowData = this._agTable.api.getDisplayedRowAtIndex(rowIndex).data;
+      for (let columnIndex = 0; columnIndex < this.columns.length; columnIndex++) {
+        // not readonly ?
+        if (
+          !this.columns[columnIndex].readonly ||
+          !this.columns[columnIndex].readonly(rowData)
+        ) {
+          continue;
+        }
+
+        // mark as read-only
+        if (!response.rows[rowIndex]) {
+          response.rows[rowIndex] = {
+            columns: {}
+          };
+        }
+
+        // +1 because we need to take in account row no column
+        response.rows[rowIndex].columns[columnIndex + 1] = true;
+      }
+    }
+
+    // finished
+    return response;
+  }
+
+  /**
    * Render remaining stuff other than selected range
    */
   private cellProcessRemaining(showFillIfPossible: boolean): void {
@@ -1307,8 +1349,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     }
 
     // readonly cells
-    for (const rowIndex in this.editor.readonly.rows) {
-      for (const columnIndex in this.editor.readonly.rows[rowIndex].columns) {
+    const readonly = this.cellDetermineReadonly();
+    for (const rowIndex in readonly.rows) {
+      for (const columnIndex in readonly.rows[rowIndex].columns) {
         const invalidHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-basic-renderer-${rowIndex}-${columnIndex}`);
         if (invalidHtml) {
           invalidHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-renderer-readonly');
@@ -2236,12 +2279,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // - reverse - start from the end, so we don't need to account for previous changes
         rowsToDelete.reverse();
         rowsToDelete.forEach((deleteRowIndex) => {
-          // readonly
-          this.editor.readonly.rows = updateRowsIndexes(
-            deleteRowIndex,
-            this.editor.readonly.rows
-          );
-
           // has data
           this.editor.hasData.rows = updateRowsIndexes(
             deleteRowIndex,
@@ -2518,37 +2555,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     const handler: IV2SpreadsheetEditorHandler = {
       rowValidate: (localRowIndex: number) => {
         this.rowValidate(localRowIndex);
-      },
-      cellReadonly: (
-        localRowIndex: number,
-        localColumnIndex: number,
-        readonly: boolean
-      ) => {
-        // set readonly
-        if (readonly) {
-          // initialize ?
-          if (!this.editor.readonly.rows[localRowIndex]) {
-            this.editor.readonly.rows[localRowIndex] = {
-              columns: {}
-            };
-          }
-
-          // mark as readonly
-          this.editor.readonly.rows[localRowIndex].columns[localColumnIndex] = true;
-        } else {
-          // cleanup - column
-          if (this.editor.readonly.rows[localRowIndex]?.columns[localColumnIndex]) {
-            delete this.editor.readonly.rows[localRowIndex].columns[localColumnIndex];
-          }
-
-          // cleanup - row
-          if (
-            this.editor.readonly.rows[localRowIndex] &&
-            Object.keys(this.editor.readonly.rows[localRowIndex].columns).length < 1
-          ) {
-            delete this.editor.readonly.rows[localRowIndex];
-          }
-        }
       },
       redraw: () => {
         // refresh cells
@@ -2866,13 +2872,13 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // -1 because row no not included in this.columns
         const columnDefinition = this.columns[columnIndex - 1];
 
-        // check if column is readonly, then ignore
-        // #TODO
-        // // if readonly - ignore
-        // replace same as disabled column definition
-        // if (this.editor.readonly.rows[rowIndex]?.columns[columnIndex]) {
-        //   continue;
-        // }
+        // if readonly - ignore
+        if (
+          columnDefinition.readonly &&
+          columnDefinition.readonly(rowNode.data)
+        ) {
+          continue;
+        }
 
         // previous value
         const oldValue: string = _.get(
@@ -3476,14 +3482,20 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
         // go through columns
         for (let columnIndex: number = range.columns.start; columnIndex <= range.columns.end; columnIndex++) {
+          // column definition
+          const columnDefinition = this.columns[columnIndex - 1];
+
           // if readonly - ignore
-          if (this.editor.readonly.rows[rowIndex]?.columns[columnIndex]) {
+          if (
+            columnDefinition.readonly &&
+            columnDefinition.readonly(rowNode.data)
+          ) {
             continue;
           }
 
           // determine column field
           // -1 because row no not included in this.columns
-          const columnField: string = this.columns[columnIndex - 1].field;
+          const columnField: string = columnDefinition.field;
           const oldValue: any = _.get(
             rowNode.data,
             columnField
