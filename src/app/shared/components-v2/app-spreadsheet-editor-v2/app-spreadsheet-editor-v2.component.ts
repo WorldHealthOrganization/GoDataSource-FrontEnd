@@ -1346,10 +1346,13 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
           // add error message
           if (this.editor.invalid.rows[rowIndex].columns[columnIndex].error?.key) {
-            invalidHtml.title = AppFormBaseErrorMsgV2.msg(
-              this.i18nService,
-              this.editor.invalid.rows[rowIndex].columns[columnIndex].error.key,
-              this.editor.invalid.rows[rowIndex].columns[columnIndex].error.data
+            invalidHtml.setAttribute(
+              'data-error',
+              AppFormBaseErrorMsgV2.msg(
+                this.i18nService,
+                this.editor.invalid.rows[rowIndex].columns[columnIndex].error.key,
+                this.editor.invalid.rows[rowIndex].columns[columnIndex].error.data
+              )
             );
           }
         }
@@ -1366,10 +1369,13 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         invalidHtml.classList.add('gd-spreadsheet-editor-v2-cell-row-no-renderer-invalid');
 
         // add error message
-        invalidHtml.title = this.i18nService.instant(
-          'LNG_FORM_VALIDATION_ERROR_INVALID_COLUMNS', {
-            fields: invalidFields
-          }
+        invalidHtml.setAttribute(
+          'data-error',
+          this.i18nService.instant(
+            'LNG_FORM_VALIDATION_ERROR_INVALID_COLUMNS', {
+              fields: invalidFields
+            }
+          )
         );
       }
     }
@@ -1382,10 +1388,13 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         headerHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-header-invalid');
 
         // add error message
-        headerHtml.title = this.i18nService.instant(
-          'LNG_FORM_VALIDATION_ERROR_INVALID_ROWS', {
-            rows: invalidRows
-          }
+        headerHtml.setAttribute(
+          'data-error',
+          this.i18nService.instant(
+            'LNG_FORM_VALIDATION_ERROR_INVALID_ROWS', {
+              rows: invalidRows
+            }
+          )
         );
       }
     }
@@ -1456,7 +1465,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       );
 
       // error message cleanup
-      cellHtmlElements[elementIndex].title = '';
+      cellHtmlElements[elementIndex].removeAttribute('data-error');
     }
 
     // remove main row no cells classes
@@ -1470,7 +1479,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       );
 
       // error message cleanup
-      rowNoHtmlElements[elementIndex].title = '';
+      rowNoHtmlElements[elementIndex].removeAttribute('data-error');
     }
 
     // remove full / partial from headers
@@ -1484,7 +1493,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       );
 
       // error message cleanup
-      headerHtmlElements[elementIndex].title = '';
+      headerHtmlElements[elementIndex].removeAttribute('data-error');
     }
 
     // hide previous fills
