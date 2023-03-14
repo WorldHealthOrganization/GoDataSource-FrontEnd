@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ICellEditorParams } from '@ag-grid-community/core';
 import { ICellEditorAngularComp } from '@ag-grid-community/angular';
 import { AppFormSelectLocationSingleV2Component } from '../../../../forms-v2/components/app-form-select-location-single-v2/app-form-select-location-single-v2.component';
@@ -8,6 +8,8 @@ import { IV2SpreadsheetEditorExtendedColDef } from '../../models/extended-column
 @Component({
   selector: 'app-spreadsheet-editor-v2-editor-location',
   templateUrl: './app-spreadsheet-editor-v2-editor-location.component.html',
+  styleUrls: ['./app-spreadsheet-editor-v2-editor-location.component.scss'],
+  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppSpreadsheetEditorV2EditorLocationComponent implements ICellEditorAngularComp {

@@ -1,0 +1,61 @@
+@import 'mixins';
+
+/* Spreadsheet location select */
+app-spreadsheet-editor-v2-editor-location {
+  .gd-form-select-location-single-v2 {
+    .mat-form-field {
+      .mat-form-field-wrapper {
+        background-color: var(--gd-background);
+
+        .mat-form-field-flex {
+          padding: 0 0.5rem;
+  
+          /* Spreadsheet location select borders */
+          .mat-form-field-outline {
+            .mat-form-field-outline-start,
+            .mat-form-field-outline-gap,
+            .mat-form-field-outline-end {
+              @include border-radius(0);
+            }
+          }
+  
+          /* Spreadsheet location select borders on focus */
+          .mat-form-field-outline-thick {
+            .mat-form-field-outline-start,
+            .mat-form-field-outline-gap,
+            .mat-form-field-outline-end {
+              @include border-radius(0);
+            }
+          }
+  
+          /* Spreadsheet location select middle */
+          .mat-form-field-infix {
+            padding: 0.2rem 0;
+  
+            .mat-select {
+              height: 2.4rem;
+              line-height: 2.4rem;
+  
+              /* Spreadsheet location select arrow trigger */
+              .mat-select-trigger {
+                height: 2.4rem;
+  
+                .mat-select-arrow-wrapper {
+                  .mat-select-arrow {
+                    color: var(--gd-text);
+                    margin: 0 0.6rem;
+                  }
+                }
+              }
+            }
+          }
+        }
+  
+        /* Form input error */
+        .mat-form-field-subscript-wrapper {
+          min-height: 0;
+        }
+      }
+    }
+  }
+}
