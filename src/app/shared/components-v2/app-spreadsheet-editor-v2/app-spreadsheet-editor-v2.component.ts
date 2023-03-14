@@ -2756,7 +2756,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     }
 
     // split text into cell values
-    const columnValues: string[][] = text.replace(/\n$/g, '').split('\n')
+    let columnValues: string[][] = text.replace(/\n$/g, '').split('\n')
       .map((line) => line.replace(/\r/g, '').split(columnSeparator));
 
     // locations
@@ -2785,7 +2785,30 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // just one line ?, then we need to duplicate the same value for entire selected range (columnValues.length === 1)
     // - same for just one column (columnValues[0].length === 1)
-    // #TODO
+    // - duplicate values instead of doing many ifs bellow
+    const range = this.editor.selection.selected.ranges[0];
+    if (columnValues.length === 1) {
+      // duplicate
+      const oldValues: string[][] = columnValues;
+      columnValues = [];
+      for (let rowIndex: number = 0; rowIndex <= range.rows.end - range.rows.start; rowIndex++) {
+        // add the new row
+        columnValues.push([]);
+
+        // duplicate values
+        if (oldValues[0].length === 1) {
+          for (let columnIndex: number = 0; columnIndex <= range.columns.end - range.columns.start; columnIndex++) {
+            // push value
+            columnValues[rowIndex].push(oldValues[0][0]);
+          }
+        } else {
+          for (let columnIndex: number = 0; columnIndex < oldValues[0].length; columnIndex++) {
+            // push value
+            columnValues[rowIndex].push(oldValues[0][columnIndex]);
+          }
+        }
+      }
+    }
 
     // for undo / redo
     const change: IV2SpreadsheetEditorChangeValues = {
@@ -2825,7 +2848,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         columnIndex: number
       }[]
     } = {};
-    const range = this.editor.selection.selected.ranges[0];
     for (let rowIndex: number = range.rows.start; rowIndex < range.rows.start + columnValues.length; rowIndex++) {
       // retrieve row node
       const rowNode = this._agTable.api.getDisplayedRowAtIndex(rowIndex);
@@ -2845,11 +2867,12 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // check if column is readonly, then ignore
         // #TODO
         // // if readonly - ignore
+        // replace same as disabled column definition
         // if (this.editor.readonly.rows[rowIndex]?.columns[columnIndex]) {
         //   continue;
         // }
 
-        // determine value
+        // previous value
         const oldValue: string = _.get(
           rowNode.data,
           columnDefinition.field
@@ -3171,7 +3194,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           observer.next();
           observer.complete();
         });
-
     });
   }
 
