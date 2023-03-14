@@ -209,7 +209,7 @@
       }
 
       &.mat-active {
-        background: transparent;
+        background: rgba(var(--gd-primary-rgb), 0.1);
         
         &:not(.mat-option-disabled) {
           color: var(--gd-text);
