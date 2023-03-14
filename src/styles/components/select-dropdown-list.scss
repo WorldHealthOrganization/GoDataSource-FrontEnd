@@ -206,10 +206,14 @@
         &:not(.mat-option-disabled) {
           color: var(--gd-text);
         }
+
+        &.mat-active {
+          background: rgba(var(--gd-secondary-rgb), 0.1);
+        }
       }
 
       &.mat-active {
-        background: rgba(var(--gd-primary-rgb), 0.1);
+        background: rgba(var(--gd-secondary-rgb), 0.1);
         
         &:not(.mat-option-disabled) {
           color: var(--gd-text);
