@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ICellEditorParams } from '@ag-grid-community/core';
 import { ICellEditorAngularComp } from '@ag-grid-community/angular';
 import { AppFormNumberV2Component } from '../../../../forms-v2/components/app-form-number-v2/app-form-number-v2.component';
@@ -6,6 +6,8 @@ import { AppFormNumberV2Component } from '../../../../forms-v2/components/app-fo
 @Component({
   selector: 'app-spreadsheet-editor-v2-editor-number',
   templateUrl: './app-spreadsheet-editor-v2-editor-number.component.html',
+  styleUrls: ['./app-spreadsheet-editor-v2-editor-number.component.scss'],
+  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppSpreadsheetEditorV2EditorNumberComponent implements ICellEditorAngularComp {

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ICellEditorParams } from '@ag-grid-community/core';
 import { ICellEditorAngularComp } from '@ag-grid-community/angular';
 import { AppFormDateV2Component } from '../../../../forms-v2/components/app-form-date-v2/app-form-date-v2.component';
@@ -9,6 +9,8 @@ import { IV2SpreadsheetEditorColumnValidatorDate } from '../../models/column.mod
 @Component({
   selector: 'app-spreadsheet-editor-v2-editor-date',
   templateUrl: './app-spreadsheet-editor-v2-editor-date.component.html',
+  styleUrls: ['./app-spreadsheet-editor-v2-editor-date.component.scss'],
+  encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppSpreadsheetEditorV2EditorDateComponent implements ICellEditorAngularComp {

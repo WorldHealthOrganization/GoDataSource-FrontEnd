@@ -1,0 +1,49 @@
+@import 'mixins';
+
+/* Spreadsheet input number */
+app-spreadsheet-editor-v2-editor-number {
+  .gd-form-number-v2 {
+    .mat-form-field {
+      .mat-form-field-wrapper {
+        background-color: var(--gd-background);
+  
+        .mat-form-field-flex {
+          padding: 0 0.5rem;
+  
+          /* Spreadsheet input number borders */
+          .mat-form-field-outline {
+            .mat-form-field-outline-start,
+            .mat-form-field-outline-gap,
+            .mat-form-field-outline-end {
+              @include border-radius(0);
+            }
+          }
+  
+          /* Spreadsheet input number borders on focus */
+          .mat-form-field-outline-thick {
+            .mat-form-field-outline-start,
+            .mat-form-field-outline-gap,
+            .mat-form-field-outline-end {
+              @include border-radius(0);
+            }
+          }
+  
+          /* Spreadsheet input number middle */
+          .mat-form-field-infix {
+            padding: 0.2rem 0;
+
+            input {
+              height: 2.4rem;
+              line-height: 2.4rem;
+            }
+          }
+        }
+  
+        /* Form input error */
+        .mat-form-field-subscript-wrapper {
+          min-height: 0;
+        }
+      }
+    }
+  }
+}

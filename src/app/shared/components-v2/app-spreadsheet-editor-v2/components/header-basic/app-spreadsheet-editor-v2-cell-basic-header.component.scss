@@ -1,24 +1,30 @@
+@import 'mixins';
+
+/* Spreadsheet Header Cell */
 app-spreadsheet-editor-v2-cell-basic-header {
-  width: 100%;
   height: 100%;
+  width: 100%;
 
   .gd-spreadsheet-editor-v2-cell-basic-header {
-    width: 100%;
+    border: 0.1rem solid transparent;
+    @include box-sizing(border-box);
+    @include flex(flex);
+    @include flex_align_items(center);
     height: 100%;
-    box-sizing: border-box;
-    border: 1px solid transparent;
+    padding: 0 0.8rem;
+    width: 100%;
 
     &.gd-spreadsheet-editor-v2-cell-basic-header-selected-partial {
-      display: inline-block;
       background-color: rgba(var(--gd-primary-rgb), 0.15);
     }
+
     &.gd-spreadsheet-editor-v2-cell-basic-header-selected-full {
-      display: inline-block;
-      background-color: rgba(var(--gd-primary-rgb), 0.50);
+      background-color: var(--gd-primary);
+      color: var(--gd-background);
     }
 
     &.gd-spreadsheet-editor-v2-cell-basic-header-invalid {
-      background-color: rgba(red, 0.40);
+      background-color: rgba(var(--gd-danger-rgb), 0.25);
     }
   }
 }

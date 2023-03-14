@@ -1,0 +1,76 @@
+@import 'mixins';
+
+/* Date input */
+app-spreadsheet-editor-v2-editor-date {
+  .gd-form-date-v2 {
+    .mat-form-field {
+      .mat-form-field-wrapper {
+        background-color: var(--gd-background);
+  
+        .mat-form-field-flex {
+          @include flex_align_items(center);
+          padding: 0 0.5rem;
+  
+          /* Form input borders */
+          .mat-form-field-outline {
+            .mat-form-field-outline-start,
+            .mat-form-field-outline-gap,
+            .mat-form-field-outline-end {
+              @include border-radius(0);
+            }
+          }
+  
+          /* Form input borders on focus */
+          .mat-form-field-outline-thick {
+            .mat-form-field-outline-start,
+            .mat-form-field-outline-gap,
+            .mat-form-field-outline-end {
+              @include border-radius(0);
+            }
+          }
+  
+          /* Form input middle */
+          .mat-form-field-infix {
+            padding: 0.2rem 0;
+
+            input {
+              height: 2.4rem;
+              line-height: 2.4rem;
+            }
+          }
+  
+          /* Form input suffix */
+          .mat-form-field-suffix {
+            top: 0;
+  
+            .mat-datepicker-toggle {
+              color: var(--gd-text);
+              margin-right: 0;
+  
+              .mat-icon-button {
+                width: auto;
+
+                svg {
+                  @include svg(var(--gd-text));
+                }
+              }
+
+              &.mat-datepicker-toggle-active {
+                .mat-icon-button {
+                  svg {
+                    @include svg(var(--gd-primary));
+                  }
+                }
+              }
+            }
+          }
+        }
+  
+        /* Form input error */
+        .mat-form-field-subscript-wrapper {
+          min-height: 0;
+        }
+      }
+    }
+  }
+}
