@@ -1,4 +1,5 @@
 import { TranslateService } from '@ngx-translate/core';
+import { I18nService } from '../../../core/services/helper/i18n.service';
 
 /**
  * Error type
@@ -33,7 +34,7 @@ export abstract class AppFormBaseErrorMsgV2 {
    * Retrieve message
    */
   static msg(
-    translateService: TranslateService,
+    translateService: TranslateService | I18nService,
     errKey: AppFormBaseErrorMsgV2Type,
     errData: any
   ): string {

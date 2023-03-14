@@ -30,34 +30,13 @@
     cdkMenu
     class="gd-context-menu">
 
-    <!-- Cut -->
-    <!-- #TODO -->
+    <!-- Copy raw -->
     <button
       class="gd-context-menu-item"
       fxLayout="row"
       cdkMenuItem
-      [disabled]="editor.selection.selected.ranges.length < 1">
-      <!-- Label -->
-      <div
-        class="gd-context-menu-item-label"
-        fxFlex fxLayoutAlign="start">
-        {{'LNG_SHEET_CONTEXT_MENU_CUT' | translate}}
-      </div>
-
-      <!-- Shortcut -->
-      <div
-        fxGrow="0">
-        Ctrl+X
-      </div>
-    </button>
-
-    <!-- Copy -->
-    <!-- #TODO -->
-    <button
-      class="gd-context-menu-item"
-      fxLayout="row"
-      cdkMenuItem
-      [disabled]="editor.selection.selected.ranges.length < 1">
+      [disabled]="editor.selection.selected.ranges.length < 1"
+      (click)="cellCopy(true)">
       <!-- Label -->
       <div
         class="gd-context-menu-item-label"
@@ -72,13 +51,28 @@
       </div>
     </button>
 
-    <!-- Paste -->
-    <!-- #TODO -->
+    <!-- Copy text -->
     <button
       class="gd-context-menu-item"
       fxLayout="row"
       cdkMenuItem
-      [disabled]="editor.selection.selected.ranges.length !== 1">
+      [disabled]="editor.selection.selected.ranges.length < 1"
+      (click)="cellCopy(false)">
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_COPY_TEXT' | translate}}
+      </div>
+    </button>
+
+    <!-- Paste -->
+    <button
+      class="gd-context-menu-item"
+      fxLayout="row"
+      cdkMenuItem
+      [disabled]="editor.selection.selected.ranges.length !== 1"
+      (click)="cellPaste()">
       <!-- Label -->
       <div
         class="gd-context-menu-item-label"
@@ -162,7 +156,7 @@
       class="gd-context-menu-item"
       fxLayout="row"
       cdkMenuItem
-      [disabled]="editor.selection.selected.ranges.length !== 1"
+      [disabled]="editor.selection.selected.ranges.length < 1"
       (click)="cellDeleteContent()">
       <!-- Label -->
       <div
@@ -194,18 +188,5 @@
       </div>
     </button>
 
-
-
-    <!-- #TODO -->
-    <button
-      class="gd-context-menu-item"
-      cdkMenuItem>
-      Copy and configure
-    </button>
-    <button
-      class="gd-context-menu-item"
-      cdkMenuItem>
-      Paste and configure...
-    </button>
   </div>
 </ng-template>

@@ -23,7 +23,9 @@ export const EnglishUsLang = {
     'LNG_COMMON_NOTHING_TO_SAVE': 'Nothing to save',
     'LNG_COMMON_INVALID_ROWS': 'You have invalid rows',
     'LNG_COMMON_ROWS_NO': 'No. of rows to append',
-    'LNG_DIALOG_CONFIRM_DELETE_SELECTED_ROWS': 'Are you sure you want to delete selected rows ({{rows}})?'
+    'LNG_DIALOG_CONFIRM_DELETE_SELECTED_ROWS': 'Are you sure you want to delete selected rows ({{rows}})?',
+    'LNG_SHEET_CONTEXT_MENU_COPY': 'Copy raw',
+    'LNG_SHEET_CONTEXT_MENU_COPY_TEXT': 'Copy text'
 
 
     /**
@@ -64,5 +66,6 @@ export const EnglishUsLang = {
     // LNG_PAGE_BULK_ADD_CONTACTS_WARNING_NO_DATA
     // LNG_SHEET_CONTEXT_MENU_ROW_BELOW
     // LNG_SHEET_CONTEXT_MENU_ROW_ABOVE
+    // LNG_SHEET_CONTEXT_MENU_CUT
   }
 };

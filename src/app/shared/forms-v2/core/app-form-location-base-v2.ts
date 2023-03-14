@@ -22,6 +22,7 @@ import { TranslateService } from '@ngx-translate/core';
 export interface ILocation {
   id: string;
   label: string;
+  name: string;
   level: number;
   disabled: boolean;
   geoLocation: {
@@ -358,6 +359,7 @@ export abstract class AppFormLocationBaseV2<T>
                 ` ( ${currentItem.location.synonymsAsString} )` :
                 ''
             ),
+            name: currentItem.location.name,
             level: currentItem.location.parentLocationId && levels[currentItem.location.parentLocationId] !== undefined ?
               levels[currentItem.location.parentLocationId] + 1 :
               0,
