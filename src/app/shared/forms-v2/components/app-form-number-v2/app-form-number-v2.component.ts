@@ -84,6 +84,9 @@ export class AppFormNumberV2Component
     return this._input;
   }
 
+  // timers
+  private _focusTimer: any;
+
   /**
    * Constructor
    */
@@ -103,7 +106,11 @@ export class AppFormNumberV2Component
    * Release resources
    */
   ngOnDestroy(): void {
+    // parent
     super.onDestroy();
+
+    // timers
+    this.stopFocusTimer();
   }
 
   /**
@@ -141,10 +148,28 @@ export class AppFormNumberV2Component
   }
 
   /**
+   * Timer - focus
+   */
+  private stopFocusTimer(): void {
+    if (this._focusTimer) {
+      clearTimeout(this._focusTimer);
+      this._focusTimer = undefined;
+    }
+  }
+
+  /**
    * Focus
    */
   focus(): void {
-    setTimeout(() => {
+    // timer - focus
+    this.stopFocusTimer();
+
+    // wait for binds to take effect
+    this._focusTimer = setTimeout(() => {
+      // reset
+      this._focusTimer = undefined;
+
+      // focus
       if (this.input) {
         this._focusAfterInit = false;
         this.input.focus();

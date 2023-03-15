@@ -156,7 +156,7 @@ export class AppFormSelectSingleV2Component
 
   // search value
   startSearch: string;
-  private _searchValue: string;
+  searchValue: string;
 
   // allow disabled options to be selected ?
   @Input() allowDisabledToBeSelected: boolean = false;
@@ -180,6 +180,9 @@ export class AppFormSelectSingleV2Component
     return this._input;
   }
 
+  // timers
+  private _openTimer: any;
+
   /**
    * Constructor
    */
@@ -199,7 +202,11 @@ export class AppFormSelectSingleV2Component
    * Release resources
    */
   ngOnDestroy(): void {
+    // parent
     super.onDestroy();
+
+    // timers
+    this.stopOpenTimer();
   }
 
   /**
@@ -224,7 +231,7 @@ export class AppFormSelectSingleV2Component
   filterOptions(searchValue?: string): void {
     // update search value
     if (searchValue !== undefined) {
-      this._searchValue = searchValue;
+      this.searchValue = searchValue;
     }
 
     // nothing to filter ?
@@ -234,7 +241,7 @@ export class AppFormSelectSingleV2Component
     }
 
     // filter options
-    if (!this._searchValue) {
+    if (!this.searchValue) {
       // all visible options
       this.filteredOptions = this.allowDisabledToBeSelected ?
         this.options :
@@ -250,7 +257,7 @@ export class AppFormSelectSingleV2Component
     }
 
     // case insensitive
-    const byValue: string = this._searchValue.toLowerCase();
+    const byValue: string = this.searchValue.toLowerCase();
 
     // filter
     this.filteredOptions = this.options.filter((item: ILabelValuePairModel): boolean => {
@@ -311,10 +318,28 @@ export class AppFormSelectSingleV2Component
   }
 
   /**
+   * Timer - open
+   */
+  private stopOpenTimer(): void {
+    if (this._openTimer) {
+      clearTimeout(this._openTimer);
+      this._openTimer = undefined;
+    }
+  }
+
+  /**
    * Open select
    */
   open(startSearch?: string): void {
-    setTimeout(() => {
+    // timer - open
+    this.stopOpenTimer();
+
+    // wait for binds to take effect
+    this._openTimer = setTimeout(() => {
+      // reset
+      this._openTimer = undefined;
+
+      // open
       if (this.input) {
         // init
         this._openAfterInit = false;

@@ -87,7 +87,7 @@
 
         <!-- Empty option used to select nothing -->
         <mat-option
-          *ngIf="clearable"
+          *ngIf="clearable && !searchValue"
           [value]="null">
           {{ 'LNG_COMMON_LABEL_NONE' | translate }}
         </mat-option>

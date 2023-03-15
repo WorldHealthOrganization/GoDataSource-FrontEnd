@@ -156,6 +156,11 @@ export class AppFormDateV2Component
     return this._calendar;
   }
 
+  // timers
+  private _focusTimer: any;
+  private _openTimer: any;
+  private _setStartingValueTimer: any;
+
   /**
    * Constructor
    */
@@ -176,7 +181,13 @@ export class AppFormDateV2Component
    * Release resources
    */
   ngOnDestroy(): void {
+    // parent
     super.onDestroy();
+
+    // timers
+    this.stopFocusTimer();
+    this.stopOpenTimer();
+    this.stopSetStartingValueTimer();
   }
 
   /**
@@ -196,10 +207,48 @@ export class AppFormDateV2Component
   }
 
   /**
+   * Timer - focus
+   */
+  private stopFocusTimer(): void {
+    if (this._focusTimer) {
+      clearTimeout(this._focusTimer);
+      this._focusTimer = undefined;
+    }
+  }
+
+  /**
+   * Timer - open
+   */
+  private stopOpenTimer(): void {
+    if (this._openTimer) {
+      clearTimeout(this._openTimer);
+      this._openTimer = undefined;
+    }
+  }
+
+  /**
+   * Timer - set starting value
+   */
+  private stopSetStartingValueTimer(): void {
+    if (this._setStartingValueTimer) {
+      clearTimeout(this._setStartingValueTimer);
+      this._setStartingValueTimer = undefined;
+    }
+  }
+
+  /**
    * Focus
    */
   focus(): void {
-    setTimeout(() => {
+    // timer - focus
+    this.stopFocusTimer();
+
+    // wait for binds to take effect
+    this._focusTimer = setTimeout(() => {
+      // reset
+      this._focusTimer = undefined;
+
+      // focus
       if (this.input) {
         this._focusAfterInit = false;
         this.input.focus();
@@ -214,9 +263,18 @@ export class AppFormDateV2Component
    */
   open(): void {
     if (this.calendar) {
+      // reset
       this._openAfterInit = false;
+
+      // timer - open
+      this.stopOpenTimer();
+
       // wait for this.value to be bind
-      setTimeout(() => {
+      this._openTimer = setTimeout(() => {
+        // reset
+        this._openTimer = undefined;
+
+        // open
         this.calendar.open();
       });
     } else {
@@ -228,7 +286,15 @@ export class AppFormDateV2Component
    * Set starting value
    */
   setStartingValue(value: string): void {
-    setTimeout(() => {
+    // timer
+    this.stopSetStartingValueTimer();
+
+    // wait for binds to take effect
+    this._setStartingValueTimer = setTimeout(() => {
+      // reset
+      this._setStartingValueTimer = undefined;
+
+      // set starting value
       const input = this.elementRef.nativeElement.querySelector('input');
       if (input) {
         input.value = value;

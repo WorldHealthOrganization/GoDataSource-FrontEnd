@@ -3,6 +3,9 @@
  */
 export interface IV2SpreadsheetEditorEventSave {
   // required
-  rows: any[];
+  rows: {
+    full: any,
+    dirty: any
+  }[];
   finished: () => void;
 }

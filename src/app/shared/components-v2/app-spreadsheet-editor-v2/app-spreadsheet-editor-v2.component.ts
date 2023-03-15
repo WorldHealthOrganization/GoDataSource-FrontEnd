@@ -11,7 +11,8 @@ import {
   IV2SpreadsheetEditorColumnValidatorEmail,
   IV2SpreadsheetEditorColumnValidatorInteger,
   IV2SpreadsheetEditorColumnValidatorRequired,
-  IV2SpreadsheetEditorEventData, IV2SpreadsheetEditorEventDataLocation,
+  IV2SpreadsheetEditorEventData,
+  IV2SpreadsheetEditorEventDataLocation,
   IV2SpreadsheetEditorHandler,
   V2SpreadsheetEditorColumn,
   V2SpreadsheetEditorColumnType,
@@ -112,6 +113,12 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     return this._columns;
   }
 
+  // ignore groups
+  @Input() saveIgnoreGroups: string[];
+  @Input() saveFieldReplace: {
+    [field: string]: string
+  };
+
   // rows data
   private _recordsSubscription: Subscription;
   private _records$: Observable<any[]>;
@@ -158,6 +165,11 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       rows: {}
     },
     asyncResponses: {
+      rows: {}
+    },
+
+    // dirty
+    dirty: {
       rows: {}
     },
 
@@ -450,6 +462,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     this.editor.locationsMap = {};
     this.editorClearSelected();
     this.editorClearInvalid();
+    this.editorClearDirty();
     this.editorClearHasData();
 
     // stop async request
@@ -912,6 +925,16 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   private editorClearInvalid(): void {
     // clear
     this.editor.invalid = {
+      rows: {}
+    };
+  }
+
+  /**
+   * Clear dirty
+   */
+  private editorClearDirty(): void {
+    // clear
+    this.editor.dirty = {
       rows: {}
     };
   }
@@ -2321,6 +2344,12 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // - reverse - start from the end, so we don't need to account for previous changes
         rowsToDelete.reverse();
         rowsToDelete.forEach((deleteRowIndex) => {
+          // dirty data
+          this.editor.dirty.rows = updateRowsIndexes(
+            deleteRowIndex,
+            this.editor.dirty.rows
+          );
+
           // has data
           this.editor.hasData.rows = updateRowsIndexes(
             deleteRowIndex,
@@ -2584,6 +2613,19 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     eventType: V2SpreadsheetEditorEventType,
     change: V2SpreadsheetEditorChange
   ): void {
+    // make dirty
+    if (eventType === V2SpreadsheetEditorEventType.CHANGE) {
+      // initialize ?
+      if (!this.editor.dirty.rows[rowIndex]) {
+        this.editor.dirty.rows[rowIndex] = {
+          columns: {}
+        };
+      }
+
+      // set dirty
+      this.editor.dirty.rows[rowIndex].columns[this.editor.columnsMap[columnField].index] = true;
+    }
+
     // anything to trigger for this cell ?
     if (
       eventType === V2SpreadsheetEditorEventType.CHANGE &&
@@ -3894,20 +3936,106 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   /**
    * Retrieve rows to save
    */
-  private retrieveRowsToSave(): any[] {
+  private retrieveRowsToSave(): {
+    full: any,
+    dirty: any
+  }[] {
     // list of rows
-    const rows: any[] = [];
+    const rows: {
+      full: any,
+      dirty: any
+    }[] = [];
 
-    // validate once again all rows
-    const rowsNo: number = this._agTable.api.getDisplayedRowCount();
-    for (let rowIndex = 0; rowIndex < rowsNo; rowIndex++) {
-      // no need to add it if we don't have data
-      if (!this.editor.hasData.rows[rowIndex]) {
-        continue;
-      }
+    // process row
+    const processRowNode = (
+      rowNode: IRowNode,
+      columns: V2SpreadsheetEditorColumn[]
+    ) => {
+      // go through dirty columns
+      const dirty: {
+        [prop: string]: any
+      } = {};
+      columns.forEach((columnDefinition) => {
+        // determine child key
+        // - ignore model / relationship
+        let field: string = columnDefinition.field;
+        let childKeyFinishIndex: number = -1;
+        if (this.saveIgnoreGroups?.length) {
+          for (let groupKeyIndex: number = 0; groupKeyIndex < this.saveIgnoreGroups.length; groupKeyIndex++) {
+            const key: string = `${this.saveIgnoreGroups[groupKeyIndex]}.`;
+            if (field.startsWith(key)) {
+              childKeyFinishIndex = key.length;
+              break;
+            }
+          }
+        }
+
+        // determine if child key is from a group
+        if (childKeyFinishIndex > -1) {
+          const groupIndex: number = field.indexOf('.', childKeyFinishIndex);
+          if (groupIndex > -1) {
+            field = field.substring(0, groupIndex);
+          }
+        }
+
+        // last stand - replace fields
+        if (
+          this.saveFieldReplace &&
+          this.saveFieldReplace[field]
+        ) {
+          field = this.saveFieldReplace[field];
+        }
+
+        // append dirty value
+        _.set(
+          dirty,
+          field,
+          _.get(
+            rowNode.data,
+            field
+          )
+        );
+      });
 
       // add it to the list
-      rows.push(this._agTable.api.getDisplayedRowAtIndex(rowIndex).data);
+      rows.push({
+        full: rowNode.data,
+        dirty
+      });
+    };
+
+    // on create we need to retrieve all non-empty rows
+    if (this.action === CreateViewModifyV2Action.CREATE) {
+      const rowsNo: number = this._agTable.api.getDisplayedRowCount();
+      for (let rowIndex = 0; rowIndex < rowsNo; rowIndex++) {
+        // no need to add it if we don't have data
+        if (!this.editor.hasData.rows[rowIndex]) {
+          continue;
+        }
+
+        // add it to the list
+        processRowNode(
+          this._agTable.api.getDisplayedRowAtIndex(rowIndex),
+          this.columns
+        );
+      }
+    } else {
+      // on modify we need to retrieve only dirty rows
+      for (const rowIndex in this.editor.dirty.rows) {
+        // determine dirty columns
+        const dirtyColumns: V2SpreadsheetEditorColumn[] = [];
+        for (const columnIndex in this.editor.dirty.rows[rowIndex].columns) {
+          // retrieve column definition
+          // -1 because we need to exclude row no column which isn't in this.columns
+          dirtyColumns.push(this.columns[parseInt(columnIndex, 10) - 1]);
+        }
+
+        // process
+        processRowNode(
+          this._agTable.api.getDisplayedRowAtIndex(parseInt(rowIndex, 10)),
+          dirtyColumns
+        );
+      }
     }
 
     // finished
@@ -3986,7 +4114,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       }
 
       // retrieve only rows that need to be saved
-      const rows: any[] = this.retrieveRowsToSave();
+      const rows = this.retrieveRowsToSave();
 
       // nothing to save ?
       if (rows.length < 1) {

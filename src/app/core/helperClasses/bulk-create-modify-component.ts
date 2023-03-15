@@ -28,6 +28,14 @@ export abstract class BulkCreateModifyComponent<T> {
   // columns
   tableColumns: V2SpreadsheetEditorColumn[];
 
+  // ignore groups
+  saveIgnoreGroups: string[];
+
+  // field replace
+  saveFieldReplace: {
+    [field: string]: string
+  };
+
   // records
   records$: Observable<T[]>;
 
@@ -44,6 +52,10 @@ export abstract class BulkCreateModifyComponent<T> {
   // page title
   pageTitle: string;
 
+  // timers
+  private _initializeTimer: any;
+  private _initializeRecordsTimer: any;
+
   /**
    * Constructor
    */
@@ -59,7 +71,10 @@ export abstract class BulkCreateModifyComponent<T> {
     this.action = activatedRoute.snapshot.data.action;
 
     // wait for binding so some things get processed
-    setTimeout(() => {
+    this._initializeTimer = setTimeout(() => {
+      // reset
+      this._initializeTimer = undefined;
+
       // initialize page title
       this.initializePageTitle();
 
@@ -68,6 +83,12 @@ export abstract class BulkCreateModifyComponent<T> {
 
       // initialize table columns
       this.initializeTableColumns();
+
+      // initialize ignore groups
+      this.initializeSaveIgnoreGroups();
+
+      // initialize field replace
+      this.initializeSaveFieldReplace();
     });
 
     // listen for outbreak selection
@@ -92,7 +113,11 @@ export abstract class BulkCreateModifyComponent<T> {
 
         // trigger outbreak selection changed
         // - wait for binding
-        setTimeout(() => {
+        this._initializeRecordsTimer = setTimeout(() => {
+          // reset
+          this._initializeRecordsTimer = undefined;
+
+          // init
           this.initializeRecords();
         });
       });
@@ -122,6 +147,16 @@ export abstract class BulkCreateModifyComponent<T> {
   protected abstract initializeTableColumns(): void;
 
   /**
+   * Initialize ignore groups
+   */
+  protected abstract initializeSaveIgnoreGroups(): void;
+
+  /**
+   * Initialize ignore groups
+   */
+  protected abstract initializeSaveFieldReplace(): void;
+
+  /**
    * Initialize records data
    */
   protected abstract initializeRecords(): void;
@@ -144,6 +179,18 @@ export abstract class BulkCreateModifyComponent<T> {
     if (this.selectedOutbreakSubscription) {
       this.selectedOutbreakSubscription.unsubscribe();
       this.selectedOutbreakSubscription = undefined;
+    }
+
+    // timer - setup
+    if (this._initializeTimer) {
+      clearTimeout(this._initializeTimer);
+      this._initializeTimer = undefined;
+    }
+
+    // timer - records
+    if (this._initializeRecordsTimer) {
+      clearTimeout(this._initializeRecordsTimer);
+      this._initializeRecordsTimer = undefined;
     }
   }
 }

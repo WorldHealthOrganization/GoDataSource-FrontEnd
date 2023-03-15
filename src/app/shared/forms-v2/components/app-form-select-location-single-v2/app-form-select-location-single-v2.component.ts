@@ -66,6 +66,9 @@ export class AppFormSelectLocationSingleV2Component
     return this._input;
   }
 
+  // timers
+  private _openTimer: any;
+
   /**
    * Constructor
    */
@@ -102,6 +105,9 @@ export class AppFormSelectLocationSingleV2Component
   ngOnDestroy(): void {
     // parent
     super.onDestroy();
+
+    // timers
+    this.stopOpenTimer();
   }
 
   /**
@@ -148,10 +154,28 @@ export class AppFormSelectLocationSingleV2Component
   }
 
   /**
+   * Timer - open
+   */
+  private stopOpenTimer(): void {
+    if (this._openTimer) {
+      clearTimeout(this._openTimer);
+      this._openTimer = undefined;
+    }
+  }
+
+  /**
    * Open select
    */
   open(): void {
-    setTimeout(() => {
+    // timer - open
+    this.stopOpenTimer();
+
+    // wait for binds to take effect
+    this._openTimer = setTimeout(() => {
+      // reset
+      this._openTimer = undefined;
+
+      // open
       if (this.input) {
         this._openAfterInit = false;
         this.input.open();

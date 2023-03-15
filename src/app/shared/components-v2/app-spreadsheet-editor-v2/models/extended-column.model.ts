@@ -106,6 +106,17 @@ export interface IV2SpreadsheetEditorExtendedColDefEditor {
     }
   },
 
+  // dirty
+  dirty: {
+    rows: {
+      [rowIndex: number]: {
+        columns: {
+          [columnIndex: number]: true
+        }
+      }
+    }
+  },
+
   // row has data ?
   hasData: {
     rows: {
