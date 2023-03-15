@@ -26,7 +26,8 @@ import { ClusterModel } from '../../../../core/models/cluster.model';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
 import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
-import { map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 @Component({
   selector: 'app-contacts-bulk-create-modify',
@@ -533,6 +534,25 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
   }
 
   /**
+   * Initialize Ignore Groups
+   */
+  protected initializeSaveIgnoreGroups(): void {
+    this.saveIgnoreGroups = [
+      'model',
+      'relationship'
+    ];
+  }
+
+  /**
+   * Initialize Field replace
+   */
+  protected initializeSaveFieldReplace(): void {
+    this.saveFieldReplace = {
+      'model.mainAddress': 'model.addresses'
+    };
+  }
+
+  /**
    * Initialize Table Columns
    */
   protected initializeRecords(): void {
@@ -775,125 +795,159 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
    * Save handler
    */
   save(event) {
-    // #TODO - handle modify
-    if (this.isModify) {
-      throw new Error('bla bla bla');
-    }
+    // configure save request
+    let request$;
+    if (this.isCreate) {
+      // determine data that we need to save
+      const data = event.rows.map((row) => {
+        // clone contact
+        const fullEntity: EntityModel = row.full;
+        const dirtyEntity: EntityModel = row.dirty;
+        const contact: ContactModel = dirtyEntity.model as ContactModel;
 
-    // create contacts
-    this.contactDataService
-      .bulkAddContacts(
-        this.selectedOutbreak.id,
-        this._entity.type,
-        this._entity.id,
-        event.rows.map((row: EntityModel) => {
-          // clone contact
-          const contact: ContactModel = new ContactModel(_.cloneDeep(row.model));
+        // remove empty address
+        if (
+          contact.addresses &&
+          contact.addresses.length === 1 &&
+          contact.addresses[0].typeId === AddressType.CURRENT_ADDRESS &&
+          !AddressModel.isNotEmpty(contact.addresses[0])
+        ) {
+          contact.addresses = [];
+        }
 
-          // remove empty address
+        // format as API expects it
+        return {
+          contact,
+          relationship: fullEntity.relationship
+        };
+      });
+
+      // create
+      request$ = this.contactDataService
+        .bulkAddContacts(
+          this.selectedOutbreak.id,
+          this._entity.type,
+          this._entity.id,
+          data
+        );
+    } else {
+      // determine data that we need to save
+      const data = event.rows.reduce(
+        (acc: any[], row) => {
+          // no need to update ?
           if (
-            contact.addresses.length === 1 &&
-            contact.addresses[0].typeId === AddressType.CURRENT_ADDRESS &&
-            !AddressModel.isNotEmpty(contact.addresses[0])
+            !row.dirty?.model ||
+            Object.keys(row.dirty.model).length < 1
           ) {
-            contact.addresses = [];
+            return;
           }
 
-          // format as API expects it
-          return {
-            contact,
-            relationship: row.relationship
-          };
+          // add data
+          acc.push({
+            id: row.full.model.id,
+            ...row.dirty.model
+          });
+
+          // finished
+          return acc;
+        },
+        []
+      );
+
+      // modify
+      request$ = this.contactDataService.bulkModifyContacts(
+        this.selectedOutbreak.id,
+        data
+      );
+    }
+
+    // create / modify contacts
+    request$
+      .pipe(
+        catchError((err) => {
+          // display partial success message
+          if (!_.isEmpty(_.get(err, 'details.success'))) {
+            this.toastV2Service.error('LNG_PAGE_BULK_ADD_CONTACTS_LABEL_PARTIAL_ERROR_MSG');
+          }
+
+          // remove success records
+          // items should be ordered by recordNo
+          //  - so in this case if we reverse we can remove records from sheet without having to take in account that we removed other rows as well
+          const rowsToDelete: number[] = [];
+          (_.get(err, 'details.success') || []).reverse().forEach((successRecord) => {
+            // remove record that was added
+            if (typeof successRecord.recordNo === 'number') {
+              // remove row
+              rowsToDelete.push(successRecord.recordNo);
+
+              // substract row numbers
+              _.each(
+                _.get(err, 'details.failed'),
+                (item) => {
+                  if (typeof item.recordNo !== 'number') {
+                    return;
+                  }
+
+                  // if record is after the one that we removed then we need to substract 1 value
+                  if (item.recordNo > successRecord.recordNo) {
+                    item.recordNo = item.recordNo - 1;
+                  }
+                }
+              );
+            }
+          });
+
+          // remove success rows
+          if (rowsToDelete.length > 0) {
+            event.removeRows(rowsToDelete);
+          }
+
+          // prepare errors to parse later into more readable errors
+          const errors = [];
+          (_.get(err, 'details.failed') || []).forEach((childError) => {
+            if (!_.isEmpty(childError.error)) {
+              errors.push({
+                err: childError.error,
+                echo: childError
+              });
+            }
+          });
+
+          // try to parse into more clear errors
+          this.toastV2Service.translateErrors(errors)
+            .subscribe((translatedErrors) => {
+              // transform errors
+              (translatedErrors || []).forEach((translatedError) => {
+                // determine row number
+                let row: number = _.get(translatedError, 'echo.recordNo', null);
+                if (typeof row === 'number') {
+                  row++;
+                }
+
+                // add to error list
+                this.toastV2Service.error(
+                  'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_API_ERROR_MSG', {
+                    row: row + '',
+                    err: translatedError.message
+                  }
+                );
+              });
+            });
+
+          // close dialog
+          event.finished();
+
+          // finished
+          return throwError(err);
         })
       )
-      // #TODO
-      // .pipe(
-      //   catchError((err) => {
-      //     // close dialog
-      //     loadingDialog.close();
-      //
-      //     // mark success records
-      //     this.errorMessages = [];
-      //     if (dataResponse.sheetCore) {
-      //       // display partial success message
-      //       if (!_.isEmpty(_.get(err, 'details.success'))) {
-      //         this.errorMessages.push({
-      //           message: 'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_PARTIAL_ERROR_MSG'
-      //         });
-      //       }
-      //
-      //       // remove success records
-      //       // items should be ordered by recordNo
-      //       //  - so in this case if we reverse we can remove records from sheet without having to take in account that we removed other rows as well
-      //       (_.get(err, 'details.success') || []).reverse().forEach((successRecord) => {
-      //         // remove record that was added
-      //         if (_.isNumber(successRecord.recordNo)) {
-      //           // remove row
-      //           dataResponse.sheetCore.alter(
-      //             'remove_row',
-      //             successRecord.recordNo,
-      //             1
-      //           );
-      //
-      //           // substract row numbers
-      //           _.each(
-      //             _.get(err, 'details.failed'),
-      //             (item) => {
-      //               if (!_.isNumber(item.recordNo)) {
-      //                 return;
-      //               }
-      //
-      //               // if record is after the one that we removed then we need to substract 1 value
-      //               if (item.recordNo > successRecord.recordNo) {
-      //                 item.recordNo = item.recordNo - 1;
-      //               }
-      //             }
-      //           );
-      //         }
-      //       });
-      //     }
-      //
-      //     // prepare errors to parse later into more readable errors
-      //     const errors = [];
-      //     (_.get(err, 'details.failed') || []).forEach((childError) => {
-      //       if (!_.isEmpty(childError.error)) {
-      //         errors.push({
-      //           err: childError.error,
-      //           echo: childError
-      //         });
-      //       }
-      //     });
-      //
-      //     // try to parse into more clear errors
-      //     this.toastV2Service.translateErrors(errors)
-      //       .subscribe((translatedErrors) => {
-      //         // transform errors
-      //         (translatedErrors || []).forEach((translatedError) => {
-      //           // determine row number
-      //           let row: number = _.get(translatedError, 'echo.recordNo', null);
-      //           if (_.isNumber(row)) {
-      //             row++;
-      //           }
-      //
-      //           // add to error list
-      //           this.errorMessages.push({
-      //             message: 'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_API_ERROR_MSG',
-      //             data: {
-      //               row: row,
-      //               err: translatedError.message
-      //             }
-      //           });
-      //         });
-      //       });
-      //
-      //     // display error
-      //     this.toastV2Service.error(err);
-      //     return throwError(err);
-      //   })
-      // )
       .subscribe(() => {
         // message
-        this.toastV2Service.success('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
+        if (this.isCreate) {
+          this.toastV2Service.success('LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_SUCCESS_MESSAGE');
+        } else {
+          this.toastV2Service.success('LNG_PAGE_BULK_MODIFY_CONTACTS_ACTION_MODIFY_CONTACTS_SUCCESS_MESSAGE');
+        }
 
         // finished
         event.finished();

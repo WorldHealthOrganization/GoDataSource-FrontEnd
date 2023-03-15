@@ -8,4 +8,5 @@ export interface IV2SpreadsheetEditorEventSave {
     dirty: any
   }[];
   finished: () => void;
+  removeRows: (rowsToDelete: number[]) => void;
 }

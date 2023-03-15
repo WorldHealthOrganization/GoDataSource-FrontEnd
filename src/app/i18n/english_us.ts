@@ -25,7 +25,10 @@ export const EnglishUsLang = {
     'LNG_COMMON_ROWS_NO': 'No. of rows to append',
     'LNG_DIALOG_CONFIRM_DELETE_SELECTED_ROWS': 'Are you sure you want to delete selected rows ({{rows}})?',
     'LNG_SHEET_CONTEXT_MENU_COPY': 'Copy raw',
-    'LNG_SHEET_CONTEXT_MENU_COPY_TEXT': 'Copy text'
+    'LNG_SHEET_CONTEXT_MENU_COPY_TEXT': 'Copy text',
+    'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_API_ERROR_MSG': 'Row {{row}} is invalid: {{err}}',
+    'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_PARTIAL_ERROR_MSG': 'Records that were created with success were removed from the spreadsheet so we don\'t create duplicates',
+
 
 
     /**

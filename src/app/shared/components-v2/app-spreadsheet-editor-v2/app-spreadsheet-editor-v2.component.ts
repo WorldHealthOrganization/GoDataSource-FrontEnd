@@ -2250,6 +2250,120 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Remove rows from grid
+   */
+  private rowActualDelete(
+    rowsToDelete: number[],
+    keepChanges: boolean
+  ): void {
+    // delete
+    this._agTable.api.applyTransaction({
+      remove: rowsToDelete.map((rowIndex) => this._agTable.api.getDisplayedRowAtIndex(rowIndex).data)
+    });
+
+    // cleanup
+    this.editorClearSelected();
+
+    // stop async request
+    this.stopAsyncRequests();
+
+    // update rows
+    const updateRowsIndexes = (
+      deleteRowIndex,
+      oldRows: {
+        [rowIndex: number]: any
+      }
+    ): {
+      [rowIndex: number]: any
+    } => {
+      // determine new row indexes
+      const newRows = {};
+      for (const rowIndex in oldRows) {
+        // format
+        const rowIndexNumber: number = parseInt(rowIndex, 10);
+
+        // if deleted row, just ignore
+        if (rowIndexNumber === deleteRowIndex) {
+          continue;
+        }
+
+        // if smaller just add it as it was
+        if (rowIndexNumber < deleteRowIndex) {
+          newRows[rowIndex] = oldRows[rowIndex];
+          continue;
+        }
+
+        // else bigger, we need to update
+        newRows[rowIndexNumber - 1] = oldRows[rowIndex];
+      }
+
+      // finished
+      return newRows;
+    };
+
+    // update everything
+    // - reverse - start from the end, so we don't need to account for previous changes
+    rowsToDelete.reverse();
+    rowsToDelete.forEach((deleteRowIndex) => {
+      // dirty data
+      this.editor.dirty.rows = updateRowsIndexes(
+        deleteRowIndex,
+        this.editor.dirty.rows
+      );
+
+      // has data
+      this.editor.hasData.rows = updateRowsIndexes(
+        deleteRowIndex,
+        this.editor.hasData.rows
+      );
+
+      // invalid
+      this.editor.invalid.rows = updateRowsIndexes(
+        deleteRowIndex,
+        this.editor.invalid.rows
+      );
+
+      // changes
+      const oldChanges: V2SpreadsheetEditorChange[] = this.changes;
+      this.changes = [];
+      this.changesIndex = 0;
+      if (keepChanges) {
+        oldChanges.forEach((change) => {
+          // not handled for now ?
+          // - ignore
+          if (change.type !== V2SpreadsheetEditorChangeType.VALUES) {
+            return;
+          }
+
+          // update rows
+          change.changes.rows = updateRowsIndexes(
+            deleteRowIndex,
+            change.changes.rows
+          );
+
+          // empty change ?
+          // - ignore
+          if (Object.keys(change.changes.rows).length < 1) {
+            return;
+          }
+
+          // append to changes
+          this.cellAppendChange(change);
+        });
+      }
+    });
+
+    // redraw
+    this._agTable.api.refreshCells({
+      force: true,
+      suppressFlash: true
+    });
+
+    // redraw ranges
+    this.cellUpdateRangeClasses(true);
+  }
+
+  /**
    * Delete selected rows
    */
   rowDelete(): void {
@@ -2295,109 +2409,11 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           return;
         }
 
-        // delete
-        this._agTable.api.applyTransaction({
-          remove: rowsToDelete.map((rowIndex) => this._agTable.api.getDisplayedRowAtIndex(rowIndex).data)
-        });
-
-        // cleanup
-        this.editorClearSelected();
-
-        // stop async request
-        this.stopAsyncRequests();
-
-        // update rows
-        const updateRowsIndexes = (
-          deleteRowIndex,
-          oldRows: {
-            [rowIndex: number]: any
-          }
-        ): {
-          [rowIndex: number]: any
-        } => {
-          // determine new row indexes
-          const newRows = {};
-          for (const rowIndex in oldRows) {
-            // format
-            const rowIndexNumber: number = parseInt(rowIndex, 10);
-
-            // if deleted row, just ignore
-            if (rowIndexNumber === deleteRowIndex) {
-              continue;
-            }
-
-            // if smaller just add it as it was
-            if (rowIndexNumber < deleteRowIndex) {
-              newRows[rowIndex] = oldRows[rowIndex];
-              continue;
-            }
-
-            // else bigger, we need to update
-            newRows[rowIndexNumber - 1] = oldRows[rowIndex];
-          }
-
-          // finished
-          return newRows;
-        };
-
-        // update everything
-        // - reverse - start from the end, so we don't need to account for previous changes
-        rowsToDelete.reverse();
-        rowsToDelete.forEach((deleteRowIndex) => {
-          // dirty data
-          this.editor.dirty.rows = updateRowsIndexes(
-            deleteRowIndex,
-            this.editor.dirty.rows
-          );
-
-          // has data
-          this.editor.hasData.rows = updateRowsIndexes(
-            deleteRowIndex,
-            this.editor.hasData.rows
-          );
-
-          // invalid
-          this.editor.invalid.rows = updateRowsIndexes(
-            deleteRowIndex,
-            this.editor.invalid.rows
-          );
-
-          // changes
-          const oldChanges: V2SpreadsheetEditorChange[] = this.changes;
-          this.changes = [];
-          this.changesIndex = 0;
-          oldChanges.forEach((change) => {
-            // not handled for now ?
-            // - ignore
-            if (change.type !== V2SpreadsheetEditorChangeType.VALUES) {
-              return;
-            }
-
-            // update rows
-            change.changes.rows = updateRowsIndexes(
-              deleteRowIndex,
-              change.changes.rows
-            );
-
-            // empty change ?
-            // - ignore
-            if (Object.keys(change.changes.rows).length < 1) {
-              return;
-            }
-
-            // append to changes
-            this.cellAppendChange(change);
-          });
-        });
-
-        // redraw
-        this._agTable.api.refreshCells({
-          force: true,
-          suppressFlash: true
-        });
-
-        // redraw ranges
-        this.cellUpdateRangeClasses(true);
+        // remove rows
+        this.rowActualDelete(
+          rowsToDelete,
+          true
+        );
       });
   }
 
@@ -4134,6 +4150,13 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         finished: () => {
           // hide loading when parent finishes
           loading.close();
+        },
+        removeRows: (rowsToDelete) => {
+          // remove rows
+          this.rowActualDelete(
+            rowsToDelete,
+            false
+          );
         }
       });
     };
