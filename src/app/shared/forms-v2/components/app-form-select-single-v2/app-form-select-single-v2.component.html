@@ -200,7 +200,7 @@
         class="gd-form-select-single-v2-viewonly-value">
         <!-- Has value -->
         <ng-container
-          *ngIf="value">
+          *ngIf="value; else noValue">
           <!-- Icon -->
           <mat-icon
             *ngIf="allOptionsMap[value]?.icon">{{allOptionsMap[value].icon}}</mat-icon>
