@@ -138,7 +138,7 @@ interface IV2SpreadsheetEditorColumnBase {
 /**
  * Column - text
  */
-export interface IV2SpreadsheetEditorColumnText extends Omit<IV2SpreadsheetEditorColumnBase, 'editor' | 'validators'> {
+export interface IV2SpreadsheetEditorColumnText extends Omit<IV2SpreadsheetEditorColumnBase, 'editor' | 'change' | 'validators'> {
   // required
   type: V2SpreadsheetEditorColumnType.TEXT;
 
@@ -146,6 +146,7 @@ export interface IV2SpreadsheetEditorColumnText extends Omit<IV2SpreadsheetEdito
   editor?: {
     params?: ITextCellEditorParams
   };
+  change?: (data: IV2SpreadsheetEditorEventData) => void;
   validators?: IV2SpreadsheetEditorColumnValidatorRequired | IV2SpreadsheetEditorColumnValidatorAsync | IV2SpreadsheetEditorColumnValidatorEmail;
 }
 
@@ -183,11 +184,12 @@ export interface IV2SpreadsheetEditorColumnSingleSelect extends Omit<IV2Spreadsh
 /**
  * Column - date
  */
-export interface IV2SpreadsheetEditorColumnDate extends Omit<IV2SpreadsheetEditorColumnBase, 'validators'> {
+export interface IV2SpreadsheetEditorColumnDate extends Omit<IV2SpreadsheetEditorColumnBase, 'change' | 'validators'> {
   // required
   type: V2SpreadsheetEditorColumnType.DATE;
 
   // optional
+  change?: (data: IV2SpreadsheetEditorEventData) => void;
   validators?: IV2SpreadsheetEditorColumnValidatorRequired | IV2SpreadsheetEditorColumnValidatorDate;
 }
 
@@ -206,11 +208,12 @@ export interface IV2SpreadsheetEditorColumnLocation extends Omit<IV2SpreadsheetE
 /**
  * Column - number
  */
-export interface IV2SpreadsheetEditorColumnNumber extends Omit<IV2SpreadsheetEditorColumnBase, 'validators'> {
+export interface IV2SpreadsheetEditorColumnNumber extends Omit<IV2SpreadsheetEditorColumnBase, 'change' | 'validators'> {
   // required
   type: V2SpreadsheetEditorColumnType.NUMBER;
 
   // optional
+  change?: (data: IV2SpreadsheetEditorEventData) => void;
   validators?: IV2SpreadsheetEditorColumnValidatorRequired | IV2SpreadsheetEditorColumnValidatorInteger;
 }
 

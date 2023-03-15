@@ -1,6 +1,6 @@
 import { Component, OnDestroy } from '@angular/core';
 import { ContactModel } from '../../../../core/models/contact.model';
-import { IV2SpreadsheetEditorEventDataLocation, IV2SpreadsheetEditorHandler, V2SpreadsheetEditorColumnType } from '../../../../shared/components-v2/app-spreadsheet-editor-v2/models/column.model';
+import { IV2SpreadsheetEditorEventData, IV2SpreadsheetEditorEventDataLocation, IV2SpreadsheetEditorHandler, V2SpreadsheetEditorColumnType } from '../../../../shared/components-v2/app-spreadsheet-editor-v2/models/column.model';
 import { BulkCreateModifyComponent } from '../../../../core/helperClasses/bulk-create-modify-component';
 import { OutbreakDataService } from '../../../../core/services/data/outbreak.data.service';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
@@ -28,6 +28,7 @@ import * as _ from 'lodash';
 import { RequestQueryBuilder } from '../../../../core/helperClasses/request-query-builder';
 import { catchError, map } from 'rxjs/operators';
 import { throwError } from 'rxjs';
+import { AppMessages } from '../../../../core/enums/app-messages.enum';
 
 @Component({
   selector: 'app-contacts-bulk-create-modify',
@@ -57,6 +58,22 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
       locationsMap: undefined,
       columnsMap: undefined
     };
+
+  // warning messages
+  private _warnings: {
+    dateOfOnset: string | null,
+    rows: {
+      [rowIndex: number]: true
+    }
+  } = {
+      dateOfOnset: null,
+      rows: {}
+    };
+
+  // manual cleared "date" cells
+  private _manualClearedDateCells: {
+    [rowNumber: number]: true
+  } = {};
 
   /**
    * Constructor
@@ -90,6 +107,9 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
 
     // stop timer
     this.stopDisplayOnceGeoLocationChange();
+
+    // remove global notifications
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
   }
 
   /**
@@ -319,18 +339,27 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
       {
         type: V2SpreadsheetEditorColumnType.DATE,
         label: 'LNG_PAGE_BULK_ADD_CONTACTS_ADDRESS_DATE',
-        field: 'model.mainAddress.date'
+        field: 'model.mainAddress.date',
+        change: (data) => {
+          this.setAddressDate(data);
+        }
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_ADDRESS_FIELD_LABEL_EMAIL_ADDRESS',
         field: 'model.mainAddress.emailAddress',
         validators: {
           email: () => true
+        },
+        change: (data) => {
+          this.setAddressDate(data);
         }
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_CONTACT_FIELD_LABEL_PHONE_NUMBER',
-        field: 'model.mainAddress.phoneNumber'
+        field: 'model.mainAddress.phoneNumber',
+        change: (data) => {
+          this.setAddressDate(data);
+        }
       }, {
         type: V2SpreadsheetEditorColumnType.LOCATION,
         label: 'LNG_ADDRESS_FIELD_LABEL_LOCATION',
@@ -347,6 +376,9 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
 
           // since fill will call this method for each row / cell we need to show dialog only once
           this.displayOnceGeoLocationChange(true);
+
+          // set address date
+          this.setAddressDate(data);
         },
         validators: {
           required: (rowData: EntityModel): boolean => {
@@ -357,15 +389,24 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_ADDRESS_FIELD_LABEL_CITY',
-        field: 'model.mainAddress.city'
+        field: 'model.mainAddress.city',
+        change: (data) => {
+          this.setAddressDate(data);
+        }
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_ADDRESS_FIELD_LABEL_POSTAL_CODE',
-        field: 'model.mainAddress.postalCode'
+        field: 'model.mainAddress.postalCode',
+        change: (data) => {
+          this.setAddressDate(data);
+        }
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_ADDRESS_FIELD_LABEL_ADDRESS_LINE_1',
-        field: 'model.mainAddress.addressLine1'
+        field: 'model.mainAddress.addressLine1',
+        change: (data) => {
+          this.setAddressDate(data);
+        }
       }, {
         type: V2SpreadsheetEditorColumnType.NUMBER,
         label: 'LNG_ADDRESS_FIELD_LABEL_GEOLOCATION_LAT',
@@ -376,6 +417,9 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
             return contact.mainAddress &&
               typeof contact.mainAddress.geoLocation?.lng === 'number';
           }
+        },
+        change: (data) => {
+          this.setAddressDate(data);
         }
       }, {
         type: V2SpreadsheetEditorColumnType.NUMBER,
@@ -387,12 +431,18 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
             return contact.mainAddress &&
               typeof contact.mainAddress.geoLocation?.lat === 'number';
           }
+        },
+        change: (data) => {
+          this.setAddressDate(data);
         }
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
         label: 'LNG_ADDRESS_FIELD_LABEL_MANUAL_COORDINATES',
         field: 'model.mainAddress.geoLocationAccurate',
-        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options
+        options: (this.activatedRoute.snapshot.data.yesNo as IResolverV2ResponseModel<ILabelValuePairModel>).options,
+        change: (data) => {
+          this.setAddressDate(data);
+        }
       },
 
       // Epidemiology
@@ -459,6 +509,50 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
           date: () => ({
             max: moment()
           })
+        },
+        change: (data) => {
+          // nothing to do ?
+          if (!this.selectedOutbreak.checkLastContactDateAgainstDateOnSet) {
+            return;
+          }
+
+          // check if there is a new value
+          let refreshWarning: boolean = false;
+          const newValue = (data.rowData as EntityModel).relationship?.contactDate;
+          if (
+            newValue &&
+            moment(newValue).isValid() &&
+            this._entity instanceof CaseModel &&
+            this._entity.dateOfOnset &&
+            moment(newValue).isBefore(moment(this._entity.dateOfOnset))
+          ) {
+            this._warnings.dateOfOnset = moment(this._entity.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+            this._warnings.rows[data.rowIndex + 1] = true;
+            refreshWarning = true;
+          } else {
+            // remove the row if exists
+            if (this._warnings.rows[data.rowIndex + 1]) {
+              refreshWarning = true;
+              delete this._warnings.rows[data.rowIndex + 1];
+            }
+          }
+
+          // hide previous message if the warning message was updated
+          if (refreshWarning) {
+            this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
+          }
+
+          // show the warning message
+          if (Object.keys(this._warnings.rows).length) {
+            this.toastV2Service.notice(
+              'LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_WARNING_LAST_CONTACT_IS_BEFORE_DATE_OF_ONSET',
+              {
+                dateOfOnset: this._warnings.dateOfOnset,
+                rows: Object.keys(this._warnings.rows).join(', ')
+              },
+              AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET
+            );
+          }
         }
       }, {
         type: V2SpreadsheetEditorColumnType.SINGLE_SELECT,
@@ -792,6 +886,41 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
   }
 
   /**
+   * Sets "date" address field to current date if it's not set
+   */
+  private setAddressDate(data: IV2SpreadsheetEditorEventData): void {
+    // return if the date was manually cleared
+    if (
+      !this.isCreate ||
+      this._manualClearedDateCells[data.rowIndex]
+    ) {
+      return;
+    }
+
+    // next time no need to fill date
+    this._manualClearedDateCells[data.rowIndex] = true;
+
+    // nothing else filled ?
+    const entity: EntityModel = data.rowData;
+    if (
+      entity.model.mainAddress &&
+      !AddressModel.isNotEmpty(entity.model.mainAddress)
+    ) {
+      return;
+    }
+
+    // do we need to set date ?
+    if (!entity.model.mainAddress?.date) {
+      // set date
+      entity.model.mainAddress.date = moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+
+      // update grid
+      data.handler.rowValidate(data.rowIndex);
+      data.handler.redraw();
+    }
+  }
+
+  /**
    * Save handler
    */
   save(event) {
@@ -952,10 +1081,8 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
         // finished
         event.finished();
 
-        // #TODO
-        // this.disableDirtyConfirm();
-
         // navigate to listing page
+        this.disableDirtyConfirm();
         if (ContactModel.canList(this.authUser)) {
           this.router.navigate(['/contacts']);
         } else {
@@ -963,441 +1090,4 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
         }
       });
   }
-
-
-  // // constants
-  // private static readonly COLUMN_PROPERTY_LAST_CONTACT: string = 'relationship.contactDate';
-  // private static readonly COLUMN_PROPERTY_DATE: string = 'contact.addresses[0].date';
-  // private static readonly COLUMN_PROPERTY_EMAIL_ADDRESS: string = 'contact.addresses[0].emailAddress';
-  // private static readonly COLUMN_PROPERTY_PHONE_NUMBER: string = 'contact.addresses[0].phoneNumber';
-  // private static readonly COLUMN_PROPERTY_LOCATION: string = 'contact.addresses[0].locationId';
-  // private static readonly COLUMN_PROPERTY_CITY: string = 'contact.addresses[0].city';
-  // private static readonly COLUMN_PROPERTY_POSTAL_CODE: string = 'contact.addresses[0].postalCode';
-  // private static readonly COLUMN_PROPERTY_ADDRESS_LINE1: string = 'contact.addresses[0].addressLine1';
-  // private static readonly COLUMN_PROPERTY_GEOLOCATION_LAT: string = 'contact.addresses[0].geoLocation.lat';
-  // private static readonly COLUMN_PROPERTY_GEOLOCATION_LNG: string = 'contact.addresses[0].geoLocation.lng';
-  // private static readonly COLUMN_PROPERTY_GEOLOCATION_ACCURATE: string = 'contact.addresses[0].geoLocationAccurate';
-  //
-  // @ViewChild('inputForMakingFormDirty', { static: true }) inputForMakingFormDirty;
-  // @ViewChild('hotTableWrapper', { static: true }) hotTableWrapper: HotTableWrapperComponent;
-  //
-  // // selected outbreak
-  // selectedOutbreak: OutbreakModel;
-  // // related entity
-  // relatedEntityType: EntityType;
-  // relatedEntityId: string;
-  //
-  // relatedEntityData: CaseModel | EventModel;
-  //
-  // // sheet widget configuration
-  // sheetContextMenu = {};
-  // sheetColumns: any[] = [];
-  //
-  // // sheet column indexes
-  // private _addressColumnIndexes: IAddressColumnIndex;
-  // private _addressColumnIndexesMap: {
-  //   [columnIndex: number]: true
-  // } = {};
-  //
-  // // manual cleared "date" cells
-  // private _manualClearedDateCells: {
-  //   [rowNumber: number]: true
-  // } = {};
-  //
-  // // error messages
-  // errorMessages: {
-  //   message: string,
-  //   data?: {
-  //     row: number,
-  //     columns?: string,
-  //     err?: string
-  //   }
-  // }[] = [];
-  //
-  // // warning messages
-  // private _warnings: {
-  //   dateOfOnset: string | null,
-  //   rows: {
-  //     [rowIndex: number]: true
-  //   }
-  // } = {
-  //     dateOfOnset: null,
-  //     rows: {}
-  //   };
-  //
-  // // action
-  // actionButton: IV2ActionIconLabel;
-  //
-  // /**
-  //  * Constructor
-  //  */
-  // constructor(
-  //   private router: Router,
-  //   private activatedRoute: ActivatedRoute,
-  //   private contactDataService: ContactDataService,
-  //   private entityDataService: EntityDataService,
-  //   private outbreakDataService: OutbreakDataService,
-  //   private toastV2Service: ToastV2Service,
-  //   private i18nService: I18nService,
-  //   private dialogV2Service: DialogV2Service,
-  //   private authDataService: AuthDataService,
-  //   private teamDataService: TeamDataService
-  // ) {
-  //   super();
-  // }
-  //
-  // /**
-  //  * Component initialized
-  //  */
-  // ngOnInit() {
-  //   // get the authenticated user
-  //   this.authUser = this.authDataService.getAuthenticatedUser();
-  //
-  //
-  //   // teams
-  //   if (TeamModel.canList(this.authUser)) {
-  //     this.teamList$ = this.teamDataService.getTeamsListReduced().pipe(share());
-  //   }
-  //
-  //   // configure Sheet widget
-  //   this.configureSheetWidget();
-  //
-  //   // retrieve query params
-  //   this.activatedRoute.queryParams
-  //     .subscribe((params: { entityType, entityId }) => {
-  //       this.relatedEntityType = _.get(params, 'entityType');
-  //       this.relatedEntityId = _.get(params, 'entityId');
-  //
-  //       if (!this.validateRelatedEntity()) {
-  //         return;
-  //       }
-  //
-  //       // initialize page breadcrumbs
-  //       this.initializeBreadcrumbs();
-  //
-  //       // retrieve related person information
-  //       this.retrieveRelatedPerson();
-  //     });
-  // }
-  //
-  // /**
-  //  * Component destroyed
-  //  */
-  // ngOnDestroy() {
-  //   // remove global notifications
-  //   this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
-  // }
-  //
-  // /**
-  //  * Configure 'Handsontable'
-  //  */
-  // private configureSheetWidget() {
-  //
-  //   // configure the context menu
-  //   this.sheetContextMenu = {
-  //     items: {
-  //       row_above: {
-  //         name: this.i18nService.instant('LNG_SHEET_CONTEXT_MENU_ROW_ABOVE')
-  //       },
-  //       row_below: {
-  //         name: this.i18nService.instant('LNG_SHEET_CONTEXT_MENU_ROW_BELOW')
-  //       },
-  //       remove_row: {
-  //         name: this.i18nService.instant('LNG_SHEET_CONTEXT_MENU_REMOVE_ROW')
-  //       },
-  //       cut: {
-  //         name: this.i18nService.instant('LNG_SHEET_CONTEXT_MENU_CUT')
-  //       },
-  //       copy: {
-  //         name: this.i18nService.instant('LNG_SHEET_CONTEXT_MENU_COPY')
-  //       }
-  //     }
-  //   };
-  //
-  //   // get address column indexes
-  //   this._addressColumnIndexes = {
-  //     date: this.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_DATE),
-  //     emailAddress: this.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_EMAIL_ADDRESS),
-  //     phoneNumber: this.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_PHONE_NUMBER),
-  //     locationId: this.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_LOCATION),
-  //     city: this.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_CITY),
-  //     postalCode: this.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_POSTAL_CODE),
-  //     addressLine1: this.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_ADDRESS_LINE1),
-  //     geoLocationLat: this.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_GEOLOCATION_LAT),
-  //     geoLocationLng: this.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_GEOLOCATION_LNG),
-  //     geoLocationAccurate: this.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_GEOLOCATION_ACCURATE)
-  //   };
-  //
-  //   // map address column indexes
-  //   this._addressColumnIndexesMap = Object.assign({}, ...Object.values(this._addressColumnIndexes).map((index: number) => ({ [index]: true })));
-  // }
-  //
-  // /**
-  //  * After changes
-  //  */
-  // afterChange(event: IHotTableWrapperEvent) {
-  //   // validate if only there are changes
-  //   if (!event.typeSpecificData.changes) {
-  //     return;
-  //   }
-  //
-  //   // get the contact date column index
-  //   const lastContactColumnIndex: number = this.hotTableWrapper.sheetColumns.findIndex((column) => column.property === BulkCreateContactsComponent.COLUMN_PROPERTY_LAST_CONTACT);
-  //
-  //   // check if the date of onset or address fields were changed
-  //   let refreshWarning = false;
-  //   let isLastContactDateModified = false;
-  //   event.typeSpecificData.changes.forEach((cell: any) => {
-  //     // cell[0] - row number, cell[1] - column index, cell[2] - old value, cell[3] - new value
-  //     const columnIndex: number = cell[1];
-  //
-  //     // check changed column
-  //     if (this._addressColumnIndexesMap[columnIndex]) {
-  //       // address fields
-  //       this.setAddressDate(
-  //         event.sheetTable,
-  //         cell
-  //       );
-  //     } else if (
-  //       columnIndex === lastContactColumnIndex &&
-  //       this.selectedOutbreak.checkLastContactDateAgainstDateOnSet
-  //     ) {
-  //       // validate last contact against date of onset
-  //       isLastContactDateModified = true;
-  //       const mustRefreshWarning = this.checkForLastContactBeforeCaseOnSet(cell);
-  //       refreshWarning = refreshWarning || mustRefreshWarning;
-  //     }
-  //   });
-  //
-  //   // show warnings if only last contact cell was modified
-  //   if (isLastContactDateModified) {
-  //     this.showWarnings(refreshWarning);
-  //   }
-  // }
-  //
-  // /**
-  //  * Check if "Date of Last Contact" is before "Date of Onset" of the source case
-  //  */
-  // private checkForLastContactBeforeCaseOnSet(
-  //   cell: any
-  // ): boolean {
-  //   // cell[0] - row number, cell[1] - column index, cell[2] - old value, cell[3] - new value
-  //   const rowNumber = cell[0];
-  //   const newValue = cell[3];
-  //   let refreshWarning = false;
-  //
-  //   // check if there is a new value
-  //   if (
-  //     newValue &&
-  //     moment(newValue).isValid() &&
-  //     this.relatedEntityData instanceof CaseModel &&
-  //     this.relatedEntityData.dateOfOnset &&
-  //     moment(newValue).isBefore(moment(this.relatedEntityData.dateOfOnset))
-  //   ) {
-  //     this._warnings.dateOfOnset = moment(this.relatedEntityData.dateOfOnset).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
-  //     this._warnings.rows[rowNumber + 1] = true;
-  //
-  //     refreshWarning = true;
-  //   } else {
-  //     // remove the row if exists
-  //     if (this._warnings.rows[rowNumber + 1]) {
-  //       refreshWarning = true;
-  //       delete this._warnings.rows[rowNumber + 1];
-  //     }
-  //   }
-  //
-  //   // return
-  //   return refreshWarning;
-  // }
-  //
-  // /**
-  //  * Sets "date" address field to current date if it's not set
-  //  */
-  // private setAddressDate(
-  //   sheetTable: HotTableComponent,
-  //   cell: any[]
-  // ): void {
-  //   // get cell info
-  //   const rowNumber: number = cell[0];
-  //   const columnIndex: number = cell[1];
-  //   const newValue: string = cell[3];
-  //
-  //   // return if the date was manually cleared
-  //   if (this._manualClearedDateCells[rowNumber]) {
-  //     return;
-  //   }
-  //
-  //   // check if "date" was changed
-  //   if (columnIndex === this._addressColumnIndexes.date) {
-  //     // save if date was manually cleared
-  //     if (!newValue) {
-  //       this._manualClearedDateCells[rowNumber] = true;
-  //     }
-  //
-  //     // return
-  //     return;
-  //   }
-  //
-  //   // return if "date" field is filled
-  //   const sheetCore: Handsontable.default = (sheetTable as any).hotInstance;
-  //   if (
-  //     sheetCore.getDataAtCell(
-  //       rowNumber,
-  //       this._addressColumnIndexes.date
-  //     )
-  //   ) {
-  //     return;
-  //   }
-  //
-  //   // set "date" address field to current date if at least an address field is filled
-  //   if (this.isAddressFilled(rowNumber)) {
-  //     sheetCore.setDataAtCell(
-  //       rowNumber,
-  //       this._addressColumnIndexes.date,
-  //       moment().format(Constants.DEFAULT_DATE_DISPLAY_FORMAT)
-  //     );
-  //   }
-  // }
-  //
-  // /**
-  //  * Checks if any of the address field is filled
-  //  */
-  // private isAddressFilled(
-  //   rowNumber: number,
-  //   ignoredColumn: number = this._addressColumnIndexes.date
-  // ): boolean {
-  //   // sheet core
-  //   const sheetCore: Handsontable.default = (this.hotTableWrapper.sheetTable as any).hotInstance;
-  //
-  //   // check fields
-  //   const indexesFiltered: number[] = Object.values(this._addressColumnIndexes).filter((item) => item !== ignoredColumn);
-  //   for (const column of Object.values(indexesFiltered)) {
-  //     // get "date" column value
-  //     const value: any = sheetCore.getDataAtCell(
-  //       rowNumber,
-  //       column
-  //     );
-  //
-  //     // break if any address field is filled
-  //     if (value) {
-  //       return true;
-  //     }
-  //   }
-  //
-  //   // no address field filled
-  //   return false;
-  // }
-  //
-  // /**
-  //  * Show warnings
-  //  */
-  // private showWarnings(refreshWarning) {
-  //   // hide previous message if the warning message was updated
-  //   if (refreshWarning) {
-  //     this.toastV2Service.hide(AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
-  //   }
-  //
-  //   // show the warning message
-  //   if (Object.keys(this._warnings.rows).length) {
-  //     this.toastV2Service.notice(
-  //       'LNG_PAGE_BULK_ADD_CONTACTS_ACTION_CREATE_CONTACTS_WARNING_LAST_CONTACT_IS_BEFORE_DATE_OF_ONSET',
-  //       {
-  //         dateOfOnset: this._warnings.dateOfOnset,
-  //         rows: Object.keys(this._warnings.rows).join(', ')
-  //       },
-  //       AppMessages.APP_MESSAGE_LAST_CONTACT_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET
-  //     );
-  //   }
-  // }
-  //
-  // /**
-  //  * After changes
-  //  */
-  // afterBecameDirty() {
-  //   // no input to make dirty ?
-  //   if (!this.inputForMakingFormDirty) {
-  //     return;
-  //   }
-  //
-  //   // make form dirty
-  //   this.inputForMakingFormDirty.control.markAsDirty();
-  // }
-  //
-  // /**
-  //  * Retrieve information of related person (Case or Event)
-  //  */
-  // private retrieveRelatedPerson() {
-  //   if (
-  //     this.selectedOutbreak &&
-  //     this.selectedOutbreak.id &&
-  //     this.relatedEntityType &&
-  //     this.relatedEntityId
-  //   ) {
-  //     // retrieve related person information
-  //     this.entityDataService
-  //       .getEntity(this.relatedEntityType, this.selectedOutbreak.id, this.relatedEntityId)
-  //       .pipe(
-  //         catchError((err) => {
-  //           // show error message
-  //           this.toastV2Service.error(err);
-  //
-  //           // navigate to Cases/Events listing page
-  //           this.redirectToRelatedEntityList();
-  //
-  //           return throwError(err);
-  //         })
-  //       )
-  //       .subscribe((relatedEntityData: CaseModel | EventModel) => {
-  //         // keep person data
-  //         this.relatedEntityData = relatedEntityData;
-  //       });
-  //   }
-  // }
-  //
-  // /**
-  //  * Check that we have related Person Type and ID
-  //  */
-  // private validateRelatedEntity() {
-  //   if (
-  //     this.relatedEntityId &&
-  //     (
-  //       this.relatedEntityType === EntityType.CASE ||
-  //       this.relatedEntityType === EntityType.EVENT
-  //     )
-  //   ) {
-  //     return true;
-  //   }
-  //
-  //   // related person data is wrong or missing
-  //   this.toastV2Service.success('LNG_PAGE_BULK_ADD_CONTACTS_WARNING_CASE_OR_EVENT_REQUIRED');
-  //
-  //   // navigate to Cases/Events listing page
-  //   this.redirectToRelatedEntityList();
-  //
-  //   return false;
-  // }
-  //
-  // /**
-  //  * Redirect to Cases or Events list, based on related Entity Type
-  //  */
-  // private redirectToRelatedEntityList() {
-  //   if (
-  //     this.relatedEntityType === EntityType.CASE &&
-  //     CaseModel.canList(this.authUser)
-  //   ) {
-  //     this.router.navigate(['/cases']);
-  //   } else if (
-  //     this.relatedEntityType === EntityType.EVENT &&
-  //     EventModel.canList(this.authUser)
-  //   ) {
-  //     this.router.navigate(['/events']);
-  //   } else {
-  //     // NOT SUPPORTED
-  //     if (ContactModel.canList(this.authUser)) {
-  //       this.router.navigate(['/contacts']);
-  //     } else {
-  //       this.router.navigate(['/']);
-  //     }
-  //   }
-  // }
 }

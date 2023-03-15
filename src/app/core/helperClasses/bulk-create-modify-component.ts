@@ -9,12 +9,13 @@ import { V2SpreadsheetEditorColumn } from '../../shared/components-v2/app-spread
 import { CreateViewModifyV2Action } from '../../shared/components-v2/app-create-view-modify-v2/models/action.model';
 import { IV2SpreadsheetEditorEventSave } from '../../shared/components-v2/app-spreadsheet-editor-v2/models/event.model';
 import { ActivatedRoute } from '@angular/router';
+import { ConfirmOnFormChanges } from '../services/guards/page-change-confirmation-guard.service';
 
 /**
  * Bulk create / modify component
  */
 @Directive()
-export abstract class BulkCreateModifyComponent<T> {
+export abstract class BulkCreateModifyComponent<T> extends ConfirmOnFormChanges {
   // breadcrumbs
   breadcrumbs: IV2Breadcrumb[];
 
@@ -64,6 +65,9 @@ export abstract class BulkCreateModifyComponent<T> {
     protected authDataService: AuthDataService,
     protected outbreakDataService: OutbreakDataService
   ) {
+    // parent
+    super();
+
     // get auth data
     this.authUser = authDataService.getAuthenticatedUser();
 

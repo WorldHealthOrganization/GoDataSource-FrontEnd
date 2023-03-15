@@ -136,6 +136,12 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   // save
   @Output() save: EventEmitter<IV2SpreadsheetEditorEventSave> = new EventEmitter<IV2SpreadsheetEditorEventSave>();
 
+  // form dirty ?
+  private _formDirty: boolean = false;
+  get isDirty(): boolean {
+    return this._formDirty;
+  }
+
   // keep changes
   changes: V2SpreadsheetEditorChange[] = [];
   changesIndex: number = 0;
@@ -2640,6 +2646,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
       // set dirty
       this.editor.dirty.rows[rowIndex].columns[this.editor.columnsMap[columnField].index] = true;
+
+      // trigger dirty
+      this._formDirty = true;
     }
 
     // anything to trigger for this cell ?

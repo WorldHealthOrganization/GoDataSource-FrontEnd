@@ -27,7 +27,7 @@ export const EnglishUsLang = {
     'LNG_SHEET_CONTEXT_MENU_COPY': 'Copy raw',
     'LNG_SHEET_CONTEXT_MENU_COPY_TEXT': 'Copy text',
     'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_API_ERROR_MSG': 'Row {{row}} is invalid: {{err}}',
-    'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_PARTIAL_ERROR_MSG': 'Records that were created with success were removed from the spreadsheet so we don\'t create duplicates',
+    'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_PARTIAL_ERROR_MSG': 'Records that were created with success were removed from the spreadsheet so we don\'t create duplicates'
 
 
 
@@ -70,5 +70,6 @@ export const EnglishUsLang = {
     // LNG_SHEET_CONTEXT_MENU_ROW_BELOW
     // LNG_SHEET_CONTEXT_MENU_ROW_ABOVE
     // LNG_SHEET_CONTEXT_MENU_CUT
+    // LNG_PAGE_BULK_ADD_CONTACTS_WARNING_CASE_OR_EVENT_REQUIRED
   }
 };
