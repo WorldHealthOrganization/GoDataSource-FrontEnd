@@ -880,7 +880,7 @@ export class ContactsBulkCreateModifyComponent extends BulkCreateModifyComponent
               // remove row
               rowsToDelete.push(successRecord.recordNo);
 
-              // substract row numbers
+              // subtract row numbers
               _.each(
                 _.get(err, 'details.failed'),
                 (item) => {
