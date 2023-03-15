@@ -479,7 +479,9 @@ export class ContactOfContactModel
     // finished
     return mainAddress ?
       mainAddress :
-      new AddressModel();
+      new AddressModel({
+        typeId: AddressType.CURRENT_ADDRESS
+      });
   }
 
   /**

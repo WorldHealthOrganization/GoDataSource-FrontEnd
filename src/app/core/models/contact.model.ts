@@ -812,7 +812,9 @@ export class ContactModel
     // finished
     return mainAddress ?
       mainAddress :
-      new AddressModel();
+      new AddressModel({
+        typeId: AddressType.CURRENT_ADDRESS
+      });
   }
   set mainAddress(mainAddress: AddressModel) {
     // find address

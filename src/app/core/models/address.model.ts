@@ -70,8 +70,11 @@ export class AddressModel {
     this.addressLine1 = _.get(data, 'addressLine1');
     this.locationId = _.get(data, 'locationId');
     this.location = locationsMap && this.locationId ?
-      locationsMap[this.locationId] :
-      new LocationModel(_.get(data, 'location'));
+      locationsMap[this.locationId] : (
+        _.get(data, 'location') ?
+          new LocationModel(_.get(data, 'location')) :
+          undefined
+      );
     this.date = _.get(data, 'date');
     this.geoLocation = _.get(data, 'geoLocation', {});
     this.geoLocationAccurate = _.get(data, 'geoLocationAccurate', false);

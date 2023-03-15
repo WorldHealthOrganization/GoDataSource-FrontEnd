@@ -773,7 +773,9 @@ export class CaseModel
     // finished
     return mainAddress ?
       mainAddress :
-      new AddressModel();
+      new AddressModel({
+        typeId: AddressType.CURRENT_ADDRESS
+      });
   }
 
   /**
