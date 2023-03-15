@@ -5,7 +5,6 @@ import { FormContactQuickComponent } from './form-contact-quick/form-contact-qui
 import { HoverRowActionsComponent } from './hover-row-actions/hover-row-actions.component';
 import { FormCaseQuickComponent } from './form-case-quick/form-case-quick.component';
 import { FormEventQuickComponent } from './form-event-quick/form-event-quick.component';
-import { HotTableWrapperComponent } from './hot-table-wrapper/hot-table-wrapper.component';
 import { FormContactOfContactQuickComponent } from './form-contact-of-contact-quick/form-contact-of-contact-quick.component';
 import { FancyTooltipComponent } from './fancy-tooltip/fancy-tooltip.component';
 import { PieDonutChartComponent } from './pie-donut-graph/pie-donut-chart.component';
@@ -22,7 +21,6 @@ export const components: any[] = [
   FormContactOfContactQuickComponent,
   FormCaseQuickComponent,
   FormEventQuickComponent,
-  HotTableWrapperComponent,
 
   // display information
   ChronologyComponent,
