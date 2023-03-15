@@ -483,6 +483,22 @@ export class ContactOfContactModel
         typeId: AddressType.CURRENT_ADDRESS
       });
   }
+  set mainAddress(mainAddress: AddressModel) {
+    // find address
+    const existingAddressIndex = _.findIndex(this.addresses, { 'typeId': AddressType.CURRENT_ADDRESS });
+    if (existingAddressIndex < 0) {
+      // initialize
+      if (!this.addresses) {
+        this.addresses = [];
+      }
+
+      // put main address at the top
+      this.addresses.splice(0, 0, mainAddress);
+    } else if (mainAddress !== this.addresses[existingAddressIndex]) {
+      // replace address
+      this.addresses.splice(existingAddressIndex, 1, mainAddress);
+    }
+  }
 
   /**
    * Get phone numbers
