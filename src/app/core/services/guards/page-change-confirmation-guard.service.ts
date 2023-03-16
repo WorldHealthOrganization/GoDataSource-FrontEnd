@@ -8,6 +8,7 @@ import { DialogV2Service } from '../helper/dialog-v2.service';
 import { AppBottomDialogV2Component } from '../../../shared/components-v2/app-bottom-dialog-v2/app-bottom-dialog-v2.component';
 import { IV2BottomDialogConfigButtonType, IV2BottomDialogResponse } from '../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
 import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
+import { AppSpreadsheetEditorV2Component } from '../../../shared/components-v2/app-spreadsheet-editor-v2/app-spreadsheet-editor-v2.component';
 
 /**
  * Extended by components that use ngForms to determine the dirtiness of a component & need confirmation before leaving a page
@@ -19,6 +20,7 @@ export class ConfirmOnFormChanges {
 
   // Child forms
   @ViewChild(AppCreateViewModifyV2Component, { static: true }) protected createViewModifyComponent: AppCreateViewModifyV2Component;
+  @ViewChild(AppSpreadsheetEditorV2Component, { static: true }) protected appSpreadsheetEditorV2Component: AppSpreadsheetEditorV2Component;
 
   // False if confirm dialog should be shown when forms are dirty
   private _confirmDisabled: boolean = false;
@@ -59,44 +61,61 @@ export class ConfirmOnFormChanges {
     // nothing to check ?
     if (
       ConfirmOnFormChanges._allConfirmDisabled ||
-      this._confirmDisabled ||
-      !this.createViewModifyComponent ||
-      this.createViewModifyComponent.isView
+      this._confirmDisabled || (
+        !this.createViewModifyComponent &&
+        !this.appSpreadsheetEditorV2Component
+      )
     ) {
       return true;
     }
 
-    // determine forms
-    const canDeactivateForms: NgForm[] = [];
-    (this.createViewModifyComponent.tabData?.tabs || [])
-      .forEach((tab) => {
-        // nothing to do
-        if (!tab.form) {
-          return;
-        }
+    // create view modify
+    if (this.createViewModifyComponent) {
+      // do not check if view
+      if (this.createViewModifyComponent.isView) {
+        return true;
+      }
 
-        // add form
-        canDeactivateForms.push(tab.form);
+      // determine forms
+      const canDeactivateForms: NgForm[] = [];
+      (this.createViewModifyComponent.tabData?.tabs || [])
+        .forEach((tab) => {
+          // nothing to do
+          if (!tab.form) {
+            return;
+          }
+
+          // add form
+          canDeactivateForms.push(tab.form);
+        });
+
+      // there are no forms to check for changes ?
+      if (canDeactivateForms.length < 1) {
+        return true;
+      }
+
+      // check if we have forms with changes
+      let foundChanges: boolean = false;
+      canDeactivateForms.forEach((form: NgForm) => {
+        // determine if we have changes
+        if (form.dirty) {
+          // we found changes, there is no point in going through the rest of the forms
+          foundChanges = true;
+          return false;
+        }
       });
 
-    // there are no forms to check for changes ?
-    if (canDeactivateForms.length < 1) {
-      return true;
+      // do we have changes, if not user can leave page without confirmation ?
+      return !foundChanges;
     }
 
-    // check if we have forms with changes
-    let foundChanges: boolean = false;
-    canDeactivateForms.forEach((form: NgForm) => {
-      // determine if we have changes
-      if (form.dirty) {
-        // we found changes, there is no point in going through the rest of the forms
-        foundChanges = true;
-        return false;
-      }
-    });
+    // bulk create & modify
+    if (this.appSpreadsheetEditorV2Component?.isDirty) {
+      return false;
+    }
 
-    // do we have changes, if not user can leave page without confirmation ?
-    return !foundChanges;
+    // allow
+    return true;
   }
 }
 

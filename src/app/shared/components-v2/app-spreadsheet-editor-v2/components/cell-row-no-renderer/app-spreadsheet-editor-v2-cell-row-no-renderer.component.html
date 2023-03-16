@@ -1,0 +1,16 @@
+<div
+  [id]="id"
+  class="gd-spreadsheet-editor-v2-cell-row-no-renderer"
+  [cdkContextMenuTriggerFor]="colDef.editor.cellContextMenu"
+  (mouseenter)="mouseEnter($event)"
+  (mousedown)="mouseDown($event)"
+  (mouseup)="mouseUp()"
+  (mouseleave)="mouseLeave()">
+
+  <!-- Value -->
+  <div
+    class="gd-spreadsheet-editor-v2-cell-row-no-renderer-value">
+    {{rowNo}}
+  </div>
+
+</div>

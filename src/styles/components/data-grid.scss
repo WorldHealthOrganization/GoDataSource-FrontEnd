@@ -509,6 +509,26 @@
         top: 8.9rem;
       }
     }
+
+    input[class^=ag-]:not([type]),
+    input[class^=ag-][type=date],
+    input[class^=ag-][type=datetime-local],
+    input[class^=ag-][type=number],
+    input[class^=ag-][type=tel],
+    input[class^=ag-][type=text],
+    textarea[class^=ag-] {
+      border: 0.1rem solid var(--gd-secondary);
+      @include border-radius(0);
+      @include box-shadow(none);
+      color: var(--gd-text);
+      font-family: $gd-font-family;
+      font-size: $gd-font-size;
+      line-height: $gd-line-height;
+
+      &:focus {
+        border-color: var(--gd-primary);
+      }
+    }
   }
 }
 

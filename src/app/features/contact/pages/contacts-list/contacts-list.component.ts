@@ -406,7 +406,7 @@ export class ContactsListComponent
                 },
                 linkQueryParams: (item: ContactModel): Params => {
                   return {
-                    entityType: EntityType.CONTACT_OF_CONTACT,
+                    entityType: EntityType.CONTACT,
                     entityId: item.id
                   };
                 }

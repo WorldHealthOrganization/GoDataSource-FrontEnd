@@ -1,0 +1,192 @@
+<app-basic-page-v2
+  [breadcrumbs]="breadcrumbs"
+  [pageTitle]="pageTitle"
+  [actionButton]="actionButton"
+  [actionButtonLoading]="actionButtonLoading">
+
+  <!-- Spreadsheet Editor -->
+  <ag-grid-angular
+    class="ag-theme-balham gd-spreadsheet-editor"
+    [modules]="modules"
+    enableCellChangeFlash="true"
+    undoRedoCellEditing="false"
+    suppressRowClickSelection="true"
+    suppressClipboardPaste="true"
+    [loadingOverlayComponent]="AppSpreadsheetEditorV2LoadingComponent"
+    [noRowsOverlayComponent]="AppSpreadsheetEditorV2NoDataComponent"
+    (gridReady)="gridReady($event)"
+    (mouseleave)="gridMouseLeave()"
+    (mousemove)="gridMouseMove($event)"
+    (bodyScroll)="gridBodyScroll()"
+    (cellEditingStopped)="gridCellEditingStopped($event)">
+  </ag-grid-angular>
+
+</app-basic-page-v2>
+
+<!-- Cell - Context menu for spreadsheet-editor -->
+<ng-template
+  #cellContextMenu>
+  <div
+    cdkMenu
+    class="gd-context-menu">
+
+    <!-- Copy raw -->
+    <button
+      class="gd-context-menu-item"
+      fxLayout="row"
+      cdkMenuItem
+      [disabled]="editor.selection.selected.ranges.length < 1"
+      (click)="cellCopy(true)">
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_COPY' | translate}}
+      </div>
+
+      <!-- Shortcut -->
+      <div
+        fxGrow="0">
+        Ctrl+C
+      </div>
+    </button>
+
+    <!-- Copy text -->
+    <button
+      class="gd-context-menu-item"
+      fxLayout="row"
+      cdkMenuItem
+      [disabled]="editor.selection.selected.ranges.length < 1"
+      (click)="cellCopy(false)">
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_COPY_TEXT' | translate}}
+      </div>
+    </button>
+
+    <!-- Paste -->
+    <button
+      class="gd-context-menu-item"
+      fxLayout="row"
+      cdkMenuItem
+      [disabled]="editor.selection.selected.ranges.length !== 1"
+      (click)="cellPaste()">
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_PASTE' | translate}}
+      </div>
+
+      <!-- Shortcut -->
+      <div
+        fxGrow="0">
+        Ctrl+V
+      </div>
+    </button>
+
+    <!-- Undo -->
+    <button
+      class="gd-context-menu-item"
+      fxLayout="row"
+      cdkMenuItem
+      [disabled]="changesIndex < 1"
+      (click)="cellUndo()">
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_UNDO' | translate}}
+      </div>
+
+      <!-- Shortcut -->
+      <div
+        fxGrow="0">
+        Ctrl+Z
+      </div>
+    </button>
+
+    <!-- Redo -->
+    <button
+      class="gd-context-menu-item"
+      fxLayout="row"
+      cdkMenuItem
+      [disabled]="changesIndex >= changes.length"
+      (click)="cellRedo()">
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_REDO' | translate}}
+      </div>
+
+      <!-- Shortcut -->
+      <div
+        fxGrow="0">
+        Ctrl+Y
+      </div>
+    </button>
+
+    <!-- Splitter -->
+    <hr
+      *ngIf="editor.action === CreateViewModifyV2Action.CREATE" />
+
+    <!-- Append rows at the end -->
+    <button
+      *ngIf="editor.action === CreateViewModifyV2Action.CREATE"
+      class="gd-context-menu-item"
+      fxLayout="row"
+      cdkMenuItem
+      (click)="rowAppend()">
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_APPEND_ROW' | translate}}
+      </div>
+    </button>
+
+    <!-- Splitter -->
+    <hr />
+
+    <!-- Delete cells content -->
+    <button
+      class="gd-context-menu-item"
+      fxLayout="row"
+      cdkMenuItem
+      [disabled]="editor.selection.selected.ranges.length < 1"
+      (click)="cellDeleteContent()">
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_DELETE' | translate}}
+      </div>
+
+      <!-- Shortcut -->
+      <div
+        fxGrow="0">
+        Delete
+      </div>
+    </button>
+
+    <!-- Delete rows -->
+    <button
+      *ngIf="editor.action === CreateViewModifyV2Action.CREATE"
+      class="gd-context-menu-item"
+      fxLayout="row"
+      cdkMenuItem
+      [disabled]="editor.selection.selected.ranges.length < 1"
+      (click)="rowDelete()">
+      <!-- Label -->
+      <div
+        class="gd-context-menu-item-label"
+        fxFlex fxLayoutAlign="start">
+        {{'LNG_SHEET_CONTEXT_MENU_REMOVE_ROW' | translate}}
+      </div>
+    </button>
+
+  </div>
+</ng-template>

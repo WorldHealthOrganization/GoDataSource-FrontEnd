@@ -1,0 +1,20 @@
+<div
+  [id]="id"
+  class="gd-spreadsheet-editor-v2-cell-basic-header"
+  (mouseenter)="mouseEnter($event)"
+  (mousedown)="mouseDown($event)"
+  (mouseup)="mouseUp()"
+  (mouseleave)="mouseLeave()">
+
+  <!-- Value -->
+  <div
+    class="gd-spreadsheet-editor-v2-cell-basic-header-value">
+
+    <!-- Label -->
+    <span>
+      {{label}}
+    </span>
+
+  </div>
+
+</div>
