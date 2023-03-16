@@ -1,6 +1,7 @@
 <div
   [id]="id"
   class="gd-spreadsheet-editor-v2-cell-basic-header"
+  [class.gd-spreadsheet-editor-v2-cell-basic-header-first-cell]="columnIndex === 0"
   (mouseenter)="mouseEnter($event)"
   (mousedown)="mouseDown($event)"
   (mouseup)="mouseUp()"
@@ -9,6 +10,20 @@
   <!-- Value -->
   <div
     class="gd-spreadsheet-editor-v2-cell-basic-header-value">
+
+    <!-- #TODO
+    - Always show tooltip with info (black icon, black tooltip) and if error appears, add errors in tooltip (warn icon, gd-tooltip-error - see below)
+    - Added icon only in first cell of the grid (see *ngIf)
+    - Add .gd-tooltip-error class only when error appears in spreadsheet, else, leave as it is
+    - Add color warn on icon only when error appears in spreadsheet, else, leave as it is -->
+    <div
+      *ngIf="columnIndex === 0"
+      matTooltip="Info tooltip test message"
+      matTooltipClass="gd-tooltip-error"
+      matTooltipPosition="after"
+      class="gd-spreadsheet-editor-v2-cell-basic-header-first-cell-value">  
+      <mat-icon color="warn">help</mat-icon>
+    </div>
 
     <!-- Label -->
     <span>
