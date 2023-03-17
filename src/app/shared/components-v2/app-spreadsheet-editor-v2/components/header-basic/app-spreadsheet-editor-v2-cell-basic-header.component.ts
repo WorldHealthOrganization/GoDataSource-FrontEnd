@@ -1,5 +1,5 @@
 import { IHeaderAngularComp } from '@ag-grid-community/angular';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { IHeaderParams } from '@ag-grid-community/core';
 import { IV2SpreadsheetEditorExtendedColDef } from '../../models/extended-column.model';
 
@@ -13,7 +13,7 @@ import { IV2SpreadsheetEditorExtendedColDef } from '../../models/extended-column
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppSpreadsheetEditorV2CellBasicHeaderComponent implements IHeaderAngularComp {
+export class AppSpreadsheetEditorV2CellBasicHeaderComponent implements IHeaderAngularComp, OnDestroy {
   // constants
   static readonly DEFAULT_COLUMN_ROW_NO: string = 'rowNo';
 
@@ -29,6 +29,17 @@ export class AppSpreadsheetEditorV2CellBasicHeaderComponent implements IHeaderAn
   constructor(
     protected changeDetectorRef: ChangeDetectorRef
   ) {}
+
+  /**
+   * Component destroyed
+   */
+  ngOnDestroy(): void {
+    // first cell ?
+    if (this.columnIndex === 0) {
+      // reset
+      this.colDef.editor.refreshErrorRowsCell = undefined;
+    }
+  }
 
   /**
    * Gets called whenever the cell refreshes
