@@ -18,13 +18,19 @@
 
   &.gd-spreadsheet-editor-v2-cell-row-no-renderer-selected-partial {
     background-color: rgba(var(--gd-primary-rgb), 0.15);
+
+    &.gd-spreadsheet-editor-v2-cell-row-no-renderer-invalid {
+      background-color: rgba(var(--gd-danger-rgb), 0.35);
+    }
   }
+
   &.gd-spreadsheet-editor-v2-cell-row-no-renderer-selected-full {
     background-color: var(--gd-primary);
     color: var(--gd-background);
 
     &.gd-spreadsheet-editor-v2-cell-row-no-renderer-invalid {
-      color: var(--gd-text);
+      background-color: var(--gd-danger);
+      color: var(--gd-background);
     }
   }
 

@@ -26,5 +26,27 @@ app-spreadsheet-editor-v2-cell-basic-header {
     &.gd-spreadsheet-editor-v2-cell-basic-header-invalid {
       background-color: rgba(var(--gd-danger-rgb), 0.25);
     }
+
+    &.gd-spreadsheet-editor-v2-cell-basic-header-first-cell {
+      padding: 0;
+
+      .gd-spreadsheet-editor-v2-cell-basic-header-value {
+        height: 100%;
+        width: 100%;
+
+        .gd-spreadsheet-editor-v2-cell-basic-header-first-cell-value {
+          @include flex(flex);
+          @include flex_align_items(center);
+          @include flex_justify(center);
+          height: 100%;
+          width: 100%;
+        }
+
+        .mat-icon {
+          height: 2rem;
+          width: 2rem;
+        }
+      }
+    }
   }
 }
