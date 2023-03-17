@@ -160,6 +160,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // location
     locationsMap: {},
 
+    // help
+    errorRows: undefined,
+    refreshErrorRowsCell: undefined,
+
     // invalid
     invalid: {
       rows: {}
@@ -1411,11 +1415,16 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         headerHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-header-invalid');
 
         // add error message
-        headerHtml.title = this.i18nService.instant(
+        this.editor.errorRows = this.i18nService.instant(
           'LNG_FORM_VALIDATION_ERROR_INVALID_ROWS', {
             rows: invalidRows
           }
         );
+
+        // refresh error cell
+        if (this.editor.refreshErrorRowsCell) {
+          this.editor.refreshErrorRowsCell();
+        }
       }
     }
 
@@ -1505,15 +1514,29 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // remove full / partial from headers
     const headerHtmlElements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-basic-header');
     for (let elementIndex = 0; elementIndex < headerHtmlElements.length; elementIndex++) {
-      // class cleanup
-      headerHtmlElements[elementIndex].classList.remove(
-        'gd-spreadsheet-editor-v2-cell-basic-header-selected-partial',
-        'gd-spreadsheet-editor-v2-cell-basic-header-selected-full',
-        'gd-spreadsheet-editor-v2-cell-basic-header-invalid'
-      );
+      // first header column has special needs
+      if (elementIndex === 0) {
+        // class cleanup
+        headerHtmlElements[elementIndex].classList.remove(
+          'gd-spreadsheet-editor-v2-cell-basic-header-selected-partial',
+          'gd-spreadsheet-editor-v2-cell-basic-header-selected-full',
+          'gd-spreadsheet-editor-v2-cell-basic-header-invalid'
+        );
 
-      // error message cleanup
-      headerHtmlElements[elementIndex].title = '';
+        // error message cleanup
+        this.editor.errorRows = undefined;
+
+        // refresh error cell
+        if (this.editor.refreshErrorRowsCell) {
+          this.editor.refreshErrorRowsCell();
+        }
+      } else {
+        // class cleanup
+        headerHtmlElements[elementIndex].classList.remove(
+          'gd-spreadsheet-editor-v2-cell-basic-header-selected-partial',
+          'gd-spreadsheet-editor-v2-cell-basic-header-selected-full'
+        );
+      }
     }
 
     // hide previous fills
@@ -3933,7 +3956,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    */
   gridBodyScroll(): void {
     // redraw ranges since they might've disappeared when cells were destroyed
-    // #TODO
     this.cellUpdateRangeClasses(true);
   }
 

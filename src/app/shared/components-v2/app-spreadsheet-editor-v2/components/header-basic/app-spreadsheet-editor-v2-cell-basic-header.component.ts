@@ -58,6 +58,13 @@ export class AppSpreadsheetEditorV2CellBasicHeaderComponent implements IHeaderAn
       this.colDef.editor.columnsMap[this.colDef.columnDefinition.field].index;
     this.id = `gd-spreadsheet-editor-v2-cell-basic-header-${this.columnIndex}`;
 
+    // first cell ?
+    if (this.columnIndex === 0) {
+      this.colDef.editor.refreshErrorRowsCell = () => {
+        this.changeDetectorRef.detectChanges();
+      };
+    }
+
     // update ui
     this.changeDetectorRef.detectChanges();
   }

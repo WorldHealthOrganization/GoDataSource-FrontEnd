@@ -68,6 +68,10 @@ export interface IV2SpreadsheetEditorExtendedColDefEditor {
     [locationId: string]: IV2SpreadsheetEditorEventDataLocation
   };
 
+  // help details
+  errorRows: string,
+  refreshErrorRowsCell: () => void,
+
   // invalid
   invalid: {
     rows: {

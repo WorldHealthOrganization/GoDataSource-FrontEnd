@@ -11,18 +11,15 @@
   <div
     class="gd-spreadsheet-editor-v2-cell-basic-header-value">
 
-    <!-- #TODO
-    - Always show tooltip with info (black icon, black tooltip) and if error appears, add errors in tooltip (warn icon, gd-tooltip-error - see below)
-    - Added icon only in first cell of the grid (see *ngIf)
-    - Add .gd-tooltip-error class only when error appears in spreadsheet, else, leave as it is
-    - Add color warn on icon only when error appears in spreadsheet, else, leave as it is -->
+    <!-- Details / Rows with errors -->
     <div
       *ngIf="columnIndex === 0"
-      matTooltip="Info tooltip test message"
-      matTooltipClass="gd-tooltip-error"
+      [matTooltip]="colDef.editor.errorRows ? ('LNG_FORM_VALIDATION_EDITOR_HELP' | translate) + '. ' + colDef.editor.errorRows : ('LNG_FORM_VALIDATION_EDITOR_HELP' | translate)"
+      [matTooltipClass]="colDef.editor.errorRows ? 'gd-tooltip-error' : undefined"
       matTooltipPosition="after"
-      class="gd-spreadsheet-editor-v2-cell-basic-header-first-cell-value">  
-      <mat-icon color="warn">help</mat-icon>
+      class="gd-spreadsheet-editor-v2-cell-basic-header-first-cell-value">
+      <mat-icon
+        [color]="colDef.editor.errorRows ? 'warn' : undefined">help</mat-icon>
     </div>
 
     <!-- Label -->
