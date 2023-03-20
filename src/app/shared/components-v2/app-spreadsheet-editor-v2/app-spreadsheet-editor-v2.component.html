@@ -30,12 +30,13 @@
     class="gd-context-menu">
 
     <!-- Copy raw -->
+    <!-- (click) doesn't work on MacOS Safari -->
     <button
       class="gd-context-menu-item"
       fxLayout="row"
       cdkMenuItem
       [disabled]="editor.selection.selected.ranges.length < 1"
-      (click)="cellCopy(true)">
+      (mouseup)="cellCopy(true)">
       <!-- Label -->
       <div
         class="gd-context-menu-item-label"
@@ -51,12 +52,13 @@
     </button>
 
     <!-- Copy text -->
+    <!-- (click) doesn't work on MacOS Safari -->
     <button
       class="gd-context-menu-item"
       fxLayout="row"
       cdkMenuItem
       [disabled]="editor.selection.selected.ranges.length < 1"
-      (click)="cellCopy(false)">
+      (mouseup)="cellCopy(false)">
       <!-- Label -->
       <div
         class="gd-context-menu-item-label"
@@ -66,12 +68,14 @@
     </button>
 
     <!-- Paste -->
+    <!-- (click) doesn't work on MacOS Safari -->
     <button
+      *ngIf="showPasteMenuOption"
       class="gd-context-menu-item"
       fxLayout="row"
       cdkMenuItem
       [disabled]="editor.selection.selected.ranges.length !== 1"
-      (click)="cellPaste()">
+      (mouseup)="cellPaste()">
       <!-- Label -->
       <div
         class="gd-context-menu-item-label"
@@ -87,12 +91,13 @@
     </button>
 
     <!-- Undo -->
+    <!-- (click) doesn't work on MacOS Safari -->
     <button
       class="gd-context-menu-item"
       fxLayout="row"
       cdkMenuItem
       [disabled]="changesIndex < 1"
-      (click)="cellUndo()">
+      (mouseup)="cellUndo()">
       <!-- Label -->
       <div
         class="gd-context-menu-item-label"
@@ -108,12 +113,13 @@
     </button>
 
     <!-- Redo -->
+    <!-- (click) doesn't work on MacOS Safari -->
     <button
       class="gd-context-menu-item"
       fxLayout="row"
       cdkMenuItem
       [disabled]="changesIndex >= changes.length"
-      (click)="cellRedo()">
+      (mouseup)="cellRedo()">
       <!-- Label -->
       <div
         class="gd-context-menu-item-label"
@@ -133,12 +139,13 @@
       *ngIf="editor.action === CreateViewModifyV2Action.CREATE" />
 
     <!-- Append rows at the end -->
+    <!-- (click) doesn't work on MacOS Safari -->
     <button
       *ngIf="editor.action === CreateViewModifyV2Action.CREATE"
       class="gd-context-menu-item"
       fxLayout="row"
       cdkMenuItem
-      (click)="rowAppend()">
+      (mouseup)="rowAppend()">
       <!-- Label -->
       <div
         class="gd-context-menu-item-label"
@@ -151,12 +158,13 @@
     <hr />
 
     <!-- Delete cells content -->
+    <!-- (click) doesn't work on MacOS Safari -->
     <button
       class="gd-context-menu-item"
       fxLayout="row"
       cdkMenuItem
       [disabled]="editor.selection.selected.ranges.length < 1"
-      (click)="cellDeleteContent()">
+      (mouseup)="cellDeleteContent()">
       <!-- Label -->
       <div
         class="gd-context-menu-item-label"
@@ -172,13 +180,14 @@
     </button>
 
     <!-- Delete rows -->
+    <!-- (click) doesn't work on MacOS Safari -->
     <button
       *ngIf="editor.action === CreateViewModifyV2Action.CREATE"
       class="gd-context-menu-item"
       fxLayout="row"
       cdkMenuItem
       [disabled]="editor.selection.selected.ranges.length < 1"
-      (click)="rowDelete()">
+      (mouseup)="rowDelete()">
       <!-- Label -->
       <div
         class="gd-context-menu-item-label"

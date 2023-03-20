@@ -147,6 +147,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   // is mac ?
   isMac: boolean = determineIfMacDevice();
 
+  // paste from context menu doesn't work if clipboard.readtext doesn't exist (only ctrl+v has a chance that it could work)
+  showPasteMenuOption: boolean = !!navigator.clipboard?.readText;
+
   // form dirty ?
   private _formDirty: boolean = false;
   get isDirty(): boolean {
@@ -376,6 +379,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   private _timerCellSelectFocused: any;
   private _waitForAsyncToFinish: any;
   private _scrollTimer: any;
+  private _pasteTimer: any;
 
   // constants
   AppSpreadsheetEditorV2LoadingComponent = AppSpreadsheetEditorV2LoadingComponent;
@@ -431,6 +435,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // stop scroll timer
     this.stopScrollTimer();
+
+    // stop paste timer
+    this.stopPasteTimer();
   }
 
   /**
@@ -3373,6 +3380,78 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Generate dummy textarea to use for copy / paste text
+   * - modern browsers should allow navigator.clipboard
+   */
+  private cellDummyTextarea(): Observable<{
+    textarea: HTMLTextAreaElement,
+    finish: () => void
+  }> {
+    return new Observable((observer) => {
+      // generate textarea
+      const textarea = document.createElement('textarea');
+
+      // make it small in case of async and browser has time to render it
+      // - make sure scroll doesn't appear
+      textarea.style.display = 'inline-block';
+      textarea.style.position = 'absolute';
+      textarea.style.width = '1px';
+      textarea.style.height = '1px';
+      textarea.style.top = '0px';
+      textarea.style.left = '0px';
+
+      // append it to body
+      this.elementRef.nativeElement.appendChild(textarea);
+
+      // let child do its thing
+      observer.next({
+        textarea,
+        finish: () => {
+          // cleanup
+          this.elementRef.nativeElement.removeChild(textarea);
+        }
+      });
+      observer.complete();
+    });
+  }
+
+  /**
+   * Copy using textarea if browser doesn't support navigator.clipboard.writeText
+   */
+  private cellCopyUsingTextarea(textToCopy: string): void {
+    this.cellDummyTextarea().subscribe((data) => {
+      // determine previous focus
+      const currentActiveElement: HTMLElement = document.activeElement as HTMLElement;
+
+      // handle copy errors
+      try {
+        // prepare for copy
+        data.textarea.value = textToCopy;
+        data.textarea.select();
+        data.textarea.focus({
+          preventScroll: true
+        });
+
+        // copy
+        document.execCommand('copy');
+      } catch (e) {
+        // no luck with this browser
+        this.toastV2Service.error(e.message);
+      }
+
+      // cleanup
+      data.finish();
+
+      // re-focus previous
+      if (currentActiveElement?.focus) {
+        currentActiveElement.focus({
+          preventScroll: true
+        });
+      }
+    });
+  }
+
+  /**
    * Context menu option - copy
    */
   cellCopy(raw: boolean): void {
@@ -3389,11 +3468,78 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // copy
     // - even empty cell
-    navigator.clipboard.writeText(textToCopy)
-      .then()
-      .catch((error) => {
-        this.toastV2Service.error(error.message);
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(textToCopy)
+        .then()
+        .catch(() => {
+          // try the other way
+          this.cellCopyUsingTextarea(textToCopy);
+        });
+    } else {
+      // try the other way
+      this.cellCopyUsingTextarea(textToCopy);
+    }
+  }
+
+  /**
+   * Paste using textarea if browser doesn't support navigator.clipboard.readText
+   */
+  private cellPasteUsingTextarea(): Observable<string> {
+    return new Observable<string>((observer) => {
+      this.cellDummyTextarea().subscribe((data) => {
+        // determine previous focus
+        const currentActiveElement: HTMLElement = document.activeElement as HTMLElement;
+
+        // handle paste errors
+        try {
+          // paste event handler
+          // - dummy to force browser to paste text
+          const textAreaPasteHandler = () => {};
+
+          // prepare for paste
+          data.textarea.addEventListener(
+            'paste',
+            textAreaPasteHandler
+          );
+          data.textarea.focus({
+            preventScroll: true
+          });
+
+          // stop paste timer
+          this.stopPasteTimer();
+
+          // wait for paste bubble to take effect
+          this._pasteTimer = setTimeout(() => {
+            // reset
+            this._pasteTimer = undefined;
+
+            // text to paste
+            const pasteText: string = data.textarea.value;
+
+            // cleanup
+            data.textarea.removeEventListener(
+              'paste',
+              textAreaPasteHandler
+            );
+            data.finish();
+
+            // re-focus previous
+            if (currentActiveElement?.focus) {
+              currentActiveElement.focus({
+                preventScroll: true
+              });
+            }
+
+            // finished
+            observer.next(pasteText);
+            observer.complete();
+          }, 200);
+        } catch (e) {
+          // no luck with this browser
+          this.toastV2Service.error(e.message);
+        }
       });
+    });
   }
 
   /**
@@ -3405,23 +3551,43 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       return;
     }
 
-    // paste text
-    navigator.clipboard.readText()
-      .then((text) => {
-        // paste into cells
-        const asyncResponse = this.cellTextToCells(text);
-        if (asyncResponse) {
-          const loading = this.dialogV2Service.showLoadingDialog();
-          asyncResponse.subscribe(() => {
-            loading.close();
-          });
-        } else {
-          // not async, no need to display loading
-        }
-      })
-      .catch((error) => {
-        this.toastV2Service.error(error.message);
+    // actual paste of text
+    const actualPasteText = (text: string) => {
+      // paste into cells
+      const asyncResponse = this.cellTextToCells(text);
+      if (asyncResponse) {
+        const loading = this.dialogV2Service.showLoadingDialog();
+        asyncResponse.subscribe(() => {
+          loading.close();
+        });
+      } else {
+        // not async, no need to display loading
+      }
+    };
+
+    // paste using textarea
+    const pasteUsingTextarea = () => {
+      this.cellPasteUsingTextarea().subscribe((text) => {
+        // actual paste
+        actualPasteText(text);
       });
+    };
+
+    // paste text
+    if (navigator.clipboard?.readText) {
+      navigator.clipboard.readText()
+        .then((text) => {
+          // actual paste
+          actualPasteText(text);
+        })
+        .catch(() => {
+          // try the other way
+          pasteUsingTextarea();
+        });
+    } else {
+      // try the other way
+      pasteUsingTextarea();
+    }
   }
 
   /**
@@ -3849,8 +4015,15 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // cut selected cells
     if (
-      params.event.ctrlKey &&
-      params.event.code === 'KeyA'
+      (
+        params.event.ctrlKey &&
+        params.event.code === 'KeyA'
+      ) || (
+        this.isMac &&
+        // command key
+        params.event.metaKey &&
+        params.event.code === 'KeyA'
+      )
     ) {
       // stop browser default
       params.event.preventDefault();
@@ -3895,8 +4068,15 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // cut selected cells - not implemented
     if (
-      params.event.ctrlKey &&
-      params.event.code === 'KeyX'
+      (
+        params.event.ctrlKey &&
+        params.event.code === 'KeyX'
+      ) || (
+        this.isMac &&
+        // command key
+        params.event.metaKey &&
+        params.event.code === 'KeyX'
+      )
     ) {
       // block caller
       return true;
@@ -3914,6 +4094,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         params.event.code === 'KeyC'
       )
     ) {
+      // stop browser default
+      params.event.preventDefault();
+
       // just ignore if bubble
       if (params.event.repeat) {
         // block caller
@@ -4365,5 +4548,15 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // start scroll
     scrollGrid();
+  }
+
+  /**
+   * Stop paste timer
+   */
+  private stopPasteTimer(): void {
+    if (this._pasteTimer) {
+      clearTimeout(this._pasteTimer);
+      this._pasteTimer = undefined;
+    }
   }
 }
