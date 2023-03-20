@@ -47,6 +47,7 @@ import { IV2SpreadsheetEditorSelectedMatrix } from './models/selected.model';
 import { IRowNode } from '@ag-grid-community/core/dist/cjs/es5/interfaces/iRowNode';
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { AgGridAngular } from '@ag-grid-community/angular';
+import { determineIfMacDevice } from '../../../core/methods/mac';
 
 /**
  * Component
@@ -142,6 +143,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
   // save
   @Output() save: EventEmitter<IV2SpreadsheetEditorEventSave> = new EventEmitter<IV2SpreadsheetEditorEventSave>();
+
+  // is mac ?
+  isMac: boolean = determineIfMacDevice();
 
   // form dirty ?
   private _formDirty: boolean = false;
@@ -3900,8 +3904,15 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // copy selected cells
     if (
-      params.event.ctrlKey &&
-      params.event.code === 'KeyC'
+      (
+        params.event.ctrlKey &&
+        params.event.code === 'KeyC'
+      ) || (
+        this.isMac &&
+        // command key
+        params.event.metaKey &&
+        params.event.code === 'KeyC'
+      )
     ) {
       // just ignore if bubble
       if (params.event.repeat) {
@@ -3918,8 +3929,15 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // paste
     if (
-      params.event.ctrlKey &&
-      params.event.code === 'KeyV'
+      (
+        params.event.ctrlKey &&
+        params.event.code === 'KeyV'
+      ) || (
+        this.isMac &&
+        // command key
+        params.event.metaKey &&
+        params.event.code === 'KeyV'
+      )
     ) {
       // just ignore if bubble
       if (params.event.repeat) {
@@ -3936,8 +3954,15 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // undo
     if (
-      params.event.ctrlKey &&
-      params.event.code === 'KeyZ'
+      (
+        params.event.ctrlKey &&
+        params.event.code === 'KeyZ'
+      ) || (
+        this.isMac &&
+        // command key
+        params.event.metaKey &&
+        params.event.code === 'KeyZ'
+      )
     ) {
       // stop browser default
       params.event.preventDefault();
@@ -3957,8 +3982,15 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // redo
     if (
-      params.event.ctrlKey &&
-      params.event.code === 'KeyY'
+      (
+        params.event.ctrlKey &&
+        params.event.code === 'KeyY'
+      ) || (
+        this.isMac &&
+        // command key
+        params.event.metaKey &&
+        params.event.code === 'KeyY'
+      )
     ) {
       // stop browser default
       params.event.preventDefault();
