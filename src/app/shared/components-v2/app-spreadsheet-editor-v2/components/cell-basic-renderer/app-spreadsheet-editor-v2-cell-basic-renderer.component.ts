@@ -127,6 +127,13 @@ export class AppSpreadsheetEditorV2CellBasicRendererComponent implements ICellRe
   }
 
   /**
+   * Mouse move
+   */
+  mouseMove(event: MouseEvent): void {
+    this.colDef.editor.selection.cell.mouseMove(event);
+  }
+
+  /**
    * Fill mouse down
    */
   fillMouseDown(event: MouseEvent): void {

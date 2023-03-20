@@ -16,6 +16,7 @@ import { IV2SpreadsheetEditorExtendedColDef } from '../../models/extended-column
 export class AppSpreadsheetEditorV2CellBasicHeaderComponent implements IHeaderAngularComp, OnDestroy {
   // constants
   static readonly DEFAULT_COLUMN_ROW_NO: string = 'rowNo';
+  static readonly DEFAULT_COLUMN_ROW_NO_WIDTH: number = 50;
 
   // data
   id: string;
@@ -119,5 +120,15 @@ export class AppSpreadsheetEditorV2CellBasicHeaderComponent implements IHeaderAn
    */
   mouseLeave(): void {
     this.colDef.editor.selection.header.top.mouseLeave();
+  }
+
+  /**
+   * Mouse move
+   */
+  mouseMove(event: MouseEvent): void {
+    this.colDef.editor.selection.header.top.mouseMove(
+      this.columnIndex === 0,
+      event
+    );
   }
 }

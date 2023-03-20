@@ -46,6 +46,7 @@ import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/
 import { IV2SpreadsheetEditorSelectedMatrix } from './models/selected.model';
 import { IRowNode } from '@ag-grid-community/core/dist/cjs/es5/interfaces/iRowNode';
 import { I18nService } from '../../../core/services/helper/i18n.service';
+import { AgGridAngular } from '@ag-grid-community/angular';
 
 /**
  * Component
@@ -62,6 +63,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   private static readonly DEFAULT_CREATE_RECORDS_ROW_NO = 20;
   private static readonly HOVER_OUTSIDE_LIMIT_UNTIL_MOUSE_OUT: number = 500;
   private static readonly MAX_UNDO_TO_KEEP: number = 100;
+  private static readonly SCROLL_MARGIN_PX: number = 32;
+  private static readonly SCROLL_SPEED_MS: number = 20;
+  private static readonly SCROLL_SPEED_PX: number = 8;
 
   // elements
   @ViewChild('cellContextMenu', { static: true }) set cellContextMenu(cellContextMenu: TemplateRef<any>) {
@@ -69,7 +73,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   }
 
   // basic page
-  @ViewChild(AppBasicPageV2Component, { static: true }) basicPage: AppBasicPageV2Component;
+  @ViewChild(AppBasicPageV2Component, { static: true }) private _basicPage: AppBasicPageV2Component;
+
+  // ag-grid angular component
+  @ViewChild(AgGridAngular, { static: true, read: ElementRef }) private _agGridAngularElementRef: ElementRef;
 
   // breadcrumbs
   @Input() breadcrumbs: IV2Breadcrumb[];
@@ -231,6 +238,14 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         mouseLeave: () => {
           this.cellMouseLeave();
         },
+        mouseMove: (event) => {
+          this.gridMouseMove(
+            false,
+            false,
+            false,
+            event
+          );
+        },
         fill: () => {
           this.cellFill();
         }
@@ -262,6 +277,14 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           },
           mouseLeave: () => {
             this.rowNoMouseLeave();
+          },
+          mouseMove: (event) => {
+            this.gridMouseMove(
+              false,
+              false,
+              true,
+              event
+            );
           }
         },
         top: {
@@ -290,6 +313,17 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           },
           mouseLeave: () => {
             this.headerMouseLeave();
+          },
+          mouseMove: (
+            pivotCell: boolean,
+            event
+          ) => {
+            this.gridMouseMove(
+              pivotCell,
+              true,
+              false,
+              event
+            );
           }
         }
       }
@@ -326,9 +360,18 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     updateColumnDefinitions?: true
   } = {};
 
+  // scroll
+  private _scrollIf: {
+    top: boolean,
+    bottom: boolean,
+    left: boolean,
+    right: boolean
+  };
+
   // timers
-  timerCellSelectFocused: any;
-  waitForAsyncToFinish: any;
+  private _timerCellSelectFocused: any;
+  private _waitForAsyncToFinish: any;
+  private _scrollTimer: any;
 
   // constants
   AppSpreadsheetEditorV2LoadingComponent = AppSpreadsheetEditorV2LoadingComponent;
@@ -371,9 +414,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     this.stopAsyncRequests();
 
     // stop timers - cellSelectFocused
-    if (this.timerCellSelectFocused) {
-      clearTimeout(this.timerCellSelectFocused);
-      this.timerCellSelectFocused = undefined;
+    if (this._timerCellSelectFocused) {
+      clearTimeout(this._timerCellSelectFocused);
+      this._timerCellSelectFocused = undefined;
     }
 
     // stop timers - waitForAsyncToFinish
@@ -381,6 +424,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // stop refresh language tokens
     this.releaseLanguageChangeListener();
+
+    // stop scroll timer
+    this.stopScrollTimer();
   }
 
   /**
@@ -705,7 +751,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       suppressNavigable: true,
       editable: false,
       pinned: 'left',
-      width: 50,
+      width: AppSpreadsheetEditorV2CellBasicHeaderComponent.DEFAULT_COLUMN_ROW_NO_WIDTH,
       cellClass: 'gd-spreadsheet-editor-row-no',
       editor: this.editor,
       cellRenderer: AppSpreadsheetEditorV2CellRowNoRendererComponent,
@@ -1962,7 +2008,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
           // execute async request
           this.editor.async.inProgress = true;
-          this.basicPage.detectChanges();
+          this._basicPage.detectChanges();
           this.editor.async.rows[rowIndex].columns[realColumnIndex].subscription = (function(
             // works as long as value is string - visualId ...
             localValue: string,
@@ -2008,7 +2054,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
                 this.editor.asyncResponses.rows[localRowIndex].columns[localColumnIndex][localValue] = response;
 
                 // update ui buttons
-                this.basicPage.detectChanges();
+                this._basicPage.detectChanges();
 
                 // validate once again since we have async response
                 this.rowValidate(localRowIndex);
@@ -2557,21 +2603,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   gridMouseLeave(): void {
     // end collecting
     this.cellFinishCollecting();
-  }
-
-  /**
-   * Gird mouse move
-   */
-  gridMouseMove(_event: MouseEvent): void {
-    // nothing to do ?
-    if (!this.editor.selection.selected.collecting) {
-      return;
-    }
-
-    // #TODO
-    // left top bottom right
-    // console.log(event);
-    // this._agTable.api.ensureIndexVisible(this.editor.selection.selected.collecting.range.rows.end + 1);
   }
 
   /**
@@ -3802,10 +3833,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       // allow bubble
 
       // update focused selection after focused cell is changed by ag-grid (return false)
-      this.timerCellSelectFocused = setTimeout(() => {
+      this._timerCellSelectFocused = setTimeout(() => {
         // update focused selection
         this.cellSelectFocused();
-        this.timerCellSelectFocused = undefined;
+        this._timerCellSelectFocused = undefined;
       });
 
       // don't block caller
@@ -3974,9 +4005,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    * Clear wait for async to finish
    */
   private stopWaitForAsyncToFinish(): void {
-    if (this.waitForAsyncToFinish) {
-      clearTimeout(this.waitForAsyncToFinish);
-      this.waitForAsyncToFinish = undefined;
+    if (this._waitForAsyncToFinish) {
+      clearTimeout(this._waitForAsyncToFinish);
+      this._waitForAsyncToFinish = undefined;
     }
   }
 
@@ -4127,12 +4158,12 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // check periodically if async finished
     const checkIfAsyncFinished = () => {
       // executed
-      this.waitForAsyncToFinish = undefined;
+      this._waitForAsyncToFinish = undefined;
 
       // async finished ?
       if (this.editor.async.inProgress) {
         // try again later
-        this.waitForAsyncToFinish = setTimeout(
+        this._waitForAsyncToFinish = setTimeout(
           checkIfAsyncFinished,
           500
         );
@@ -4141,7 +4172,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         asyncFinished();
       }
     };
-    this.waitForAsyncToFinish = setTimeout(
+    this._waitForAsyncToFinish = setTimeout(
       checkIfAsyncFinished,
       500
     );
@@ -4191,5 +4222,116 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         }
       });
     };
+  }
+
+  /**
+   * Stop scroll timer
+   */
+  private stopScrollTimer(): void {
+    if (this._scrollTimer) {
+      clearTimeout(this._scrollTimer);
+      this._scrollTimer = undefined;
+    }
+  }
+
+  /**
+   * Grid - mouse move
+   */
+  private gridMouseMove(
+    allCell: boolean,
+    headerColumn: boolean,
+    rowColumn: boolean,
+    event: MouseEvent
+  ): void {
+    // nothing to do ?
+    if (!this.editor.selection.selected.collecting) {
+      return;
+    }
+
+    // scroll elements
+    const scrollElementVertical: any = this._agGridAngularElementRef.nativeElement.querySelector('.ag-body-vertical-scroll-viewport');
+    const scrollElementHorizontal: any = this._agGridAngularElementRef.nativeElement.querySelector('.ag-body-horizontal-scroll-viewport');
+
+    // retrieve ag-grid details
+    const agGridRect: DOMRect = this._agGridAngularElementRef.nativeElement.getBoundingClientRect();
+    const headerRect: DOMRect = this._agGridAngularElementRef.nativeElement.querySelector('.ag-header').getBoundingClientRect();
+
+    // determine scrolling limits
+    this._scrollIf = {
+      top: !allCell && !headerColumn && scrollElementVertical.scrollTop > 0 && event.y < agGridRect.y + headerRect.height + AppSpreadsheetEditorV2Component.SCROLL_MARGIN_PX,
+      bottom: !allCell && event.y > agGridRect.y + agGridRect.height - AppSpreadsheetEditorV2Component.SCROLL_MARGIN_PX,
+      left: !allCell && !rowColumn && scrollElementHorizontal.scrollLeft > 0 && event.x < agGridRect.x + AppSpreadsheetEditorV2CellBasicHeaderComponent.DEFAULT_COLUMN_ROW_NO_WIDTH + AppSpreadsheetEditorV2Component.SCROLL_MARGIN_PX,
+      right: !allCell && event.x > agGridRect.x + agGridRect.width - AppSpreadsheetEditorV2Component.SCROLL_MARGIN_PX
+    };
+
+    // scroll
+    const scrollGrid = () => {
+      // stop scroll timer
+      this.stopScrollTimer();
+
+      // scroll
+      this._scrollTimer = setTimeout(
+        () => {
+          // reset
+          this._scrollTimer = undefined;
+
+          // nothing to do ?
+          if (
+            !this.editor.selection.selected.collecting ||
+            !this._scrollIf ||
+            !scrollElementVertical
+          ) {
+            return;
+          }
+
+          // scroll top / bottom
+          if (this._scrollIf.top) {
+            scrollElementVertical.scrollTop -= scrollElementVertical.scrollTop >= AppSpreadsheetEditorV2Component.SCROLL_SPEED_PX ?
+              AppSpreadsheetEditorV2Component.SCROLL_SPEED_PX :
+              scrollElementVertical.scrollTop;
+          } else if (this._scrollIf.bottom) {
+            scrollElementVertical.scrollTop += AppSpreadsheetEditorV2Component.SCROLL_SPEED_PX;
+          }
+
+          // scroll left / right
+          if (this._scrollIf.left) {
+            scrollElementHorizontal.scrollLeft -= scrollElementHorizontal.scrollLeft >= AppSpreadsheetEditorV2Component.SCROLL_SPEED_PX ?
+              AppSpreadsheetEditorV2Component.SCROLL_SPEED_PX :
+              scrollElementHorizontal.scrollLeft;
+          } else if (this._scrollIf.right) {
+            scrollElementHorizontal.scrollLeft += AppSpreadsheetEditorV2Component.SCROLL_SPEED_PX;
+          }
+
+          // continue scrolling ?
+          scrollGrid();
+        },
+        AppSpreadsheetEditorV2Component.SCROLL_SPEED_MS
+      );
+    };
+
+    // no need to scroll ?
+    if (
+      !this._scrollIf.top &&
+      !this._scrollIf.bottom &&
+      !this._scrollIf.left &&
+      !this._scrollIf.right
+    ) {
+      // stop scroll timer
+      this.stopScrollTimer();
+
+      // stop
+      this._scrollIf = undefined;
+
+      // finished
+      return;
+    }
+
+    // already scrolling ?
+    if (this._scrollTimer) {
+      return;
+    }
+
+    // start scroll
+    scrollGrid();
   }
 }

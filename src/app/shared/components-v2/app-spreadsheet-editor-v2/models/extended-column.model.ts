@@ -159,6 +159,7 @@ export interface IV2SpreadsheetEditorExtendedColDefEditor {
         column: number,
         primaryButtonStillDown: boolean
       ) => void,
+      mouseMove: (event: MouseEvent) => void,
       fill: () => void
     },
     header: {
@@ -174,7 +175,8 @@ export interface IV2SpreadsheetEditorExtendedColDefEditor {
         mouseEnter: (
           row: number,
           primaryButtonStillDown: boolean
-        ) => void
+        ) => void,
+        mouseMove: (event: MouseEvent) => void
       },
 
       // column headers
@@ -189,6 +191,10 @@ export interface IV2SpreadsheetEditorExtendedColDefEditor {
         mouseEnter: (
           column: number,
           primaryButtonStillDown: boolean
+        ) => void,
+        mouseMove: (
+          pivotCell: boolean,
+          event: MouseEvent
         ) => void
       }
     }

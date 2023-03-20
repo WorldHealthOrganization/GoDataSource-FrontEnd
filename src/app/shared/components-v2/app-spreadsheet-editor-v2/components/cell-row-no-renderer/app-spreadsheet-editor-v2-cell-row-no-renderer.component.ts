@@ -96,4 +96,11 @@ export class AppSpreadsheetEditorV2CellRowNoRendererComponent implements ICellRe
   mouseLeave(): void {
     this.colDef.editor.selection.header.left.mouseLeave();
   }
+
+  /**
+   * Mouse move
+   */
+  mouseMove(event: MouseEvent): void {
+    this.colDef.editor.selection.header.left.mouseMove(event);
+  }
 }
