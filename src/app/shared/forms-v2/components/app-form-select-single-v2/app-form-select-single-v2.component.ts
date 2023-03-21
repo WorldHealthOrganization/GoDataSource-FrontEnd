@@ -12,7 +12,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { ILabelValuePairModel } from '../../core/label-value-pair.model';
-import { MAT_SELECT_CONFIG } from '@angular/material/select';
+import { MAT_SELECT_CONFIG, MatSelect } from '@angular/material/select';
 import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
 
 @Component({
@@ -155,13 +155,33 @@ export class AppFormSelectSingleV2Component
   }
 
   // search value
-  private _searchValue: string;
+  startSearch: string;
+  searchValue: string;
 
   // allow disabled options to be selected ?
   @Input() allowDisabledToBeSelected: boolean = false;
 
   // vscroll handler
   @ViewChild('cdkVirtualScrollViewport') cdkVirtualScrollViewport: CdkVirtualScrollViewport;
+
+  // input
+  private _input: MatSelect;
+  private _openAfterInit: boolean = false;
+  @ViewChild(MatSelect) set input(input: MatSelect) {
+    // set
+    this._input = input;
+
+    // do we need to open after init ?
+    if (this._openAfterInit) {
+      this.open();
+    }
+  }
+  get input(): MatSelect {
+    return this._input;
+  }
+
+  // timers
+  private _openTimer: any;
 
   /**
    * Constructor
@@ -182,7 +202,11 @@ export class AppFormSelectSingleV2Component
    * Release resources
    */
   ngOnDestroy(): void {
+    // parent
     super.onDestroy();
+
+    // timers
+    this.stopOpenTimer();
   }
 
   /**
@@ -207,7 +231,7 @@ export class AppFormSelectSingleV2Component
   filterOptions(searchValue?: string): void {
     // update search value
     if (searchValue !== undefined) {
-      this._searchValue = searchValue;
+      this.searchValue = searchValue;
     }
 
     // nothing to filter ?
@@ -217,7 +241,7 @@ export class AppFormSelectSingleV2Component
     }
 
     // filter options
-    if (!this._searchValue) {
+    if (!this.searchValue) {
       // all visible options
       this.filteredOptions = this.allowDisabledToBeSelected ?
         this.options :
@@ -233,7 +257,7 @@ export class AppFormSelectSingleV2Component
     }
 
     // case insensitive
-    const byValue: string = this._searchValue.toLowerCase();
+    const byValue: string = this.searchValue.toLowerCase();
 
     // filter
     this.filteredOptions = this.options.filter((item: ILabelValuePairModel): boolean => {
@@ -291,5 +315,44 @@ export class AppFormSelectSingleV2Component
     if (iconB.clickAction) {
       iconB.clickAction(this);
     }
+  }
+
+  /**
+   * Timer - open
+   */
+  private stopOpenTimer(): void {
+    if (this._openTimer) {
+      clearTimeout(this._openTimer);
+      this._openTimer = undefined;
+    }
+  }
+
+  /**
+   * Open select
+   */
+  open(startSearch?: string): void {
+    // timer - open
+    this.stopOpenTimer();
+
+    // wait for binds to take effect
+    this._openTimer = setTimeout(() => {
+      // reset
+      this._openTimer = undefined;
+
+      // open
+      if (this.input) {
+        // init
+        this._openAfterInit = false;
+        this.startSearch = startSearch;
+        this.input.open();
+
+        // filter ?
+        if (this.startSearch) {
+          this.filterOptions(this.startSearch);
+        }
+      } else {
+        this._openAfterInit = true;
+      }
+    });
   }
 }

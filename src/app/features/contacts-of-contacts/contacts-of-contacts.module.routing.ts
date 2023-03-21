@@ -107,50 +107,53 @@ const routes: Routes = [
   // Bulk Add Contacts of Contacts
   {
     path: 'create-bulk',
-    component: fromPages.BulkCreateContactsOfContactsComponent,
+    component: fromPages.ContactsOfContactsBulkCreateModifyComponent,
     canActivate: [AuthGuard],
     data: {
       permissions: [
         PERMISSION.CONTACT_OF_CONTACT_BULK_CREATE
-      ]
+      ],
+      action: CreateViewModifyV2Action.CREATE
     },
     canDeactivate: [
       PageChangeConfirmationGuard
     ],
     resolve: {
+      entity: RelationshipPersonDataResolver,
       gender: GenderDataResolver,
+      pregnancyStatus: PregnancyStatusDataResolver,
       occupation: OccupationDataResolver,
-      risk: RiskDataResolver,
       documentType: DocumentTypeDataResolver,
+      yesNo: YesNoDataResolver,
+      risk: RiskDataResolver,
       certaintyLevel: CertaintyLevelDataResolver,
       exposureType: ExposureTypeDataResolver,
       exposureFrequency: ExposureFrequencyDataResolver,
       exposureDuration: ExposureDurationDataResolver,
       contextOfTransmission: ContextOfTransmissionDataResolver,
-      yesNo: YesNoDataResolver,
-      pregnancyStatus: PregnancyStatusDataResolver,
       cluster: ClusterDataResolver
     }
   },
   // Bulk Modify Contacts of Contacts
   {
     path: 'modify-bulk',
-    component: fromPages.BulkModifyContactsOfContactsComponent,
+    component: fromPages.ContactsOfContactsBulkCreateModifyComponent,
     canActivate: [AuthGuard],
     data: {
       permissions: [
         PERMISSION.CONTACT_OF_CONTACT_BULK_MODIFY
-      ]
+      ],
+      action: CreateViewModifyV2Action.MODIFY
     },
     canDeactivate: [
       PageChangeConfirmationGuard
     ],
     resolve: {
       gender: GenderDataResolver,
+      pregnancyStatus: PregnancyStatusDataResolver,
       occupation: OccupationDataResolver,
       risk: RiskDataResolver,
-      yesNo: YesNoDataResolver,
-      pregnancyStatus: PregnancyStatusDataResolver
+      yesNo: YesNoDataResolver
     }
   },
   // View Contact of contact movement

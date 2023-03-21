@@ -34,6 +34,7 @@ export class AppBasicPageV2Component implements OnInit, OnDestroy {
 
   // button
   @Input() actionButton: IV2ActionIconLabel | IV2ActionIcon;
+  @Input() actionButtonLoading: () => boolean;
 
   // advanced filters
   @Input() advancedFilterType: string;

@@ -1,0 +1,97 @@
+<div
+  [id]="id"
+  class="gd-spreadsheet-editor-v2-cell-basic-renderer"
+  [ngSwitch]="colDef.columnDefinition?.type"
+  [cdkContextMenuTriggerFor]="colDef.editor.cellContextMenu"
+  (mouseenter)="mouseEnter($event)"
+  (mousedown)="mouseDown($event)"
+  (mouseup)="mouseUp()"
+  (mouseleave)="mouseLeave()"
+  (mousemove)="mouseMove($event)">
+
+  <!-- Value -->
+  <div
+    class="gd-spreadsheet-editor-v2-cell-basic-renderer-value">
+
+    <!-- Single select -->
+    <div
+      *ngSwitchCase="V2SpreadsheetEditorColumnType.SINGLE_SELECT">
+
+      <!-- Text -->
+      <div
+        fxFlex>
+
+        <!-- Icon -->
+        <mat-icon
+          *ngIf="params.value !== undefined && params.value !== null && colDef.columnDefinition.optionsMap![params.value]?.icon">{{colDef.columnDefinition.optionsMap![params.value].icon}}</mat-icon>
+
+        <!-- Image -->
+        <img
+          *ngIf="params.value !== undefined && params.value !== null && colDef.columnDefinition.optionsMap![params.value]?.iconUrl"
+          [src]="colDef.columnDefinition.optionsMap![params.value].iconUrl"/>
+
+        <!-- Label -->
+        {{ params.value !== undefined && params.value !== null && colDef.columnDefinition.optionsMap![params.value] ? (colDef.columnDefinition.optionsMap![params.value].label | translate) : params.value }}
+      </div>
+
+      <!-- Editor open -->
+      <div
+        fxGrow="0" fxLayoutAlign="start center">
+        <mat-icon
+          (click)="startEditCell()">unfold_more</mat-icon>
+      </div>
+    </div>
+
+    <!-- Date -->
+    <div
+      *ngSwitchCase="V2SpreadsheetEditorColumnType.DATE">
+
+      <!-- Text -->
+      <div
+        fxFlex>
+        {{ params.value | dateDefault }}
+      </div>
+
+      <!-- Editor open -->
+      <div
+        fxGrow="0" fxLayoutAlign="start center">
+        <mat-icon
+          (click)="startEditCell(AppFormDateV2Component.ACTION_KEY_CALENDAR)">today</mat-icon>
+      </div>
+    </div>
+
+    <!-- Location -->
+    <div
+      *ngSwitchCase="V2SpreadsheetEditorColumnType.LOCATION">
+
+      <!-- Text -->
+      <div
+        fxFlex>
+        {{ params.value && colDef.editor.locationsMap && colDef.editor.locationsMap[params.value] ? colDef.editor.locationsMap[params.value].label : params.value }}
+      </div>
+
+      <!-- Editor open -->
+      <div
+        fxGrow="0" fxLayoutAlign="start center">
+        <mat-icon
+          (click)="startEditCell()">location_on</mat-icon>
+      </div>
+    </div>
+
+    <!-- Default: text, textarea ... -->
+    <div
+      *ngSwitchDefault>
+      {{ params.value }}
+    </div>
+
+  </div>
+
+  <!-- Fill -->
+  <div
+    [id]="fillId"
+    class="gd-spreadsheet-editor-v2-cell-basic-renderer-fill"
+    (mousedown)="fillMouseDown($event)"></div>
+
+</div>
+
+

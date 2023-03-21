@@ -67,7 +67,7 @@
       <!-- Search filter -->
       <mat-option>
         <ngx-mat-select-search
-          ngModel
+          [ngModel]="startSearch"
           [placeholderLabel]="'LNG_COMMON_LABEL_SEARCH' | translate"
           [noEntriesFoundLabel]="null"
           [clearSearchInput]="true"
@@ -87,7 +87,7 @@
 
         <!-- Empty option used to select nothing -->
         <mat-option
-          *ngIf="clearable"
+          *ngIf="clearable && !searchValue"
           [value]="null">
           {{ 'LNG_COMMON_LABEL_NONE' | translate }}
         </mat-option>
@@ -200,7 +200,7 @@
         class="gd-form-select-single-v2-viewonly-value">
         <!-- Has value -->
         <ng-container
-          *ngIf="value">
+          *ngIf="value; else noValue">
           <!-- Icon -->
           <mat-icon
             *ngIf="allOptionsMap[value]?.icon">{{allOptionsMap[value].icon}}</mat-icon>

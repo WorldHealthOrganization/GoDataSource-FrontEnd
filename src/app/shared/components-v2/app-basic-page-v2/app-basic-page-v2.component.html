@@ -46,6 +46,12 @@
 
           <!-- Label -->
           <span>{{ actionButton.label | translate }}</span>
+
+          <!-- Loading -->
+          <mat-progress-spinner
+            *ngIf="actionButtonLoading && actionButtonLoading()"
+            diameter="16"
+            mode="indeterminate"></mat-progress-spinner>
         </a>
 
         <!-- Icon -->

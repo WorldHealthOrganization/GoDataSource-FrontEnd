@@ -1,0 +1,7 @@
+<app-form-select-location-single-v2
+  [(ngModel)]="value"
+  useOutbreakLocations="true"
+  clearable="true"
+  (blurEvent)="stopEditing()"
+  (selectedLocationChanged)="selectedLocationChanged($event)">
+</app-form-select-location-single-v2>
