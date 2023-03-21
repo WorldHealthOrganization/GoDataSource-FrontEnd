@@ -1,5 +1,5 @@
 import { IHeaderAngularComp } from '@ag-grid-community/angular';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { IHeaderParams } from '@ag-grid-community/core';
 import { IV2SpreadsheetEditorExtendedColDef } from '../../models/extended-column.model';
 
@@ -13,9 +13,10 @@ import { IV2SpreadsheetEditorExtendedColDef } from '../../models/extended-column
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppSpreadsheetEditorV2CellBasicHeaderComponent implements IHeaderAngularComp {
+export class AppSpreadsheetEditorV2CellBasicHeaderComponent implements IHeaderAngularComp, OnDestroy {
   // constants
   static readonly DEFAULT_COLUMN_ROW_NO: string = 'rowNo';
+  static readonly DEFAULT_COLUMN_ROW_NO_WIDTH: number = 50;
 
   // data
   id: string;
@@ -29,6 +30,17 @@ export class AppSpreadsheetEditorV2CellBasicHeaderComponent implements IHeaderAn
   constructor(
     protected changeDetectorRef: ChangeDetectorRef
   ) {}
+
+  /**
+   * Component destroyed
+   */
+  ngOnDestroy(): void {
+    // first cell ?
+    if (this.columnIndex === 0) {
+      // reset
+      this.colDef.editor.refreshErrorRowsCell = undefined;
+    }
+  }
 
   /**
    * Gets called whenever the cell refreshes
@@ -57,6 +69,13 @@ export class AppSpreadsheetEditorV2CellBasicHeaderComponent implements IHeaderAn
       0 :
       this.colDef.editor.columnsMap[this.colDef.columnDefinition.field].index;
     this.id = `gd-spreadsheet-editor-v2-cell-basic-header-${this.columnIndex}`;
+
+    // first cell ?
+    if (this.columnIndex === 0) {
+      this.colDef.editor.refreshErrorRowsCell = () => {
+        this.changeDetectorRef.detectChanges();
+      };
+    }
 
     // update ui
     this.changeDetectorRef.detectChanges();
@@ -101,5 +120,15 @@ export class AppSpreadsheetEditorV2CellBasicHeaderComponent implements IHeaderAn
    */
   mouseLeave(): void {
     this.colDef.editor.selection.header.top.mouseLeave();
+  }
+
+  /**
+   * Mouse move
+   */
+  mouseMove(event: MouseEvent): void {
+    this.colDef.editor.selection.header.top.mouseMove(
+      this.columnIndex === 0,
+      event
+    );
   }
 }

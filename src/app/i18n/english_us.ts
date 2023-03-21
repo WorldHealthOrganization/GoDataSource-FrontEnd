@@ -19,6 +19,7 @@ export const EnglishUsLang = {
     'LNG_SHEET_CONTEXT_MENU_REMOVE_ROW': 'Delete rows',
     'LNG_FORM_VALIDATION_ERROR_INTEGER': 'Field must be an integer',
     'LNG_FORM_VALIDATION_ERROR_INVALID_COLUMNS': 'Column(s) "{{fields}}" are invalid',
+    'LNG_FORM_VALIDATION_EDITOR_HELP': 'All cells with red backgrounds will display details on mouse hover about what is invalid and why',
     'LNG_FORM_VALIDATION_ERROR_INVALID_ROWS': 'Row(s) "{{rows}}" are invalid',
     'LNG_COMMON_NOTHING_TO_SAVE': 'Nothing to save',
     'LNG_COMMON_INVALID_ROWS': 'You have invalid rows',

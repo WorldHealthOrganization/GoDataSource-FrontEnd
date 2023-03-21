@@ -16,7 +16,6 @@
     [noRowsOverlayComponent]="AppSpreadsheetEditorV2NoDataComponent"
     (gridReady)="gridReady($event)"
     (mouseleave)="gridMouseLeave()"
-    (mousemove)="gridMouseMove($event)"
     (bodyScroll)="gridBodyScroll()"
     (cellEditingStopped)="gridCellEditingStopped($event)">
   </ag-grid-angular>
@@ -31,12 +30,13 @@
     class="gd-context-menu">
 
     <!-- Copy raw -->
+    <!-- (click) doesn't work on MacOS Safari -->
     <button
       class="gd-context-menu-item"
       fxLayout="row"
       cdkMenuItem
       [disabled]="editor.selection.selected.ranges.length < 1"
-      (click)="cellCopy(true)">
+      (mouseup)="cellCopy(true)">
       <!-- Label -->
       <div
         class="gd-context-menu-item-label"
@@ -47,17 +47,18 @@
       <!-- Shortcut -->
       <div
         fxGrow="0">
-        Ctrl+C
+        {{isMac ? '⌘+C' : 'Ctrl+C'}}
       </div>
     </button>
 
     <!-- Copy text -->
+    <!-- (click) doesn't work on MacOS Safari -->
     <button
       class="gd-context-menu-item"
       fxLayout="row"
       cdkMenuItem
       [disabled]="editor.selection.selected.ranges.length < 1"
-      (click)="cellCopy(false)">
+      (mouseup)="cellCopy(false)">
       <!-- Label -->
       <div
         class="gd-context-menu-item-label"
@@ -67,12 +68,14 @@
     </button>
 
     <!-- Paste -->
+    <!-- (click) doesn't work on MacOS Safari -->
     <button
+      *ngIf="showPasteMenuOption"
       class="gd-context-menu-item"
       fxLayout="row"
       cdkMenuItem
       [disabled]="editor.selection.selected.ranges.length !== 1"
-      (click)="cellPaste()">
+      (mouseup)="cellPaste()">
       <!-- Label -->
       <div
         class="gd-context-menu-item-label"
@@ -83,17 +86,18 @@
       <!-- Shortcut -->
       <div
         fxGrow="0">
-        Ctrl+V
+        {{isMac ? '⌘+V' : 'Ctrl+V'}}
       </div>
     </button>
 
     <!-- Undo -->
+    <!-- (click) doesn't work on MacOS Safari -->
     <button
       class="gd-context-menu-item"
       fxLayout="row"
       cdkMenuItem
       [disabled]="changesIndex < 1"
-      (click)="cellUndo()">
+      (mouseup)="cellUndo()">
       <!-- Label -->
       <div
         class="gd-context-menu-item-label"
@@ -104,17 +108,18 @@
       <!-- Shortcut -->
       <div
         fxGrow="0">
-        Ctrl+Z
+        {{isMac ? '⌘+Z' : 'Ctrl+Z'}}
       </div>
     </button>
 
     <!-- Redo -->
+    <!-- (click) doesn't work on MacOS Safari -->
     <button
       class="gd-context-menu-item"
       fxLayout="row"
       cdkMenuItem
       [disabled]="changesIndex >= changes.length"
-      (click)="cellRedo()">
+      (mouseup)="cellRedo()">
       <!-- Label -->
       <div
         class="gd-context-menu-item-label"
@@ -125,7 +130,7 @@
       <!-- Shortcut -->
       <div
         fxGrow="0">
-        Ctrl+Y
+        {{isMac ? '⌘+Y' : 'Ctrl+Y'}}
       </div>
     </button>
 
@@ -134,12 +139,13 @@
       *ngIf="editor.action === CreateViewModifyV2Action.CREATE" />
 
     <!-- Append rows at the end -->
+    <!-- (click) doesn't work on MacOS Safari -->
     <button
       *ngIf="editor.action === CreateViewModifyV2Action.CREATE"
       class="gd-context-menu-item"
       fxLayout="row"
       cdkMenuItem
-      (click)="rowAppend()">
+      (mouseup)="rowAppend()">
       <!-- Label -->
       <div
         class="gd-context-menu-item-label"
@@ -152,12 +158,13 @@
     <hr />
 
     <!-- Delete cells content -->
+    <!-- (click) doesn't work on MacOS Safari -->
     <button
       class="gd-context-menu-item"
       fxLayout="row"
       cdkMenuItem
       [disabled]="editor.selection.selected.ranges.length < 1"
-      (click)="cellDeleteContent()">
+      (mouseup)="cellDeleteContent()">
       <!-- Label -->
       <div
         class="gd-context-menu-item-label"
@@ -173,13 +180,14 @@
     </button>
 
     <!-- Delete rows -->
+    <!-- (click) doesn't work on MacOS Safari -->
     <button
       *ngIf="editor.action === CreateViewModifyV2Action.CREATE"
       class="gd-context-menu-item"
       fxLayout="row"
       cdkMenuItem
       [disabled]="editor.selection.selected.ranges.length < 1"
-      (click)="rowDelete()">
+      (mouseup)="rowDelete()">
       <!-- Label -->
       <div
         class="gd-context-menu-item-label"

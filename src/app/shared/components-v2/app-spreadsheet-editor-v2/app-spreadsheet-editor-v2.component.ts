@@ -46,6 +46,8 @@ import { IV2BottomDialogConfigButtonType } from '../app-bottom-dialog-v2/models/
 import { IV2SpreadsheetEditorSelectedMatrix } from './models/selected.model';
 import { IRowNode } from '@ag-grid-community/core/dist/cjs/es5/interfaces/iRowNode';
 import { I18nService } from '../../../core/services/helper/i18n.service';
+import { AgGridAngular } from '@ag-grid-community/angular';
+import { determineIfMacDevice } from '../../../core/methods/mac';
 
 /**
  * Component
@@ -62,6 +64,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   private static readonly DEFAULT_CREATE_RECORDS_ROW_NO = 20;
   private static readonly HOVER_OUTSIDE_LIMIT_UNTIL_MOUSE_OUT: number = 500;
   private static readonly MAX_UNDO_TO_KEEP: number = 100;
+  private static readonly SCROLL_MARGIN_PX: number = 32;
+  private static readonly SCROLL_SPEED_MS: number = 20;
+  private static readonly SCROLL_SPEED_PX: number = 8;
 
   // elements
   @ViewChild('cellContextMenu', { static: true }) set cellContextMenu(cellContextMenu: TemplateRef<any>) {
@@ -69,7 +74,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   }
 
   // basic page
-  @ViewChild(AppBasicPageV2Component, { static: true }) basicPage: AppBasicPageV2Component;
+  @ViewChild(AppBasicPageV2Component, { static: true }) private _basicPage: AppBasicPageV2Component;
+
+  // ag-grid angular component
+  @ViewChild(AgGridAngular, { static: true, read: ElementRef }) private _agGridAngularElementRef: ElementRef;
 
   // breadcrumbs
   @Input() breadcrumbs: IV2Breadcrumb[];
@@ -136,6 +144,12 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   // save
   @Output() save: EventEmitter<IV2SpreadsheetEditorEventSave> = new EventEmitter<IV2SpreadsheetEditorEventSave>();
 
+  // is mac ?
+  isMac: boolean = determineIfMacDevice();
+
+  // paste from context menu doesn't work if clipboard.readtext doesn't exist (only ctrl+v has a chance that it could work)
+  showPasteMenuOption: boolean = !!navigator.clipboard?.readText;
+
   // form dirty ?
   private _formDirty: boolean = false;
   get isDirty(): boolean {
@@ -159,6 +173,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // location
     locationsMap: {},
+
+    // help
+    errorRows: undefined,
+    refreshErrorRowsCell: undefined,
 
     // invalid
     invalid: {
@@ -227,6 +245,14 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         mouseLeave: () => {
           this.cellMouseLeave();
         },
+        mouseMove: (event) => {
+          this.gridMouseMove(
+            false,
+            false,
+            false,
+            event
+          );
+        },
         fill: () => {
           this.cellFill();
         }
@@ -258,6 +284,14 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           },
           mouseLeave: () => {
             this.rowNoMouseLeave();
+          },
+          mouseMove: (event) => {
+            this.gridMouseMove(
+              false,
+              false,
+              true,
+              event
+            );
           }
         },
         top: {
@@ -286,6 +320,17 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           },
           mouseLeave: () => {
             this.headerMouseLeave();
+          },
+          mouseMove: (
+            pivotCell: boolean,
+            event
+          ) => {
+            this.gridMouseMove(
+              pivotCell,
+              true,
+              false,
+              event
+            );
           }
         }
       }
@@ -322,9 +367,19 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     updateColumnDefinitions?: true
   } = {};
 
+  // scroll
+  private _scrollIf: {
+    top: boolean,
+    bottom: boolean,
+    left: boolean,
+    right: boolean
+  };
+
   // timers
-  timerCellSelectFocused: any;
-  waitForAsyncToFinish: any;
+  private _timerCellSelectFocused: any;
+  private _waitForAsyncToFinish: any;
+  private _scrollTimer: any;
+  private _pasteTimer: any;
 
   // constants
   AppSpreadsheetEditorV2LoadingComponent = AppSpreadsheetEditorV2LoadingComponent;
@@ -367,9 +422,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     this.stopAsyncRequests();
 
     // stop timers - cellSelectFocused
-    if (this.timerCellSelectFocused) {
-      clearTimeout(this.timerCellSelectFocused);
-      this.timerCellSelectFocused = undefined;
+    if (this._timerCellSelectFocused) {
+      clearTimeout(this._timerCellSelectFocused);
+      this._timerCellSelectFocused = undefined;
     }
 
     // stop timers - waitForAsyncToFinish
@@ -377,6 +432,12 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // stop refresh language tokens
     this.releaseLanguageChangeListener();
+
+    // stop scroll timer
+    this.stopScrollTimer();
+
+    // stop paste timer
+    this.stopPasteTimer();
   }
 
   /**
@@ -701,7 +762,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       suppressNavigable: true,
       editable: false,
       pinned: 'left',
-      width: 50,
+      width: AppSpreadsheetEditorV2CellBasicHeaderComponent.DEFAULT_COLUMN_ROW_NO_WIDTH,
       cellClass: 'gd-spreadsheet-editor-row-no',
       editor: this.editor,
       cellRenderer: AppSpreadsheetEditorV2CellRowNoRendererComponent,
@@ -1411,11 +1472,16 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         headerHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-header-invalid');
 
         // add error message
-        headerHtml.title = this.i18nService.instant(
+        this.editor.errorRows = this.i18nService.instant(
           'LNG_FORM_VALIDATION_ERROR_INVALID_ROWS', {
             rows: invalidRows
           }
         );
+
+        // refresh error cell
+        if (this.editor.refreshErrorRowsCell) {
+          this.editor.refreshErrorRowsCell();
+        }
       }
     }
 
@@ -1505,15 +1571,29 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // remove full / partial from headers
     const headerHtmlElements = this.elementRef.nativeElement.getElementsByClassName('gd-spreadsheet-editor-v2-cell-basic-header');
     for (let elementIndex = 0; elementIndex < headerHtmlElements.length; elementIndex++) {
-      // class cleanup
-      headerHtmlElements[elementIndex].classList.remove(
-        'gd-spreadsheet-editor-v2-cell-basic-header-selected-partial',
-        'gd-spreadsheet-editor-v2-cell-basic-header-selected-full',
-        'gd-spreadsheet-editor-v2-cell-basic-header-invalid'
-      );
+      // first header column has special needs
+      if (elementIndex === 0) {
+        // class cleanup
+        headerHtmlElements[elementIndex].classList.remove(
+          'gd-spreadsheet-editor-v2-cell-basic-header-selected-partial',
+          'gd-spreadsheet-editor-v2-cell-basic-header-selected-full',
+          'gd-spreadsheet-editor-v2-cell-basic-header-invalid'
+        );
 
-      // error message cleanup
-      headerHtmlElements[elementIndex].title = '';
+        // error message cleanup
+        this.editor.errorRows = undefined;
+
+        // refresh error cell
+        if (this.editor.refreshErrorRowsCell) {
+          this.editor.refreshErrorRowsCell();
+        }
+      } else {
+        // class cleanup
+        headerHtmlElements[elementIndex].classList.remove(
+          'gd-spreadsheet-editor-v2-cell-basic-header-selected-partial',
+          'gd-spreadsheet-editor-v2-cell-basic-header-selected-full'
+        );
+      }
     }
 
     // hide previous fills
@@ -1939,7 +2019,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
           // execute async request
           this.editor.async.inProgress = true;
-          this.basicPage.detectChanges();
+          this._basicPage.detectChanges();
           this.editor.async.rows[rowIndex].columns[realColumnIndex].subscription = (function(
             // works as long as value is string - visualId ...
             localValue: string,
@@ -1985,7 +2065,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
                 this.editor.asyncResponses.rows[localRowIndex].columns[localColumnIndex][localValue] = response;
 
                 // update ui buttons
-                this.basicPage.detectChanges();
+                this._basicPage.detectChanges();
 
                 // validate once again since we have async response
                 this.rowValidate(localRowIndex);
@@ -2534,21 +2614,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   gridMouseLeave(): void {
     // end collecting
     this.cellFinishCollecting();
-  }
-
-  /**
-   * Gird mouse move
-   */
-  gridMouseMove(_event: MouseEvent): void {
-    // nothing to do ?
-    if (!this.editor.selection.selected.collecting) {
-      return;
-    }
-
-    // #TODO
-    // left top bottom right
-    // console.log(event);
-    // this._agTable.api.ensureIndexVisible(this.editor.selection.selected.collecting.range.rows.end + 1);
   }
 
   /**
@@ -3315,6 +3380,78 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   }
 
   /**
+   * Generate dummy textarea to use for copy / paste text
+   * - modern browsers should allow navigator.clipboard
+   */
+  private cellDummyTextarea(): Observable<{
+    textarea: HTMLTextAreaElement,
+    finish: () => void
+  }> {
+    return new Observable((observer) => {
+      // generate textarea
+      const textarea = document.createElement('textarea');
+
+      // make it small in case of async and browser has time to render it
+      // - make sure scroll doesn't appear
+      textarea.style.display = 'inline-block';
+      textarea.style.position = 'absolute';
+      textarea.style.width = '1px';
+      textarea.style.height = '1px';
+      textarea.style.top = '0px';
+      textarea.style.left = '0px';
+
+      // append it to body
+      this.elementRef.nativeElement.appendChild(textarea);
+
+      // let child do its thing
+      observer.next({
+        textarea,
+        finish: () => {
+          // cleanup
+          this.elementRef.nativeElement.removeChild(textarea);
+        }
+      });
+      observer.complete();
+    });
+  }
+
+  /**
+   * Copy using textarea if browser doesn't support navigator.clipboard.writeText
+   */
+  private cellCopyUsingTextarea(textToCopy: string): void {
+    this.cellDummyTextarea().subscribe((data) => {
+      // determine previous focus
+      const currentActiveElement: HTMLElement = document.activeElement as HTMLElement;
+
+      // handle copy errors
+      try {
+        // prepare for copy
+        data.textarea.value = textToCopy;
+        data.textarea.select();
+        data.textarea.focus({
+          preventScroll: true
+        });
+
+        // copy
+        document.execCommand('copy');
+      } catch (e) {
+        // no luck with this browser
+        this.toastV2Service.error(e.message);
+      }
+
+      // cleanup
+      data.finish();
+
+      // re-focus previous
+      if (currentActiveElement?.focus) {
+        currentActiveElement.focus({
+          preventScroll: true
+        });
+      }
+    });
+  }
+
+  /**
    * Context menu option - copy
    */
   cellCopy(raw: boolean): void {
@@ -3331,11 +3468,78 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // copy
     // - even empty cell
-    navigator.clipboard.writeText(textToCopy)
-      .then()
-      .catch((error) => {
-        this.toastV2Service.error(error.message);
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(textToCopy)
+        .then()
+        .catch(() => {
+          // try the other way
+          this.cellCopyUsingTextarea(textToCopy);
+        });
+    } else {
+      // try the other way
+      this.cellCopyUsingTextarea(textToCopy);
+    }
+  }
+
+  /**
+   * Paste using textarea if browser doesn't support navigator.clipboard.readText
+   */
+  private cellPasteUsingTextarea(): Observable<string> {
+    return new Observable<string>((observer) => {
+      this.cellDummyTextarea().subscribe((data) => {
+        // determine previous focus
+        const currentActiveElement: HTMLElement = document.activeElement as HTMLElement;
+
+        // handle paste errors
+        try {
+          // paste event handler
+          // - dummy to force browser to paste text
+          const textAreaPasteHandler = () => {};
+
+          // prepare for paste
+          data.textarea.addEventListener(
+            'paste',
+            textAreaPasteHandler
+          );
+          data.textarea.focus({
+            preventScroll: true
+          });
+
+          // stop paste timer
+          this.stopPasteTimer();
+
+          // wait for paste bubble to take effect
+          this._pasteTimer = setTimeout(() => {
+            // reset
+            this._pasteTimer = undefined;
+
+            // text to paste
+            const pasteText: string = data.textarea.value;
+
+            // cleanup
+            data.textarea.removeEventListener(
+              'paste',
+              textAreaPasteHandler
+            );
+            data.finish();
+
+            // re-focus previous
+            if (currentActiveElement?.focus) {
+              currentActiveElement.focus({
+                preventScroll: true
+              });
+            }
+
+            // finished
+            observer.next(pasteText);
+            observer.complete();
+          }, 200);
+        } catch (e) {
+          // no luck with this browser
+          this.toastV2Service.error(e.message);
+        }
       });
+    });
   }
 
   /**
@@ -3347,23 +3551,43 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       return;
     }
 
-    // paste text
-    navigator.clipboard.readText()
-      .then((text) => {
-        // paste into cells
-        const asyncResponse = this.cellTextToCells(text);
-        if (asyncResponse) {
-          const loading = this.dialogV2Service.showLoadingDialog();
-          asyncResponse.subscribe(() => {
-            loading.close();
-          });
-        } else {
-          // not async, no need to display loading
-        }
-      })
-      .catch((error) => {
-        this.toastV2Service.error(error.message);
+    // actual paste of text
+    const actualPasteText = (text: string) => {
+      // paste into cells
+      const asyncResponse = this.cellTextToCells(text);
+      if (asyncResponse) {
+        const loading = this.dialogV2Service.showLoadingDialog();
+        asyncResponse.subscribe(() => {
+          loading.close();
+        });
+      } else {
+        // not async, no need to display loading
+      }
+    };
+
+    // paste using textarea
+    const pasteUsingTextarea = () => {
+      this.cellPasteUsingTextarea().subscribe((text) => {
+        // actual paste
+        actualPasteText(text);
       });
+    };
+
+    // paste text
+    if (navigator.clipboard?.readText) {
+      navigator.clipboard.readText()
+        .then((text) => {
+          // actual paste
+          actualPasteText(text);
+        })
+        .catch(() => {
+          // try the other way
+          pasteUsingTextarea();
+        });
+    } else {
+      // try the other way
+      pasteUsingTextarea();
+    }
   }
 
   /**
@@ -3779,10 +4003,10 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       // allow bubble
 
       // update focused selection after focused cell is changed by ag-grid (return false)
-      this.timerCellSelectFocused = setTimeout(() => {
+      this._timerCellSelectFocused = setTimeout(() => {
         // update focused selection
         this.cellSelectFocused();
-        this.timerCellSelectFocused = undefined;
+        this._timerCellSelectFocused = undefined;
       });
 
       // don't block caller
@@ -3791,8 +4015,15 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // cut selected cells
     if (
-      params.event.ctrlKey &&
-      params.event.code === 'KeyA'
+      (
+        params.event.ctrlKey &&
+        params.event.code === 'KeyA'
+      ) || (
+        this.isMac &&
+        // command key
+        params.event.metaKey &&
+        params.event.code === 'KeyA'
+      )
     ) {
       // stop browser default
       params.event.preventDefault();
@@ -3837,8 +4068,15 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // cut selected cells - not implemented
     if (
-      params.event.ctrlKey &&
-      params.event.code === 'KeyX'
+      (
+        params.event.ctrlKey &&
+        params.event.code === 'KeyX'
+      ) || (
+        this.isMac &&
+        // command key
+        params.event.metaKey &&
+        params.event.code === 'KeyX'
+      )
     ) {
       // block caller
       return true;
@@ -3846,9 +4084,19 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // copy selected cells
     if (
-      params.event.ctrlKey &&
-      params.event.code === 'KeyC'
+      (
+        params.event.ctrlKey &&
+        params.event.code === 'KeyC'
+      ) || (
+        this.isMac &&
+        // command key
+        params.event.metaKey &&
+        params.event.code === 'KeyC'
+      )
     ) {
+      // stop browser default
+      params.event.preventDefault();
+
       // just ignore if bubble
       if (params.event.repeat) {
         // block caller
@@ -3864,8 +4112,15 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // paste
     if (
-      params.event.ctrlKey &&
-      params.event.code === 'KeyV'
+      (
+        params.event.ctrlKey &&
+        params.event.code === 'KeyV'
+      ) || (
+        this.isMac &&
+        // command key
+        params.event.metaKey &&
+        params.event.code === 'KeyV'
+      )
     ) {
       // just ignore if bubble
       if (params.event.repeat) {
@@ -3882,8 +4137,15 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // undo
     if (
-      params.event.ctrlKey &&
-      params.event.code === 'KeyZ'
+      (
+        params.event.ctrlKey &&
+        params.event.code === 'KeyZ'
+      ) || (
+        this.isMac &&
+        // command key
+        params.event.metaKey &&
+        params.event.code === 'KeyZ'
+      )
     ) {
       // stop browser default
       params.event.preventDefault();
@@ -3903,8 +4165,15 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // redo
     if (
-      params.event.ctrlKey &&
-      params.event.code === 'KeyY'
+      (
+        params.event.ctrlKey &&
+        params.event.code === 'KeyY'
+      ) || (
+        this.isMac &&
+        // command key
+        params.event.metaKey &&
+        params.event.code === 'KeyY'
+      )
     ) {
       // stop browser default
       params.event.preventDefault();
@@ -3933,7 +4202,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    */
   gridBodyScroll(): void {
     // redraw ranges since they might've disappeared when cells were destroyed
-    // #TODO
     this.cellUpdateRangeClasses(true);
   }
 
@@ -3952,9 +4220,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
    * Clear wait for async to finish
    */
   private stopWaitForAsyncToFinish(): void {
-    if (this.waitForAsyncToFinish) {
-      clearTimeout(this.waitForAsyncToFinish);
-      this.waitForAsyncToFinish = undefined;
+    if (this._waitForAsyncToFinish) {
+      clearTimeout(this._waitForAsyncToFinish);
+      this._waitForAsyncToFinish = undefined;
     }
   }
 
@@ -4105,12 +4373,12 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // check periodically if async finished
     const checkIfAsyncFinished = () => {
       // executed
-      this.waitForAsyncToFinish = undefined;
+      this._waitForAsyncToFinish = undefined;
 
       // async finished ?
       if (this.editor.async.inProgress) {
         // try again later
-        this.waitForAsyncToFinish = setTimeout(
+        this._waitForAsyncToFinish = setTimeout(
           checkIfAsyncFinished,
           500
         );
@@ -4119,7 +4387,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         asyncFinished();
       }
     };
-    this.waitForAsyncToFinish = setTimeout(
+    this._waitForAsyncToFinish = setTimeout(
       checkIfAsyncFinished,
       500
     );
@@ -4169,5 +4437,126 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         }
       });
     };
+  }
+
+  /**
+   * Stop scroll timer
+   */
+  private stopScrollTimer(): void {
+    if (this._scrollTimer) {
+      clearTimeout(this._scrollTimer);
+      this._scrollTimer = undefined;
+    }
+  }
+
+  /**
+   * Grid - mouse move
+   */
+  private gridMouseMove(
+    allCell: boolean,
+    headerColumn: boolean,
+    rowColumn: boolean,
+    event: MouseEvent
+  ): void {
+    // nothing to do ?
+    if (!this.editor.selection.selected.collecting) {
+      return;
+    }
+
+    // scroll elements
+    const scrollElementVertical: any = this._agGridAngularElementRef.nativeElement.querySelector('.ag-body-vertical-scroll-viewport');
+    const scrollElementHorizontal: any = this._agGridAngularElementRef.nativeElement.querySelector('.ag-body-horizontal-scroll-viewport');
+
+    // retrieve ag-grid details
+    const agGridRect: DOMRect = this._agGridAngularElementRef.nativeElement.getBoundingClientRect();
+    const headerRect: DOMRect = this._agGridAngularElementRef.nativeElement.querySelector('.ag-header').getBoundingClientRect();
+
+    // determine scrolling limits
+    this._scrollIf = {
+      top: !allCell && !headerColumn && scrollElementVertical.scrollTop > 0 && event.y < agGridRect.y + headerRect.height + AppSpreadsheetEditorV2Component.SCROLL_MARGIN_PX,
+      bottom: !allCell && event.y > agGridRect.y + agGridRect.height - AppSpreadsheetEditorV2Component.SCROLL_MARGIN_PX,
+      left: !allCell && !rowColumn && scrollElementHorizontal.scrollLeft > 0 && event.x < agGridRect.x + AppSpreadsheetEditorV2CellBasicHeaderComponent.DEFAULT_COLUMN_ROW_NO_WIDTH + AppSpreadsheetEditorV2Component.SCROLL_MARGIN_PX,
+      right: !allCell && event.x > agGridRect.x + agGridRect.width - AppSpreadsheetEditorV2Component.SCROLL_MARGIN_PX
+    };
+
+    // scroll
+    const scrollGrid = () => {
+      // stop scroll timer
+      this.stopScrollTimer();
+
+      // scroll
+      this._scrollTimer = setTimeout(
+        () => {
+          // reset
+          this._scrollTimer = undefined;
+
+          // nothing to do ?
+          if (
+            !this.editor.selection.selected.collecting ||
+            !this._scrollIf ||
+            !scrollElementVertical
+          ) {
+            return;
+          }
+
+          // scroll top / bottom
+          if (this._scrollIf.top) {
+            scrollElementVertical.scrollTop -= scrollElementVertical.scrollTop >= AppSpreadsheetEditorV2Component.SCROLL_SPEED_PX ?
+              AppSpreadsheetEditorV2Component.SCROLL_SPEED_PX :
+              scrollElementVertical.scrollTop;
+          } else if (this._scrollIf.bottom) {
+            scrollElementVertical.scrollTop += AppSpreadsheetEditorV2Component.SCROLL_SPEED_PX;
+          }
+
+          // scroll left / right
+          if (this._scrollIf.left) {
+            scrollElementHorizontal.scrollLeft -= scrollElementHorizontal.scrollLeft >= AppSpreadsheetEditorV2Component.SCROLL_SPEED_PX ?
+              AppSpreadsheetEditorV2Component.SCROLL_SPEED_PX :
+              scrollElementHorizontal.scrollLeft;
+          } else if (this._scrollIf.right) {
+            scrollElementHorizontal.scrollLeft += AppSpreadsheetEditorV2Component.SCROLL_SPEED_PX;
+          }
+
+          // continue scrolling ?
+          scrollGrid();
+        },
+        AppSpreadsheetEditorV2Component.SCROLL_SPEED_MS
+      );
+    };
+
+    // no need to scroll ?
+    if (
+      !this._scrollIf.top &&
+      !this._scrollIf.bottom &&
+      !this._scrollIf.left &&
+      !this._scrollIf.right
+    ) {
+      // stop scroll timer
+      this.stopScrollTimer();
+
+      // stop
+      this._scrollIf = undefined;
+
+      // finished
+      return;
+    }
+
+    // already scrolling ?
+    if (this._scrollTimer) {
+      return;
+    }
+
+    // start scroll
+    scrollGrid();
+  }
+
+  /**
+   * Stop paste timer
+   */
+  private stopPasteTimer(): void {
+    if (this._pasteTimer) {
+      clearTimeout(this._pasteTimer);
+      this._pasteTimer = undefined;
+    }
   }
 }
