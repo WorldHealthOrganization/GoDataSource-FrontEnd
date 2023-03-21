@@ -5,12 +5,13 @@ import {
   Host, Input,
   OnDestroy,
   Optional,
-  SkipSelf, ViewEncapsulation
+  SkipSelf, ViewChild, ViewEncapsulation
 } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { IAppFormIconButtonV2 } from '../../core/app-form-icon-button-v2';
+import { MatInput } from '@angular/material/input';
 
 @Component({
   selector: 'app-form-number-v2',
@@ -67,6 +68,25 @@ export class AppFormNumberV2Component
     return this._tooltip;
   }
 
+  // input
+  private _input: MatInput;
+  private _focusAfterInit: boolean = false;
+  @ViewChild(MatInput) set input(input: MatInput) {
+    // set
+    this._input = input;
+
+    // do we need to focus after init ?
+    if (this._focusAfterInit) {
+      this.focus();
+    }
+  }
+  get input(): MatInput {
+    return this._input;
+  }
+
+  // timers
+  private _focusTimer: any;
+
   /**
    * Constructor
    */
@@ -86,7 +106,11 @@ export class AppFormNumberV2Component
    * Release resources
    */
   ngOnDestroy(): void {
+    // parent
     super.onDestroy();
+
+    // timers
+    this.stopFocusTimer();
   }
 
   /**
@@ -108,9 +132,50 @@ export class AppFormNumberV2Component
           value = Math.round(value * 1000000) / 1000000;
         }
       }
+
+      // convert to number
+      if (typeof value === 'string') {
+        try {
+          // trigger change
+          this.value = parseFloat(value);
+          return;
+        } catch (e) {}
+      }
     }
 
     // write value
     super.writeValue(value);
+  }
+
+  /**
+   * Timer - focus
+   */
+  private stopFocusTimer(): void {
+    if (this._focusTimer) {
+      clearTimeout(this._focusTimer);
+      this._focusTimer = undefined;
+    }
+  }
+
+  /**
+   * Focus
+   */
+  focus(): void {
+    // timer - focus
+    this.stopFocusTimer();
+
+    // wait for binds to take effect
+    this._focusTimer = setTimeout(() => {
+      // reset
+      this._focusTimer = undefined;
+
+      // focus
+      if (this.input) {
+        this._focusAfterInit = false;
+        this.input.focus();
+      } else {
+        this._focusAfterInit = true;
+      }
+    });
   }
 }

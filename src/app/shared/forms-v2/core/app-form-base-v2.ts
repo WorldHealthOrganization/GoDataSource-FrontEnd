@@ -2,7 +2,7 @@ import { AbstractControl, ControlContainer, ControlValueAccessor, UntypedFormGro
 import { noop } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseErrorStateMatcherV2 } from './app-form-base-error-state-matcher-v2';
-import { AppFormBaseErrorMsgV2 } from './app-form-base-error-msg-v2';
+import { AppFormBaseErrorMsgV2, AppFormBaseErrorMsgV2Type } from './app-form-base-error-msg-v2';
 import { ChangeDetectorRef, Directive, EventEmitter, Input, Output } from '@angular/core';
 import { Subscription } from 'rxjs/internal/Subscription';
 
@@ -188,7 +188,7 @@ export abstract class AppFormBaseV2<T> implements ControlValueAccessor {
           (this.errorsString ? this.errorsString + AppFormBaseErrorMsgV2.SEPARATOR : '') +
           AppFormBaseErrorMsgV2.msg(
             this.translateService,
-            prop,
+            prop as AppFormBaseErrorMsgV2Type,
             this.previousErrorsObject[prop]
           );
       }

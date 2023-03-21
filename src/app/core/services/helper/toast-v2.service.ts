@@ -294,8 +294,28 @@ export class ToastV2Service {
         // add language token prefix for API Error codes
         apiErrorCode = `LNG_API_ERROR_CODE_${apiErrorCode}`;
 
-        // translate
+        // try using the api error in english...better than using general error
         const defaultApiErrorCode = 'LNG_API_ERROR_CODE_UNKNOWN_ERROR';
+        if (
+          apiErrorCode === defaultApiErrorCode &&
+          errData.err.details.messages &&
+          Object.keys(errData.err.details.messages).length > 0
+        ) {
+          // determine error message
+          let finalMsg: string = '';
+          Object.keys(errData.err.details.messages).forEach((key) => {
+            finalMsg += (finalMsg ? '<br />' : '') + key + ' ' + (errData.err.details.messages[key] as string[]).join(', ');
+          });
+
+          // use this error message, no need to translate
+          if (finalMsg) {
+            obs.next(finalMsg);
+            obs.complete();
+            return;
+          }
+        }
+
+        // translate
         return this.i18nService
           .get(apiErrorCode, errData.translateData)
           .subscribe((apiErrorMessage) => {

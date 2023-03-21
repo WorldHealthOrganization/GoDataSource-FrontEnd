@@ -116,6 +116,11 @@
         &:has(.gd-app-side-dialog-v2-content-middle-item-has-group) {
           @include flex(flex);
           @include flex_direction(column);
+
+          &[hidden],
+          &.hidden {
+            display: none;
+          }
         }
 
         /* Slide-in panel content item */
@@ -260,7 +265,7 @@
                   }
                 }
               }
-  
+
               .gd-app-side-dialog-v2-content-middle-item-input-link {
                 margin: 0;
 
@@ -434,7 +439,7 @@
                                 border-left: 0 none;
                                 @include border-radius(0.4rem 0 0 0);
                               }
-  
+
                               .mat-form-field-outline-end {
                                 border-right: 0 none;
                                 @include border-radius(0);
@@ -618,10 +623,10 @@
                 height: 2rem;
                 @include transition(color 0.24s ease-in-out 0s);
                 width: 2rem;
-          
+
                 &.cdk-drag-handle {
                   cursor: grab;
-          
+
                   &:hover,
                   &:focus,
                   &:active {

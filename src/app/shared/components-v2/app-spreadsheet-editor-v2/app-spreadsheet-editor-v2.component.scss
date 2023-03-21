@@ -1,0 +1,194 @@
+@import 'mixins';
+@import 'font';
+
+/* Spreadsheet Editor */
+app-spreadsheet-editor-v2 {
+  .gd-spreadsheet-editor {
+    color: var(--gd-text);
+    font-family: $gd-font-family;
+    font-size: $gd-font-size;
+    font-weight: 400;
+    height: 100%;
+    line-height: 2.4rem;
+    min-height: 22rem;
+
+    @media only screen and (max-height: 599px) {
+      min-height: 0;
+    }
+
+    .ag-root-wrapper {
+      border-color: rgba(var(--gd-secondary-rgb), 0.25);
+      @include border-radius(0.4rem);
+    }
+
+    /* Spreadsheet header */
+    .ag-header {
+      background-color: rgba(var(--gd-secondary-rgb), 0.1);
+      border-bottom-color: rgba(var(--gd-secondary-rgb), 0.25);
+
+      .ag-pinned-left-header {
+        border-right-color: rgba(var(--gd-secondary-rgb), 0.25);
+      }
+
+      .ag-pinned-right-header {
+        border-left-color: rgba(var(--gd-secondary-rgb), 0.25);
+      }
+  
+      /* Spreadsheet header row */
+      .ag-header-row {
+        color: var(--gd-text);
+        font-weight: 700;
+      }
+  
+      /* Spreadsheet header cell */
+      .ag-header-cell {
+        @include flex_align_items(flex-start);
+        padding: 0;
+  
+        &:after {
+          background-color: rgba(var(--gd-secondary-rgb), 0.25);
+          height: 100%;
+          top: 0;
+        }
+
+        &.ag-header-active {
+          background-color: rgba(var(--gd-primary-rgb), 0.05);
+        }
+
+        &:not(.ag-column-hover) {
+          &:first-of-type {
+            &:not(.ag-header-cell-moving) {
+              &:hover {
+                background-color: rgba(var(--gd-primary-rgb), 0.05);
+              }
+            }
+          }
+        }
+
+        &:not(.ag-column-resizing) {
+          + .ag-header-cell {
+            &:not(.ag-column-hover) {
+              &:not(.ag-header-cell-moving) {
+                &:hover {
+                  background-color: rgba(var(--gd-primary-rgb), 0.05);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    /* Spreadsheet content */
+    .ag-body-viewport {
+      /* Spreadsheet content row */
+      .ag-row {
+        background-color: var(--gd-background);
+        border-bottom: 0 none;
+        border-color: rgba(var(--gd-secondary-rgb), 0.25);
+        color: var(--gd-text);
+
+        &.ag-row-odd {
+          background-color: var(--gd-background);
+        }
+
+        &.ag-row-hover {
+          background-color: rgba(var(--gd-primary-rgb), 0.05);
+        }
+
+        &.ag-row-selected {
+          background-color: rgba(var(--gd-primary-rgb), 0.1);
+
+          &:before {
+            display: none;
+          }
+        }
+
+        /* Spreadsheet content cell */
+        .ag-cell {
+          line-height: 2.4rem;
+          padding: 0.8rem;
+
+          &.ag-cell-last-left-pinned {
+            &:not(.ag-cell-range-right):not(.ag-cell-range-single-cell) {
+              border-right-color: rgba(var(--gd-secondary-rgb), 0.25);
+            }
+          }
+
+          &.ag-cell-first-right-pinned {
+            &:not(.ag-cell-range-left):not(.ag-cell-range-single-cell) {
+              border-left-color: rgba(var(--gd-secondary-rgb), 0.25);
+            }
+          }
+
+          &.ag-column-hover {
+            background-color: transparent;
+          }
+        }
+
+        .gd-spreadsheet-editor-row-no {
+          background-color: rgba(var(--gd-secondary-rgb), 0.1);
+        }
+      }
+
+      /* Spreadsheet row focused */
+      &.ag-has-focus {
+        .ag-cell-focus:not(.ag-cell-range-selected) {
+          border-color: var(--gd-primary);
+        }
+
+        .ag-row {
+          .ag-cell {
+            &.ag-cell-last-left-pinned {
+              &:not(.ag-cell-range-right):not(.ag-cell-range-single-cell) {
+                &.ag-cell-focus {
+                  border-right-color: var(--gd-primary);
+
+                  &.gd-cell-no-focus {
+                    border-right-color: rgba(var(--gd-secondary-rgb), 0.25);
+                  }
+                }
+              }
+            }
+  
+            &.ag-cell-first-right-pinned {
+              &:not(.ag-cell-range-left):not(.ag-cell-range-single-cell) {
+                &.ag-cell-focus {
+                  border-left-color: var(--gd-primary);
+
+                  &.gd-cell-no-focus {
+                    border-left-color: rgba(var(--gd-secondary-rgb), 0.25);
+                  }
+                }
+              }
+            }
+
+            &.gd-cell-no-focus {
+              border-color: transparent;
+            }
+          }
+        }
+      }
+    }
+
+    input[class^=ag-]:not([type]),
+    input[class^=ag-][type=date],
+    input[class^=ag-][type=datetime-local],
+    input[class^=ag-][type=number],
+    input[class^=ag-][type=tel],
+    input[class^=ag-][type=text],
+    textarea[class^=ag-] {
+      border: 0.1rem solid var(--gd-secondary);
+      @include border-radius(0);
+      @include box-shadow(none);
+      color: var(--gd-text);
+      font-family: $gd-font-family;
+      font-size: $gd-font-size;
+      line-height: $gd-line-height;
+
+      &:focus {
+        border-color: var(--gd-primary);
+      }
+    }
+  }
+}

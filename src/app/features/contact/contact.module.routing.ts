@@ -196,51 +196,56 @@ const routes: Routes = [
   // Bulk Add Contacts
   {
     path: 'create-bulk',
-    component: fromPages.BulkCreateContactsComponent,
+    component: fromPages.ContactsBulkCreateModifyComponent,
     canActivate: [AuthGuard],
     data: {
       permissions: [
         PERMISSION.CONTACT_BULK_CREATE
-      ]
+      ],
+      action: CreateViewModifyV2Action.CREATE
     },
     canDeactivate: [
       PageChangeConfirmationGuard
     ],
     resolve: {
+      entity: RelationshipPersonDataResolver,
       gender: GenderDataResolver,
+      pregnancyStatus: PregnancyStatusDataResolver,
       occupation: OccupationDataResolver,
-      risk: RiskDataResolver,
       documentType: DocumentTypeDataResolver,
+      yesNo: YesNoDataResolver,
+      risk: RiskDataResolver,
+      team: TeamDataResolver,
       certaintyLevel: CertaintyLevelDataResolver,
       exposureType: ExposureTypeDataResolver,
       exposureFrequency: ExposureFrequencyDataResolver,
       exposureDuration: ExposureDurationDataResolver,
       contextOfTransmission: ContextOfTransmissionDataResolver,
-      yesNo: YesNoDataResolver,
-      pregnancyStatus: PregnancyStatusDataResolver,
       cluster: ClusterDataResolver
     }
   },
   // Bulk Modify Contacts
   {
     path: 'modify-bulk',
-    component: fromPages.BulkModifyContactsComponent,
+    component: fromPages.ContactsBulkCreateModifyComponent,
     canActivate: [AuthGuard],
     data: {
       permissions: [
         PERMISSION.CONTACT_BULK_MODIFY
-      ]
+      ],
+      action: CreateViewModifyV2Action.MODIFY
     },
     canDeactivate: [
       PageChangeConfirmationGuard
     ],
     resolve: {
       gender: GenderDataResolver,
+      pregnancyStatus: PregnancyStatusDataResolver,
       occupation: OccupationDataResolver,
       risk: RiskDataResolver,
-      followUpStatus: FinalFollowUpStatusDataResolver,
       yesNo: YesNoDataResolver,
-      pregnancyStatus: PregnancyStatusDataResolver
+      team: TeamDataResolver,
+      followUpStatus: FinalFollowUpStatusDataResolver
     }
   },
 
