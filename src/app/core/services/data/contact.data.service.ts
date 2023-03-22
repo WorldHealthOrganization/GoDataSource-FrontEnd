@@ -8,7 +8,6 @@ import { AddressModel } from '../../models/address.model';
 import { RiskLevelGroupModel } from '../../models/risk-level-group.model';
 import { EntityModel } from '../../models/entity-and-relationship.model';
 import { EntityType } from '../../models/entity-type';
-import { EntityDuplicatesModel } from '../../models/entity-duplicates.model';
 import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';
 import * as _ from 'lodash';
 import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
@@ -106,24 +105,6 @@ export class ContactDataService {
     return this.modelHelper.mapObservableListToModel(
       this.http.get(`outbreaks/${outbreakId}/contacts/${contactId}/movement`),
       AddressModel
-    );
-  }
-
-  /**
-     * Find contact duplicates
-     * @param outbreakId
-     * @param contactData
-     */
-  findDuplicates(
-    outbreakId: string,
-    contactData: any
-  ): Observable<EntityDuplicatesModel> {
-    return this.modelHelper.mapObservableToModel(
-      this.http.post(
-        `outbreaks/${outbreakId}/contacts/duplicates/find`,
-        contactData
-      ),
-      EntityDuplicatesModel
     );
   }
 

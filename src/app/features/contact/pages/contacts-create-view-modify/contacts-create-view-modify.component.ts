@@ -34,7 +34,6 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RequestFilterGenerator, RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
@@ -66,6 +65,7 @@ import { AppListTableV2Component } from '../../../../shared/components-v2/app-li
 import { DomSanitizer } from '@angular/platform-browser';
 import { EventModel } from '../../../../core/models/event.model';
 import { IV2BottomDialogConfigButtonType } from '../../../../shared/components-v2/app-bottom-dialog-v2/models/bottom-dialog-config.model';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 /**
  * Component
@@ -90,7 +90,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
   // check for duplicate
   private _duplicateCheckingTimeout: any;
   private _duplicateCheckingSubscription: Subscription;
-  private _personDuplicates: (ContactModel | CaseModel)[] = [];
+  private _personDuplicates: EntityModel[] = [];
   private _previousChecked: {
     firstName: string,
     lastName: string,
@@ -2052,7 +2052,7 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
           }
 
           // check for duplicates
-          this.contactDataService
+          this.entityDataService
             .findDuplicates(
               this.selectedOutbreak.id,
               this.isCreate ?
@@ -2118,7 +2118,8 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
                       },
                       {
                         label: Constants.DUPLICATE_ACTION.MERGE,
-                        value: Constants.DUPLICATE_ACTION.MERGE
+                        value: Constants.DUPLICATE_ACTION.MERGE,
+                        disabled: item.model.type !== EntityType.CONTACT
                       }
                     ]
                   }
@@ -2378,21 +2379,36 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
           // check rights
           if (
             (
-              item.type === EntityType.CONTACT &&
+              item.model.type === EntityType.CASE &&
+              !CaseModel.canView(this.authUser)
+            ) || (
+              item.model.type === EntityType.CONTACT &&
               !ContactModel.canView(this.authUser)
             ) || (
-              item.type === EntityType.CASE &&
-              !CaseModel.canView(this.authUser)
+              item.model.type === EntityType.CONTACT_OF_CONTACT &&
+              !ContactOfContactModel.canView(this.authUser)
             )
           ) {
-            return `${item.name} (${this.translateService.instant(item.type)})`;
+            return `${item.model.name} (${this.translateService.instant(item.type)})`;
           }
 
           // create url
-          const url: string = `${item.type === EntityType.CONTACT ? '/contacts' : '/cases'}/${item.id}/view`;
+          let entityPath: string = '';
+          switch (item.model.type) {
+            case EntityType.CASE:
+              entityPath = 'cases';
+              break;
+            case EntityType.CONTACT:
+              entityPath = 'contacts';
+              break;
+            case EntityType.CONTACT_OF_CONTACT:
+              entityPath = 'contacts-of-contacts';
+              break;
+          }
+          const url =  `${entityPath}/${item.model.id}/view`;
 
           // finished
-          return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.name} (${this.translateService.instant(item.type)})</span></a>`;
+          return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.model.name} (${this.translateService.instant(item.model.type)})</span></a>`;
         })
         .join(', '),
       undefined,
@@ -2485,8 +2501,8 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
         this._previousChecked.middleName = this.itemData.middleName;
 
         // check for duplicates
-        this._duplicateCheckingSubscription = forkJoin([
-          this.contactDataService
+        this._duplicateCheckingSubscription =
+          this.entityDataService
             .findDuplicates(
               this.selectedOutbreak.id,
               this.isView || this.isModify ?
@@ -2495,49 +2511,33 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
                   ...this._previousChecked
                 } :
                 this._previousChecked
-            ),
-          this.caseDataService
-            .findDuplicates(
-              this.selectedOutbreak.id,
-              this._previousChecked
-            )
-        ]).pipe(
-          // handle error
-          catchError((err) => {
-            // show error
-            this.toastV2Service.error(err);
+            ).pipe(
+              // handle error
+              catchError((err) => {
+                // show error
+                this.toastV2Service.error(err);
 
-            // finished
-            return throwError(err);
-          }),
+                // finished
+                return throwError(err);
+              }),
 
-          // should be the last pipe
-          takeUntil(this.destroyed$)
-        ).subscribe((
-          [foundContacts, foundCases]: [
-            EntityDuplicatesModel,
-            EntityDuplicatesModel
-          ]
-        ) => {
-          // request executed
-          this._duplicateCheckingSubscription = undefined;
+              // should be the last pipe
+              takeUntil(this.destroyed$)
+            ).subscribe((foundPersons: EntityDuplicatesModel) => {
+              // request executed
+              this._duplicateCheckingSubscription = undefined;
 
-          // update what we found
-          this._personDuplicates = [];
-          if (foundContacts?.duplicates?.length > 0) {
-            this._personDuplicates.push(
-              ...foundContacts.duplicates.map((item) => item.model as ContactModel)
-            );
-          }
-          if (foundCases?.duplicates?.length > 0) {
-            this._personDuplicates.push(
-              ...foundCases.duplicates.map((item) => item.model as CaseModel)
-            );
-          }
+              // update what we found
+              this._personDuplicates = [];
+              if (foundPersons?.duplicates?.length > 0) {
+                this._personDuplicates.push(
+                  ...foundPersons.duplicates.map((item) => item as EntityModel)
+                );
+              }
 
-          // update alert
-          updateAlert();
-        });
+              // update alert
+              updateAlert();
+            });
       },
       400
     );

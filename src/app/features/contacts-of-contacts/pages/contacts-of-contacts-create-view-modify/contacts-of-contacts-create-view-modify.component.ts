@@ -1337,7 +1337,7 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
           }
 
           // check for duplicates
-          this.contactsOfContactsDataService
+          this.entityDataService
             .findDuplicates(
               this.selectedOutbreak.id,
               this.isCreate ?
@@ -1400,7 +1400,8 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
                       },
                       {
                         label: Constants.DUPLICATE_ACTION.MERGE,
-                        value: Constants.DUPLICATE_ACTION.MERGE
+                        value: Constants.DUPLICATE_ACTION.MERGE,
+                        disabled: item.model.type !== EntityType.CONTACT_OF_CONTACT
                       }
                     ]
                   }

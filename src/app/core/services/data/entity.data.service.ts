@@ -15,6 +15,8 @@ import { map } from 'rxjs/operators';
 import { IBasicCount } from '../../models/basic-count.interface';
 import { ContactOfContactModel } from '../../models/contact-of-contact.model';
 import { ContactsOfContactsDataService } from './contacts-of-contacts.data.service';
+import { EntityDuplicatesModel } from '../../models/entity-duplicates.model';
+import { ModelHelperService } from '../helper/model-helper.service';
 
 @Injectable()
 export class EntityDataService {
@@ -58,7 +60,8 @@ export class EntityDataService {
     private caseDataService: CaseDataService,
     private contactDataService: ContactDataService,
     private contactsOfContactsDataService: ContactsOfContactsDataService,
-    private eventDataService: EventDataService
+    private eventDataService: EventDataService,
+    private modelHelper: ModelHelperService
   ) {}
 
   /**
@@ -240,5 +243,23 @@ export class EntityDataService {
     const method = this.entityMap[entityType].getRelationshipsCountMethod;
     // call the method based on entity type
     return dataService[method](outbreakId, entityId);
+  }
+
+  /**
+   * Find person duplicates
+   * @param outbreakId
+   * @param entityData
+   */
+  findDuplicates(
+    outbreakId: string,
+    entityData: any
+  ): Observable<EntityDuplicatesModel> {
+    return this.modelHelper.mapObservableToModel(
+      this.http.post(
+        `outbreaks/${outbreakId}/people/duplicates/find`,
+        entityData
+      ),
+      EntityDuplicatesModel
+    );
   }
 }
