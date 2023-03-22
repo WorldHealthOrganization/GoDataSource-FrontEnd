@@ -176,7 +176,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     }
 
     // remove global notifications
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
     this.toastV2Service.hide(AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
     this.toastV2Service.hide(AppMessages.APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
   }
@@ -226,7 +226,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       this.isModify
     ) {
       // remove global notifications
-      this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
+      this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
 
       // show global notifications
       this.checkForPersonExistence();
@@ -2133,7 +2133,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
               // hide notification
               // - hide alert
-              this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
+              this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
 
               // construct list of actions
               const itemsToManage: IV2SideDialogConfigInputLinkWithAction[] = response.duplicates.map((item, index) => {
@@ -2419,7 +2419,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     // update message & show alert if not visible already
     // - with links for cases / contacts view page if we have enough rights
     this.toastV2Service.notice(
-      this.translateService.instant('LNG_CASE_FIELD_LABEL_DUPLICATE_CONTACTS') +
+      this.translateService.instant('LNG_CASE_FIELD_LABEL_DUPLICATE_PERSONS') +
       ' ' +
       this._personDuplicates
         .map((item) => {
@@ -2459,7 +2459,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         })
         .join(', '),
       undefined,
-      AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT
+      AppMessages.APP_MESSAGE_DUPLICATE_PERSONS
     );
   }
 
@@ -2496,7 +2496,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         const updateAlert = () => {
           // must update message ?
           // - hide alert
-          this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
+          this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
 
           // show duplicates alert
           this.showDuplicatesAlert();
