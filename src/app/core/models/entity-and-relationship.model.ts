@@ -318,31 +318,35 @@ export class EntityModel {
   }
 
   /**
-     * Get name + date or age
+     * Get name, type + date or age
      * @param model
      */
-  static getNameWithDOBAge(
-    model: CaseModel | ContactModel | ContactOfContactModel,
+  static getDuplicatePersonDetails(
+    entity: EntityModel,
+    typeLabel,
     yearsLabel: string,
     monthsLabel: string
   ) {
-    // initialize
-    let name: string = model.name;
-
-    // add dob / age
-    if (model.dob) {
-      name += ' ( ' + moment(model.dob).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) + ' )';
-    } else if (
-      model.age && (
-        model.age.years > 0 ||
-                model.age.months > 0
-      )
+    // check dob / age
+    let dob = '';
+    if (
+      entity.model.type !== EntityType.EVENT &&
+      !(entity.model instanceof EventModel)
     ) {
-      name += ' ( ' + EntityModel.getAgeString(model.age, yearsLabel, monthsLabel) + ' )';
+      if (entity.model.dob) {
+        dob = ', ' + moment(entity.model.dob).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT);
+      } else if (
+        entity.model.age && (
+          entity.model.age.years > 0 ||
+          entity.model.age.months > 0
+        )
+      ) {
+        dob += ', ' + EntityModel.getAgeString(entity.model.age, yearsLabel, monthsLabel);
+      }
     }
 
-    // finished
-    return name;
+    // return entity details
+    return entity.model.name + ' ( ' + typeLabel + dob + ')';
   }
 
   /**

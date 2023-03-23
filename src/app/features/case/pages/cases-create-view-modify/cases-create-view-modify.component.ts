@@ -2140,8 +2140,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                 return {
                   type: V2SideDialogConfigInputType.LINK_WITH_ACTION,
                   name: `actionsLink[${item.model.id}]`,
-                  placeholder: (index + 1) + '. ' + EntityModel.getNameWithDOBAge(
-                    item.model as CaseModel,
+                  placeholder: (index + 1) + '. ' + EntityModel.getDuplicatePersonDetails(
+                    item,
+                    this.translateService.instant(item.model.type),
                     this.translateService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
                     this.translateService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
                   ),
