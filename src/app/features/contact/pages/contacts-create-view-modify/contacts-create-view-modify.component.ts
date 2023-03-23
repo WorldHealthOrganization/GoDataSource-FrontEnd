@@ -2501,43 +2501,42 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
         this._previousChecked.middleName = this.itemData.middleName;
 
         // check for duplicates
-        this._duplicateCheckingSubscription =
-          this.entityDataService
-            .findDuplicates(
-              this.selectedOutbreak.id,
-              this.isView || this.isModify ?
-                {
-                  id: this.itemData.id,
-                  ...this._previousChecked
-                } :
-                this._previousChecked
-            ).pipe(
-              // handle error
-              catchError((err) => {
-                // show error
-                this.toastV2Service.error(err);
+        this._duplicateCheckingSubscription = this.entityDataService
+          .findDuplicates(
+            this.selectedOutbreak.id,
+            this.isView || this.isModify ?
+              {
+                id: this.itemData.id,
+                ...this._previousChecked
+              } :
+              this._previousChecked
+          ).pipe(
+            // handle error
+            catchError((err) => {
+              // show error
+              this.toastV2Service.error(err);
 
-                // finished
-                return throwError(err);
-              }),
+              // finished
+              return throwError(err);
+            }),
 
-              // should be the last pipe
-              takeUntil(this.destroyed$)
-            ).subscribe((foundPersons: EntityDuplicatesModel) => {
-              // request executed
-              this._duplicateCheckingSubscription = undefined;
+            // should be the last pipe
+            takeUntil(this.destroyed$)
+          ).subscribe((foundPersons: EntityDuplicatesModel) => {
+            // request executed
+            this._duplicateCheckingSubscription = undefined;
 
-              // update what we found
-              this._personDuplicates = [];
-              if (foundPersons?.duplicates?.length > 0) {
-                this._personDuplicates.push(
-                  ...foundPersons.duplicates.map((item) => item as EntityModel)
-                );
-              }
+            // update what we found
+            this._personDuplicates = [];
+            if (foundPersons?.duplicates?.length > 0) {
+              this._personDuplicates.push(
+                ...foundPersons.duplicates.map((item) => item as EntityModel)
+              );
+            }
 
-              // update alert
-              updateAlert();
-            });
+            // update alert
+            updateAlert();
+          });
       },
       400
     );
