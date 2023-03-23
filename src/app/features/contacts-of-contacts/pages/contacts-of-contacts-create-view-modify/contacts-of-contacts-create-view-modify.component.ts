@@ -1804,7 +1804,12 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
         this._duplicateCheckingSubscription = this.entityDataService
           .findDuplicates(
             this.selectedOutbreak.id,
-            this._previousChecked
+            this.isView || this.isModify ?
+              {
+                id: this.itemData.id,
+                ...this._previousChecked
+              } :
+              this._previousChecked
           )
           .pipe(
             // handle error
