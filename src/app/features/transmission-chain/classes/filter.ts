@@ -47,6 +47,16 @@ export class TransmissionChainFilters {
    * Attach conditions to query builder
    */
   attachConditionsToRequestQueryBuilder(qb: RequestQueryBuilder) {
+    // clusterIds
+    if (!_.isEmpty(this.clusterIds)) {
+      const relationshipQueryBuilder = qb.addChildQueryBuilder('relationship');
+      relationshipQueryBuilder.filter.where({
+        clusterId: {
+          inq: this.clusterIds
+        }
+      });
+    }
+
     // case classification
     if (!_.isEmpty(this.classificationId)) {
       qb.filter.where({

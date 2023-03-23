@@ -23,6 +23,8 @@ import { CaseModel } from '../../models/case.model';
 import { IBasicCount } from '../../models/basic-count.interface';
 import { FileSize } from '../../helperClasses/file-size';
 import { EntityModel } from '../../models/entity-and-relationship.model';
+import { IV2DateRange } from '../../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
+import { IV2NumberRange } from '../../../shared/forms-v2/components/app-form-number-range-v2/models/number.model';
 
 export interface IConvertChainToGraphElements {
   nodes: {
@@ -152,7 +154,12 @@ export class TransmissionChainDataService {
       name?: string,
       labSeqResult?: string[],
       classification?: string[],
-      occupation?: string[]
+      occupation?: string[],
+      outcomeId?: string[],
+      gender?: string[],
+      cluster?: string[],
+      age?: IV2NumberRange,
+      date?: IV2DateRange
     }
   ): ITransmissionChainGroupPageModel[] {
     // must filter
@@ -166,6 +173,19 @@ export class TransmissionChainDataService {
       ) || (
         snapshotFilters.occupation &&
         snapshotFilters.occupation.length > 0
+      ) || (
+        snapshotFilters.outcomeId &&
+        snapshotFilters.outcomeId.length > 0
+      ) || (
+        snapshotFilters.gender &&
+        snapshotFilters.gender.length > 0
+      ) || (
+        snapshotFilters.cluster &&
+        snapshotFilters.cluster.length > 0
+      ) || (
+        !!snapshotFilters.age
+      ) || (
+        !!snapshotFilters.date
       )
     );
 
@@ -191,6 +211,19 @@ export class TransmissionChainDataService {
     let snapshotFiltersOccupation: {
       [occupation: string]: true
     };
+    let snapshotFiltersOutcomeId: {
+      [outcomeId: string]: true
+    };
+    let snapshotFiltersGender: {
+      [gender: string]: true
+    };
+    let snapshotFiltersCluster: {
+      [cluster: string]: true
+    };
+    let snapshotFiltersAge: IV2NumberRange;
+    let snapshotFiltersDate: IV2DateRange;
+
+    // filter chains
     if (mustFilterSnapshot) {
       // filter value
       snapshotFiltersName = snapshotFilters.name ? snapshotFilters.name.toLowerCase() : null;
@@ -230,7 +263,69 @@ export class TransmissionChainDataService {
           snapshotFiltersOccupation[occupation] = true;
         });
       }
+
+      // outcomeId
+      snapshotFiltersGender = null;
+      if (
+        snapshotFilters.outcomeId &&
+        snapshotFilters.outcomeId.length > 0
+      ) {
+        snapshotFiltersOutcomeId = {};
+        snapshotFilters.outcomeId.forEach((outcomeId) => {
+          snapshotFiltersOutcomeId[outcomeId] = true;
+        });
+      }
+
+      // gender
+      snapshotFiltersGender = null;
+      if (
+        snapshotFilters.gender &&
+        snapshotFilters.gender.length > 0
+      ) {
+        snapshotFiltersGender = {};
+        snapshotFilters.gender.forEach((gender) => {
+          snapshotFiltersGender[gender] = true;
+        });
+      }
+
+      // cluster
+      snapshotFiltersCluster = null;
+      if (
+        snapshotFilters.cluster &&
+        snapshotFilters.cluster.length > 0
+      ) {
+        snapshotFiltersCluster = {};
+        snapshotFilters.cluster.forEach((cluster) => {
+          snapshotFiltersCluster[cluster] = true;
+        });
+      }
+
+      // age
+      snapshotFiltersAge = snapshotFilters.age ? snapshotFilters.age : null;
+
+      // date
+      snapshotFiltersDate = snapshotFilters.date ? snapshotFilters.date : null;
     }
+
+    // map entity to cluster
+    const clustersMap: {
+      [entityId: string]: {
+        [clusterId: string]: true
+      }
+    } = {};
+    (chainGroup.relationships || []).forEach(relationship => {
+      if (
+        relationship.clusterId &&
+        relationship.persons.length === 2
+      ) {
+        clustersMap[relationship.persons[0].id] = {
+          [relationship.clusterId]: true
+        };
+        clustersMap[relationship.persons[1].id] = {
+          [relationship.clusterId]: true
+        };
+      }
+    });
 
     // filter nodes
     const nodesToCheck: EntityModel[] = Object.values(chainGroup.nodesMap);
@@ -263,6 +358,39 @@ export class TransmissionChainDataService {
             !(nodeData.model instanceof EventModel) &&
             nodeData.model.occupation &&
             snapshotFiltersOccupation[nodeData.model.occupation]
+          )
+        ) && (
+          !snapshotFiltersOutcomeId || (
+            nodeData.model instanceof CaseModel &&
+            nodeData.model.outcomeId &&
+            snapshotFiltersOutcomeId[nodeData.model.outcomeId]
+          )
+        ) && (
+          !snapshotFiltersGender || (
+            !(nodeData.model instanceof EventModel) &&
+            nodeData.model.gender &&
+            snapshotFiltersGender[nodeData.model.gender]
+          )
+        ) && (
+          !snapshotFiltersCluster || (
+            Object.keys(clustersMap).length &&
+            clustersMap[nodeData.model.id] &&
+            Object.keys(clustersMap[nodeData.model.id]).filter(clusterId => Object.keys(snapshotFiltersCluster).includes(clusterId)).length
+          )
+        ) && (
+          !snapshotFiltersAge ||
+          (
+            !(nodeData.model instanceof EventModel) &&
+            nodeData.model.age &&
+            nodeData.model.age.years && (
+              !snapshotFiltersAge.from || nodeData.model.age.years >= snapshotFiltersAge.from
+            ) && (
+              !snapshotFiltersAge.to || nodeData.model.age.years <= snapshotFiltersAge.to
+            )
+          )
+        ) && (
+          !snapshotFiltersDate || (
+            moment(nodeData.model.dateOfReporting).isBetween(snapshotFiltersDate.startDate, snapshotFiltersDate.endDate)
           )
         )
       ) {
