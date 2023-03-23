@@ -9,6 +9,7 @@ export class TransmissionChainFilters {
   outcomeId: string[];
   firstName: string;
   lastName: string;
+  labSequenceResult?: string[];
   gender: string[];
   locationIds: string[];
   clusterIds: string[];
@@ -29,6 +30,7 @@ export class TransmissionChainFilters {
     outcomeId?: string[],
     firstName?: string,
     lastName?: string,
+    labSequenceResult?: string[],
     gender?: string[],
     locationIds?: string[],
     clusterIds?: string[],
@@ -53,6 +55,16 @@ export class TransmissionChainFilters {
       relationshipQueryBuilder.filter.where({
         clusterId: {
           inq: this.clusterIds
+        }
+      });
+    }
+
+    // Lab result variant/strain result
+    if (!_.isEmpty(this.labSequenceResult)) {
+      const labResultQueryBuilder = qb.addChildQueryBuilder('labResult');
+      labResultQueryBuilder.filter.where({
+        'sequence.resultId': {
+          inq: this.labSequenceResult
         }
       });
     }
