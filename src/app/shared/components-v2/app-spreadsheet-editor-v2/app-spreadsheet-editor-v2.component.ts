@@ -22,7 +22,6 @@ import {
 import { IV2SpreadsheetEditorExtendedColDef, IV2SpreadsheetEditorExtendedColDefEditor, IV2SpreadsheetEditorExtendedColDefEditorError, IV2SpreadsheetEditorExtendedColDefEditorSelectionRange } from './models/extended-column.model';
 import * as moment from 'moment';
 import { Moment } from 'moment';
-import { AppSpreadsheetEditorV2CellBasicHeaderComponent } from './components/header-basic/app-spreadsheet-editor-v2-cell-basic-header.component';
 import { NewValueParams, SuppressHeaderKeyboardEventParams, SuppressKeyboardEventParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 import { IV2SpreadsheetEditorChangeValues, V2SpreadsheetEditorChange, V2SpreadsheetEditorChangeType } from './models/change.model';
 import { Observable, of, Subscription, switchMap, throwError } from 'rxjs';
@@ -50,6 +49,7 @@ import { DateDefaultPipe } from '../../pipes/date-default-pipe/date-default.pipe
 import { CdkContextMenuTrigger } from '@angular/cdk/menu';
 import { AppSpreadsheetEditorV2CellRowNoRendererModel } from './models/app-spreadsheet-editor-v2-cell-row-no-renderer.model';
 import { AppSpreadsheetEditorV2CellBasicHeaderPivotComponent } from './components/header-left-top-corner/app-spreadsheet-editor-v2-cell-basic-header-pivot.component';
+import { AppSpreadsheetEditorV2CellBasicHeaderModel } from './models/app-spreadsheet-editor-v2-cell-basic-header.model';
 
 /**
  * Component
@@ -838,7 +838,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           padding: '0',
           border: 'none'
         },
-        headerComponent: AppSpreadsheetEditorV2CellBasicHeaderComponent,
+        headerComponent: AppSpreadsheetEditorV2CellBasicHeaderModel,
         suppressKeyboardEvent: (params): boolean => {
           return this.suppressKeyboardEvent(params);
         },

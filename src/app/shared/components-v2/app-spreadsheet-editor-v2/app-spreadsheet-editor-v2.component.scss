@@ -191,6 +191,26 @@ app-spreadsheet-editor-v2 {
       }
     }
 
+    /* Spreadsheet Header Cell */
+    .gd-spreadsheet-editor-v2-cell-basic-header {
+      border: 0.1rem solid transparent;
+      @include box-sizing(border-box);
+      @include flex(flex);
+      @include flex_align_items(center);
+      height: 100%;
+      padding: 0 0.8rem;
+      width: 100%;
+
+      &.gd-spreadsheet-editor-v2-cell-basic-header-selected-partial {
+        background-color: rgba(var(--gd-primary-rgb), 0.15);
+      }
+
+      &.gd-spreadsheet-editor-v2-cell-basic-header-selected-full {
+        background-color: var(--gd-primary);
+        color: var(--gd-background);
+      }
+    }
+
     /* Spreadsheet Row Cell */
     .gd-spreadsheet-editor-v2-cell-row-no-renderer {
       border-width: 0.1rem;
