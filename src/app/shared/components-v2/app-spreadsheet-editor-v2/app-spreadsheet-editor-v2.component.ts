@@ -48,8 +48,8 @@ import { determineIfMacDevice } from '../../../core/methods/mac';
 import { DateDefaultPipe } from '../../pipes/date-default-pipe/date-default.pipe';
 import { CdkContextMenuTrigger } from '@angular/cdk/menu';
 import { AppSpreadsheetEditorV2CellRowNoRendererModel } from './models/app-spreadsheet-editor-v2-cell-row-no-renderer.model';
-import { AppSpreadsheetEditorV2CellBasicHeaderPivotComponent } from './components/header-left-top-corner/app-spreadsheet-editor-v2-cell-basic-header-pivot.component';
 import { AppSpreadsheetEditorV2CellBasicHeaderModel } from './models/app-spreadsheet-editor-v2-cell-basic-header.model';
+import { AppSpreadsheetEditorV2CellBasicHeaderPivotComponent } from './components/header-pivot/app-spreadsheet-editor-v2-cell-basic-header-pivot.component';
 
 /**
  * Component

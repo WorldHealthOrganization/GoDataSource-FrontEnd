@@ -23,7 +23,7 @@ import { AppSpreadsheetEditorV2EditorLocationComponent } from './app-spreadsheet
 import { AppSpreadsheetEditorV2EditorNumberComponent } from './app-spreadsheet-editor-v2/components/editor-number/app-spreadsheet-editor-v2-editor-number.component';
 import { AppSpreadsheetEditorV2LoadingComponent } from './app-spreadsheet-editor-v2/components/loading/app-spreadsheet-editor-v2-loading.component';
 import { AppSpreadsheetEditorV2NoDataComponent } from './app-spreadsheet-editor-v2/components/no-data/app-spreadsheet-editor-v2-no-data.component';
-import { AppSpreadsheetEditorV2CellBasicHeaderPivotComponent } from './app-spreadsheet-editor-v2/components/header-left-top-corner/app-spreadsheet-editor-v2-cell-basic-header-pivot.component';
+import { AppSpreadsheetEditorV2CellBasicHeaderPivotComponent } from './app-spreadsheet-editor-v2/components/header-pivot/app-spreadsheet-editor-v2-cell-basic-header-pivot.component';
 
 export const components: any[] = [
   AppBasicPageV2Component,
@@ -45,11 +45,11 @@ export const components: any[] = [
   AppSelectLanguageV2Component,
   AppSideDialogV2Component,
   AppSpreadsheetEditorV2Component,
+  AppSpreadsheetEditorV2CellBasicHeaderPivotComponent,
   AppSpreadsheetEditorV2EditorDateComponent,
   AppSpreadsheetEditorV2EditorLocationComponent,
   AppSpreadsheetEditorV2EditorNumberComponent,
   AppSpreadsheetEditorV2EditorSingleSelectComponent,
-  AppSpreadsheetEditorV2CellBasicHeaderPivotComponent,
   AppSpreadsheetEditorV2LoadingComponent,
   AppSpreadsheetEditorV2NoDataComponent
 ];
