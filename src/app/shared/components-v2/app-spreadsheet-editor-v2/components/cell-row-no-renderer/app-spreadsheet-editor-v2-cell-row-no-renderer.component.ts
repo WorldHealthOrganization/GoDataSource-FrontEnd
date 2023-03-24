@@ -57,6 +57,20 @@ export class AppSpreadsheetEditorV2CellRowNoRendererComponent implements ICellRe
   }
 
   /**
+   * Context menu
+   */
+  contextMenu(event: PointerEvent): boolean {
+    // stop
+    event.preventDefault();
+
+    // show context menu
+    this.colDef.editor.helpers.openMenu(event);
+
+    // finish
+    return false;
+  }
+
+  /**
    * Mouse enter
    */
   mouseEnter(event: MouseEvent): void {

@@ -23,6 +23,9 @@
 </app-basic-page-v2>
 
 <!-- Cell - Context menu for spreadsheet-editor -->
+<span
+  style="display: inline-block; width: 0; height: 0; position: absolute;"
+  [cdkContextMenuTriggerFor]="cellContextMenu"></span>
 <ng-template
   #cellContextMenu>
   <div

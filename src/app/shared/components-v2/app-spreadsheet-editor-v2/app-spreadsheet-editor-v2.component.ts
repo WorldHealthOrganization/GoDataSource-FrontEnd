@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
 import { IV2ActionIconLabel, V2ActionType } from '../app-list-table-v2/models/action.model';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
@@ -16,11 +16,10 @@ import {
   IV2SpreadsheetEditorHandler,
   V2SpreadsheetEditorColumn,
   V2SpreadsheetEditorColumnType,
-  V2SpreadsheetEditorColumnTypeToEditor,
+  V2SpreadsheetEditorColumnTypeToEditor, V2SpreadsheetEditorColumnTypeToRenderer,
   V2SpreadsheetEditorEventType
 } from './models/column.model';
 import { IV2SpreadsheetEditorExtendedColDef, IV2SpreadsheetEditorExtendedColDefEditor, IV2SpreadsheetEditorExtendedColDefEditorError, IV2SpreadsheetEditorExtendedColDefEditorSelectionRange } from './models/extended-column.model';
-import { AppSpreadsheetEditorV2CellBasicRendererComponent } from './components/cell-basic-renderer/app-spreadsheet-editor-v2-cell-basic-renderer.component';
 import * as moment from 'moment';
 import { Moment } from 'moment';
 import { AppSpreadsheetEditorV2CellBasicHeaderComponent } from './components/header-basic/app-spreadsheet-editor-v2-cell-basic-header.component';
@@ -48,6 +47,8 @@ import { IRowNode } from '@ag-grid-community/core/dist/cjs/es5/interfaces/iRowNo
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { AgGridAngular } from '@ag-grid-community/angular';
 import { determineIfMacDevice } from '../../../core/methods/mac';
+import { DateDefaultPipe } from '../../pipes/date-default-pipe/date-default.pipe';
+import { CdkContextMenuTrigger } from '@angular/cdk/menu';
 
 /**
  * Component
@@ -68,16 +69,14 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   private static readonly SCROLL_SPEED_MS: number = 20;
   private static readonly SCROLL_SPEED_PX: number = 8;
 
-  // elements
-  @ViewChild('cellContextMenu', { static: true }) set cellContextMenu(cellContextMenu: TemplateRef<any>) {
-    this.editor.cellContextMenu = cellContextMenu;
-  }
-
   // basic page
   @ViewChild(AppBasicPageV2Component, { static: true }) private _basicPage: AppBasicPageV2Component;
 
   // ag-grid angular component
   @ViewChild(AgGridAngular, { static: true, read: ElementRef }) private _agGridAngularElementRef: ElementRef;
+
+  // context menu
+  @ViewChild(CdkContextMenuTrigger, { static: true }) private _contextMenu: CdkContextMenuTrigger;
 
   // breadcrumbs
   @Input() breadcrumbs: IV2Breadcrumb[];
@@ -156,6 +155,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     return this._formDirty;
   }
 
+  // used to format dates
+  private _datePipe: DateDefaultPipe = new DateDefaultPipe();
+
   // keep changes
   changes: V2SpreadsheetEditorChange[] = [];
   changesIndex: number = 0;
@@ -165,8 +167,17 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // setup
     action: undefined,
 
-    // elements
-    cellContextMenu: undefined,
+    // helpers
+    helpers: {
+      date: (value) => this._datePipe.transform(value),
+      translate: (value) => this.i18nService.instant(value),
+      openMenu: (event) => {
+        this._contextMenu.open({
+          x: event.x,
+          y: event.y
+        });
+      }
+    },
 
     // columns map
     columnsMap: {},
@@ -821,7 +832,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         cellEditorParams: column.editor?.params,
         columnDefinition: column,
         editor: this.editor,
-        cellRenderer: AppSpreadsheetEditorV2CellBasicRendererComponent,
+        cellRenderer: V2SpreadsheetEditorColumnTypeToRenderer[column.type],
         cellStyle: {
           padding: '0',
           border: 'none'

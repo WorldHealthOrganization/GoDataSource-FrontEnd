@@ -1,7 +1,6 @@
 import { ColDef } from '@ag-grid-community/core';
 import { IV2SpreadsheetEditorEventDataLocation, V2SpreadsheetEditorColumn } from './column.model';
 import { Moment } from 'moment';
-import { TemplateRef } from '@angular/core';
 import { CreateViewModifyV2Action } from '../../app-create-view-modify-v2/models/action.model';
 import { AppFormBaseErrorMsgV2Type } from '../../../forms-v2/core/app-form-base-error-msg-v2';
 import { Subscription } from 'rxjs';
@@ -57,8 +56,12 @@ export interface IV2SpreadsheetEditorExtendedColDefEditor {
   // setup
   action: CreateViewModifyV2Action.CREATE | CreateViewModifyV2Action.MODIFY,
 
-  // elements
-  cellContextMenu: TemplateRef<any>,
+  // helpers
+  helpers: {
+    date: (value: string) => string,
+    translate: (value: string) => string,
+    openMenu: (event: PointerEvent) => void
+  },
 
   // columns map
   columnsMap: IV2SpreadsheetEditorExtendedColDefEditorColumnMap,

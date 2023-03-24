@@ -9,6 +9,10 @@ import { Observable } from 'rxjs';
 import { IGeneralAsyncValidatorResponse } from '../../../xt-forms/validators/general-async-validator.directive';
 import { V2SpreadsheetEditorChange } from './change.model';
 import { Moment } from '../../../../core/helperClasses/x-moment';
+import { AppSpreadsheetEditorV2CellBasicRendererModel } from './app-spreadsheet-editor-v2-cell-basic-renderer.model';
+import { AppSpreadsheetEditorV2CellSelectRendererModel } from './app-spreadsheet-editor-v2-cell-select-renderer.model';
+import { AppSpreadsheetEditorV2CellDateRendererModel } from './app-spreadsheet-editor-v2-cell-date-renderer.model';
+import { AppSpreadsheetEditorV2CellLocationRendererModel } from './app-spreadsheet-editor-v2-cell-location-renderer.model';
 
 /**
  * Editor handler
@@ -222,6 +226,20 @@ export interface IV2SpreadsheetEditorColumnNumber extends Omit<IV2SpreadsheetEdi
  */
 export type V2SpreadsheetEditorColumn = IV2SpreadsheetEditorColumnText | IV2SpreadsheetEditorColumnTextarea | IV2SpreadsheetEditorColumnSingleSelect | IV2SpreadsheetEditorColumnDate
 | IV2SpreadsheetEditorColumnLocation | IV2SpreadsheetEditorColumnNumber;
+
+/**
+ * Renderers
+ */
+export const V2SpreadsheetEditorColumnTypeToRenderer: {
+  [type in V2SpreadsheetEditorColumnType]: typeof AppSpreadsheetEditorV2CellBasicRendererModel
+} = {
+  [V2SpreadsheetEditorColumnType.TEXT]: AppSpreadsheetEditorV2CellBasicRendererModel,
+  [V2SpreadsheetEditorColumnType.TEXTAREA]: AppSpreadsheetEditorV2CellBasicRendererModel,
+  [V2SpreadsheetEditorColumnType.SINGLE_SELECT]: AppSpreadsheetEditorV2CellSelectRendererModel,
+  [V2SpreadsheetEditorColumnType.DATE]: AppSpreadsheetEditorV2CellDateRendererModel,
+  [V2SpreadsheetEditorColumnType.LOCATION]: AppSpreadsheetEditorV2CellLocationRendererModel,
+  [V2SpreadsheetEditorColumnType.NUMBER]: AppSpreadsheetEditorV2CellBasicRendererModel
+};
 
 /**
  * Supported editors
