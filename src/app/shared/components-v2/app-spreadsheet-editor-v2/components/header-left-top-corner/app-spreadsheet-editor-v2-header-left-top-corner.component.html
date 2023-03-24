@@ -1,0 +1,25 @@
+<div
+  id="gd-spreadsheet-editor-v2-cell-basic-header-0"
+  class="gd-spreadsheet-editor-v2-header-left-top-corner"
+  (mouseenter)="mouseEnter($event)"
+  (mousedown)="mouseDown($event)"
+  (mouseup)="mouseUp()"
+  (mouseleave)="mouseLeave()"
+  (mousemove)="mouseMove($event)">
+
+  <!-- Value -->
+  <div
+    class="gd-spreadsheet-editor-v2-header-left-top-corner-value">
+
+    <!-- Details / Rows with errors -->
+    <div
+      [matTooltip]="colDef.editor.errorRows ? ('LNG_FORM_VALIDATION_EDITOR_HELP' | translate) + '. ' + colDef.editor.errorRows : ('LNG_FORM_VALIDATION_EDITOR_HELP' | translate)"
+      [matTooltipClass]="colDef.editor.errorRows ? 'gd-tooltip-error' : undefined"
+      matTooltipPosition="after">
+      <mat-icon
+        [color]="colDef.editor.errorRows ? 'warn' : undefined">help</mat-icon>
+    </div>
+
+  </div>
+
+</div>

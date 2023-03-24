@@ -1,7 +1,6 @@
 <div
   [id]="id"
   class="gd-spreadsheet-editor-v2-cell-basic-header"
-  [class.gd-spreadsheet-editor-v2-cell-basic-header-first-cell]="columnIndex === 0"
   (mouseenter)="mouseEnter($event)"
   (mousedown)="mouseDown($event)"
   (mouseup)="mouseUp()"
@@ -11,17 +10,6 @@
   <!-- Value -->
   <div
     class="gd-spreadsheet-editor-v2-cell-basic-header-value">
-
-    <!-- Details / Rows with errors -->
-    <div
-      *ngIf="columnIndex === 0"
-      [matTooltip]="colDef.editor.errorRows ? ('LNG_FORM_VALIDATION_EDITOR_HELP' | translate) + '. ' + colDef.editor.errorRows : ('LNG_FORM_VALIDATION_EDITOR_HELP' | translate)"
-      [matTooltipClass]="colDef.editor.errorRows ? 'gd-tooltip-error' : undefined"
-      matTooltipPosition="after"
-      class="gd-spreadsheet-editor-v2-cell-basic-header-first-cell-value">
-      <mat-icon
-        [color]="colDef.editor.errorRows ? 'warn' : undefined">help</mat-icon>
-    </div>
 
     <!-- Label -->
     <span>
