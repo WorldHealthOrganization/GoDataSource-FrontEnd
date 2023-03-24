@@ -191,6 +191,45 @@ app-spreadsheet-editor-v2 {
       }
     }
 
+    /* Spreadsheet Row Cell */
+    .gd-spreadsheet-editor-v2-cell-row-no-renderer {
+      border-width: 0.1rem;
+      border-style: none solid solid none;
+      border-color: transparent rgba(var(--gd-secondary-rgb), 0.25) rgba(var(--gd-secondary-rgb), 0.25) transparent;
+      @include box-sizing(border-box);
+      @include flex(flex);
+      @include flex_align_items(center);
+      height: 100%;
+      width: 100%;
+
+      .gd-spreadsheet-editor-v2-cell-row-no-renderer-value {
+        padding-left: 0.8rem;
+        padding-right: 0.8rem;
+      }
+
+      &.gd-spreadsheet-editor-v2-cell-row-no-renderer-selected-partial {
+        background-color: rgba(var(--gd-primary-rgb), 0.15);
+
+        &.gd-spreadsheet-editor-v2-cell-row-no-renderer-invalid {
+          background-color: rgba(var(--gd-danger-rgb), 0.35);
+        }
+      }
+
+      &.gd-spreadsheet-editor-v2-cell-row-no-renderer-selected-full {
+        background-color: var(--gd-primary);
+        color: var(--gd-background);
+
+        &.gd-spreadsheet-editor-v2-cell-row-no-renderer-invalid {
+          background-color: var(--gd-danger);
+          color: var(--gd-background);
+        }
+      }
+
+      &.gd-spreadsheet-editor-v2-cell-row-no-renderer-invalid {
+        background-color: rgba(var(--gd-danger-rgb), 0.25);
+      }
+    }
+
     /* Spreadsheet Cell */
     .gd-spreadsheet-editor-v2-cell-basic-renderer {
       /* Variables */

@@ -23,7 +23,6 @@ import { IV2SpreadsheetEditorExtendedColDef, IV2SpreadsheetEditorExtendedColDefE
 import * as moment from 'moment';
 import { Moment } from 'moment';
 import { AppSpreadsheetEditorV2CellBasicHeaderComponent } from './components/header-basic/app-spreadsheet-editor-v2-cell-basic-header.component';
-import { AppSpreadsheetEditorV2CellRowNoRendererComponent } from './components/cell-row-no-renderer/app-spreadsheet-editor-v2-cell-row-no-renderer.component';
 import { NewValueParams, SuppressHeaderKeyboardEventParams, SuppressKeyboardEventParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 import { IV2SpreadsheetEditorChangeValues, V2SpreadsheetEditorChange, V2SpreadsheetEditorChangeType } from './models/change.model';
 import { Observable, of, Subscription, switchMap, throwError } from 'rxjs';
@@ -49,6 +48,7 @@ import { AgGridAngular } from '@ag-grid-community/angular';
 import { determineIfMacDevice } from '../../../core/methods/mac';
 import { DateDefaultPipe } from '../../pipes/date-default-pipe/date-default.pipe';
 import { CdkContextMenuTrigger } from '@angular/cdk/menu';
+import { AppSpreadsheetEditorV2CellRowNoRendererModel } from './models/app-spreadsheet-editor-v2-cell-row-no-renderer.model';
 
 /**
  * Component
@@ -776,7 +776,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       width: AppSpreadsheetEditorV2CellBasicHeaderComponent.DEFAULT_COLUMN_ROW_NO_WIDTH,
       cellClass: 'gd-spreadsheet-editor-row-no',
       editor: this.editor,
-      cellRenderer: AppSpreadsheetEditorV2CellRowNoRendererComponent,
+      cellRenderer: AppSpreadsheetEditorV2CellRowNoRendererModel,
       cellStyle: {
         padding: '0',
         border: 'none'

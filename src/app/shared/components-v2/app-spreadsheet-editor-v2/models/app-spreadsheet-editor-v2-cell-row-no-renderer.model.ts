@@ -2,13 +2,12 @@ import { ICellRendererComp, ICellRendererParams } from '@ag-grid-community/core'
 import { IV2SpreadsheetEditorExtendedColDef } from './extended-column.model';
 
 /**
- * Basic cell renderer (text, textarea ...)
+ * Row number cell renderer
  */
-export class AppSpreadsheetEditorV2CellBasicRendererModel implements ICellRendererComp {
+export class AppSpreadsheetEditorV2CellRowNoRendererModel implements ICellRendererComp {
   // gui
   private _guiRoot: HTMLDivElement;
   protected _guiRootValueHTML: HTMLDivElement;
-  protected _guiRootFill: HTMLDivElement;
 
   // data
   protected _params: ICellRendererParams;
@@ -26,9 +25,8 @@ export class AppSpreadsheetEditorV2CellBasicRendererModel implements ICellRender
     return false;
   };
   private _mouseEnter: (event: MouseEvent) => void = (event) => {
-    this._colDef.editor.selection.cell.mouseEnter(
+    this._colDef.editor.selection.header.left.mouseEnter(
       this._params.rowIndex,
-      this._colDef.editor.columnsMap[this._colDef.columnDefinition.field].index,
       event.buttons === 1
     );
   };
@@ -39,28 +37,20 @@ export class AppSpreadsheetEditorV2CellBasicRendererModel implements ICellRender
     }
 
     // execute mouse down
-    this._colDef.editor.selection.cell.mouseDown(
+    this._colDef.editor.selection.header.left.mouseDown(
       this._params.rowIndex,
-      this._colDef.editor.columnsMap[this._colDef.columnDefinition.field].index,
       event.ctrlKey,
       event.shiftKey
     );
   };
   private _mouseUp: () => void = () => {
-    this._colDef.editor.selection.cell.mouseUp();
+    this._colDef.editor.selection.header.left.mouseUp();
   };
   private _mouseLeave: () => void = () => {
-    this._colDef.editor.selection.cell.mouseLeave();
+    this._colDef.editor.selection.header.left.mouseLeave();
   };
   private _mouseMove: (event: MouseEvent) => void = (event) => {
-    this._colDef.editor.selection.cell.mouseMove(event);
-  };
-  private _fillMouseMove: (event: MouseEvent) => void = (event) => {
-    // stop propagation
-    event.stopPropagation();
-
-    // trigger fill process
-    this._colDef.editor.selection.cell.fill();
+    this._colDef.editor.selection.header.left.mouseMove(event);
   };
 
   /**
@@ -70,27 +60,20 @@ export class AppSpreadsheetEditorV2CellBasicRendererModel implements ICellRender
     // initialize root
     this._guiRoot = document.createElement('div');
 
-    // fill
-    this._guiRootFill = document.createElement('div');
-
     // data
     this.updateParams(params);
 
     // attach classes
-    this._guiRoot.classList.add('gd-spreadsheet-editor-v2-cell-basic-renderer');
-    this._guiRootFill.classList.add('gd-spreadsheet-editor-v2-cell-basic-renderer-fill');
+    this._guiRoot.classList.add('gd-spreadsheet-editor-v2-cell-row-no-renderer');
 
     // create child value
-    const guiRootValue = document.createElement('div');
     this._guiRootValueHTML = document.createElement('div');
 
     // attach css
-    guiRootValue.classList.add('gd-spreadsheet-editor-v2-cell-basic-renderer-value');
+    this._guiRootValueHTML.classList.add('gd-spreadsheet-editor-v2-cell-row-no-renderer-value');
 
     // append child
-    guiRootValue.appendChild(this._guiRootValueHTML);
-    this._guiRoot.appendChild(guiRootValue);
-    this._guiRoot.appendChild(this._guiRootFill);
+    this._guiRoot.appendChild(this._guiRootValueHTML);
 
     // attach events
     this._guiRoot.addEventListener(
@@ -116,10 +99,6 @@ export class AppSpreadsheetEditorV2CellBasicRendererModel implements ICellRender
     this._guiRoot.addEventListener(
       'mousemove',
       this._mouseMove
-    );
-    this._guiRootFill.addEventListener(
-      'mousedown',
-      this._fillMouseMove
     );
 
     // update value
@@ -154,10 +133,6 @@ export class AppSpreadsheetEditorV2CellBasicRendererModel implements ICellRender
     this._guiRoot.removeEventListener(
       'mousemove',
       this._mouseMove
-    );
-    this._guiRootFill.removeEventListener(
-      'mousedown',
-      this._fillMouseMove
     );
   }
 
@@ -199,16 +174,9 @@ export class AppSpreadsheetEditorV2CellBasicRendererModel implements ICellRender
    */
   private checkAndUpdateIDs(): void {
     // root id
-    const columnIndex = this._colDef.editor.columnsMap[this._colDef.columnDefinition.field].index;
-    let id = `gd-spreadsheet-editor-v2-cell-basic-renderer-${this._params.rowIndex}-${columnIndex}`;
+    const id = `gd-spreadsheet-editor-v2-cell-row-no-renderer-${this._params.rowIndex}`;
     if (this._guiRoot.id !== id) {
       this._guiRoot.id = id;
-    }
-
-    // fill id
-    id = `gd-spreadsheet-editor-v2-cell-basic-renderer-fill-${this._params.rowIndex}-${columnIndex}`;
-    if (this._guiRootFill.id !== id) {
-      this._guiRootFill.id = id;
     }
   }
 
@@ -216,25 +184,6 @@ export class AppSpreadsheetEditorV2CellBasicRendererModel implements ICellRender
    * Update value
    */
   protected updateValue(): void {
-    this._guiRootValueHTML.innerHTML = this._params.value || this._params.value === 0 ?
-      this._params.value :
-      '';
-  }
-
-  /**
-   * Start edit cell
-   */
-  protected startEditCell(key?: string): void {
-    // nothing to do ?
-    if (!this._params) {
-      return;
-    }
-
-    // edit cell
-    this._params.api.startEditingCell({
-      rowIndex: this._params.rowIndex,
-      colKey: this._colDef.columnDefinition.field,
-      key
-    });
+    this._guiRootValueHTML.innerHTML = (this._params.rowIndex + 1).toString();
   }
 }

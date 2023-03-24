@@ -22,7 +22,6 @@ import { AppSpreadsheetEditorV2EditorDateComponent } from './app-spreadsheet-edi
 import { AppSpreadsheetEditorV2EditorLocationComponent } from './app-spreadsheet-editor-v2/components/editor-location/app-spreadsheet-editor-v2-editor-location.component';
 import { AppSpreadsheetEditorV2EditorNumberComponent } from './app-spreadsheet-editor-v2/components/editor-number/app-spreadsheet-editor-v2-editor-number.component';
 import { AppSpreadsheetEditorV2CellBasicHeaderComponent } from './app-spreadsheet-editor-v2/components/header-basic/app-spreadsheet-editor-v2-cell-basic-header.component';
-import { AppSpreadsheetEditorV2CellRowNoRendererComponent } from './app-spreadsheet-editor-v2/components/cell-row-no-renderer/app-spreadsheet-editor-v2-cell-row-no-renderer.component';
 import { AppSpreadsheetEditorV2LoadingComponent } from './app-spreadsheet-editor-v2/components/loading/app-spreadsheet-editor-v2-loading.component';
 import { AppSpreadsheetEditorV2NoDataComponent } from './app-spreadsheet-editor-v2/components/no-data/app-spreadsheet-editor-v2-no-data.component';
 
@@ -46,7 +45,6 @@ export const components: any[] = [
   AppSelectLanguageV2Component,
   AppSideDialogV2Component,
   AppSpreadsheetEditorV2CellBasicHeaderComponent,
-  AppSpreadsheetEditorV2CellRowNoRendererComponent,
   AppSpreadsheetEditorV2Component,
   AppSpreadsheetEditorV2EditorDateComponent,
   AppSpreadsheetEditorV2EditorLocationComponent,
