@@ -22,9 +22,5 @@ app-spreadsheet-editor-v2-cell-basic-header {
       background-color: var(--gd-primary);
       color: var(--gd-background);
     }
-
-    &.gd-spreadsheet-editor-v2-cell-basic-header-invalid {
-      background-color: rgba(var(--gd-danger-rgb), 0.25);
-    }
   }
 }

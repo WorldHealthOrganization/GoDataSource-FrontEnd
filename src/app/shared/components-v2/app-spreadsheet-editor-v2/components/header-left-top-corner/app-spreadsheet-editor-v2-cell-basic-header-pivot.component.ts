@@ -7,13 +7,13 @@ import { IV2SpreadsheetEditorExtendedColDef } from '../../models/extended-column
  * Component
  */
 @Component({
-  selector: 'app-spreadsheet-editor-v2-header-left-top-corner',
-  templateUrl: './app-spreadsheet-editor-v2-header-left-top-corner.component.html',
-  styleUrls: ['./app-spreadsheet-editor-v2-header-left-top-corner.component.scss'],
+  selector: 'app-spreadsheet-editor-v2-cell-basic-header-pivot',
+  templateUrl: './app-spreadsheet-editor-v2-cell-basic-header-pivot.component.html',
+  styleUrls: ['./app-spreadsheet-editor-v2-cell-basic-header-pivot.component.scss'],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppSpreadsheetEditorV2HeaderLeftTopCornerComponent implements IHeaderAngularComp, OnDestroy {
+export class AppSpreadsheetEditorV2CellBasicHeaderPivotComponent implements IHeaderAngularComp, OnDestroy {
   // constants
   static readonly DEFAULT_COLUMN_ROW_NO: string = 'rowNo';
   static readonly DEFAULT_COLUMN_ROW_NO_WIDTH: number = 50;

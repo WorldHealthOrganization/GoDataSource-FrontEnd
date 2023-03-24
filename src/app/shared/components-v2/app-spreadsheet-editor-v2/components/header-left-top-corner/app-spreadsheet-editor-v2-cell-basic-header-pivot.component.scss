@@ -1,11 +1,11 @@
 @import 'mixins';
 
 /* Spreadsheet Header Cell */
-app-spreadsheet-editor-v2-header-left-top-corner {
+app-spreadsheet-editor-v2-cell-basic-header-pivot {
   height: 100%;
   width: 100%;
 
-  .gd-spreadsheet-editor-v2-header-left-top-corner {
+  .gd-spreadsheet-editor-v2-cell-basic-header-pivot {
     border: 0.1rem solid transparent;
     @include box-sizing(border-box);
     @include flex(flex);
@@ -14,11 +14,11 @@ app-spreadsheet-editor-v2-header-left-top-corner {
     padding: 0;
     width: 100%;
 
-    &.gd-spreadsheet-editor-v2-cell-basic-header-invalid {
+    &.gd-spreadsheet-editor-v2-cell-basic-header-pivot-invalid {
       background-color: rgba(var(--gd-danger-rgb), 0.25);
     }
 
-    .gd-spreadsheet-editor-v2-header-left-top-corner-value {
+    .gd-spreadsheet-editor-v2-cell-basic-header-pivot-value {
       height: 100%;
       width: 100%;
 
