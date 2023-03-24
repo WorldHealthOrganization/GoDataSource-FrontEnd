@@ -2,7 +2,7 @@ import { AppSpreadsheetEditorV2CellBasicRendererModel } from './app-spreadsheet-
 import { AppFormDateV2Component } from '../../../forms-v2/components/app-form-date-v2/app-form-date-v2.component';
 
 /**
- * Select date renderer
+ * Date cell renderer
  */
 export class AppSpreadsheetEditorV2CellDateRendererModel extends AppSpreadsheetEditorV2CellBasicRendererModel {
   // data

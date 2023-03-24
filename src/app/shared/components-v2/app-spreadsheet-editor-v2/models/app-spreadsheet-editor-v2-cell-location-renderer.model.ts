@@ -1,7 +1,7 @@
 import { AppSpreadsheetEditorV2CellBasicRendererModel } from './app-spreadsheet-editor-v2-cell-basic-renderer.model';
 
 /**
- * Select location renderer
+ * Location cell renderer
  */
 export class AppSpreadsheetEditorV2CellLocationRendererModel extends AppSpreadsheetEditorV2CellBasicRendererModel {
   // data
