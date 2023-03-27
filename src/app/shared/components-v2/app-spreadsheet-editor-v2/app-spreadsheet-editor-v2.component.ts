@@ -3595,7 +3595,12 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       navigator.clipboard.readText()
         .then((text) => {
           // actual paste
-          actualPasteText(text);
+          try {
+            actualPasteText(text);
+          } catch (e) {
+            // something went wrong
+            this.toastV2Service.error(e);
+          }
         })
         .catch(() => {
           // try the other way
