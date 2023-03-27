@@ -105,6 +105,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       this.records$ = of(records);
     }
   }
+  get action(): CreateViewModifyV2Action.CREATE | CreateViewModifyV2Action.MODIFY {
+    return this.editor.action;
+  }
 
   // columns
   private _locationColumns: string[];
@@ -690,7 +693,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // select first cell
         // - fix for first render issue (necessary to render css properly from this.validateAllRows)
         if (
-          this.editor.action === CreateViewModifyV2Action.MODIFY &&
+          this.action === CreateViewModifyV2Action.MODIFY &&
           data.length > 0
         ) {
           // start edit
@@ -1888,7 +1891,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       columnIndex: number,
       error: IV2SpreadsheetEditorExtendedColDefEditorError
     }[] = [];
-    let rowHasColumnData: boolean = this.editor.action === CreateViewModifyV2Action.MODIFY;
+    let rowHasColumnData: boolean = this.action === CreateViewModifyV2Action.MODIFY;
     for (let columnIndex = 0; columnIndex < this.columns.length; columnIndex++) {
       // +1 to take in account row no column
       const realColumnIndex: number = columnIndex + 1;
@@ -4448,8 +4451,13 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       });
     };
 
-    // check if async validation is in progress
-    checkIfAsyncFinished();
+    // wait for data to be processed (stop edit cell, save last value...)
+    // - setTimeout necessary
+    // - check if async validation is in progress
+    this._waitForAsyncToFinish = setTimeout(
+      checkIfAsyncFinished,
+      500
+    );
   }
 
   /**
