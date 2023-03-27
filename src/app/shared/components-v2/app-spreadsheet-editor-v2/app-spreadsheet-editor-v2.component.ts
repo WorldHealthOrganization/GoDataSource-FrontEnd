@@ -2332,17 +2332,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           return;
         }
 
-        // number of rows
+        // append number of rows
         const noOfRows: number = (response.data.map.rowsNo as IV2SideDialogConfigInputNumber).value;
-        const listToAdd: any[] = [];
-        for (let index = 0; index < noOfRows; index++) {
-          listToAdd.push(this.newRecord());
-        }
-
-        // append rows
-        this._agTable.api.applyTransaction({
-          add: listToAdd
-        });
+        this.rowActualAppend(noOfRows);
 
         // validate and redraw css
         this.cellUpdateRangeClasses(true);
@@ -2350,6 +2342,22 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // close dialog
         response.handler.hide();
       });
+  }
+
+  /**
+   * Append rows to editor
+   */
+  private rowActualAppend(noOfRows: number): void {
+    // append empty rows
+    const listToAdd: any[] = [];
+    for (let index = 0; index < noOfRows; index++) {
+      listToAdd.push(this.newRecord());
+    }
+
+    // append rows
+    this._agTable.api.applyTransaction({
+      add: listToAdd
+    });
   }
 
   /**
@@ -3040,6 +3048,13 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       );
     };
 
+    // do we need to append new rows ?
+    const start: number = range.rows.start;
+    const end: number = start + columnValues.length;
+    if (end > this._agTable.api.getDisplayedRowCount()) {
+      this.rowActualAppend(end - this._agTable.api.getDisplayedRowCount());
+    }
+
     // start pasting
     const locationsToRetrieve: {
       [key: string]: {
@@ -3047,7 +3062,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         columnIndex: number
       }[]
     } = {};
-    for (let rowIndex: number = range.rows.start; rowIndex < range.rows.start + columnValues.length; rowIndex++) {
+    for (let rowIndex: number = start; rowIndex < end; rowIndex++) {
       // retrieve row node
       const rowNode = this._agTable.api.getDisplayedRowAtIndex(rowIndex);
 
