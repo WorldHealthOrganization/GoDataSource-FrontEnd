@@ -4401,10 +4401,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         asyncFinished();
       }
     };
-    this._waitForAsyncToFinish = setTimeout(
-      checkIfAsyncFinished,
-      500
-    );
 
     // execute once async finished
     const asyncFinished = () => {
@@ -4451,6 +4447,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         }
       });
     };
+
+    // check if async validation is in progress
+    checkIfAsyncFinished();
   }
 
   /**
