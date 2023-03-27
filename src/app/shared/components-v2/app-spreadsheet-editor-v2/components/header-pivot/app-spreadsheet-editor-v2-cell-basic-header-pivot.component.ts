@@ -7,22 +7,19 @@ import { IV2SpreadsheetEditorExtendedColDef } from '../../models/extended-column
  * Component
  */
 @Component({
-  selector: 'app-spreadsheet-editor-v2-cell-basic-header',
-  templateUrl: './app-spreadsheet-editor-v2-cell-basic-header.component.html',
-  styleUrls: ['./app-spreadsheet-editor-v2-cell-basic-header.component.scss'],
+  selector: 'app-spreadsheet-editor-v2-cell-basic-header-pivot',
+  templateUrl: './app-spreadsheet-editor-v2-cell-basic-header-pivot.component.html',
+  styleUrls: ['./app-spreadsheet-editor-v2-cell-basic-header-pivot.component.scss'],
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AppSpreadsheetEditorV2CellBasicHeaderComponent implements IHeaderAngularComp, OnDestroy {
+export class AppSpreadsheetEditorV2CellBasicHeaderPivotComponent implements IHeaderAngularComp, OnDestroy {
   // constants
   static readonly DEFAULT_COLUMN_ROW_NO: string = 'rowNo';
   static readonly DEFAULT_COLUMN_ROW_NO_WIDTH: number = 50;
 
   // data
-  id: string;
-  label: string;
   colDef: IV2SpreadsheetEditorExtendedColDef;
-  columnIndex: number;
 
   /**
    * Constructor
@@ -35,11 +32,8 @@ export class AppSpreadsheetEditorV2CellBasicHeaderComponent implements IHeaderAn
    * Component destroyed
    */
   ngOnDestroy(): void {
-    // first cell ?
-    if (this.columnIndex === 0) {
-      // reset
-      this.colDef.editor.refreshErrorRowsCell = undefined;
-    }
+    // reset
+    this.colDef.editor.refreshErrorRowsCell = undefined;
   }
 
   /**
@@ -63,19 +57,12 @@ export class AppSpreadsheetEditorV2CellBasicHeaderComponent implements IHeaderAn
    */
   private update(params: IHeaderParams): void {
     // data
-    this.label = params.displayName;
     this.colDef = params.column.getUserProvidedColDef() as IV2SpreadsheetEditorExtendedColDef;
-    this.columnIndex = this.colDef.field === AppSpreadsheetEditorV2CellBasicHeaderComponent.DEFAULT_COLUMN_ROW_NO ?
-      0 :
-      this.colDef.editor.columnsMap[this.colDef.columnDefinition.field].index;
-    this.id = `gd-spreadsheet-editor-v2-cell-basic-header-${this.columnIndex}`;
 
-    // first cell ?
-    if (this.columnIndex === 0) {
-      this.colDef.editor.refreshErrorRowsCell = () => {
-        this.changeDetectorRef.detectChanges();
-      };
-    }
+    // update cell on changes
+    this.colDef.editor.refreshErrorRowsCell = () => {
+      this.changeDetectorRef.detectChanges();
+    };
 
     // update ui
     this.changeDetectorRef.detectChanges();
@@ -86,7 +73,7 @@ export class AppSpreadsheetEditorV2CellBasicHeaderComponent implements IHeaderAn
    */
   mouseEnter(event: MouseEvent): void {
     this.colDef.editor.selection.header.top.mouseEnter(
-      this.columnIndex,
+      0,
       event.buttons === 1
     );
   }
@@ -102,7 +89,7 @@ export class AppSpreadsheetEditorV2CellBasicHeaderComponent implements IHeaderAn
 
     // execute mouse down
     this.colDef.editor.selection.header.top.mouseDown(
-      this.columnIndex,
+      0,
       event.ctrlKey,
       event.shiftKey
     );
@@ -127,7 +114,7 @@ export class AppSpreadsheetEditorV2CellBasicHeaderComponent implements IHeaderAn
    */
   mouseMove(event: MouseEvent): void {
     this.colDef.editor.selection.header.top.mouseMove(
-      this.columnIndex === 0,
+      true,
       event
     );
   }

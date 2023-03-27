@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { IV2Breadcrumb } from '../app-breadcrumb-v2/models/breadcrumb.model';
 import { IV2ActionIconLabel, V2ActionType } from '../app-list-table-v2/models/action.model';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
@@ -17,14 +17,12 @@ import {
   V2SpreadsheetEditorColumn,
   V2SpreadsheetEditorColumnType,
   V2SpreadsheetEditorColumnTypeToEditor,
+  V2SpreadsheetEditorColumnTypeToRenderer,
   V2SpreadsheetEditorEventType
 } from './models/column.model';
 import { IV2SpreadsheetEditorExtendedColDef, IV2SpreadsheetEditorExtendedColDefEditor, IV2SpreadsheetEditorExtendedColDefEditorError, IV2SpreadsheetEditorExtendedColDefEditorSelectionRange } from './models/extended-column.model';
-import { AppSpreadsheetEditorV2CellBasicRendererComponent } from './components/cell-basic-renderer/app-spreadsheet-editor-v2-cell-basic-renderer.component';
 import * as moment from 'moment';
 import { Moment } from 'moment';
-import { AppSpreadsheetEditorV2CellBasicHeaderComponent } from './components/header-basic/app-spreadsheet-editor-v2-cell-basic-header.component';
-import { AppSpreadsheetEditorV2CellRowNoRendererComponent } from './components/cell-row-no-renderer/app-spreadsheet-editor-v2-cell-row-no-renderer.component';
 import { NewValueParams, SuppressHeaderKeyboardEventParams, SuppressKeyboardEventParams } from '@ag-grid-community/core/dist/cjs/es5/entities/colDef';
 import { IV2SpreadsheetEditorChangeValues, V2SpreadsheetEditorChange, V2SpreadsheetEditorChangeType } from './models/change.model';
 import { Observable, of, Subscription, switchMap, throwError } from 'rxjs';
@@ -48,6 +46,11 @@ import { IRowNode } from '@ag-grid-community/core/dist/cjs/es5/interfaces/iRowNo
 import { I18nService } from '../../../core/services/helper/i18n.service';
 import { AgGridAngular } from '@ag-grid-community/angular';
 import { determineIfMacDevice } from '../../../core/methods/mac';
+import { DateDefaultPipe } from '../../pipes/date-default-pipe/date-default.pipe';
+import { CdkContextMenuTrigger } from '@angular/cdk/menu';
+import { AppSpreadsheetEditorV2CellRowNoRendererModel } from './models/app-spreadsheet-editor-v2-cell-row-no-renderer.model';
+import { AppSpreadsheetEditorV2CellBasicHeaderModel } from './models/app-spreadsheet-editor-v2-cell-basic-header.model';
+import { AppSpreadsheetEditorV2CellBasicHeaderPivotComponent } from './components/header-pivot/app-spreadsheet-editor-v2-cell-basic-header-pivot.component';
 
 /**
  * Component
@@ -68,16 +71,14 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   private static readonly SCROLL_SPEED_MS: number = 20;
   private static readonly SCROLL_SPEED_PX: number = 8;
 
-  // elements
-  @ViewChild('cellContextMenu', { static: true }) set cellContextMenu(cellContextMenu: TemplateRef<any>) {
-    this.editor.cellContextMenu = cellContextMenu;
-  }
-
   // basic page
   @ViewChild(AppBasicPageV2Component, { static: true }) private _basicPage: AppBasicPageV2Component;
 
   // ag-grid angular component
   @ViewChild(AgGridAngular, { static: true, read: ElementRef }) private _agGridAngularElementRef: ElementRef;
+
+  // context menu
+  @ViewChild(CdkContextMenuTrigger, { static: true }) private _contextMenu: CdkContextMenuTrigger;
 
   // breadcrumbs
   @Input() breadcrumbs: IV2Breadcrumb[];
@@ -104,6 +105,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       // finished
       this.records$ = of(records);
     }
+  }
+  get action(): CreateViewModifyV2Action.CREATE | CreateViewModifyV2Action.MODIFY {
+    return this.editor.action;
   }
 
   // columns
@@ -156,6 +160,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     return this._formDirty;
   }
 
+  // used to format dates
+  private _datePipe: DateDefaultPipe = new DateDefaultPipe();
+
   // keep changes
   changes: V2SpreadsheetEditorChange[] = [];
   changesIndex: number = 0;
@@ -165,8 +172,17 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // setup
     action: undefined,
 
-    // elements
-    cellContextMenu: undefined,
+    // helpers
+    helpers: {
+      date: (value) => this._datePipe.transform(value),
+      translate: (value) => this.i18nService.instant(value),
+      openMenu: (event) => {
+        this._contextMenu.open({
+          x: event.x,
+          y: event.y
+        });
+      }
+    },
 
     // columns map
     columnsMap: {},
@@ -678,7 +694,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // select first cell
         // - fix for first render issue (necessary to render css properly from this.validateAllRows)
         if (
-          this.editor.action === CreateViewModifyV2Action.MODIFY &&
+          this.action === CreateViewModifyV2Action.MODIFY &&
           data.length > 0
         ) {
           // start edit
@@ -754,7 +770,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // determine columns
     const columnDefs: IV2SpreadsheetEditorExtendedColDef[] = [{
       headerName: '',
-      field: AppSpreadsheetEditorV2CellBasicHeaderComponent.DEFAULT_COLUMN_ROW_NO,
+      field: AppSpreadsheetEditorV2CellBasicHeaderPivotComponent.DEFAULT_COLUMN_ROW_NO,
       resizable: false,
       suppressMovable: true,
       suppressFillHandle: true,
@@ -762,15 +778,15 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       suppressNavigable: true,
       editable: false,
       pinned: 'left',
-      width: AppSpreadsheetEditorV2CellBasicHeaderComponent.DEFAULT_COLUMN_ROW_NO_WIDTH,
+      width: AppSpreadsheetEditorV2CellBasicHeaderPivotComponent.DEFAULT_COLUMN_ROW_NO_WIDTH,
       cellClass: 'gd-spreadsheet-editor-row-no',
       editor: this.editor,
-      cellRenderer: AppSpreadsheetEditorV2CellRowNoRendererComponent,
+      cellRenderer: AppSpreadsheetEditorV2CellRowNoRendererModel,
       cellStyle: {
         padding: '0',
         border: 'none'
       },
-      headerComponent: AppSpreadsheetEditorV2CellBasicHeaderComponent,
+      headerComponent: AppSpreadsheetEditorV2CellBasicHeaderPivotComponent,
       suppressKeyboardEvent: (params): boolean => {
         return this.suppressKeyboardEvent(params);
       },
@@ -812,7 +828,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         resizable: true,
         suppressMovable: true,
         editable: (params): boolean => {
-          return params.colDef.field !== AppSpreadsheetEditorV2CellBasicHeaderComponent.DEFAULT_COLUMN_ROW_NO && (
+          return params.colDef.field !== AppSpreadsheetEditorV2CellBasicHeaderPivotComponent.DEFAULT_COLUMN_ROW_NO && (
             !column.readonly ||
             !column.readonly(params.data)
           );
@@ -821,12 +837,12 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         cellEditorParams: column.editor?.params,
         columnDefinition: column,
         editor: this.editor,
-        cellRenderer: AppSpreadsheetEditorV2CellBasicRendererComponent,
+        cellRenderer: V2SpreadsheetEditorColumnTypeToRenderer[column.type],
         cellStyle: {
           padding: '0',
           border: 'none'
         },
-        headerComponent: AppSpreadsheetEditorV2CellBasicHeaderComponent,
+        headerComponent: AppSpreadsheetEditorV2CellBasicHeaderModel,
         suppressKeyboardEvent: (params): boolean => {
           return this.suppressKeyboardEvent(params);
         },
@@ -1465,11 +1481,11 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     }
 
     // announce that we have invalid rows
-    if (invalidRows) {
-      const headerHtml = document.getElementById('gd-spreadsheet-editor-v2-cell-basic-header-0');
-      if (headerHtml) {
+    const headerHtml = document.getElementById('gd-spreadsheet-editor-v2-cell-basic-header-pivot');
+    if (headerHtml) {
+      if (invalidRows) {
         // add invalid class
-        headerHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-header-invalid');
+        headerHtml.classList.add('gd-spreadsheet-editor-v2-cell-basic-header-pivot-invalid');
 
         // add error message
         this.editor.errorRows = this.i18nService.instant(
@@ -1482,6 +1498,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         if (this.editor.refreshErrorRowsCell) {
           this.editor.refreshErrorRowsCell();
         }
+      } else {
+        // add invalid class
+        headerHtml.classList.remove('gd-spreadsheet-editor-v2-cell-basic-header-pivot-invalid');
       }
     }
 
@@ -1504,7 +1523,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     ) {
       // determine if selectable column
       const columnField: string = focusedCell.column.getUserProvidedColDef().field;
-      if (columnField !== AppSpreadsheetEditorV2CellBasicHeaderComponent.DEFAULT_COLUMN_ROW_NO) {
+      if (columnField !== AppSpreadsheetEditorV2CellBasicHeaderPivotComponent.DEFAULT_COLUMN_ROW_NO) {
         const columnIndex: number = this.editor.columnsMap[columnField].index;
         const focusedHtml = document.getElementById(`gd-spreadsheet-editor-v2-cell-basic-renderer-${focusedCell.rowIndex}-${columnIndex}`);
         if (focusedHtml) {
@@ -1576,8 +1595,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // class cleanup
         headerHtmlElements[elementIndex].classList.remove(
           'gd-spreadsheet-editor-v2-cell-basic-header-selected-partial',
-          'gd-spreadsheet-editor-v2-cell-basic-header-selected-full',
-          'gd-spreadsheet-editor-v2-cell-basic-header-invalid'
+          'gd-spreadsheet-editor-v2-cell-basic-header-selected-full'
         );
 
         // error message cleanup
@@ -1874,7 +1892,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       columnIndex: number,
       error: IV2SpreadsheetEditorExtendedColDefEditorError
     }[] = [];
-    let rowHasColumnData: boolean = this.editor.action === CreateViewModifyV2Action.MODIFY;
+    let rowHasColumnData: boolean = this.action === CreateViewModifyV2Action.MODIFY;
     for (let columnIndex = 0; columnIndex < this.columns.length; columnIndex++) {
       // +1 to take in account row no column
       const realColumnIndex: number = columnIndex + 1;
@@ -2315,17 +2333,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
           return;
         }
 
-        // number of rows
+        // append number of rows
         const noOfRows: number = (response.data.map.rowsNo as IV2SideDialogConfigInputNumber).value;
-        const listToAdd: any[] = [];
-        for (let index = 0; index < noOfRows; index++) {
-          listToAdd.push(this.newRecord());
-        }
-
-        // append rows
-        this._agTable.api.applyTransaction({
-          add: listToAdd
-        });
+        this.rowActualAppend(noOfRows);
 
         // validate and redraw css
         this.cellUpdateRangeClasses(true);
@@ -2333,6 +2343,25 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // close dialog
         response.handler.hide();
       });
+  }
+
+  /**
+   * Append rows to editor
+   */
+  private rowActualAppend(noOfRows: number): void {
+    // append empty rows
+    const listToAdd: any[] = [];
+    for (let index = 0; index < noOfRows; index++) {
+      listToAdd.push(this.newRecord());
+    }
+
+    // append rows
+    this._agTable.api.applyTransaction({
+      add: listToAdd
+    });
+
+    // flush - so we can append our css logic, otherwise it will be lost due to re-render
+    this._agTable.api.flushAllAnimationFrames();
   }
 
   /**
@@ -2660,7 +2689,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
   private cellValueChanged(event: NewValueParams): void {
     // nothing to do ?
     const columnField: string = event.column.getUserProvidedColDef().field;
-    if (columnField === AppSpreadsheetEditorV2CellBasicHeaderComponent.DEFAULT_COLUMN_ROW_NO) {
+    if (columnField === AppSpreadsheetEditorV2CellBasicHeaderPivotComponent.DEFAULT_COLUMN_ROW_NO) {
       return;
     }
 
@@ -3023,6 +3052,17 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       );
     };
 
+    // do we need to append new rows ?
+    const start: number = range.rows.start;
+    let end: number = start + columnValues.length;
+    if (end > this._agTable.api.getDisplayedRowCount()) {
+      if (this.action === CreateViewModifyV2Action.CREATE) {
+        this.rowActualAppend(end - this._agTable.api.getDisplayedRowCount());
+      } else {
+        end = this._agTable.api.getDisplayedRowCount();
+      }
+    }
+
     // start pasting
     const locationsToRetrieve: {
       [key: string]: {
@@ -3030,7 +3070,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         columnIndex: number
       }[]
     } = {};
-    for (let rowIndex: number = range.rows.start; rowIndex < range.rows.start + columnValues.length; rowIndex++) {
+    for (let rowIndex: number = start; rowIndex < end; rowIndex++) {
       // retrieve row node
       const rowNode = this._agTable.api.getDisplayedRowAtIndex(rowIndex);
 
@@ -3578,7 +3618,12 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
       navigator.clipboard.readText()
         .then((text) => {
           // actual paste
-          actualPasteText(text);
+          try {
+            actualPasteText(text);
+          } catch (e) {
+            // something went wrong
+            this.toastV2Service.error(e);
+          }
         })
         .catch(() => {
           // try the other way
@@ -3893,7 +3938,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     }
 
     // if focused cell is the first one (row no) we need to select the next one
-    if (focusedCell.column.getUserProvidedColDef().field === AppSpreadsheetEditorV2CellBasicHeaderComponent.DEFAULT_COLUMN_ROW_NO) {
+    if (focusedCell.column.getUserProvidedColDef().field === AppSpreadsheetEditorV2CellBasicHeaderPivotComponent.DEFAULT_COLUMN_ROW_NO) {
       // next cell
       this._agTable.api.tabToNextCell();
 
@@ -4387,10 +4432,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         asyncFinished();
       }
     };
-    this._waitForAsyncToFinish = setTimeout(
-      checkIfAsyncFinished,
-      500
-    );
 
     // execute once async finished
     const asyncFinished = () => {
@@ -4437,6 +4478,14 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         }
       });
     };
+
+    // wait for data to be processed (stop edit cell, save last value...)
+    // - setTimeout necessary
+    // - check if async validation is in progress
+    this._waitForAsyncToFinish = setTimeout(
+      checkIfAsyncFinished,
+      500
+    );
   }
 
   /**
@@ -4475,7 +4524,7 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     this._scrollIf = {
       top: !allCell && !headerColumn && scrollElementVertical.scrollTop > 0 && event.y < agGridRect.y + headerRect.height + AppSpreadsheetEditorV2Component.SCROLL_MARGIN_PX,
       bottom: !allCell && event.y > agGridRect.y + agGridRect.height - AppSpreadsheetEditorV2Component.SCROLL_MARGIN_PX,
-      left: !allCell && !rowColumn && scrollElementHorizontal.scrollLeft > 0 && event.x < agGridRect.x + AppSpreadsheetEditorV2CellBasicHeaderComponent.DEFAULT_COLUMN_ROW_NO_WIDTH + AppSpreadsheetEditorV2Component.SCROLL_MARGIN_PX,
+      left: !allCell && !rowColumn && scrollElementHorizontal.scrollLeft > 0 && event.x < agGridRect.x + AppSpreadsheetEditorV2CellBasicHeaderPivotComponent.DEFAULT_COLUMN_ROW_NO_WIDTH + AppSpreadsheetEditorV2Component.SCROLL_MARGIN_PX,
       right: !allCell && event.x > agGridRect.x + agGridRect.width - AppSpreadsheetEditorV2Component.SCROLL_MARGIN_PX
     };
 
