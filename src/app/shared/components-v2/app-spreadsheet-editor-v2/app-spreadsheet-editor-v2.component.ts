@@ -2358,6 +2358,9 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     this._agTable.api.applyTransaction({
       add: listToAdd
     });
+
+    // flush - so we can append our css logic, otherwise it will be lost due to re-render
+    this._agTable.api.flushAllAnimationFrames();
   }
 
   /**
