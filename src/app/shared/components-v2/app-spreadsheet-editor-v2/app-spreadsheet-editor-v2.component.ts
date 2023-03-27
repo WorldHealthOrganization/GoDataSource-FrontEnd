@@ -16,7 +16,8 @@ import {
   IV2SpreadsheetEditorHandler,
   V2SpreadsheetEditorColumn,
   V2SpreadsheetEditorColumnType,
-  V2SpreadsheetEditorColumnTypeToEditor, V2SpreadsheetEditorColumnTypeToRenderer,
+  V2SpreadsheetEditorColumnTypeToEditor,
+  V2SpreadsheetEditorColumnTypeToRenderer,
   V2SpreadsheetEditorEventType
 } from './models/column.model';
 import { IV2SpreadsheetEditorExtendedColDef, IV2SpreadsheetEditorExtendedColDefEditor, IV2SpreadsheetEditorExtendedColDefEditorError, IV2SpreadsheetEditorExtendedColDefEditorSelectionRange } from './models/extended-column.model';
@@ -3053,9 +3054,13 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
 
     // do we need to append new rows ?
     const start: number = range.rows.start;
-    const end: number = start + columnValues.length;
+    let end: number = start + columnValues.length;
     if (end > this._agTable.api.getDisplayedRowCount()) {
-      this.rowActualAppend(end - this._agTable.api.getDisplayedRowCount());
+      if (this.action === CreateViewModifyV2Action.CREATE) {
+        this.rowActualAppend(end - this._agTable.api.getDisplayedRowCount());
+      } else {
+        end = this._agTable.api.getDisplayedRowCount();
+      }
     }
 
     // start pasting
