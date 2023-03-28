@@ -422,7 +422,7 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
             validators: {
               async: new Observable((observer) => {
                 // construct cache key
-                const cacheKey: string = 'CCA_' + this.selectedOutbreak.id +
+                const cacheKey: string = 'CEV_' + this.selectedOutbreak.id +
                   this._eventVisualIDMask.mask +
                   this.itemData.visualId +
                   (
