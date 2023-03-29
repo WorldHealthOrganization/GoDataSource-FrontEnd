@@ -311,19 +311,22 @@ export class TransmissionChainDataService {
     const modelsThatMatchClusterFilter: {
       [entityId: string]: true
     } = {};
-    (chainGroup.relationships || []).forEach(relationship => {
-      if (
-        snapshotFiltersCluster &&
-        Object.keys(snapshotFiltersCluster).length &&
-        relationship.clusterId &&
-        Object.keys(snapshotFiltersCluster).includes(relationship.clusterId) &&
-        relationship.persons.length === 2
-      ) {
-        // add both persons to map
-        modelsThatMatchClusterFilter[relationship.persons[0].id] = true;
-        modelsThatMatchClusterFilter[relationship.persons[1].id] = true;
-      }
-    });
+    if (
+      snapshotFiltersCluster &&
+      Object.keys(snapshotFiltersCluster).length
+    ) {
+      (chainGroup.relationships || []).forEach(relationship => {
+        if (
+          relationship.clusterId &&
+          snapshotFiltersCluster[relationship.clusterId] &&
+          relationship.persons.length === 2
+        ) {
+          // add both persons to map
+          modelsThatMatchClusterFilter[relationship.persons[0].id] = true;
+          modelsThatMatchClusterFilter[relationship.persons[1].id] = true;
+        }
+      });
+    }
 
     // filter nodes
     const nodesToCheck: EntityModel[] = Object.values(chainGroup.nodesMap);
