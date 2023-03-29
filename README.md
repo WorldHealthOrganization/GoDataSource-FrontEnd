@@ -97,8 +97,6 @@ Use the IDE of your choice (Webstorm recommended).
 
 ### Known issues
 
-<br>
-
 ___
 ## Copyright
 Copyright The GoDataSource-FrontEnd Contributors.
