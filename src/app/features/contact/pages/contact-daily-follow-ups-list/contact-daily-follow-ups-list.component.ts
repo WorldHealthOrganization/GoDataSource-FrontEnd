@@ -1785,7 +1785,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
 
                   // get data
                   const date = (response.data.map.date as IV2SideDialogConfigInputDate).value;
-                  const dateColumn = this.tableColumns.find(column => column.field === 'date');
+                  const dateColumn = this.tableColumns.find((column) => column.field === 'date');
 
                   // set date column filter
                   (dateColumn.filter.value as IV2DateRange) = {

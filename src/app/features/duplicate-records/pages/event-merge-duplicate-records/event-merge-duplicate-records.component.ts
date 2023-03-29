@@ -168,8 +168,8 @@ export class EventMergeDuplicateRecordsComponent extends CreateViewModifyCompone
                 event.address?.phoneNumber,
                 event.address?.geoLocation?.lat,
                 event.address?.geoLocation?.lng
-              ].map(e => e ? e.toString().trim() : e)
-                .filter(e => e)
+              ].map((e) => e ? e.toString().trim() : e)
+                .filter((e) => e)
                 .join(', ');
 
               // add to list ?

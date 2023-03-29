@@ -607,9 +607,9 @@ export class EntityHelperService {
     relationship: RelationshipModel
   ): ILabelValuePairModel[] {
     // determine source and target
-    const sourcePerson = _.find(relationship.persons, person => person.source === true);
-    const sourcePeople = _.find(relationship.people, people => people.model.id === sourcePerson.id);
-    const destinationPeople = _.find(relationship.people, people => people.model.id !== sourcePerson.id);
+    const sourcePerson = _.find(relationship.persons, (person) => person.source === true);
+    const sourcePeople = _.find(relationship.people, (people) => people.model.id === sourcePerson.id);
+    const destinationPeople = _.find(relationship.people, (people) => people.model.id !== sourcePerson.id);
 
     // create list of fields to display
     const lightObject: ILabelValuePairModel[] = [];
