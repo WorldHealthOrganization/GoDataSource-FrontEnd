@@ -315,7 +315,7 @@ export class TransmissionChainDataService {
       snapshotFiltersCluster &&
       Object.keys(snapshotFiltersCluster).length
     ) {
-      (chainGroup.relationships || []).forEach(relationship => {
+      (chainGroup.relationships || []).forEach((relationship) => {
         if (
           relationship.clusterId &&
           snapshotFiltersCluster[relationship.clusterId] &&
