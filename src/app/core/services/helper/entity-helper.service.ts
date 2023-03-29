@@ -574,6 +574,9 @@ export class EntityHelperService {
           label: 'LNG_EVENT_FIELD_LABEL_NAME',
           value: entity.name
         }, {
+          label: 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
+          value: entity.visualId
+        }, {
           label: 'LNG_EVENT_FIELD_LABEL_DATE',
           value: entity.date ?
             moment(entity.date).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :

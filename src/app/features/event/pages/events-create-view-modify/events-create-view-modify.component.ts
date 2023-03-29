@@ -35,12 +35,19 @@ import * as _ from 'lodash';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
 import { moment } from '../../../../core/helperClasses/x-moment';
+import { TimerCache } from '../../../../core/helperClasses/timer-cache';
+import { IGeneralAsyncValidatorResponse } from '../../../../shared/xt-forms/validators/general-async-validator.directive';
 
 @Component({
   selector: 'app-events-create-view-modify',
   templateUrl: './events-create-view-modify.component.html'
 })
 export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<EventModel> implements OnDestroy {
+  // event visual id mask
+  private _eventVisualIDMask: {
+    mask: string
+  };
+
   /**
    * Constructor
    */
@@ -83,6 +90,10 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
         or: [
           {
             name: RequestFilterGenerator.textContains(
+              data.searchBy
+            )
+          }, {
+            visualId: RequestFilterGenerator.textContains(
               data.searchBy
             )
           }, {
@@ -134,7 +145,17 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
   /**
    * Data initialized
    */
-  protected initializedData(): void {}
+  protected initializedData(): void {
+    // initialize visual ID mask
+    this._eventVisualIDMask = {
+      mask: EventModel.generateEventIDMask(this.selectedOutbreak.eventIdMask)
+    };
+
+    // set visual id for event
+    this.itemData.visualId = this.isCreate ?
+      this._eventVisualIDMask.mask :
+      this.itemData.visualId;
+  }
 
   /**
    * Initialize page title
@@ -365,6 +386,67 @@ export class EventsCreateViewModifyComponent extends CreateViewModifyComponent<E
               set: (value) => {
                 this.itemData.isDateOfReportingApproximate = value;
               }
+            }
+          }, {
+            type: CreateViewModifyV2TabInputType.ASYNC_VALIDATOR_TEXT,
+            name: 'visualId',
+            placeholder: () => 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
+            description: () => this.translateService.instant(
+              'LNG_EVENT_FIELD_LABEL_VISUAL_ID_DESCRIPTION',
+              this._eventVisualIDMask
+            ),
+            value: {
+              get: () => this.itemData.visualId,
+              set: (value) => {
+                this.itemData.visualId = value;
+              }
+            },
+            suffixIconButtons: [
+              {
+                icon: 'refresh',
+                tooltip: 'LNG_PAGE_ACTION_REFRESH_VISUAL_ID_DESCRIPTION',
+                clickAction: (input) => {
+                  // nothing to do ?
+                  if (!this._eventVisualIDMask) {
+                    return;
+                  }
+
+                  // generate
+                  this.itemData.visualId = EventModel.generateEventIDMask(this.selectedOutbreak.eventIdMask);
+
+                  // mark as dirty
+                  input.control?.markAsDirty();
+                }
+              }
+            ],
+            validators: {
+              async: new Observable((observer) => {
+                // construct cache key
+                const cacheKey: string = 'CEV_' + this.selectedOutbreak.id +
+                  this._eventVisualIDMask.mask +
+                  this.itemData.visualId +
+                  (
+                    this.isCreate ?
+                      '' :
+                      this.itemData.id
+                  );
+
+                // get data from cache or execute validator
+                TimerCache.run(
+                  cacheKey,
+                  this.eventDataService.checkEventVisualIDValidity(
+                    this.selectedOutbreak.id,
+                    this._eventVisualIDMask.mask,
+                    this.itemData.visualId,
+                    this.isCreate ?
+                      undefined :
+                      this.itemData.id
+                  )
+                ).subscribe((isValid: boolean | IGeneralAsyncValidatorResponse) => {
+                  observer.next(isValid);
+                  observer.complete();
+                });
+              })
             }
           }, {
             type: CreateViewModifyV2TabInputType.SELECT_SINGLE,

@@ -389,6 +389,26 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
               }
             }, {
               type: CreateViewModifyV2TabInputType.TEXT,
+              name: 'eventIdMask',
+              placeholder: () => 'LNG_OUTBREAK_FIELD_LABEL_EVENT_ID_MASK',
+              description: () => 'LNG_OUTBREAK_FIELD_LABEL_EVENT_ID_MASK_DESCRIPTION',
+              value: {
+                get: () => this.itemData.eventIdMask,
+                set: (value) => {
+                  this.itemData.eventIdMask = value;
+
+                  // check duplicate mask
+                  this.checkDuplicateEntityMasks();
+                }
+              },
+              validators: {
+                regex: () => ({
+                  expression: '^(?:9*[^9()]*|[^9()]*9*[^9()]*|[^9()]*9*)$',
+                  msg: 'LNG_FORM_VALIDATION_ERROR_PATTERN'
+                })
+              }
+            }, {
+              type: CreateViewModifyV2TabInputType.TEXT,
               name: 'caseIdMask',
               placeholder: () => 'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK',
               description: () => 'LNG_OUTBREAK_FIELD_LABEL_CASE_ID_MASK_DESCRIPTION',
@@ -1207,7 +1227,12 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
    */
   private checkDuplicateEntityMasks() {
     // create an array with all masks
-    const entityMasks = [this.itemData.caseIdMask, this.itemData.contactIdMask, this.itemData.contactOfContactIdMask];
+    const entityMasks = [
+      this.itemData.eventIdMask,
+      this.itemData.caseIdMask,
+      this.itemData.contactIdMask,
+      this.itemData.contactOfContactIdMask
+    ];
 
     // find duplicates and also check if any of them contains at least one "9" digit
     // "9" means that there is an auto-generated sequence number

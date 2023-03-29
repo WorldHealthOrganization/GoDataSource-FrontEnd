@@ -792,17 +792,18 @@ export class TransmissionChainDataService {
             // location
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.LOCATION.value) {
             nodeData.label = '';
-            if (node.type !== EntityType.EVENT) {
-              const mainAddr = node.model.mainAddress;
-              if (
-                mainAddr &&
-                mainAddr.locationId &&
-                locationsListMap[mainAddr.locationId] &&
-                locationsListMap[mainAddr.locationId].name
-              ) {
-                nodeData.label = locationsListMap[mainAddr.locationId].name;
-              }
-            } else {
+            const mainAddr = node.model.mainAddress;
+            if (
+              mainAddr &&
+              mainAddr.locationId &&
+              locationsListMap[mainAddr.locationId] &&
+              locationsListMap[mainAddr.locationId].name
+            ) {
+              nodeData.label = locationsListMap[mainAddr.locationId].name;
+            }
+
+            // put a default value if no location found
+            if (!nodeData.label) {
               nodeData.label = node.model.name;
             }
             // initials
@@ -816,43 +817,21 @@ export class TransmissionChainDataService {
             }
             // visual id
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.VISUAL_ID.value) {
-            if (
-              node.type !== EntityType.EVENT &&
-              !(node.model instanceof EventModel)
-            ) {
-              nodeData.label = node.model.visualId ? node.model.visualId : '';
-            } else {
-              nodeData.label = node.model.name;
-            }
+            nodeData.label = node.model.visualId ? node.model.visualId : '';
             // visual id and location
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.ID_AND_LOCATION.value) {
+            // visual id
+            nodeData.label = node.model.visualId ? node.model.visualId : '';
+
+            // location
+            const mainAddr = node.model.mainAddress;
             if (
-              node.type !== EntityType.EVENT &&
-              !(node.model instanceof EventModel)
+              mainAddr &&
+              mainAddr.locationId &&
+              locationsListMap[mainAddr.locationId] &&
+              locationsListMap[mainAddr.locationId].name
             ) {
-              if (node.model.visualId) {
-                nodeData.label = node.model.visualId;
-              }
-              const mainAddr = node.model.mainAddress;
-              if (
-                mainAddr &&
-                mainAddr.locationId &&
-                locationsListMap[mainAddr.locationId] &&
-                locationsListMap[mainAddr.locationId].name
-              ) {
-                nodeData.label = (node.model.visualId ? nodeData.label + ' - ' : '') + locationsListMap[mainAddr.locationId].name;
-              }
-            } else {
-              nodeData.label = node.model.name;
-              const mainAddr = node.model.mainAddress;
-              if (
-                mainAddr &&
-                mainAddr.locationId &&
-                locationsListMap[mainAddr.locationId] &&
-                locationsListMap[mainAddr.locationId].name
-              ) {
-                nodeData.label = (node.model.name ? nodeData.label + ' - ' : '') + locationsListMap[mainAddr.locationId].name;
-              }
+              nodeData.label = (node.model.visualId ? nodeData.label + ' - ' : '') + locationsListMap[mainAddr.locationId].name;
             }
             // concatenated details
           } else if (colorCriteria.nodeLabel === Constants.TRANSMISSION_CHAIN_NODE_LABEL_CRITERIA_OPTIONS.CONCATENATED_DETAILS.value) {
