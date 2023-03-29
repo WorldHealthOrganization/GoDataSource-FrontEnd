@@ -265,7 +265,7 @@ export class TransmissionChainDataService {
       }
 
       // outcomeId
-      snapshotFiltersGender = null;
+      snapshotFiltersOutcomeId = null;
       if (
         snapshotFilters.outcomeId &&
         snapshotFilters.outcomeId.length > 0
@@ -308,22 +308,20 @@ export class TransmissionChainDataService {
     }
 
     // map entity to cluster
-    const clustersMap: {
-      [entityId: string]: {
-        [clusterId: string]: true
-      }
+    const modelsThatMatchClusterFilter: {
+      [entityId: string]: true
     } = {};
     (chainGroup.relationships || []).forEach(relationship => {
       if (
+        snapshotFiltersCluster &&
+        Object.keys(snapshotFiltersCluster).length &&
         relationship.clusterId &&
+        Object.keys(snapshotFiltersCluster).includes(relationship.clusterId) &&
         relationship.persons.length === 2
       ) {
-        clustersMap[relationship.persons[0].id] = {
-          [relationship.clusterId]: true
-        };
-        clustersMap[relationship.persons[1].id] = {
-          [relationship.clusterId]: true
-        };
+        // add both persons to map
+        modelsThatMatchClusterFilter[relationship.persons[0].id] = true;
+        modelsThatMatchClusterFilter[relationship.persons[1].id] = true;
       }
     });
 
@@ -372,11 +370,8 @@ export class TransmissionChainDataService {
             snapshotFiltersGender[nodeData.model.gender]
           )
         ) && (
-          !snapshotFiltersCluster || (
-            Object.keys(clustersMap).length &&
-            clustersMap[nodeData.model.id] &&
-            Object.keys(clustersMap[nodeData.model.id]).filter(clusterId => Object.keys(snapshotFiltersCluster).includes(clusterId)).length
-          )
+          !snapshotFiltersCluster ||
+          modelsThatMatchClusterFilter[nodeData.model.id]
         ) && (
           !snapshotFiltersAge ||
           (
