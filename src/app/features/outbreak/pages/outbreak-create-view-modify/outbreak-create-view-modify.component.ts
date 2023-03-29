@@ -816,7 +816,7 @@ export class OutbreakCreateViewModifyComponent extends CreateViewModifyComponent
 
                 // try to fetch sources
                 fetch(url)
-                  .then(r => r.json())
+                  .then((r) => r.json())
                   .then((glStyle: {
                     sources: {
                       [name: string]: any

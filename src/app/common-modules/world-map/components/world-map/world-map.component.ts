@@ -1563,7 +1563,7 @@ export class WorldMapComponent implements OnInit, OnDestroy {
 
             // get and apply the style
             fetch(mapServer.styleUrl)
-              .then(r => r.json())
+              .then((r) => r.json())
               .then((glStyle) => {
                 // apply style
                 applyStyle(

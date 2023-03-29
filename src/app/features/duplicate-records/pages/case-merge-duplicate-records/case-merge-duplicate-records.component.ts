@@ -454,8 +454,8 @@ export class CaseMergeDuplicateRecordsComponent extends CreateViewModifyComponen
                 address.phoneNumber,
                 address.geoLocation?.lat,
                 address.geoLocation?.lng
-              ].map(e => e ? e.toString().trim() : e)
-                .filter(e => e);
+              ].map((e) => e ? e.toString().trim() : e)
+                .filter((e) => e);
 
               // add to list ?
               if (addressFields.length) {

@@ -87,7 +87,7 @@ export class ViewHelpComponent extends CreateViewModifyComponent<HelpItemModel> 
     return new Observable((subscriber) => {
       this.helpDataService
         .getHelpItem(this._categoryId, this._itemId)
-        .subscribe(helpItemData => {
+        .subscribe((helpItemData) => {
           // process data
           this._helpItemTitle = helpItemData?.title ?? '';
           this._helpItemContent = this.translateService.instant(helpItemData?.content) ?? '';
