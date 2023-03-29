@@ -174,6 +174,17 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
         }
       }, {
         type: V2AdvancedFilterType.MULTISELECT,
+        field: 'labSequenceResult',
+        label: 'LNG_PAGE_CASE_COUNT_LAB_SEQUENCE_RESULT',
+        options: (this.activatedRoute.snapshot.data.labSequenceResult as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+        allowedComparators: [
+          _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
+        ],
+        filterBy: (_qb, filter) => {
+          this.filters.labSequenceResult = filter.value;
+        }
+      }, {
+        type: V2AdvancedFilterType.MULTISELECT,
         field: 'gender',
         label: 'LNG_CASE_FIELD_LABEL_GENDER',
         options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
@@ -211,7 +222,7 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
       }, {
         type: V2AdvancedFilterType.RANGE_DATE,
         field: 'date',
-        label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_DATE',
+        label: 'LNG_PAGE_CASE_COUNT_DATE',
         allowedComparators: [
           _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.RANGE_DATE], { value: V2AdvancedFilterComparatorType.BETWEEN }),
           _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.RANGE_DATE], { value: V2AdvancedFilterComparatorType.BEFORE }),
@@ -337,6 +348,9 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
       if (!usedFilters['genderLNG_CASE_FIELD_LABEL_GENDER']) {
         this.filters.gender = undefined;
       }
+      if (!usedFilters['labSequenceResultLNG_PAGE_CASE_COUNT_LAB_SEQUENCE_RESULT']) {
+        this.filters.labSequenceResult = undefined;
+      }
       if (!usedFilters['locationIdsLNG_ADDRESS_FIELD_LABEL_LOCATION']) {
         this.filters.locationIds = undefined;
       }
@@ -346,7 +360,7 @@ export class CaseCountMapComponent implements OnInit, OnDestroy {
       if (!usedFilters['ageLNG_ENTITY_FIELD_LABEL_AGE']) {
         this.filters.age = undefined;
       }
-      if (!usedFilters['dateLNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_DATE']) {
+      if (!usedFilters['dateLNG_PAGE_CASE_COUNT_DATE']) {
         this.filters.date = undefined;
       }
     }

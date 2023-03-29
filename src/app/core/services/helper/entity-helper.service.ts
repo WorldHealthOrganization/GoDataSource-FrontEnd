@@ -549,6 +549,9 @@ export class EntityHelperService {
           value: entity.dateOfInfection ?
             moment(entity.dateOfInfection).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
             ''
+        }, {
+          label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+          value: entity.outcomeId
         }
       );
     }
