@@ -33,6 +33,15 @@
     [dateSameOrBefore]="currentDate">
   </app-form-date-v2>
 
+  <app-form-input-v2
+    name="visualId"
+    [(ngModel)]="event.visualId"
+    [placeholder]="'LNG_EVENT_FIELD_LABEL_VISUAL_ID' | translate"
+    [tooltip]="visualIDTooltip"
+    [suffixIconButtons]="visualIdSuffixIconButtons"
+    (ngModelChange)="onChange()">
+  </app-form-input-v2>
+
   <app-form-textarea-v2
     name="description"
     [(ngModel)]="event.description"

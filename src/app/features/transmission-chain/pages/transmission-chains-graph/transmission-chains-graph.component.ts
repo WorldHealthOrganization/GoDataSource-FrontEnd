@@ -773,7 +773,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
     const loading = this.dialogV2Service.showLoadingDialog();
 
     // create source person
-    const sourcePerson = _.find(this.selectedRelationship.persons, person => person.source === true);
+    const sourcePerson = _.find(this.selectedRelationship.persons, (person) => person.source === true);
     this.relationshipDataService
       .modifyRelationship(
         this.selectedOutbreak.id,
@@ -831,7 +831,7 @@ export class TransmissionChainsGraphComponent implements OnInit, OnDestroy {
 
         // delete relationship
         const loadingDialog = this.dialogV2Service.showLoadingDialog();
-        const sourcePerson = _.find(this.selectedRelationship.persons, person => person.source === true);
+        const sourcePerson = _.find(this.selectedRelationship.persons, (person) => person.source === true);
         this.relationshipDataService
           .deleteRelationship(
             this.selectedOutbreak.id,

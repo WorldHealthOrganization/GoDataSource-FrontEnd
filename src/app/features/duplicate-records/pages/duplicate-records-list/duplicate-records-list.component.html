@@ -132,15 +132,7 @@
                   </div>
                 </mat-header-cell>
                 <mat-cell *matCellDef="let item">
-                  <span
-                    *ngIf="duplicatesList.peopleMap[item]?.type === EntityType.EVENT; else visualIdTemplate"
-                    class="duplicate-records-label-not-applicable">
-                    {{ 'LNG_PAGE_LIST_DUPLICATE_RECORDS_LABEL_NOT_APPLICABLE' | translate }}
-                  </span>
-                  <ng-template
-                    #visualIdTemplate>
-                    {{getNotEvent(duplicatesList.peopleMap[item])?.visualId}}
-                  </ng-template>
+                  {{ duplicatesList.peopleMap[item]?.visualId }}
                 </mat-cell>
               </ng-container>
 

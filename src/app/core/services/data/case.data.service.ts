@@ -600,7 +600,9 @@ export class CaseDataService {
     outbreakId: string,
     queryBuilder: RequestQueryBuilder = new RequestQueryBuilder()
   ): Observable<{ lat: number, lng: number }[]> {
-    const whereFilter = queryBuilder.filter.generateCondition(true);
+    // generate filter
+    const filter = queryBuilder.buildQuery(false);
+    const whereFilter = JSON.stringify(filter.where || {});
     return this.http.get(`outbreaks/${outbreakId}/cases/count-map?where=${whereFilter}`) as Observable<{ lat: number, lng: number }[]>;
   }
 }

@@ -3,7 +3,10 @@ import { AddressModel } from './address.model';
 import { EntityType } from './entity-type';
 import { InconsistencyModel } from './inconsistency.model';
 import { EntityMatchedRelationshipModel } from './entity-matched-relationship.model';
-import { Moment } from '../helperClasses/x-moment';
+import {
+  moment,
+  Moment
+} from '../helperClasses/x-moment';
 import { BaseModel } from './base.model';
 import { UserModel } from './user.model';
 import { PERMISSION } from './permission.model';
@@ -42,6 +45,9 @@ export class EventModel
   relationship: any;
 
   matchedDuplicateRelationships: EntityMatchedRelationshipModel[];
+
+  // visual id
+  visualId: string;
 
   responsibleUserId: string;
   responsibleUser: UserModel;
@@ -104,6 +110,12 @@ export class EventModel
         label: 'LNG_EVENT_FIELD_LABEL_END_DATE'
       },
       {
+        type: V2AdvancedFilterType.TEXT,
+        field: 'visualId',
+        label: 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
+        sortable: true
+      },
+      {
         type: V2AdvancedFilterType.RANGE_NUMBER,
         field: 'numberOfContacts',
         label: 'LNG_EVENT_FIELD_LABEL_NUMBER_OF_CONTACTS',
@@ -128,6 +140,23 @@ export class EventModel
   }
 
   /**
+   * Return event id mask with data replaced
+   */
+  static generateEventIDMask(eventIdMask: string): string {
+    // validate
+    if (!eventIdMask) {
+      return '';
+    }
+
+    // !!!!!!!!!!!!!!!
+    // format ( IMPORTANT - NOT CASE INSENSITIVE => so yyyy won't be replaced with year, only YYYY )
+    // !!!!!!!!!!!!!!!
+    return eventIdMask
+      .replace(/YYYY/g, moment().format('YYYY'))
+      .replace(/\*/g, '');
+  }
+
+  /**
      * Static Permissions - IPermissionBasic
      */
   static canView(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_VIEW) : false); }
@@ -135,6 +164,11 @@ export class EventModel
   static canCreate(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_CREATE) : false); }
   static canModify(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_VIEW, PERMISSION.EVENT_MODIFY) : false); }
   static canDelete(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_DELETE) : false); }
+
+  /**
+   * Static Permissions - IPermissionEvent
+   */
+  static canGenerateVisualId(user: UserModel): boolean { return OutbreakModel.canView(user) && (user ? user.hasPermissions(PERMISSION.EVENT_GENERATE_VISUAL_ID) : false); }
 
   /**
      * Static Permissions - IPermissionRestorable
@@ -189,6 +223,7 @@ export class EventModel
     super(data);
 
     this.id = _.get(data, 'id');
+    this.visualId = _.get(data, 'visualId');
     this.name = _.get(data, 'name');
     this.date = _.get(data, 'date');
     this.dateApproximate = _.get(data, 'dateApproximate');
@@ -238,6 +273,11 @@ export class EventModel
   canCreate(user: UserModel): boolean { return EventModel.canCreate(user); }
   canModify(user: UserModel): boolean { return EventModel.canModify(user); }
   canDelete(user: UserModel): boolean { return EventModel.canDelete(user); }
+
+  /**
+   * Permissions - IPermissionEvent
+   */
+  canGenerateVisualId(user: UserModel): boolean { return EventModel.canGenerateVisualId(user); }
 
   /**
      * Permissions - IPermissionRestorable

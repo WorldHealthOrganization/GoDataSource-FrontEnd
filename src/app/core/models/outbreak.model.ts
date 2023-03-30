@@ -38,6 +38,7 @@ export class OutbreakModel
   contactInvestigationTemplate: QuestionModel[];
   contactFollowUpTemplate: QuestionModel[];
   labResultsTemplate: QuestionModel[];
+  eventIdMask: string;
   caseIdMask: string;
   contactIdMask: string;
   contactOfContactIdMask: string;
@@ -263,6 +264,7 @@ export class OutbreakModel
     this.noLessContacts = _.get(data, 'noLessContacts');
     this.noDaysNewContacts = _.get(data, 'noDaysNewContacts', 1);
     this.reportingGeographicalLevelId = _.get(data, 'reportingGeographicalLevelId', '');
+    this.eventIdMask = _.get(data, 'eventIdMask');
     this.caseIdMask = _.get(data, 'caseIdMask');
     this.contactIdMask = _.get(data, 'contactIdMask');
     this.contactOfContactIdMask = _.get(data, 'contactOfContactIdMask');

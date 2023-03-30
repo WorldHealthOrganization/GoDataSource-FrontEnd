@@ -71,7 +71,7 @@ export abstract class ElementBase<T> extends ValueAccessorBase<T> implements Aft
 
           // check if we have errors
           this.validationResultIsInvalid = Object.keys(this.validationResult || {}).length > 0;
-          this.validationResultErrMsgs = Object.keys(this.validationResult || {}).map(k => {
+          this.validationResultErrMsgs = Object.keys(this.validationResult || {}).map((k) => {
             const errorMessage = new ErrorMessage(this.validationResult, k);
             return errorMessage.getMessage();
           });

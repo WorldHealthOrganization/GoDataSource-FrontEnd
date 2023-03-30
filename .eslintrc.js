@@ -123,6 +123,7 @@ module.exports = {
         "@typescript-eslint/type-annotation-spacing": "error",
         "@typescript-eslint/unified-signatures": "error",
         "arrow-body-style": "off",
+        "arrow-parens": ["error", "always"],
         "brace-style": "off",
         "comma-dangle": "off",
         "comma-spacing": "off",
