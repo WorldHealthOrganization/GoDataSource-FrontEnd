@@ -2529,11 +2529,9 @@ export class ContactsCreateViewModifyComponent extends CreateViewModifyComponent
 
             // update what we found
             this._personDuplicates = [];
-            if (foundPersons?.duplicates?.length > 0) {
-              this._personDuplicates.push(
-                ...foundPersons.duplicates.map((item) => item as EntityModel)
-              );
-            }
+            this._personDuplicates = foundPersons?.duplicates?.length ?
+              [...foundPersons.duplicates] :
+              [];
 
             // update alert
             updateAlert();

@@ -128,7 +128,18 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
    * Release resources
    */
   ngOnDestroy(): void {
+    // parent
     super.onDestroy();
+
+    // cancel previous timout that will trigger request
+    if (this._duplicateCheckingTimeout) {
+      // clear timeout
+      clearTimeout(this._duplicateCheckingTimeout);
+      this._duplicateCheckingTimeout = undefined;
+    }
+
+    // remove global notifications
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
   }
 
   /**
@@ -1829,11 +1840,9 @@ export class ContactsOfContactsCreateViewModifyComponent extends CreateViewModif
 
             // update what we found
             this._personDuplicates = [];
-            if (foundPersons?.duplicates?.length > 0) {
-              this._personDuplicates.push(
-                ...foundPersons.duplicates.map((item) => item as EntityModel)
-              );
-            }
+            this._personDuplicates = foundPersons?.duplicates?.length ?
+              [...foundPersons.duplicates] :
+              [];
 
             // update alert
             updateAlert();

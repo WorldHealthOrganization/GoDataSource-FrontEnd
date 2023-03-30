@@ -2576,12 +2576,9 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
             this._duplicateCheckingSubscription = undefined;
 
             // update what we found
-            this._personDuplicates = [];
-            if (foundPersons?.duplicates?.length > 0) {
-              this._personDuplicates.push(
-                ...foundPersons.duplicates.map((item) => item as EntityModel)
-              );
-            }
+            this._personDuplicates = foundPersons?.duplicates?.length ?
+              [...foundPersons.duplicates] :
+              [];
 
             // update alert
             updateAlert();
