@@ -13,7 +13,7 @@ export abstract class ValueAccessorBase<T> implements ControlValueAccessor {
   set value(value: T) {
     if (this.innerValue !== value) {
       this.innerValue = value;
-      this.onChangeFns.forEach(f => f(value));
+      this.onChangeFns.forEach((f) => f(value));
     }
   }
 
@@ -30,6 +30,6 @@ export abstract class ValueAccessorBase<T> implements ControlValueAccessor {
   }
 
   public touch() {
-    this.onTouchFns.forEach(f => f());
+    this.onTouchFns.forEach((f) => f());
   }
 }

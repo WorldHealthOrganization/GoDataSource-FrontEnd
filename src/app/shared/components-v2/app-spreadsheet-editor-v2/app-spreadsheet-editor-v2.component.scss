@@ -33,18 +33,18 @@ app-spreadsheet-editor-v2 {
       .ag-pinned-right-header {
         border-left-color: rgba(var(--gd-secondary-rgb), 0.25);
       }
-  
+
       /* Spreadsheet header row */
       .ag-header-row {
         color: var(--gd-text);
         font-weight: 700;
       }
-  
+
       /* Spreadsheet header cell */
       .ag-header-cell {
         @include flex_align_items(flex-start);
         padding: 0;
-  
+
         &:after {
           background-color: rgba(var(--gd-secondary-rgb), 0.25);
           height: 100%;
@@ -150,7 +150,7 @@ app-spreadsheet-editor-v2 {
                 }
               }
             }
-  
+
             &.ag-cell-first-right-pinned {
               &:not(.ag-cell-range-left):not(.ag-cell-range-single-cell) {
                 &.ag-cell-focus {
@@ -188,6 +188,199 @@ app-spreadsheet-editor-v2 {
 
       &:focus {
         border-color: var(--gd-primary);
+      }
+    }
+
+    /* Spreadsheet Header Cell */
+    .gd-spreadsheet-editor-v2-cell-basic-header {
+      border: 0.1rem solid transparent;
+      @include box-sizing(border-box);
+      @include flex(flex);
+      @include flex_align_items(center);
+      height: 100%;
+      padding: 0 0.8rem;
+      width: 100%;
+
+      &.gd-spreadsheet-editor-v2-cell-basic-header-selected-partial {
+        background-color: rgba(var(--gd-primary-rgb), 0.15);
+      }
+
+      &.gd-spreadsheet-editor-v2-cell-basic-header-selected-full {
+        background-color: var(--gd-primary);
+        color: var(--gd-background);
+      }
+    }
+
+    /* Spreadsheet Row Cell */
+    .gd-spreadsheet-editor-v2-cell-row-no-renderer {
+      border-width: 0.1rem;
+      border-style: none solid solid none;
+      border-color: transparent rgba(var(--gd-secondary-rgb), 0.25) rgba(var(--gd-secondary-rgb), 0.25) transparent;
+      @include box-sizing(border-box);
+      @include flex(flex);
+      @include flex_align_items(center);
+      height: 100%;
+      width: 100%;
+
+      .gd-spreadsheet-editor-v2-cell-row-no-renderer-value {
+        padding-left: 0.8rem;
+        padding-right: 0.8rem;
+      }
+
+      &.gd-spreadsheet-editor-v2-cell-row-no-renderer-selected-partial {
+        background-color: rgba(var(--gd-primary-rgb), 0.15);
+
+        &.gd-spreadsheet-editor-v2-cell-row-no-renderer-invalid {
+          background-color: rgba(var(--gd-danger-rgb), 0.35);
+        }
+      }
+
+      &.gd-spreadsheet-editor-v2-cell-row-no-renderer-selected-full {
+        background-color: var(--gd-primary);
+        color: var(--gd-background);
+
+        &.gd-spreadsheet-editor-v2-cell-row-no-renderer-invalid {
+          background-color: var(--gd-danger);
+          color: var(--gd-background);
+        }
+      }
+
+      &.gd-spreadsheet-editor-v2-cell-row-no-renderer-invalid {
+        background-color: rgba(var(--gd-danger-rgb), 0.25);
+      }
+    }
+
+    /* Spreadsheet Cell */
+    .gd-spreadsheet-editor-v2-cell-basic-renderer {
+      /* Variables */
+      --gd-spreadsheet-selected-cell-border-style: 0.1rem solid;
+      --gd-spreadsheet-selected-cell-border-color: var(--gd-success);
+
+      border-width: 0.1rem;
+      border-style: solid;
+      border-color: transparent rgba(var(--gd-secondary-rgb), 0.25) rgba(var(--gd-secondary-rgb), 0.25) transparent;
+      @include box-sizing(border-box);
+      display: block;
+      height: 100%;
+      width: 100%;
+
+      .gd-spreadsheet-editor-v2-cell-basic-renderer-value {
+        height: 100%;
+        line-height: 2.6rem;
+        padding-left: 0.4rem;
+        padding-right: 0.4rem;
+
+        > div {
+          height: 100%;
+          @include box-sizing(border-box);
+          @include flex(flex);
+          @include flex_direction(row);
+
+          > div:first-child {
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            &.gd-spreadsheet-editor-v2-cell-basic-renderer-value-text {
+              @include box-sizing(border-box);
+              @include flex_val(1 1 0);
+            }
+          }
+
+          .gd-spreadsheet-editor-v2-cell-basic-renderer-value-icon {
+            @include box-sizing(border-box);
+            @include flex(flex);
+            @include flex_direction(row);
+            @include flex_align_items(center);
+
+            &:hover {
+              cursor: pointer;
+            }
+          }
+        }
+
+        .mat-icon {
+          height: auto;
+          width: auto;
+        }
+
+        img {
+          height: 2rem;
+          margin-right: 0.7rem;
+          position: relative;
+          top: 0.2rem;
+          vertical-align: top;
+          width: auto;
+        }
+      }
+
+      &.gd-spreadsheet-editor-v2-cell-basic-renderer-selected-visible {
+        background-color: rgba(var(--gd-primary-rgb), 0.15);
+
+        &.gd-spreadsheet-editor-v2-cell-basic-renderer-selected-fill {
+          background-color: rgba(var(--gd-success-rgb), 0.15);
+          cursor: cell;
+        }
+      }
+
+      &.gd-spreadsheet-editor-v2-cell-basic-renderer-selected-border-top {
+        border-top: var(--gd-spreadsheet-selected-cell-border-style);
+        border-top-color: var(--gd-spreadsheet-selected-cell-border-color);
+      }
+
+      &.gd-spreadsheet-editor-v2-cell-basic-renderer-selected-border-bottom {
+        border-bottom: var(--gd-spreadsheet-selected-cell-border-style);
+        border-bottom-color: var(--gd-spreadsheet-selected-cell-border-color);
+      }
+
+      &.gd-spreadsheet-editor-v2-cell-basic-renderer-selected-border-right {
+        border-right: var(--gd-spreadsheet-selected-cell-border-style);
+        border-right-color: var(--gd-spreadsheet-selected-cell-border-color);
+      }
+
+      &.gd-spreadsheet-editor-v2-cell-basic-renderer-selected-border-left {
+        border-left: var(--gd-spreadsheet-selected-cell-border-style);
+        border-left-color: var(--gd-spreadsheet-selected-cell-border-color);
+      }
+
+      .gd-spreadsheet-editor-v2-cell-basic-renderer-fill {
+        background-color: var(--gd-success);
+        bottom: 0;
+        @include box-sizing(border-box);
+        display: none;
+        height: 0.8rem;
+        position: absolute;
+        right: 0;
+        width: 0.8rem;
+        z-index: 99999;
+
+        &.gd-spreadsheet-editor-v2-cell-basic-renderer-fill-visible {
+          display: inline-block;
+        }
+
+        &:hover {
+          cursor: cell;
+        }
+      }
+
+      &.gd-spreadsheet-editor-v2-cell-basic-renderer-focused {
+        border: 0.1rem solid var(--gd-success);
+      }
+
+      &.gd-spreadsheet-editor-v2-cell-basic-renderer-invalid {
+        background-color: rgba(var(--gd-danger-rgb), 0.25);
+
+        &.gd-spreadsheet-editor-v2-cell-basic-renderer-selected-visible {
+          background-color: rgba(var(--gd-danger-rgb), 0.35);
+        }
+      }
+
+      &.gd-spreadsheet-editor-v2-cell-basic-renderer-readonly {
+        background-color: rgba(var(--gd-secondary-rgb), 0.15);
+        color: var(--gd-secondary);
+
+        &.gd-spreadsheet-editor-v2-cell-basic-renderer-selected-visible {
+          background-color: rgba(var(--gd-secondary-rgb), 0.25);
+        }
       }
     }
   }

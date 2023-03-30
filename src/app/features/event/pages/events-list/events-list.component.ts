@@ -65,7 +65,8 @@ export class EventsListComponent
     { label: 'LNG_EVENT_FIELD_LABEL_DATE_OF_REPORTING_APPROXIMATE', value: 'isDateOfReportingApproximate' },
     { label: 'LNG_EVENT_FIELD_LABEL_END_DATE', value: 'endDate' },
     { label: 'LNG_EVENT_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUser' },
-    { label: 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY', value: 'eventCategory' }
+    { label: 'LNG_EVENT_FIELD_LABEL_EVENT_CATEGORY', value: 'eventCategory' },
+    { label: 'LNG_EVENT_FIELD_LABEL_VISUAL_ID', value: 'visualId' }
   ];
 
   // relationship fields
@@ -466,6 +467,16 @@ export class EventsListComponent
       {
         field: 'name',
         label: 'LNG_EVENT_FIELD_LABEL_NAME',
+        pinned: IV2ColumnPinned.LEFT,
+        sortable: true,
+        filter: {
+          type: V2FilterType.TEXT,
+          textType: V2FilterTextType.STARTS_WITH
+        }
+      },
+      {
+        field: 'visualId',
+        label: 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
         pinned: IV2ColumnPinned.LEFT,
         sortable: true,
         filter: {
@@ -1299,6 +1310,7 @@ export class EventsListComponent
   protected refreshListFields(): string[] {
     return [
       'id',
+      'visualId',
       'name',
       'date',
       'eventCategory',

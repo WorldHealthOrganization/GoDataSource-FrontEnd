@@ -549,6 +549,9 @@ export class EntityHelperService {
           value: entity.dateOfInfection ?
             moment(entity.dateOfInfection).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
             ''
+        }, {
+          label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+          value: entity.outcomeId
         }
       );
     }
@@ -573,6 +576,9 @@ export class EntityHelperService {
         {
           label: 'LNG_EVENT_FIELD_LABEL_NAME',
           value: entity.name
+        }, {
+          label: 'LNG_EVENT_FIELD_LABEL_VISUAL_ID',
+          value: entity.visualId
         }, {
           label: 'LNG_EVENT_FIELD_LABEL_DATE',
           value: entity.date ?
@@ -601,9 +607,9 @@ export class EntityHelperService {
     relationship: RelationshipModel
   ): ILabelValuePairModel[] {
     // determine source and target
-    const sourcePerson = _.find(relationship.persons, person => person.source === true);
-    const sourcePeople = _.find(relationship.people, people => people.model.id === sourcePerson.id);
-    const destinationPeople = _.find(relationship.people, people => people.model.id !== sourcePerson.id);
+    const sourcePerson = _.find(relationship.persons, (person) => person.source === true);
+    const sourcePeople = _.find(relationship.people, (people) => people.model.id === sourcePerson.id);
+    const destinationPeople = _.find(relationship.people, (people) => people.model.id !== sourcePerson.id);
 
     // create list of fields to display
     const lightObject: ILabelValuePairModel[] = [];
