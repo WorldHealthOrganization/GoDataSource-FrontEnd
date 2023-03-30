@@ -79,8 +79,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUser' },
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value: 'questionnaireAnswers' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdByUser' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
+    { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedBy' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_BY', value: 'updatedByUser' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED', value: 'deleted' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_DELETED_AT', value: 'deletedAt' },
@@ -2636,8 +2638,18 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                     dbColumns: true,
                     dbValues: true,
                     jsonReplaceUndefinedWithNull: true,
-                    questionnaireVariables: true,
-                    includeAlerted: true
+                    questionnaireVariables: true
+                  },
+                  inputs: {
+                    append: [
+                      {
+                        type: V2SideDialogConfigInputType.CHECKBOX,
+                        placeholder: 'LNG_COMMON_LABEL_EXPORT_INCLUDE_ALERTED',
+                        tooltip: 'LNG_COMMON_LABEL_EXPORT_INCLUDE_ALERTED_DESCRIPTION',
+                        name: 'includeAlerted',
+                        checked: false
+                      }
+                    ]
                   }
                 }
               });

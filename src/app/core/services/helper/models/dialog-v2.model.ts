@@ -109,7 +109,6 @@ export interface IV2ExportDataConfig {
       dbValues?: boolean,
       jsonReplaceUndefinedWithNull?: boolean,
       questionnaireVariables?: boolean
-      includeAlerted?: boolean
     },
 
     // optional

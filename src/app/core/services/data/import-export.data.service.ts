@@ -45,7 +45,6 @@ export class ImportExportDataService {
       jsonReplaceUndefinedWithNull?: boolean,
       dontTranslateValues?: boolean,
       useQuestionVariable?: boolean,
-      includeAlerted?: boolean,
       [otherData: string]: any
     },
     queryBuilder: RequestQueryBuilder,
