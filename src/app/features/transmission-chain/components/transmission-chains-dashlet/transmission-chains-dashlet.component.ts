@@ -66,6 +66,8 @@ import { SavedFilterData } from '../../../../core/models/saved-filters.model';
 import { EntityHelperService } from '../../../../core/services/helper/entity-helper.service';
 import { RelationshipDataService } from '../../../../core/services/data/relationship.data.service';
 import { determineRenderMode, RenderMode } from '../../../../core/enums/render-mode.enum';
+import { IV2DateRange } from '../../../../shared/forms-v2/components/app-form-date-range-v2/models/date.model';
+import { IV2NumberRange } from '../../../../shared/forms-v2/components/app-form-number-range-v2/models/number.model';
 
 @Component({
   selector: 'app-transmission-chains-dashlet',
@@ -501,13 +503,23 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
     name?: string,
     labSeqResult?: string[],
     classification?: string[],
-    occupation?: string[]
+    occupation?: string[],
+    outcomeId?: string[],
+    gender?: string[],
+    cluster?: string[],
+    age?: IV2NumberRange,
+    date?: IV2DateRange
   } = {};
   snapshotFiltersClone: {
     name?: string,
     labSeqResult?: string[],
     classification?: string[],
-    occupation?: string[]
+    occupation?: string[],
+    outcomeId?: string[],
+    gender?: string[],
+    cluster?: string[],
+    age?: IV2NumberRange,
+    date?: IV2DateRange
   } = {};
 
   /**
@@ -2585,6 +2597,18 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
       if (!usedMap['occupationLNG_CONTACT_FIELD_LABEL_OCCUPATION']) {
         this.snapshotFilters.occupation = undefined;
       }
+      if (!usedMap['outcomeIdLNG_CASE_FIELD_LABEL_OUTCOME']) {
+        this.snapshotFilters.outcomeId = undefined;
+      }
+      if (!usedMap['genderLNG_ENTITY_FIELD_LABEL_GENDER']) {
+        this.snapshotFilters.gender = undefined;
+      }
+      if (!usedMap['ageLNG_ENTITY_FIELD_LABEL_AGE']) {
+        this.snapshotFilters.age = undefined;
+      }
+      if (!usedMap['dateLNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_DATE']) {
+        this.snapshotFilters.date = undefined;
+      }
     }
 
     // do we have required data ?
@@ -3274,6 +3298,73 @@ export class TransmissionChainsDashletComponent implements OnInit, OnDestroy {
             this.snapshotFilters.occupation = filter.value ?
               filter.value :
               undefined;
+          }
+        }, {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'outcomeId',
+          label: 'LNG_CASE_FIELD_LABEL_OUTCOME',
+          options: (this.activatedRoute.snapshot.data.outcome as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          allowedComparators: [
+            _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
+          ],
+          filterBy: (
+            _qb,
+            filter
+          ) => {
+            this.snapshotFilters.outcomeId = filter.value ?
+              filter.value :
+              undefined;
+          }
+        }, {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'gender',
+          label: 'LNG_ENTITY_FIELD_LABEL_GENDER',
+          options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          allowedComparators: [
+            _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
+          ],
+          filterBy: (
+            _qb,
+            filter
+          ) => {
+            this.snapshotFilters.gender = filter.value ?
+              filter.value :
+              undefined;
+          }
+        }, {
+          type: V2AdvancedFilterType.MULTISELECT,
+          field: 'clusterId',
+          label: 'LNG_ENTITY_FIELD_LABEL_CLUSTER',
+          options: (this.activatedRoute.snapshot.data.cluster as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          allowedComparators: [
+            _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.MULTISELECT], { value: V2AdvancedFilterComparatorType.NONE })
+          ],
+          filterBy: (
+            _qb,
+            filter
+          ) => {
+            this.snapshotFilters.cluster = filter.value ?
+              filter.value :
+              undefined;
+          }
+        }, {
+          type: V2AdvancedFilterType.RANGE_AGE,
+          field: 'age',
+          label: 'LNG_ENTITY_FIELD_LABEL_AGE',
+          filterBy: (_qb, filter) => {
+            this.snapshotFilters.age = filter.value;
+          }
+        }, {
+          type: V2AdvancedFilterType.RANGE_DATE,
+          field: 'date',
+          label: 'LNG_PAGE_GRAPH_CHAINS_OF_TRANSMISSION_LABEL_DATE',
+          allowedComparators: [
+            _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.RANGE_DATE], { value: V2AdvancedFilterComparatorType.BETWEEN }),
+            _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.RANGE_DATE], { value: V2AdvancedFilterComparatorType.BEFORE }),
+            _.find(V2AdvancedFilterComparatorOptions[V2AdvancedFilterType.RANGE_DATE], { value: V2AdvancedFilterComparatorType.AFTER })
+          ],
+          filterBy: (_qb, filter) => {
+            this.snapshotFilters.date = filter.value;
           }
         }],
         this.advancedFiltersApplied,

@@ -181,6 +181,7 @@ export enum PERMISSION {
   EVENT_IMPORT = 'event_import',
   EVENT_CREATE_CONTACT = 'event_create_contact',
   EVENT_CREATE_BULK_CONTACT = 'event_create_bulk_contact',
+  EVENT_GENERATE_VISUAL_ID = 'event_generate_visual_id',
   EVENT_LIST_RELATIONSHIP_CONTACTS = 'event_list_relationship_contacts',
   EVENT_VIEW_RELATIONSHIP_CONTACTS = 'event_view_relationship_contacts',
   EVENT_CREATE_RELATIONSHIP_CONTACTS = 'event_create_relationship_contacts',

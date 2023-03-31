@@ -1263,7 +1263,7 @@ export class TransmissionChainBarsService {
    */
   private determineGraphHeaderHeight(): number {
     // determine max of number of center name
-    const maxCenterNames = Math.max(0, ...Object.values(this.entityToCenterNameCell).map(t => Object.keys(t).length));
+    const maxCenterNames = Math.max(0, ...Object.values(this.entityToCenterNameCell).map((t) => Object.keys(t).length));
 
     // add entity name cell height and each center name cell height
     return this.entityDetailsCellHeight + maxCenterNames * (this.entityDetailsTextLineCellHeight + this.entityDetailsTextLineSpaceBetween);

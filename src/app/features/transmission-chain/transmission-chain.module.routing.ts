@@ -97,7 +97,8 @@ const routes: Routes = [
       occupation: OccupationDataResolver,
       outcome: OutcomeDataResolver,
       gender: GenderDataResolver,
-      cluster: ClusterDataResolver
+      cluster: ClusterDataResolver,
+      labSequenceResult: LabSequenceResultDataResolver
     }
   },
 
