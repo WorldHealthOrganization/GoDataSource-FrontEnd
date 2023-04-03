@@ -80,6 +80,5 @@ export const EnglishUsLang = {
     // LNG_CASE_FIELD_LABEL_DUPLICATE_CONTACTS
     // LNG_CONTACT_FIELD_LABEL_DUPLICATE_CASES
 
-    
   }
 };
