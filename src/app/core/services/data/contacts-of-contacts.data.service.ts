@@ -5,7 +5,6 @@ import { HttpClient } from '@angular/common/http';
 import { ModelHelperService } from '../helper/model-helper.service';
 import { ContactOfContactModel } from '../../models/contact-of-contact.model';
 import { AddressModel } from '../../models/address.model';
-import { EntityDuplicatesModel } from '../../models/entity-duplicates.model';
 import { RiskLevelGroupModel } from '../../models/risk-level-group.model';
 import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';
 import { IGeneralAsyncValidatorResponse } from '../../../shared/xt-forms/validators/general-async-validator.directive';
@@ -105,24 +104,6 @@ export class ContactsOfContactsDataService {
     return this.modelHelper.mapObservableListToModel(
       this.http.get(`outbreaks/${outbreakId}/contacts-of-contacts/${contactOfContactId}/movement`),
       AddressModel
-    );
-  }
-
-  /**
-     * Find contact of contact duplicates
-     * @param outbreakId
-     * @param contactOfContactData
-     */
-  findDuplicates(
-    outbreakId: string,
-    contactOfContactData: any
-  ): Observable<EntityDuplicatesModel> {
-    return this.modelHelper.mapObservableToModel(
-      this.http.post(
-        `outbreaks/${outbreakId}/contacts-of-contacts/duplicates/find`,
-        contactOfContactData
-      ),
-      EntityDuplicatesModel
     );
   }
 
