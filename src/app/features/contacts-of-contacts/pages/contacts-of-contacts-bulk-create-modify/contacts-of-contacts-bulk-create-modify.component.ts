@@ -290,12 +290,26 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
         visible: this.isCreate,
         options: this.isCreate ?
           (this.activatedRoute.snapshot.data.documentType as IResolverV2ResponseModel<ReferenceDataEntryModel>).options :
-          []
+          [],
+        validators: {
+          required: (rowData: EntityModel) => {
+            const contact: ContactOfContactModel = rowData.model as ContactOfContactModel;
+            return contact.documents?.length &&
+              !!contact.documents[0].number;
+          }
+        }
       }, {
         type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_DOCUMENT_FIELD_LABEL_DOCUMENT_NUMBER',
         field: 'model.documents[0].number',
-        visible: this.isCreate
+        visible: this.isCreate,
+        validators: {
+          required: (rowData: EntityModel) => {
+            const contact: ContactOfContactModel = rowData.model as ContactOfContactModel;
+            return contact.documents?.length &&
+              !!contact.documents[0].type;
+          }
+        }
       },
 
       // Contact Address(es)
@@ -845,6 +859,18 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
           !AddressModel.isNotEmpty(contactOfContact.addresses[0])
         ) {
           contactOfContact.addresses = [];
+        }
+
+        // remove empty documents
+        if (
+          contactOfContact.documents?.length === 1 && (
+            !contactOfContact.documents[0] || (
+              !contactOfContact.documents[0].type &&
+              !contactOfContact.documents[0].number
+            )
+          )
+        ) {
+          contactOfContact.documents = [];
         }
 
         // format as API expects it
