@@ -3134,6 +3134,11 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
               newValue = undefined;
             }
 
+            // convert NaN to undefined
+            if (isNaN(newValue)) {
+              newValue = undefined;
+            }
+
             // finished
             break;
 
@@ -3171,7 +3176,20 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
                 newValue = columnDefinition.optionsMap[newValue].value;
               } else {
                 // search first one that matches by name
-                const newValueFirstMatch = columnDefinition.options.find((item) => item.label && (item.label === newValue || this.i18nService.instant(item.label) === newValue));
+                const newValueLower: string = newValue ?
+                  newValue.toString().toLowerCase() :
+                  newValue;
+                const newValueFirstMatch = columnDefinition.options.find(
+                  (item) => item.label && (
+                    item.label === newValue ||
+                    this.i18nService.instant(item.label) === newValue || (
+                      newValueLower && (
+                        item.label.toLowerCase() === newValueLower ||
+                        this.i18nService.instant(item.label).toLowerCase() === newValueLower
+                      )
+                    )
+                  )
+                );
                 if (newValueFirstMatch) {
                   newValue = newValueFirstMatch.value;
                 } else {
