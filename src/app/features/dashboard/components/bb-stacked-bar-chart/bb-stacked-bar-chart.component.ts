@@ -1,6 +1,16 @@
-import { Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  ViewEncapsulation
+} from '@angular/core';
 import { v4 as uuid } from 'uuid';
-import { bar, bb, zoom } from 'billboard.js';
+import { bar, bb, DataItem, zoom } from 'billboard.js';
 import { Chart } from 'billboard.js/types/chart';
 
 @Component({
@@ -22,6 +32,7 @@ export class BbStackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
   @Input() xLabel: string = '';
   @Input() yLabel: string = '';
   @Input() colorPattern: string[] = [];
+  @Output() barClick: EventEmitter<DataItem> = new EventEmitter<DataItem>();
   chart: Chart;
 
   maxTickCulling: number = 1;
@@ -114,7 +125,10 @@ export class BbStackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
         groups: [
           this.chartDataColumns
         ],
-        labels: this.showLabels
+        labels: this.showLabels,
+        onclick: (d) => {
+          this.barClick.emit(d);
+        }
       },
       bar: {
         width: {

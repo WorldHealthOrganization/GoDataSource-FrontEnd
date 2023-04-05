@@ -41,40 +41,28 @@
     *ngIf="expanded">
     <!-- Chart -->
     <ng-container
-      *ngIf="!displayLoading && histogramResults?.length > 0">
+      *ngIf="!displayLoading && chartData?.length > 0">
       <!-- Chart -->
       <div
-        class="gd-dashlet-histogram-bottom"
-        fxLayoutAlign="start center">
-        <ngx-charts-bar-vertical
-          class="histogram-size-chains"
-          [scheme]="{ domain: [caseRefDataColor] }"
-          [results]="histogramResults"
-          [gradient]="false"
-          [xAxis]="true"
-          [yAxis]="true"
-          [legend]="false"
-          [showXAxisLabel]="true"
-          [showYAxisLabel]="true"
-          [yAxisTickFormatting]="axisFormat"
-          [xAxisLabel]="'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_LABEL' | translate"
-          [yAxisLabel]="'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_NUMBER_LABEL' | translate"
-          (select)="onSelectChart($event)">
-          <ng-template let-model="model">
-            <div>
-              {{'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_LABEL' | translate}}: {{model.name}}
-            </div>
-            <div>
-              {{'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_NUMBER_LABEL' | translate}}: {{model.value}}
-            </div>
-          </ng-template>
-        </ngx-charts-bar-vertical>
+        class="gd-dashlet-histogram-bottom">
+        <app-bb-stacked-bar-chart
+          [chartData]="chartData"
+          [chartDataColumns]="chartDataColumns"
+          [chartDataCategories]="chartDataCategories"
+          [showLabels]="false"
+          [showLegend]="false"
+          [zoomEnabled]="false"
+          [xLabel]="'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_SIZE_LABEL' | translate"
+          [yLabel]="'LNG_PAGE_DASHBOARD_HISTOGRAM_CHAINS_OF_TRANSMISSION_NUMBER_LABEL' | translate"
+          [colorPattern]="colorPattern"
+          (barClick)="onSelectChart($event)">
+        </app-bb-stacked-bar-chart>
       </div>
     </ng-container>
 
     <!-- No data -->
     <ng-container
-      *ngIf="!displayLoading && histogramResults?.length < 1">
+      *ngIf="!displayLoading && chartData?.length < 1">
       <div
         class="gd-dashlet-histogram-no-data"
         fxFlex fxFlexAlign="center center">
