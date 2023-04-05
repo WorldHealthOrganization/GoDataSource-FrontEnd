@@ -2644,6 +2644,18 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                     append: [
                       {
                         type: V2SideDialogConfigInputType.CHECKBOX,
+                        placeholder: 'LNG_COMMON_LABEL_EXPORT_INCLUDE_CREATED_BY_USER',
+                        tooltip: 'LNG_COMMON_LABEL_EXPORT_INCLUDE_CREATED_BY_USER_DESCRIPTION',
+                        name: 'includeCreatedByUser',
+                        checked: false
+                      }, {
+                        type: V2SideDialogConfigInputType.CHECKBOX,
+                        placeholder: 'LNG_COMMON_LABEL_EXPORT_INCLUDE_UPDATED_BY_USER',
+                        tooltip: 'LNG_COMMON_LABEL_EXPORT_INCLUDE_UPDATED_BY_USER_DESCRIPTION',
+                        name: 'includeUpdatedByUser',
+                        checked: false
+                      }, {
+                        type: V2SideDialogConfigInputType.CHECKBOX,
                         placeholder: 'LNG_COMMON_LABEL_EXPORT_INCLUDE_ALERTED',
                         tooltip: 'LNG_COMMON_LABEL_EXPORT_INCLUDE_ALERTED_DESCRIPTION',
                         name: 'includeAlerted',
