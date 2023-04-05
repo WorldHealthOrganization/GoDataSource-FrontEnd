@@ -18,6 +18,7 @@ export class BbStackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
   @Input() chartDataCategories;
   @Input() showLabels: boolean = false;
   @Input() showLegend: boolean = true;
+  @Input() zoomEnabled: boolean = true;
   @Input() xLabel: string = '';
   @Input() yLabel: string = '';
   @Input() colorPattern: string[] = [];
@@ -85,7 +86,9 @@ export class BbStackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
         this.configureNumberOfTicks(this.chartDataCategories.length);
       },
       zoom: {
-        enabled: zoom(),
+        enabled: this.zoomEnabled ?
+          zoom() :
+          false,
         type: 'wheel',
         rescale: false,
         onzoom: (domain) => {
