@@ -9,7 +9,6 @@ import { MetricCasesCountStratified } from '../../models/metrics/metric-cases-co
 import { MetricCasesPerLocationCountsModel } from '../../models/metrics/metric-cases-per-location-counts.model';
 import { AddressModel } from '../../models/address.model';
 import { MetricCasesDelayBetweenOnsetLabTestModel } from '../../models/metrics/metric-cases-delay-between-onset-lab-test.model';
-import { EntityDuplicatesModel } from '../../models/entity-duplicates.model';
 import { VisualIdErrorModel, VisualIdErrorModelCode } from '../../models/visual-id-error.model';
 import * as _ from 'lodash';
 import { MetricCasesDelayBetweenOnsetHospitalizationModel } from '../../models/metrics/metric-cases-delay-between-onset-hospitalization.model';
@@ -76,24 +75,6 @@ export class CaseDataService {
     return this.modelHelper.mapObservableListToModel(
       this.http.get(`outbreaks/${outbreakId}/cases/${caseId}/movement`),
       AddressModel
-    );
-  }
-
-  /**
-     * Find case duplicates
-     * @param outbreakId
-     * @param caseData
-     */
-  findDuplicates(
-    outbreakId: string,
-    caseData: any
-  ): Observable<EntityDuplicatesModel> {
-    return this.modelHelper.mapObservableToModel(
-      this.http.post(
-        `outbreaks/${outbreakId}/cases/duplicates/find`,
-        caseData
-      ),
-      EntityDuplicatesModel
     );
   }
 

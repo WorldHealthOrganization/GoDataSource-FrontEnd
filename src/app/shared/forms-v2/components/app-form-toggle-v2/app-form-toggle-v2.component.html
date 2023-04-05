@@ -10,7 +10,8 @@
 
     <mat-button-toggle
       *ngFor="let option of options"
-      [value]="option.value">
+      [value]="option.value"
+      [disabled]="option.disabled">
 
       <!-- Icon -->
       <mat-icon>{{option.value === value ? 'radio_button_checked' : 'radio_button_unchecked'}}</mat-icon>

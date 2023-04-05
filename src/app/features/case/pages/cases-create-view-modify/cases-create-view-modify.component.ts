@@ -41,7 +41,6 @@ import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-val
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RequestFilterGenerator, RequestQueryBuilder, RequestSortDirection } from '../../../../core/helperClasses/request-query-builder';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { EntityDuplicatesModel } from '../../../../core/models/entity-duplicates.model';
 import { AppMessages } from '../../../../core/enums/app-messages.enum';
@@ -64,6 +63,7 @@ import { RedirectService } from '../../../../core/services/helper/redirect.servi
 import { V2ColumnStatusForm } from '../../../../shared/components-v2/app-list-table-v2/models/column.model';
 import { AppListTableV2Component } from '../../../../shared/components-v2/app-list-table-v2/app-list-table-v2.component';
 import { DomSanitizer } from '@angular/platform-browser';
+import { ContactOfContactModel } from '../../../../core/models/contact-of-contact.model';
 
 /**
  * Component
@@ -88,7 +88,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
   // check for duplicate
   private _duplicateCheckingTimeout: any;
   private _duplicateCheckingSubscription: Subscription;
-  private _personDuplicates: (ContactModel | CaseModel)[] = [];
+  private _personDuplicates: EntityModel[] = [];
   private _previousChecked: {
     firstName: string,
     lastName: string,
@@ -176,7 +176,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     }
 
     // remove global notifications
-    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
     this.toastV2Service.hide(AppMessages.APP_MESSAGE_DATE_OF_REPORTING_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
     this.toastV2Service.hide(AppMessages.APP_MESSAGE_HOSPITALIZATION_START_DATE_SHOULD_NOT_BE_BEFORE_DATE_OF_ONSET);
   }
@@ -226,7 +226,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
       this.isModify
     ) {
       // remove global notifications
-      this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
+      this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
 
       // show global notifications
       this.checkForPersonExistence();
@@ -2096,7 +2096,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
           }
 
           // check for duplicates
-          this.caseDataService
+          this.entityDataService
             .findDuplicates(
               this.selectedOutbreak.id,
               this.isCreate ?
@@ -2133,15 +2133,16 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
 
               // hide notification
               // - hide alert
-              this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
+              this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
 
               // construct list of actions
               const itemsToManage: IV2SideDialogConfigInputLinkWithAction[] = response.duplicates.map((item, index) => {
                 return {
                   type: V2SideDialogConfigInputType.LINK_WITH_ACTION,
                   name: `actionsLink[${item.model.id}]`,
-                  placeholder: (index + 1) + '. ' + EntityModel.getNameWithDOBAge(
-                    item.model as CaseModel,
+                  placeholder: (index + 1) + '. ' + EntityModel.getDuplicatePersonDetails(
+                    item,
+                    this.translateService.instant(item.model.type),
                     this.translateService.instant('LNG_AGE_FIELD_LABEL_YEARS'),
                     this.translateService.instant('LNG_AGE_FIELD_LABEL_MONTHS')
                   ),
@@ -2162,7 +2163,8 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
                       },
                       {
                         label: Constants.DUPLICATE_ACTION.MERGE,
-                        value: Constants.DUPLICATE_ACTION.MERGE
+                        value: Constants.DUPLICATE_ACTION.MERGE,
+                        disabled: item.model.type !== EntityType.CASE
                       }
                     ]
                   }
@@ -2418,32 +2420,47 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
     // update message & show alert if not visible already
     // - with links for cases / contacts view page if we have enough rights
     this.toastV2Service.notice(
-      this.translateService.instant('LNG_CASE_FIELD_LABEL_DUPLICATE_CONTACTS') +
+      this.translateService.instant('LNG_CASE_FIELD_LABEL_DUPLICATE_PERSONS') +
       ' ' +
       this._personDuplicates
         .map((item) => {
           // check rights
           if (
             (
-              item.type === EntityType.CONTACT &&
+              item.model.type === EntityType.CASE &&
+              !CaseModel.canView(this.authUser)
+            ) || (
+              item.model.type === EntityType.CONTACT &&
               !ContactModel.canView(this.authUser)
             ) || (
-              item.type === EntityType.CASE &&
-              !CaseModel.canView(this.authUser)
+              item.model.type === EntityType.CONTACT_OF_CONTACT &&
+              !ContactOfContactModel.canView(this.authUser)
             )
           ) {
-            return `${item.name} (${this.translateService.instant(item.type)})`;
+            return `${item.model.name} (${this.translateService.instant(item.type)})`;
           }
 
           // create url
-          const url: string = `${item.type === EntityType.CONTACT ? '/contacts' : '/cases'}/${item.id}/view`;
+          let entityPath: string = '';
+          switch (item.model.type) {
+            case EntityType.CASE:
+              entityPath = 'cases';
+              break;
+            case EntityType.CONTACT:
+              entityPath = 'contacts';
+              break;
+            case EntityType.CONTACT_OF_CONTACT:
+              entityPath = 'contacts-of-contacts';
+              break;
+          }
+          const url =  `${entityPath}/${item.model.id}/view`;
 
           // finished
-          return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.name} (${this.translateService.instant(item.type)})</span></a>`;
+          return `<a class="gd-alert-link" href="${this.location.prepareExternalUrl(url)}"><span>${item.model.name} (${this.translateService.instant(item.model.type)})</span></a>`;
         })
         .join(', '),
       undefined,
-      AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT
+      AppMessages.APP_MESSAGE_DUPLICATE_PERSONS
     );
   }
 
@@ -2480,7 +2497,7 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         const updateAlert = () => {
           // must update message ?
           // - hide alert
-          this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_CASE_CONTACT);
+          this.toastV2Service.hide(AppMessages.APP_MESSAGE_DUPLICATE_PERSONS);
 
           // show duplicates alert
           this.showDuplicatesAlert();
@@ -2532,59 +2549,40 @@ export class CasesCreateViewModifyComponent extends CreateViewModifyComponent<Ca
         this._previousChecked.middleName = this.itemData.middleName;
 
         // check for duplicates
-        this._duplicateCheckingSubscription = forkJoin([
-          this.contactDataService
-            .findDuplicates(
-              this.selectedOutbreak.id,
+        this._duplicateCheckingSubscription = this.entityDataService
+          .findDuplicates(
+            this.selectedOutbreak.id,
+            this.isView || this.isModify ?
+              {
+                id: this.itemData.id,
+                ...this._previousChecked
+              } :
               this._previousChecked
-            ),
-          this.caseDataService
-            .findDuplicates(
-              this.selectedOutbreak.id,
-              this.isView || this.isModify ?
-                {
-                  id: this.itemData.id,
-                  ...this._previousChecked
-                } :
-                this._previousChecked
-            )
-        ]).pipe(
-          // handle error
-          catchError((err) => {
-            // show error
-            this.toastV2Service.error(err);
+          )
+          .pipe(
+            // handle error
+            catchError((err) => {
+              // show error
+              this.toastV2Service.error(err);
 
-            // finished
-            return throwError(err);
-          }),
+              // finished
+              return throwError(err);
+            }),
 
-          // should be the last pipe
-          takeUntil(this.destroyed$)
-        ).subscribe((
-          [foundContacts, foundCases]: [
-            EntityDuplicatesModel,
-            EntityDuplicatesModel
-          ]
-        ) => {
-          // request executed
-          this._duplicateCheckingSubscription = undefined;
+            // should be the last pipe
+            takeUntil(this.destroyed$)
+          ).subscribe((foundPersons: EntityDuplicatesModel) => {
+            // request executed
+            this._duplicateCheckingSubscription = undefined;
 
-          // update what we found
-          this._personDuplicates = [];
-          if (foundContacts?.duplicates?.length > 0) {
-            this._personDuplicates.push(
-              ...foundContacts.duplicates.map((item) => item.model as ContactModel)
-            );
-          }
-          if (foundCases?.duplicates?.length > 0) {
-            this._personDuplicates.push(
-              ...foundCases.duplicates.map((item) => item.model as CaseModel)
-            );
-          }
+            // update what we found
+            this._personDuplicates = foundPersons?.duplicates?.length ?
+              [...foundPersons.duplicates] :
+              [];
 
-          // update alert
-          updateAlert();
-        });
+            // update alert
+            updateAlert();
+          });
       },
       400
     );

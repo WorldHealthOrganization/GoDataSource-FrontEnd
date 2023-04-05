@@ -348,7 +348,15 @@ export class AppFormSelectSingleV2Component
 
         // filter ?
         if (this.startSearch) {
+          // filter
           this.filterOptions(this.startSearch);
+
+          // make active first one
+          if (this.filteredOptions.length) {
+            setTimeout(() => {
+              this.input._keyManager.setFirstItemActive();
+            });
+          }
         }
       } else {
         this._openAfterInit = true;

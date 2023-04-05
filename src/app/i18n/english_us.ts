@@ -31,7 +31,6 @@ export const EnglishUsLang = {
     'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_PARTIAL_ERROR_MSG': 'Records that were created with success were removed from the spreadsheet so we don\'t create duplicates'
 
 
-
     /**
      * REMOVE the tokens from below
      */
@@ -77,5 +76,7 @@ export const EnglishUsLang = {
     // LNG_PAGE_BULK_ADD_CONTACTS_OF_CONTACTS_VISUAL_ID_INFO_LABEL
     // LNG_PAGE_BULK_ADD_CONTACTS_OF_CONTACTS_LABEL_ERRORS
     // LNG_PAGE_BULK_MODIFY_CONTACTS_OF_CONTACTS_LABEL_ERRORS
+    // LNG_CASE_FIELD_LABEL_DUPLICATE_CONTACTS
+    // LNG_CONTACT_FIELD_LABEL_DUPLICATE_CASES
   }
 };
