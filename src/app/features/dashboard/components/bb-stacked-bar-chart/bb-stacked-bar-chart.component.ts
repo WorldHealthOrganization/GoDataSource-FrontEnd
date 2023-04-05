@@ -157,7 +157,7 @@ export class BbStackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
         show: this.showLegend
       },
       padding: {
-        left: 25,
+        left: 50,
         right: 25
       },
       color: {

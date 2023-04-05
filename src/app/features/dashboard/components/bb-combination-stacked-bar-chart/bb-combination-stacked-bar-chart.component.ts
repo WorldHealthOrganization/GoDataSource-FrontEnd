@@ -172,7 +172,7 @@ export class BbCombinationStackedBarChartComponent implements OnInit, OnChanges,
         }
       },
       padding: {
-        left: 25,
+        left: 50,
         right: 25
       },
       color: {
