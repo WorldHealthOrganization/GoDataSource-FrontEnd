@@ -42,7 +42,7 @@
             },
             "scripts": [],
             "allowedCommonJsDependencies": [
-              "c3",
+              "billboard.js",
               "clone-deep",
               "core-js",
               "cytoscape",

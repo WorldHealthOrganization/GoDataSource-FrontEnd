@@ -1,20 +1,19 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import * as c3 from 'c3';
 import * as d3 from 'd3';
-import { ChartConfiguration, FormatFunction } from 'c3';
+import { bar, bb, FormatFunction } from 'billboard.js';
 
 @Component({
-  selector: 'app-c3-combination-stacked-bar-chart',
+  selector: 'app-bb-combination-stacked-bar-chart',
   encapsulation: ViewEncapsulation.None,
-  templateUrl: './c3-combination-stacked-bar-chart.component.html',
-  styleUrls: ['./c3-combination-stacked-bar-chart.component.less']
+  templateUrl: './bb-combination-stacked-bar-chart.component.html',
+  styleUrls: ['./bb-combination-stacked-bar-chart.component.less']
 })
-export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges, OnDestroy {
+export class BbCombinationStackedBarChartComponent implements OnInit, OnChanges, OnDestroy {
 
   @Input() chartData;
   @Input() chartDataColumns;
   @Input() chartDataCategories;
-  @Input() showLabels: boolean | { format: FormatFunction } | { format: { [key: string]: boolean | FormatFunction } } = false;
+  @Input() showLabels: boolean | { format: FormatFunction } | { format: { [key: string]: FormatFunction } } = false;
   @Input() xLabel: string = '';
   @Input() yLabel: string = '';
   @Input() y2Label: string = '';
@@ -31,7 +30,7 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
   maxTickCulling: number = 1;
 
   ngOnInit() {
-    // render c3 object
+    // render bb object
     this.render();
   }
 
@@ -40,7 +39,7 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
   }
 
   ngOnChanges(): any {
-    // render c3 object
+    // render bb object
     this.render();
   }
 
@@ -59,7 +58,7 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
     this.destroyChart();
 
     const chartIdBind = '#' + this.chartId;
-    this.chart = c3.generate({
+    this.chart = bb.generate({
       bindto: chartIdBind,
       oninit: () => {
         if (this.initialZoomRanges) {
@@ -73,9 +72,9 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
         this.configureNumberOfTicks(this.chartDataCategories.length);
 
         // reposition labels
-        d3.selectAll('app-c3-combination-stacked-bar-chart .c3-chart-texts .c3-chart-text:nth-of-type(3) .c3-texts .c3-text').attr('y', '15px');
-        d3.selectAll('app-c3-combination-stacked-bar-chart .c3-chart-texts .c3-chart-text:nth-of-type(1) .c3-texts .c3-text').attr('y', '31px');
-        d3.selectAll('app-c3-combination-stacked-bar-chart .c3-chart-texts .c3-chart-text:nth-of-type(2) .c3-texts .c3-text').attr('y', '47px');
+        d3.selectAll('app-bb-combination-stacked-bar-chart .bb-chart-texts .bb-chart-text:nth-of-type(3) .bb-texts .bb-text').attr('y', '15px');
+        d3.selectAll('app-bb-combination-stacked-bar-chart .bb-chart-texts .bb-chart-text:nth-of-type(1) .bb-texts .bb-text').attr('y', '31px');
+        d3.selectAll('app-bb-combination-stacked-bar-chart .bb-chart-texts .bb-chart-text:nth-of-type(2) .bb-texts .bb-text').attr('y', '47px');
       },
       zoom: {
         enabled: true,
@@ -87,7 +86,7 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
             this.configureNumberOfTicks(domainDiff);
           }
         },
-        initialRange: this.initialZoomRanges ? this.initialZoomRanges : undefined
+        extent: this.initialZoomRanges ? this.initialZoomRanges : undefined
       },
       interaction: {
         enabled: false
@@ -100,7 +99,7 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
       },
       data: {
         columns: this.chartData,
-        type: 'bar',
+        type: bar(),
         types: {
           [this.lineData]: 'spline'
         },
@@ -177,7 +176,7 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
       color: {
         pattern: this.colorPattern
       }
-    } as ChartConfiguration);
+    });
 
   }
 
@@ -191,7 +190,7 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
       return;
     }
 
-    const elements: any = chartElement.querySelectorAll('.c3-axis-x');
+    const elements: any = chartElement.querySelectorAll('.bb-axis-x');
     if (
       !elements ||
             elements.length < 1
@@ -208,47 +207,47 @@ export class C3CombinationStackedBarChartComponent implements OnInit, OnChanges,
     }
 
     if (elementsDisplayedNo < 70) {
-      element.classList.add('c3-axis-x-n');
-      element.classList.remove('c3-axis-x-2n');
-      element.classList.remove('c3-axis-x-3n');
-      element.classList.remove('c3-axis-x-5n');
-      element.classList.remove('c3-axis-x-8n');
-      element.classList.remove('c3-axis-x-10n');
+      element.classList.add('bb-axis-x-n');
+      element.classList.remove('bb-axis-x-2n');
+      element.classList.remove('bb-axis-x-3n');
+      element.classList.remove('bb-axis-x-5n');
+      element.classList.remove('bb-axis-x-8n');
+      element.classList.remove('bb-axis-x-10n');
     } else if (elementsDisplayedNo < 150 ) {
-      element.classList.add('c3-axis-x-2n');
-      element.classList.remove('c3-axis-x-n');
-      element.classList.remove('c3-axis-x-3n');
-      element.classList.remove('c3-axis-x-5n');
-      element.classList.remove('c3-axis-x-8n');
-      element.classList.remove('c3-axis-x-10n');
+      element.classList.add('bb-axis-x-2n');
+      element.classList.remove('bb-axis-x-n');
+      element.classList.remove('bb-axis-x-3n');
+      element.classList.remove('bb-axis-x-5n');
+      element.classList.remove('bb-axis-x-8n');
+      element.classList.remove('bb-axis-x-10n');
     } else if (elementsDisplayedNo < 250 ) {
-      element.classList.add('c3-axis-x-3n');
-      element.classList.remove('c3-axis-x-n');
-      element.classList.remove('c3-axis-x-2n');
-      element.classList.remove('c3-axis-x-5n');
-      element.classList.remove('c3-axis-x-8n');
-      element.classList.remove('c3-axis-x-10n');
+      element.classList.add('bb-axis-x-3n');
+      element.classList.remove('bb-axis-x-n');
+      element.classList.remove('bb-axis-x-2n');
+      element.classList.remove('bb-axis-x-5n');
+      element.classList.remove('bb-axis-x-8n');
+      element.classList.remove('bb-axis-x-10n');
     } else if (elementsDisplayedNo < 300 ) {
-      element.classList.add('c3-axis-x-5n');
-      element.classList.remove('c3-axis-x-n');
-      element.classList.remove('c3-axis-x-2n');
-      element.classList.remove('c3-axis-x-3n');
-      element.classList.remove('c3-axis-x-8n');
-      element.classList.remove('c3-axis-x-10n');
+      element.classList.add('bb-axis-x-5n');
+      element.classList.remove('bb-axis-x-n');
+      element.classList.remove('bb-axis-x-2n');
+      element.classList.remove('bb-axis-x-3n');
+      element.classList.remove('bb-axis-x-8n');
+      element.classList.remove('bb-axis-x-10n');
     } else if (elementsDisplayedNo < 350 ) {
-      element.classList.add('c3-axis-x-8n');
-      element.classList.remove('c3-axis-x-n');
-      element.classList.remove('c3-axis-x-2n');
-      element.classList.remove('c3-axis-x-3n');
-      element.classList.remove('c3-axis-x-5n');
-      element.classList.remove('c3-axis-x-10n');
+      element.classList.add('bb-axis-x-8n');
+      element.classList.remove('bb-axis-x-n');
+      element.classList.remove('bb-axis-x-2n');
+      element.classList.remove('bb-axis-x-3n');
+      element.classList.remove('bb-axis-x-5n');
+      element.classList.remove('bb-axis-x-10n');
     } else {
-      element.classList.add('c3-axis-x-10n');
-      element.classList.remove('c3-axis-x-n');
-      element.classList.remove('c3-axis-x-2n');
-      element.classList.remove('c3-axis-x-3n');
-      element.classList.remove('c3-axis-x-5n');
-      element.classList.remove('c3-axis-x-8n');
+      element.classList.add('bb-axis-x-10n');
+      element.classList.remove('bb-axis-x-n');
+      element.classList.remove('bb-axis-x-2n');
+      element.classList.remove('bb-axis-x-3n');
+      element.classList.remove('bb-axis-x-5n');
+      element.classList.remove('bb-axis-x-8n');
     }
   }
 }

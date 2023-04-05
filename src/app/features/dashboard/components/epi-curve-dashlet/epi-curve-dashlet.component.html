@@ -43,7 +43,7 @@
     <div
       class="gd-dashlet-epi-curve-bottom"
       [fxShow]="!displayLoading && chartData?.length > 0">
-      <app-c3-stacked-bar-chart
+      <app-bb-stacked-bar-chart
         [chartData]="chartData"
         [chartDataColumns]="chartDataColumns"
         [chartDataCategories]="chartDataCategories"
@@ -51,7 +51,7 @@
         [xLabel]="'LNG_PAGE_DASHBOARD_EPI_CURVE_DATE_OF_ONSET_LABEL' | translate"
         [yLabel]="'LNG_PAGE_DASHBOARD_EPI_CURVE_NO_CASES_LABEL' | translate"
         [colorPattern]="colorPattern">
-      </app-c3-stacked-bar-chart>
+      </app-bb-stacked-bar-chart>
 
       <div
         fxLayout="row" fxLayout.xs="column" fxLayoutAlign="center start" fxLayoutAlign.xs="start center" fxLayoutGap="1.6rem">

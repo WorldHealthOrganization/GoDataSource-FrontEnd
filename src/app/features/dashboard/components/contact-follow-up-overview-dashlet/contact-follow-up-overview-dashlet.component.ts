@@ -10,7 +10,7 @@ import { RequestQueryBuilder } from '../../../../core/helperClasses/request-quer
 import { ContactDataService } from '../../../../core/services/data/contact.data.service';
 import { MetricContactsFollowedUpReportModel } from '../../../../core/models/metrics/metric-contacts-followed-up-report.model';
 import { moment, Moment } from '../../../../core/helperClasses/x-moment';
-import { FormatFunction } from 'c3';
+import { FormatFunction } from 'billboard.js';
 
 @Component({
   selector: 'app-contact-follow-up-overview-dashlet',

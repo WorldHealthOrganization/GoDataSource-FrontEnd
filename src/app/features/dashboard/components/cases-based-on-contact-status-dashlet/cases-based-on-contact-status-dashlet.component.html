@@ -43,8 +43,8 @@
     <div
       class="gd-dashlet-contact-status-bottom"
       [fxShow]="expanded && !displayLoading && chartData?.length > 0">
-      <app-c3-combination-stacked-bar-chart
-        chartId="c3CasesBasedOnContactStatusReport"
+      <app-bb-combination-stacked-bar-chart
+        chartId="bbCasesBasedOnContactStatusReport"
         [chartData]="chartData"
         [chartDataColumns]="chartDataColumns"
         [lineData]="lineData"
@@ -56,7 +56,7 @@
         [colorPattern]="colorPattern"
         [y2Max]="100"
         [y2Min]="0">
-      </app-c3-combination-stacked-bar-chart>
+      </app-bb-combination-stacked-bar-chart>
     </div>
 
     <!-- No data -->
