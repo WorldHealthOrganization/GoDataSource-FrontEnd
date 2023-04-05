@@ -1,6 +1,7 @@
 import { Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { v4 as uuid } from 'uuid';
-import { bar, bb } from 'billboard.js';
+import { bar, bb, zoom } from 'billboard.js';
+import { Chart } from 'billboard.js/types/chart';
 
 @Component({
   selector: 'app-bb-stacked-bar-chart',
@@ -20,7 +21,7 @@ export class BbStackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
   @Input() xLabel: string = '';
   @Input() yLabel: string = '';
   @Input() colorPattern: string[] = [];
-  chart: any;
+  chart: Chart;
 
   maxTickCulling: number = 1;
 
@@ -84,7 +85,8 @@ export class BbStackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
         this.configureNumberOfTicks(this.chartDataCategories.length);
       },
       zoom: {
-        enabled: true,
+        enabled: zoom(),
+        type: 'wheel',
         rescale: false,
         onzoom: (domain) => {
           // display the ticks based on the domain zoomed
@@ -95,10 +97,10 @@ export class BbStackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
         }
       },
       interaction: {
-        enabled: false
+        enabled: true
       },
       tooltip: {
-        show: true
+        show: false
       },
       transition: {
         duration: 0
@@ -133,7 +135,7 @@ export class BbStackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
           }
         },
         y: {
-          inner: true,
+          inner: false,
           label: {
             text: this.yLabel,
             position: 'outer-middle'

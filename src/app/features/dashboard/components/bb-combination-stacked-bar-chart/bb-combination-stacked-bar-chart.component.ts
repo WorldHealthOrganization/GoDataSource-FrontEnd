@@ -1,6 +1,7 @@
 import { Component, Input, OnChanges, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import * as d3 from 'd3';
-import { bar, bb, FormatFunction } from 'billboard.js';
+import { bar, bb, FormatFunction, spline, zoom } from 'billboard.js';
+import { Chart } from 'billboard.js/types/chart';
 
 @Component({
   selector: 'app-bb-combination-stacked-bar-chart',
@@ -25,7 +26,7 @@ export class BbCombinationStackedBarChartComponent implements OnInit, OnChanges,
   @Input() initialZoomRanges: [number, number];
   @Input() tooltip: string;
 
-  chart: any;
+  chart: Chart;
 
   maxTickCulling: number = 1;
 
@@ -77,7 +78,8 @@ export class BbCombinationStackedBarChartComponent implements OnInit, OnChanges,
         d3.selectAll('app-bb-combination-stacked-bar-chart .bb-chart-texts .bb-chart-text:nth-of-type(2) .bb-texts .bb-text').attr('y', '47px');
       },
       zoom: {
-        enabled: true,
+        enabled: zoom(),
+        type: 'wheel',
         rescale: false,
         onzoom: (domain) => {
           // display the ticks based on the domain zoomed
@@ -89,10 +91,10 @@ export class BbCombinationStackedBarChartComponent implements OnInit, OnChanges,
         extent: this.initialZoomRanges ? this.initialZoomRanges : undefined
       },
       interaction: {
-        enabled: false
+        enabled: true
       },
       tooltip: {
-        show: true
+        show: false
       },
       transition: {
         duration: 0
@@ -101,7 +103,7 @@ export class BbCombinationStackedBarChartComponent implements OnInit, OnChanges,
         columns: this.chartData,
         type: bar(),
         types: {
-          [this.lineData]: 'spline'
+          [this.lineData]: spline()
         },
         groups: [
           this.chartDataColumns
@@ -136,7 +138,7 @@ export class BbCombinationStackedBarChartComponent implements OnInit, OnChanges,
           }
         },
         y: {
-          inner: true,
+          inner: false,
           label: {
             text: this.yLabel,
             position: 'outer-middle'
@@ -148,7 +150,7 @@ export class BbCombinationStackedBarChartComponent implements OnInit, OnChanges,
         },
         y2: {
           show: true,
-          inner: true,
+          inner: false,
           label: {
             text: this.y2Label,
             position: 'outer-middle'
