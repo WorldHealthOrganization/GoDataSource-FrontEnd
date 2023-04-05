@@ -1,14 +1,25 @@
-import { Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
-import * as c3 from 'c3';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  ViewEncapsulation
+} from '@angular/core';
 import { v4 as uuid } from 'uuid';
+import { bar, bb, DataItem, zoom } from 'billboard.js';
+import { Chart } from 'billboard.js/types/chart';
 
 @Component({
-  selector: 'app-c3-stacked-bar-chart',
+  selector: 'app-bb-stacked-bar-chart',
   encapsulation: ViewEncapsulation.None,
-  templateUrl: './c3-stacked-bar-chart.component.html',
-  styleUrls: ['./c3-stacked-bar-chart.component.less']
+  templateUrl: './bb-stacked-bar-chart.component.html',
+  styleUrls: ['./bb-stacked-bar-chart.component.less']
 })
-export class C3StackedBarChartComponent implements OnInit, OnChanges, OnDestroy {
+export class BbStackedBarChartComponent implements OnInit, OnChanges, OnDestroy {
   // chart id generator
   chartId: string = `chart${uuid()}`;
 
@@ -16,17 +27,20 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
   @Input() chartDataColumns;
   @Input() chartDataCategories;
   @Input() showLabels: boolean = false;
+  @Input() showLegend: boolean = true;
+  @Input() zoomEnabled: boolean = true;
   @Input() xLabel: string = '';
   @Input() yLabel: string = '';
   @Input() colorPattern: string[] = [];
-  chart: any;
+  @Output() barClick: EventEmitter<DataItem> = new EventEmitter<DataItem>();
+  chart: Chart;
 
   maxTickCulling: number = 1;
 
   timeoutCall: any;
 
   ngOnInit() {
-    // render c3 object
+    // render bb object
     this.ngOnChanges();
   }
 
@@ -41,7 +55,7 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
       this.timeoutCall = undefined;
     }
 
-    // render c3 object
+    // render bb object
     this.timeoutCall = setTimeout(() => {
       this.timeoutCall = undefined;
       this.render();
@@ -77,13 +91,16 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
     this.destroyChart();
 
     // create chart
-    this.chart = c3.generate({
+    this.chart = bb.generate({
       bindto: `#${this.chartId}`,
       onrendered: () => {
         this.configureNumberOfTicks(this.chartDataCategories.length);
       },
       zoom: {
-        enabled: true,
+        enabled: this.zoomEnabled ?
+          zoom() :
+          false,
+        type: 'wheel',
         rescale: false,
         onzoom: (domain) => {
           // display the ticks based on the domain zoomed
@@ -94,21 +111,24 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
         }
       },
       interaction: {
-        enabled: false
+        enabled: true
       },
       tooltip: {
-        show: true
+        show: false
       },
       transition: {
         duration: 0
       },
       data: {
         columns: this.chartData,
-        type: 'bar',
+        type: bar(),
         groups: [
           this.chartDataColumns
         ],
-        labels: this.showLabels
+        labels: this.showLabels,
+        onclick: (d) => {
+          this.barClick.emit(d);
+        }
       },
       bar: {
         width: {
@@ -132,7 +152,7 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
           }
         },
         y: {
-          inner: true,
+          inner: false,
           label: {
             text: this.yLabel,
             position: 'outer-middle'
@@ -150,10 +170,11 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
           onclick: function() {
             return false;
           }
-        }
+        },
+        show: this.showLegend
       },
       padding: {
-        left: 25,
+        left: 50,
         right: 25
       },
       color: {
@@ -168,7 +189,7 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
      * @param {number} elementsDisplayedNo
      */
   configureNumberOfTicks(elementsDisplayedNo: number) {
-    const elements: any = this.elementRef.nativeElement.getElementsByClassName('c3-axis-x');
+    const elements: any = this.elementRef.nativeElement.getElementsByClassName('bb-axis-x');
     if (
       !elements ||
       elements.length < 1
@@ -184,25 +205,25 @@ export class C3StackedBarChartComponent implements OnInit, OnChanges, OnDestroy 
     }
 
     if (elementsDisplayedNo < 70) {
-      element.classList.add('c3-axis-x-n');
-      element.classList.remove('c3-axis-x-2n');
-      element.classList.remove('c3-axis-x-3n');
-      element.classList.remove('c3-axis-x-5n');
+      element.classList.add('bb-axis-x-n');
+      element.classList.remove('bb-axis-x-2n');
+      element.classList.remove('bb-axis-x-3n');
+      element.classList.remove('bb-axis-x-5n');
     } else if (elementsDisplayedNo < 150 ) {
-      element.classList.add('c3-axis-x-2n');
-      element.classList.remove('c3-axis-x-n');
-      element.classList.remove('c3-axis-x-3n');
-      element.classList.remove('c3-axis-x-5n');
+      element.classList.add('bb-axis-x-2n');
+      element.classList.remove('bb-axis-x-n');
+      element.classList.remove('bb-axis-x-3n');
+      element.classList.remove('bb-axis-x-5n');
     } else if (elementsDisplayedNo < 250 ) {
-      element.classList.add('c3-axis-x-3n');
-      element.classList.remove('c3-axis-x-n');
-      element.classList.remove('c3-axis-x-2n');
-      element.classList.remove('c3-axis-x-5n');
+      element.classList.add('bb-axis-x-3n');
+      element.classList.remove('bb-axis-x-n');
+      element.classList.remove('bb-axis-x-2n');
+      element.classList.remove('bb-axis-x-5n');
     } else {
-      element.classList.add('c3-axis-x-5n');
-      element.classList.remove('c3-axis-x-n');
-      element.classList.remove('c3-axis-x-2n');
-      element.classList.remove('c3-axis-x-3n');
+      element.classList.add('bb-axis-x-5n');
+      element.classList.remove('bb-axis-x-n');
+      element.classList.remove('bb-axis-x-2n');
+      element.classList.remove('bb-axis-x-3n');
     }
   }
 

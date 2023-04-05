@@ -2,7 +2,7 @@
   class="gd-dashlet-contact-followup"
   [class.gd-dashlet-contact-followup-expanded]="expanded"
   fxLayout="column">
-  
+
   <!-- Title / Description -->
   <div
     class="gd-dashlet-contact-followup-top"
@@ -43,8 +43,8 @@
     <div
       class="gd-dashlet-contact-followup-bottom"
       [fxShow]="expanded && !displayLoading && chartData?.length > 0">
-      <app-c3-combination-stacked-bar-chart
-        chartId="c3FollowedUpReport"
+      <app-bb-combination-stacked-bar-chart
+        chartId="bbFollowedUpReport"
         [chartData]="chartData"
         [chartDataColumns]="chartDataColumns"
         [lineData]="lineData"
@@ -57,7 +57,7 @@
         [y2Max]="100"
         [y2Min]="0"
         [initialZoomRanges]="dashletZoomRanges">
-      </app-c3-combination-stacked-bar-chart>
+      </app-bb-combination-stacked-bar-chart>
     </div>
 
     <!-- No data -->
