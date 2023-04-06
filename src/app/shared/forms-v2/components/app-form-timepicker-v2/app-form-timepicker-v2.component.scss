@@ -1,6 +1,8 @@
 @import 'mixins';
 @import 'font';
 
+// #TODO
+// - needs to be updated by Laur
 /* Timepicker */
 .gd-form-timepicker-v2 {
   @include flex(flex);
@@ -197,7 +199,7 @@
               color: var(--gd-secondary);
             }
           }
-  
+
           .mat-form-field-infix {
             .mat-form-field-label-wrapper {
               .mat-form-field-label {
@@ -205,7 +207,7 @@
               }
             }
           }
-  
+
           .mat-form-field-suffix {
             .mat-icon {
               color: var(--gd-secondary);
