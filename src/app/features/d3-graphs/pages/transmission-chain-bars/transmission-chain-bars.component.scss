@@ -25,7 +25,6 @@ app-transmission-chain-bars {
   }
 
   #chart {
-    // #TODO keep some padding for scrollbars when exporting the graph
     box-sizing: border-box;
     border: 0.1rem solid rgba(var(--gd-primary-rgb), 0.2);
     border-bottom: 0 none;
