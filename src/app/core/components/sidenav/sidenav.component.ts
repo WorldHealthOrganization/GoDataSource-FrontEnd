@@ -19,7 +19,7 @@ import { SystemSettingsDataService } from '../../services/data/system-settings.d
 import { SystemSettingsVersionModel } from '../../models/system-settings-version.model';
 import { IsActiveMatchOptions } from '@angular/router';
 import { ToastV2Service } from '../../services/helper/toast-v2.service';
-import { MAT_MENU_DEFAULT_OPTIONS } from '@angular/material/menu';
+import { MAT_MENU_DEFAULT_OPTIONS, MatMenuTrigger } from '@angular/material/menu';
 import { determineIfTouchDevice } from '../../methods/touch-device';
 import { I18nService } from '../../services/helper/i18n.service';
 
@@ -40,10 +40,10 @@ export class SidenavComponent implements OnInit, OnDestroy {
   // expanded / collapsed mode
   @Input() expanded: boolean = false;
 
-  // used for main menu hover animation
-  enteredButton = false;
-  isMatMenuOpen = false;
-  prevButtonTrigger;
+  // current active main menu
+  private _activeMainMenuId: string;
+  private _menuPositionTimer: any;
+  private _menuCloseTimer: any;
 
   // check if this is a touch device
   isTouchDevice: boolean = determineIfTouchDevice();
@@ -511,6 +511,15 @@ export class SidenavComponent implements OnInit, OnDestroy {
       this.outbreakSubscriber = null;
     }
 
+    // stop position timer
+    this.stopPositionTimer();
+
+    // stop close main menus
+    if (this._menuCloseTimer) {
+      clearTimeout(this._menuCloseTimer);
+      this._menuCloseTimer = undefined;
+    }
+
     // stop refresh language tokens
     this.releaseLanguageChangeListener();
   }
@@ -623,17 +632,44 @@ export class SidenavComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Clear position timer
+   */
+  private stopPositionTimer(): void {
+    if (this._menuPositionTimer) {
+      clearTimeout(this._menuPositionTimer);
+      this._menuPositionTimer = undefined;
+    }
+  }
+
+  /**
    * Main menu opened
    */
-  mainMenuOpened(menuId: string): void {
+  mainMenuOpened(
+    navItem: NavItem,
+    trigger: MatMenuTrigger
+  ): void {
+    // menu opened
+    this._activeMainMenuId = navItem.id;
+    navItem.menuOpenedTrigger = trigger;
+
+    // close all main menus except the active one
+    this.checkAndCloseMenusImmediate();
+
     // retrieve parent element
-    const menuClassList: any = document.querySelector(`.gd-main-menu-option-float-menu.${menuId}`);
+    const menuClassList: any = document.querySelector(`.gd-main-menu-option-float-menu.${navItem.id}`);
     const overlayClassList: any = menuClassList ?
       menuClassList.closest('.cdk-overlay-pane').classList :
       menuClassList;
 
+    // stop previous
+    this.stopPositionTimer();
+
     // make position adjustments
-    setTimeout(() => {
+    this._menuPositionTimer = setTimeout(() => {
+      // clear
+      this._menuPositionTimer = undefined;
+
+      // attach class
       if (
         menuClassList &&
         menuClassList.classList
@@ -645,72 +681,142 @@ export class SidenavComponent implements OnInit, OnDestroy {
           ) {
             overlayClassList.add('gd-cdk-overlay-pane-main-menu-above');
           }
-        } else {
-          if (
-            overlayClassList &&
-            overlayClassList.contains('gd-cdk-overlay-pane-main-menu-above')
-          ) {
-            overlayClassList.remove('gd-cdk-overlay-pane-main-menu-above');
-          }
+        } else if (
+          overlayClassList &&
+          overlayClassList.contains('gd-cdk-overlay-pane-main-menu-above')
+        ) {
+          overlayClassList.remove('gd-cdk-overlay-pane-main-menu-above');
         }
       }
     });
   }
 
   /**
+   * Main menu opened
+   */
+  mainMenuClosed(navItem: NavItem): void {
+    // menu closed
+    navItem.menuOpenedTrigger = undefined;
+
+    // clear active menu ?
+    if (this._activeMainMenuId === navItem.id) {
+      // clear
+      this._activeMainMenuId = undefined;
+
+      // stop position timer
+      this.stopPositionTimer();
+    }
+  }
+
+  /**
    * Floating menu enter
    */
-  floatingMenuEnter() {
-    this.isMatMenuOpen = true;
+  floatingMenuEnter(navItem: NavItem): void {
+    // make active
+    this._activeMainMenuId = navItem.id;
   }
 
   /**
    * Floating menu leave
    */
-  floatingMenuLeave(trigger) {
-    setTimeout(() => {
-      if (!this.enteredButton) {
-        this.isMatMenuOpen = false;
-        trigger.closeMenu();
-      } else {
-        this.isMatMenuOpen = false;
-      }
-    }, 80);
+  floatingMenuLeave(navItem: NavItem): void {
+    // clear active menu ?
+    if (this._activeMainMenuId === navItem.id) {
+      this._activeMainMenuId = undefined;
+    }
+
+    // check and close menus
+    this.checkAndCloseMenus();
   }
 
   /**
    * Menu option enter
    */
-  menuOptionEnter(trigger) {
-    setTimeout(() => {
-      if (this.prevButtonTrigger && this.prevButtonTrigger !== trigger) {
-        this.prevButtonTrigger.closeMenu();
-        this.prevButtonTrigger = trigger;
-        this.isMatMenuOpen = false;
-        trigger.openMenu();
-      } else if (!this.isMatMenuOpen) {
-        this.enteredButton = true;
-        this.prevButtonTrigger = trigger;
-        trigger.openMenu();
-      } else {
-        this.enteredButton = true;
-        this.prevButtonTrigger = trigger;
-      }
-    });
+  menuOptionEnter(
+    navItem: NavItem,
+    trigger: MatMenuTrigger
+  ): void {
+    // make active
+    this._activeMainMenuId = navItem.id;
+
+    // open menu
+    if (!trigger.menuOpen) {
+      trigger.openMenu();
+    }
   }
 
   /**
    * Menu option leave
    */
-  menuOptionLeave(trigger) {
-    setTimeout(() => {
-      if (this.enteredButton && !this.isMatMenuOpen) {
-        trigger.closeMenu();
-      } if (!this.isMatMenuOpen) {
-        trigger.closeMenu();
-      } else {
-        this.enteredButton = false;
+  menuOptionLeave(navItem: NavItem): void {
+    // clear active menu ?
+    if (this._activeMainMenuId === navItem.id) {
+      // check if active element isn't the floating menu that doesn't trigger the (mouseenter)="floatingMenuEnter(menuOption)" due to appearing under cursor
+      let hideMenu: boolean = true;
+      if (document.activeElement) {
+        const closestFloatMenu = document.activeElement.closest('.gd-main-menu-option-float-menu');
+        if (
+          closestFloatMenu &&
+          closestFloatMenu.classList.contains(navItem.id)
+        ) {
+          hideMenu = false;
+        }
       }
-    }, 100);
+
+      // reset
+      if (hideMenu) {
+        this._activeMainMenuId = undefined;
+      }
+    }
+
+    // check and close menus
+    this.checkAndCloseMenus();
+  }
+
+  /**
+   * Close main menu - now!!!
+   */
+  private checkAndCloseMenusImmediate(): void {
+    // go through menu options
+    this.menuGroups.forEach((menuGroup) => {
+      // nothing to do ?
+      // - we need to check even if it became npt visible since the menu could be visible before it became..
+      if (!menuGroup.options?.length) {
+        return;
+      }
+
+      // go through options
+      menuGroup.options.forEach((menuOption) => {
+        // nothing to do ?
+        if (!menuOption.menuOpenedTrigger?.menuOpen) {
+          return;
+        }
+
+        // close menu if not active
+        if (menuOption.id !== this._activeMainMenuId) {
+          menuOption.menuOpenedTrigger.closeMenu();
+        }
+      });
+    });
+  }
+
+  /**
+   * Check and close main menus
+   */
+  private checkAndCloseMenus(): void {
+    // already in progress ?
+    if (this._menuCloseTimer) {
+      // wait to execute
+      return;
+    }
+
+    // menu cleanup
+    this._menuCloseTimer = setTimeout(() => {
+      // executed
+      this._menuCloseTimer = undefined;
+
+      // close all main menus except the active one
+      this.checkAndCloseMenusImmediate();
+    }, 50);
   }
 }
