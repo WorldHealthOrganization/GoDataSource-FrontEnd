@@ -15,6 +15,7 @@ import { TransmissionChainModel } from '../../../../core/models/transmission-cha
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { UserModel } from '../../../../core/models/user.model';
 import { Constants } from '../../../../core/models/constants';
+import { DataItem } from 'billboard.js';
 
 @Component({
   selector: 'app-histogram-transmission-chains-size-dashlet',
@@ -23,8 +24,11 @@ import { Constants } from '../../../../core/models/constants';
   styleUrls: ['./histogram-transmission-chains-size-dashlet.component.scss']
 })
 export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, OnDestroy {
-  histogramResults: any = [];
-  caseRefDataColor: string = '';
+  chartData: any = [];
+  chartDataCategories: string[] = [];
+  chartDataColumns: string[] = ['chains_no'];
+  caseRefDataColor: string = 'red';
+  colorPattern: string[] = [];
 
   // detect changes
   @Output() detectChanges = new EventEmitter<void>();
@@ -171,7 +175,9 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
   setHistogramResults(chains) {
     // determine size
     const chainsSize = {};
-    this.histogramResults = [];
+    this.chartData = [[this.chartDataColumns[0]]];
+    this.chartDataCategories = [];
+    this.colorPattern = [];
     _.forEach(chains, (value) => {
       if (!_.isEmpty(chainsSize) && chainsSize[value.size]) {
         chainsSize[value.size]++;
@@ -182,29 +188,19 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
 
     // push to chart
     _.forEach(chainsSize, (value, key) => {
-      this.histogramResults.push({ name: key, value: value });
+      this.chartDataCategories.push(key);
+      this.chartData[0].push(
+        value
+      );
+      this.colorPattern.push(this.caseRefDataColor);
     });
   }
 
   /**
-     * format the axis numbers to only display integers
-     * @param data
-     * @returns {string}
-     */
-  axisFormat(data) {
-    if (data % 1 === 0) {
-      return data.toLocaleString();
-    } else {
-      return '';
-    }
-  }
-
-  /**
-     * Handle click on a bar in the chart
-     * Redirect to chains graph
-     * @param event
-     */
-  onSelectChart(event) {
+   * Handle click on a bar in the chart
+   * Redirect to chains graph
+   */
+  onSelectChart(data: DataItem): void {
     // we need case list permission to redirect
     if (!TransmissionChainModel.canViewBubbleNetwork(this.authUser)) {
       return;
@@ -212,7 +208,7 @@ export class HistogramTransmissionChainsSizeDashletComponent implements OnInit, 
 
     // extra params sent along with global filters
     const otherParams = {
-      sizeOfChainsFilter: event.name,
+      sizeOfChainsFilter: this.chartDataCategories[data.x],
       [Constants.DONT_LOAD_STATIC_FILTERS_KEY]: true
     };
 
