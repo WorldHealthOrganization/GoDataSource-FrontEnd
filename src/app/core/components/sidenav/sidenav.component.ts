@@ -751,22 +751,7 @@ export class SidenavComponent implements OnInit, OnDestroy {
   menuOptionLeave(navItem: NavItem): void {
     // clear active menu ?
     if (this._activeMainMenuId === navItem.id) {
-      // check if active element isn't the floating menu that doesn't trigger the (mouseenter)="floatingMenuEnter(menuOption)" due to appearing under cursor
-      let hideMenu: boolean = true;
-      if (document.activeElement) {
-        const closestFloatMenu = document.activeElement.closest('.gd-main-menu-option-float-menu');
-        if (
-          closestFloatMenu &&
-          closestFloatMenu.classList.contains(navItem.id)
-        ) {
-          hideMenu = false;
-        }
-      }
-
-      // reset
-      if (hideMenu) {
-        this._activeMainMenuId = undefined;
-      }
+      this._activeMainMenuId = undefined;
     }
 
     // check and close menus
