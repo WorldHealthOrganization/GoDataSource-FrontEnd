@@ -45,7 +45,7 @@
     "ng2-file-upload": "3.0.0",
     "ngx-color-picker": "13.0.0",
     "ngx-mat-select-search": "5.0.0",
-    "ngx-material-timepicker": "5.5.3",
+    "ngx-mat-timepicker": "14.0.8",
     "ngx-popperjs": "14.1.6",
     "ngx-toastr": "16.0.2",
     "ngx-wig": "14.0.6",
