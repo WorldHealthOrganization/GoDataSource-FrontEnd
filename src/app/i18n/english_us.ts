@@ -11,24 +11,7 @@ export const EnglishUsLang = {
      */
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
-    'LNG_SHEET_CONTEXT_MENU_PASTE': 'Paste',
-    'LNG_SHEET_CONTEXT_MENU_DELETE': 'Delete content',
-    'LNG_SHEET_CONTEXT_MENU_UNDO': 'Undo',
-    'LNG_SHEET_CONTEXT_MENU_REDO': 'Redo',
-    'LNG_SHEET_CONTEXT_MENU_APPEND_ROW': 'Add row(s)',
-    'LNG_SHEET_CONTEXT_MENU_REMOVE_ROW': 'Delete rows',
-    'LNG_FORM_VALIDATION_ERROR_INTEGER': 'Field must be an integer',
-    'LNG_FORM_VALIDATION_ERROR_INVALID_COLUMNS': 'Column(s) "{{fields}}" are invalid',
-    'LNG_FORM_VALIDATION_EDITOR_HELP': 'All cells with red backgrounds will display details on mouse hover about what is invalid and why',
-    'LNG_FORM_VALIDATION_ERROR_INVALID_ROWS': 'Row(s) "{{rows}}" are invalid',
-    'LNG_COMMON_NOTHING_TO_SAVE': 'Nothing to save',
-    'LNG_COMMON_INVALID_ROWS': 'You have invalid rows',
-    'LNG_COMMON_ROWS_NO': 'No. of rows to append',
-    'LNG_DIALOG_CONFIRM_DELETE_SELECTED_ROWS': 'Are you sure you want to delete selected rows ({{rows}})?',
-    'LNG_SHEET_CONTEXT_MENU_COPY': 'Copy raw',
-    'LNG_SHEET_CONTEXT_MENU_COPY_TEXT': 'Copy text',
-    'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_API_ERROR_MSG': 'Row {{row}} is invalid: {{err}}',
-    'LNG_PAGE_BULK_ADD_CONTACTS_LABEL_PARTIAL_ERROR_MSG': 'Records that were created with success were removed from the spreadsheet so we don\'t create duplicates'
+
 
 
     /**
