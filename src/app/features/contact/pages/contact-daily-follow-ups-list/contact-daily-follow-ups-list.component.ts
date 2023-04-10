@@ -85,8 +85,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_DOB', value: 'contact.dob' },
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUser' },
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value: 'questionnaireAnswers' },
-    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY_USER', value: 'createdByUser' },
-    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY_USER', value: 'updatedByUser' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY_USER', value: ContactDailyFollowUpsListComponent.CREATED_BY_USER },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY_USER', value: ContactDailyFollowUpsListComponent.UPDATED_BY_USER },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
@@ -2647,8 +2647,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                         const includeUpdatedByUserDataCheckbox: IV2SideDialogConfigInputCheckbox = data.map.includeUpdatedByUser as IV2SideDialogConfigInputCheckbox;
                         const allFields: boolean = (data.map.fieldsAll as IV2SideDialogConfigInputCheckbox)?.checked;
                         const fieldsListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsList as IV2SideDialogConfigInputMultiDropdown;
-
                         if (!allFields) {
+                          let detectChanges = false;
+
                           // check created by user
                           if (
                             includeCreatedByUserDataCheckbox?.checked
@@ -2659,7 +2660,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                           ) {
                             // de-select include updated by data
                             includeCreatedByUserDataCheckbox.checked = false;
-                            handler.detectChanges();
+                            detectChanges = true;
                           }
 
                           // check updated by user
@@ -2672,6 +2673,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                           ) {
                             // de-select include updated by data
                             includeUpdatedByUserDataCheckbox.checked = false;
+                            detectChanges = true;
+                          }
+
+                          // detect changes ?
+                          if (detectChanges) {
                             handler.detectChanges();
                           }
                         }
@@ -2720,7 +2726,6 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
 
   /**
    * Checks if related "created/updated by user" group/fields options should be checked
-   *
    */
   private checkUserDataChanged(data: IV2SideDialogData, handler: IV2SideDialogHandler): void {
     // return if no param provided
@@ -2760,6 +2765,8 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         // do we need to select relationship data ?
         const fieldsListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsList as IV2SideDialogConfigInputMultiDropdown;
         if (fieldsListDropdown) {
+          let detectChanges = false;
+
           // initialize if necessary
           fieldsListDropdown.values = fieldsListDropdown.values || [];
 
@@ -2771,7 +2778,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             // select relationship data
             fieldsListDropdown.values.push(ContactDailyFollowUpsListComponent.CREATED_BY_USER);
             fieldsListDropdown.values = [...fieldsListDropdown.values];
-            handler.detectChanges();
+            detectChanges = true;
           }
 
           // select updated by user data since this is necessary
@@ -2782,6 +2789,11 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
             // select relationship data
             fieldsListDropdown.values.push(ContactDailyFollowUpsListComponent.UPDATED_BY_USER);
             fieldsListDropdown.values = [...fieldsListDropdown.values];
+            detectChanges = true;
+          }
+
+          // detect changes?
+          if (detectChanges) {
             handler.detectChanges();
           }
         }
