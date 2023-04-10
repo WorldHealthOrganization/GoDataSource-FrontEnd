@@ -978,17 +978,9 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         field: 'contact.age',
         label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE',
         format: {
-          type: (item) => item.person && item.person.age ?
-            item.person?.age.months > 0 ?
-              item.person?.age.months + ' ' + this.translateService.instant('LNG_AGE_FIELD_LABEL_MONTHS') :
-              (
-                item.person?.age.years > 0 ?
-                  (item.person?.age.years + ' ' + this.translateService.instant('LNG_AGE_FIELD_LABEL_YEARS')) :
-                  '-'
-              ) :
-            '-'
+          type: V2ColumnFormat.AGE,
+          value: (item) => item.person?.age
         },
-        sortable: true,
         filter: {
           type: V2FilterType.AGE_RANGE,
           min: 0,
@@ -1000,12 +992,10 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
         sortable: true,
         format: {
-          type: (item) => item.person?.dob ?
-            moment(item.person.dob).format(Constants.DEFAULT_DATE_DISPLAY_FORMAT) :
-            '—'
+          type: V2ColumnFormat.DATE,
+          value: (item) => item.person?.dob
         },
         filter: {
-          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
           type: V2FilterType.DATE_RANGE
         }
       },
@@ -2637,7 +2627,49 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                     },
                     groups: {
                       fields: followUpFieldGroups,
-                      required: followUpFieldGroupsRequires
+                      required: followUpFieldGroupsRequires,
+                      change: (data, handler) => {
+                        // do we need to de-select include created and updated by user data ?
+                        const includeCreatedByUserDataCheckbox: IV2SideDialogConfigInputCheckbox = data.map.includeCreatedByUser as IV2SideDialogConfigInputCheckbox;
+                        const includeUpdatedByUserDataCheckbox: IV2SideDialogConfigInputCheckbox = data.map.includeUpdatedByUser as IV2SideDialogConfigInputCheckbox;
+                        const allGroups: boolean = (data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox)?.checked;
+                        const fieldsGroupListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsGroupList as IV2SideDialogConfigInputMultiDropdown;
+                        if (!allGroups) {
+                          // determine if it should detect the changes
+                          let detectChanges = false;
+
+                          // check created by user
+                          if (
+                            includeCreatedByUserDataCheckbox?.checked &&
+                            (
+                              !fieldsGroupListDropdown.values?.length ||
+                              fieldsGroupListDropdown.values.indexOf(Constants.EXPORT_GROUP.RELATIONSHIPS_DATA) < 0
+                            )
+                          ) {
+                            // de-select include created by data
+                            includeCreatedByUserDataCheckbox.checked = false;
+                            detectChanges = true;
+                          }
+
+                          // check updated by user
+                          if (
+                            includeUpdatedByUserDataCheckbox?.checked &&
+                            (
+                              !fieldsGroupListDropdown.values?.length ||
+                              fieldsGroupListDropdown.values.indexOf(Constants.EXPORT_GROUP.RELATIONSHIPS_DATA) < 0
+                            )
+                          ) {
+                            // de-select include updated by data
+                            includeUpdatedByUserDataCheckbox.checked = false;
+                            detectChanges = true;
+                          }
+
+                          // detect changes ?
+                          if (detectChanges) {
+                            handler.detectChanges();
+                          }
+                        }
+                      }
                     },
                     fields: {
                       options: this.followUpFields,
@@ -2648,6 +2680,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                         const allFields: boolean = (data.map.fieldsAll as IV2SideDialogConfigInputCheckbox)?.checked;
                         const fieldsListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsList as IV2SideDialogConfigInputMultiDropdown;
                         if (!allFields) {
+                          // determine if it should detect the changes
                           let detectChanges = false;
 
                           // check created by user
@@ -2765,6 +2798,7 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         // do we need to select relationship data ?
         const fieldsListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsList as IV2SideDialogConfigInputMultiDropdown;
         if (fieldsListDropdown) {
+          // determine if it should detect the changes
           let detectChanges = false;
 
           // initialize if necessary
