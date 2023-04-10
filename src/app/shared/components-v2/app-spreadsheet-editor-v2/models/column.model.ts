@@ -1,4 +1,4 @@
-import { ILargeTextEditorParams, ITextCellEditorParams } from '@ag-grid-community/core';
+import { ITextCellEditorParams } from '@ag-grid-community/core';
 import { ILabelValuePairModel } from '../../../forms-v2/core/label-value-pair.model';
 import { AppSpreadsheetEditorV2EditorSingleSelectComponent } from '../components/editor-single-select/app-spreadsheet-editor-v2-editor-single-select.component';
 import { AppSpreadsheetEditorV2EditorDateComponent } from '../components/editor-date/app-spreadsheet-editor-v2-editor-date.component';
@@ -112,7 +112,6 @@ export interface IV2SpreadsheetEditorColumnValidatorDate {
  */
 export enum V2SpreadsheetEditorColumnType {
   TEXT,
-  TEXTAREA,
   SINGLE_SELECT,
   DATE,
   LOCATION,
@@ -152,19 +151,6 @@ export interface IV2SpreadsheetEditorColumnText extends Omit<IV2SpreadsheetEdito
   };
   change?: (data: IV2SpreadsheetEditorEventData) => void;
   validators?: IV2SpreadsheetEditorColumnValidatorRequired | IV2SpreadsheetEditorColumnValidatorAsync | IV2SpreadsheetEditorColumnValidatorEmail;
-}
-
-/**
- * Column - textarea
- */
-export interface IV2SpreadsheetEditorColumnTextarea extends Omit<IV2SpreadsheetEditorColumnBase, 'editor'> {
-  // required
-  type: V2SpreadsheetEditorColumnType.TEXTAREA;
-
-  // optional
-  editor?: {
-    params?: ILargeTextEditorParams
-  };
 }
 
 /**
@@ -224,7 +210,7 @@ export interface IV2SpreadsheetEditorColumnNumber extends Omit<IV2SpreadsheetEdi
 /**
  * Column types
  */
-export type V2SpreadsheetEditorColumn = IV2SpreadsheetEditorColumnText | IV2SpreadsheetEditorColumnTextarea | IV2SpreadsheetEditorColumnSingleSelect | IV2SpreadsheetEditorColumnDate
+export type V2SpreadsheetEditorColumn = IV2SpreadsheetEditorColumnText | IV2SpreadsheetEditorColumnSingleSelect | IV2SpreadsheetEditorColumnDate
 | IV2SpreadsheetEditorColumnLocation | IV2SpreadsheetEditorColumnNumber;
 
 /**
@@ -234,7 +220,6 @@ export const V2SpreadsheetEditorColumnTypeToRenderer: {
   [type in V2SpreadsheetEditorColumnType]: typeof AppSpreadsheetEditorV2CellBasicRendererModel
 } = {
   [V2SpreadsheetEditorColumnType.TEXT]: AppSpreadsheetEditorV2CellBasicRendererModel,
-  [V2SpreadsheetEditorColumnType.TEXTAREA]: AppSpreadsheetEditorV2CellBasicRendererModel,
   [V2SpreadsheetEditorColumnType.SINGLE_SELECT]: AppSpreadsheetEditorV2CellSelectRendererModel,
   [V2SpreadsheetEditorColumnType.DATE]: AppSpreadsheetEditorV2CellDateRendererModel,
   [V2SpreadsheetEditorColumnType.LOCATION]: AppSpreadsheetEditorV2CellLocationRendererModel,
@@ -256,9 +241,6 @@ export const V2SpreadsheetEditorColumnTypeToEditor: {
 } = {
   [V2SpreadsheetEditorColumnType.TEXT]: {
     type: 'agTextCellEditor'
-  },
-  [V2SpreadsheetEditorColumnType.TEXTAREA]: {
-    type: 'agLargeTextCellEditor'
   },
   [V2SpreadsheetEditorColumnType.SINGLE_SELECT]: {
     type: AppSpreadsheetEditorV2EditorSingleSelectComponent

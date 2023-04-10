@@ -2655,7 +2655,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
     // determine column
     switch (this.editor.columnsMap[columnField].columnDefinition.type) {
       case V2SpreadsheetEditorColumnType.TEXT:
-      case V2SpreadsheetEditorColumnType.TEXTAREA:
         // nothing changes here
         return value as string;
 
@@ -3104,7 +3103,6 @@ export class AppSpreadsheetEditorV2Component implements OnInit, OnDestroy {
         // paste value
         switch (columnDefinition.type) {
           case V2SpreadsheetEditorColumnType.TEXT:
-          case V2SpreadsheetEditorColumnType.TEXTAREA:
 
             // we shouldn't have anything else but strings taking in account what we process is from clipboard
             newValue = typeof newValue === 'string' ?

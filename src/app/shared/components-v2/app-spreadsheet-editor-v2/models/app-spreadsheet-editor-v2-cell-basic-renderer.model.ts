@@ -2,7 +2,7 @@ import { ICellRendererComp, ICellRendererParams } from '@ag-grid-community/core'
 import { IV2SpreadsheetEditorExtendedColDef } from './extended-column.model';
 
 /**
- * Basic cell renderer (text, textarea ...)
+ * Basic cell renderer (text...)
  */
 export class AppSpreadsheetEditorV2CellBasicRendererModel implements ICellRendererComp {
   // gui

@@ -176,8 +176,7 @@ app-spreadsheet-editor-v2 {
     input[class^=ag-][type=datetime-local],
     input[class^=ag-][type=number],
     input[class^=ag-][type=tel],
-    input[class^=ag-][type=text],
-    textarea[class^=ag-] {
+    input[class^=ag-][type=text] {
       border: 0.1rem solid var(--gd-secondary);
       @include border-radius(0);
       @include box-shadow(none);

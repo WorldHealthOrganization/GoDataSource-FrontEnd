@@ -536,7 +536,7 @@ export class ContactsOfContactsBulkCreateModifyComponent extends BulkCreateModif
         field: 'relationship.socialRelationshipDetail',
         visible: this.isCreate
       }, {
-        type: V2SpreadsheetEditorColumnType.TEXTAREA,
+        type: V2SpreadsheetEditorColumnType.TEXT,
         label: 'LNG_RELATIONSHIP_FIELD_LABEL_COMMENT',
         field: 'relationship.comment',
         visible: this.isCreate
