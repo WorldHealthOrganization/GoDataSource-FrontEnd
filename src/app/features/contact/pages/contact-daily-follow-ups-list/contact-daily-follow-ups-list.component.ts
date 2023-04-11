@@ -32,14 +32,17 @@ import { IV2FilterDate, V2FilterTextType, V2FilterType } from '../../../../share
 import { IV2GroupedData } from '../../../../shared/components-v2/app-list-table-v2/models/grouped-data.model';
 import {
   IV2SideDialogConfigButtonType,
+  IV2SideDialogConfigInputCheckbox,
   IV2SideDialogConfigInputDate,
   IV2SideDialogConfigInputDateRange,
+  IV2SideDialogConfigInputMultiDropdown,
   IV2SideDialogConfigInputNumber,
   IV2SideDialogConfigInputSingleDropdown,
   IV2SideDialogConfigInputText,
   IV2SideDialogConfigInputToggle,
   IV2SideDialogConfigInputToggleCheckbox,
   IV2SideDialogData,
+  IV2SideDialogHandler,
   V2SideDialogConfigInputType
 } from '../../../../shared/components-v2/app-side-dialog-v2/models/side-dialog-config.model';
 import { ILabelValuePairModel } from '../../../../shared/forms-v2/core/label-value-pair.model';
@@ -55,6 +58,10 @@ import { LocationModel } from '../../../../core/models/location.model';
   templateUrl: './contact-daily-follow-ups-list.component.html'
 })
 export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpModel> implements OnDestroy {
+  // constants
+  private static readonly CREATED_BY_USER: string = 'createdByUser';
+  private static readonly UPDATED_BY_USER: string = 'updatedByUser';
+
   // case
   caseData: CaseModel;
 
@@ -70,8 +77,16 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_STATUSID', value: 'statusId' },
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_TARGETED', value: 'targeted' },
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_COMMENT', value: 'comment' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_RISK_LEVEL', value: 'contact.riskLevel' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_GENDER', value: 'contact.gender' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_OCCUPATION', value: 'contact.occupation' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_AGE_YEARS', value: 'contact.age.years' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_AGE_MONTHS', value: 'contact.age.months' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_DOB', value: 'contact.dob' },
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_RESPONSIBLE_USER_ID', value: 'responsibleUser' },
     { label: 'LNG_FOLLOW_UP_FIELD_LABEL_QUESTIONNAIRE_ANSWERS', value: 'questionnaireAnswers' },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_CREATED_BY_USER', value: ContactDailyFollowUpsListComponent.CREATED_BY_USER },
+    { label: 'LNG_FOLLOW_UP_FIELD_LABEL_UPDATED_BY_USER', value: ContactDailyFollowUpsListComponent.UPDATED_BY_USER },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_AT', value: 'createdAt' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_CREATED_BY', value: 'createdBy' },
     { label: 'LNG_COMMON_MODEL_FIELD_LABEL_UPDATED_AT', value: 'updatedAt' },
@@ -676,6 +691,36 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         }
       },
       {
+        field: 'contact.gender',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_GENDER',
+        format: {
+          type: (item) => item.person?.gender && (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.gender] ?
+            this.translateService.instant((this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.gender].value) :
+            '—'
+        },
+        filter: {
+          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.gender as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          includeNoValue: true
+        }
+      },
+      {
+        field: 'contact.occupation',
+        label: 'LNG_FOLLOW_UP_FIELD_LABEL_CONTACT_OCCUPATION',
+        format: {
+          type: (item) => item.person?.occupation && (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.occupation] ?
+            this.translateService.instant((this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).map[item.person.occupation].value) :
+            '—'
+        },
+        filter: {
+          // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+          type: V2FilterType.MULTIPLE_SELECT,
+          options: (this.activatedRoute.snapshot.data.occupation as IResolverV2ResponseModel<ReferenceDataEntryModel>).options,
+          includeNoValue: true
+        }
+      },
+      {
         field: 'date',
         label: 'LNG_FOLLOW_UP_FIELD_LABEL_DATE',
         sortable: true,
@@ -926,6 +971,31 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
         },
         filter: {
           // NO relationshipKey because we want to filter using the aggregate function that has both cases and contacts, if we use relationshipKey it will filter only for contacts..cases will be ignored
+          type: V2FilterType.DATE_RANGE
+        }
+      },
+      {
+        field: 'contact.age',
+        label: 'LNG_CONTACT_OF_CONTACT_FIELD_LABEL_AGE',
+        format: {
+          type: V2ColumnFormat.AGE,
+          value: (item) => item.person?.age
+        },
+        filter: {
+          type: V2FilterType.AGE_RANGE,
+          min: 0,
+          max: Constants.DEFAULT_AGE_MAX_YEARS
+        }
+      },
+      {
+        field: 'contact.dob',
+        label: 'LNG_CONTACT_FIELD_LABEL_DATE_OF_BIRTH',
+        sortable: true,
+        format: {
+          type: V2ColumnFormat.DATE,
+          value: (item) => item.person?.dob
+        },
+        filter: {
           type: V2FilterType.DATE_RANGE
         }
       },
@@ -2557,20 +2627,211 @@ export class ContactDailyFollowUpsListComponent extends ListComponent<FollowUpMo
                     },
                     groups: {
                       fields: followUpFieldGroups,
-                      required: followUpFieldGroupsRequires
+                      required: followUpFieldGroupsRequires,
+                      change: (data, handler) => {
+                        // do we need to de-select include created and updated by user data ?
+                        const includeCreatedByUserDataCheckbox: IV2SideDialogConfigInputCheckbox = data.map.includeCreatedByUser as IV2SideDialogConfigInputCheckbox;
+                        const includeUpdatedByUserDataCheckbox: IV2SideDialogConfigInputCheckbox = data.map.includeUpdatedByUser as IV2SideDialogConfigInputCheckbox;
+                        const allGroups: boolean = (data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox)?.checked;
+                        const fieldsGroupListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsGroupList as IV2SideDialogConfigInputMultiDropdown;
+                        if (!allGroups) {
+                          // determine if it should detect the changes
+                          let detectChanges = false;
+
+                          // check created by user
+                          if (
+                            includeCreatedByUserDataCheckbox?.checked &&
+                            (
+                              !fieldsGroupListDropdown.values?.length ||
+                              fieldsGroupListDropdown.values.indexOf(Constants.EXPORT_GROUP.RELATIONSHIPS_DATA) < 0
+                            )
+                          ) {
+                            // de-select include created by data
+                            includeCreatedByUserDataCheckbox.checked = false;
+                            detectChanges = true;
+                          }
+
+                          // check updated by user
+                          if (
+                            includeUpdatedByUserDataCheckbox?.checked &&
+                            (
+                              !fieldsGroupListDropdown.values?.length ||
+                              fieldsGroupListDropdown.values.indexOf(Constants.EXPORT_GROUP.RELATIONSHIPS_DATA) < 0
+                            )
+                          ) {
+                            // de-select include updated by data
+                            includeUpdatedByUserDataCheckbox.checked = false;
+                            detectChanges = true;
+                          }
+
+                          // detect changes ?
+                          if (detectChanges) {
+                            handler.detectChanges();
+                          }
+                        }
+                      }
                     },
                     fields: {
-                      options: this.followUpFields
+                      options: this.followUpFields,
+                      change: (data, handler) => {
+                        // do we need to de-select include created and updated by user data ?
+                        const includeCreatedByUserDataCheckbox: IV2SideDialogConfigInputCheckbox = data.map.includeCreatedByUser as IV2SideDialogConfigInputCheckbox;
+                        const includeUpdatedByUserDataCheckbox: IV2SideDialogConfigInputCheckbox = data.map.includeUpdatedByUser as IV2SideDialogConfigInputCheckbox;
+                        const allFields: boolean = (data.map.fieldsAll as IV2SideDialogConfigInputCheckbox)?.checked;
+                        const fieldsListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsList as IV2SideDialogConfigInputMultiDropdown;
+                        if (!allFields) {
+                          // determine if it should detect the changes
+                          let detectChanges = false;
+
+                          // check created by user
+                          if (
+                            includeCreatedByUserDataCheckbox?.checked
+                            && (
+                              !fieldsListDropdown.values?.length ||
+                              fieldsListDropdown.values.indexOf(ContactDailyFollowUpsListComponent.CREATED_BY_USER) < 0
+                            )
+                          ) {
+                            // de-select include updated by data
+                            includeCreatedByUserDataCheckbox.checked = false;
+                            detectChanges = true;
+                          }
+
+                          // check updated by user
+                          if (
+                            includeUpdatedByUserDataCheckbox?.checked
+                            && (
+                              !fieldsListDropdown.values?.length ||
+                              fieldsListDropdown.values.indexOf(ContactDailyFollowUpsListComponent.UPDATED_BY_USER) < 0
+                            )
+                          ) {
+                            // de-select include updated by data
+                            includeUpdatedByUserDataCheckbox.checked = false;
+                            detectChanges = true;
+                          }
+
+                          // detect changes ?
+                          if (detectChanges) {
+                            handler.detectChanges();
+                          }
+                        }
+                      }
                     },
                     dbColumns: true,
                     dbValues: true,
                     jsonReplaceUndefinedWithNull: true,
                     questionnaireVariables: true
+                  },
+                  inputs: {
+                    append: [
+                      {
+                        type: V2SideDialogConfigInputType.CHECKBOX,
+                        placeholder: 'LNG_COMMON_LABEL_EXPORT_INCLUDE_CREATED_BY_USER',
+                        tooltip: 'LNG_COMMON_LABEL_EXPORT_INCLUDE_CREATED_BY_USER_DESCRIPTION',
+                        name: 'includeCreatedByUser',
+                        checked: false,
+                        change: (data, handler) => {
+                          this.checkUserDataChanged(data, handler);
+                        }
+                      }, {
+                        type: V2SideDialogConfigInputType.CHECKBOX,
+                        placeholder: 'LNG_COMMON_LABEL_EXPORT_INCLUDE_UPDATED_BY_USER',
+                        tooltip: 'LNG_COMMON_LABEL_EXPORT_INCLUDE_UPDATED_BY_USER_DESCRIPTION',
+                        name: 'includeUpdatedByUser',
+                        checked: false,
+                        change: (data, handler) => {
+                          this.checkUserDataChanged(data, handler);
+                        }
+                      }, {
+                        type: V2SideDialogConfigInputType.CHECKBOX,
+                        placeholder: 'LNG_COMMON_LABEL_EXPORT_INCLUDE_ALERTED',
+                        tooltip: 'LNG_COMMON_LABEL_EXPORT_INCLUDE_ALERTED_DESCRIPTION',
+                        name: 'includeAlerted',
+                        checked: false
+                      }
+                    ]
                   }
                 }
               });
             });
         }
       });
+  }
+
+  /**
+   * Checks if related "created/updated by user" group/fields options should be checked
+   */
+  private checkUserDataChanged(data: IV2SideDialogData, handler: IV2SideDialogHandler): void {
+    // return if no param provided
+    if (
+      !data ||
+      !handler
+    ) {
+      return;
+    }
+
+    // check if we need to make adjustments
+    const includeCreatedByUserData: boolean = (data.map.includeCreatedByUser as IV2SideDialogConfigInputCheckbox)?.checked;
+    const includeUpdatedByUserData: boolean = (data.map.includeUpdatedByUser as IV2SideDialogConfigInputCheckbox)?.checked;
+    if (
+      includeCreatedByUserData ||
+      includeUpdatedByUserData
+    ) {
+      // check groups & fields
+      const allGroups: boolean = (data.map.fieldsGroupAll as IV2SideDialogConfigInputCheckbox)?.checked;
+      const allFields: boolean = (data.map.fieldsAll as IV2SideDialogConfigInputCheckbox)?.checked;
+      if (!allGroups) {
+        // do we need to select record creation and update data ?
+        const fieldsGroupListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsGroupList as IV2SideDialogConfigInputMultiDropdown;
+        if (fieldsGroupListDropdown) {
+          // initialize if necessary
+          fieldsGroupListDropdown.values = fieldsGroupListDropdown.values || [];
+
+          // select relationship data since this is necessary
+          if (fieldsGroupListDropdown.values.indexOf(Constants.EXPORT_GROUP.RECORD_CREATION_AND_UPDATE_DATA) < 0) {
+            // select relationship data
+            fieldsGroupListDropdown.values.push(Constants.EXPORT_GROUP.RECORD_CREATION_AND_UPDATE_DATA);
+            fieldsGroupListDropdown.values = [...fieldsGroupListDropdown.values];
+            handler.detectChanges();
+          }
+        }
+      } else if (!allFields) {
+        // do we need to select relationship data ?
+        const fieldsListDropdown: IV2SideDialogConfigInputMultiDropdown = data.map.fieldsList as IV2SideDialogConfigInputMultiDropdown;
+        if (fieldsListDropdown) {
+          // determine if it should detect the changes
+          let detectChanges = false;
+
+          // initialize if necessary
+          fieldsListDropdown.values = fieldsListDropdown.values || [];
+
+          // select created by user data since this is necessary
+          if (
+            includeCreatedByUserData &&
+            fieldsListDropdown.values.indexOf(ContactDailyFollowUpsListComponent.CREATED_BY_USER) < 0
+          ) {
+            // select relationship data
+            fieldsListDropdown.values.push(ContactDailyFollowUpsListComponent.CREATED_BY_USER);
+            fieldsListDropdown.values = [...fieldsListDropdown.values];
+            detectChanges = true;
+          }
+
+          // select updated by user data since this is necessary
+          if (
+            includeUpdatedByUserData &&
+            fieldsListDropdown.values.indexOf(ContactDailyFollowUpsListComponent.UPDATED_BY_USER) < 0
+          ) {
+            // select relationship data
+            fieldsListDropdown.values.push(ContactDailyFollowUpsListComponent.UPDATED_BY_USER);
+            fieldsListDropdown.values = [...fieldsListDropdown.values];
+            detectChanges = true;
+          }
+
+          // detect changes?
+          if (detectChanges) {
+            handler.detectChanges();
+          }
+        }
+      }
+    }
   }
 }

@@ -121,6 +121,33 @@ export class ImportExportDataService {
       delete data.useQuestionVariable;
     }
 
+    // add flag includeAlerted
+    if (!_.isUndefined(data.includeAlerted)) {
+      queryBuilder.filter.flag(
+        'includeAlerted',
+        data.includeAlerted
+      );
+      delete data.includeAlerted;
+    }
+
+    // add flag includeCreatedByUser
+    if (!_.isUndefined(data.includeCreatedByUser)) {
+      queryBuilder.filter.flag(
+        'includeCreatedByUser',
+        data.includeCreatedByUser
+      );
+      delete data.includeCreatedByUser;
+    }
+
+    // add flag includeUpdatedByUser
+    if (!_.isUndefined(data.includeUpdatedByUser)) {
+      queryBuilder.filter.flag(
+        'includeUpdatedByUser',
+        data.includeUpdatedByUser
+      );
+      delete data.includeUpdatedByUser;
+    }
+
     // add flag includeContactFields
     if (!_.isUndefined(data.includeContactFields)) {
       queryBuilder.filter.flag(
@@ -251,6 +278,33 @@ export class ImportExportDataService {
         data.useQuestionVariable
       );
       delete data.useQuestionVariable;
+    }
+
+    // add flag includeAlerted
+    if (!_.isUndefined(data.includeAlerted)) {
+      queryBuilder.filter.flag(
+        'includeAlerted',
+        data.includeAlerted
+      );
+      delete data.includeAlerted;
+    }
+
+    // add flag includeCreatedByUser
+    if (!_.isUndefined(data.includeCreatedByUser)) {
+      queryBuilder.filter.flag(
+        'includeCreatedByUser',
+        data.includeCreatedByUser
+      );
+      delete data.includeCreatedByUser;
+    }
+
+    // add flag includeUpdatedByUser
+    if (!_.isUndefined(data.includeUpdatedByUser)) {
+      queryBuilder.filter.flag(
+        'includeUpdatedByUser',
+        data.includeUpdatedByUser
+      );
+      delete data.includeUpdatedByUser;
     }
 
     // add flag includeContactFields
