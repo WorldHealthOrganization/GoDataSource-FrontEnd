@@ -1,8 +1,6 @@
 @import 'mixins';
 @import 'font';
 
-// #TODO
-// - needs to be updated by Laur
 /* Timepicker */
 .gd-form-timepicker-v2 {
   @include flex(flex);
@@ -241,9 +239,55 @@
 }
 
 /* Timepicker Clock */
-.timepicker.gd-form-timepicker-v2-panel {
-  --button-color: #2F7977;
-  --dial-background-color: #2F7977;
-  --dial-editable-active-color: #2F7977;
-  --clock-hand-color: #2F7977;
+.ngx-mat-timepicker-dialog {
+  --timepicker-active-color: var(--gd-primary);
+  --timepicker-button-color: var(--gd-primary);
+
+  @include border-radius(0.8rem);
+
+  .mat-dialog-container {
+    background: var(--gd-background);
+    @include border-radius(0.8rem);
+    padding: 2.4rem;
+
+    .gd-form-timepicker-v2-panel {
+      .timepicker-dial__time {
+        line-height: 1;
+      }
+
+      .mat-toolbar {
+        background: var(--timepicker-active-color);
+        color: var(--gd-background);
+      }
+
+      .mat-flat-button,
+      .mat-raised-button,
+      .mat-fab,
+      .mat-mini-fab {
+        &.mat-primary {
+          background-color: var(--timepicker-button-color);
+        }
+      }
+    }
+
+    .mat-dialog-actions {
+      min-height: 0;
+
+      .mat-button {
+        color: var(--timepicker-button-color);
+
+        .mat-button-focus-overlay {
+          background-color: var(--timepicker-button-color);
+        }
+
+        &:hover {
+          &:not(.mat-button-disabled) {
+            .mat-button-focus-overlay {
+              @include opacity(0.2);
+            }
+          }
+        }
+      }
+    }
+  }
 }
