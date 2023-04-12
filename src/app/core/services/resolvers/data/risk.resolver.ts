@@ -21,7 +21,7 @@ export class RiskDataResolver implements IMapResolverV2<ReferenceDataEntryModel>
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.RISK_LEVEL)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_RISK_LEVEL)
       .pipe(
         map((data) => {
           // construct map

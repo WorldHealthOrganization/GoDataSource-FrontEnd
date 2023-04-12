@@ -124,7 +124,7 @@ export class EpiCurveReportingDashletComponent implements OnInit, OnDestroy {
     // retrieve ref data
     this.displayLoading = true;
     this.refdataSubscriber = this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION)
       .subscribe((caseClassification) => {
         // map classifications to translation and color
         this.mapCaseClassifications = {};

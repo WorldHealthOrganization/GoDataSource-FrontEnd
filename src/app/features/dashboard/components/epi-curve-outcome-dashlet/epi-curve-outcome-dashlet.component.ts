@@ -125,7 +125,7 @@ export class EpiCurveOutcomeDashletComponent implements OnInit, OnDestroy {
     // retrieve ref data
     this.displayLoading = true;
     this.refdataSubscriber = this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.OUTCOME)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_OUTCOME)
       .subscribe((outcome) => {
         // map classifications to translation and color
         this.mapOutcomes = {};

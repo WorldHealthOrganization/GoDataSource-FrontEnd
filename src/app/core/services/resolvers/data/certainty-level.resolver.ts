@@ -21,7 +21,7 @@ export class CertaintyLevelDataResolver implements IMapResolverV2<ReferenceDataE
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.CERTAINTY_LEVEL)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_CERTAINTY_LEVEL)
       .pipe(
         map((data) => {
           // construct map

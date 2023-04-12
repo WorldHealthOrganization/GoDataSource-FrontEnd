@@ -21,7 +21,7 @@ export class PregnancyStatusDataResolver implements IMapResolverV2<ReferenceData
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.PREGNANCY_STATUS)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_PREGNANCY_STATUS)
       .pipe(
         map((data) => {
           // construct map

@@ -21,7 +21,7 @@ export class InvestigationStatusDataResolver implements IMapResolverV2<Reference
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.INVESTIGATION_STATUS)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_INVESTIGATION_STATUS)
       .pipe(
         map((data) => {
           // construct map

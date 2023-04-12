@@ -21,7 +21,7 @@ export class EventCategoryDataResolver implements IMapResolverV2<ReferenceDataEn
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.EVENT_CATEGORY)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_EVENT_CATEGORY)
       .pipe(
         map((data) => {
           // construct map

@@ -21,7 +21,7 @@ export class DateRangeCenterDataResolver implements IMapResolverV2<ReferenceData
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.DATE_RANGE_CENTRE_NAME)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_CENTRE_NAME)
       .pipe(
         map((data) => {
           // construct map

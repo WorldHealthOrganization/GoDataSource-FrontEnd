@@ -21,7 +21,7 @@ export class ExposureDurationDataResolver implements IMapResolverV2<ReferenceDat
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.EXPOSURE_DURATION)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_EXPOSURE_DURATION)
       .pipe(
         map((data) => {
           // construct map

@@ -295,10 +295,10 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
 
     // add lat & lng for specific categories
     if (
-      this.category.id === ReferenceDataCategory.INSTITUTION_NAME ||
-      this.category.id === ReferenceDataCategory.LAB_NAME ||
-      this.category.id === ReferenceDataCategory.LAB_SEQUENCE_LABORATORY ||
-      this.category.id === ReferenceDataCategory.DATE_RANGE_CENTRE_NAME
+      this.category.id === ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_INSTITUTION_NAME ||
+      this.category.id === ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_LAB_NAME ||
+      this.category.id === ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_LAB_SEQUENCE_LABORATORY ||
+      this.category.id === ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_CENTRE_NAME
     ) {
       this.tableColumns.push({
         field: 'geoLocation.lat',

@@ -21,7 +21,7 @@ export class ClassificationDataResolver implements IMapResolverV2<ReferenceDataE
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.CASE_CLASSIFICATION)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_CASE_CLASSIFICATION)
       .pipe(
         map((data) => {
           // construct map

@@ -21,7 +21,7 @@ export class LocationGeographicalLevelDataResolver implements IMapResolverV2<Ref
    */
   resolve(): Observable<IResolverV2ResponseModel<ReferenceDataEntryModel>> {
     return this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.LOCATION_GEOGRAPHICAL_LEVEL)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_LOCATION_GEOGRAPHICAL_LEVEL)
       .pipe(
         map((data) => {
           // construct map

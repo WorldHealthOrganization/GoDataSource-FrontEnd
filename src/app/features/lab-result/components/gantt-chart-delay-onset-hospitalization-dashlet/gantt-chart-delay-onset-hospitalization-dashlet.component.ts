@@ -94,7 +94,7 @@ export class GanttChartDelayOnsetHospitalizationDashletComponent implements OnIn
     // retrieve ref data
     this.displayLoading = true;
     this.refdataSubscriber = this.referenceDataDataService
-      .getReferenceDataByCategory(ReferenceDataCategory.PERSON_TYPE)
+      .getReferenceDataByCategory(ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_PERSON_TYPE)
       .subscribe((personTypes) => {
         const casePersonType = _.find(personTypes.entries, { value: EntityType.CASE });
         if (casePersonType) {
