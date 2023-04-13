@@ -819,6 +819,9 @@ export class ImportDataComponent
 
     // initialize pagination
     this.initPaginator();
+
+    // hide toast
+    this.toastV2Service.hide(AppMessages.APP_MESSAGE_IMPORT_DATA_SUCCESSFUL);
   }
 
   /**
