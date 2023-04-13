@@ -5,7 +5,6 @@ import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { AuthDataService } from '../../../../core/services/data/auth.data.service';
 import { Observable, throwError } from 'rxjs';
 import { ToastV2Service } from '../../../../core/services/helper/toast-v2.service';
-import { TranslateService } from '@ngx-translate/core';
 import {
   CreateViewModifyV2ActionType,
   CreateViewModifyV2MenuType,
@@ -43,7 +42,6 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
   constructor(
     protected activatedRoute: ActivatedRoute,
     protected toastV2Service: ToastV2Service,
-    protected translateService: TranslateService,
     protected i18nService: I18nService,
     protected router: Router,
     protected referenceDataDataService: ReferenceDataDataService,
@@ -143,13 +141,13 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
     // add info accordingly to page type
     if (this.isCreate) {
       this.breadcrumbs.push({
-        label: this.translateService.instant('LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_TITLE'),
+        label: this.i18nService.instant('LNG_PAGE_CREATE_REFERENCE_DATA_ENTRY_TITLE'),
         action: null
       });
     } else {
       // view
       this.breadcrumbs.push({
-        label: this.translateService.instant(this.itemData.value),
+        label: this.i18nService.instant(this.itemData.value),
         action: null
       });
     }
@@ -169,12 +167,12 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
       // create details
       create: {
         finalStep: {
-          buttonLabel: this.translateService.instant('LNG_COMMON_BUTTON_SAVE'),
-          message: () => this.translateService.instant(
+          buttonLabel: this.i18nService.instant('LNG_COMMON_BUTTON_SAVE'),
+          message: () => this.i18nService.instant(
             'LNG_STEPPER_FINAL_STEP_TEXT_GENERAL',
             {
               name: this.itemData.value ?
-                this.translateService.instant(this.itemData.value) :
+                this.i18nService.instant(this.itemData.value) :
                 ''
             }
           )
@@ -227,7 +225,7 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
               description: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_VALUE_DESCRIPTION',
               value: {
                 get: () => this.itemData.value ?
-                  this.translateService.instant(this.itemData.value) :
+                  this.i18nService.instant(this.itemData.value) :
                   this.itemData.value,
                 set: (value) => {
                   // set data
@@ -302,7 +300,7 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
               description: () => 'LNG_REFERENCE_DATA_ENTRY_FIELD_LABEL_DESCRIPTION_DESCRIPTION',
               value: {
                 get: () => this.itemData.description ?
-                  this.translateService.instant(this.itemData.description) :
+                  this.i18nService.instant(this.itemData.description) :
                   this.itemData.description,
                 set: (value) => {
                   // set data
@@ -512,7 +510,7 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
       type: CreateViewModifyV2ExpandColumnType.TEXT,
       link: (item: ReferenceDataEntryModel) => ['/reference-data', this.category.id, item.id, 'view'],
       get: {
-        text: (item: ReferenceDataEntryModel) => this.translateService.instant(item.value)
+        text: (item: ReferenceDataEntryModel) => this.i18nService.instant(item.value)
       }
     };
   }
