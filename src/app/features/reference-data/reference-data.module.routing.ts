@@ -21,15 +21,6 @@ const createViewModifyFoundation: Route = {
   }
 };
 
-// common base - view / modify ref data per disease
-const viewModifyDiseaseRefDataFoundation: Route = {
-  component: fromPages.ReferenceDataCategoryEntriesPerDiseaseViewModifyComponent,
-  canActivate: [AuthGuard],
-  resolve: {
-    // #TODO
-  }
-};
-
 // routes
 const routes: Routes = [
   // Reference Data Categories List
@@ -91,35 +82,6 @@ const routes: Routes = [
   {
     path: ':categoryId/:entryId/modify',
     ...createViewModifyFoundation,
-    data: {
-      permissions: [
-        PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_MODIFY
-      ],
-      action: CreateViewModifyV2Action.MODIFY
-    },
-    canDeactivate: [
-      PageChangeConfirmationGuard
-    ]
-  },
-
-  // View - Reference data per disease
-  {
-    path: 'reference-data-per-disease/view',
-    ...viewModifyDiseaseRefDataFoundation,
-    data: {
-      permissions: [
-        PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_VIEW
-      ],
-      action: CreateViewModifyV2Action.VIEW
-    },
-    canDeactivate: [
-      PageChangeConfirmationGuard
-    ]
-  },
-  // Modify - Reference data per disease
-  {
-    path: 'reference-data-per-disease/modify',
-    ...viewModifyDiseaseRefDataFoundation,
     data: {
       permissions: [
         PERMISSION.REFERENCE_DATA_CATEGORY_ITEM_MODIFY

@@ -4,7 +4,6 @@ import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IconModel } from '../../../../core/models/icon.model';
 import {
-  ReferenceDataCategory,
   ReferenceDataCategoryModel,
   ReferenceDataEntryModel
 } from '../../../../core/models/reference-data.model';
@@ -79,22 +78,6 @@ export class ReferenceDataCategoriesListComponent
           },
           visible: (): boolean => {
             return ReferenceDataEntryModel.canList(this.authUser);
-          }
-        },
-
-        // View reference data per disease
-        {
-          type: V2ActionType.ICON,
-          icon: 'format_list_bulleted',
-          iconTooltip: 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_ACTION_VIEW_REF_DATA_PER_DISEASE',
-          action: {
-            link: (): string[] => {
-              return ['/reference-data/reference-data-per-disease/view'];
-            }
-          },
-          visible: (item: ReferenceDataCategoryModel): boolean => {
-            return item.id === ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_DISEASE &&
-              ReferenceDataEntryModel.canView(this.authUser);
           }
         }
       ]
