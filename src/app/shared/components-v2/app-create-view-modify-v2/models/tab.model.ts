@@ -61,7 +61,7 @@ export enum CreateViewModifyV2TabInputType {
   TAB_TABLE_RECORDS_LIST,
   TAB_TABLE_EDIT_QUESTIONNAIRE,
   TAB_TABLE_FILL_QUESTIONNAIRE,
-  TAB_TABLE_TREE,
+  TAB_TABLE_TREE_EDITOR,
   SECTION,
 
   // other
@@ -708,7 +708,7 @@ interface ICreateViewModifyV2TabTableFillQuestionnaire {
  */
 interface ICreateViewModifyV2TabTableTree {
   // required
-  type: CreateViewModifyV2TabInputType.TAB_TABLE_TREE;
+  type: CreateViewModifyV2TabInputType.TAB_TABLE_TREE_EDITOR;
   name: string;
 }
 

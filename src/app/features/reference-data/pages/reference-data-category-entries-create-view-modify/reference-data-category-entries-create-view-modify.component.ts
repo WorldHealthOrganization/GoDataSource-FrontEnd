@@ -396,7 +396,7 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
       name: 'ref_data_per_disease',
       label: 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE',
       definition: {
-        type: CreateViewModifyV2TabInputType.TAB_TABLE_TREE,
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_TREE_EDITOR,
         name: 'allowedDiseaseIds'
       },
       visible: () => {
