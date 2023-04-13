@@ -627,7 +627,7 @@ export class SystemSyncLogsComponent
             name: 'error',
             placeholder: errJson ?
               `<code><pre>${JSON.stringify(errJson, null, 1)}</pre></code>` :
-              `<div>${error}</div>`
+              `<code>${error}</code>`
           }
         ],
 
