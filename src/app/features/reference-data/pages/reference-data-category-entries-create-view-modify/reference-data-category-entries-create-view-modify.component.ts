@@ -162,7 +162,7 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
     this.tabData = {
       // tabs
       tabs: [
-        // Personal
+        // Details
         this.initializeTabsDetails()
       ],
 
