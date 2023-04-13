@@ -367,6 +367,20 @@ export class ReferenceDataCategoryEntriesListComponent extends ListComponent<Ref
           visible: (): boolean => {
             return IconModel.canList(this.authUser);
           }
+        },
+
+        // View reference data per disease
+        {
+          label: {
+            get: () => 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_ACTION_VIEW_REF_DATA_PER_DISEASE'
+          },
+          action: {
+            link: () => ['/reference-data/reference-data-per-disease/view']
+          },
+          visible: (): boolean => {
+            return this.category.id === ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_DISEASE &&
+              ReferenceDataEntryModel.canView(this.authUser);
+          }
         }
       ]
     };

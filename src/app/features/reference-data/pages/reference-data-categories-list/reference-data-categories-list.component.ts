@@ -3,7 +3,11 @@ import { takeUntil, tap } from 'rxjs/operators';
 import { ListComponent } from '../../../../core/helperClasses/list-component';
 import { DashboardModel } from '../../../../core/models/dashboard.model';
 import { IconModel } from '../../../../core/models/icon.model';
-import { ReferenceDataCategoryModel, ReferenceDataEntryModel } from '../../../../core/models/reference-data.model';
+import {
+  ReferenceDataCategory,
+  ReferenceDataCategoryModel,
+  ReferenceDataEntryModel
+} from '../../../../core/models/reference-data.model';
 import { ReferenceDataDataService } from '../../../../core/services/data/reference-data.data.service';
 import { DialogV2Service } from '../../../../core/services/helper/dialog-v2.service';
 import { I18nService } from '../../../../core/services/helper/i18n.service';
@@ -75,6 +79,22 @@ export class ReferenceDataCategoriesListComponent
           },
           visible: (): boolean => {
             return ReferenceDataEntryModel.canList(this.authUser);
+          }
+        },
+
+        // View reference data per disease
+        {
+          type: V2ActionType.ICON,
+          icon: 'format_list_bulleted',
+          iconTooltip: 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_ACTION_VIEW_REF_DATA_PER_DISEASE',
+          action: {
+            link: (): string[] => {
+              return ['/reference-data/reference-data-per-disease/view'];
+            }
+          },
+          visible: (item: ReferenceDataCategoryModel): boolean => {
+            return item.id === ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_DISEASE &&
+              ReferenceDataEntryModel.canView(this.authUser);
           }
         }
       ]
