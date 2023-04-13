@@ -61,6 +61,7 @@ export enum CreateViewModifyV2TabInputType {
   TAB_TABLE_RECORDS_LIST,
   TAB_TABLE_EDIT_QUESTIONNAIRE,
   TAB_TABLE_FILL_QUESTIONNAIRE,
+  TAB_TABLE_TREE,
   SECTION,
 
   // other
@@ -703,6 +704,15 @@ interface ICreateViewModifyV2TabTableFillQuestionnaire {
 }
 
 /**
+ * Tab table - tree
+ */
+interface ICreateViewModifyV2TabTableTree {
+  // required
+  type: CreateViewModifyV2TabInputType.TAB_TABLE_TREE;
+  name: string;
+}
+
+/**
  * Tab table
  */
 export interface ICreateViewModifyV2TabTable {
@@ -710,7 +720,7 @@ export interface ICreateViewModifyV2TabTable {
   type: CreateViewModifyV2TabInputType.TAB_TABLE;
   name: string;
   label: string;
-  definition: ICreateViewModifyV2TabTableRecordsList | ICreateViewModifyV2TabTableEditQuestionnaire | ICreateViewModifyV2TabTableFillQuestionnaire;
+  definition: ICreateViewModifyV2TabTableRecordsList | ICreateViewModifyV2TabTableEditQuestionnaire | ICreateViewModifyV2TabTableFillQuestionnaire | ICreateViewModifyV2TabTableTree;
 
   // optional
   visible?: () => boolean
