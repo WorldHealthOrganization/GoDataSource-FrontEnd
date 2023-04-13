@@ -11,8 +11,6 @@ export const EnglishUsLang = {
      */
     // 'LNG_EXAMPLE_TOKEN': 'Example value'
     // !!!!!IMPORTANT: SOME MIGHT ALREADY EXISTS AND NEED TO BE UPDATED
-    'LNG_PAGE_REF_DATA_PER_DISEASE_TITLE': 'Reference data per disease',
-    'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_ACTION_VIEW_REF_DATA_PER_DISEASE': 'View reference data per disease'
 
 
 

@@ -11,7 +11,7 @@ import {
   CreateViewModifyV2TabInputType,
   ICreateViewModifyV2Buttons,
   ICreateViewModifyV2CreateOrUpdate,
-  ICreateViewModifyV2Tab
+  ICreateViewModifyV2Tab, ICreateViewModifyV2TabTable
 } from '../../../../shared/components-v2/app-create-view-modify-v2/models/tab.model';
 import { CreateViewModifyV2ExpandColumnType } from '../../../../shared/components-v2/app-create-view-modify-v2/models/expand-column.model';
 import { RedirectService } from '../../../../core/services/helper/redirect.service';
@@ -161,7 +161,10 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
       // tabs
       tabs: [
         // Details
-        this.initializeTabsDetails()
+        this.initializeTabsDetails(),
+
+        // Reference Data Per Disease
+        this.initializeTabsReferenceDataPerDisease()
       ],
 
       // create details
@@ -382,6 +385,24 @@ export class ReferenceDataCategoryEntriesCreateViewModifyComponent extends Creat
 
     // finished
     return tab;
+  }
+
+  /**
+   * Initialize tabs - Reference data per disease
+   */
+  private initializeTabsReferenceDataPerDisease(): ICreateViewModifyV2TabTable {
+    return {
+      type: CreateViewModifyV2TabInputType.TAB_TABLE,
+      name: 'ref_data_per_disease',
+      label: 'LNG_PAGE_REFERENCE_DATA_CATEGORIES_LIST_TITLE',
+      definition: {
+        type: CreateViewModifyV2TabInputType.TAB_TABLE_TREE,
+        name: 'allowedDiseaseIds'
+      },
+      visible: () => {
+        return this.category.id === ReferenceDataCategory.LNG_REFERENCE_DATA_CATEGORY_DISEASE;
+      }
+    };
   }
 
   /**
