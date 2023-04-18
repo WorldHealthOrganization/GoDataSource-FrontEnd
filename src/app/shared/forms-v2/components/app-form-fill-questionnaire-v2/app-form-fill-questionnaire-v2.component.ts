@@ -1,9 +1,8 @@
-import { ChangeDetectorRef, Component, EventEmitter, forwardRef, Host, HostListener, Input, OnDestroy, Optional, Output, SkipSelf, ViewChild, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, forwardRef, Host, Input, OnDestroy, Optional, Output, SkipSelf, ViewChild, ViewEncapsulation } from '@angular/core';
 import { ControlContainer, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { AppFormBaseV2 } from '../../core/app-form-base-v2';
 import { AnswerModel, IAnswerData, QuestionModel } from '../../../../core/models/question.model';
-import { determineRenderMode, RenderMode } from '../../../../core/enums/render-mode.enum';
 import { Constants } from '../../../../core/models/constants';
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { ILabelValuePairModel } from '../../core/label-value-pair.model';
@@ -219,9 +218,6 @@ export class AppFormFillQuestionnaireV2Component
     );
   }
 
-  // render mode
-  renderMode: RenderMode = RenderMode.FULL;
-
   // handlers
   private _nonFlatToFlatWait: any;
 
@@ -280,9 +276,6 @@ export class AppFormFillQuestionnaireV2Component
       translateService,
       changeDetectorRef
     );
-
-    // update render mode
-    this.updateRenderMode();
   }
 
   /**
@@ -1404,14 +1397,5 @@ export class AppFormFillQuestionnaireV2Component
         // update ui
         this.detectChanges();
       });
-  }
-
-  /**
-   * Update website render mode
-   */
-  @HostListener('window:resize')
-  private updateRenderMode(): void {
-    // determine render mode
-    this.renderMode = determineRenderMode();
   }
 }
